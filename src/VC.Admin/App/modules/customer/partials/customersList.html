@@ -86,13 +86,7 @@
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
                         </th>
-                        <th class="sortable-column" data-ng-click="applySort('Name')">
-                            <span>Name</span>
-                            <span data-ng-if="filter.Sorting.Path == 'Name'">
-                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
-                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
-                            </span>
-                        </th>
+                        <th>Name</th>
                         <th class="sortable-column" data-ng-click="applySort('Email')">
                             <span>Email</span>
                             <span data-ng-if="filter.Sorting.Path == 'Email'">
@@ -100,20 +94,8 @@
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
                         </th>
-                        <th class="sortable-column" data-ng-click="applySort('State')">
-                            <span>State/Province</span>
-                            <span data-ng-if="filter.Sorting.Path == 'State'">
-                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
-                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
-                            </span>
-                        </th>
-                        <th class="sortable-column" data-ng-click="applySort('City')">
-                            <span>City</span>
-                            <span data-ng-if="filter.Sorting.Path == 'City'">
-                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
-                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
-                            </span>
-                        </th>
+                        <th>Ship State/Province</th>
+                        <th>Ship City</th>
                         <th>Last Order Placed</th>
                         <th>Total Orders</th>
                         <th class="sortable-column" data-ng-click="applySort('Status')">

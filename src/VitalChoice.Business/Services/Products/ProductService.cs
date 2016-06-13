@@ -492,6 +492,18 @@ namespace VitalChoice.Business.Services.Products
             return await _skuMapper.FromEntityAsync(sku, withDefaults);
         }
 
+
+        public async Task<ICollection<SkuDynamic>> GetSkusByProductIdsAsync(ICollection<int> ids)
+        {
+            SkuQuery conditions = new SkuQuery().NotDeleted().WithProductIds(ids);
+            var skus =
+                await _skuRepository.Query(conditions)
+                    .Include(s => s.OptionValues)
+                    .Include(s => s.Product)
+                    .SelectAsync(false);
+            return await _skuMapper.FromEntityRangeAsync(skus, true);
+        }
+
         public async Task<ICollection<VSku>> GetSkusAsync(VProductSkuFilter filter)
         {
             var conditions = new VSkuQuery().NotDeleted()

@@ -1,4 +1,5 @@
 ﻿using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Validation.Models;
 
@@ -52,6 +53,22 @@ namespace VC.Admin.Models.Products
                 AutoShipFrequency3 = item.AutoShipFrequency3;
                 AutoShipFrequency6 = item.AutoShipFrequency6;
                 InStock = item.DisregardStock || item.Stock > 0;
+            }
+        }
+
+        public SkuListItemModel(SkuDynamic item, VProductSku vProductSku)
+        {
+            if (item != null)
+            {
+                Id = item.Id;
+                ProductId = item.IdProduct;
+                Code = item.Code;
+                ProductName = vProductSku.Name;
+                Price = item.Price;
+                WholesalePrice = item.WholesalePrice;
+                ProductType = vProductSku.IdProductType;
+                InStock = vProductSku.IdProductType == ProductType.EGс || vProductSku.IdProductType == ProductType.Gc ||
+                 ((bool?)item.SafeData.DisregardStock ?? false) || ((int?)item.SafeData.Stock ?? 0) > 0;
             }
         }
     }

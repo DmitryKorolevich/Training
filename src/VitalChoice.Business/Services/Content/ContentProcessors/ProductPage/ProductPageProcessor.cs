@@ -88,9 +88,14 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             var customerVisibility = GetCustomerVisibility(viewContext);
 
             var eProduct = viewContext.Parameters.Product;
-            if (!eProduct.IdVisibility.HasValue || !customerVisibility.Contains(eProduct.IdVisibility.Value) || targetStatuses.All(x => x != (RecordStatusCode) eProduct.StatusCode))
+            if (!eProduct.IdVisibility.HasValue || 
+                !customerVisibility.Contains(eProduct.IdVisibility.Value) || 
+                targetStatuses.All(x => x != (RecordStatusCode) eProduct.StatusCode))
             {
-                throw new ApiException("Product not found", HttpStatusCode.NotFound);
+                if (!viewContext.Parameters.Preview)
+                {
+                    throw new ApiException("Product not found", HttpStatusCode.NotFound);
+                }
             }
 
             ProductNavCategoryLite rootAllCategory = null;

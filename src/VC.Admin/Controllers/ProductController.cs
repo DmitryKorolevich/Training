@@ -58,7 +58,7 @@ namespace VC.Admin.Controllers
         public ProductController(IProductCategoryService productCategoryService,
             IProductService productService,
             IDynamicServiceAsync<ProductDynamic, Product> productUniversalService,
-            IInventoryCategoryService inventoryCategoryService, 
+            IInventoryCategoryService inventoryCategoryService,
             IProductReviewService productReviewService,
             ILoggerProviderExtended loggerProvider,
             ISettingService settingService,
@@ -90,7 +90,7 @@ namespace VC.Admin.Controllers
         {
             var lookups = productService.GetProductLookupsAsync().Select(
                         p => new LookupViewModel(p.Name, p.IdObjectType, p.DefaultValue, p.Lookup)).ToList();
-            var inventoryChannelLookup = (await settingService.GetLookupsAsync(new [] { SettingConstants.INVENTORY_SKU_LOOKUP_CHANNEL_NAME })).FirstOrDefault();
+            var inventoryChannelLookup = (await settingService.GetLookupsAsync(new[] { SettingConstants.INVENTORY_SKU_LOOKUP_CHANNEL_NAME })).FirstOrDefault();
             if (inventoryChannelLookup != null)
             {
                 lookups.Add(new LookupViewModel(inventoryChannelLookup.Name, null, null, inventoryChannelLookup));
@@ -140,14 +140,14 @@ namespace VC.Admin.Controllers
             {
                 foreach (var item in items)
                 {
-                    if(sku.SkuId==item.Key)
+                    if (sku.SkuId == item.Key)
                     {
-                        toReturn.Add(new SkuWithStatisticListItemModel(sku,item.Value));
+                        toReturn.Add(new SkuWithStatisticListItemModel(sku, item.Value));
                         break;
                     }
                 }
             }
-            
+
             return toReturn.OrderByDescending(p => p.Ordered).Take(20).ToList();
         }
 
@@ -174,16 +174,17 @@ namespace VC.Admin.Controllers
                 Count = result.Count,
             };
 
-            VProductSkuFilter skuFilter = new VProductSkuFilter();
-            skuFilter.IdProducts = toReturn.Items.Select(p => p.ProductId).ToList();
-            skuFilter.Paging = null;
-            var skus = await productService.GetSkusAsync(skuFilter);
+            var skus = await productService.GetSkusByProductIdsAsync(toReturn.Items.Select(p => p.ProductId).ToList());
             foreach (var item in toReturn.Items)
             {
-                item.SKUs = skus.Where(p => p.IdProduct == item.ProductId)
-                            .OrderBy(p => p.Order)
-                            .Select(p => new SkuListItemModel(p))
-                            .ToList();  new List<SkuListItemModel>();
+                var vProductSku = result.Items.FirstOrDefault(p => p.IdProduct == item.ProductId);
+                if (vProductSku != null)
+                {
+                    var skusInProduct = skus.Where(p => p.IdProduct == item.ProductId)
+                        .OrderBy(p => p.Order);
+
+                    item.SKUs = skusInProduct.Select(p => new SkuListItemModel(p, vProductSku)).ToList();
+                }
             }
 
             return toReturn;
@@ -219,13 +220,13 @@ namespace VC.Admin.Controllers
             }
 
             var item = await productService.SelectTransferAsync(id);
-            
+
             ProductManageModel toReturn = await _mapper.ToModelAsync<ProductManageModel>(item?.ProductDynamic);
             if (item.ProductContent != null)
             {
                 toReturn.Url = item.ProductContent.Url;
                 toReturn.MasterContentItemId = item.ProductContent.MasterContentItemId;
-	            toReturn.Template = item.ProductContent.ContentItem.Template;
+                toReturn.Template = item.ProductContent.ContentItem.Template;
                 toReturn.MetaTitle = item.ProductContent.ContentItem.Title;
                 toReturn.MetaDescription = item.ProductContent.ContentItem.MetaDescription;
             }
@@ -252,7 +253,7 @@ namespace VC.Admin.Controllers
         {
             if (!Validate(model))
                 return null;
-            
+
             var product = await _mapper.FromModelAsync(model);
             var sUserId = _userManager.GetUserId(User);
             int userId;
@@ -268,24 +269,24 @@ namespace VC.Admin.Controllers
             content.ContentItem = new ContentItem();
             content.ContentItem.Template = model.Template ?? string.Empty;
             content.ContentItem.Description = model.Description ?? string.Empty;
-	        content.ContentItem.Title = model.MetaTitle;
-	        content.ContentItem.MetaDescription = model.MetaDescription;
-	        content.MasterContentItemId = model.MasterContentItemId;
+            content.ContentItem.Title = model.MetaTitle;
+            content.ContentItem.MetaDescription = model.MetaDescription;
+            content.MasterContentItemId = model.MasterContentItemId;
             transferEntity.ProductContent = content;
             transferEntity.ProductDynamic = product;
 
-	        if (model.Id > 0)
-		        product = (await productService.UpdateAsync(transferEntity));
-	        else
-	        {
-		        transferEntity.ProductDynamic.PublicId = Guid.NewGuid();
-				product = (await productService.InsertAsync(transferEntity));
-			}
+            if (model.Id > 0)
+                product = (await productService.UpdateAsync(transferEntity));
+            else
+            {
+                transferEntity.ProductDynamic.PublicId = Guid.NewGuid();
+                product = (await productService.InsertAsync(transferEntity));
+            }
 
-			ProductManageModel toReturn = await _mapper.ToModelAsync<ProductManageModel>(product);
-	        toReturn.MasterContentItemId = transferEntity.ProductContent.MasterContentItemId;
+            ProductManageModel toReturn = await _mapper.ToModelAsync<ProductManageModel>(product);
+            toReturn.MasterContentItemId = transferEntity.ProductContent.MasterContentItemId;
 
-			return toReturn;
+            return toReturn;
         }
 
         [HttpPost]
@@ -297,7 +298,7 @@ namespace VC.Admin.Controllers
             {
                 foreach (var item in items)
                 {
-                    if(product.Id==item.ProductId)
+                    if (product.Id == item.ProductId)
                     {
                         product.Data.TaxCode = item.TaxCode;
                     }
@@ -327,7 +328,7 @@ namespace VC.Admin.Controllers
             var contentCategories =
                 await productCategoryService.GetLiteCategoriesTreeAsync(productCategory, new ProductCategoryLiteFilter
                 {
-                    ShowAll=true,
+                    ShowAll = true,
                     Statuses = filter.Statuses,
                     Paging = filter.Paging,
                     SearchText = filter.SearchText,
@@ -340,7 +341,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         [AdminAuthorize(PermissionType.Products)]
         public async Task<Result<bool>> UpdateCategoriesTree([FromBody]ProductCategoryTreeItemModel model)
-        {            
+        {
             if (!Validate(model))
                 return false;
             var category = model.Convert();
@@ -359,7 +360,7 @@ namespace VC.Admin.Controllers
                     Template = String.Empty,
                     StatusCode = RecordStatusCode.Active,
                     Assigned = CustomerTypeCode.All,
-                    NavIdVisible=CustomerTypeCode.All,
+                    NavIdVisible = CustomerTypeCode.All,
                 };
             }
             return new ProductCategoryManageModel((await productCategoryService.GetCategoryAsync(id)));
@@ -427,7 +428,7 @@ namespace VC.Admin.Controllers
         {
             var prefix = String.Empty;
             int current = 0;
-            while (current <level)
+            while (current < level)
             {
                 prefix += "----";
                 current++;
@@ -435,9 +436,9 @@ namespace VC.Admin.Controllers
             item.Name = prefix + item.Name;
             item.Percent = item.Percent / 100;
             list.Add(item);
-            if(item.SubItems!=null)
+            if (item.SubItems != null)
             {
-                foreach(var subItem in item.SubItems)
+                foreach (var subItem in item.SubItems)
                 {
                     TransformProductCategoryTreeToList(subItem, list, ++level);
                 }
@@ -460,7 +461,7 @@ namespace VC.Admin.Controllers
         {
             var result = await inventoryCategoryService.GetCategoriesTreeAsync(filter);
 
-            return result.Select(p => new InventoryCategoryTreeItemModel(p)).ToList(); 
+            return result.Select(p => new InventoryCategoryTreeItemModel(p)).ToList();
         }
 
         [HttpPost]
@@ -468,9 +469,9 @@ namespace VC.Admin.Controllers
         public async Task<Result<bool>> UpdateInventoryCategoriesTree([FromBody]IList<InventoryCategoryTreeItemModel> model)
         {
             IList<InventoryCategory> categories = new List<InventoryCategory>();
-            if(model != null)
+            if (model != null)
             {
-                foreach(var modelCategory in model)
+                foreach (var modelCategory in model)
                 {
                     categories.Add(modelCategory.Convert());
                 }
@@ -603,7 +604,7 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Products)]
         public async Task<Result<bool>> SendProductOutOfStockRequests([FromBody]SendOutOfStockProductRequestsModel model)
         {
-            return await productService.SendProductOutOfStockRequestsAsync(model.Ids,model.MessageFormat);
+            return await productService.SendProductOutOfStockRequestsAsync(model.Ids, model.MessageFormat);
         }
 
         [HttpPost]

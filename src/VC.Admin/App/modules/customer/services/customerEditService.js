@@ -62,7 +62,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
                 if (uiScope.creditCardTypes[idx].Key == idType)
                     return uiScope.creditCardTypes[idx].Text;
             }
-        };        
+        };
 
         uiScope.deleteSelectedCreditCard = function ()
         {
@@ -90,7 +90,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
             uiScope.paymentInfoTab.CreditCardIndex = undefined;
         };
 
-        uiScope.makeBillingAsProfileAddress = function ()
+        uiScope.makeBillingAsShippingAddress = function ()
         {
             var address;
             switch (String(uiScope.paymentInfoTab.PaymentMethodType))
@@ -134,19 +134,17 @@ angular.module('app.modules.customer.services.customerEditService', [])
             }
             if (address)
             {
-                for (var key in uiScope.currentCustomer.ProfileAddress)
+                var activeShipping = uiScope.buildShippingAddressForPartial(uiScope.currentCustomer.Shipping, uiScope.shippingAddressTab.AddressIndex,
+                    uiScope.order ? uiScope.order.OnHold && !uiScope.order.UpdateShippingAddressForCustomer : false, uiScope.order && true);
+                if (activeShipping)
                 {
-                    address[key] = uiScope.currentCustomer.ProfileAddress[key];
+                    for (var key in activeShipping.Address)
+                    {
+                        address[key] = activeShipping.Address[key];
+                    }
+                    address.AddressType = 2;
+                    address.Id = 0;
                 }
-                if (uiScope.currentCustomer.newEmail)
-                {
-                    address.Email = uiScope.currentCustomer.newEmail;
-                } else
-                {
-                    address.Email = uiScope.currentCustomer.Email;
-                }
-                address.AddressType = 2;
-                address.Id = 0;
             }
         };
     };
@@ -164,7 +162,8 @@ angular.module('app.modules.customer.services.customerEditService', [])
             });
         }
 
-        uiScope.buildShippingAddressForPartial = function (collection, index, disableValidation, forOrder) {
+        uiScope.buildShippingAddressForPartial = function (collection, index, disableValidation, forOrder)
+        {
             if (collection === undefined || collection[index] === undefined || uiScope.shippingAddressTab.ShippingEditModels === undefined)
                 return undefined;
             if (uiScope.shippingAddressTab.ShippingEditModels[index] === undefined ||
@@ -242,8 +241,9 @@ angular.module('app.modules.customer.services.customerEditService', [])
             }
         };
 
-        uiScope.toggleSuspended = function () {
-        	uiScope.currentCustomer.StatusCode = uiScope.currentCustomer.StatusCode == 4 ? (uiScope.currentCustomer.IsConfirmed ? 2 : 1) : 4;
+        uiScope.toggleSuspended = function ()
+        {
+            uiScope.currentCustomer.StatusCode = uiScope.currentCustomer.StatusCode == 4 ? (uiScope.currentCustomer.IsConfirmed ? 2 : 1) : 4;
         };
 
         uiScope.$watch("currentCustomer.CustomerType", function (newValue, oldValue)
@@ -312,14 +312,11 @@ angular.module('app.modules.customer.services.customerEditService', [])
 
         uiScope.makeAsProfileAddress = function ()
         {
-            var defaultValue = uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Default;
-            var shippingAddressType = uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].ShippingAddressType;
-            var preferredShipMethod = uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].PreferredShipMethod;
-            var deliveryInstructions = uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].DeliveryInstructions;
-            for (var key in uiScope.currentCustomer.ProfileAddress)
-            {
-                uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex][key] = uiScope.currentCustomer.ProfileAddress[key];
-            }
+            uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Company = uiScope.currentCustomer.ProfileAddress.Company;
+            uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].FirstName = uiScope.currentCustomer.ProfileAddress.FirstName;
+            uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].LastName = uiScope.currentCustomer.ProfileAddress.LastName;
+            uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Phone = uiScope.currentCustomer.ProfileAddress.Phone;
+            uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Fax = uiScope.currentCustomer.ProfileAddress.Fax;
             if (uiScope.currentCustomer.newEmail)
             {
                 uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Email = uiScope.currentCustomer.newEmail;
@@ -327,12 +324,74 @@ angular.module('app.modules.customer.services.customerEditService', [])
             {
                 uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Email = uiScope.currentCustomer.Email;
             }
-            uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Default = defaultValue;
-            uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].ShippingAddressType = shippingAddressType;
-            uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].PreferredShipMethod = preferredShipMethod;
-            uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].DeliveryInstructions = deliveryInstructions;
             uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].AddressType = 3;
             uiScope.currentCustomer.Shipping[uiScope.shippingAddressTab.AddressIndex].Id = 0;
+        };
+
+        uiScope.makeShippingAsBillingAddress = function ()
+        {
+            var address;
+            switch (String(uiScope.paymentInfoTab.PaymentMethodType))
+            {
+                case "1":
+                    if (uiScope.paymentInfoTab.CreditCardIndex)
+                    {
+                        address = uiScope.currentCustomer.CreditCards[uiScope.paymentInfoTab.CreditCardIndex].Address;
+                    }
+                    break;
+                case "2":
+                    if (uiScope.currentCustomer.Oac)
+                    {
+                        address = uiScope.currentCustomer.Oac.Address;
+                    }
+                    break;
+                case "3":
+                    if (uiScope.currentCustomer.Check)
+                    {
+                        address = uiScope.currentCustomer.Check.Address;
+                    }
+                    break;
+                case "6":
+                    if (uiScope.currentCustomer.WireTransfer)
+                    {
+                        address = uiScope.currentCustomer.WireTransfer.Address;
+                    }
+                    break;
+                case "7":
+                    if (uiScope.currentCustomer.Marketing)
+                    {
+                        address = uiScope.currentCustomer.Marketing.Address;
+                    }
+                    break;
+                case "8":
+                    if (uiScope.currentCustomer.VCWellness)
+                    {
+                        address = uiScope.currentCustomer.VCWellness.Address;
+                    }
+                    break;
+            }
+            if (address)
+            {
+                var activeShipping = uiScope.buildShippingAddressForPartial(uiScope.currentCustomer.Shipping, uiScope.shippingAddressTab.AddressIndex,
+                    uiScope.order ? uiScope.order.OnHold && !uiScope.order.UpdateShippingAddressForCustomer : false, uiScope.order && true);
+                if (activeShipping)
+                {
+                    var defaultField = activeShipping.Address.Default;
+                    var shippingAddressType = activeShipping.Address.ShippingAddressType;
+                    var preferredShipMethod = activeShipping.Address.PreferredShipMethod;
+                    var deliveryInstructions = activeShipping.Address.DeliveryInstructions;
+                    for (var key in address)
+                    {
+                        activeShipping.Address[key] = address[key];
+                    }
+                    activeShipping.Address.AddressType = 3;
+                    activeShipping.Address.Id = 0;
+                    activeShipping.Address.Default = defaultField;
+                    activeShipping.Address.ShippingAddressType = shippingAddressType;
+                    activeShipping.Address.PreferredShipMethod = preferredShipMethod;
+                    activeShipping.Address.DeliveryInstructions = deliveryInstructions;
+                }
+            }
         };
 
         uiScope.deleteShippingAddress = function ()
@@ -350,27 +409,34 @@ angular.module('app.modules.customer.services.customerEditService', [])
 
         uiScope.setNewAddress = function ()
         {
-            if (uiScope.forms.shipping.$valid) {
+            if (uiScope.forms.shipping.$valid)
+            {
                 customerService.createAddressPrototype(uiScope.addEditTracker)
-                    .success(function (result) {
-                        if (result.Success) {
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
                             uiScope.currentCustomer.sameShipping = false;
                             uiScope.shippingAddressTab.NewAddress = true;
                             syncCountry(uiScope, result.Data);
                             uiScope.currentCustomer.Shipping.push(result.Data);
-                            uiScope.shippingAddressTab.AddressIndex = (parseInt(uiScope.currentCustomer.Shipping.length-1)).toString();
-                        } else {
+                            uiScope.shippingAddressTab.AddressIndex = (parseInt(uiScope.currentCustomer.Shipping.length - 1)).toString();
+                        } else
+                        {
                             errorHandler(result);
                         }
                     }).
-                    error(function (result) {
+                    error(function (result)
+                    {
                         errorHandler(result);
                     })
-                    .then(function () {
+                    .then(function ()
+                    {
                         uiScope.forms.submitted['shipping'] = false;
                     });
             }
-            else {
+            else
+            {
                 uiScope.forms.submitted['shipping'] = true;
             }
             return false;
@@ -404,13 +470,15 @@ angular.module('app.modules.customer.services.customerEditService', [])
                     creditCard.Default = true;
                 }
             });
-        };        
+        };
 
         uiScope.setNewCreditCard = function (callback)
         {
-            if (uiScope.forms.card.$valid) {
+            if (uiScope.forms.card.$valid)
+            {
                 customerService.createCreditCardPrototype(uiScope.addEditTracker)
-                    .success(function (result) {
+                    .success(function (result)
+                    {
                         if (result.Success)
                         {
                             syncCountry(uiScope, result.Data.Address);
@@ -419,22 +487,27 @@ angular.module('app.modules.customer.services.customerEditService', [])
                                 result.Data.Default = true;
                             }
                             uiScope.currentCustomer.CreditCards.push(result.Data);
-                            if (uiScope.paymentInfoTab.CreditCardIndex === undefined) {
+                            if (uiScope.paymentInfoTab.CreditCardIndex === undefined)
+                            {
                                 uiScope.paymentInfoTab.CreditCardIndex = "0";
                             }
-                            else {
-                                uiScope.paymentInfoTab.CreditCardIndex = (uiScope.currentCustomer.CreditCards.length-1).toString();
+                            else
+                            {
+                                uiScope.paymentInfoTab.CreditCardIndex = (uiScope.currentCustomer.CreditCards.length - 1).toString();
                             }
                             if (callback)
                                 callback(result.Data);
-                        } else {
+                        } else
+                        {
                             successHandler(result);
                         }
                     }).
-                    error(function (result) {
+                    error(function (result)
+                    {
                         errorHandler(result);
                     })
-                    .then(function () {
+                    .then(function ()
+                    {
                         uiScope.forms.submitted['card'] = false;
                     });
             }
@@ -450,7 +523,8 @@ angular.module('app.modules.customer.services.customerEditService', [])
             if (uiScope.forms.check.$valid)
             {
                 customerService.createCheckPrototype(uiScope.addEditTracker)
-                    .success(function (result) {
+                    .success(function (result)
+                    {
                         if (result.Success)
                         {
                             syncCountry(uiScope, result.Data.Address);
@@ -458,18 +532,22 @@ angular.module('app.modules.customer.services.customerEditService', [])
                             uiScope.currentCustomer.Check.formName = 'check';
                             if (callback)
                                 callback(result.Data);
-                        } else {
+                        } else
+                        {
                             successHandler(result);
                         }
                     }).
-                    error(function (result) {
+                    error(function (result)
+                    {
                         errorHandler(result);
                     })
-                    .then(function () {
+                    .then(function ()
+                    {
                         uiScope.forms.submitted['check'] = false;
                     });
             }
-            else {
+            else
+            {
                 uiScope.forms.submitted['check'] = true;
             }
             return false;
@@ -480,7 +558,8 @@ angular.module('app.modules.customer.services.customerEditService', [])
             if (uiScope.forms.oac.$valid)
             {
                 customerService.createOacPrototype(uiScope.addEditTracker)
-                    .success(function (result) {
+                    .success(function (result)
+                    {
                         if (result.Success)
                         {
                             syncCountry(uiScope, result.Data.Address);
@@ -488,18 +567,22 @@ angular.module('app.modules.customer.services.customerEditService', [])
                             uiScope.currentCustomer.Oac.formName = 'oac';
                             if (callback)
                                 callback(result.Data);
-                        } else {
+                        } else
+                        {
                             successHandler(result);
                         }
                     }).
-                    error(function (result) {
+                    error(function (result)
+                    {
                         errorHandler(result);
                     })
-                    .then(function () {
+                    .then(function ()
+                    {
                         uiScope.forms.submitted['oac'] = false;
                     });
             }
-            else {
+            else
+            {
                 uiScope.forms.submitted['oac'] = true;
             }
             return false;
@@ -610,16 +693,19 @@ angular.module('app.modules.customer.services.customerEditService', [])
             }
             return false;
         };
-    }; 
+    };
 
     var initOrderEditCustomerParts = function (uiScope)
     {
         uiScope.setNewCreditCard = function (callback)
         {
-            if (uiScope.forms.card.$valid) {
+            if (uiScope.forms.card.$valid)
+            {
                 customerService.createCreditCardPrototype(uiScope.addEditTracker)
-                    .success(function (result) {
-                        if (result.Success) {
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
                             uiScope.paymentInfoTab.CreditCard = result.Data;
                             syncCountry(uiScope, result.Data.Address);
                             uiScope.paymentInfoTab.CreditCard.formName = "card";
@@ -634,18 +720,22 @@ angular.module('app.modules.customer.services.customerEditService', [])
                             }
                             if (callback)
                                 callback(result.Data);
-                        } else {
+                        } else
+                        {
                             successHandler(result);
                         }
                     }).
-                    error(function (result) {
+                    error(function (result)
+                    {
                         errorHandler(result);
                     })
-                    .then(function () {
+                    .then(function ()
+                    {
                         uiScope.forms.submitted['card'] = false;
                     });
             }
-            else {
+            else
+            {
                 uiScope.forms.submitted['card'] = true;
             }
             return false;
@@ -653,27 +743,34 @@ angular.module('app.modules.customer.services.customerEditService', [])
 
         uiScope.setNewCheck = function (callback)
         {
-            if (uiScope.forms.check.$valid) {
+            if (uiScope.forms.check.$valid)
+            {
                 customerService.createCheckPrototype(uiScope.addEditTracker)
-                    .success(function (result) {
-                        if (result.Success) {
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
                             uiScope.order.Check = result.Data;
                             syncCountry(uiScope, result.Data.Address);
                             uiScope.order.Check.formName = 'check';
                             if (callback)
                                 callback(result.Data);
-                        } else {
+                        } else
+                        {
                             successHandler(result);
                         }
                     }).
-                    error(function (result) {
+                    error(function (result)
+                    {
                         errorHandler(result);
                     })
-                    .then(function () {
+                    .then(function ()
+                    {
                         uiScope.forms.submitted['check'] = false;
                     });
             }
-            else {
+            else
+            {
                 uiScope.forms.submitted['check'] = true;
             }
             return false;
@@ -681,27 +778,34 @@ angular.module('app.modules.customer.services.customerEditService', [])
 
         uiScope.setNewOac = function (callback)
         {
-            if (uiScope.forms.oac.$valid) {
+            if (uiScope.forms.oac.$valid)
+            {
                 customerService.createOacPrototype(uiScope.addEditTracker)
-                    .success(function (result) {
-                        if (result.Success) {
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
                             uiScope.order.Oac = result.Data;
                             syncCountry(uiScope, result.Data.Address);
                             uiScope.order.Oac.formName = 'oac';
                             if (callback)
                                 callback(result.Data);
-                        } else {
+                        } else
+                        {
                             successHandler(result);
                         }
                     }).
-                    error(function (result) {
+                    error(function (result)
+                    {
                         errorHandler(result);
                     })
-                    .then(function () {
+                    .then(function ()
+                    {
                         uiScope.forms.submitted['oac'] = false;
                     });
             }
-            else {
+            else
+            {
                 uiScope.forms.submitted['oac'] = true;
             }
             return false;
@@ -812,7 +916,7 @@ angular.module('app.modules.customer.services.customerEditService', [])
             return false;
         };
     };
-  
+
     var syncCountry = function (uiScope, addressItem)
     {
         if (addressItem && addressItem.Country)

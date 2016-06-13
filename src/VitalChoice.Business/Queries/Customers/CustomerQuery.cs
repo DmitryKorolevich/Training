@@ -170,10 +170,10 @@ namespace VitalChoice.Business.Queries.Customers
 
         public CustomerQuery FilterDefaultShippingAddress(CustomerAddressFilter filter)
         {
-            if (filter != null)
+            if (!string.IsNullOrEmpty(filter?.Address1) || !string.IsNullOrEmpty(filter?.City) ||
+                !string.IsNullOrEmpty(filter?.Zip))
             {
                 filter.Default = true;
-                //Add(c => c.ShippingAddresses.Select(p => p.ShippingAddress).WhenValuesAny(filter));
                 Add(c => c.ShippingAddresses.Any(p => p.ShippingAddress.WhenValues(filter, (int)AddressType.Shipping, ValuesFilterType.And)));
             }
             return this;

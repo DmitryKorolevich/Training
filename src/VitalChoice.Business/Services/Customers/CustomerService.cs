@@ -396,14 +396,6 @@ namespace VitalChoice.Business.Services.Customers
                                 ? x.OrderBy(y => y.IdObjectType)
                                 : x.OrderByDescending(y => y.IdObjectType);
                     break;
-                case VCustomerSortPath.Name:
-                    sortDynamic =
-                        (x) =>
-                            sortOrder == FilterSortOrder.Asc
-                                ? x.OrderBy(y => y.ProfileAddress.Data.LastName).ThenBy(y => y.ProfileAddress.Data.FirstName)
-                                : x.OrderByDescending(y => y.ProfileAddress.Data.LastName)
-                                    .ThenByDescending(y => y.ProfileAddress.Data.FirstName);
-                    break;
                 case VCustomerSortPath.Email:
                     sortable =
                         (x) =>
@@ -417,27 +409,6 @@ namespace VitalChoice.Business.Services.Customers
                             sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.DateEdited)
                                 : x.OrderByDescending(y => y.DateEdited);
-                    break;
-                case VCustomerSortPath.Country:
-                    sortDynamic =
-                        (x) =>
-                            sortOrder == FilterSortOrder.Asc
-                                ? x.OrderBy(y => _countryNameCode.GetCountryCode(y.ProfileAddress))
-                                : x.OrderByDescending(y => _countryNameCode.GetCountryCode(y.ProfileAddress));
-                    break;
-                case VCustomerSortPath.City:
-                    sortDynamic =
-                        (x) =>
-                            sortOrder == FilterSortOrder.Asc
-                                ? x.OrderBy(y => y.ProfileAddress.Data.City)
-                                : x.OrderByDescending(y => y.ProfileAddress.Data.City);
-                    break;
-                case VCustomerSortPath.State:
-                    sortDynamic =
-                        (x) =>
-                            sortOrder == FilterSortOrder.Asc
-                                ? x.OrderBy(y => _countryNameCode.GetRegionOrStateCode(y.ProfileAddress)).ThenBy(y => y.ProfileAddress.County)
-                                : x.OrderByDescending(y => _countryNameCode.GetRegionOrStateCode(y.ProfileAddress)).ThenByDescending(y => y.ProfileAddress.County);
                     break;
                 case VCustomerSortPath.Status:
                     sortable =
@@ -460,7 +431,10 @@ namespace VitalChoice.Business.Services.Customers
                             .FilterDefaultShippingAddress(filter.DefaultShippingAddress),
                         includes =>
                             includes.Include(c => c.ProfileAddress)
-                                .ThenInclude(c => c.OptionValues), orderBy: sortable, withDefaults: true);
+                                .ThenInclude(c => c.OptionValues)
+                                .Include(p=>p.ShippingAddresses)
+                                .ThenInclude(p=>p.ShippingAddress)
+                                .ThenInclude(p=>p.OptionValues), orderBy: sortable, withDefaults: true);
 
             var adminProfileCondition =
                 new AdminProfileQuery().IdInRange(
@@ -468,11 +442,7 @@ namespace VitalChoice.Business.Services.Customers
 
             var adminProfiles = await _adminProfileRepository.Query(adminProfileCondition).SelectAsync(false);
 
-            IEnumerable<CustomerDynamic> orderedCustomers;
-            if (sortDynamic != null)
-                orderedCustomers = sortDynamic(customers.Items);
-            else
-                orderedCustomers = customers.Items;
+            IEnumerable<CustomerDynamic> orderedCustomers= customers.Items;
 
             var resultList = new List<ExtendedVCustomer>(customers.Items.Count);
 
@@ -484,17 +454,27 @@ namespace VitalChoice.Business.Services.Customers
                     IdEditedBy = item.IdEditedBy,
                     DateEdited = item.DateEdited,
                     IdObjectType = (CustomerType) item.IdObjectType,
-                    CountryCode = _countryNameCode.GetCountryCode(item.ProfileAddress),
-                    StateCode = _countryNameCode.GetStateCode(item.ProfileAddress),
-                    StateName = _countryNameCode.GetStateName(item.ProfileAddress),
-                    CountryName = _countryNameCode.GetCountryName(item.ProfileAddress),
                     Id = item.Id,
                     Email = item.Email,
                     County = item.ProfileAddress.County,
-                    StateOrCounty = _countryNameCode.GetRegionOrStateCode(item.ProfileAddress),
                     StatusCode = item.StatusCode,
                 };
+                var defaultShippingAddress = item.ShippingAddresses.FirstOrDefault(p => p.SafeData.Default == true);
+                if (defaultShippingAddress != null)
+                {
+                    newItem.CountryCode = _countryNameCode.GetCountryCode(defaultShippingAddress);
+                    newItem.StateCode = _countryNameCode.GetStateCode(defaultShippingAddress);
+                    newItem.StateName = _countryNameCode.GetStateName(defaultShippingAddress);
+                    newItem.CountryName = _countryNameCode.GetCountryName(defaultShippingAddress);
+                    newItem.StateOrCounty = _countryNameCode.GetRegionOrStateCode(defaultShippingAddress);
+                }
                 await _customerAddressMapper.UpdateModelAsync(newItem, item.ProfileAddress);
+                if (defaultShippingAddress != null)
+                {
+                    newItem.Address1 = defaultShippingAddress.SafeData.Address1;
+                    newItem.City= defaultShippingAddress.SafeData.City;
+                    newItem.Zip= defaultShippingAddress.SafeData.Zip;
+                }
                 resultList.Add(newItem);
             }
 

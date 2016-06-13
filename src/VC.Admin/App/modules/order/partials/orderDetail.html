@@ -622,7 +622,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [accountProfileTab]"></div>
+                                            <div data-ng-include="'app/modules/customer/partials/profileAddress.html'" data-ng-repeat="model in [accountProfileTab]"></div>
                                             <div class="form-group">
                                                 <label for="currentEmail" class="col-md-3 control-label">Current Email</label>
                                                 <div class="col-md-9 form-control-static">
@@ -992,7 +992,7 @@
                                                             <div class="col-md-3">
                                                             </div>
                                                             <div class="col-md-3">
-                                                                <button class="btn btn-info" id="sameCreditCardAsProfile" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                                <button class="btn btn-info" id="sameCreditCardAsProfile" data-ng-click="makeBillingAsShippingAddress();">Copy Shipping</button>
                                                             </div>
                                                         </div>
                                                         <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildCreditCardAddressForPartial(currentCustomer.CreditCards, paymentInfoTab.CreditCardIndex, order.OnHold && !order.UpdateCardForCustomer)]"></div>
@@ -1038,7 +1038,7 @@
                                                             <div class="col-md-3">
                                                             </div>
                                                             <div class="col-md-3">
-                                                                <button class="btn btn-info" id="sameOacAsProfile" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                                <button class="btn btn-info" id="sameOacAsProfile" data-ng-click="makeBillingAsShippingAddress();">Copy Shipping</button>
                                                             </div>
                                                         </div>
                                                         <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(currentCustomer.Oac, order.OnHold && !order.UpdateOACForCustomer)]"></div>
@@ -1086,7 +1086,7 @@
                                                             <div class="col-md-3">
                                                             </div>
                                                             <div class="col-md-3">
-                                                                <button class="btn btn-info" id="sameCheckAsProfile" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                                <button class="btn btn-info" id="sameCheckAsProfile" data-ng-click="makeBillingAsShippingAddress();">Copy Shipping</button>
                                                             </div>
                                                         </div>
                                                         <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(currentCustomer.Check, order.OnHold && !order.UpdateCheckForCustomer)]"></div>
@@ -1123,7 +1123,7 @@
                                                             <div class="col-md-3">
                                                             </div>
                                                             <div class="col-md-3">
-                                                                <button class="btn btn-info" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                                <button class="btn btn-info" data-ng-click="makeBillingAsShippingAddress();">Copy Shipping</button>
                                                             </div>
                                                         </div>
                                                         <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(currentCustomer.WireTransfer, order.OnHold && !order.UpdateWireTransferForCustomer)]"></div>
@@ -1172,7 +1172,7 @@
                                                             <div class="col-md-3">
                                                             </div>
                                                             <div class="col-md-3">
-                                                                <button class="btn btn-info" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                                <button class="btn btn-info" data-ng-click="makeBillingAsShippingAddress();">Copy Shipping</button>
                                                             </div>
                                                         </div>
                                                         <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(currentCustomer.Marketing, order.OnHold && !order.UpdateMarketingForCustomer)]"></div>
@@ -1209,7 +1209,7 @@
                                                             <div class="col-md-3">
                                                             </div>
                                                             <div class="col-md-3">
-                                                                <button class="btn btn-info" data-ng-click="makeBillingAsProfileAddress();">Copy Profile</button>
+                                                                <button class="btn btn-info" data-ng-click="makeBillingAsShippingAddress();">Copy Shipping</button>
                                                             </div>
                                                         </div>
                                                         <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(currentCustomer.VCWellness, order.OnHold && !order.UpdateVCWellnessForCustomer)]"></div>
