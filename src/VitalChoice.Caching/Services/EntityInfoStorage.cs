@@ -59,6 +59,7 @@ namespace VitalChoice.Caching.Services
 
             lock (SyncRoot)
             {
+                var parsed = new HashSet<Type>(_parsedEntities);
                 var entityInfos = new Dictionary<Type, EntityInfo>();
                 foreach (var entityType in context.Model.GetEntityTypes())
                 {
@@ -70,9 +71,9 @@ namespace VitalChoice.Caching.Services
                     var cacheCondition = GetCacheCondition(entityType);
                     var nonUniqueIndexes = SetupForeignKeys(entityType, entityInfos);
 
-                    if (!_parsedEntities.Contains(entityType.ClrType))
+                    if (!parsed.Contains(entityType.ClrType))
                     {
-                        _parsedEntities.Add(entityType.ClrType);
+                        parsed.Add(entityType.ClrType);
                         entityInfos.AddOrUpdate(entityType.ClrType, () => new EntityInfo
                         {
                             NonUniqueIndexes = nonUniqueIndexes,
@@ -120,6 +121,7 @@ namespace VitalChoice.Caching.Services
                 }
                 CacheDebugger.EntityInfo = this;
                 _contextTypeContainer.ContextTypes = new HashSet<Type>(_contextTypeContainer.ContextTypes) {contextType};
+                _parsedEntities.AddRange(parsed);
             }
         }
 
