@@ -13,6 +13,7 @@ using VitalChoice.Business.Queries.Product;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Services.Ecommerce;
+using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
@@ -308,15 +309,29 @@ namespace VitalChoice.Business.Services.Products
         private async Task<SkuOrdered> PopulateSkuOrderedWithUrlAsync(Sku sku)
         {
             var skuDynamic = await _skuMapper.FromEntityAsync(sku, true);
-            var skuOrdered = new SkuOrdered
+
+            var product = await _productContentRepository.Query(p => p.Id == sku.IdProduct).SelectFirstOrDefaultAsync(false);
+            skuDynamic.Product.Url = product.Url;
+            return new SkuOrdered
             {
                 Sku = skuDynamic
             };
+        }
 
-            var productUrl = _productContentRepository.Query(p => p.Id == sku.IdProduct).Select(p => p.Url, false).FirstOrDefault();
-            skuOrdered.Sku.Product.Url = productUrl;
-
-            return skuOrdered;
+        private async Task<IEnumerable<SkuOrdered>> PopulateSkusOrderedWithUrlAsync(ICollection<Sku> skus)
+        {
+            var productIds = skus.Select(s => s.IdProduct).Distinct().ToArray();
+            var skusDynamic = await _skuMapper.FromEntityRangeAsync(skus, true);
+            
+            var products = await _productContentRepository.Query(p => productIds.Contains(p.Id)).SelectAsync(false);
+            foreach (var product in products)
+            {
+                skusDynamic.Where(s => s.Product.Id == product.Id).ForEach(s => s.Product.Url = product.Url);
+            }
+            return skusDynamic.Select(s => new SkuOrdered
+            {
+                Sku = s
+            });
         }
 
         private async Task<RefundSkuOrdered> PopulateRefundSkuOrderedAsync(Sku sku)
@@ -373,7 +388,7 @@ namespace VitalChoice.Business.Services.Products
                 return new List<SkuOrdered>();
 
             var skus =
-                await _skuRepository.Query(s => codes.Contains(s.Code) && s.StatusCode != (int)RecordStatusCode.Deleted)
+                await _skuRepository.Query(s => codes.Contains(s.Code) && s.StatusCode != (int) RecordStatusCode.Deleted)
                     .Include(s => s.OptionValues)
                     .Include(s => s.Product)
                     .ThenInclude(p => p.OptionValues)
@@ -381,14 +396,7 @@ namespace VitalChoice.Business.Services.Products
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectAsync(false);
 
-            var res = new List<SkuOrdered>();
-            foreach (var temp in skus)
-            {
-                var skuOrdered = await PopulateSkuOrderedWithUrlAsync(temp);
-                res.Add(skuOrdered);
-            }
-
-            return res;
+            return (await PopulateSkusOrderedWithUrlAsync(skus)).ToList();
         }
 
         public async Task<List<SkuOrdered>> GetSkusOrderedAsync(ICollection<int> ids)
@@ -400,7 +408,7 @@ namespace VitalChoice.Business.Services.Products
                 return new List<SkuOrdered>();
 
             var skus =
-                await _skuRepository.Query(s => ids.Contains(s.Id) && s.StatusCode != (int)RecordStatusCode.Deleted)
+                await _skuRepository.Query(s => ids.Contains(s.Id) && s.StatusCode != (int) RecordStatusCode.Deleted)
                     .Include(s => s.OptionValues)
                     .Include(s => s.Product)
                     .ThenInclude(p => p.OptionValues)
@@ -408,14 +416,7 @@ namespace VitalChoice.Business.Services.Products
                     .ThenInclude(p => p.ProductsToCategories)
                     .SelectAsync(false);
 
-            var res = new List<SkuOrdered>();
-            foreach (var temp in skus)
-            {
-                var skuOrdered = await PopulateSkuOrderedWithUrlAsync(temp);
-                res.Add(skuOrdered);
-            }
-
-            return res;
+            return (await PopulateSkusOrderedWithUrlAsync(skus)).ToList();
         }
 
         public async Task<List<RefundSkuOrdered>> GetRefundSkusOrderedAsync(ICollection<int> ids)

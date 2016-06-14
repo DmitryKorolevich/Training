@@ -23,6 +23,7 @@ using VitalChoice.Data.Transaction;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.ObjectMapping.Base;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Business.Services.Settings
 {
@@ -57,8 +58,7 @@ namespace VitalChoice.Business.Services.Settings
         {
             var data = (await SelectAsync(p => p.StatusCode != (int) RecordStatusCode.Deleted)).ToList();
 
-            var toReturn =
-                (await Task.WhenAll(data.Select(async p => await Mapper.ToModelAsync<CatalogRequestAddressListItemModel>(p)))).ToList();
+            var toReturn = await data.Select(async p => await Mapper.ToModelAsync<CatalogRequestAddressListItemModel>(p)).ToListAsync();
 
             var countries = await _countryService.GetCountriesAsync(new CountryFilter());
             var states = countries.SelectMany(p => p.States).ToList();

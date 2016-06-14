@@ -44,7 +44,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.SkusToInventorySkus = entity.SkusToInventorySkus?.ToList();
                 if ((entity.Product?.Skus?.Count ?? 0) > 0)
                 {
-                    entity.Product = entity.Product.Clone<Product, Entity>();
+                    entity.Product = entity.Product.Clone();
                     entity.Product.Skus = null;
                 }
                 dynamic.Product = await ProductMapper.FromEntityAsync(entity.Product, true);

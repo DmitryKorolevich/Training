@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache;
@@ -38,7 +39,7 @@ namespace VitalChoice.Caching.Interfaces
         CachedEntity<T> TryRemove(EntityKey key);
         CachedEntity<T> Update(T entity);
         CachedEntity<T> UpdateExist(T entity);
-        CachedEntity<T> UpdateKeepRelations(T entity, IDictionary<TrackedEntityKey, EntityEntry> trackedEntities);
+        CachedEntity<T> UpdateKeepRelations(T entity, IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities);
         bool Update(IEnumerable<T> entity);
         bool UpdateExist(IEnumerable<T> entities);
         bool UpdateAll(IEnumerable<T> entity);

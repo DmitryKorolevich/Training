@@ -31,7 +31,9 @@ namespace VitalChoice.Business.Services.Bronto
         private readonly BrontoSettings _brontoSettings;
         private readonly ILogger _logger;
 
-        private readonly BrontoSoapPortTypeClient _client;
+        private readonly Lazy<BrontoSoapPortTypeClient> _lclient;
+
+        private BrontoSoapPortTypeClient Client => _lclient.Value;
 
         public BrontoService(IOptions<AppOptions> options,
             ILoggerProviderExtended loggerProvider)
@@ -41,7 +43,7 @@ namespace VitalChoice.Business.Services.Bronto
 
             BasicHttpBinding binding = new BasicHttpBinding {Security = {Mode = BasicHttpSecurityMode.Transport}};
             EndpointAddress endpoint = new EndpointAddress(_brontoSettings.ApiUrl);
-            _client = new BrontoSoapPortTypeClient(binding, endpoint);
+            _lclient = new Lazy<BrontoSoapPortTypeClient>(() => new BrontoSoapPortTypeClient(binding, endpoint));
         }
 
         public void PushSubscribe(string email, bool subscribe)
@@ -157,10 +159,10 @@ namespace VitalChoice.Business.Services.Bronto
             int pageNumber = 1;
             contactObject[] lists;
             var brontoEmailAddress = new stringValue {value = email};
-            var sessionHeader = new sessionHeader {sessionId = _client.login(_brontoSettings.ApiKey)};
+            var sessionHeader = new sessionHeader {sessionId = Client.login(_brontoSettings.ApiKey)};
             do
             {
-                lists = (await _client.readContactsAsync(sessionHeader, new readContacts
+                lists = (await Client.readContactsAsync(sessionHeader, new readContacts
                 {
                     pageNumber = pageNumber,
                     filter = new contactFilter
@@ -184,7 +186,7 @@ namespace VitalChoice.Business.Services.Bronto
                 }).ToArray();
             if (contactsToUpdate.Length > 0)
             {
-                var results = (await _client.updateContactsAsync(sessionHeader, contactsToUpdate)).@return.results;
+                var results = (await Client.updateContactsAsync(sessionHeader, contactsToUpdate)).@return.results;
                 return results.All(s => !s.isError);
             }
             return false;
@@ -196,10 +198,10 @@ namespace VitalChoice.Business.Services.Bronto
             int pageNumber = 1;
             contactObject[] lists;
             var brontoEmailAddress = new stringValue { value = email };
-            var sessionHeader = new sessionHeader { sessionId = _client.login(_brontoSettings.ApiKey) };
+            var sessionHeader = new sessionHeader { sessionId = Client.login(_brontoSettings.ApiKey) };
             do
             {
-                lists = (await _client.readContactsAsync(sessionHeader, new readContacts
+                lists = (await Client.readContactsAsync(sessionHeader, new readContacts
                 {
                     pageNumber = pageNumber,
                     filter = new contactFilter
@@ -225,10 +227,10 @@ namespace VitalChoice.Business.Services.Bronto
             List<contactObject> result = new List<contactObject>();
             int pageNumber = 1;
             contactObject[] lists;
-            var sessionHeader = new sessionHeader { sessionId = _client.login(_brontoSettings.ApiKey) };
+            var sessionHeader = new sessionHeader { sessionId = Client.login(_brontoSettings.ApiKey) };
             do
             {
-                lists = (await _client.readContactsAsync(sessionHeader, new readContacts
+                lists = (await Client.readContactsAsync(sessionHeader, new readContacts
                 {
                     pageNumber = pageNumber,
                     filter = new contactFilter
@@ -257,10 +259,10 @@ namespace VitalChoice.Business.Services.Bronto
             int pageNumber = 1;
             deliveryObject[] deliveries;
             List<deliveryObject> result = new List<deliveryObject>();
-            var sessionHeader = new sessionHeader { sessionId = _client.login(_brontoSettings.ApiKey) };
+            var sessionHeader = new sessionHeader { sessionId = Client.login(_brontoSettings.ApiKey) };
             do
             {
-                deliveries = (await _client.readDeliveriesAsync(sessionHeader, new readDeliveries
+                deliveries = (await Client.readDeliveriesAsync(sessionHeader, new readDeliveries
                 {
                     filter = new deliveryFilter(),
                     includeContent = false,

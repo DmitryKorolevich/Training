@@ -54,6 +54,7 @@ using VitalChoice.Interfaces.Services.Avatax;
 using VitalChoice.Interfaces.Services.VeraCore;
 using Address = VitalChoice.Ecommerce.Domain.Entities.Addresses.Address;
 using AddressType = VitalChoice.Ecommerce.Domain.Entities.Addresses.AddressType;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VC.Admin.Controllers
 {
@@ -433,7 +434,7 @@ namespace VC.Admin.Controllers
             var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, countries);
             var ordersModel = new PagedList<AutoShipHistoryItemModel>
             {
-                Items = (await Task.WhenAll(orders.Items.Select(async p => await helper.PopulateAutoShipItemModel(p)))).ToList(),
+                Items = await orders.Items.Select(async p => await helper.PopulateAutoShipItemModel(p)).ToListAsync(),
                 Count = orders.Count
             };
 

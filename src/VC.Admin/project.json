@@ -59,7 +59,6 @@
     "Microsoft.AspNetCore.StaticFiles": "1.0.0-rc2-final",
     "Microsoft.Extensions.Configuration.Json": "1.0.0-rc2-final",
     "Microsoft.Extensions.Logging.Console": "1.0.0-rc2-final",
-    "Microsoft.EntityFrameworkCore": "1.0.0-fixed-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Infrastructure.Domain": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",

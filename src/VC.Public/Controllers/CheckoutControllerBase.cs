@@ -111,19 +111,19 @@ namespace VC.Public.Controllers
             cartModel.Messages =
                 context.Messages.Select(x => new KeyValuePair<string, string>(x.Field, x.Message)).ToList();
             cartModel.Skus.Clear();
-            cartModel.Skus.AddRange(await Task.WhenAll(
+            await cartModel.Skus.AddRangeAsync(
                 order.Skus?.Select(async sku =>
                 {
                     var result = await SkuMapper.ToModelAsync<CartSkuModel>(sku.Sku);
                     await ProductMapper.UpdateModelAsync(result, sku.Sku.Product);
                     result.Price = sku.Amount;
                     result.Quantity = sku.Quantity;
-                    result.SubTotal = sku.Quantity * sku.Amount;
+                    result.SubTotal = sku.Quantity*sku.Amount;
 
                     result.GeneratedGCCodes = sku.GcsGenerated?.Select(g => g.Code).ToList();
 
                     return result;
-                })) ?? Enumerable.Empty<CartSkuModel>());
+                }) ?? Enumerable.Empty<Task<CartSkuModel>>());
             var gcsInCart = cartModel.GiftCertificateCodes.ToArray();
             var hasEmpty = gcsInCart.Any(g => string.IsNullOrWhiteSpace(g.Value));
             cartModel.GiftCertificateCodes.Clear();
@@ -163,18 +163,18 @@ namespace VC.Public.Controllers
             cartModel.DiscountTotal = -context.DiscountTotal;
             cartModel.GiftCertificatesTotal = context.GiftCertificatesSubtotal;
             cartModel.PromoSkus.Clear();
-            cartModel.PromoSkus.AddRange(await Task.WhenAll(context.PromoSkus.Where(p => p.Enabled).Select(async sku =>
+            await cartModel.PromoSkus.AddRangeAsync(context.PromoSkus.Where(p => p.Enabled).Select(async sku =>
             {
                 var result = await SkuMapper.ToModelAsync<CartSkuModel>(sku.Sku);
                 await ProductMapper.UpdateModelAsync(result, sku.Sku.Product);
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
-                result.SubTotal = sku.Quantity * sku.Amount;
+                result.SubTotal = sku.Quantity*sku.Amount;
 
                 result.GeneratedGCCodes = sku.GcsGenerated?.Select(g => g.Code).ToList();
 
                 return result;
-            })));
+            }));
             cartModel.Tax = order.TaxTotal;
             cartModel.OrderTotal = order.Total;
             cartModel.DiscountCode = order.Discount?.Code;

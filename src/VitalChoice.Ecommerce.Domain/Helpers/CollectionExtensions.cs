@@ -69,7 +69,20 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));
 
-            collection.AddRange(await Task.WhenAll(items));
+            foreach (var item in items)
+            {
+                collection.Add(await item);
+            }
+        }
+
+        public static async Task<List<T>> ToListAsync<T>(this IEnumerable<Task<T>> items)
+        {
+            List<T> results = new List<T>();
+            foreach (var item in items)
+            {
+                results.Add(await item);
+            }
+            return results;
         }
 
         public static IEnumerable<T> DistinctObjects<T>(this IEnumerable<T> source)

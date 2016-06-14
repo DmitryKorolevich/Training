@@ -9,6 +9,7 @@ using Autofac;
 using Autofac.Core.Lifetime;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -314,17 +315,17 @@ namespace VitalChoice.Caching.Services
             return (LambdaExpression) fullCacheAnnotation?.Value;
         }
 
-        public IDictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context)
+        public IDictionary<TrackedEntityKey, InternalEntityEntry> GetTrackData(DbContext context)
         {
             if (context == null)
                 return null;
-            var trackData = new Dictionary<TrackedEntityKey, EntityEntry>();
+            var trackData = new Dictionary<TrackedEntityKey, InternalEntityEntry>();
             try
             {
                 foreach (
                     var group in
-                        context.ChangeTracker.Entries()
-                            .Where(e => e.Entity != null && e.State != EntityState.Detached)
+                        context.StateManager.Entries
+                            .Where(e => e.Entity != null && e.EntityState != EntityState.Detached)
                             .GroupBy(e => e.Entity.GetType()))
                 {
                     var keyInfo = GetPrimaryKeyInfo(group.Key);
@@ -347,21 +348,21 @@ namespace VitalChoice.Caching.Services
             return trackData;
         }
 
-        public IDictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context, out HashSet<object> trackedObjects)
+        public IDictionary<TrackedEntityKey, InternalEntityEntry> GetTrackData(DbContext context, out HashSet<object> trackedObjects)
         {
             if (context == null)
             {
                 trackedObjects = null;
                 return null;
             }
-            var trackData = new Dictionary<TrackedEntityKey, EntityEntry>();
+            var trackData = new Dictionary<TrackedEntityKey, InternalEntityEntry>();
             trackedObjects = new HashSet<object>();
             try
             {
                 foreach (
                     var group in
-                        context.ChangeTracker.Entries()
-                            .Where(e => e.Entity != null && e.State != EntityState.Detached)
+                        context.StateManager.Entries
+                            .Where(e => e.Entity != null && e.EntityState != EntityState.Detached)
                             .GroupBy(e => e.Entity.GetType()))
                 {
                     var keyInfo = GetPrimaryKeyInfo(group.Key);
