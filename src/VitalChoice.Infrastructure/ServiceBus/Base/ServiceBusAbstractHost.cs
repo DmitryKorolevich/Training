@@ -96,7 +96,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(0, e.ToString());
+                    Logger.LogError(e.ToString());
                     _readyToDisposeReceive.Set();
                     Thread.Sleep(TimeSpan.FromSeconds(1));
                 }
@@ -119,29 +119,52 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         private void SendMessages()
         {
             List<BrokeredMessage> messages = new List<BrokeredMessage>();
+            long batchSize = 0;
             while (!_terminated)
             {
                 try
                 {
                     BrokeredMessage message;
-                    if (!_sendQue.TryDequeue(out message))
+                    if (batchSize >= 262144 || !_sendQue.TryDequeue(out message))
                     {
                         if (messages.Count > 0)
                         {
                             Sender.SendBatch(messages);
                             messages.Clear();
+                            batchSize = 0;
+                            if (_sendQue.Count == 0)
+                            {
+                                _newMessageSignal.WaitOne();
+                                _newMessageSignal.Reset();
+                            }
+                        }
+                        else
+                        {
+                            _newMessageSignal.WaitOne();
+                            _newMessageSignal.Reset();
                         }
                         _readyToDisposeReceive.Set();
-                        _newMessageSignal.WaitOne();
-                        _newMessageSignal.Reset();
                         continue;
                     }
-                    messages.Add(message);
                     _readyToDisposeReceive.Reset();
+                    if (message.Size >= 262144)
+                    {
+                        Logger.LogError($"Message {message.MessageId} too big: {message.Size} bytes");
+                        continue;
+                    }
+                    batchSize += message.Size;
+                    if (batchSize >= 262144)
+                    {
+                        _sendQue.Enqueue(message);
+                    }
+                    else
+                    {
+                        messages.Add(message);
+                    }
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(0, e, e.Message);
+                    Logger.LogError(e.ToString());
                     _readyToDisposeReceive.Set();
                     Thread.Sleep(TimeSpan.FromSeconds(1));
                 }
