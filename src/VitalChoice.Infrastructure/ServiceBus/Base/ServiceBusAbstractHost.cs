@@ -164,7 +164,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(e.ToString());
+                    messages.Clear();
+                    Logger.LogError($"Total Batch Size: {messages.Sum(m => m.Size)}\n{e}");
                     _readyToDisposeReceive.Set();
                     Thread.Sleep(TimeSpan.FromSeconds(1));
                 }

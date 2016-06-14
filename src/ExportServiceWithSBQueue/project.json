@@ -3,7 +3,7 @@
   "description": "ExportWorkerRoleWithSBQueue Class Library",
   "authors": [ "multi_000" ],
   "dependencies": {
-    "WindowsAzure.ServiceBus": "3.2.1",
+    "WindowsAzure.ServiceBus": "3.2.2",
     "Microsoft.WindowsAzure.ConfigurationManager": "3.2.1",
     "VitalChoice.Infrastructure": "1.0.0-*",
     "VitalChoice.Business": "1.0.0-*",

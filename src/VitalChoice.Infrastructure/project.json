@@ -14,7 +14,7 @@
   "frameworks": {
     "net451": {
       "dependencies": {
-        "WindowsAzure.ServiceBus": "3.2.1",
+        "WindowsAzure.ServiceBus": "3.2.2",
         "Microsoft.WindowsAzure.ConfigurationManager": "3.2.1",
         "NLog": "4.3.4"
       }
