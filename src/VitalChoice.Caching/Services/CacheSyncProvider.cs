@@ -45,10 +45,24 @@ namespace VitalChoice.Caching.Services
 
         public void AcceptChanges(IEnumerable<SyncOperation> syncOperations)
         {
-            var syncGroups = syncOperations.Select(op => new SyncOp
+            var syncGroups = syncOperations.Select(op =>
             {
-                SyncOperation = op,
-                EntityType = ReflectionHelper.ResolveType(op.EntityType)
+                try
+                {
+                    return new SyncOp
+                    {
+                        SyncOperation = op,
+                        EntityType = ReflectionHelper.ResolveType(op.EntityType)
+                    };
+                }
+                catch
+                {
+                    return new SyncOp
+                    {
+                        SyncOperation = op,
+                        EntityType = typeof(object)
+                    };
+                }
             }).GroupBy(s => s.EntityType).ToArray();
 
             foreach (var group in syncGroups)
