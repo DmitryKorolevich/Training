@@ -64,25 +64,18 @@ namespace VitalChoice.Business.Queries.Orders
 
         public OrderQuery WithCreatedDate(DateTime? from, DateTime? to)
         {
-            if (from.HasValue)
+            if (from.HasValue && to.HasValue)
             {
-                Add(x => x.DateCreated >= from.Value);
-            }
-            if (to.HasValue)
-            {
-                Add(x =>x.DateCreated <= to.Value);
+                Add(x => x.DateCreated >= from.Value && x.DateCreated <= to.Value);
             }
             return this;
         }
 
         public OrderQuery WithShippedDate(DateTime? from, DateTime? to)
         {
-            if (from.HasValue)
+            if (from.HasValue && to.HasValue)
             {
-                //
-            }
-            if (to.HasValue)
-            {
+                Add(x => x.OrderShippingPackages.Any(p=>p.ShippedDate>=from.Value && p.ShippedDate <= to.Value));
             }
             return this;
         }

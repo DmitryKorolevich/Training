@@ -5,9 +5,10 @@
             <fieldset>
                 <div class="row form-group">
                     <div class="col-md-2">
-                        <input type="text" name="Id" class="form-control" placeholder="Order #" data-ng-model="directOrdersfilter.Id" numbers-only autocomplete="off" data-ng-minlength="3">
-                        <div class="error-container" ng-show="forms.form.submitted && forms.form.IdString.$invalid">
-                            <small class="error" ng-show="forms.form.IdString.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Order #")}}</small>
+                        <input type="text" name="Id" class="form-control" placeholder="Order #" data-ng-model="directOrdersfilter.Id" numbers-only autocomplete="off" data-ng-minlength="3" data-ng-required="true">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.Id.$invalid">
+                            <small class="error" ng-show="forms.form.Id.$error.required">{{getValidationMessage("{0} should have at least 3 symbols","Order #")}}</small>
+                            <small class="error" ng-show="forms.form.Id.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Order #")}}</small>
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -15,22 +16,32 @@
                     </div>
                 </div>
                 <hr />
+            </fieldset>
+        </form>
+        <form class="form-horizontal" name="forms.filterForm" data-ng-submit="save()" data-ng-class="{submitted: forms.filterForm.submitted}" novalidate>
+            <fieldset>
                 <div class="row form-group">
                     <div class="col-md-2">
                         <p class="input-group">
-                            <input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                            <input type="text" class="form-control" name="From" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
                         </p>
+                        <div class="error-container" ng-show="forms.filterForm.submitted && forms.filterForm.From.$invalid">
+                            <small class="error" ng-show="forms.filterForm.From.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","From")}}</small>
+                        </div>
                     </div>
                     <div class="col-md-2">
                         <p class="input-group">
-                            <input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                            <input type="text" class="form-control" name="To" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
                         </p>
+                        <div class="error-container" ng-show="forms.filterForm.submitted && forms.filterForm.To.$invalid">
+                            <small class="error" ng-show="forms.filterForm.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
+                        </div>
                     </div>
                     <div class="col-md-2">
                         <div class="checkbox">
@@ -242,14 +253,14 @@
             </table>
         </spinner-overlay>
         <uib-pagination boundary-links="true"
-                    total-items="totalItems"
-                    items-per-page="filter.Paging.PageItemCount"
-                    data-ng-model="filter.Paging.PageIndex"
-                    previous-text="&lsaquo;"
-                    next-text="&rsaquo;"
-                    first-text="&laquo;"
-                    last-text="&raquo;"
-                    data-ng-change="pageChanged()">
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        previous-text="&lsaquo;"
+                        next-text="&rsaquo;"
+                        first-text="&laquo;"
+                        last-text="&raquo;"
+                        data-ng-change="pageChanged()">
         </uib-pagination>
     </div>
 </div>

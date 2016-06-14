@@ -218,9 +218,8 @@ namespace VC.Admin.Controllers
             {
                 filter.To = filter.To.Value.AddDays(1);
             }
-
-            //var result = await _orderService.GetOrdersAsync(filter);
-            var result = await _orderService.GetOrdersAsync2(filter);
+            
+            var result = await _orderService.GetOrdersAsync(filter);
 
             var toReturn = new PagedList<OrderListItemModel>
             {
