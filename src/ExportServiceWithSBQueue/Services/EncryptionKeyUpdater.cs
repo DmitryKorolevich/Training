@@ -24,6 +24,7 @@ namespace VitalChoice.ExportService.Services
         private bool _terminated;
         private readonly ManualResetEvent _terminateReadyEvent;
         private readonly string _keyFilePath;
+        private readonly Thread _updateThread;
 
         public EncryptionKeyUpdater(IObjectEncryptionHost encryptionHost, ILogger logger, IOptions<ExportOptions> options, DbContextOptions<ExportInfoContext> contextOptions)
         {
@@ -35,7 +36,8 @@ namespace VitalChoice.ExportService.Services
             _terminateReadyEvent = new ManualResetEvent(true);
             if (!string.IsNullOrWhiteSpace(_keyFilePath))
             {
-                new Thread(KeyUpdateProcess).Start();
+                _updateThread = new Thread(KeyUpdateProcess);
+                _updateThread.Start();
             }
         }
 
@@ -241,6 +243,7 @@ namespace VitalChoice.ExportService.Services
         {
             _terminated = true;
             _terminateReadyEvent.WaitOne();
+            _updateThread.Abort();
         }
     }
 }
