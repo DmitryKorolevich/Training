@@ -67,8 +67,7 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
         public string StateCode { get; set; }
 
         public string ShipTo { get; set; }
-
-        [Map]
+        
         public int? PreferredShipMethod { get; set; }
 
         [Map]

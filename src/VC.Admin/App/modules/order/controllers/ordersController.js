@@ -162,31 +162,28 @@
 
         $scope.filterOrders = function ()
         {
-            if ($scope.filter.From > $scope.filter.To)
-            {
-                toaster.pop('error', "Error!", "'To' date can't be less than 'From' date.", null, 'trustedHtml');
-                return;
-            }
             $scope.forms.IsActive = true;
-            $scope.forms.form.submitted = false;
-            $scope.filter.Paging.PageIndex = 1;
-            refreshOrders();
-            //if ($scope.forms.filterForm.$valid)
-            //{
-            //    $scope.forms.filterForm.submitted = false;
-            //    $scope.filter.Paging.PageIndex = 1;
-            //    refreshOrders();
-            //}
-            //else
-            //{
-            //    $scope.forms.filterForm.submitted = true;
-            //}
+            if ($scope.forms.filterForm.$valid)
+            {
+                if ($scope.filter.From > $scope.filter.To)
+                {
+                    toaster.pop('error', "Error!", "'To' date can't be less than 'From' date.", null, 'trustedHtml');
+                    return;
+                }
+                $scope.forms.filterForm.submitted = false;
+                $scope.filter.Paging.PageIndex = 1;
+                refreshOrders();
+            }
+            else
+            {
+                $scope.forms.filterForm.submitted = true;
+            }
         };
 
         $scope.directFilterOrders = function ()
         {
             $scope.forms.IsActive = false;
-            //$scope.forms.filterForm.submitted = false;
+            $scope.forms.filterForm.submitted = false;
             if ($scope.forms.form.$valid)
             {
                 $scope.forms.form.submitted = false;

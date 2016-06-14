@@ -21,6 +21,7 @@
                     {
                         $.each(result.Data.Items, function (index, item)
                         {
+                            item.SKUs = null;
                             item.NewTaxCode = item.TaxCode;
                         });
                         $scope.products = result.Data.Items;
