@@ -82,7 +82,7 @@ namespace VitalChoice.ExportService.Services
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(0, e, e.Message);
+                    Logger.LogError(e.ToString());
                     SendCommand(new ServiceBusCommandBase(command, false));
                     return true;
                 }
@@ -108,7 +108,7 @@ namespace VitalChoice.ExportService.Services
                 }
                 catch(Exception e)
                 {
-                    Logger.LogError(0, e, e.Message);
+                    Logger.LogError(e.ToString());
                     SendCommand(new ServiceBusCommandBase(command, false));
                     return true;
                 }

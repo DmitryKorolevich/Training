@@ -45,6 +45,7 @@ namespace VitalChoice.ExportService.Services
             {
                 try
                 {
+                    _terminateReadyEvent.Reset();
                     var lasAccessed = File.GetLastWriteTime(_keyFilePath);
                     if (DateTime.Now - lasAccessed > TimeSpan.FromDays(30))
                     {
@@ -59,54 +60,120 @@ namespace VitalChoice.ExportService.Services
                             DropCopy(conn);
                             CopyDatabase(conn);
                             ReCryptDatabaseCopy(newAes, 500);
+                            _encryptionHost.UpdateLocalKey(key);
+                            RenameCopyToCurrent(conn);
                             conn.Close();
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    _logger.LogCritical(e.Message, e);
-                    throw;
+                    _logger.LogCritical(e.ToString());
                 }
                 finally
                 {
                     _terminateReadyEvent.Set();
                 }
+                Thread.Sleep(TimeSpan.FromDays(1));
             }
         }
 
-        private static void DropCopy(SqlConnection conn)
+        private static void RenameCopyToCurrent(SqlConnection conn)
         {
-            var statusCmd = new SqlCommand("SELECT TOP 1 state_desc FROM sys.databases WHERE name = 'VitalChoice.ExportInfo.Copy';", conn);
-            var status = statusCmd.ExecuteScalar() as string;
+            string status;
+            using (
+                var statusCmd = new SqlCommand("SELECT TOP 1 state_desc FROM sys.databases WHERE name = 'VitalChoice.ExportInfo.Copy';",
+                    conn))
+            {
+                status = statusCmd.ExecuteScalar() as string;
+            }
             if (!string.IsNullOrEmpty(status))
             {
-                SqlCommand dropCmd =
-                    new SqlCommand("DROP DATABASE VitalChoice.ExportInfo.Copy", conn);
-                dropCmd.ExecuteNonQuery();
+                using (SqlCommand dropCmd =
+                    new SqlCommand("DROP DATABASE [VitalChoice.ExportInfo]", conn))
+                {
+                    dropCmd.ExecuteNonQuery();
+                }
+                using (SqlCommand renameCmd =
+                    new SqlCommand("ALTER DATABASE [VitalChoice.ExportInfo.Copy] MODIFY NAME = [VitalChoice.ExportInfo]", conn))
+                {
+                    renameCmd.ExecuteNonQuery();
+                }
+                using (
+                    var statusCmd = new SqlCommand("SELECT TOP 1 state_desc FROM sys.databases WHERE name = 'VitalChoice.ExportInfo';",
+                        conn))
+                {
+                    while (true)
+                    {
+                        status = statusCmd.ExecuteScalar() as string;
+                        if (string.IsNullOrEmpty(status))
+                        {
+                            Thread.Sleep(TimeSpan.FromSeconds(60));
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+
+        private static void DropCopy(SqlConnection conn)
+        {
+            using (
+                var statusCmd = new SqlCommand("SELECT TOP 1 state_desc FROM sys.databases WHERE name = 'VitalChoice.ExportInfo.Copy';",
+                    conn))
+            {
+                var status = statusCmd.ExecuteScalar() as string;
+                if (!string.IsNullOrEmpty(status))
+                {
+                    using (SqlCommand dropCmd =
+                        new SqlCommand("DROP DATABASE [VitalChoice.ExportInfo.Copy]", conn))
+                    {
+                        dropCmd.ExecuteNonQuery();
+                    }
+                    while (true)
+                    {
+                        status = statusCmd.ExecuteScalar() as string;
+                        if (string.IsNullOrEmpty(status))
+                        {
+                            break;
+                        }
+                        Thread.Sleep(TimeSpan.FromSeconds(60));
+                    }
+                }
             }
         }
 
         private static void CopyDatabase(SqlConnection conn)
         {
-            var statusCmd = new SqlCommand("SELECT TOP 1 state_desc FROM sys.databases WHERE name = 'VitalChoice.ExportInfo.Copy';", conn);
-            var command = new SqlCommand("CREATE DATABASE VitalChoice.ExportInfo.Copy AS COPY OF VitalChoice.ExportInfo;", conn);
-            command.ExecuteNonQuery();
-
-            while (true)
+            using (
+                var statusCmd = new SqlCommand("SELECT TOP 1 state_desc FROM sys.databases WHERE name = 'VitalChoice.ExportInfo.Copy';",
+                    conn))
             {
-                var status = statusCmd.ExecuteScalar() as string;
-                if (string.IsNullOrEmpty(status))
+                using (
+                    var command = new SqlCommand("CREATE DATABASE [VitalChoice.ExportInfo.Copy] AS COPY OF [VitalChoice.ExportInfo];", conn)
+                    )
                 {
-                    Thread.Sleep(TimeSpan.FromSeconds(60));
+                    command.ExecuteNonQuery();
                 }
-                else if (status == "COPYING")
+                while (true)
                 {
-                    Thread.Sleep(TimeSpan.FromSeconds(60));
-                }
-                else
-                {
-                    break;
+                    var status = statusCmd.ExecuteScalar() as string;
+                    if (string.IsNullOrEmpty(status))
+                    {
+                        Thread.Sleep(TimeSpan.FromSeconds(60));
+                    }
+                    else if (status == "COPYING")
+                    {
+                        Thread.Sleep(TimeSpan.FromSeconds(60));
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
         }
@@ -116,11 +183,11 @@ namespace VitalChoice.ExportService.Services
             using (ExportInfoCopyContext copyContext = new ExportInfoCopyContext(_options, _contextOptions))
             {
                 var localAes = Aes.Create();
-                var localKey = _encryptionHost.GetLocalKey();
                 if (localAes == null)
                 {
                     throw new CryptographicException("Cannot create AES");
                 }
+                var localKey = _encryptionHost.GetLocalKey();
                 localAes.KeySize = 256;
                 localAes.Key = localKey.Key;
                 localAes.IV = localKey.IV;

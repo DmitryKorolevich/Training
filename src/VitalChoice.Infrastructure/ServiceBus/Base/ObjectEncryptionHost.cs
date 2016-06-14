@@ -27,6 +27,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 
         public void UpdateLocalKey(KeyExchange key)
         {
+            File.WriteAllBytes(_localEncryptionPath, RsaEncrypt(key.ToCombined(), _signProvider));
             _localAes.Key = key.Key;
             _localAes.IV = key.IV;
         }
@@ -242,7 +243,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 }
                 catch (CryptographicException e)
                 {
-                    _logger.LogError(0, e, e.Message);
+                    _logger.LogError(e.ToString());
                 }
             }
             return default(T);
@@ -283,7 +284,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             }
             catch (CryptographicException e)
             {
-                _logger.LogError(0, e, e.Message);
+                _logger.LogError(e.ToString());
             }
             catch (SerializationException)
             {
@@ -475,7 +476,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                         if (!string.IsNullOrEmpty(directory))
                         {
                             var security = new DirectorySecurity();
-                            var currentUser = WindowsIdentity.GetCurrent()?.User;
+                            var currentUser = WindowsIdentity.GetCurrent().User;
                             if (currentUser == null)
                                 throw new AccessDeniedException("Cannot get current User");
                             security.SetOwner(currentUser);

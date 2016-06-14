@@ -13,7 +13,7 @@ using VitalChoice.Infrastructure.ServiceBus.Base;
 
 namespace VitalChoice.ExportService
 {
-    public class ExportServiceManager : ServiceBase
+    public class ExportServiceInstance : ServiceBase
     {
         private EncryptedServiceBusHostServer _server;
         private readonly IOptions<AppOptions> _options;
@@ -21,7 +21,7 @@ namespace VitalChoice.ExportService
         private readonly IObjectEncryptionHost _encryptionHost;
         private readonly IServiceProvider _container;
 
-        public ExportServiceManager()
+        public ExportServiceInstance()
         {
             try
             {
@@ -34,7 +34,7 @@ namespace VitalChoice.ExportService
                 _container = Program.Host.Services;
                 _options = _container.GetRequiredService<IOptions<AppOptions>>();
                 var factory = _container.GetRequiredService<ILoggerFactory>();
-                _logger = factory.CreateLogger<ExportServiceManager>();
+                _logger = factory.CreateLogger<ExportServiceInstance>();
                 _encryptionHost = _container.GetRequiredService<IObjectEncryptionHost>();
             }
             catch (Exception e)
