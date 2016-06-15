@@ -378,7 +378,7 @@ namespace VitalChoice.Business.Services.Customers
         public async Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter)
         {
             Func<IQueryable<Customer>, IOrderedQueryable<Customer>> sortable = x => x.OrderByDescending(y => y.DateEdited);
-            Func<IEnumerable<CustomerDynamic>, IOrderedEnumerable<CustomerDynamic>> sortDynamic = null;
+            //Func<IEnumerable<CustomerDynamic>, IOrderedEnumerable<CustomerDynamic>> sortDynamic = null;
             var sortOrder = filter.Sorting.SortOrder;
             switch (filter.Sorting.Path)
             {

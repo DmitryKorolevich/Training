@@ -16,14 +16,15 @@ namespace VitalChoice.Data.Repositories
         //public bool EarlyRead { get; set; } //added temporarly till ef 7 becomes stable
 
         protected IDataContextAsync Context { get; }
-        protected internal DbSet<TEntity> DbSet { get; }
+        protected internal DbSet<TEntity> DbSet => _lazyDbSet.Value;
+        private readonly Lazy<DbSet<TEntity>> _lazyDbSet;
 
         public ReadRepositoryAsync(IDataContextAsync context)
         {
             this.Context = context;
             var dbContext = context as DbContext;
             if (dbContext != null)
-                this.DbSet = dbContext.Set<TEntity>();
+                _lazyDbSet = new Lazy<DbSet<TEntity>>(() => dbContext.Set<TEntity>());
         }
 
         public IQueryFluent<TEntity> Query()

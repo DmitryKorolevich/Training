@@ -16,13 +16,13 @@ using VitalChoice.Data.Extensions;
 
 namespace VitalChoice.Business.Services.Dynamic
 {
-    public class SkuMapper : DynamicMapper<SkuDynamic, Sku, ProductOptionType, SkuOptionValue>
+    public class SkuMapper : DynamicMapper<SkuDynamic, Sku, SkuOptionType, SkuOptionValue>
     {
         public ProductMapper ProductMapper { get; set; }
 
         public SkuMapper(ITypeConverter converter,
             IModelConverterService converterService,
-            IEcommerceRepositoryAsync<ProductOptionType> productRepositoryAsync)
+            IEcommerceRepositoryAsync<SkuOptionType> productRepositoryAsync)
             : base(converter, converterService, productRepositoryAsync)
         {
         }

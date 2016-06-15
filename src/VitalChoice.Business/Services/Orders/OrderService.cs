@@ -510,7 +510,7 @@ namespace VitalChoice.Business.Services.Orders
                         entities.SelectMany(o => o.Skus).Where(s => s.Sku?.Product != null && s.Sku.OptionTypes == null))
                 {
                     var optionTypes = _productMapper.FilterByType(orderToSku.Sku.Product.IdObjectType);
-                    orderToSku.Sku.OptionTypes = optionTypes;
+                    orderToSku.Sku.OptionTypes = _skuMapper.FilterByType(orderToSku.Sku.Product.IdObjectType);
                     orderToSku.Sku.Product.OptionTypes = optionTypes;
                 }
                 //var invalidSkuOrdered =
@@ -545,7 +545,7 @@ namespace VitalChoice.Business.Services.Orders
                         entities.SelectMany(o => o.PromoSkus).Where(s => s.Sku?.Product != null && s.Sku.OptionTypes == null))
                 {
                     var optionTypes = _productMapper.FilterByType(orderToSku.Sku.Product.IdObjectType);
-                    orderToSku.Sku.OptionTypes = optionTypes;
+                    orderToSku.Sku.OptionTypes = _skuMapper.FilterByType(orderToSku.Sku.Product.IdObjectType);
                     orderToSku.Sku.Product.OptionTypes = optionTypes;
                 }
                 //var invalidSkuOrdered =
@@ -1416,7 +1416,9 @@ namespace VitalChoice.Business.Services.Orders
 
         private async Task SetSkusBornDate(ICollection<OrderDynamic> orders, IUnitOfWorkAsync uow)
         {
-            var option = _productService.GetProductOptionTypes(new HashSet<string>() { ProductConstants.FIELD_NAME_SKU_INVENTORY_BORN_DATE }).FirstOrDefault();
+            var option =
+                _productService.GetSkuOptionTypes(new HashSet<string>() {ProductConstants.FIELD_NAME_SKU_INVENTORY_BORN_DATE})
+                    .FirstOrDefault();
             if (option != null)
             {
                 var skuIds =

@@ -165,7 +165,7 @@ BEGIN
 		JOIN Products osp WITH(NOLOCK) ON oss.IdProduct= osp.Id
 		LEFT JOIN ProductOptionTypes AS pSubTitleopt WITH(NOLOCK) ON pSubTitleopt.Name = N'SubTitle' AND pSubTitleopt.IdObjectType = osp.IdObjectType
 		LEFT JOIN ProductOptionValues AS pSubTitleval WITH(NOLOCK) ON pSubTitleval.IdProduct = osp.Id AND pSubTitleval.IdOptionType = pSubTitleopt.Id		
-		LEFT JOIN ProductOptionTypes AS sQTYopt WITH(NOLOCK) ON sQTYopt.Name = N'QTY' AND sQTYopt.IdObjectType = osp.IdObjectType
+		LEFT JOIN SkuOptionTypes AS sQTYopt WITH(NOLOCK) ON sQTYopt.Name = N'QTY' AND (sQTYopt.IdObjectType = osp.IdObjectType OR sQTYopt.IdObjectType IS NULL)
 		LEFT JOIN SkuOptionValues AS sQTYval WITH(NOLOCK) ON sQTYval.IdSku = oss.Id AND sQTYval.IdOptionType = sQTYopt.Id
 		UNION All
 		SELECT 
@@ -182,7 +182,7 @@ BEGIN
 		JOIN Products opp WITH(NOLOCK) ON ops.IdProduct= opp.Id
 		LEFT JOIN ProductOptionTypes AS pSubTitleopt WITH(NOLOCK) ON pSubTitleopt.Name = N'SubTitle' AND pSubTitleopt.IdObjectType = opp.IdObjectType
 		LEFT JOIN ProductOptionValues AS pSubTitleval WITH(NOLOCK) ON pSubTitleval.IdProduct = opp.Id AND pSubTitleval.IdOptionType = pSubTitleopt.Id		
-		LEFT JOIN ProductOptionTypes AS sQTYopt WITH(NOLOCK) ON sQTYopt.Name = N'QTY' AND sQTYopt.IdObjectType = opp.IdObjectType
+		LEFT JOIN SkuOptionTypes AS sQTYopt WITH(NOLOCK) ON sQTYopt.Name = N'QTY' AND (sQTYopt.IdObjectType = opp.IdObjectType OR sQTYopt.IdObjectType IS NULL)
 		LEFT JOIN SkuOptionValues AS sQTYval WITH(NOLOCK) ON sQTYval.IdSku = ops.Id AND sQTYval.IdOptionType = sQTYopt.Id
 		UNION All
 		SELECT 
@@ -199,7 +199,7 @@ BEGIN
 		JOIN Products orp WITH(NOLOCK) ON ors.IdProduct= orp.Id
 		LEFT JOIN ProductOptionTypes AS pSubTitleopt WITH(NOLOCK) ON pSubTitleopt.Name = N'SubTitle' AND pSubTitleopt.IdObjectType = orp.IdObjectType
 		LEFT JOIN ProductOptionValues AS pSubTitleval WITH(NOLOCK) ON pSubTitleval.IdProduct = orp.Id AND pSubTitleval.IdOptionType = pSubTitleopt.Id		
-		LEFT JOIN ProductOptionTypes AS sQTYopt WITH(NOLOCK) ON sQTYopt.Name = N'QTY' AND sQTYopt.IdObjectType = orp.IdObjectType
+		LEFT JOIN SkuOptionTypes AS sQTYopt WITH(NOLOCK) ON sQTYopt.Name = N'QTY' AND (sQTYopt.IdObjectType = orp.IdObjectType OR sQTYopt.IdObjectType IS NULL)
 		LEFT JOIN SkuOptionValues AS sQTYval WITH(NOLOCK) ON sQTYval.IdSku = ors.Id AND sQTYval.IdOptionType = sQTYopt.Id
 		) temp	
 	ORDER BY temp.[Rank] ASC, temp.IdOrder ASC

@@ -277,6 +277,18 @@ namespace VitalChoice.Ecommerce.Context
                 entity.Ignore(p => p.IdEditedBy);
             });
 
+            builder.Entity<SkuOptionType>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("SkuOptionTypes");
+                entity
+                    .HasOne(p => p.Lookup)
+                    .WithMany()
+                    .HasForeignKey(p => p.IdLookup)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
+                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
+            });
 
             builder.Entity<SkuOptionValue>(entity =>
             {

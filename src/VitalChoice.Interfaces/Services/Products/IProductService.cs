@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Content.Products;
@@ -17,15 +18,18 @@ namespace VitalChoice.Interfaces.Services.Products
 	{
         #region Products
 
-        IEnumerable<ProductOptionType> GetProductOptionTypes(HashSet<string> names);
+        IEnumerable<OptionType> GetProductOptionTypes(HashSet<string> names);
+        IEnumerable<OptionType> GetSkuOptionTypes(HashSet<string> names);
 
         Dictionary<int, Dictionary<string, string>> GetProductEditDefaultSettingsAsync();
 
-        ICollection<ProductOptionType> GetProductLookupsAsync();
+        IEnumerable<OptionType> GetExpandedOptionTypesWithSkuTypes();
 
 	    Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter);
 
-	    Task<ICollection<ProductCategoryOrderModel>> GetProductsOnCategoryOrderAsync(int idCategory);
+	    Task<PagedList<ProductDynamic>> GetProductsAsync2(VProductSkuFilter filter);
+
+        Task<ICollection<ProductCategoryOrderModel>> GetProductsOnCategoryOrderAsync(int idCategory);
 
 	    Task<bool> UpdateProductsOnCategoryOrderAsync(int idCategory, ICollection<ProductCategoryOrderModel> products);
 

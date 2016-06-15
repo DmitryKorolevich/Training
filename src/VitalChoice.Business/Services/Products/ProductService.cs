@@ -24,6 +24,7 @@ using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
@@ -62,7 +63,6 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoryRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
-        private readonly ProductMapper _mapper;
         private readonly IEcommerceRepositoryAsync<VCustomerFavorite> _vCustomerFavoriteRepository;
         private readonly SkuMapper _skuMapper;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
@@ -79,6 +79,59 @@ namespace VitalChoice.Business.Services.Products
         private readonly ICsvExportService<SkuGoogleItem, SkuGoogleItemExportCsvMap> _skuGoogleItemCSVExportService;
         private readonly IBlobStorageClient _storageClient;
         private readonly SpEcommerceRepository _sPEcommerceRepository;
+
+        public ProductService(VProductSkuRepository vProductSkuRepository,
+            IEcommerceRepositoryAsync<VSku> vSkuRepository,
+            IEcommerceRepositoryAsync<Product> productRepository,
+            IEcommerceRepositoryAsync<ProductToCategory> productToCategoryRepository,
+            IEcommerceRepositoryAsync<Sku> skuRepository,
+            IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper,
+            IObjectLogItemExternalService objectLogItemExternalService,
+            IEcommerceRepositoryAsync<ProductOptionValue> productValueRepositoryAsync,
+            IEcommerceRepositoryAsync<SkuOptionValue> skuOptionValueRepositoryAsync,
+            IRepositoryAsync<AdminProfile> adminProfileRepository,
+            OrderSkusRepository orderSkusRepositoryRepository,
+            SkuMapper skuMapper,
+            IEcommerceRepositoryAsync<ProductOutOfStockRequest> productOutOfStockRequestRepository,
+            ISettingService settingService,
+            INotificationService notificationService,
+            IRepositoryAsync<ProductContent> productContentRepository,
+            IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
+            ICsvExportService<SkuGoogleItem, SkuGoogleItemExportCsvMap> skuGoogleItemCSVExportService,
+            IBlobStorageClient storageClient,
+            IProductCategoryService productCategoryService,
+            IAppInfrastructureService appInfrastructureService,
+            IOptions<AppOptions> options,
+            ILoggerProviderExtended loggerProvider,
+            IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync,
+            SpEcommerceRepository sPEcommerceRepository,
+            DirectMapper<Product> directMapper, DynamicExtensionsRewriter queryVisitor, ITransactionAccessor<EcommerceContext> transactionAccessor)
+            : base(
+                mapper, productRepository, productValueRepositoryAsync,
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
+        {
+            _vProductSkuRepository = vProductSkuRepository;
+            _vSkuRepository = vSkuRepository;
+            _productRepository = productRepository;
+            _productToCategoryRepository = productToCategoryRepository;
+            _skuRepository = skuRepository;
+            _adminProfileRepository = adminProfileRepository;
+            _orderSkusRepositoryRepository = orderSkusRepositoryRepository;
+            _skuMapper = skuMapper;
+            _productOutOfStockRequestRepository = productOutOfStockRequestRepository;
+            _settingService = settingService;
+            _notificationService = notificationService;
+            _productContentRepository = productContentRepository;
+            _contentTypeRepository = contentTypeRepository;
+            _skuGoogleItemCSVExportService = skuGoogleItemCSVExportService;
+            _productCategoryService = productCategoryService;
+            _referenceData = appInfrastructureService.Data();
+            _storageClient = storageClient;
+            _vCustomerFavoriteRepository = vCustomerRepositoryAsync;
+            _options = options;
+            _skuOptionValueRepositoryAsync = skuOptionValueRepositoryAsync;
+            _sPEcommerceRepository = sPEcommerceRepository;
+        }
 
         public async Task<ProductContent> SelectContentForTransfer(int id)
         {
@@ -178,115 +231,110 @@ namespace VitalChoice.Business.Services.Products
 
         protected override bool LogObjectFullData { get { return true; } }
 
-        public ProductService(VProductSkuRepository vProductSkuRepository,
-            IEcommerceRepositoryAsync<VSku> vSkuRepository,
-            IEcommerceRepositoryAsync<Lookup> lookupRepository,
-            IEcommerceRepositoryAsync<Product> productRepository,
-            IEcommerceRepositoryAsync<ProductToCategory> productToCategoryRepository,
-            IEcommerceRepositoryAsync<Sku> skuRepository,
-            IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository, ProductMapper mapper,
-            IObjectLogItemExternalService objectLogItemExternalService,
-            IEcommerceRepositoryAsync<ProductToCategory> productToCategoriesRepository,
-            IEcommerceRepositoryAsync<ProductOptionValue> productValueRepositoryAsync,
-            IEcommerceRepositoryAsync<SkuOptionValue> skuOptionValueRepositoryAsync,
-            IRepositoryAsync<AdminProfile> adminProfileRepository,
-            OrderSkusRepository orderSkusRepositoryRepository,
-            SkuMapper skuMapper,
-            IEcommerceRepositoryAsync<ProductOutOfStockRequest> productOutOfStockRequestRepository,
-            ISettingService settingService,
-            INotificationService notificationService,
-            IRepositoryAsync<ProductContent> productContentRepository,
-            IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
-            ICsvExportService<SkuGoogleItem, SkuGoogleItemExportCsvMap> skuGoogleItemCSVExportService,
-            IBlobStorageClient storageClient,
-            IProductCategoryService productCategoryService,
-            IAppInfrastructureService appInfrastructureService,
-            IOptions<AppOptions> options,
-            ILoggerProviderExtended loggerProvider,
-            IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync,
-            SpEcommerceRepository sPEcommerceRepository,
-            DirectMapper<Product> directMapper, DynamicExtensionsRewriter queryVisitor, ITransactionAccessor<EcommerceContext> transactionAccessor)
-            : base(
-                mapper, productRepository, productValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
-        {
-            _vProductSkuRepository = vProductSkuRepository;
-            _vSkuRepository = vSkuRepository;
-            _productRepository = productRepository;
-            _productToCategoryRepository = productToCategoryRepository;
-            _skuRepository = skuRepository;
-            _mapper = mapper;
-            _adminProfileRepository = adminProfileRepository;
-            _orderSkusRepositoryRepository = orderSkusRepositoryRepository;
-            _skuMapper = skuMapper;
-            _productOutOfStockRequestRepository = productOutOfStockRequestRepository;
-            _settingService = settingService;
-            _notificationService = notificationService;
-            _productContentRepository = productContentRepository;
-            _contentTypeRepository = contentTypeRepository;
-            _skuGoogleItemCSVExportService = skuGoogleItemCSVExportService;
-            _productCategoryService = productCategoryService;
-            _referenceData = appInfrastructureService.Data();
-            _storageClient = storageClient;
-            _vCustomerFavoriteRepository = vCustomerRepositoryAsync;
-            _options = options;
-            _skuOptionValueRepositoryAsync = skuOptionValueRepositoryAsync;
-            _sPEcommerceRepository = sPEcommerceRepository;
-        }
-
         #region ProductOptions
 
-        public IEnumerable<ProductOptionType> GetProductOptionTypes(HashSet<string> names)
+        public IEnumerable<OptionType> GetProductOptionTypes(HashSet<string> names)
         {
-            return _mapper.OptionTypes.Where(o => names.Contains(o.Name));
+            return DynamicMapper.OptionTypes.Where(o => names.Contains(o.Name));
+        }
+
+        public IEnumerable<OptionType> GetSkuOptionTypes(HashSet<string> names)
+        {
+            return _skuMapper.OptionTypes.Where(o => names.Contains(o.Name));
         }
 
         public Dictionary<int, Dictionary<string, string>> GetProductEditDefaultSettingsAsync()
         {
             Dictionary<int, Dictionary<string, string>> toReturn = new Dictionary<int, Dictionary<string, string>>();
-            HashSet<string> names = new HashSet<string>();
-            for (int i = 1; i <= ProductConstants.FIELD_COUNT_CROSS_SELL_PRODUCT; i++)
+            //HashSet<string> names = new HashSet<string>();
+            //for (int i = 1; i <= ProductConstants.FIELD_COUNT_CROSS_SELL_PRODUCT; i++)
+            //{
+            //    names.Add(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_IMAGE + i);
+            //    names.Add(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_URL + i);
+            //}
+            //for (int i = 1; i <= ProductConstants.FIELD_COUNT_YOUTUBE; i++)
+            //{
+            //    names.Add(ProductConstants.FIELD_NAME_YOUTUBE_IMAGE + i);
+            //    names.Add(ProductConstants.FIELD_NAME_YOUTUBE_TEXT + i);
+            //    names.Add(ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + i);
+            //}
+            //names.Add(ProductConstants.FIELD_NAME_DISREGARD_STOCK);
+            //names.Add(ProductConstants.FIELD_NAME_STOCK);
+            //names.Add(ProductConstants.FIELD_NAME_NON_DISCOUNTABLE);
+            //names.Add(ProductConstants.FIELD_NAME_HIDE_FROM_DATA_FEED);
+            //names.Add(ProductConstants.FIELD_NAME_QTY_THRESHOLD);
+            //var items = GetProductOptionTypes(names);
+            foreach (
+                var item in
+                    ((IEnumerable<OptionType>) DynamicMapper.OptionTypes).Union(_skuMapper.OptionTypes).Where(t => t.DefaultValue != null))
             {
-                names.Add(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_IMAGE + i);
-                names.Add(ProductConstants.FIELD_NAME_CROSS_SELL_PRODUCT_URL + i);
-            }
-            for (int i = 1; i <= ProductConstants.FIELD_COUNT_YOUTUBE; i++)
-            {
-                names.Add(ProductConstants.FIELD_NAME_YOUTUBE_IMAGE + i);
-                names.Add(ProductConstants.FIELD_NAME_YOUTUBE_TEXT + i);
-                names.Add(ProductConstants.FIELD_NAME_YOUTUBE_VIDEO + i);
-            }
-            names.Add(ProductConstants.FIELD_NAME_DISREGARD_STOCK);
-            names.Add(ProductConstants.FIELD_NAME_STOCK);
-            names.Add(ProductConstants.FIELD_NAME_NON_DISCOUNTABLE);
-            names.Add(ProductConstants.FIELD_NAME_HIDE_FROM_DATA_FEED);
-            names.Add(ProductConstants.FIELD_NAME_QTY_THRESHOLD);
-            var items = GetProductOptionTypes(names);
-            foreach (var item in items.Where(p => p.IdObjectType.HasValue))
-            {
-                Dictionary<string, string> productTypeDefaultValues = null;
-                if (item.IdObjectType != null && toReturn.ContainsKey(item.IdObjectType.Value))
+                if (item.IdObjectType != null)
                 {
-                    productTypeDefaultValues = toReturn[item.IdObjectType.Value];
+                    Dictionary<string, string> productTypeDefaultValues;
+                    if (toReturn.ContainsKey(item.IdObjectType.Value))
+                    {
+                        productTypeDefaultValues = toReturn[item.IdObjectType.Value];
+                    }
+                    else
+                    {
+                        productTypeDefaultValues = new Dictionary<string, string>();
+                        toReturn.Add(item.IdObjectType.Value, productTypeDefaultValues);
+                    }
+                    if (!productTypeDefaultValues.ContainsKey(item.Name))
+                    {
+                        productTypeDefaultValues.Add(item.Name, item.DefaultValue);
+                    }
                 }
                 else
                 {
-                    productTypeDefaultValues = new Dictionary<string, string>();
-                    if (item.IdObjectType != null)
-                        toReturn.Add(item.IdObjectType.Value, productTypeDefaultValues);
-                }
-                if (!productTypeDefaultValues.ContainsKey(item.Name))
-                {
-                    productTypeDefaultValues.Add(item.Name, item.DefaultValue);
+                    foreach (int productType in Enum.GetValues(typeof(ProductType)))
+                    {
+                        Dictionary<string, string> productTypeDefaultValues;
+                        if (toReturn.ContainsKey(productType))
+                        {
+                            productTypeDefaultValues = toReturn[productType];
+                        }
+                        else
+                        {
+                            productTypeDefaultValues = new Dictionary<string, string>();
+                            toReturn.Add(productType, productTypeDefaultValues);
+                        }
+                        if (!productTypeDefaultValues.ContainsKey(item.Name))
+                        {
+                            productTypeDefaultValues.Add(item.Name, item.DefaultValue);
+                        }
+                    }
                 }
             }
 
             return toReturn;
         }
 
-        public ICollection<ProductOptionType> GetProductLookupsAsync()
+        public IEnumerable<OptionType> GetExpandedOptionTypesWithSkuTypes()
         {
-            return _mapper.OptionTypes;
+            foreach (var type in ((IEnumerable<OptionType>) DynamicMapper.OptionTypes).Union(_skuMapper.OptionTypes))
+            {
+                if (type.IdObjectType == null)
+                {
+                    foreach (int productType in Enum.GetValues(typeof(ProductType)))
+                    {
+                        yield return new ProductOptionType
+                        {
+                            Id = type.Id,
+                            Name = type.Name,
+                            IdObjectType = productType,
+                            DefaultValue = type.DefaultValue,
+                            IdFieldType = type.IdFieldType,
+                            IdLookup = type.IdLookup,
+                            Lookup = type.Lookup
+                        };
+                    }
+                }
+                else
+                {
+                    yield return type;
+                }
+            }
         }
 
         public async Task<ICollection<SkuOptionValue>> GetSkuOptionValues(ICollection<int> skuIds,
@@ -547,7 +595,7 @@ namespace VitalChoice.Business.Services.Products
             {
                 var sku = skusKeyed[info.Id];
                 sku.OptionTypes =
-                    _mapper.FilterByType((int?)info.IdProductType);
+                    _skuMapper.FilterByType((int?)info.IdProductType);
             }
             return await _skuMapper.FromEntityRangeAsync(skus, withDefaults);
         }
@@ -567,7 +615,7 @@ namespace VitalChoice.Business.Services.Products
             foreach (var sku in skus)
             {
                 sku.OptionTypes =
-                     _mapper.FilterByType(sku.Product.IdObjectType);
+                     _skuMapper.FilterByType(sku.Product.IdObjectType);
             }
             return await _skuMapper.FromEntityRangeAsync(skus, withDefaults);
         }
@@ -756,6 +804,49 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
+        public async Task<PagedList<ProductDynamic>> GetProductsAsync2(VProductSkuFilter filter)
+        {
+            Func<IQueryable<Product>, IOrderedQueryable<Product>> sortable = x => x.OrderByDescending(y => y.Name);
+            var sortOrder = filter.Sorting.SortOrder;
+            switch (filter.Sorting.Path)
+            {
+                case VProductSkuSortPath.Name:
+                    sortable =
+                        x =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.Name)
+                                : x.OrderByDescending(y => y.Name);
+                    break;
+                case VProductSkuSortPath.DateEdited:
+                    sortable =
+                        x =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.DateEdited)
+                                : x.OrderByDescending(y => y.DateEdited);
+                    break;
+                //case VProductSkuSortPath.TaxCode:
+                //    sortable =
+                //        x =>
+                //            sortOrder == FilterSortOrder.Asc
+                //                ? x.OrderBy(y => y.TaxCode)
+                //                : x.OrderByDescending(y => y.TaxCode);
+                //    break;
+                case VProductSkuSortPath.IdProductType:
+                    sortable =
+                        x =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.IdObjectType)
+                                : x.OrderByDescending(y => y.IdObjectType);
+                    break;
+            }
+
+            var products = await SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount,
+                new ProductQuery().NotDeleted().WithNameOrSkuCodeLike(filter.SearchText).WithIds(filter.IdProducts),
+                query => query.Include(p => p.Skus).ThenInclude(p => p.OptionValues).Include(p => p.OptionValues), sortable, true);
+
+            return products;
+        }
+
         public async Task<ICollection<ProductCategoryOrderModel>> GetProductsOnCategoryOrderAsync(int idCategory)
         {
             List<ProductCategoryOrderModel> toReturn = new List<ProductCategoryOrderModel>();
@@ -853,7 +944,7 @@ namespace VitalChoice.Business.Services.Products
                 if (product != null)
                 {
                     sku.OptionTypes =
-                         _mapper.FilterByType(product.IdObjectType);
+                         _skuMapper.FilterByType(product.IdObjectType);
                 }
             }
             var skuDynamics = await _skuMapper.FromEntityRangeAsync(skus, true);

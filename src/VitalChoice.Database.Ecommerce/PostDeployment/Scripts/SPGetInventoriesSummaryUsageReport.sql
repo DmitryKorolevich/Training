@@ -32,7 +32,7 @@ BEGIN
 		FROM Skus s WITH(NOLOCK)
 		JOIN SkusToInventorySkus sToInv WITH(NOLOCK) ON s.Id=sToInv.IdSku
 		JOIN InventorySkus inv WITH(NOLOCK) ON inv.Id=sToInv.IdInventorySku
-		LEFT JOIN ProductOptionTypes AS oopt WITH(NOLOCK) ON oopt.Name = N'Assemble'
+		LEFT JOIN SkuOptionTypes AS oopt WITH(NOLOCK) ON oopt.Name = N'Assemble'
 		LEFT JOIN SkuOptionValues AS oval WITH(NOLOCK) ON oval.IdSku = s.Id AND oval.IdOptionType = oopt.Id
 		WHERE (@sku IS NULL OR s.Code LIKE '%'+@sku+'%') AND
 		(@invsku IS NULL OR inv.Code LIKE '%'+@invsku+'%') AND

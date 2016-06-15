@@ -73,7 +73,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         });
                 }
 
-                await _skuMapper.SyncCollectionsAsync(dynamic.Skus, entity.Skus, entity.OptionTypes);
+                await _skuMapper.SyncCollectionsAsync(dynamic.Skus, entity.Skus);
             });
         }
 
@@ -98,7 +98,7 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 if (entity.Skus == null)
                     entity.Skus = new List<Sku>();
-                entity.Skus.AddRange(await _skuMapper.ToEntityRangeAsync(dynamic.Skus, entity.OptionTypes));
+                entity.Skus.AddRange(await _skuMapper.ToEntityRangeAsync(dynamic.Skus));
             });
         }
 

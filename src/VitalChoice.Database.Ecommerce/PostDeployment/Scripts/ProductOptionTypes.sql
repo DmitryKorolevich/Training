@@ -651,100 +651,100 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT * FROM ProductOptionTypes WHERE Name='QTY')
-BEGIN
+--IF NOT EXISTS(SELECT * FROM ProductOptionTypes WHERE Name='QTY')
+--BEGIN
 
-INSERT INTO ProductOptionTypes
-(DefaultValue, IdFieldType, IdObjectType, Name)
-SELECT NULL, 4, 1, N'QTY'
-UNION
-SELECT NULL, 4, 2, N'QTY'
-UNION
-SELECT NULL, 4, 3, N'QTY'
-UNION
-SELECT NULL, 4, 4, N'QTY'
+--INSERT INTO ProductOptionTypes
+--(DefaultValue, IdFieldType, IdObjectType, Name)
+--SELECT NULL, 4, 1, N'QTY'
+--UNION
+--SELECT NULL, 4, 2, N'QTY'
+--UNION
+--SELECT NULL, 4, 3, N'QTY'
+--UNION
+--SELECT NULL, 4, 4, N'QTY'
 
-END
-
-GO
-
-IF NOT EXISTS (SELECT * FROM ProductOptionTypes WHERE Name='QTYThreshold')
-BEGIN
-
-INSERT INTO ProductOptionTypes
-(DefaultValue, IdFieldType, IdObjectType, Name)
-SELECT 4, 3, 1, N'QTYThreshold'
-
-END
+--END
 
 GO
 
-IF NOT EXISTS(SELECT * FROM ProductOptionTypes WHERE Name='SalesText')
-BEGIN
+--IF NOT EXISTS (SELECT * FROM ProductOptionTypes WHERE Name='QTYThreshold')
+--BEGIN
 
-	INSERT INTO ProductOptionTypes
-	(DefaultValue, IdFieldType, IdObjectType, Name)
-	SELECT NULL, 4, NULL, N'SalesText'
-	UNION
-	SELECT NULL, 4, 1, N'DescriptionTitleOverride'
-	UNION
-	SELECT 'False', 5, 1, N'DescriptionHide'
-	UNION
-	SELECT NULL, 4, 2, N'DescriptionTitleOverride'
-	UNION
-	SELECT 'False', 5, 2, N'DescriptionHide'
-	UNION
-	SELECT NULL, 4, 3, N'DescriptionTitleOverride'
-	UNION
-	SELECT 'False', 5, 3, N'DescriptionHide'
-	UNION
-	SELECT NULL, 4, 4, N'DescriptionTitleOverride'
-	UNION
-	SELECT 'False', 5, 4, N'DescriptionHide'
-	UNION
-	SELECT NULL, 8, 1, N'Shipping'
-	UNION
-	SELECT NULL, 4, 1, N'ShippingTitleOverride'
-	UNION
-	SELECT 'False', 5, 1, N'ShippingHide'
-	UNION
-	SELECT NULL, 8, 2, N'Shipping'
-	UNION
-	SELECT NULL, 4, 2, N'ShippingTitleOverride'
-	UNION
-	SELECT 'False', 5, 2, N'ShippingHide'
-	UNION
-	SELECT NULL, 4, 1, N'ServingTitleOverride'
-	UNION
-	SELECT 'False', 5, 1, N'ServingHide'
-	UNION
-	SELECT NULL, 4, 2, N'ServingTitleOverride'
-	UNION
-	SELECT 'False', 5, 2, N'ServingHide'
-	UNION
-	SELECT NULL, 4, 1, N'RecipesTitleOverride'
-	UNION
-	SELECT 'False', 5, 1, N'RecipesHide'
-	UNION
-	SELECT NULL, 4, 2, N'RecipesTitleOverride'
-	UNION
-	SELECT 'False', 5, 2, N'RecipesHide'
-	UNION
-	SELECT NULL, 4, 1, N'IngredientsTitleOverride'
-	UNION
-	SELECT 'False', 5, 1, N'IngredientsHide'
-	UNION
-	SELECT NULL, 4, 2, N'IngredientsTitleOverride'
-	UNION
-	SELECT 'False', 5, 2, N'IngredientsHide'
+--INSERT INTO ProductOptionTypes
+--(DefaultValue, IdFieldType, IdObjectType, Name)
+--SELECT 4, 3, 1, N'QTYThreshold'
 
-END
+--END
 
 GO
 
-UPDATE [dbo].[ProductOptionTypes]
-SET [IdFieldType] = 3
-WHERE [Name] = 'QTY'
+--IF NOT EXISTS(SELECT * FROM ProductOptionTypes WHERE Name='SalesText')
+--BEGIN
+
+--	INSERT INTO ProductOptionTypes
+--	(DefaultValue, IdFieldType, IdObjectType, Name)
+--	SELECT NULL, 4, NULL, N'SalesText'
+--	UNION
+--	SELECT NULL, 4, 1, N'DescriptionTitleOverride'
+--	UNION
+--	SELECT 'False', 5, 1, N'DescriptionHide'
+--	UNION
+--	SELECT NULL, 4, 2, N'DescriptionTitleOverride'
+--	UNION
+--	SELECT 'False', 5, 2, N'DescriptionHide'
+--	UNION
+--	SELECT NULL, 4, 3, N'DescriptionTitleOverride'
+--	UNION
+--	SELECT 'False', 5, 3, N'DescriptionHide'
+--	UNION
+--	SELECT NULL, 4, 4, N'DescriptionTitleOverride'
+--	UNION
+--	SELECT 'False', 5, 4, N'DescriptionHide'
+--	UNION
+--	SELECT NULL, 8, 1, N'Shipping'
+--	UNION
+--	SELECT NULL, 4, 1, N'ShippingTitleOverride'
+--	UNION
+--	SELECT 'False', 5, 1, N'ShippingHide'
+--	UNION
+--	SELECT NULL, 8, 2, N'Shipping'
+--	UNION
+--	SELECT NULL, 4, 2, N'ShippingTitleOverride'
+--	UNION
+--	SELECT 'False', 5, 2, N'ShippingHide'
+--	UNION
+--	SELECT NULL, 4, 1, N'ServingTitleOverride'
+--	UNION
+--	SELECT 'False', 5, 1, N'ServingHide'
+--	UNION
+--	SELECT NULL, 4, 2, N'ServingTitleOverride'
+--	UNION
+--	SELECT 'False', 5, 2, N'ServingHide'
+--	UNION
+--	SELECT NULL, 4, 1, N'RecipesTitleOverride'
+--	UNION
+--	SELECT 'False', 5, 1, N'RecipesHide'
+--	UNION
+--	SELECT NULL, 4, 2, N'RecipesTitleOverride'
+--	UNION
+--	SELECT 'False', 5, 2, N'RecipesHide'
+--	UNION
+--	SELECT NULL, 4, 1, N'IngredientsTitleOverride'
+--	UNION
+--	SELECT 'False', 5, 1, N'IngredientsHide'
+--	UNION
+--	SELECT NULL, 4, 2, N'IngredientsTitleOverride'
+--	UNION
+--	SELECT 'False', 5, 2, N'IngredientsHide'
+
+--END
+
+GO
+
+--UPDATE [dbo].[ProductOptionTypes]
+--SET [IdFieldType] = 3
+--WHERE [Name] = 'QTY'
 
 GO
 

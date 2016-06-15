@@ -90,7 +90,7 @@ BEGIN
 		LEFT JOIN 
 			(SELECT IdSku, BornDate, InventorySkuChannel, Assemble
 				FROM 
-				(SELECT IdSku, [Name], [Value] FROM ProductOptionTypes AS adt
+				(SELECT IdSku, [Name], [Value] FROM SkuOptionTypes AS adt
 				INNER JOIN SkuOptionValues AS adv on adt.Id = adv.IdOptionType) As source
 				PIVOT(
 					MIN([Value]) FOR [Name] in (BornDate, InventorySkuChannel, Assemble)

@@ -62,3 +62,5 @@
 
 :r .\Scripts\Newsletters.sql
 :r .\Scripts\VeraCore.sql
+
+:r .\Scripts\Skus.sql

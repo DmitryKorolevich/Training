@@ -36,6 +36,7 @@ using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.InventorySkus;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VC.Admin.Controllers
 {
@@ -53,6 +54,7 @@ namespace VC.Admin.Controllers
         private readonly IObjectHistoryLogService objectHistoryLogService;
         private readonly ILogger logger;
         private readonly ExtendedUserManager _userManager;
+        private readonly IAgentService _agentService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
 
         public ProductController(IProductCategoryService productCategoryService,
@@ -65,7 +67,7 @@ namespace VC.Admin.Controllers
             IDynamicMapper<ProductDynamic, Product> mapper,
             ICsvExportService<ProductCategoryStatisticTreeItemModel, ProductCategoryStatisticTreeItemCsvMap> productCategoryStatisticTreeItemCSVExportService,
             ICsvExportService<SkuBreakDownReportItem, SkuBreakDownReportItemCsvMap> skuBreakDownReportItemCSVExportService,
-            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager)
+            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager, IAgentService agentService)
         {
             this.productCategoryService = productCategoryService;
             this.inventoryCategoryService = inventoryCategoryService;
@@ -77,6 +79,7 @@ namespace VC.Admin.Controllers
             _skuBreakDownReportItemCSVExportService = skuBreakDownReportItemCSVExportService;
             this.objectHistoryLogService = objectHistoryLogService;
             _userManager = userManager;
+            _agentService = agentService;
             _mapper = mapper;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             this.logger = loggerProvider.CreateLogger<ProductController>();
@@ -88,7 +91,7 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Products)]
         public async Task<Result<ProductEditSettingsModel>> GetProductEditSettings()
         {
-            var lookups = productService.GetProductLookupsAsync().Select(
+            var lookups = productService.GetExpandedOptionTypesWithSkuTypes().Select(
                         p => new LookupViewModel(p.Name, p.IdObjectType, p.DefaultValue, p.Lookup)).ToList();
             var inventoryChannelLookup = (await settingService.GetLookupsAsync(new[] { SettingConstants.INVENTORY_SKU_LOOKUP_CHANNEL_NAME })).FirstOrDefault();
             if (inventoryChannelLookup != null)
@@ -164,28 +167,28 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<PagedList<ProductListItemModel>>> GetProducts([FromBody]VProductSkuFilter filter)
+        public async Task<Result<PagedList<ProductListItemModel>>> GetProducts([FromBody] VProductSkuFilter filter)
         {
-            var result = await productService.GetProductsAsync(filter);
+            var result = await productService.GetProductsAsync2(filter);
+
+            var agents =
+                await
+                    _agentService.GetAgents(
+                        result.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value).Distinct().ToList());
 
             var toReturn = new PagedList<ProductListItemModel>
             {
-                Items = result.Items.Select(p => new ProductListItemModel(p)).ToList(),
+                Items = await result.Items.Select(async p =>
+                {
+                    var productItem = await _mapper.ToModelAsync<ProductListItemModel>(p);
+                    if (p.IdEditedBy != null)
+                    {
+                        productItem.EditedByAgentId = agents.GetValueOrDefault(p.IdEditedBy.Value);
+                    }
+                    return productItem;
+                }).ToListAsync(),
                 Count = result.Count,
             };
-
-            var skus = await productService.GetSkusByProductIdsAsync(toReturn.Items.Select(p => p.ProductId).ToList());
-            foreach (var item in toReturn.Items)
-            {
-                var vProductSku = result.Items.FirstOrDefault(p => p.IdProduct == item.ProductId);
-                if (vProductSku != null)
-                {
-                    var skusInProduct = skus.Where(p => p.IdProduct == item.ProductId)
-                        .OrderBy(p => p.Order);
-
-                    item.SKUs = skusInProduct.Select(p => new SkuListItemModel(p, vProductSku)).ToList();
-                }
-            }
 
             return toReturn;
         }

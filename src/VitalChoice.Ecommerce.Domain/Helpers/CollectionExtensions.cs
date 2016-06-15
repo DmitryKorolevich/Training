@@ -46,6 +46,16 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 
+        public static T GetValueOrDefault<T, TKey>(this IDictionary<TKey, T> dict, TKey key)
+        {
+            T result;
+            if (dict.TryGetValue(key, out result))
+            {
+                return result;
+            }
+            return default(T);
+        }
+
         //public static void AddRange(this IList results, IEnumerable items)
         //{
         //    if (items == null)

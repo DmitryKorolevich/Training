@@ -3,7 +3,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Base;
 
 namespace VitalChoice.Ecommerce.Domain.Entities.Products
 {
-    public class Sku : DynamicDataEntity<SkuOptionValue, ProductOptionType>
+    public class Sku : DynamicDataEntity<SkuOptionValue, SkuOptionType>
     {
         public int IdProduct { get; set; }
 
@@ -15,14 +15,6 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Products
         {
             get { return Product?.IdObjectType ?? _idObjectType; }
             set { _idObjectType = value; }
-        }
-
-        private ICollection<ProductOptionType> _optionTypes;
-
-        public override ICollection<ProductOptionType> OptionTypes
-        {
-            get { return Product?.OptionTypes ?? _optionTypes; }
-            set { _optionTypes = value; }
         }
 
         public string Code { get; set; }
