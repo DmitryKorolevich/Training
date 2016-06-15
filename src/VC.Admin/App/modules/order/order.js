@@ -20,7 +20,8 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.orderAgentsReportController',
 	'app.modules.order.controllers.wholesaleDropShipReportController',
 	'app.modules.order.controllers.transactionsAndRefundsReportController',
-	'app.modules.order.controllers.ordersSummarySalesReportController'
+	'app.modules.order.controllers.ordersSummarySalesReportController',
+	'app.modules.order.controllers.skuAddressReportController'
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -111,6 +112,11 @@ angular.module('app.modules.order', [
 				    url: '/report/summary-sales',
 				    templateUrl: 'app/modules/order/partials/ordersSummarySalesReport.html',
 				    controller: 'ordersSummarySalesReportController'
+				})
+				.state('index.oneCol.orderSKUAddressReport', {
+				    url: '/report/sku-address',
+				    templateUrl: 'app/modules/order/partials/skuAddressReport.html',
+				    controller: 'skuAddressReportController'
 				});
 		}
 ]);

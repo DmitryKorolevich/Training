@@ -34,5 +34,8 @@ namespace VitalChoice.Interfaces.Services.Orders
 	    Task<ICollection<OrdersSummarySalesOrderTypeStatisticItem>> GetOrdersSummarySalesOrderTypeStatisticItemsAsync(OrdersSummarySalesReportFilter filter);
 
 	    Task<PagedList<OrdersSummarySalesOrderItem>> GetOrdersSummarySalesOrderItemsAsync(OrdersSummarySalesReportFilter filter);
+
+	    Task<PagedList<SkuAddressReportItem>> GetSkuAddressReportItemsAsync(SkuAddressReportFilter filter);
+
 	}
 }

@@ -25,6 +25,7 @@ using Newtonsoft.Json;
 using VC.Admin.Models.Customers;
 using VitalChoice.Business.CsvExportMaps;
 using VitalChoice.Business.CsvExportMaps.Customers;
+using VitalChoice.Business.Mail;
 using VitalChoice.Business.Queries.Users;
 using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -68,6 +69,7 @@ namespace VC.Admin.Controllers
         private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly ExtendedUserManager _userManager;
+        private readonly INotificationService _notificationService;
 
         public CustomerController(ICustomerService customerService,
             IDynamicMapper<CustomerDynamic, Customer> customerMapper,
@@ -80,7 +82,9 @@ namespace VC.Admin.Controllers
             IObjectHistoryLogService objectHistoryLogService,
             ICsvExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> csvExportCustomersForAffiliatesService,
             ICsvExportService<WholesaleListitem, WholesaleListitemCsvMap> csvExportWholesaleListitemService,
-            IPaymentMethodService paymentMethodService, ExtendedUserManager userManager)
+            IPaymentMethodService paymentMethodService, 
+            ExtendedUserManager userManager,
+            INotificationService notificationService)
         {
             _customerService = customerService;
             _countryService = countryService;
@@ -99,6 +103,7 @@ namespace VC.Admin.Controllers
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
 	        _paymentMethodService = paymentMethodService;
             _userManager = userManager;
+            _notificationService = notificationService;
         }
 
         [HttpGet]
@@ -156,7 +161,8 @@ namespace VC.Admin.Controllers
 	        var defaultPaymentMethodId = (await _paymentMethodService.GetStorefrontDefaultPaymentMethod()).Id;
 
 			model.ApprovedPaymentMethods = new List<int>() { defaultPaymentMethodId };
-            model.DefaultPaymentMethod = defaultPaymentMethodId; 
+            model.DefaultPaymentMethod = defaultPaymentMethodId;
+            model.ProductReviewEmailEnabled = true;
             return model;
         }
 
@@ -259,7 +265,7 @@ namespace VC.Admin.Controllers
                     toReturn.AddedBy = adminProfile.AgentId;
                 }
             }
-
+            
             return toReturn;
         }
 
@@ -357,6 +363,20 @@ namespace VC.Admin.Controllers
 			toReturn.PublicUserId = addUpdateCustomerModel.PublicUserId;
 
             await PrepareCustomerNotes(customer, toReturn);
+
+            if (!string.IsNullOrEmpty(toReturn.Email))
+            {
+                var dbProductReviewEmailEnabled = !await _notificationService.IsEmailUnsubscribedAsync(EmailConstants.ProductReviewIdNewsletter, toReturn.Email);
+                if (addUpdateCustomerModel.ProductReviewEmailEnabled && !dbProductReviewEmailEnabled)
+                {
+                    await _notificationService.UpdateUnsubscribeEmailAsync(EmailConstants.ProductReviewIdNewsletter, toReturn.Email, false);
+                }
+                if (!addUpdateCustomerModel.ProductReviewEmailEnabled && dbProductReviewEmailEnabled)
+                {
+                    await _notificationService.UpdateUnsubscribeEmailAsync(EmailConstants.ProductReviewIdNewsletter, toReturn.Email, true);
+                }
+            }
+            toReturn.ProductReviewEmailEnabled = addUpdateCustomerModel.ProductReviewEmailEnabled;
 
             return toReturn;
         }
@@ -464,6 +484,11 @@ namespace VC.Admin.Controllers
 			customerModel.PublicUserId = login.PublicId;
 
             await PrepareCustomerNotes(result,customerModel);
+
+            if (!string.IsNullOrEmpty(customerModel.Email))
+            {
+                customerModel.ProductReviewEmailEnabled = !await _notificationService.IsEmailUnsubscribedAsync(EmailConstants.ProductReviewIdNewsletter, customerModel.Email);
+            }
 
             return customerModel;
         }

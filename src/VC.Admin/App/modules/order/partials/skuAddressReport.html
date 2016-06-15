@@ -1,0 +1,156 @@
+﻿<div class="container-fluid sku-address-report">
+    <div class="well">
+        <span class="legend">Order SKU and Address Report</span>
+        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+            <fieldset>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="From" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.From.$invalid">
+                            <small class="error" ng-show="forms.form.From.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","From")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="To" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.To.$invalid">
+                            <small class="error" ng-show="forms.form.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <select class="form-control" name="IdCustomerType" data-ng-change="filterChanged();" data-ng-model="filter.IdCustomerType" ng-options="item.Key as item.Text for item in customerTypes"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group autocomplete col-md-12">
+                            <input type="text" name="SKU" class="form-control" placeholder="SKU" data-ng-model="filter.SkuCode" autocomplete="off"
+                                   typeahead-min-length="1" uib-typeahead="item.Code as item.Code for item in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU"
+                                   typeahead-wait-ms="100" data-ng-change="filterChanged();">
+                            <span class="input-group-addon">
+                                <i ng-show="loadingSKUsBySKU" class="glyphicon glyphicon-refresh"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group autocomplete col-md-12">
+                            <input data-ng-disabled="filter.WithoutDiscount" type="text" name="DiscountCode" class="form-control" placeholder="Discount Code" data-ng-model="filter.DiscountCode" autocomplete="off"
+                                   typeahead-min-length="1" uib-typeahead="item.Code as item.Code for item in getDiscounts($viewValue)" typeahead-loading="loadingDiscountCodesByCode"
+                                   typeahead-wait-ms="100" data-ng-change="filterChanged();">
+                            <span class="input-group-addon">
+                                <i ng-show="loadingDiscountCodesByCode" class="glyphicon glyphicon-refresh"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="WithoutDiscount" data-ng-model="filter.WithoutDiscount" data-ng-change="filterChanged();"/>
+                                No discount
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
+                        <a target="_self" class="btn btn-primary pull-right" data-ng-href="{{options.exportUrl}}">Export</a>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <spinner-overlay data-loading="refreshTracker.active()">            
+            <div class="orders">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Order Date</th>
+                            <th>SKU</th>
+                            <th>Quantity</th>
+                            <th>Bill to Name</th>
+                            <th>Bill to Company</th>
+                            <th>Bill to Address1</th>
+                            <th>Bill to Address2</th>
+                            <th>Bill to City</th>
+                            <th>Bill to State</th>
+                            <th>Bill to Zip</th>
+                            <th>Bill to Country</th>
+                            <th>Bill to Phone</th>
+                            <th>Customer #</th>
+                            <th>Discount Code</th>
+                            <th>Channel</th>
+                            <th>Unit Price</th>
+                            <th>Extended Price (Qty x Unit Price)</th>
+                            <th>DNM flag</th>
+                            <th>Ship to Name</th>
+                            <th>Ship to Company</th>
+                            <th>Ship to Address1</th>
+                            <th>Ship to Address2</th>
+                            <th>Ship to City</th>
+                            <th>Ship to State</th>
+                            <th>Ship to Zip</th>
+                            <th>Ship to Country</th>
+                            <th>Ship to Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="item in items">
+                            <td>
+                                <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.IdOrder })' : item.IdObjectType==6 ? 'index.oneCol.orderRefundDetail({id: item.IdOrder })' : 'index.oneCol.orderDetail({id: item.IdOrder })'}}">{{::item.IdOrder}}</a>
+                            </td>
+                            <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
+                            <td>{{::item.SkuCode}}</td>
+                            <td>{{::item.Quantity}}</td>
+                            <td>{{::item.BillingFirstName}} {{::item.BillingLastName}}</td>
+                            <td>{{::item.BillingCompany}}</td>
+                            <td>{{::item.BillingAddress1}}</td>
+                            <td>{{::item.BillingAddress2}}</td>
+                            <td>{{::item.BillingCity}}</td>
+                            <td>{{::item.BillingStateCode}}</td>
+                            <td>{{::item.BillingZip}}</td>
+                            <td>{{::item.BillingCountyCode}}</td>
+                            <td>{{::item.BillingPhone}}</td>
+                            <td>
+                                <a ui-sref="index.oneCol.customerDetail({id: {{::item.IdCustomer}}})">{{::item.IdCustomer}}</a>
+                            </td>
+                            <td>{{::item.DiscountCode}}</td>
+                            <td>{{::item.Source}}</td>
+                            <td>{{::item.Price | currency}}</td>
+                            <td>{{::item.Amount | currency}}</td>
+                            <td>{{::item.DoNotMail}}</td>
+                            <td>{{::item.ShippingFirstName}} {{::item.BillingLastName}}</td>
+                            <td>{{::item.ShippingCompany}}</td>
+                            <td>{{::item.ShippingAddress1}}</td>
+                            <td>{{::item.ShippingAddress2}}</td>
+                            <td>{{::item.ShippingCity}}</td>
+                            <td>{{::item.ShippingStateCode}}</td>
+                            <td>{{::item.ShippingZip}}</td>
+                            <td>{{::item.ShippingCountyCode}}</td>
+                            <td>{{::item.ShippingPhone}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </spinner-overlay>
+        <uib-pagination boundary-links="true"
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        previous-text="&lsaquo;"
+                        next-text="&rsaquo;"
+                        first-text="&laquo;"
+                        last-text="&raquo;"
+                        data-ng-change="pageChanged()">
+        </uib-pagination>
+    </div>
+</div>

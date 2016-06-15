@@ -21,12 +21,15 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using VitalChoice.Data.Helpers;
+using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities.Reports;
+using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Settings;
 
 namespace VitalChoice.Business.Services.Orders
@@ -40,6 +43,9 @@ namespace VitalChoice.Business.Services.Orders
         private readonly SpEcommerceRepository _sPEcommerceRepository;
         private readonly ICountryService _countryService;
         private readonly IAppInfrastructureService _appInfrastructureService;
+        private readonly IProductService _productService;
+        private readonly IDiscountService _discountService;
+        private readonly IDynamicMapper<AddressDynamic, Address> _addresMapper;
         private readonly ILogger _logger;
 
         public OrderReportService(
@@ -50,6 +56,9 @@ namespace VitalChoice.Business.Services.Orders
             SpEcommerceRepository sPEcommerceRepository,
             ICountryService countryService,
             IAppInfrastructureService appInfrastructureService,
+            IProductService productService,
+            IDiscountService discountService,
+            IDynamicMapper<AddressDynamic, Address> addresMapper,
             ILoggerProviderExtended loggerProvider)
         {
             _orderService = orderService;
@@ -59,6 +68,9 @@ namespace VitalChoice.Business.Services.Orders
             _sPEcommerceRepository = sPEcommerceRepository;
             _countryService = countryService;
             _appInfrastructureService = appInfrastructureService;
+            _productService = productService;
+            _discountService = discountService;
+            _addresMapper = addresMapper;
             _logger = loggerProvider.CreateLogger<OrderReportService>();
         }
 
@@ -634,6 +646,146 @@ namespace VitalChoice.Business.Services.Orders
             toReturn.Count = items.Count > 0 ? items.First().TotalCount : 0;
 
             return toReturn;
+        }
+
+        public async Task<PagedList<SkuAddressReportItem>> GetSkuAddressReportItemsAsync(SkuAddressReportFilter filter)
+        {
+            var toReturn = new PagedList<SkuAddressReportItem>();
+            int? idSku = null;
+            int? idDiscount = null;
+            if (!string.IsNullOrEmpty(filter.SkuCode))
+            {
+                idSku = (await _productService.GetSkuAsync(filter.SkuCode))?.Id;
+                if (!idSku.HasValue)
+                {
+                    return toReturn;
+                }
+            }
+            if (!string.IsNullOrEmpty(filter.DiscountCode))
+            {
+                idDiscount = (await _discountService.GetByCode(filter.DiscountCode))?.Id;
+                if (!idDiscount.HasValue)
+                {
+                    return toReturn;
+                }
+            }
+
+            OrderQuery conditions = new OrderQuery().NotDeleted().WithCreatedDate(filter.From, filter.To).WithActualStatusOnly().
+                    WithOrderTypes(new [] { OrderType.AutoShipOrder, OrderType.DropShip, OrderType.GiftList, OrderType.Normal }).
+                    WithCustomerType(filter.IdCustomerType).WithIdSku(idSku).WithIdDiscount(idDiscount,filter.WithoutDiscount);
+
+            Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderByDescending(y => y.Id);
+            Func<IQueryLite<Order>, IQueryLite<Order>> includes = p => p.Include(c => c.OptionValues).
+                Include(c => c.PaymentMethod).ThenInclude(c => c.BillingAddress).ThenInclude(c => c.OptionValues).
+                Include(c => c.ShippingAddress).ThenInclude(c => c.OptionValues).
+                Include(c => c.Customer).ThenInclude(c => c.OptionValues).
+                Include(c => c.Skus).ThenInclude(c => c.Sku).
+                Include(c => c.PromoSkus).ThenInclude(c => c.Sku).
+                Include(c => c.Discount);
+
+            PagedList<OrderDynamic> orders;
+            if(filter.Paging!=null)
+            { 
+                orders = await _orderService.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, conditions,
+                        includes, orderBy: sortable, withDefaults: true);
+            }
+            else
+            {
+                var data = await _orderService.SelectAsync(conditions, includes, orderBy: sortable, withDefaults: true);
+                orders =new PagedList<OrderDynamic>();
+                orders.Items = data;
+                orders.Count = data.Count;
+            }
+
+            toReturn.Count = orders.Count;
+
+            var countries = await _countryService.GetCountriesAsync();
+
+            foreach (var order in orders.Items)
+            {
+                foreach (var skuOrdered in order.Skus)
+                {
+                    if (!idSku.HasValue || skuOrdered.Sku.Id == idSku.Value)
+                    {
+                        SkuAddressReportItem item = new SkuAddressReportItem();
+                        SetBaseSkuAddressReportItemFields(item, order, skuOrdered, countries);
+                        toReturn.Items.Add(item);
+                    }
+                }
+
+                foreach (var skuOrdered in order.PromoSkus.Where(p=>p.Enabled))
+                {
+                    if (!idSku.HasValue || skuOrdered.Sku.Id == idSku.Value)
+                    {
+                        SkuAddressReportItem item = new SkuAddressReportItem();
+                        SetBaseSkuAddressReportItemFields(item, order, skuOrdered, countries);
+                        toReturn.Items.Add(item);
+                    }
+                }
+            }
+
+            return toReturn;
+        }
+
+        private void SetBaseSkuAddressReportItemFields(SkuAddressReportItem item, OrderDynamic order, SkuOrdered skuOrdered, ICollection<Country> countries)
+        {
+            item.IdOrder = order.Id;
+            item.DateCreated = order.DateCreated;
+            item.IdObjectType = order.IdObjectType;
+            item.OrderStatus = order.OrderStatus;
+            item.POrderStatus = order.POrderStatus;
+            item.NPOrderStatus = order.NPOrderStatus;
+            item.IdCustomer = order.Customer.Id;
+            item.IdCustomerObjectType = order.IdObjectType;
+
+            item.SkuCode = skuOrdered.Sku.Code;
+            item.DiscountCode = order.Discount?.Code;
+            item.Quantity = skuOrdered.Quantity;
+            item.Price = skuOrdered.Amount;
+            item.Amount = skuOrdered.Quantity*skuOrdered.Amount;
+
+            item.Source = _appInfrastructureService.Data().OrderSources.FirstOrDefault(p => (order.Customer.SafeData.Source ?? 0) == p.Key)?.Text;
+            item.DoNotMail = order.Customer.SafeData.DoNotMail ?? false;
+
+            var shippingAddress = _addresMapper.ToModelAsync<SkuAddressReportAddressItem>(order.ShippingAddress).Result;
+            shippingAddress.CountyCode = countries.FirstOrDefault(x => x.Id == shippingAddress.IdCountry)?.CountryCode;
+            shippingAddress.StateCode = countries.SelectMany(x => x.States).FirstOrDefault(x => x.Id == shippingAddress.IdState)?.StateCode;
+
+            item.ShippingFirstName = shippingAddress.FirstName;
+            item.ShippingLastName = shippingAddress.LastName;
+            item.ShippingCompany = shippingAddress.Company;
+            item.ShippingAddress1 = shippingAddress.Address1;
+            item.ShippingAddress2 = shippingAddress.Address2;
+            item.ShippingCity = shippingAddress.City;
+            item.ShippingCounty = shippingAddress.County;
+            item.ShippingCountyCode = shippingAddress.CountyCode;
+            item.ShippingStateCode = shippingAddress.StateCode;
+            item.ShippingZip = shippingAddress.Zip;
+            item.ShippingPhone = shippingAddress.Phone;
+
+            SkuAddressReportAddressItem billingAddress;
+            if (order.PaymentMethod.Address != null)
+            {
+                billingAddress = _addresMapper.ToModelAsync<SkuAddressReportAddressItem>(order.PaymentMethod.Address).Result;
+                billingAddress.CountyCode = countries.FirstOrDefault(x => x.Id == order.PaymentMethod.Address?.IdCountry)?.CountryCode;
+                billingAddress.StateCode = countries.SelectMany(x => x.States).FirstOrDefault(x => x.Id == order.PaymentMethod.Address?.IdState)?.StateCode;
+            }
+            else
+            {
+                billingAddress = new SkuAddressReportAddressItem();
+            }
+
+            item.BillingFirstName = shippingAddress.FirstName;
+            item.BillingLastName = shippingAddress.LastName;
+            item.BillingCompany = shippingAddress.Company;
+            item.BillingAddress1 = shippingAddress.Address1;
+            item.BillingAddress2 = shippingAddress.Address2;
+            item.BillingCity = shippingAddress.City;
+            item.BillingCounty = shippingAddress.County;
+            item.BillingCountyCode = shippingAddress.CountyCode;
+            item.BillingStateCode = shippingAddress.StateCode;
+            item.BillingZip = shippingAddress.Zip;
+            item.BillingPhone = shippingAddress.Phone;
         }
     }
 }

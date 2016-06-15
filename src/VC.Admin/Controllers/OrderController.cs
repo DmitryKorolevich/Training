@@ -80,6 +80,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<WholesaleDropShipReportOrderItem, WholesaleDropShipReportOrderItemCsvMap> _wholesaleDropShipReportOrderItemCSVExportService;
         private readonly ICsvExportService<TransactionAndRefundReportItem, TransactionAndRefundReportItemCsvMap> _transactionAndRefundReportItemCSVExportService;
         private readonly ICsvExportService<OrdersSummarySalesOrderItem, OrdersSummarySalesOrderItemCsvMap> _ordersSummarySalesOrderItemSVExportService;
+        private readonly ICsvExportService<SkuAddressReportItem, SkuAddressReportItemCsvMap> _skuAddressReportItemSVExportService;
         private readonly INotificationService _notificationService;
         private readonly BrontoService _brontoService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
@@ -106,6 +107,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<TransactionAndRefundReportItem, TransactionAndRefundReportItemCsvMap>
                 transactionAndRefundReportItemCSVExportService,
             ICsvExportService<OrdersSummarySalesOrderItem, OrdersSummarySalesOrderItemCsvMap> ordersSummarySalesOrderItemSVExportService,
+            ICsvExportService<SkuAddressReportItem, SkuAddressReportItemCsvMap> skuAddressReportItemSVExportService,
             INotificationService notificationService,
             BrontoService brontoService,
             IOrderReportService orderReportService,
@@ -130,6 +132,7 @@ namespace VC.Admin.Controllers
             _wholesaleDropShipReportOrderItemCSVExportService = wholesaleDropShipReportOrderItemCSVExportService;
             _transactionAndRefundReportItemCSVExportService = transactionAndRefundReportItemCSVExportService;
             _ordersSummarySalesOrderItemSVExportService = ordersSummarySalesOrderItemSVExportService;
+            _skuAddressReportItemSVExportService = skuAddressReportItemSVExportService;
             _notificationService = notificationService;
             _brontoService = brontoService;
             _orderReportService = orderReportService;
@@ -365,6 +368,19 @@ namespace VC.Admin.Controllers
             if (!string.IsNullOrEmpty(model.Customer.Email) && model.SignUpNewsletter.HasValue)
             {
                 _brontoService.PushSubscribe(model.Customer.Email, model.SignUpNewsletter.Value);
+            }
+
+            if (!string.IsNullOrEmpty(order.Customer.Email) && model.Id==0)
+            {
+                var dbProductReviewEmailEnabled = !await _notificationService.IsEmailUnsubscribedAsync(EmailConstants.ProductReviewIdNewsletter, order.Customer.Email);
+                if (model.Customer.ProductReviewEmailEnabled && !dbProductReviewEmailEnabled)
+                {
+                    await _notificationService.UpdateUnsubscribeEmailAsync(EmailConstants.ProductReviewIdNewsletter, order.Customer.Email, false);
+                }
+                if (!model.Customer.ProductReviewEmailEnabled && dbProductReviewEmailEnabled)
+                {
+                    await _notificationService.UpdateUnsubscribeEmailAsync(EmailConstants.ProductReviewIdNewsletter, order.Customer.Email, true);
+                }
             }
 
             return toReturn;
@@ -1213,6 +1229,50 @@ namespace VC.Admin.Controllers
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileName = String.Format(FileConstants.SUMMARY_SALES_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<PagedList<SkuAddressReportItem>>> GetSkuAddressReportItems([FromBody]SkuAddressReportFilter filter)
+        {
+            var toReturn = await _orderReportService.GetSkuAddressReportItemsAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<FileResult> GetSkuAddressReportItemsReportFile([FromQuery]string from, [FromQuery]string to,
+            [FromQuery]int? idcustomertype = null, [FromQuery]string skucode = null, [FromQuery]string discountcode = null, [FromQuery]bool withoutdiscount = false)
+        {
+            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+
+            SkuAddressReportFilter filter = new SkuAddressReportFilter()
+            {
+                From = dFrom.Value,
+                To = dTo.Value.AddDays(1),
+                IdCustomerType = idcustomertype,
+                SkuCode = skucode,
+                DiscountCode = discountcode,
+                WithoutDiscount = withoutdiscount
+            };
+            filter.Paging = null;
+
+            var data = await _orderReportService.GetSkuAddressReportItemsAsync(filter);
+
+            var result = _skuAddressReportItemSVExportService.ExportToCsv(data.Items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.ORDERS_SKUS_REPORT, DateTime.Now)
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
