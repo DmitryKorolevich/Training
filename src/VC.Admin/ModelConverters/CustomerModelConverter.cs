@@ -19,17 +19,14 @@ namespace VC.Admin.ModelConverters
 	    private readonly IDynamicMapper<CustomerNoteDynamic, CustomerNote> _customerNoteMapper;
         private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodMapper;
         private readonly IDynamicMapper<AddressDynamic, Address> _addressMapper;
-        private readonly INotificationService _notificationService;
 
         public CustomerModelConverter(IDynamicMapper<CustomerNoteDynamic, CustomerNote> customerNoteMapper,
             IDynamicMapper<AddressDynamic, Address> addressMapper,
-            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodMapper,
-            INotificationService notificationService)
+            IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodMapper)
         {
             _customerNoteMapper = customerNoteMapper;
             _addressMapper = addressMapper;
             _paymentMethodMapper = paymentMethodMapper;
-            _notificationService = notificationService;
         }
 
         public override async Task DynamicToModelAsync(AddUpdateCustomerModel model, CustomerDynamic dynamic)
@@ -82,11 +79,6 @@ namespace VC.Admin.ModelConverters
 					model.Files.Add(fileDynamic);
 				}
 			}
-
-            if (!string.IsNullOrEmpty(model.Email))
-            {
-                model.ProductReviewEmailEnabled = !await _notificationService.IsEmailUnsubscribedAsync(EmailConstants.ProductReviewIdNewsletter, model.Email);
-            }
 	    }
 
 	    public override async Task ModelToDynamicAsync(AddUpdateCustomerModel model, CustomerDynamic dynamic)
@@ -164,19 +156,6 @@ namespace VC.Admin.ModelConverters
 					dynamic.Files.Add(fileModel);
 				}
 			}
-
-            if(!string.IsNullOrEmpty(model.Email) && model.Id != 0)
-            { 
-                var dbProductReviewEmailEnabled = !await _notificationService.IsEmailUnsubscribedAsync(EmailConstants.ProductReviewIdNewsletter, model.Email);
-	            if (model.ProductReviewEmailEnabled && !dbProductReviewEmailEnabled)
-	            {
-	                await _notificationService.UpdateUnsubscribeEmailAsync(EmailConstants.ProductReviewIdNewsletter, model.Email,false);
-                }
-                if (!model.ProductReviewEmailEnabled && dbProductReviewEmailEnabled)
-                {
-                    await _notificationService.UpdateUnsubscribeEmailAsync(EmailConstants.ProductReviewIdNewsletter, model.Email, true);
-                }
-            }
         }
 	}
 }

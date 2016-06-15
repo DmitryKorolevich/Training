@@ -215,5 +215,14 @@ angular.module('app.core.dataAccess.services.orderService', [])
                 filter.CustomerSourceDetails, filter.IdCustomer, filter.KeyCode,
                 filter.DiscountCode, filter.IsAffiliate, filter.FromCount, filter.ToCount, buildNumber);
 	    },
+	    getSkuAddressReportItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetSkuAddressReportItems', filter, getConfig(tracker));
+	    },
+	    getSkuAddressReportItemsReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + ('GetSkuAddressReportItemsReportFile?from={0}&to={1}&idcustomertype={2}&skucode={3}&discountcode={4}&withoutdiscount={5}&buildNumber={6}')
+                .format(filter.From, filter.To, filter.IdCustomerType, filter.SkuCode, filter.DiscountCode, filter.WithoutDiscount, buildNumber);
+	    },
 	};
 }]);

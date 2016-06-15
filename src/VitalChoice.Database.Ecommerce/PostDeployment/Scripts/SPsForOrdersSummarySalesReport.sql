@@ -18,8 +18,8 @@ CREATE PROCEDURE [dbo].[SPGetOrdersForOrdersSummarySalesReport]
 	@tocount int = null,
 	@keycode nvarchar(250) = NULL,
 	@idcustomer int = NULL,
-	@firstorderfrom datetime2,
-	@firstorderto datetime2,
+	@firstorderfrom datetime2 =NULL,
+	@firstorderto datetime2 =NULL,
 	@idcustomertype int = NULL,
 	@discountcode nvarchar(250) = NULL,
 	@isaffiliate bit =NULL,
@@ -29,6 +29,30 @@ AS
 BEGIN
 
 	SET NOCOUNT ON
+
+	DECLARE @orders AS TABLE
+    (
+        Id INT NOT NULL, IdObjectType INT NOT NULL, IdCustomer INT NOT NULL, CustomerIdObjectType INT NOT NULL, 
+		IdDiscount INT NULL, CustomerDateCreated DATETIME2 NOT NULL, IdProfileAddress INT NOT NULL, OrderStatus INT NULL,
+		POrderStatus INT NULL, NPOrderStatus INT NULL, DateCreated DATETIME2 NOT NULL, ProductsSubtotal MONEY NOT NULL, Total MONEY NOT NULL
+    );
+
+	INSERT INTO @orders
+	(Id, IdObjectType, IdCustomer, CustomerIdObjectType,
+	IdDiscount, CustomerDateCreated, IdProfileAddress, OrderStatus,
+	POrderStatus, NPOrderStatus, DateCreated, ProductsSubtotal, Total)
+	SELECT o.Id, o.IdObjectType, o.IdCustomer, c.IdObjectType As CustomerIdObjectType, o.IdDiscount, c.DateCreated AS CustomerDateCreated,
+		c.IdProfileAddress, o.OrderStatus, o.POrderStatus, o.NPOrderStatus, o.DateCreated, o.ProductsSubtotal, o.Total
+	FROM Orders o WITH(NOLOCK)
+	JOIN Customers c WITH(NOLOCK) ON o.IdCustomer=c.Id
+	WHERE
+		o.DateCreated>=@from AND o.DateCreated<=@to AND
+		o.StatusCode!=3 AND o.IdObjectType NOT IN (2,5,6) AND 
+		((o.OrderStatus IS NOT NULL AND o.OrderStatus !=1 AND o.OrderStatus !=4 AND o.OrderStatus !=6 ) OR 
+		(o.OrderStatus IS NULL AND o.POrderStatus !=1 AND o.POrderStatus !=4 AND o.POrderStatus !=6 AND 
+		o.NPOrderStatus !=1 AND o.NPOrderStatus !=4 AND o.NPOrderStatus !=6)) AND
+		(@idcustomer IS NULL OR o.IdCustomer = @idcustomer) AND	
+		(@idcustomertype IS NULL OR c.IdObjectType = @idcustomertype)
 
 		;WITH tempOrders(
 			Id, IdObjectType, IdCustomer, CustomerIdObjectType, IdDiscount, CustomerDateCreated,
@@ -45,19 +69,7 @@ BEGIN
 				d.Code as DiscountCode, aop.IdAffiliate, kcval.Value as KeyCode, CAST(sval.Value as int) as Source,
 				sdval.Value as SourceDetails, occ.Count as OrdersCount, ISNULL(foc.DateCreated, temp.CustomerDateCreated) as FirstOrderDate
 				FROM
-				(SELECT 
-					o.Id, o.IdObjectType, o.IdCustomer, c.IdObjectType As CustomerIdObjectType, o.IdDiscount, c.DateCreated AS CustomerDateCreated,
-					c.IdProfileAddress, o.OrderStatus, o.POrderStatus, o.NPOrderStatus, o.DateCreated, o.ProductsSubtotal, o.Total
-				FROM Orders o WITH(NOLOCK)
-				JOIN Customers c WITH(NOLOCK) ON o.IdCustomer=c.Id
-				WHERE
-					o.DateCreated>=@from AND o.DateCreated<=@to AND
-					o.StatusCode!=3 AND o.IdObjectType NOT IN (2,5,6) AND 
-					((o.OrderStatus IS NOT NULL AND o.OrderStatus !=1 AND o.OrderStatus !=4 AND o.OrderStatus !=6 ) OR 
-					(o.OrderStatus IS NULL AND o.POrderStatus !=1 AND o.POrderStatus !=4 AND o.POrderStatus !=6 AND 
-					o.NPOrderStatus !=1 AND o.NPOrderStatus !=4 AND o.NPOrderStatus !=6)) AND
-					(@idcustomer IS NULL OR o.IdCustomer = @idcustomer) AND	
-					(@idcustomertype IS NULL OR c.IdObjectType = @idcustomertype)) temp	
+				@orders as temp	
 			LEFT JOIN OrderOptionTypes AS kcopt WITH(NOLOCK) ON kcopt.Name = N'KeyCode' AND kcopt.IdObjectType = temp.IdObjectType
 			LEFT JOIN OrderOptionValues AS kcval WITH(NOLOCK) ON kcval.IdOrder = temp.Id AND kcval.IdOptionType = kcopt.Id
 			LEFT JOIN CustomerOptionTypes AS sopt WITH(NOLOCK) ON sopt.Name = N'Source'
@@ -119,8 +131,8 @@ CREATE PROCEDURE [dbo].[SPGetOrderStatisticByTypeForOrdersSummarySalesReport]
 	@tocount int = null,
 	@keycode nvarchar(250) = NULL,
 	@idcustomer int = NULL,
-	@firstorderfrom datetime2,
-	@firstorderto datetime2,
+	@firstorderfrom datetime2 =NULL,
+	@firstorderto datetime2 =NULL,
 	@idcustomertype int = NULL,
 	@discountcode nvarchar(250) = NULL,
 	@isaffiliate bit =NULL

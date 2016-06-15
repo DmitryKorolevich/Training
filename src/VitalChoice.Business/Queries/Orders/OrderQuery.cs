@@ -226,6 +226,20 @@ namespace VitalChoice.Business.Queries.Orders
             return this;
         }
 
+        public OrderQuery WithIdDiscount(int? idDiscount, bool? withoutDiscount)
+        {
+            if (withoutDiscount.HasValue && withoutDiscount.Value)
+            {
+                Add(c => !c.IdDiscount.HasValue);
+            }
+            else if (idDiscount.HasValue)
+            {
+                Add(c => c.IdDiscount == idDiscount.Value);
+            }
+
+            return this;
+        }
+
         public OrderQuery WithShipState(int? idShipState)
         {
             if (idShipState.HasValue)

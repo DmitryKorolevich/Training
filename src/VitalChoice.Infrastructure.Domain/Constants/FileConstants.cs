@@ -25,5 +25,6 @@
         public const string SUMMARY_SALES_REPORT = "Summary_Sales_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
         public const string WHOLESALE_LIST_REPORT = "Wholesale_List_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
         public const string SKU_BREAKDOWN_REPORT = "SKU_BreakDown_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+        public const string ORDERS_SKUS_REPORT = "Orders_Skus_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
     }
 }
