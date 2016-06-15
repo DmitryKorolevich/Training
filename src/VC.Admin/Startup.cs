@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Routing;
 using VitalChoice.Profiling;
 
 namespace VC.Admin
@@ -77,7 +78,8 @@ namespace VC.Admin
 
             app.InjectProfiler();
 
-            app.UseMvc(RouteConfig.RegisterRoutes);
+            app.UseMvc(
+                builder => RouteConfig.RegisterRoutes(builder, app.ApplicationServices.GetRequiredService<IInlineConstraintResolver>()));
         }
     }
 }
