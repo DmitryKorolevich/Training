@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
@@ -230,7 +231,7 @@ namespace VitalChoice.Caching.Services.Cache
             return _mainCluster.Update(pk, entity, (e, exist) => UpdateExist(pk, e, exist));
         }
 
-        public CachedEntity<T> UpdateKeepRelations(T entity, IDictionary<TrackedEntityKey, EntityEntry> trackedEntities)
+        public CachedEntity<T> UpdateKeepRelations(T entity, IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities)
         {
             if (entity == null)
                 return null;
@@ -250,7 +251,7 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        private bool UpdateEntityWithRelations(T entity, IDictionary<TrackedEntityKey, EntityEntry> trackedEntities, CachedEntity<T> cached)
+        private bool UpdateEntityWithRelations(T entity, IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities, CachedEntity<T> cached)
         {
             ICollection<RelationInfo> relationsToClone;
             if (!GetAllNormalizedAndTracked(entity, trackedEntities, out relationsToClone, cached))
@@ -274,7 +275,7 @@ namespace VitalChoice.Caching.Services.Cache
         }
 
         private bool GetAllNormalizedAndTracked(object entity,
-            IDictionary<TrackedEntityKey, EntityEntry> trackedEntities, out ICollection<RelationInfo> relationsToClone,
+            IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities, out ICollection<RelationInfo> relationsToClone,
             CachedEntity<T> cached)
         {
 
@@ -299,7 +300,7 @@ namespace VitalChoice.Caching.Services.Cache
             return GetIsNormalized(entity, _relationInfo.RelationType, trackedEntities, relationsToClone, _entityInfo);
         }
 
-        private bool GetIsNormalized(object entity, Type relationType, IDictionary<TrackedEntityKey, EntityEntry> trackedEntities,
+        private bool GetIsNormalized(object entity, Type relationType, IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities,
             ICollection<RelationInfo> relationsToClone, EntityInfo entityInfo = null)
         {
             if (entityInfo == null && !_infoStorage.GetEntityInfo(relationType, out entityInfo))
@@ -333,12 +334,12 @@ namespace VitalChoice.Caching.Services.Cache
                         }
                         if (trackedEntities != null)
                         {
-                            EntityEntry entry;
+                            InternalEntityEntry entry;
                             if (!trackedEntities.TryGetValue(new TrackedEntityKey(relation.RelationType, pk), out entry))
                             {
                                 return false;
                             }
-                            if (entry.State == EntityState.Detached || entry.Entity != newItem)
+                            if (entry.EntityState == EntityState.Detached || entry.Entity != newItem)
                             {
                                 return false;
                             }
@@ -364,7 +365,7 @@ namespace VitalChoice.Caching.Services.Cache
                             {
                                 return false;
                             }
-                            EntityEntry entry;
+                            InternalEntityEntry entry;
                             if (trackedEntities.TryGetValue(new TrackedEntityKey(relation.RelationType, newRelatedKey), out entry))
                             {
                                 if (entry.Entity != null)
@@ -384,12 +385,12 @@ namespace VitalChoice.Caching.Services.Cache
                         }
                         if (trackedEntities != null)
                         {
-                            EntityEntry entry;
+                            InternalEntityEntry entry;
                             if (!trackedEntities.TryGetValue(new TrackedEntityKey(relation.RelationType, newRelatedKey), out entry))
                             {
                                 return false;
                             }
-                            if (entry.State == EntityState.Detached || entry.Entity != newRelated)
+                            if (entry.EntityState == EntityState.Detached || entry.Entity != newRelated)
                             {
                                 return false;
                             }

@@ -52,7 +52,7 @@ namespace VitalChoice.Data.Extensions
         //{
         //    return expr.Compile().Invoke(arg1, arg2, arg3, arg4);
         //}
-        
+
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
         {
             if (source == null)
@@ -62,12 +62,15 @@ namespace VitalChoice.Data.Extensions
                 action(element);
         }
 
-        public static Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> action)
+        public static async Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> action)
         {
             if (source == null)
-                return TaskCache.CompletedTask;
+                return;
 
-            return Task.WhenAll(source.Select(action));
+            foreach (var item in source)
+            {
+                await action(item);
+            }
         }
     }
 }

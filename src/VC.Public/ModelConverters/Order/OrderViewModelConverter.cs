@@ -77,7 +77,7 @@ namespace VC.Public.ModelConverters.Order
             
             model.IdPaymentMethodType = dynamic.PaymentMethod.IdObjectType;
 
-            model.Skus.AddRange(await Task.WhenAll(dynamic.Skus?.Select(async sku =>
+            await model.Skus.AddRangeAsync(dynamic.Skus?.Select(async sku =>
                 {
                     var result = await _skuMapper.ToModelAsync<CartSkuModel>(sku.Sku);
                     await _productMapper.UpdateModelAsync(result, sku.Sku.Product);
@@ -88,7 +88,7 @@ namespace VC.Public.ModelConverters.Order
                     result.GeneratedGCCodes = sku.GcsGenerated?.Select(g => g.Code).ToList() ?? new List<string>();
 
                     return result;
-                })) ?? Enumerable.Empty<CartSkuModel>());
+                }) ?? Enumerable.Empty<Task<CartSkuModel>>());
 
             model.Skus.ForEach(p =>
             {
@@ -100,16 +100,16 @@ namespace VC.Public.ModelConverters.Order
                 p.DisplayName += $" ({p.PortionsCount})";
             });
 
-            model.PromoSkus.AddRange(await Task.WhenAll(dynamic.PromoSkus?.Where(p => p.Enabled).Select(async sku =>
+            await model.PromoSkus.AddRangeAsync(dynamic.PromoSkus?.Where(p => p.Enabled).Select(async sku =>
             {
                 var result = await _skuMapper.ToModelAsync<CartSkuModel>(sku.Sku);
                 await _productMapper.UpdateModelAsync(result, sku.Sku.Product);
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
-                result.SubTotal = sku.Quantity * sku.Amount;
-                
+                result.SubTotal = sku.Quantity*sku.Amount;
+
                 return result;
-            })) ?? Enumerable.Empty<CartSkuModel>());
+            }) ?? Enumerable.Empty<Task<CartSkuModel>>());
 
             model.PromoSkus.ForEach(p =>
             {

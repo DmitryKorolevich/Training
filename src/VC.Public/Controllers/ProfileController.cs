@@ -128,7 +128,7 @@ namespace VC.Public.Controllers
             var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, countries);
             var ordersModel = new PagedListEx<AutoShipHistoryItemModel>
             {
-                Items = (await Task.WhenAll(orders.Items.Select(async p => await helper.PopulateAutoShipItemModel(p)))).ToList(),
+                Items = await orders.Items.Select(async p => await helper.PopulateAutoShipItemModel(p)).ToListAsync(),
                 Count = orders.Count,
                 Index = filter.Paging.PageIndex
             };

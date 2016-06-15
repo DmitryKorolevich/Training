@@ -73,18 +73,18 @@ namespace VitalChoice.Business.ModelConverters
                 model.ShipDelayDateNP = TimeZoneInfo.ConvertTime(model.ShipDelayDateNP.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
             }
 
-            model.Skus.AddRange(await Task.WhenAll(dynamic.Skus?.Select(async sku =>
+            await model.Skus.AddRangeAsync(dynamic.Skus?.Select(async sku =>
             {
                 var result = await _skuMapper.ToModelAsync<SkuEmailItem>(sku.Sku);
                 await _productMapper.UpdateModelAsync(result, sku.Sku.Product);
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
-                result.SubTotal = sku.Quantity * sku.Amount;
+                result.SubTotal = sku.Quantity*sku.Amount;
 
                 result.GeneratedGCCodes = sku.GcsGenerated?.Select(s => s.Code).ToList();
 
                 return result;
-            })) ?? Enumerable.Empty<SkuEmailItem>());
+            }) ?? Enumerable.Empty<Task<SkuEmailItem>>());
 
             model.Skus.ForEach(p =>
             {
@@ -96,18 +96,18 @@ namespace VitalChoice.Business.ModelConverters
                 p.DisplayName += $" ({p.PortionsCount})";
             });
 
-            model.PromoSkus.AddRange(await Task.WhenAll(dynamic.PromoSkus.Where(p => p.Enabled).Select(async sku =>
+            await model.PromoSkus.AddRangeAsync(dynamic.PromoSkus?.Where(p => p.Enabled).Select(async sku =>
             {
                 var result = await _skuMapper.ToModelAsync<SkuEmailItem>(sku.Sku);
                 await _productMapper.UpdateModelAsync(result, sku.Sku.Product);
                 result.Price = sku.Amount;
                 result.Quantity = sku.Quantity;
-                result.SubTotal = sku.Quantity * sku.Amount;
+                result.SubTotal = sku.Quantity*sku.Amount;
 
                 result.GeneratedGCCodes = sku.GcsGenerated?.Select(s => s.Code).ToList();
 
                 return result;
-            })) ?? Enumerable.Empty<SkuEmailItem>());
+            }) ?? Enumerable.Empty<Task<SkuEmailItem>>());
 
             model.PromoSkus.ForEach(p =>
             {

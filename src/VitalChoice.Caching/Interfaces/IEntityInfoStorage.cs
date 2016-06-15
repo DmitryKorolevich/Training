@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Autofac;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Base;
@@ -20,8 +21,8 @@ namespace VitalChoice.Caching.Interfaces
         Type GetContextType(Type entityType);
         object GetEntity(Type entityType, ICollection<EntityValueExportable> keyValues, IServiceScopeFactory rootScope);
         object GetEntity(Type entityType, EntityKey pk, IServiceScopeFactory rootScope);
-        IDictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context);
-        IDictionary<TrackedEntityKey, EntityEntry> GetTrackData(DbContext context, out HashSet<object> trackedObjects);
+        IDictionary<TrackedEntityKey, InternalEntityEntry> GetTrackData(DbContext context);
+        IDictionary<TrackedEntityKey, InternalEntityEntry> GetTrackData(DbContext context, out HashSet<object> trackedObjects);
 
         EntityPrimaryKeyInfo GetPrimaryKeyInfo(Type entityType);
         EntityCacheableIndexInfo GetIndexInfo(Type entityType);

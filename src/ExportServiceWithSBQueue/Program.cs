@@ -19,7 +19,7 @@ namespace VitalChoice.ExportService
 
             var servicesToRun = new ServiceBase[]
             {
-                new ExportServiceManager()
+                new ExportServiceInstance()
             };
             ServiceBase.Run(servicesToRun);
         }

@@ -85,9 +85,9 @@ namespace VC.Admin.ModelConverters
         {
 			if (model.CustomerNotes.Count > 0 && !string.IsNullOrWhiteSpace(model.CustomerNotes[0].Text))
 			{
-				foreach (var customerNoteDynamic in await Task.WhenAll(model.CustomerNotes.Select(async customerNote => await _customerNoteMapper.FromModelAsync(customerNote))))
+				foreach (var customerNoteDynamic in model.CustomerNotes.Select(async customerNote => await _customerNoteMapper.FromModelAsync(customerNote)))
 				{
-					dynamic.CustomerNotes.Add(customerNoteDynamic);
+					dynamic.CustomerNotes.Add(await customerNoteDynamic);
 				}
 			}
 
@@ -98,9 +98,9 @@ namespace VC.Admin.ModelConverters
 	        }
 	        if (model.Shipping.Count > 0)
 			{
-				foreach (var addressDynamic in await Task.WhenAll(model.Shipping.Select(async shipping => await _addressMapper.FromModelAsync(shipping, (int)AddressType.Shipping))))
+				foreach (var addressDynamic in model.Shipping.Select(async shipping => await _addressMapper.FromModelAsync(shipping, (int)AddressType.Shipping)))
 				{
-					dynamic.ShippingAddresses.Add(addressDynamic);
+					dynamic.ShippingAddresses.Add(await addressDynamic);
 				}
 			}
 	        foreach (var creditCard in model.CreditCards)

@@ -47,7 +47,8 @@ namespace VitalChoice.ExportService
         {
             var reg = new ExportDependencyConfig();
 
-            var container = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly, _hostingEnvironment, false);
+            var container = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly, _hostingEnvironment,
+                true);
             return container.Resolve<IServiceProvider>();
         }
     }

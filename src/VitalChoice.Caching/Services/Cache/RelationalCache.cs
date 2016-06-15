@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
@@ -26,7 +27,7 @@ namespace VitalChoice.Caching.Services.Cache
         private readonly IEntityInfoStorage _infoStorage;
         private readonly DbContext _context;
         private readonly ILogger _logger;
-        private IDictionary<TrackedEntityKey, EntityEntry> _trackData;
+        private IDictionary<TrackedEntityKey, InternalEntityEntry> _trackData;
         private HashSet<object> _trackedObjects;
 
         public RelationalCache(IInternalCache<T> internalCache, IEntityInfoStorage infoStorage, DbContext context, ILogger logger)
@@ -41,7 +42,7 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (_internalCache == null)
             {
-                _logger.LogInformation($"Cache doesn't exist for type: {typeof (T)}");
+                _logger.LogInformation($"Cache doesn't exist for type: {typeof(T)}");
                 entities = null;
                 return CacheGetResult.NotFound;
             }
@@ -83,7 +84,7 @@ namespace VitalChoice.Caching.Services.Cache
                     results, out entities);
             }
             if (_logger.IsEnabled(LogLevel.Trace))
-                _logger.LogTrace($"Cache miss, type: {typeof (T)}");
+                _logger.LogTrace($"Cache miss, type: {typeof(T)}");
             entities = null;
             if (query.CanCollectionCache)
                 return CacheGetResult.Update;
@@ -94,7 +95,7 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (_internalCache == null)
             {
-                _logger.LogInformation($"Cache doesn't exist for type: {typeof (T)}");
+                _logger.LogInformation($"Cache doesn't exist for type: {typeof(T)}");
                 entity = default(T);
                 return CacheGetResult.NotFound;
             }
@@ -136,7 +137,7 @@ namespace VitalChoice.Caching.Services.Cache
                     results, out entity);
             }
             if (_logger.IsEnabled(LogLevel.Trace))
-                _logger.LogTrace($"Cache miss, type: {typeof (T)}");
+                _logger.LogTrace($"Cache miss, type: {typeof(T)}");
             entity = default(T);
             if (query.CanCache)
                 return CacheGetResult.Update;
@@ -174,14 +175,14 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (_internalCache == null)
             {
-                _logger.LogWarning($"<Cache Update> Cache doesn't exist for type: {typeof (T)}");
+                _logger.LogWarning($"<Cache Update> Cache doesn't exist for type: {typeof(T)}");
                 return false;
             }
 
             if (!queryData.CanCache)
             {
                 _logger.LogWarning(
-                    $"<Cache Update> can't update cache, preconditions not met: {typeof (T)}\r\nExpression:\r\n{queryData.WhereExpression?.Expression.AsString()}");
+                    $"<Cache Update> can't update cache, preconditions not met: {typeof(T)}\r\nExpression:\r\n{queryData.WhereExpression?.Expression.AsString()}");
                 return false;
             }
 
@@ -357,34 +358,28 @@ namespace VitalChoice.Caching.Services.Cache
         private object AttachGraph(object item, RelationInfo relationInfo)
         {
             object result;
-            EntityEntry entry;
+            InternalEntityEntry entry;
             var trackKey = new TrackedEntityKey(relationInfo.RelationType,
                 _infoStorage.GetPrimaryKeyInfo(relationInfo.RelationType).GetPrimaryKeyValue(item));
             if (_trackData.TryGetValue(trackKey, out entry))
             {
-                if (entry.State == EntityState.Detached)
-                    entry.State = EntityState.Unchanged;
-                var state = entry.State;
+                var internalEntry = _context.StateManager.GetOrCreateEntry(entry.Entity);
                 result = entry.Entity;
                 foreach (var relation in relationInfo.Relations)
                 {
                     var value = relation.GetRelatedObject(item);
                     if (value != null)
                     {
-                        if (value.GetType().IsImplementGeneric(typeof (ICollection<>)))
+                        if (value.GetType().IsImplementGeneric(typeof(ICollection<>)))
                         {
                             var trackedRelation = relation.GetRelatedObject(result);
                             if (trackedRelation == null || !_trackedObjects.Contains(trackedRelation))
                             {
                                 var newItems =
                                     ((IEnumerable<object>) value).Select(singleValue => AttachGraph(singleValue, relation));
-                                var set = typeof (HashSet<>).CreateGenericCollection(relation.RelationType, newItems);
+                                var set = typeof(HashSet<>).CreateGenericCollection(relation.RelationType, newItems);
                                 relation.SetRelatedObject(result, set.CollectionObject);
                                 _trackedObjects.Add(set.CollectionObject);
-                                if (trackedRelation != null)
-                                {
-                                    entry.State = state;
-                                }
                             }
                         }
                         else
@@ -395,14 +390,11 @@ namespace VitalChoice.Caching.Services.Cache
                                 var newRelation = AttachGraph(value, relation);
                                 relation.SetRelatedObject(result, newRelation);
                                 _trackedObjects.Add(newRelation);
-                                if (trackedRelation != null)
-                                {
-                                    entry.State = state;
-                                }
                             }
                         }
                     }
                 }
+                internalEntry.SetEntityState(EntityState.Unchanged);
             }
             else
             {
@@ -412,11 +404,11 @@ namespace VitalChoice.Caching.Services.Cache
                     var value = relation.GetRelatedObject(item);
                     if (value != null)
                     {
-                        if (value.GetType().IsImplementGeneric(typeof (ICollection<>)))
+                        if (value.GetType().IsImplementGeneric(typeof(ICollection<>)))
                         {
                             var newItems =
                                 ((IEnumerable<object>) value).Select(singleValue => AttachGraph(singleValue, relation));
-                            var set = typeof (HashSet<>).CreateGenericCollection(relation.RelationType, newItems);
+                            var set = typeof(HashSet<>).CreateGenericCollection(relation.RelationType, newItems);
                             relation.SetRelatedObject(result, set.CollectionObject);
                         }
                         else
@@ -425,9 +417,9 @@ namespace VitalChoice.Caching.Services.Cache
                         }
                     }
                 }
-                var newEntry = _context.Entry(result);
-                newEntry.State = EntityState.Unchanged;
-                _trackData.Add(trackKey, newEntry);
+                var internalEntry = _context.StateManager.GetOrCreateEntry(result);
+                internalEntry.SetEntityState(EntityState.Unchanged);
+                _trackData.Add(trackKey, internalEntry);
                 _trackedObjects.Add(result);
             }
             return result;

@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
@@ -31,6 +32,7 @@ namespace VitalChoice.DynamicData.Base
         where TDynamic : MappedObject, new()
     {
         private readonly DirectMapper<TEntity> _directMapper;
+        protected readonly bool IsAfterChangesOverriden;
 
         protected DynamicServiceAsync(IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
             IRepositoryAsync<TEntity> objectRepository,
@@ -45,6 +47,10 @@ namespace VitalChoice.DynamicData.Base
                 objectLogItemExternalService, logger, queryVisitor)
         {
             _directMapper = directMapper;
+            var instanceType = GetType();
+            IsAfterChangesOverriden =
+                instanceType.GetTypeInfo().GetMethod(nameof(AfterEntityChangesAsync), BindingFlags.NonPublic | BindingFlags.DeclaredOnly) !=
+                null;
         }
 
         protected abstract IUnitOfWorkAsync CreateUnitOfWork();
@@ -238,9 +244,12 @@ namespace VitalChoice.DynamicData.Base
                     .ToList();
                 foreach (var item in items)
                 {
-                    item.InitialEntity = _directMapper.Clone<Entity>(item.Entity);
                     item.Entity.OptionTypes = DynamicMapper.FilterByType(item.Dynamic.IdObjectType);
-                    item.InitialEntity.OptionTypes = item.Entity.OptionTypes;
+                    if (IsAfterChangesOverriden)
+                    {
+                        item.InitialEntity = _directMapper.Clone<Entity>(item.Entity);
+                        item.InitialEntity.OptionTypes = item.Entity.OptionTypes;
+                    }
                 }
                 await UpdateItems(uow, items, bigValueRepository);
                 await mainRepository.UpdateRangeAsync(entities);
