@@ -7,8 +7,10 @@ namespace VitalChoice.ExportService.Services
 {
     public interface IOrderExportService
     {
-        Task UpdateCustomerPaymentMethods(CustomerPaymentMethodDynamic[] paymentMethods);
+        Task UpdateCustomerPaymentMethods(ICollection<CustomerPaymentMethodDynamic> paymentMethods);
         Task UpdateOrderPaymentMethod(OrderPaymentMethodDynamic paymentMethod);
         Task<bool> ExportOrder(int idOrder, POrderType orderType, out ICollection<string> errors);
+        void SwitchToInMemoryContext();
+        Task SwitchToRealContext();
     }
 }

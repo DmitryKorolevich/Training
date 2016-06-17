@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Autofac;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -20,21 +21,24 @@ namespace VitalChoice.ExportService
             services.AddDbContext<ExportInfoContext>().AddDbContext<ExportInfoCopyContext>();
         }
 
-        protected override void ConfigureAppOptions(IConfiguration configuration, AppOptions options)
+        protected override void ConfigureOptions(IConfiguration configuration, IServiceCollection services, IHostingEnvironment environment)
         {
-            base.ConfigureAppOptions(configuration, options);
-            var section = configuration.GetSection("App:ExportService");
-            options.ExportService = new Infrastructure.Domain.Options.ExportService
+            base.ConfigureOptions(configuration, services, environment);
+            services.Configure<ExportOptions>(export =>
             {
-                PlainConnectionString = section.GetSection("PlainConnectionString").Value,
-                EncryptedConnectionString = section.GetSection("EncryptedConnectionString").Value,
-                EncryptedQueueName = section.GetSection("EncryptedQueueName").Value,
-                PlainQueueName = section.GetSection("PlainQueueName").Value,
-                CertThumbprint = section.GetSection("CertThumbprint").Value,
-                RootThumbprint = section.GetSection("RootThumbprint").Value,
-                EncryptionHostSessionExpire = Convert.ToBoolean(section.GetSection("EncryptionHostSessionExpire").Value),
-                ServerHostName = section.GetSection("ServerHostName").Value
-            };
+                ConfigureAppOptions(configuration, export);
+                var section = configuration.GetSection("App:ExportConnection");
+                export.ExportConnection = new ExportDbConnection
+                {
+                    UserName = section.GetSection("UserName").Value,
+                    Server = section.GetSection("Server").Value,
+                    Password = section.GetSection("Password").Value,
+                    AdminPassword = section.GetSection("AdminPassword").Value,
+                    AdminUserName = section.GetSection("AdminUserName").Value,
+                    Encrypt = Convert.ToBoolean(section.GetSection("Encrypt").Value)
+                };
+                export.ScheduleDayTimeHour = int.Parse(configuration.GetSection("App:ScheduleDayTimeHour").Value);
+            });
         }
     }
 }

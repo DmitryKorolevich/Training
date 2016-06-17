@@ -1,4 +1,5 @@
-﻿using VitalChoice.Ecommerce.Domain;
+﻿using System;
+using VitalChoice.Ecommerce.Domain;
 
 namespace VitalChoice.ExportService.Entities
 {

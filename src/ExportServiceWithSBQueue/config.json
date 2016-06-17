@@ -9,6 +9,7 @@
     "CustomerServiceToEmail": "gary@g2designgroup.com",
     "CustomerFeedbackToEmail": "gary@g2designgroup.com",
     "MainSuperAdminEmail": "gary@g2designgroup.com",
+    "ScheduleDayTimeHour": 2,
 
     "Connection": {
       "UserName": "dev_vcdb_login",
@@ -19,6 +20,8 @@
       "UserName": "dev_expdb_login",
       "Password": "8n8HfhzbzgwbwBgMpmE9vPdz",
       "Server": "tcp:dad4lghbj.database.windows.net,1433",
+      "AdminUserName": "multiarc@dad4lghbj",
+      "AdminPassword": "5QG93n@FTPsqx^$fdrbdwpGZq",
       "Encrypt": true
     },
     "ExportService": {

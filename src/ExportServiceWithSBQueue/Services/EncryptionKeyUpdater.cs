@@ -21,17 +21,20 @@ namespace VitalChoice.ExportService.Services
         private readonly ILogger _logger;
         private readonly IOptions<ExportOptions> _options;
         private readonly DbContextOptions<ExportInfoContext> _contextOptions;
+        private readonly IOrderExportService _exportService;
         private bool _terminated;
         private readonly ManualResetEvent _terminateReadyEvent;
         private readonly string _keyFilePath;
         private readonly Thread _updateThread;
 
-        public EncryptionKeyUpdater(IObjectEncryptionHost encryptionHost, ILogger logger, IOptions<ExportOptions> options, DbContextOptions<ExportInfoContext> contextOptions)
+        public EncryptionKeyUpdater(IObjectEncryptionHost encryptionHost, ILogger logger, IOptions<ExportOptions> options,
+            DbContextOptions<ExportInfoContext> contextOptions, IOrderExportService exportService)
         {
             _encryptionHost = encryptionHost;
             _logger = logger;
             _options = options;
             _contextOptions = contextOptions;
+            _exportService = exportService;
             _keyFilePath = options.Value.LocalEncryptionKeyPath;
             _terminateReadyEvent = new ManualResetEvent(true);
             if (!string.IsNullOrWhiteSpace(_keyFilePath))
@@ -49,7 +52,7 @@ namespace VitalChoice.ExportService.Services
                 {
                     _terminateReadyEvent.Reset();
                     var lasAccessed = File.GetLastWriteTime(_keyFilePath);
-                    if (DateTime.Now - lasAccessed > TimeSpan.FromDays(30))
+                    if (DateTime.Now - lasAccessed > TimeSpan.FromDays(30) && _options.Value.ScheduleDayTimeHour == DateTime.Now.Hour)
                     {
                         Aes newAes;
                         var key = CreateNewKey(out newAes);
@@ -58,12 +61,14 @@ namespace VitalChoice.ExportService.Services
                                 new SqlConnection(_options.Value.ExportConnection.GetMasterConnectionString())
                             )
                         {
+                            _exportService.SwitchToInMemoryContext();
                             conn.Open();
                             DropCopy(conn);
                             CopyDatabase(conn);
                             ReCryptDatabaseCopy(newAes, 500);
                             _encryptionHost.UpdateLocalKey(key);
                             RenameCopyToCurrent(conn);
+                            _exportService.SwitchToRealContext().GetAwaiter().GetResult();
                             conn.Close();
                         }
                     }
@@ -76,7 +81,7 @@ namespace VitalChoice.ExportService.Services
                 {
                     _terminateReadyEvent.Set();
                 }
-                Thread.Sleep(TimeSpan.FromDays(1));
+                Thread.Sleep(TimeSpan.FromMinutes(30));
             }
         }
 

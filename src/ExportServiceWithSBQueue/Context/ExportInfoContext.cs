@@ -6,6 +6,20 @@ using VitalChoice.ExportService.Entities;
 
 namespace VitalChoice.ExportService.Context
 {
+    public class ExportInfoImMemoryContext : ExportInfoContext
+    {
+        public ExportInfoImMemoryContext(IOptions<ExportOptions> options, DbContextOptions<ExportInfoContext> contextOptions)
+            : base(options, contextOptions)
+        {
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder builder)
+        {
+            builder.UseInMemoryDatabase(options => options.IgnoreTransactions());
+            base.OnConfiguring(builder);
+        }
+    }
+
     public class ExportInfoContext : DataContext
     {
         protected readonly IOptions<ExportOptions> Options;

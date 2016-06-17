@@ -1,4 +1,5 @@
-﻿using VitalChoice.Infrastructure.Domain.Options;
+﻿using System;
+using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VitalChoice.ExportService.Context
 {
@@ -15,6 +16,7 @@ namespace VitalChoice.ExportService.Context
 
     public class ExportOptions : AppOptions
     {
+        public int ScheduleDayTimeHour { get; set; }
         public ExportDbConnection ExportConnection { get; set; }
     }
 }
