@@ -16,7 +16,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
 {
     public abstract class EncryptedServiceBusHost : IEncryptedServiceBusHost
     {
-        
         private readonly ServiceBusHostOneToOne _plainClient;
         private readonly ServiceBusHostOneToOne _encryptedClient;
         private readonly ConcurrentDictionary<CommandItem, WeakReference<ServiceBusCommandBase>> _commands;

@@ -3,6 +3,17 @@
   "description": "VitalChoice.Tests Class Library",
   "authors": [ "multi_000" ],
   "testRunner": "xunit",
+  "buildOptions": {
+    "copyToOutput": {
+      "include": [
+        "config.json",
+        "config.local.json",
+        "CSharpClassTemplate.tcs",
+        "CSharpPreparseTemplate.tcs"
+      ]
+    },
+    "preserveCompilationContext": true
+  },
   "dependencies": {
     "xunit": "2.1.0",
     "dotnet-test-xunit": "1.0.0-rc2-*",

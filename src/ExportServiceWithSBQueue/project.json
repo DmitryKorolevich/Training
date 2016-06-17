@@ -2,6 +2,14 @@
   "version": "1.0.0-*",
   "description": "ExportWorkerRoleWithSBQueue Class Library",
   "authors": [ "multi_000" ],
+  "buildOptions": { "emitEntryPoint": true },
+  "publishOptions": {
+    "include": [
+      "config.json",
+      "CSharpClassTemplate.tcs",
+      "CSharpPreparseTemplate.tcs"
+    ]
+  },
   "dependencies": {
     "WindowsAzure.ServiceBus": "3.2.2",
     "Microsoft.WindowsAzure.ConfigurationManager": "3.2.1",

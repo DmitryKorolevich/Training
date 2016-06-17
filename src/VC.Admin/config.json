@@ -1,12 +1,5 @@
 {
   "App": {
-    "GenerateLowercaseUrls": true,
-    "EnableBundlingAndMinification": true,
-    "Versioning": {
-      "EnableStaticContentVersioning": true,
-      "AutoGenerateBuildNumber": true,
-      "BuildNumber": 1
-    },
     "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
     "LogLevel": "Warning",
     "FilesPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\files",
@@ -14,39 +7,38 @@
     "DefaultCacheExpirationTermMinutes": 1440,
     "ActivationTokenExpirationTermDays": 3,
     "DefaultCultureId": "en-US",
+    "PublicHost": "staging.g2-dg.com",
+    "AdminHost": "admin.staging.g2-dg.com",
+    "CustomerServiceToEmail": "gary@g2designgroup.com",
+    "CustomerFeedbackToEmail": "gary@g2designgroup.com",
+    "MainSuperAdminEmail": "gary@g2designgroup.com",
+
+    "GenerateLowercaseUrls": true,
+    "EnableBundlingAndMinification": true,
+    "Versioning": {
+      "EnableStaticContentVersioning": true,
+      "AutoGenerateBuildNumber": true
+    },
     "Connection": {
       "UserName": "dev_vcdb_login",
       "Password": "CCQLaskw3pMFU9XqE6CHp28m",
       "Server": "vw4v86cs0h.database.windows.net"
     },
     "ExportService": {
-      "ConnectionString": "",
-      "PlainQueueName": "",
-      "EncryptedQueueName": "",
-      "CertThumbprint": "",
+      "PlainConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=6CXYK7zSC5RhTQYALz1vRqMe/Sg8vW25LwhsTSE96o8=",
+      "EncryptedConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=84NxAhwRn3vd2gDWgPWIDi14x+s3JWe2NFvBx1mTtq8=",
+      "PlainQueueName": "plainexport",
+      "EncryptedQueueName": "encryptedexport",
+      "CertThumbprint": "E2603D85F0E4B59448FD3D380FEFF740B28B3215",
+      "RootThumbprint": "89735BE3169BE34AB67B65C7D9EFFD2C230A9D98",
       "EncryptionHostSessionExpire": false,
-      "ServerHostName": ""
+      "ServerHostName": "export-server"
     },
-    //"ExportService": {
-    //  "PlainConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=6CXYK7zSC5RhTQYALz1vRqMe/Sg8vW25LwhsTSE96o8=",
-    //  "EncryptedConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=84NxAhwRn3vd2gDWgPWIDi14x+s3JWe2NFvBx1mTtq8=",
-    //  "PlainQueueName": "plainexport",
-    //  "EncryptedQueueName": "encryptedexport",
-    //  "CertThumbprint": "E2603D85F0E4B59448FD3D380FEFF740B28B3215",
-    //  "RootThumbprint": "89735BE3169BE34AB67B65C7D9EFFD2C230A9D98",
-    //  "EncryptionHostSessionExpire": false,
-    //  "ServerHostName": "export-server"
-    //},
     "AuthorizeNet": {
       "ApiLogin": "36qq5ECXB",
       "ApiKey": "4r5Zv38R56BY6tLW",
       "TestEnv": false
     },
-    "PublicHost": "staging.g2-dg.com",
-    "AdminHost": "admin.staging.g2-dg.com",
-    "CustomerServiceToEmail": "gary@g2designgroup.com",
-    "CustomerFeedbackToEmail": "gary@g2designgroup.com",
-    "MainSuperAdminEmail": "gary@g2designgroup.com",
     "Email": {
       "From": "admin.staging@g2designgroup.com",
       "Host": "smtp.1and1.com",
@@ -54,7 +46,7 @@
       "Secured": true,
       "Username": "admin.staging@g2designgroup.com",
       "Password": "vcstaging123",
-      "Disabled" : false
+      "Disabled": false
     },
     "AzureStorage": {
       "StorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=stagingvcfiles;AccountKey=RxGv/t6KyB7aFPKaKIljivC0YtoYv/FR+0f5uGcORdie1h5WGigJKazfMiYL/gNJz+fGUWsUhEvGjdfwfZAq6A==;BlobEndpoint=https://stagingvcfiles.blob.core.windows.net/;TableEndpoint=https://stagingvcfiles.table.core.windows.net/;QueueEndpoint=https://stagingvcfiles.queue.core.windows.net/;FileEndpoint=https://stagingvcfiles.file.core.windows.net/",

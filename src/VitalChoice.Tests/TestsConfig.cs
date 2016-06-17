@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace VitalChoice.Tests
 {
-    public static class ConfigureTests
+    public static class TestsConfig
     {
         public static IWebHost Host;
 
-        static ConfigureTests()
+        static TestsConfig()
         {
             Host = new WebHostBuilder()
                 .UseContentRoot(Directory.GetCurrentDirectory())
