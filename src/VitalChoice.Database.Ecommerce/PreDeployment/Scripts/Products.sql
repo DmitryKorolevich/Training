@@ -156,4 +156,15 @@ BEGIN
 	DROP COLUMN Hidden
 END
 
+IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'IX_IdBigString' AND object_id = OBJECT_ID('dbo.ProductOptionValues'))
+BEGIN
+	CREATE NONCLUSTERED INDEX [IX_IdBigString] ON [dbo].[ProductOptionValues]
+	(
+		[IdBigString] ASC
+	)
+	INCLUDE ( 	[IdProduct],
+		[IdOptionType],
+		[Value]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+END
+
 GO

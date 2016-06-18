@@ -50,6 +50,13 @@ BEGIN
 	INNER JOIN Products AS p ON p.Id = s.IdProduct
 	INNER JOIN ProductOptionTypes AS t ON t.Name NOT IN (SELECT Name FROM SkuOptionTypes) AND t.Id = v.IdOptionType
 
+	DELETE v
+	FROM SkuOptionValues AS v
+	INNER JOIN Skus AS s ON s.Id = v.IdSku
+	INNER JOIN Products AS p ON p.Id = s.IdProduct
+	INNER JOIN ProductOptionTypes AS t ON t.Id = v.IdOptionType
+	WHERE t.DefaultValue = v.Value
+
 	UPDATE SkuOptionValues
 	SET IdOptionType = st.Id
 	FROM SkuOptionValues AS v

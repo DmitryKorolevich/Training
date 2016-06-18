@@ -71,4 +71,9 @@ ALTER COLUMN IdCountry INT NULL
 
 END
 
+IF NOT EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[CustomerOptionValues]') AND name = N'IX_IdBigString')
+BEGIN
+	CREATE NONCLUSTERED INDEX IX_IdBigString ON [dbo].[CustomerOptionValues] ([IdBigString]) INCLUDE ([IdCustomer], [IdOptionType])
+END
+
 GO
