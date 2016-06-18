@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Configuration;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.ServiceProcess;
 using Autofac;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -16,10 +18,8 @@ namespace VitalChoice.ExportService
     public class ExportServiceInstance : ServiceBase
     {
         private EncryptedServiceBusHostServer _server;
-        private readonly IOptions<AppOptions> _options;
-        private readonly ILogger _logger;
-        private readonly IObjectEncryptionHost _encryptionHost;
-        private readonly IServiceProvider _container;
+        private ILogger _logger;
+        private IServiceProvider _container;
 
         public ExportServiceInstance()
         {
@@ -31,11 +31,6 @@ namespace VitalChoice.ExportService
                 }));
                 // Set the maximum number of concurrent connections 
                 ServicePointManager.DefaultConnectionLimit = 12;
-                _container = Program.Host.Services;
-                _options = _container.GetRequiredService<IOptions<AppOptions>>();
-                var factory = _container.GetRequiredService<ILoggerFactory>();
-                _logger = factory.CreateLogger<ExportServiceInstance>();
-                _encryptionHost = _container.GetRequiredService<IObjectEncryptionHost>();
             }
             catch (Exception e)
             {
@@ -48,14 +43,38 @@ namespace VitalChoice.ExportService
         protected override void OnStart(string[] args)
         {
             base.OnStart(args);
-            Trace.WriteLine("Starting processing of messages");
-            _server = new EncryptedServiceBusHostServer(_options, _logger, _container.GetRequiredService<ILifetimeScope>(), _encryptionHost);
+
+            RequestAdditionalTime(30000);
+
+            try
+            {
+
+                Host = new WebHostBuilder()
+                    .UseContentRoot(Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]))
+                    .UseStartup<Startup>()
+                    .Build();
+
+                Host.Start();
+
+                _container = Host.Services;
+                var factory = _container.GetRequiredService<ILoggerFactory>();
+                _logger = factory.CreateLogger<ExportServiceInstance>();
+                Trace.WriteLine("Starting processing of messages");
+                _server = _container.GetRequiredService<EncryptedServiceBusHostServer>();
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError(
+                    $"Env Command Line: {string.Join(", ", Environment.GetCommandLineArgs())}\n Command Line: {string.Join(", ", args)} {e}");
+            }
         }
+
+        public IWebHost Host { get; set; }
 
         protected override void OnStop()
         {
             _server.Dispose();
-            Program.Host.Dispose();
+            Host.Dispose();
             base.OnStop();
         }
     }

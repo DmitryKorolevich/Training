@@ -37,7 +37,7 @@ namespace VitalChoice.Business.Services
         private void CreateLocalizationData(IRepositoryAsync<LocalizationItemData> repository)
         {
             _localizationData = new Dictionary<int, Dictionary<int, List<LocalizationItemData>>>();
-            var dbLocalizationData = repository.Query().Select().ToList();
+            var dbLocalizationData = repository.Query().Select(false);
             foreach (var localizationDataItem in dbLocalizationData)
             {
                 Dictionary<int, List<LocalizationItemData>> group = null;

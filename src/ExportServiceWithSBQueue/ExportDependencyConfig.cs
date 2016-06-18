@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Core.DependencyInjection;
 using VitalChoice.ExportService.Context;
+using VitalChoice.ExportService.Services;
 using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VitalChoice.ExportService
@@ -18,7 +19,10 @@ namespace VitalChoice.ExportService
         {
             base.StartCustomServicesRegistration(services);
             services.AddSingleton<IServer, DummyServer>();
-            services.AddDbContext<ExportInfoContext>().AddDbContext<ExportInfoCopyContext>();
+            services.AddDbContext<ExportInfoContext>().AddDbContext<ExportInfoCopyContext>().AddDbContext<ExportInfoImMemoryContext>();
+            services.AddSingleton<IOrderExportService, OrderExportService>();
+            services.AddSingleton<EncryptionKeyUpdater>();
+            services.AddSingleton<EncryptedServiceBusHostServer>();
         }
 
         protected override void ConfigureOptions(IConfiguration configuration, IServiceCollection services, IHostingEnvironment environment)

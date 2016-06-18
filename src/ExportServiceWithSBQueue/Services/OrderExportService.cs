@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -153,14 +154,22 @@ namespace VitalChoice.ExportService.Services
                 var payments = (await customerPaymentsRep.Query().SelectAsync(false)).Select(
                     p => (CustomerPaymentMethodDynamic) ObjectSerializer.Deserialize(p.CreditCardNumber))
                     .ToArray();
-                try
+                while (true)
                 {
-                    await UpdateCustomerPaymentMethods(payments);
-                }
-                catch (Exception e)
-                {
-                    Trace.TraceError($"Cannot move data from memory context to real context (Customers):\n{e}");
-                    File.WriteAllBytes("FailedCustomers.dat", _encryptionHost.LocalEncrypt(payments));
+                    try
+                    {
+                        await UpdateCustomerPaymentMethods(payments);
+                        break;
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.TraceError($"Cannot move data from memory context to real context (Customers):\n{e}");
+                        if (!File.Exists("FailedCustomers.dat"))
+                        {
+                            File.WriteAllBytes("FailedCustomers.dat", _encryptionHost.LocalEncrypt(payments));
+                        }
+                    }
+                    Thread.Sleep(TimeSpan.FromMinutes(1));
                 }
 
                 var orderPaymentsRep = uow.ReadRepositoryAsync<OrderPaymentMethodExport>();
@@ -168,30 +177,38 @@ namespace VitalChoice.ExportService.Services
                     (await orderPaymentsRep.Query().SelectAsync(false)).Select(
                         p => (OrderPaymentMethodDynamic) ObjectSerializer.Deserialize(p.CreditCardNumber)).ToArray();
 
-                try
+                while (true)
                 {
-                    var realContext = CreateContext();
-                    using (var realUow = new UnitOfWork(realContext))
+                    try
                     {
-                        var realOrdersRep = realUow.RepositoryAsync<OrderPaymentMethodExport>();
-                        var orderIds = orderPayments.Select(o => o.IdOrder).Distinct().ToList();
-                        var realOrders = await realOrdersRep.Query(o => orderIds.Contains(o.IdOrder)).SelectAsync(true);
-                        realOrders.MergeKeyed(orderPayments, export => export.IdOrder, dynamic => dynamic.IdOrder,
-                            dynamic => new OrderPaymentMethodExport
-                            {
-                                IdOrder = dynamic.IdOrder,
-                                CreditCardNumber = _encryptionHost.LocalEncrypt(dynamic)
-                            }, (export, dynamic) => export.CreditCardNumber = _encryptionHost.LocalEncrypt(dynamic));
+                        var realContext = CreateContext();
+                        using (var realUow = new UnitOfWork(realContext))
+                        {
+                            var realOrdersRep = realUow.RepositoryAsync<OrderPaymentMethodExport>();
+                            var orderIds = orderPayments.Select(o => o.IdOrder).Distinct().ToList();
+                            var realOrders = await realOrdersRep.Query(o => orderIds.Contains(o.IdOrder)).SelectAsync(true);
+                            realOrders.MergeKeyed(orderPayments, export => export.IdOrder, dynamic => dynamic.IdOrder,
+                                dynamic => new OrderPaymentMethodExport
+                                {
+                                    IdOrder = dynamic.IdOrder,
+                                    CreditCardNumber = _encryptionHost.LocalEncrypt(dynamic)
+                                }, (export, dynamic) => export.CreditCardNumber = _encryptionHost.LocalEncrypt(dynamic));
 
-                        await realOrdersRep.InsertRangeAsync(realOrders.Where(r => r.Id == 0));
+                            await realOrdersRep.InsertRangeAsync(realOrders.Where(r => r.Id == 0));
 
-                        await realUow.SaveChangesAsync();
+                            await realUow.SaveChangesAsync();
+                        }
+                        break;
                     }
-                }
-                catch (Exception e)
-                {
-                    Trace.TraceError($"Cannot move data from memory context to real context (Orders):\n{e}");
-                    File.WriteAllBytes("FailedOrders.dat", _encryptionHost.LocalEncrypt(orderPayments));
+                    catch (Exception e)
+                    {
+                        Trace.TraceError($"Cannot move data from memory context to real context (Orders):\n{e}");
+                        if (!File.Exists("FailedOrders.dat"))
+                        {
+                            File.WriteAllBytes("FailedOrders.dat", _encryptionHost.LocalEncrypt(orderPayments));
+                        }
+                    }
+                    Thread.Sleep(TimeSpan.FromMinutes(1));
                 }
             }
         }

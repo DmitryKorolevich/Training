@@ -332,6 +332,7 @@ namespace VitalChoice.Core.DependencyInjection
                 Convert.ToBoolean(configuration.GetSection("App:GenerateLowercaseUrls").Value);
             options.EnableBundlingAndMinification =
                 Convert.ToBoolean(configuration.GetSection("App:EnableBundlingAndMinification").Value);
+            options.LocalEncryptionKeyPath = configuration.GetSection("App:LocalEncryptionKeyPath").Value;
             options.Versioning = new Versioning()
             {
                 EnableStaticContentVersioning =

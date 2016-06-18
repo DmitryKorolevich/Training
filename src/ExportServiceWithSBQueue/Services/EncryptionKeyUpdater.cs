@@ -51,8 +51,8 @@ namespace VitalChoice.ExportService.Services
                 try
                 {
                     _terminateReadyEvent.Reset();
-                    var lasAccessed = File.GetLastWriteTime(_keyFilePath);
-                    if (DateTime.Now - lasAccessed > TimeSpan.FromDays(30) && _options.Value.ScheduleDayTimeHour == DateTime.Now.Hour)
+                    var lastWriteTime = File.GetLastWriteTime(_keyFilePath);
+                    if (DateTime.Now - lastWriteTime > TimeSpan.FromDays(30) && _options.Value.ScheduleDayTimeHour == DateTime.Now.Hour)
                     {
                         Aes newAes;
                         var key = CreateNewKey(out newAes);
@@ -67,10 +67,27 @@ namespace VitalChoice.ExportService.Services
                             CopyDatabase(conn);
                             ReCryptDatabaseCopy(newAes, 500);
                             _encryptionHost.UpdateLocalKey(key);
-                            RenameCopyToCurrent(conn);
+                            while (true)
+                            {
+                                try
+                                {
+                                    RenameCopyToCurrent(conn);
+                                    break;
+                                }
+                                catch (Exception e)
+                                {
+                                    _logger.LogCritical(e.ToString());
+                                    _logger.LogWarning("Awaiting 1 minute before retry");
+                                }
+                                Thread.Sleep(TimeSpan.FromMinutes(1));
+                            }
                             _exportService.SwitchToRealContext().GetAwaiter().GetResult();
                             conn.Close();
                         }
+                    }
+                    else if (DateTime.Now - lastWriteTime > TimeSpan.FromDays(30))
+                    {
+                        _logger.LogWarning($"Skip key update, hour is {DateTime.Now.Hour}, but need {_options.Value.ScheduleDayTimeHour}");
                     }
                 }
                 catch (Exception e)
@@ -99,11 +116,13 @@ namespace VitalChoice.ExportService.Services
                 using (SqlCommand dropCmd =
                     new SqlCommand("DROP DATABASE [VitalChoice.ExportInfo]", conn))
                 {
+                    dropCmd.CommandTimeout = 0;
                     dropCmd.ExecuteNonQuery();
                 }
                 using (SqlCommand renameCmd =
                     new SqlCommand("ALTER DATABASE [VitalChoice.ExportInfo.Copy] MODIFY NAME = [VitalChoice.ExportInfo]", conn))
                 {
+                    renameCmd.CommandTimeout = 0;
                     renameCmd.ExecuteNonQuery();
                 }
                 using (
@@ -139,6 +158,7 @@ namespace VitalChoice.ExportService.Services
                     using (SqlCommand dropCmd =
                         new SqlCommand("DROP DATABASE [VitalChoice.ExportInfo.Copy]", conn))
                     {
+                        dropCmd.CommandTimeout = 0;
                         dropCmd.ExecuteNonQuery();
                     }
                     while (true)
@@ -164,6 +184,7 @@ namespace VitalChoice.ExportService.Services
                     var command = new SqlCommand("CREATE DATABASE [VitalChoice.ExportInfo.Copy] AS COPY OF [VitalChoice.ExportInfo];", conn)
                     )
                 {
+                    command.CommandTimeout = 0;
                     command.ExecuteNonQuery();
                 }
                 while (true)
@@ -187,26 +208,28 @@ namespace VitalChoice.ExportService.Services
 
         private void ReCryptDatabaseCopy(Aes newAes, int batchSize)
         {
-            using (ExportInfoCopyContext copyContext = new ExportInfoCopyContext(_options, _contextOptions))
+            _logger.LogWarning("Starting DB recrypt");
+            var copyContext = new ExportInfoCopyContext(_options, _contextOptions);
+            var localAes = Aes.Create();
+            if (localAes == null)
             {
-                var localAes = Aes.Create();
-                if (localAes == null)
-                {
-                    throw new CryptographicException("Cannot create AES");
-                }
-                var localKey = _encryptionHost.GetLocalKey();
-                localAes.KeySize = 256;
-                localAes.Key = localKey.Key;
-                localAes.IV = localKey.IV;
+                throw new CryptographicException("Cannot create AES");
+            }
+            var localKey = _encryptionHost.GetLocalKey();
+            localAes.KeySize = 256;
+            localAes.Key = localKey.Key;
+            localAes.IV = localKey.IV;
 
-                var uow = new UnitOfWorkBase(copyContext);
-
+            using (var uow = new UnitOfWorkBase(copyContext))
+            {
                 var customersRep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
                 var totalNumber = customersRep.Query().SelectCountAsync().GetAwaiter().GetResult();
+                _logger.LogWarning($"Starting customers recrypt, total number of records: {totalNumber}");
                 var pages = totalNumber/batchSize + 1;
                 for (int i = 0; i < pages; i++)
                 {
                     var toUpdate = customersRep.Query().SelectPageAsync(i, batchSize, true).GetAwaiter().GetResult();
+                    _logger.LogWarning($"Updating batch {i}, number of elemets: {toUpdate.Items.Count}");
                     foreach (var item in toUpdate.Items)
                     {
                         item.CreditCardNumber = localAes.RewriteBlock(newAes, item.CreditCardNumber);
@@ -217,10 +240,12 @@ namespace VitalChoice.ExportService.Services
 
                 var ordersRep = uow.RepositoryAsync<OrderPaymentMethodExport>();
                 totalNumber = ordersRep.Query().SelectCountAsync().GetAwaiter().GetResult();
+                _logger.LogWarning($"Starting orders recrypt, total number of records: {totalNumber}");
                 pages = totalNumber/batchSize + 1;
                 for (int i = 0; i < pages; i++)
                 {
                     var toUpdate = ordersRep.Query().SelectPageAsync(i, batchSize, true).GetAwaiter().GetResult();
+                    _logger.LogWarning($"Updating batch {i}, number of elemets: {toUpdate.Items.Count}");
                     foreach (var item in toUpdate.Items)
                     {
                         item.CreditCardNumber = localAes.RewriteBlock(newAes, item.CreditCardNumber);

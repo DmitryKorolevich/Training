@@ -24,8 +24,6 @@ namespace VitalChoice.ExportService.Context
                 TrustServerCertificate = false
             }).ConnectionString;
             builder.UseSqlServer(connectionString);
-
-            base.OnConfiguring(builder);
         }
     }
 }

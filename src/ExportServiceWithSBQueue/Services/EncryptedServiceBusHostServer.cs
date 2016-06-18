@@ -17,12 +17,16 @@ namespace VitalChoice.ExportService.Services
     public sealed class EncryptedServiceBusHostServer : EncryptedServiceBusHost
     {
         private readonly ILifetimeScope _rootScope;
+        private readonly EncryptionKeyUpdater _keyUpdater;
         private readonly RSACryptoServiceProvider _keyExchangeProvider;
         public override string LocalHostName => ServerHostName;
 
-        public EncryptedServiceBusHostServer(IOptions<AppOptions> appOptions, ILogger logger, ILifetimeScope rootScope, IObjectEncryptionHost encryptionHost) : base(appOptions, logger, encryptionHost)
+        public EncryptedServiceBusHostServer(IOptions<AppOptions> appOptions, ILoggerFactory loggerFactory, ILifetimeScope rootScope,
+            IObjectEncryptionHost encryptionHost, EncryptionKeyUpdater keyUpdater)
+            : base(appOptions, loggerFactory.CreateLogger<EncryptedServiceBusHostServer>(), encryptionHost)
         {
             _rootScope = rootScope;
+            _keyUpdater = keyUpdater;
             EncryptionHost.OnSessionExpired += OnSessionRemoved;
             _keyExchangeProvider = new RSACryptoServiceProvider(4096);
         }
@@ -164,6 +168,7 @@ namespace VitalChoice.ExportService.Services
         public override void Dispose()
         {
             base.Dispose();
+            _keyUpdater.Dispose();
             _keyExchangeProvider.Dispose();
         }
     }
