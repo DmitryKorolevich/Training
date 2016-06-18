@@ -409,7 +409,7 @@
                                                                         <div class="form-horizontal">
                                                                             <div class="row">
                                                                                 <div class="col-md-12">
-                                                                                    <div class="fixed-accordion-row margin-zero">
+                                                                                    <div class="fixed-accordion-row">
                                                                                         <div class="sortable-move btn btn-info">
                                                                                             <i class="glyphicon glyphicon-sort"></i>
                                                                                         </div>
@@ -420,7 +420,7 @@
                                                                                             <i class="glyphicon glyphicon-minus"></i>
                                                                                         </div>
                                                                                     </div>
-                                                                                    <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
+                                                                                    <div class="fixed-accordion-row margin-left-zero" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">SKU</label>
                                                                                         <div class="col-md-1">
                                                                                             <input type="text" name="Name" class="form-control sku" placeholder="SKU" data-ng-model="subSku.Name" required data-ng-pattern="/^[A-Za-z0-9-]+$/">
@@ -432,7 +432,7 @@
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
-                                                                                    <div class="fixed-accordion-row extra-spacing" data-ng-click="$event.stopPropagation()">
+                                                                                    <div class="fixed-accordion-row margin-zero margin-left-zero" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">QTY</label>
                                                                                         <div class="col-md-1">
                                                                                             <input type="text" name="QTY" class="form-control qty" placeholder="QTY" required data-ng-model="subSku.QTY" min="1" numbers-only>
@@ -443,7 +443,7 @@
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
-                                                                                    <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
+                                                                                    <div class="fixed-accordion-row margin-zero" data-ng-click="$event.stopPropagation()">
                                                                                         <label for="lblActive{{subSku.Id}}" class="control-label">Active</label>
                                                                                         <div class="checkbox">
                                                                                             <label>
@@ -451,7 +451,7 @@
                                                                                             </label>
                                                                                         </div>
                                                                                     </div>
-                                                                                    <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
+                                                                                    <div class="fixed-accordion-row margin-zero" data-ng-click="$event.stopPropagation()">
                                                                                         <label for="lblHide{{subSku.Id}}" class="control-label">Hide in Storefront</label>
                                                                                         <div class="checkbox">
                                                                                             <label>
@@ -459,7 +459,7 @@
                                                                                             </label>
                                                                                         </div>
                                                                                     </div>
-                                                                                    <div class="fixed-accordion-row" data-ng-click="$event.stopPropagation()">
+                                                                                    <div class="fixed-accordion-row margin-zero" data-ng-click="$event.stopPropagation()">
                                                                                         <label class="control-label">ID</label>
                                                                                         <span class="form-control-static" data-ng-if="subSku.Id">{{subSku.Id}}</span>
                                                                                     </div>
