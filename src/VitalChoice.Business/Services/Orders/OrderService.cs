@@ -200,17 +200,16 @@ namespace VitalChoice.Business.Services.Orders
                     //storefront update
                     if (model.IsAnyNotIncomplete())
                     {
-                        await UpdateAffiliateOrderPayment(model, entity.Id, uow);
+                        await UpdateAffiliateOrderPayment(model, uow);
                         await UpdateHealthwiseOrderWithOrder(model, uow);
                         await ChargeGiftCertificates(model, uow);
                         await ChargeOnetimeDiscount(model);
                         await uow.SaveChangesAsync();
-                        paymentCopy.IdOrder = entity.Id;
-
-                        if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
-                        {
-                            Logger.LogError("Cannot update order payment info on remote.");
-                        }
+                    }
+                    paymentCopy.IdOrder = entity.Id;
+                    if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
+                    {
+                        Logger.LogError("Cannot update order payment info on remote.");
                     }
                     transaction.Commit();
                 }
@@ -239,19 +238,36 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     SetExtendedOptions(models);
                     await SetSkusBornDate(models, uow);
+                    var paymentCopies = models.Select(p => new PaymentMethodCopy
+                    {
+                        OriginalReference = p,
+                        PaymentMethod = _paymentMapper.Clone<ExpandoObject>(p.PaymentMethod, o =>
+                        {
+                            var result = new ExpandoObject();
+                            result.AddRange(o);
+                            return result;
+                        })
+                    }).ToArray();
                     entities = await base.InsertRangeAsync(models, uow);
+                    paymentCopies.ForEach(p => p.PaymentMethod.IdOrder = p.OriginalReference.Id);
+                    var paymentRemoteUpdates =
+                        paymentCopies.Select(p => _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(p.PaymentMethod)).ToArray();
                     foreach (var model in models)
                     {
                         var entity = entities.FirstOrDefault(e => e.Id == model.Id);
                         //storefront update
                         if (entity != null)
                         {
-                            await UpdateAffiliateOrderPayment(model, entity.Id, uow);
+                            await UpdateAffiliateOrderPayment(model, uow);
                             await UpdateHealthwiseOrderWithOrder(model, uow);
                         }
                         await ChargeGiftCertificates(model, uow);
                     }
                     await uow.SaveChangesAsync();
+                    if ((await Task.WhenAll(paymentRemoteUpdates)).Any(t => !t))
+                    {
+                        Logger.LogError("Cannot update order payment info on remote.");
+                    }
                     transaction.Commit();
                 }
                 catch
@@ -301,14 +317,14 @@ namespace VitalChoice.Business.Services.Orders
                     if (model.IsAnyNotIncomplete())
                     {
                         //storefront update
-                        await UpdateAffiliateOrderPayment(model, model.Id, uow);
+                        await UpdateAffiliateOrderPayment(model, uow);
                         await UpdateHealthwiseOrderWithOrder(model, uow);
                         //charge one-time discount, remove old charge if different
-                        paymentCopy.IdOrder = entity.Id;
-                        if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
-                        {
-                            Logger.LogError("Cannot update order payment info on remote.");
-                        }
+                    }
+                    paymentCopy.IdOrder = entity.Id;
+                    if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
+                    {
+                        Logger.LogError("Cannot update order payment info on remote.");
                     }
                     await uow.SaveChangesAsync();
                     transaction.Commit();
@@ -354,8 +370,16 @@ namespace VitalChoice.Business.Services.Orders
                     SetExtendedOptions(models);
                     await SetSkusBornDate(models, uow);
                     var ids = models.Select(o => o.Id).Distinct().ToList();
+                    var paymentCopies = models.Select(p => _paymentMapper.Clone<ExpandoObject>(p.PaymentMethod, o =>
+                    {
+                        var result = new ExpandoObject();
+                        result.AddRange(o);
+                        return result;
+                    })).ToArray();
                     var initialList = await SelectEntitiesAsync(o => ids.Contains(o.Id), query => query);
                     entities = await base.UpdateRangeAsync(models, uow);
+                    var paymentRemoteUpdates =
+                        paymentCopies.Select(p => _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(p)).ToArray();
                     foreach (var model in models)
                     {
                         var entity = entities.FirstOrDefault(p => p.Id == model.Id);
@@ -367,11 +391,14 @@ namespace VitalChoice.Business.Services.Orders
                         }
 
                         //storefront update
-                        await UpdateAffiliateOrderPayment(model, model.Id, uow);
+                        await UpdateAffiliateOrderPayment(model, uow);
                         await UpdateHealthwiseOrderWithOrder(model, uow);
                     }
                     await uow.SaveChangesAsync();
-
+                    if ((await Task.WhenAll(paymentRemoteUpdates)).Any(t => !t))
+                    {
+                        Logger.LogError("Cannot update order payment info on remote.");
+                    }
                     transaction.Commit();
                 }
                 catch
@@ -1447,14 +1474,14 @@ namespace VitalChoice.Business.Services.Orders
             }
         }
 
-        private async Task UpdateAffiliateOrderPayment(OrderDynamic dynamic, int id, IUnitOfWorkAsync uow)
+        private async Task UpdateAffiliateOrderPayment(OrderDynamic dynamic, IUnitOfWorkAsync uow)
         {
             if (dynamic.Customer.IdObjectType==(int)CustomerType.Retail && dynamic.Customer.IdAffiliate.HasValue &&
                 dynamic.AffiliatePaymentAmount.HasValue && dynamic.AffiliateNewCustomerOrder.HasValue)
             {
                 AffiliateOrderPayment payment = new AffiliateOrderPayment
                 {
-                    Id = id,
+                    Id = dynamic.Id,
                     Status = AffiliateOrderPaymentStatus.NotPaid,
                     IdAffiliate = dynamic.Customer.IdAffiliate.Value,
                     Amount = dynamic.AffiliatePaymentAmount.Value,
@@ -2532,5 +2559,11 @@ namespace VitalChoice.Business.Services.Orders
         }
 
         #endregion
+
+        private struct PaymentMethodCopy
+        {
+            public OrderDynamic OriginalReference { get; set; }
+            public OrderPaymentMethodDynamic PaymentMethod { get; set; }
+        }
     }
 }
