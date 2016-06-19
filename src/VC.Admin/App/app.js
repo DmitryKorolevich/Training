@@ -30,6 +30,10 @@ var app = angular
 				$rootScope.$state = $state;
 				$rootScope.$stateParams = $stateParams;
 				appBootstrap.initialize();
+				$rootScope.$on('$locationChangeStart', function (event) {
+				    window.onresize = null;
+				});
+				nv.dev = false;
 			};
 
 		    initialize();
