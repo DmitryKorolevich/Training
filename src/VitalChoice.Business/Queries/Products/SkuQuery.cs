@@ -10,7 +10,7 @@ namespace VitalChoice.Business.Queries.Products
 {
     public class SkuQuery : QueryObject<Sku>
     {
-        private static readonly Regex DescriptionParse = new Regex("(?<subtitle>.+)(\\((?<qty>[0-9]+)\\))?", RegexOptions.Compiled);
+        private static readonly Regex DescriptionParse = new Regex("(?<subtitle>[^\\)\\(]+)(\\((?<qty>[0-9]+)\\))?", RegexOptions.Compiled);
 
         public SkuQuery NotDeleted()
         {
@@ -82,11 +82,12 @@ namespace VitalChoice.Business.Queries.Products
             return this;
         }
 
-        public SkuQuery WithSubTitleAndQty(string subTitle, int? qty)
+        public SkuQuery WithSubTitleAndQty(string name, int? qty)
         {
-            if (!string.IsNullOrEmpty(subTitle))
+            if (!string.IsNullOrEmpty(name))
             {
-                Add(x => x.Product.WhenValues(new {SubTitle = subTitle}, ValuesFilterType.And, CompareBehaviour.Equals));
+                Add(x => x.Product.Name.StartsWith(name) || name.StartsWith(x.Product.Name));
+                //Add(x => x.Product.WhenValues(new {SubTitle = name}, ValuesFilterType.And, CompareBehaviour.Equals));
                 if (qty.HasValue)
                 {
                     Add(x => x.WhenValues(new {QTY = qty.Value}, ValuesFilterType.And, CompareBehaviour.Equals));
@@ -168,7 +169,7 @@ namespace VitalChoice.Business.Queries.Products
                 }
                 if (!string.IsNullOrEmpty(subTitle))
                 {
-                    Add(x => x.Product.WhenValues(new {SubTitle = subTitle}, ValuesFilterType.And, CompareBehaviour.StartsWith));
+                    Add(x => x.Product.Name.StartsWith(subTitle) || subTitle.StartsWith(x.Product.Name));
                     if (qty.HasValue)
                     {
                         Add(x => x.WhenValues(new {QTY = qty.Value}, ValuesFilterType.And, CompareBehaviour.StartsWith));

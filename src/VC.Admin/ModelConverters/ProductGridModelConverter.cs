@@ -17,6 +17,9 @@ namespace VC.Admin.ModelConverters
             model.InStock = (ProductType) dynamic.Product.IdObjectType == ProductType.EGс ||
                             (ProductType) dynamic.Product.IdObjectType == ProductType.Gc ||
                             ((bool?) dynamic.SafeData.DisregardStock ?? false) || ((int?) dynamic.SafeData.Stock ?? 0) > 0;
+            model.ProductName = dynamic.Product?.Name;
+            model.DescriptionName =
+                $"{dynamic.Product?.Name} {dynamic.Product?.SafeData.SubTitle ?? string.Empty} ({(int?) dynamic.SafeData.QTY ?? 0})";
             return TaskCache.CompletedTask;
         }
 

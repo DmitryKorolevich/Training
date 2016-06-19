@@ -573,13 +573,36 @@ namespace VitalChoice.Business.Services.Products
 
             Func<IQueryable<Sku>, IOrderedQueryable<Sku>> sortable = x => x.OrderByDescending(y => y.DateCreated);
 
+            ICollection<SkuDynamic> results;
+
             if (filter.Paging != null)
-                return (await _skuReadServiceAsync.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, conditions,
+            {
+                results = (await _skuReadServiceAsync.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, conditions,
                     query => query.Include(s => s.OptionValues).Include(s => s.Product).ThenInclude(p => p.OptionValues), sortable, true))
                     .Items;
-
-            return await _skuReadServiceAsync.SelectAsync(conditions,
-                query => query.Include(s => s.OptionValues).Include(s => s.Product).ThenInclude(p => p.OptionValues), sortable, true);
+            }
+            else
+            {
+                results = await _skuReadServiceAsync.SelectAsync(conditions,
+                    query => query.Include(s => s.OptionValues).Include(s => s.Product).ThenInclude(p => p.OptionValues), sortable, true);
+            }
+            if (!string.IsNullOrEmpty(filter.ExactDescriptionName))
+            {
+                return
+                    results.Where(
+                        r =>
+                            $"{r.Product?.Name ?? string.Empty} {r.Product?.SafeData.SubTitle ?? string.Empty} ({r.SafeData.QTY ?? 0})" ==
+                            filter.ExactDescriptionName).ToList();
+            }
+            if (!string.IsNullOrEmpty(filter.DescriptionName))
+            {
+                return
+                    results.Where(
+                        r =>
+                            $"{r.Product?.Name ?? string.Empty} {r.Product?.SafeData.SubTitle ?? string.Empty} ({r.SafeData.QTY ?? 0})"
+                                .StartsWith(filter.DescriptionName)).ToList();
+            }
+            return results;
         }
 
         public async Task<List<SkuDynamic>> GetSkusAsync(ICollection<SkuInfo> skuInfos, bool withDefaults = false)
