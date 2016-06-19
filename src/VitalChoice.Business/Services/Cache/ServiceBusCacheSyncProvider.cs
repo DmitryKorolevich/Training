@@ -95,7 +95,7 @@ namespace VitalChoice.Business.Services.Cache
                 return;
 
             var now = DateTime.UtcNow;
-            List<string> updateMessages = new List<string>();
+            //List<string> updateMessages = new List<string>();
             foreach (var operation in syncOperations)
             {
                 operation.SendTime = now;
@@ -104,9 +104,9 @@ namespace VitalChoice.Business.Services.Cache
                     CorrelationId = _clientUid.ToString(),
                     TimeToLive = TimeSpan.FromMinutes(5)
                 });
-                updateMessages.Add(operation.ToString());
+                //updateMessages.Add(operation.ToString());
             }
-            Logger.LogWarning($"Sending cache messages: {string.Join(",", updateMessages.Select(m => m))}");
+            //Logger.LogWarning($"Sending cache messages: {string.Join(",", updateMessages.Select(m => m))}");
             _serviceBusClient.SendNow();
         }
 
@@ -127,7 +127,39 @@ namespace VitalChoice.Business.Services.Cache
 
         private void ReceiveMessages(IEnumerable<BrokeredMessage> incomingItems)
         {
-            List<SyncOperation> syncOperations = new List<SyncOperation>();
+            var syncOperations = ParseSyncOperations(incomingItems);
+            if (syncOperations.Count > 0)
+            {
+                int[] pings;
+                lock (_lockObject)
+                {
+                    pings = _pingMilliseconds.Where(p => p > 0).ToArray();
+                }
+                if (pings.Length > 0)
+                {
+                    var averagePing = (int)pings.Average();
+                    AveragePing.AddOrUpdate(_applicationEnvironment.ApplicationName, averagePing, (s, i) => averagePing);
+                    _serviceBusClient.EnqueueMessage(new BrokeredMessage(new SyncOperation
+                    {
+                        SyncType = SyncType.Ping,
+                        AppName = _applicationEnvironment.ApplicationName,
+                        AveragePing = averagePing,
+                        SendTime = DateTime.UtcNow
+                    })
+                    {
+                        CorrelationId = _clientUid.ToString(),
+                        TimeToLive = TimeSpan.FromMinutes(5)
+                    });
+                    _serviceBusClient.SendNow();
+                }
+                //Logger.LogWarning($"Accepting cache messages: {string.Join(",", syncOperations.Select(m => m.ToString()))}");
+                AcceptChanges(syncOperations);
+            }
+        }
+
+        private List<SyncOperation> ParseSyncOperations(IEnumerable<BrokeredMessage> incomingItems)
+        {
+            var syncOperations = new List<SyncOperation>();
             foreach (var message in incomingItems)
             {
                 try
@@ -172,33 +204,7 @@ namespace VitalChoice.Business.Services.Cache
                     Logger.LogError(e.ToString());
                 }
             }
-            if (syncOperations.Count > 0)
-            {
-                int[] pings;
-                lock (_lockObject)
-                {
-                    pings = _pingMilliseconds.Where(p => p > 0).ToArray();
-                }
-                if (pings.Length > 0)
-                {
-                    var averagePing = (int)pings.Average();
-                    AveragePing.AddOrUpdate(_applicationEnvironment.ApplicationName, averagePing, (s, i) => averagePing);
-                    _serviceBusClient.EnqueueMessage(new BrokeredMessage(new SyncOperation
-                    {
-                        SyncType = SyncType.Ping,
-                        AppName = _applicationEnvironment.ApplicationName,
-                        AveragePing = averagePing,
-                        SendTime = DateTime.UtcNow
-                    })
-                    {
-                        CorrelationId = _clientUid.ToString(),
-                        TimeToLive = TimeSpan.FromMinutes(5)
-                    });
-                    _serviceBusClient.SendNow();
-                }
-                Logger.LogWarning($"Accepting cache messages: {string.Join(",", syncOperations.Select(m => m.ToString()))}");
-                AcceptChanges(syncOperations);
-            }
+            return syncOperations;
         }
     }
 }
