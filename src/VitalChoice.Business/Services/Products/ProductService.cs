@@ -568,7 +568,7 @@ namespace VitalChoice.Business.Services.Products
                 .WithExactDescriptionName(filter.ExactDescriptionName)
                 .WithIds(filter.Ids)
                 .WithIdProducts(filter.IdProducts)
-                .WithIdProductTypes(filter.IdProductTypes.Select(p => (int) p).ToArray())
+                .WithIdProductTypes(filter.IdProductTypes?.Select(p => (int) p).ToArray())
                 .ActiveOnly(filter.ActiveOnly).NotHiddenOnly(filter.NotHiddenOnly);
 
             Func<IQueryable<Sku>, IOrderedQueryable<Sku>> sortable = x => x.OrderByDescending(y => y.DateCreated);
