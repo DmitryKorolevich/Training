@@ -10,6 +10,7 @@ using VitalChoice.Business.CsvExportMaps.Products;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Product;
+using VitalChoice.Business.Queries.Products;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Services.Ecommerce;
@@ -22,6 +23,7 @@ using VitalChoice.Data.Transaction;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Helpers;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -79,6 +81,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly ICsvExportService<SkuGoogleItem, SkuGoogleItemExportCsvMap> _skuGoogleItemCSVExportService;
         private readonly IBlobStorageClient _storageClient;
         private readonly SpEcommerceRepository _sPEcommerceRepository;
+        private readonly IExtendedDynamicReadServiceAsync<SkuDynamic, Sku> _skuReadServiceAsync;
 
         public ProductService(VProductSkuRepository vProductSkuRepository,
             IEcommerceRepositoryAsync<VSku> vSkuRepository,
@@ -105,7 +108,7 @@ namespace VitalChoice.Business.Services.Products
             ILoggerProviderExtended loggerProvider,
             IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync,
             SpEcommerceRepository sPEcommerceRepository,
-            DirectMapper<Product> directMapper, DynamicExtensionsRewriter queryVisitor, ITransactionAccessor<EcommerceContext> transactionAccessor)
+            DirectMapper<Product> directMapper, DynamicExtensionsRewriter queryVisitor, ITransactionAccessor<EcommerceContext> transactionAccessor, IExtendedDynamicReadServiceAsync<SkuDynamic, Sku> skuReadServiceAsync)
             : base(
                 mapper, productRepository, productValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
@@ -131,6 +134,7 @@ namespace VitalChoice.Business.Services.Products
             _options = options;
             _skuOptionValueRepositoryAsync = skuOptionValueRepositoryAsync;
             _sPEcommerceRepository = sPEcommerceRepository;
+            _skuReadServiceAsync = skuReadServiceAsync;
         }
 
         public async Task<ProductContent> SelectContentForTransfer(int id)
@@ -553,9 +557,9 @@ namespace VitalChoice.Business.Services.Products
             return await _skuMapper.FromEntityRangeAsync(skus, true);
         }
 
-        public async Task<ICollection<VSku>> GetSkusAsync(VProductSkuFilter filter)
+        public async Task<ICollection<SkuDynamic>> GetSkusAsync(VProductSkuFilter filter)
         {
-            var conditions = new VSkuQuery().NotDeleted()
+            var conditions = new SkuQuery().NotDeleted()
                 .WithText(filter.SearchText)
                 .WithCode(filter.Code)
                 .WithDescriptionName(filter.DescriptionName)
@@ -564,18 +568,18 @@ namespace VitalChoice.Business.Services.Products
                 .WithExactDescriptionName(filter.ExactDescriptionName)
                 .WithIds(filter.Ids)
                 .WithIdProducts(filter.IdProducts)
-                .WithIdProductTypes(filter.IdProductTypes)
+                .WithIdProductTypes(filter.IdProductTypes.Select(p => (int) p).ToArray())
                 .ActiveOnly(filter.ActiveOnly).NotHiddenOnly(filter.NotHiddenOnly);
-            var query = _vSkuRepository.Query(conditions);
 
-            Func<IQueryable<VSku>, IOrderedQueryable<VSku>> sortable = x => x.OrderByDescending(y => y.DateCreated);
+            Func<IQueryable<Sku>, IOrderedQueryable<Sku>> sortable = x => x.OrderByDescending(y => y.DateCreated);
 
-            if (filter.Paging == null)
-            {
-                return await query.OrderBy(sortable).SelectAsync(false);
-            }
-            var pagedList = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            return pagedList.Items;
+            if (filter.Paging != null)
+                return (await _skuReadServiceAsync.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, conditions,
+                    query => query.Include(s => s.OptionValues).Include(s => s.Product).ThenInclude(p => p.OptionValues), sortable, true))
+                    .Items;
+
+            return await _skuReadServiceAsync.SelectAsync(conditions,
+                query => query.Include(s => s.OptionValues).Include(s => s.Product).ThenInclude(p => p.OptionValues), sortable, true);
         }
 
         public async Task<List<SkuDynamic>> GetSkusAsync(ICollection<SkuInfo> skuInfos, bool withDefaults = false)

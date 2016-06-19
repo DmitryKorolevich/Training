@@ -145,7 +145,7 @@ namespace VitalChoice.DynamicData.Helpers
 
         public static string ConvertDateToIsoStringAndDropMc(DateTime datetime)
         {
-            return TrimZeros(datetime.ToString("yyyy-MM-ddTHH:mm:ss"));
+            return datetime.ToString("yyyy-MM-ddTHH:mm:ss");
         }
 
         public static string ConvertDateToIsoString(DateTime datetime)

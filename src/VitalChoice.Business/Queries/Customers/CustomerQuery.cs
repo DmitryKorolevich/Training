@@ -157,14 +157,14 @@ namespace VitalChoice.Business.Queries.Customers
                     TradeClass = idTradeClass,
                     Tier = idTier,
                 };
-                Add(c => c.WhenValues(filter, (int)CustomerType.Wholesale, ValuesFilterType.And));
+                Add(c => c.WhenValues(filter, (int)CustomerType.Wholesale, ValuesFilterType.And, CompareBehaviour.Equals));
             }
             return this;
         }
 
         public CustomerQuery FilterProfileAddress(CustomerAddressFilter filter)
         {
-            Add(c => c.ProfileAddress.WhenValues(filter, (int)AddressType.Profile, ValuesFilterType.And));
+            Add(c => c.ProfileAddress.WhenValues(filter, (int)AddressType.Profile, ValuesFilterType.And, CompareBehaviour.StartsWith));
             return this;
         }
 
@@ -174,7 +174,7 @@ namespace VitalChoice.Business.Queries.Customers
                 !string.IsNullOrEmpty(filter?.Zip))
             {
                 filter.Default = true;
-                Add(c => c.ShippingAddresses.Any(p => p.ShippingAddress.WhenValues(filter, (int)AddressType.Shipping, ValuesFilterType.And)));
+                Add(c => c.ShippingAddresses.Any(p => p.ShippingAddress.WhenValues(filter, (int)AddressType.Shipping, ValuesFilterType.And, CompareBehaviour.StartsWith)));
             }
             return this;
         }

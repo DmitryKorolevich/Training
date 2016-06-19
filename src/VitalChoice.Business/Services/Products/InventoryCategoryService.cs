@@ -188,7 +188,7 @@ namespace VitalChoice.Business.Services.Products
         private async Task<IList<ProductDynamic>> GetProductsAssignedToInvenotyCategory(int id)
         {
             Dictionary<string, object> filter = new Dictionary<string, object> {{ProductConstants.FIELD_NAME_INVENTORY_CATEGORY_ID, id}};
-            var products = await productService.SelectAsync(p => p.WhenValues(filter, ValuesFilterType.And));
+            var products = await productService.SelectAsync(p => p.WhenValues(filter, ValuesFilterType.And, CompareBehaviour.Equals));
             return products;
         }
 

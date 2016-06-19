@@ -59,7 +59,7 @@ namespace VitalChoice.Interfaces.Services.Products
 
 	    Task<ICollection<SkuDynamic>> GetSkusByProductIdsAsync(ICollection<int> ids);
 
-        Task<ICollection<VSku>> GetSkusAsync(VProductSkuFilter filter);
+        Task<ICollection<SkuDynamic>> GetSkusAsync(VProductSkuFilter filter);
 
 	    Task<List<SkuDynamic>> GetSkusAsync(ICollection<SkuInfo> skuInfos, bool withDefaults = false);
 

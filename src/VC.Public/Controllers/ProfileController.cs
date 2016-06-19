@@ -588,7 +588,7 @@ namespace VC.Public.Controllers
                     foreach (var skuOrdered in lastOrder.Skus)
                     {
                         //Ignore hidden in the storefront skus and products in this view
-                        var skuInDB = skus.FirstOrDefault(p => p.SkuId == skuOrdered.Sku.Id && !p.Hidden && p.ProductIdVisibility.HasValue);
+                        var skuInDB = skus.FirstOrDefault(p => p.Id == skuOrdered.Sku.Id && !p.Hidden && p.Product.IdVisibility.HasValue);
 
                         if (skuInDB != null)
                         {
@@ -600,11 +600,11 @@ namespace VC.Public.Controllers
                                 PortionsCount = skuOrdered.Sku.Data.QTY,
                                 Quantity = skuOrdered.Quantity,
                                 SkuCode = skuOrdered.Sku.Code,
-                                ProductSubTitle = skuInDB?.SubTitle,
+                                ProductSubTitle = skuInDB.Product.SafeData.SubTitle,
                                 SelectedPrice =
-                                    customer.IdObjectType == (int)CustomerType.Retail
-                                        ? skuInDB?.Price?.ToString("C2")
-                                        : skuInDB?.WholesalePrice?.ToString("C2"),
+                                    customer.IdObjectType == (int) CustomerType.Retail
+                                        ? skuInDB.Price.ToString("C2")
+                                        : skuInDB.WholesalePrice.ToString("C2"),
                             };
                             lines.Add(orderLineModel);
                         }

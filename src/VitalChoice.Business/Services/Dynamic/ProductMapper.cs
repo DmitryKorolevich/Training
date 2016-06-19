@@ -14,6 +14,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.ObjectMapping.Extensions;
 using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Business.Services.Dynamic
@@ -73,6 +74,16 @@ namespace VitalChoice.Business.Services.Dynamic
                         });
                 }
 
+                Lazy<ProductDynamic> clone = new Lazy<ProductDynamic>(() => dynamic.Clone());
+
+                foreach (var sku in dynamic.Skus)
+                {
+                    if (sku.Product == null)
+                    {
+                        sku.Product = clone.Value;
+                        sku.Product.Skus = null;
+                    }
+                }
                 await _skuMapper.SyncCollectionsAsync(dynamic.Skus, entity.Skus);
             });
         }

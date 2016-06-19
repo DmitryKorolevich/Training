@@ -134,7 +134,7 @@ namespace VitalChoice.Business.Queries.Orders
                 Add(c => c.WhenValues(new
                 {
                     ServiceCode = serviceCode.Value
-                }, (int)OrderType.Reship, ValuesFilterType.And));
+                }, (int)OrderType.Reship, ValuesFilterType.And, CompareBehaviour.StartsWith));
             }
             return this;
         }
@@ -146,7 +146,7 @@ namespace VitalChoice.Business.Queries.Orders
                 Add(c => c.WhenValues(new
                 {
                     ServiceCode = serviceCode.Value
-                }, (int)OrderType.Refund, ValuesFilterType.And));
+                }, (int)OrderType.Refund, ValuesFilterType.And, CompareBehaviour.StartsWith));
             }
             return this;
         }
@@ -157,34 +157,34 @@ namespace VitalChoice.Business.Queries.Orders
             {
                 Add(c => c.WhenValues(new
                 {
-                    OrderType= idOrderSource.Value
-                }, ValuesFilterType.And));
+                    OrderType = idOrderSource.Value
+                }, ValuesFilterType.And, CompareBehaviour.Equals));
             }
             if (pOrderType.HasValue)
             {
                 Add(c => c.WhenValues(new
                 {
                     POrderType = pOrderType.Value
-                }, ValuesFilterType.And));
+                }, ValuesFilterType.And, CompareBehaviour.Equals));
             }
-            if (idShippingMethod.HasValue && idShippingMethod.Value==1)//upgraded
+            if (idShippingMethod.HasValue && idShippingMethod.Value == 1) //upgraded
             {
                 Add(c => c.WhenValues(new
                 {
                     ShippingUpgradeP = 1
-                }, ValuesFilterType.And) ||
-                c.WhenValues(new
-                {
-                    ShippingUpgradeP = 2
-                }, ValuesFilterType.And) ||
-                c.WhenValues(new
-                {
-                    ShippingUpgradeNP = 1
-                }, ValuesFilterType.And) ||
-                c.WhenValues(new
-                {
-                    ShippingUpgradeNP = 2
-                }, ValuesFilterType.And));
+                }, ValuesFilterType.And, CompareBehaviour.Equals) ||
+                         c.WhenValues(new
+                         {
+                             ShippingUpgradeP = 2
+                         }, ValuesFilterType.And, CompareBehaviour.Equals) ||
+                         c.WhenValues(new
+                         {
+                             ShippingUpgradeNP = 1
+                         }, ValuesFilterType.And, CompareBehaviour.Equals) ||
+                         c.WhenValues(new
+                         {
+                             ShippingUpgradeNP = 2
+                         }, ValuesFilterType.And, CompareBehaviour.Equals));
             }
             return this;
         }
@@ -196,21 +196,21 @@ namespace VitalChoice.Business.Queries.Orders
                 Add(c => c.Customer.ProfileAddress.WhenValues(new
                 {
                     FirstName = firstName
-                }, (int)AddressType.Profile, ValuesFilterType.And));
+                }, (int) AddressType.Profile, ValuesFilterType.And, CompareBehaviour.Contains));
             }
             if (!string.IsNullOrEmpty(lastName))
             {
                 Add(c => c.Customer.ProfileAddress.WhenValues(new
                 {
                     LastName = lastName
-                },(int) AddressType.Profile, ValuesFilterType.And));
+                }, (int) AddressType.Profile, ValuesFilterType.And, CompareBehaviour.Contains));
             }
             if (!string.IsNullOrEmpty(company))
             {
                 Add(c => c.Customer.ProfileAddress.WhenValues(new
                 {
                     Company = company
-                }, (int)AddressType.Profile, ValuesFilterType.And));
+                }, (int) AddressType.Profile, ValuesFilterType.And, CompareBehaviour.Contains));
             }
 
             return this;

@@ -37,15 +37,18 @@ namespace VitalChoice.DynamicData.Helpers
                 bool objectTypeExists = false;
                 int? idObjectType = null;
                 ValuesFilterType filterType;
-                if (m.Arguments.Count > 3)
+                CompareBehaviour compareBehaviour;
+                if (m.Arguments.Count > 4)
                 {
                     objectTypeExists = true;
                     idObjectType = (int?) m.Arguments[2].GetValue();
                     filterType = (ValuesFilterType)m.Arguments[3].GetValue();
+                    compareBehaviour = (CompareBehaviour) m.Arguments[4].GetValue();
                 }
                 else
                 {
                     filterType = (ValuesFilterType)m.Arguments[2].GetValue();
+                    compareBehaviour = (CompareBehaviour) m.Arguments[3].GetValue();
                 }
                 var filterModelType = m.Arguments[1].Type;
                 var entityType = m.Arguments[0].Type;
@@ -73,8 +76,8 @@ namespace VitalChoice.DynamicData.Helpers
 
 
                         resultExpression = objectTypeExists
-                            ? queryBuilder.Filter(filterModel, filterModelType, m.Arguments[0], filterType, idObjectType)
-                            : queryBuilder.Filter(filterModel, filterModelType, m.Arguments[0], filterType);
+                            ? queryBuilder.Filter(filterModel, filterModelType, m.Arguments[0], filterType, idObjectType, compareBehaviour)
+                            : queryBuilder.Filter(filterModel, filterModelType, m.Arguments[0], filterType, compareBehaviour);
                         if (resultExpression == null)
                             return Expression.Constant(true);
                         return Visit(resultExpression);
@@ -83,8 +86,8 @@ namespace VitalChoice.DynamicData.Helpers
                             throw new ApiException("You cannot use WhenAny with non-collection properties, see When");
 
                         resultExpression = objectTypeExists
-                            ? queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], filterType, false, idObjectType)
-                            : queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], filterType, false);
+                            ? queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], filterType, false, idObjectType, compareBehaviour)
+                            : queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], filterType, false, compareBehaviour);
 
                         return Visit(resultExpression);
                     case "WhenValuesAll":
@@ -92,8 +95,8 @@ namespace VitalChoice.DynamicData.Helpers
                             throw new ApiException("You cannot use WhenAll with non-collection properties, see When");
 
                         resultExpression = objectTypeExists
-                            ? queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], filterType, true, idObjectType)
-                            : queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], filterType, true);
+                            ? queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], filterType, true, idObjectType, compareBehaviour)
+                            : queryBuilder.FilterCollection(filterModel, filterModelType, m.Arguments[0], filterType, true, compareBehaviour);
 
                         return Visit(resultExpression);
                 }

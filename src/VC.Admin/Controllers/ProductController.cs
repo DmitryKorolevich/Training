@@ -11,6 +11,7 @@ using VitalChoice.Core.Infrastructure;
 using VitalChoice.Interfaces.Services.Products;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
@@ -49,6 +50,7 @@ namespace VC.Admin.Controllers
         private readonly IProductReviewService productReviewService;
         private readonly ISettingService settingService;
         private readonly IDynamicMapper<ProductDynamic, Product> _mapper;
+        private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
         private readonly ICsvExportService<ProductCategoryStatisticTreeItemModel, ProductCategoryStatisticTreeItemCsvMap> productCategoryStatisticTreeItemCSVExportService;
         private readonly ICsvExportService<SkuBreakDownReportItem, SkuBreakDownReportItemCsvMap> _skuBreakDownReportItemCSVExportService;
         private readonly IObjectHistoryLogService objectHistoryLogService;
@@ -67,7 +69,7 @@ namespace VC.Admin.Controllers
             IDynamicMapper<ProductDynamic, Product> mapper,
             ICsvExportService<ProductCategoryStatisticTreeItemModel, ProductCategoryStatisticTreeItemCsvMap> productCategoryStatisticTreeItemCSVExportService,
             ICsvExportService<SkuBreakDownReportItem, SkuBreakDownReportItemCsvMap> skuBreakDownReportItemCSVExportService,
-            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager, IAgentService agentService)
+            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager, IAgentService agentService, IDynamicMapper<SkuDynamic, Sku> skuMapper)
         {
             this.productCategoryService = productCategoryService;
             this.inventoryCategoryService = inventoryCategoryService;
@@ -80,6 +82,7 @@ namespace VC.Admin.Controllers
             this.objectHistoryLogService = objectHistoryLogService;
             _userManager = userManager;
             _agentService = agentService;
+            _skuMapper = skuMapper;
             _mapper = mapper;
             _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             this.logger = loggerProvider.CreateLogger<ProductController>();
@@ -108,19 +111,21 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<SkuListItemModel>> GetSku([FromBody]VProductSkuFilter filter)
+        public async Task<Result<SkuListItemModel>> GetSku([FromBody] VProductSkuFilter filter)
         {
             var result = await productService.GetSkusAsync(filter);
 
-            return result.Select(p => new SkuListItemModel(p)).FirstOrDefault();
+            return
+                await
+                    (result.Select(async p => await _skuMapper.ToModelAsync<SkuListItemModel>(p)).FirstOrDefault() ??
+                     TaskCache<SkuListItemModel>.DefaultCompletedTask);
         }
 
         [HttpPost]
-        public async Task<Result<ICollection<SkuListItemModel>>> GetSkus([FromBody]VProductSkuFilter filter)
+        public async Task<Result<ICollection<SkuListItemModel>>> GetSkus([FromBody] VProductSkuFilter filter)
         {
             var result = await productService.GetSkusAsync(filter);
-
-            return result.Select(p => new SkuListItemModel(p)).ToArray();
+            return await result.Select(p => _skuMapper.ToModelAsync<SkuListItemModel>(p)).ToListAsync();
         }
 
         [HttpGet]
@@ -128,29 +133,34 @@ namespace VC.Admin.Controllers
         {
             ICollection<SkuWithStatisticListItemModel> toReturn = new List<SkuWithStatisticListItemModel>();
 
-            FilterBase idsFilter = new FilterBase();
-            idsFilter.Paging = null;
+            FilterBase idsFilter = new FilterBase {Paging = null};
             Dictionary<int, int> items = await productService.GetTopPurchasedSkuIdsAsync(idsFilter, id);
 
-            VProductSkuFilter filter = new VProductSkuFilter();
-            filter.Ids = items.Select(p => p.Key).ToList();
-            filter.Paging = null;
+            VProductSkuFilter filter = new VProductSkuFilter
+            {
+                Ids = items.Select(p => p.Key).ToList(),
+                Paging = null
+            };
 
             var result = await productService.GetSkusAsync(filter);
             //only in stock
-            result = result.Where(p => p.DisregardStock || p.Stock > 0).ToList();
-            foreach (var sku in result)
+            var inStockItems = result.Where(dynamic => (ProductType) dynamic.Product.IdObjectType == ProductType.EGс ||
+                                                       (ProductType) dynamic.Product.IdObjectType == ProductType.Gc ||
+                                                       ((bool?) dynamic.SafeData.DisregardStock ?? false) ||
+                                                       ((int?) dynamic.SafeData.Stock ?? 0) > 0)
+                .Select(async p => await _skuMapper.ToModelAsync<SkuWithStatisticListItemModel>(p));
+            foreach (var skuTask in inStockItems)
             {
-                foreach (var item in items)
+                var sku = await skuTask;
+                int ordered;
+                // ReSharper disable once PossibleInvalidOperationException
+                // ReSharper disable once AssignNullToNotNullAttribute
+                if (items.TryGetValue(sku.Id.Value, out ordered))
                 {
-                    if (sku.SkuId == item.Key)
-                    {
-                        toReturn.Add(new SkuWithStatisticListItemModel(sku, item.Value));
-                        break;
-                    }
+                    sku.Ordered = ordered;
+                    toReturn.Add(sku);
                 }
             }
-
             return toReturn.OrderByDescending(p => p.Ordered).Take(20).ToList();
         }
 

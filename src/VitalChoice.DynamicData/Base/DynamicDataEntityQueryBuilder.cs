@@ -4,9 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Autofac.Features.Indexed;
-using VitalChoice.Data.Extensions;
-using VitalChoice.Data.Helpers;
-using VitalChoice.Data.Repositories;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
@@ -20,6 +17,18 @@ namespace VitalChoice.DynamicData.Base
     {
         And,
         Or
+    }
+
+    public enum CompareBehaviour
+    {
+        Equals = 0,
+        GreaterThan,
+        LessThan,
+        GreaterOrEqualThan,
+        LessOrEqualThan,
+        StartsWith,
+        EndsWith,
+        Contains
     }
 
     public sealed class DynamicDataEntityQueryBuilder<TEntity, TOptionValue, TOptionType> : IDynamicDataEntityQueryBuilder
@@ -41,28 +50,28 @@ namespace VitalChoice.DynamicData.Base
             _member = typeof(TEntity).GetMember("OptionValues").FirstOrDefault();
         }
 
-        public Expression Filter(object model, Type modelType, Expression parameter, ValuesFilterType filterType, int? idObjectType)
+        public Expression Filter(object model, Type modelType, Expression parameter, ValuesFilterType filterType, int? idObjectType, CompareBehaviour compareBehaviour)
         {
-            return FilterInternal(model, modelType, parameter, filterType, idObjectType, true);
+            return FilterInternal(model, modelType, parameter, filterType, idObjectType, true, compareBehaviour);
         }
 
-        public Expression Filter(object model, Type modelType, Expression parameter, ValuesFilterType filterType)
+        public Expression Filter(object model, Type modelType, Expression parameter, ValuesFilterType filterType, CompareBehaviour compareBehaviour)
         {
-            return FilterInternal(model, modelType, parameter, filterType, null, false);
+            return FilterInternal(model, modelType, parameter, filterType, null, false, compareBehaviour);
         }
 
-        public Expression FilterCollection(object model, Type modelType, Expression parameter, ValuesFilterType filterType, bool all, int? idObjectType)
+        public Expression FilterCollection(object model, Type modelType, Expression parameter, ValuesFilterType filterType, bool all, int? idObjectType, CompareBehaviour compareBehaviour)
         {
-            return FilterCollectionInternal(model, modelType, parameter, filterType, all, idObjectType, true);
+            return FilterCollectionInternal(model, modelType, parameter, filterType, all, idObjectType, true, compareBehaviour);
         }
 
-        public Expression FilterCollection(object model, Type modelType, Expression parameter, ValuesFilterType filterType, bool all)
+        public Expression FilterCollection(object model, Type modelType, Expression parameter, ValuesFilterType filterType, bool all, CompareBehaviour compareBehaviour)
         {
-            return FilterCollectionInternal(model, modelType, parameter, filterType, all, null, false);
+            return FilterCollectionInternal(model, modelType, parameter, filterType, all, null, false, compareBehaviour);
         }
 
         private Expression FilterCollectionInternal(object model, Type modelType, Expression parameter, ValuesFilterType filterType,
-            bool all, int? idObjectType, bool lookObjectId)
+            bool all, int? idObjectType, bool lookObjectId, CompareBehaviour compareBehaviour)
         {
             if (model == null)
                 return Expression.Constant(true);
@@ -71,13 +80,13 @@ namespace VitalChoice.DynamicData.Base
 
             var parameterExpression = Expression.Parameter(typeof(TEntity));
             var replacement = CreateValuesSelector(BuildSearchValues(filterDictionary,
-                FilterOptionTypes(filterDictionary, optionTypesProvider, idObjectType, lookObjectId)), filterType, parameterExpression);
+                FilterOptionTypes(filterDictionary, optionTypesProvider, idObjectType, lookObjectId)), filterType, parameterExpression, compareBehaviour);
             return replacement == null
                 ? Expression.Constant(true)
                 : BuildCollectionExpression(parameter, all, Expression.Lambda<Func<TEntity, bool>>(replacement, parameterExpression));
         }
 
-        private Expression FilterInternal(object model, Type modelType, Expression parameter, ValuesFilterType filterType, int? idObjectType, bool lookObjectId)
+        private Expression FilterInternal(object model, Type modelType, Expression parameter, ValuesFilterType filterType, int? idObjectType, bool lookObjectId, CompareBehaviour compareBehaviour)
         {
             if (model == null)
                 return Expression.Constant(true);
@@ -85,7 +94,7 @@ namespace VitalChoice.DynamicData.Base
             var optionTypesProvider = GetValues(model, modelType, out filterDictionary);
 
             var replacement = CreateValuesSelector(BuildSearchValues(filterDictionary,
-                FilterOptionTypes(filterDictionary, optionTypesProvider, idObjectType, lookObjectId)), filterType, parameter);
+                FilterOptionTypes(filterDictionary, optionTypesProvider, idObjectType, lookObjectId)), filterType, parameter, compareBehaviour);
 
             return replacement ?? Expression.Constant(true);
         }
@@ -159,7 +168,7 @@ namespace VitalChoice.DynamicData.Base
         }
 
         private Expression CreateValuesSelector(
-            IEnumerable<OptionGroup<TOptionType>> optionGroups, ValuesFilterType filterType, Expression parameter)
+            IEnumerable<OptionGroup<TOptionType>> optionGroups, ValuesFilterType filterType, Expression parameter, CompareBehaviour compareBehaviour)
         {
             Expression result = null;
             foreach (var optionGroup in optionGroups)
@@ -171,10 +180,10 @@ namespace VitalChoice.DynamicData.Base
                             value => !string.IsNullOrEmpty(value.Value) && value.OptionType.IdFieldType != (int) FieldType.LargeString))
                 {
                     valuesSelector = valuesSelector == null
-                        ? CreateExpression(value, parameter)
+                        ? CreateExpression(value, parameter, compareBehaviour)
                         : (filterType == ValuesFilterType.And
-                            ? Expression.AndAlso(valuesSelector, CreateExpression(value, parameter))
-                            : Expression.OrElse(valuesSelector, CreateExpression(value, parameter)));
+                            ? Expression.AndAlso(valuesSelector, CreateExpression(value, parameter, compareBehaviour))
+                            : Expression.OrElse(valuesSelector, CreateExpression(value, parameter, compareBehaviour)));
                 }
                 if (valuesSelector != null)
                 {
@@ -205,7 +214,7 @@ namespace VitalChoice.DynamicData.Base
             return method;
         }
 
-        private Expression CreateExpression(OptionValueItem<TOptionType> value, Expression parameter)
+        private Expression CreateExpression(OptionValueItem<TOptionType> value, Expression parameter, CompareBehaviour compareBehaviour)
         {
             Expression valuesSelector;
             if (_member == null)
@@ -213,17 +222,37 @@ namespace VitalChoice.DynamicData.Base
             if (value.Value == null)
             {
                 Expression<Func<TOptionValue, bool>> lambda = v => v.IdOptionType != value.IdType;
-                valuesSelector = Expression.Call(GetConditionMethod("All", typeof(TOptionValue)), Expression.MakeMemberAccess(parameter, _member), lambda);
-            }
-            else if (value.OptionType.IdFieldType == (int) FieldType.String && !string.IsNullOrEmpty(value.Value))
-            {
-                Expression<Func<TOptionValue, bool>> lambda = v => v.IdOptionType == value.IdType && v.Value.StartsWith(value.Value);
-                valuesSelector = Expression.Call(GetConditionMethod("Any", typeof(TOptionValue)), Expression.MakeMemberAccess(parameter, _member), lambda);
+                valuesSelector = Expression.Call(GetConditionMethod("All", typeof(TOptionValue)),
+                    Expression.MakeMemberAccess(parameter, _member), lambda);
             }
             else
             {
-                Expression<Func<TOptionValue, bool>> lambda = v => v.IdOptionType == value.IdType && v.Value == value.Value;
-                valuesSelector = Expression.Call(GetConditionMethod("Any", typeof(TOptionValue)), Expression.MakeMemberAccess(parameter, _member), lambda);
+                Expression<Func<TOptionValue, bool>> lambda;
+                switch (compareBehaviour)
+                {
+                    case CompareBehaviour.Equals:
+                        lambda = v => v.IdOptionType == value.IdType && v.Value == value.Value;
+                        valuesSelector = Expression.Call(GetConditionMethod("Any", typeof(TOptionValue)),
+                            Expression.MakeMemberAccess(parameter, _member), lambda);
+                        break;
+                    case CompareBehaviour.StartsWith:
+                        lambda = v => v.IdOptionType == value.IdType && v.Value.StartsWith(value.Value);
+                        valuesSelector = Expression.Call(GetConditionMethod("Any", typeof(TOptionValue)),
+                            Expression.MakeMemberAccess(parameter, _member), lambda);
+                        break;
+                    case CompareBehaviour.EndsWith:
+                        lambda = v => v.IdOptionType == value.IdType && v.Value.EndsWith(value.Value);
+                        valuesSelector = Expression.Call(GetConditionMethod("Any", typeof(TOptionValue)),
+                            Expression.MakeMemberAccess(parameter, _member), lambda);
+                        break;
+                    case CompareBehaviour.Contains:
+                        lambda = v => v.IdOptionType == value.IdType && v.Value.Contains(value.Value);
+                        valuesSelector = Expression.Call(GetConditionMethod("Any", typeof(TOptionValue)),
+                            Expression.MakeMemberAccess(parameter, _member), lambda);
+                        break;
+                    default:
+                        throw new NotImplementedException($"{compareBehaviour} is not implemented");
+                }
             }
             return valuesSelector;
         }

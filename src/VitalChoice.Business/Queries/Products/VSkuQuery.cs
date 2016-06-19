@@ -57,7 +57,7 @@ namespace VitalChoice.Business.Queries.Product
         {
             if (!string.IsNullOrEmpty(code))
             {
-                Add(x => x.Code.Contains(code));
+                Add(x => x.Code.StartsWith(code));
             }
             return this;
         }

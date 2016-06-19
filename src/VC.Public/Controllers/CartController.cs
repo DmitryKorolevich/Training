@@ -128,17 +128,17 @@ namespace VC.Public.Controllers
 
 				if (skus.Count > 0)
 				{
-					crossSells = crossSells.Where(x => skus.Select(y => y.SkuId).Contains(x.IdSku)).ToList();
+					crossSells = crossSells.Where(x => skus.Select(y => y.Id).Contains(x.IdSku)).ToList();
 
 					var wholesale = await CustomerLoggedIn() && HasRole(RoleType.Wholesale);
 
 					crossSellModels.AddRange(from crossSell in crossSells
-											 let targetSku = skus.Single(x => x.SkuId == crossSell.IdSku)
+											 let targetSku = skus.Single(x => x.Id == crossSell.IdSku)
 											 select new CartCrossSellModel()
 											 {
 												 Title = crossSell.Title,
 												 ImageUrl = crossSell.ImageUrl,
-												 Price = wholesale ? targetSku.WholesalePrice ?? 0 : targetSku.Price ?? 0,
+												 Price = wholesale ? targetSku.WholesalePrice : targetSku.Price,
 												 SkuCode = targetSku.Code
 											 });
 				}
