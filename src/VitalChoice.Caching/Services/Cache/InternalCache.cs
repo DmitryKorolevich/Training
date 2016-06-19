@@ -515,7 +515,7 @@ namespace VitalChoice.Caching.Services.Cache
                     cached.NeedUpdateRelated.AddRange(EntityInfo.ImplicitUpdateMarkedEntities.Where(r => data.GetHasRelation(r)));
                     cached.NeedUpdate = true;
                     return true;
-                }).SelectMany(c => c.ForeignKeys).GroupBy(k => k.Key))
+                }).Where(c => c.ForeignKeys != null).SelectMany(c => c.ForeignKeys).Where(f => f.Key != null).GroupBy(k => k.Key))
                 {
                     var keySet = new HashSet<EntityForeignKey>();
                     keySet.AddRange(group.Select(g => g.Value));
