@@ -117,35 +117,44 @@ namespace VC.Public.Controllers
 		    return new Tuple<OrderDataContext, CustomerCartOrder>(context, cart);
 	    }
 
-	    private async Task<IList<CartCrossSellModel>> PopulateCartCrossSells(ContentCrossSellType type)
-		{
-			var crossSellModels = new List<CartCrossSellModel>();
+        private async Task<IList<CartCrossSellModel>> PopulateCartCrossSells(ContentCrossSellType type)
+        {
+            var crossSellModels = new List<CartCrossSellModel>();
 
-			var crossSells = await _contentCrossSellService.GetContentCrossSellsAsync(type);
-			if (crossSells.Count > 0)
-			{
-				var skus = await _productService.GetSkusAsync(new VProductSkuFilter() { Ids = crossSells.Select(x => x.IdSku).ToList(), ActiveOnly = true, NotHiddenOnly = true});
+            var crossSells = await _contentCrossSellService.GetContentCrossSellsAsync(type);
+            if (crossSells.Count > 0)
+            {
+                var skus =
+                    await
+                        _productService.GetSkusAsync(new VProductSkuFilter()
+                        {
+                            Ids = crossSells.Select(x => x.IdSku).ToList(),
+                            ActiveOnly = true,
+                            NotHiddenOnly = true
+                        });
 
-				if (skus.Count > 0)
-				{
-					crossSells = crossSells.Where(x => skus.Select(y => y.Id).Contains(x.IdSku)).ToList();
+                if (skus.Count > 0)
+                {
+                    var skuIds = new HashSet<int>(skus.Select(y => y.Id));
 
-					var wholesale = await CustomerLoggedIn() && HasRole(RoleType.Wholesale);
+                    crossSells = crossSells.Where(x => skuIds.Contains(x.IdSku)).ToList();
 
-					crossSellModels.AddRange(from crossSell in crossSells
-											 let targetSku = skus.Single(x => x.Id == crossSell.IdSku)
-											 select new CartCrossSellModel()
-											 {
-												 Title = crossSell.Title,
-												 ImageUrl = crossSell.ImageUrl,
-												 Price = wholesale ? targetSku.WholesalePrice : targetSku.Price,
-												 SkuCode = targetSku.Code
-											 });
-				}
-			}
+                    var wholesale = await CustomerLoggedIn() && HasRole(RoleType.Wholesale);
 
-			return crossSellModels;
-		}
+                    crossSellModels.AddRange(from crossSell in crossSells
+                        let targetSku = skus.Single(x => x.Id == crossSell.IdSku)
+                        select new CartCrossSellModel()
+                        {
+                            Title = crossSell.Title,
+                            ImageUrl = crossSell.ImageUrl,
+                            Price = wholesale ? targetSku.WholesalePrice : targetSku.Price,
+                            SkuCode = targetSku.Code
+                        });
+                }
+            }
+
+            return crossSellModels;
+        }
 
         [HttpGet]
         public Task<IActionResult> GetCartLiteComponent()
