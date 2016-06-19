@@ -31,7 +31,7 @@ namespace VitalChoice.Jobs.Jobs
             }
             catch (Exception ex)
             {
-                _logger.LogError(0, ex, ex.Message);
+                _logger.LogError(ex.ToString());
                 throw;
             }
         }

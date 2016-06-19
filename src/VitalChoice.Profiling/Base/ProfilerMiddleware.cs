@@ -40,7 +40,7 @@ namespace VitalChoice.Profiling.Base
                         }
                         catch (Exception e)
                         {
-                            _logger.LogError(0, e, e.Message);
+                            _logger.LogError(e.ToString());
                         }
                     }
                 }
@@ -51,7 +51,7 @@ namespace VitalChoice.Profiling.Base
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(0, e, e.Message);
+                    _logger.LogError(e.ToString());
                 }
             }
             else

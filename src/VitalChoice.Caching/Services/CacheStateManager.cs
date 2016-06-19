@@ -80,7 +80,7 @@ namespace VitalChoice.Caching.Services
             }
             catch (Exception e)
             {
-                Logger.LogError(0, e, e.Message);
+                Logger.LogError(e.ToString());
             }
             return result;
         }
@@ -108,7 +108,7 @@ namespace VitalChoice.Caching.Services
             }
             catch (Exception e)
             {
-                Logger.LogError(0, e, e.Message);
+                Logger.LogError(e.ToString());
             }
             return result;
         }

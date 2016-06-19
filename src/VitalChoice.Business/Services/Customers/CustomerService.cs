@@ -787,7 +787,7 @@ namespace VitalChoice.Business.Services.Customers
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(0, e, e.Message);
+                    Logger.LogError(e.ToString());
                     if (customerUpdated) //this needs to be done since distributed transactions not supported yet
                                          //todo: refactor this once distributed transactions arrive
                     {
