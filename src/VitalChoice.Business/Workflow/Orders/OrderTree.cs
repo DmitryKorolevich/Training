@@ -25,7 +25,7 @@ namespace VitalChoice.Business.Workflow.Orders
             return result;
         }
 
-        public OrderTree(IActionItemProvider actionProvider, string treeName) : base(actionProvider, treeName)
+        public OrderTree(IActionItemProvider actionProvider, string treeName, int idTree) : base(actionProvider, treeName, idTree)
         {
         }
     }

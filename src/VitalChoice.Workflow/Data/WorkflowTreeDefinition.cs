@@ -9,12 +9,12 @@ namespace VitalChoice.Workflow.Data
         {
             Type = type;
             Name = name;
-            Actions = new HashSet<Type>();
         }
 
         public Type Type { get; }
         public string Name { get; }
-        public HashSet<Type> Actions { get; set; }
+        public Dictionary<Type, WorkflowActionDefinition> Actions { get; set; }
+        public Dictionary<Type, WorkflowActionResolverDefinition> ActionResolvers { get; set; }
 
         public bool Equals(WorkflowTreeDefinition other) => other?.Type == Type;
 

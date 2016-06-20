@@ -32,13 +32,17 @@ namespace VitalChoice.Business.Services.Workflow
             _resolverPaths = resolverPaths;
         }
 
-        public async Task<Type> GetTreeType(string treeName)
+        public async Task<TreeInfo> GetTreeInfo(string treeName)
         {
             var tree =
                 await _treeRepository.Query(new WorkflowTreeQuery().WithName(treeName)).SelectFirstOrDefaultAsync(false);
             if (tree == null)
                 throw new ApiException($"Tree <{treeName}> not found");
-            return ReflectionHelper.ResolveType(tree.ImplementationType);
+            return new TreeInfo
+            {
+                TreeType = ReflectionHelper.ResolveType(tree.ImplementationType),
+                IdTree = tree.Id
+            };
         }
 
         public async Task<HashSet<ActionItem>> GetTreeActions(string treeName)
@@ -46,7 +50,6 @@ namespace VitalChoice.Business.Services.Workflow
             var result =
                 await _treeRepository.Query(new WorkflowTreeQuery().WithName(treeName))
                     .Include(t => t.Actions)
-                    .ThenInclude(ta => ta.Executor)
                     .SelectAsync(false);
             var tree = result.SingleOrDefault();
             if (tree == null)
@@ -54,13 +57,13 @@ namespace VitalChoice.Business.Services.Workflow
 
             return
                 new HashSet<ActionItem>(
-                    tree.Actions.Select(a => new ActionItem(a.Executor.ImplementationType, a.Executor.Name)
+                    tree.Actions.Select(a => new ActionItem(a.ImplementationType, a.Name)
                     {
-                        WorkflowActionType = a.Executor.ActionType
+                        WorkflowActionType = a.ActionType
                     }));
         }
 
-        public async Task<Dictionary<int, ActionItem>> GetActionResolverPaths(string actionName, Type implementation)
+        public async Task<Dictionary<int, ActionItem>> GetActionResolverPaths(int idTree, string actionName, Type implementation)
         {
             if (_resolvers == null)
             {
@@ -71,7 +74,7 @@ namespace VitalChoice.Business.Services.Workflow
                             .Include(r => r.Resolver)
                             .Include(r => r.Executor)
                             .SelectAsync(false);
-                var results = actions.GroupBy(a => new ExecutorKey(a.Resolver.Name, a.Resolver.ImplementationType));
+                var results = actions.GroupBy(a => new ExecutorKey(a.Resolver.Name, a.Resolver.ImplementationType, a.Resolver.IdOwnedTree));
                 foreach (var group in results)
                 {
                     var dict = group.ToDictionary(a => a.Path, a => new ActionItem(a.Executor.ImplementationType, a.Executor.Name)
@@ -82,14 +85,14 @@ namespace VitalChoice.Business.Services.Workflow
                 }
             }
             Dictionary<int, ActionItem> result;
-            if (_resolvers.TryGetValue(new ExecutorKey(actionName, implementation.FullName), out result))
+            if (_resolvers.TryGetValue(new ExecutorKey(actionName, implementation.FullName, idTree), out result))
             {
                 return result;
             }
             throw new ApiException($"Action <{actionName}> not found");
         }
 
-        public async Task<HashSet<ActionItem>> GetDependencies(string actionName, Type implementation)
+        public async Task<HashSet<ActionItem>> GetDependencies(int idTree, string actionName, Type implementation)
         {
             if (_depencies == null)
             {
@@ -106,18 +109,18 @@ namespace VitalChoice.Business.Services.Workflow
                         {
                             WorkflowActionType = a.Dependent.ActionType
                         }));
-                    _depencies.Add(new ExecutorKey(action.Name, action.ImplementationType), set);
+                    _depencies.Add(new ExecutorKey(action.Name, action.ImplementationType, action.IdOwnedTree), set);
                 }
             }
             HashSet<ActionItem> result;
-            if (_depencies.TryGetValue(new ExecutorKey(actionName, implementation.FullName), out result))
+            if (_depencies.TryGetValue(new ExecutorKey(actionName, implementation.FullName, idTree), out result))
             {
                 return result;
             }
             throw new ApiException($"Action <{actionName}> not found");
         }
 
-        public async Task<HashSet<ActionItem>> GetAggregations(string actionName, Type implementation)
+        public async Task<HashSet<ActionItem>> GetAggregations(int idTree, string actionName, Type implementation)
         {
             if (_aggregations == null)
             {
@@ -135,11 +138,11 @@ namespace VitalChoice.Business.Services.Workflow
                             {
                                 WorkflowActionType = a.ToAggregate.ActionType
                             }));
-                    _aggregations.Add(new ExecutorKey(action.Name, action.ImplementationType), set);
+                    _aggregations.Add(new ExecutorKey(action.Name, action.ImplementationType, action.IdOwnedTree), set);
                 }
             }
             HashSet<ActionItem> result;
-            if (_aggregations.TryGetValue(new ExecutorKey(actionName, implementation.FullName), out result))
+            if (_aggregations.TryGetValue(new ExecutorKey(actionName, implementation.FullName, idTree), out result))
             {
                 return result;
             }
@@ -150,17 +153,20 @@ namespace VitalChoice.Business.Services.Workflow
         {
             private readonly string _actionName;
             private readonly string _implementation;
+            private readonly int _idTree;
 
-            public ExecutorKey(string actionName, string implementation)
+            public ExecutorKey(string actionName, string implementation, int idTree)
             {
                 _actionName = actionName;
                 _implementation = implementation;
+                _idTree = idTree;
             }
 
             public bool Equals(ExecutorKey other)
             {
                 return string.Equals(_actionName, other._actionName) &&
-                       string.Equals(_implementation, other._implementation);
+                       string.Equals(_implementation, other._implementation) &&
+                       _idTree == other._idTree;
             }
 
             public override bool Equals(object obj)
@@ -173,7 +179,7 @@ namespace VitalChoice.Business.Services.Workflow
             {
                 unchecked
                 {
-                    return (_actionName.GetHashCode()*397) ^ _implementation.GetHashCode();
+                    return (((_idTree*397) ^ _actionName.GetHashCode())*397) ^ _implementation.GetHashCode();
                 }
             }
 

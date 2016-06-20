@@ -14,14 +14,16 @@ namespace VitalChoice.Workflow.Core
         where TContext : WorkflowDataContext<TResult>
     {
         private readonly IActionItemProvider _itemProvider;
+        private readonly int _id;
         private readonly Dictionary<string, IWorkflowExecutor<TContext, TResult>> _actions;
 
         private readonly Dictionary<Type, string> _reverseAccessActions;
 
-        protected WorkflowTree(IActionItemProvider itemProvider, string treeName)
+        protected WorkflowTree(IActionItemProvider itemProvider, string treeName, int id)
         {
             Name = treeName;
             _itemProvider = itemProvider;
+            _id = id;
             _actions = new Dictionary<string, IWorkflowExecutor<TContext, TResult>>();
             _reverseAccessActions = new Dictionary<Type, string>();
         }
@@ -64,26 +66,23 @@ namespace VitalChoice.Workflow.Core
 
         private async Task AddActionWithDependencies(ActionItem action)
         {
-            var workflowAction =
-                (IWorkflowAction<TContext, TResult>)
-                    Activator.CreateInstance(action.ActionType, this, action.ActionName);
-            _actions.Add(action.ActionName, workflowAction);
-            _reverseAccessActions.Add(action.ActionType, action.ActionName);
-            var dependencyItems = await _itemProvider.GetDependencies(action.ActionName, action.ActionType);
-            foreach (var dep in dependencyItems)
+            if (!_actions.ContainsKey(action.ActionName))
             {
-                workflowAction.DependendActions.Add(dep.ActionName);
-                if (!_actions.ContainsKey(dep.ActionName))
+                var workflowAction =
+                    (IWorkflowAction<TContext, TResult>)
+                        Activator.CreateInstance(action.ActionType, this, action.ActionName);
+                _actions.Add(action.ActionName, workflowAction);
+                _reverseAccessActions.Add(action.ActionType, action.ActionName);
+                var dependencyItems = await _itemProvider.GetDependencies(_id, action.ActionName, action.ActionType);
+                foreach (var dep in dependencyItems)
                 {
+                    workflowAction.DependendActions.Add(dep.ActionName);
                     await AddWalkAction(dep);
                 }
-            }
-            var aggregatedItems = await _itemProvider.GetAggregations(action.ActionName, action.ActionType);
-            foreach (var aggr in aggregatedItems)
-            {
-                workflowAction.AggreagatedActions.Add(aggr.ActionName);
-                if (!_actions.ContainsKey(aggr.ActionName))
+                var aggregatedItems = await _itemProvider.GetAggregations(_id, action.ActionName, action.ActionType);
+                foreach (var aggr in aggregatedItems)
                 {
+                    workflowAction.AggreagatedActions.Add(aggr.ActionName);
                     await AddWalkAction(aggr);
                 }
             }
@@ -106,26 +105,23 @@ namespace VitalChoice.Workflow.Core
 
         private async Task AddActionResolverWithDependencies(ActionItem action)
         {
-            var workflowActionResolver =
-                (IWorkflowActionResolver<TContext, TResult>)
-                    Activator.CreateInstance(action.ActionType, this, action.ActionName);
-            _actions.Add(action.ActionName, workflowActionResolver);
-            _reverseAccessActions.Add(action.ActionType, action.ActionName);
-            var dependencyItems = await _itemProvider.GetDependencies(action.ActionName, action.ActionType);
-            foreach (var dep in dependencyItems)
+            if (!_actions.ContainsKey(action.ActionName))
             {
-                workflowActionResolver.DependendActions.Add(dep.ActionName);
-                if (!_actions.ContainsKey(dep.ActionName))
+                var workflowActionResolver =
+                    (IWorkflowActionResolver<TContext, TResult>)
+                        Activator.CreateInstance(action.ActionType, this, action.ActionName);
+                _actions.Add(action.ActionName, workflowActionResolver);
+                _reverseAccessActions.Add(action.ActionType, action.ActionName);
+                var dependencyItems = await _itemProvider.GetDependencies(_id, action.ActionName, action.ActionType);
+                foreach (var dep in dependencyItems)
                 {
+                    workflowActionResolver.DependendActions.Add(dep.ActionName);
                     await AddWalkAction(dep);
                 }
-            }
-            var paths = await _itemProvider.GetActionResolverPaths(action.ActionName, action.ActionType);
-            foreach (var path in paths)
-            {
-                workflowActionResolver.Actions.Add(path.Key, path.Value.ActionName);
-                if (!_actions.ContainsKey(path.Value.ActionName))
+                var paths = await _itemProvider.GetActionResolverPaths(_id, action.ActionName, action.ActionType);
+                foreach (var path in paths)
                 {
+                    workflowActionResolver.Actions.Add(path.Key, path.Value.ActionName);
                     await AddWalkAction(path.Value);
                 }
             }

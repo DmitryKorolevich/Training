@@ -14,6 +14,10 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Workflow
 
         public string ImplementationType { get; set; }
 
+        public int IdOwnedTree { get; set; }
+
+        public WorkflowTree OwnedTree { get; set; }
+
         public WorkflowActionType ActionType { get; set; }
 
         public ICollection<WorkflowResolverPath> ResolverPaths { get; set; }

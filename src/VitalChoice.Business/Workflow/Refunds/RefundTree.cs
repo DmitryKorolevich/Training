@@ -11,7 +11,7 @@ namespace VitalChoice.Business.Workflow.Refunds
 {
     public class RefundTree : ComputableTree<OrderRefundDataContext>
     {
-        public RefundTree(IActionItemProvider itemProvider, string treeName) : base(itemProvider, treeName)
+        public RefundTree(IActionItemProvider itemProvider, string treeName, int idTree) : base(itemProvider, treeName, idTree)
         {
         }
 

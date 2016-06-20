@@ -75,7 +75,6 @@ namespace VitalChoice.Ecommerce.Context
             WorkflowExecutors(builder);
             WorkflowResolverPaths(builder);
             WorkflowTrees(builder);
-            WorkflowTreeActions(builder);
             WorkflowActionDependencies(builder);
             WorkflowActionAggregations(builder);
 
@@ -1654,37 +1653,12 @@ namespace VitalChoice.Ecommerce.Context
             });
         }
 
-        protected virtual void WorkflowTreeActions(ModelBuilder builder)
-        {
-            builder.Entity<WorkflowTreeAction>(entity =>
-            {
-                entity.HasKey(a => new {a.IdExecutor, a.IdTree});
-                entity.Ignore(a => a.Id);
-                entity.ToTable("WorkflowTreeActions");
-                entity
-                    .HasOne(treeAction => treeAction.Executor)
-                    .WithOne()
-                    .HasForeignKey<WorkflowTreeAction>(treeAction => treeAction.IdExecutor)
-                    .HasPrincipalKey<WorkflowExecutor>(executor => executor.Id);
-                entity
-                    .HasOne(action => action.Tree)
-                    .WithMany(tree => tree.Actions)
-                    .HasForeignKey(action => action.IdTree)
-                    .HasPrincipalKey(tree => tree.Id);
-            });
-        }
-
         protected virtual void WorkflowTrees(ModelBuilder builder)
         {
             builder.Entity<WorkflowTree>(entity =>
             {
                 entity.HasKey(w => w.Id);
                 entity.ToTable("WorkflowTrees");
-                entity
-                    .HasMany(tree => tree.Actions)
-                    .WithOne(action => action.Tree)
-                    .HasForeignKey(action => action.IdTree)
-                    .HasPrincipalKey(tree => tree.Id);
             });
         }
 
@@ -1728,6 +1702,10 @@ namespace VitalChoice.Ecommerce.Context
                     .WithOne(d => d.Parent)
                     .HasForeignKey(d => d.IdParent)
                     .HasPrincipalKey(e => e.Id);
+                entity.HasOne(e => e.OwnedTree)
+                    .WithMany(t => t.Actions)
+                    .HasForeignKey(e => e.IdOwnedTree)
+                    .HasPrincipalKey(t => t.Id);
             });
         }
 

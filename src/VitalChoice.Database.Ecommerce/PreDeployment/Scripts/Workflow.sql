@@ -139,3 +139,20 @@ BEGIN
 
 	CREATE UNIQUE INDEX UQ_ExecutorTypeAndName ON dbo.WorkflowExecutors(Name, ImplementationType)
 END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('dbo.WorkflowExecutors') AND Name = N'OwnedTree')
+BEGIN
+	DELETE FROM dbo.WorkflowExecutors
+
+	ALTER TABLE dbo.WorkflowExecutors
+	ADD IdOwnedTree INT NOT NULL,
+	CONSTRAINT [FK_WorkflowExecutorTree] FOREIGN KEY (IdOwnedTree) REFERENCES dbo.[WorkflowTrees] (Id)
+
+	DROP INDEX UQ_ExecutorTypeAndName ON dbo.WorkflowExecutors
+
+	CREATE UNIQUE INDEX UQ_ExecutorTypeAndNameForTree ON dbo.WorkflowExecutors(Name, ImplementationType, IdOwnedTree)
+
+	DROP TABLE WorkflowTreeActions
+END

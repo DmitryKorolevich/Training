@@ -43,16 +43,16 @@ namespace VitalChoice.Business.Services.Workflow
                 try
                 {
                     //Wipe out everything
-                    var trees = await _treeRepository.Query().SelectAsync();
-                    var dependencies = await _actionDependenciesRepository.Query().SelectAsync();
-                    var aggregations = await _actionAggregationsRepository.Query().SelectAsync();
-                    var resolverPaths = await _resolverPathsRepository.Query().SelectAsync();
-                    var executors = await _executorsRepository.Query().SelectAsync();
-                    await _treeRepository.DeleteAllAsync(trees);
+                    var trees = await _treeRepository.Query().SelectAsync(false);
+                    var dependencies = await _actionDependenciesRepository.Query().SelectAsync(false);
+                    var aggregations = await _actionAggregationsRepository.Query().SelectAsync(false);
+                    var resolverPaths = await _resolverPathsRepository.Query().SelectAsync(false);
+                    var executors = await _executorsRepository.Query().SelectAsync(false);
+                    await _resolverPathsRepository.DeleteAllAsync(resolverPaths);
                     await _actionAggregationsRepository.DeleteAllAsync(aggregations);
                     await _actionDependenciesRepository.DeleteAllAsync(dependencies);
-                    await _resolverPathsRepository.DeleteAllAsync(resolverPaths);
                     await _executorsRepository.DeleteAllAsync(executors);
+                    await _treeRepository.DeleteAllAsync(trees);
                     transaction.Commit();
                     return true;
                 }

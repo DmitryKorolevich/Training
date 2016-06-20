@@ -29,8 +29,9 @@ namespace VitalChoice.Workflow.Core
                     return new WorkflowTreeExecutor<TContext, TResult>((IWorkflowTree<TContext, TResult>) cachedResult, _scope);
                 }
             }
-            var treeType = await _actionItemProvider.GetTreeType(name);
-            var result = (IWorkflowTree<TContext, TResult>) Activator.CreateInstance(treeType, _actionItemProvider, name);
+            var treeInfo = await _actionItemProvider.GetTreeInfo(name);
+            var result =
+                (IWorkflowTree<TContext, TResult>) Activator.CreateInstance(treeInfo.TreeType, _actionItemProvider, name, treeInfo.IdTree);
             await result.InitializeTreeAsync();
             lock (Cache)
             {

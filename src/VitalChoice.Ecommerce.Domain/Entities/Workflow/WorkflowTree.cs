@@ -6,13 +6,13 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Workflow
     {
         public WorkflowTree()
         {
-            Actions = new List<WorkflowTreeAction>();
+            Actions = new List<WorkflowExecutor>();
         }
 
         public string Name { get; set; }
 
         public string ImplementationType { get; set; }
 
-        public ICollection<WorkflowTreeAction> Actions { get; set; }
+        public ICollection<WorkflowExecutor> Actions { get; set; }
     }
 }

@@ -614,8 +614,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterGenericServiceDecorator(typeof(ExtendedEcommerceDynamicReadServiceDecorator<,>), "extendedService")
                 .As(typeof(IExtendedDynamicReadServiceAsync<,>)).InstancePerLifetimeScope();
 
-            builder.RegisterGeneric(typeof(TreeSetup<,>)).As(typeof(ITreeSetup<,>)).InstancePerLifetimeScope();
-            builder.RegisterType<TreeSetupCleaner>().As<ITreeSetupCleaner>().InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(TreeSetup<,>)).As(typeof(ITreeSetup<,>));
+            builder.RegisterType<TreeSetupCleaner>().As<ITreeSetupCleaner>();
             builder.RegisterContentBase();
             builder.RegisterDynamicsBase();
             builder.RegisterType<DynamicExtensionsRewriter>().InstancePerLifetimeScope();
