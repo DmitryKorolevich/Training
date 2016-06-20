@@ -4,7 +4,7 @@
     </a>
 </div>
 <div class="angular-ui-tree-handle">
-    <div class="ya-treeview-content clearfix">
+    <div class="ya-treeview-content clearfix" data-ng-click="toggle(item)">
         <div class="line">
             <label>{{::item.ShortData}} <span style="font-weight:bolder"><span data-ng-if="::item.TimeElapsed > 500" style="color: orangered">{{::item.TimeElapsed}}</span><span data-ng-if="::item.TimeElapsed <= 500">{{::item.TimeElapsed}}</span> ms</span>
             </label>
@@ -12,14 +12,11 @@
     </div>
 </div>
 <div data-ng-if="item.ShowInner">
-    <div style="font-weight: bolder">
+    <div style="font-weight: bolder; border: 1px solid gainsboro; padding: 5px;">
         {{::item.Data}}
     </div>
     <div style="font-weight: lighter;color: grey">
         <div ng-repeat="additional in ::item.AdditionalData">{{::additional}}</div>
-    </div>
-    <div>
-        {{::item.ClassTypeName}}::{{::item.MethodName}}
     </div>
 </div>
 <ol data-ng-if="item.ShowInner" class="angular-ui-tree-nodes">

@@ -37,6 +37,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Infrastructure.Domain.Content;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Profiling.Base;
 
 namespace VC.Admin.Controllers
 {
@@ -236,13 +237,41 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Settings)]
-        public Task<Result<PagedList<ProfileScopeListItemModel>>> GetProfileScopeItems([FromBody]FilterBase filter)
+        public Task<Result<PagedList<ProfileScopeListItemModel>>> GetProfileScopeItems([FromBody] FilterBase filter)
         {
-            PagedList<ProfileScopeListItemModel> toReturn=new PagedList<ProfileScopeListItemModel>();
+            PagedList<ProfileScopeListItemModel> toReturn = new PagedList<ProfileScopeListItemModel>();
             var scopes = PerformanceRequestService.GetWorkedScopes();
+            IEnumerable<ProfilingScope> scopesOrderedFiltered = scopes;
             toReturn.Count = scopes.Count;
-            toReturn.Items = scopes.Skip((filter.Paging.PageIndex-1) *filter.Paging.PageItemCount).
-                Take(filter.Paging.PageItemCount).Select(p=>new ProfileScopeListItemModel(p)).ToList();
+            if (!string.IsNullOrEmpty(filter.SearchText))
+            {
+                scopesOrderedFiltered =
+                    scopesOrderedFiltered.Where(
+                        s => (s.Data as string)?.Contains(filter.SearchText) ?? false);
+            }
+            if (!string.IsNullOrEmpty(filter.Sorting?.Path))
+            {
+                switch (filter.Sorting.Path)
+                {
+                    case "Start":
+                        scopesOrderedFiltered = filter.Sorting.SortOrder == FilterSortOrder.Asc
+                            ? scopesOrderedFiltered.OrderBy(s => s.Start)
+                            : scopesOrderedFiltered.OrderByDescending(s => s.Start);
+                        break;
+                    case "TimeElapsed":
+                        scopesOrderedFiltered = filter.Sorting.SortOrder == FilterSortOrder.Asc
+                            ? scopesOrderedFiltered.OrderBy(s => s.TimeElapsed)
+                            : scopesOrderedFiltered.OrderByDescending(s => s.TimeElapsed);
+                        break;
+                    case "ShortData":
+                        scopesOrderedFiltered = filter.Sorting.SortOrder == FilterSortOrder.Asc
+                            ? scopesOrderedFiltered.OrderBy(s => s.Data)
+                            : scopesOrderedFiltered.OrderByDescending(s => s.Data);
+                        break;
+                }
+            }
+            toReturn.Items = scopesOrderedFiltered.Skip((filter.Paging.PageIndex - 1)*filter.Paging.PageItemCount).
+                Take(filter.Paging.PageItemCount).Select(p => new ProfileScopeListItemModel(p)).ToList();
 
             return Task.FromResult<Result<PagedList<ProfileScopeListItemModel>>>(toReturn);
         }

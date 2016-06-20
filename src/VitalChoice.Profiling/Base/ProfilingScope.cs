@@ -38,6 +38,7 @@ namespace VitalChoice.Profiling.Base
                 var stackFrame = new StackFrame(skipFrames, false);
                 var method = stackFrame.GetMethod();
                 ClassType = method.DeclaringType;
+                Start = DateTime.Now;
                 MethodName = method.Name;
                 if (data == null)
                 {
@@ -106,6 +107,8 @@ namespace VitalChoice.Profiling.Base
         public Type ClassType { get; }
 
         public string MethodName { get; }
+
+        public DateTime Start { get; set; }
 
         public TimeSpan TimeElapsed { get; private set; }
 

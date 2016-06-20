@@ -19,6 +19,8 @@ namespace VC.Admin.Models.Settings
 
         public double TimeElapsed { get; set; }
 
+        public DateTime Start { get; set; }
+
         public string MethodName { get; set; }
 
         public string ClassTypeName { get; set; }
@@ -39,6 +41,7 @@ namespace VC.Admin.Models.Settings
                 MethodName = item.MethodName ?? string.Empty;
                 SubScopes = item.SubScopes?.Select(p => new ProfileScopeListItemModel(p)).ToArray() ?? Enumerable.Empty<ProfileScopeListItemModel>();
                 AdditionalData = item.AdditionalData?.Select(d => d?.ToString()) ?? Enumerable.Empty<string>();
+                Start = item.Start;
             }
         }
     }
