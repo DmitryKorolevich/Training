@@ -27,6 +27,7 @@ namespace VitalChoice.Profiling.Base
             {
                 using (var scope = new ProfilingScope(context.Request.Path + context.Request.QueryString))
                 {
+                    scope.Start = DateTime.Now;
                     try
                     {
                         await _requestDelegate.Invoke(context);

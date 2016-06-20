@@ -21,9 +21,9 @@ namespace VC.Admin.Models.Settings
 
         public DateTime Start { get; set; }
 
-        public string MethodName { get; set; }
+        //public string MethodName { get; set; }
 
-        public string ClassTypeName { get; set; }
+        //public string ClassTypeName { get; set; }
 
         public IEnumerable<ProfileScopeListItemModel> SubScopes { get; set; }
 
@@ -36,9 +36,9 @@ namespace VC.Admin.Models.Settings
                 ShortData = Data.Length > 50
                     ? Data.Substring(0, 50)
                     : Data;
-                ClassTypeName = item.ClassType?.FullName ?? string.Empty;
+                //ClassTypeName = item.ClassType?.FullName ?? string.Empty;
                 TimeElapsed = Math.Round(item.TimeElapsed.TotalMilliseconds, 2);
-                MethodName = item.MethodName ?? string.Empty;
+                //MethodName = item.MethodName ?? string.Empty;
                 SubScopes = item.SubScopes?.Select(p => new ProfileScopeListItemModel(p)).ToArray() ?? Enumerable.Empty<ProfileScopeListItemModel>();
                 AdditionalData = item.AdditionalData?.Select(d => d?.ToString()) ?? Enumerable.Empty<string>();
                 Start = item.Start;

@@ -17,7 +17,7 @@ namespace VitalChoice.Profiling
         {
             ProfilingScope.Enabled = true;
             _request = request;
-            _scope = new ProfilingScope(null, 2);
+            _scope = new ProfilingScope(null);
         }
 
         public void Dispose()

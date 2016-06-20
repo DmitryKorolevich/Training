@@ -22,7 +22,7 @@ namespace VitalChoice.Profiling.Base
         private volatile List<ProfilingScope> _subScopes;
         private readonly Stack<ProfilingScope> _scopeStack;
 
-        public ProfilingScope(object data, int skipFrames = 1)
+        public ProfilingScope(object data/*, int skipFrames = 1*/)
         {
             if (Enabled)
             {
@@ -35,15 +35,14 @@ namespace VitalChoice.Profiling.Base
                 }
                 _stopwatch = new Stopwatch();
 #if !NETSTANDARD1_5
-                var stackFrame = new StackFrame(skipFrames, false);
-                var method = stackFrame.GetMethod();
-                ClassType = method.DeclaringType;
-                Start = DateTime.Now;
-                MethodName = method.Name;
-                if (data == null)
-                {
-                    data = MethodName;
-                }
+                //var stackFrame = new StackFrame(skipFrames, false);
+                //var method = stackFrame.GetMethod();
+                //ClassType = method.DeclaringType;
+                //MethodName = method.Name;
+                //if (data == null)
+                //{
+                //    data = MethodName;
+                //}
 #endif
                 Data = data;
                 _stopwatch.Start();
@@ -56,7 +55,7 @@ namespace VitalChoice.Profiling.Base
             {
 #if !NETSTANDARD1_5
                 return
-                    $"{{\"{ClassType.FullName}::{MethodName}\":\"{Data?.ToString().Replace("\"", "\\\"")}\", \"time\": {TimeElapsed.TotalMilliseconds}{(AdditionalData == null ? string.Empty : $", \"additional\": [{string.Join(",", AdditionalData.Select(d => $"\"{d}\""))}]")} {(_subScopes == null ? string.Empty : $", \"subTrace\": [{string.Join(",", _subScopes.Select(s => s.ToString()))}]")}}}";
+                    $"{{\"data\":\"{Data?.ToString().Replace("\"", "\\\"")}\", \"time\": {TimeElapsed.TotalMilliseconds}{(AdditionalData == null ? string.Empty : $", \"additional\": [{string.Join(",", AdditionalData.Select(d => $"\"{d}\""))}]")} {(_subScopes == null ? string.Empty : $", \"subTrace\": [{string.Join(",", _subScopes.Select(s => s.ToString()))}]")}}}";
 #else
             return Data?.ToString();
 #endif
@@ -104,9 +103,9 @@ namespace VitalChoice.Profiling.Base
 
         public IReadOnlyCollection<ProfilingScope> SubScopes => _subScopes?.ToArray() ?? EmptyList;
 
-        public Type ClassType { get; }
+        //public Type ClassType { get; }
 
-        public string MethodName { get; }
+        //public string MethodName { get; }
 
         public DateTime Start { get; set; }
 
