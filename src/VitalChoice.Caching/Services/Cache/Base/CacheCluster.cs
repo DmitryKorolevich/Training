@@ -7,7 +7,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
 {
     public class CacheCluster<TKey, T>
     {
-        private readonly Dictionary<TKey, CachedEntity<T>> _cluster = new Dictionary<TKey, CachedEntity<T>>(10);
+        private readonly Dictionary<TKey, CachedEntity<T>> _cluster = new Dictionary<TKey, CachedEntity<T>>();
 
         public CachedEntity<T> Remove(TKey pk)
         {

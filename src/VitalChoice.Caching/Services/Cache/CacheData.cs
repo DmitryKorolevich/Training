@@ -646,12 +646,17 @@ namespace VitalChoice.Caching.Services.Cache
             var nonUnique = _entityInfo.NonUniqueIndexes.GetNonUniqueIndexes(entity).ToArray();
             var foreignKeys = _entityInfo.ForeignKeys.GetForeignKeyValues(entity).ToArray();
 
-            if (exist.UniqueIndex != null && indexValue != exist.UniqueIndex)
+            if (indexValue != exist.UniqueIndex)
             {
-                _indexedCluster.Remove(exist.UniqueIndex);
+                if (exist.UniqueIndex != null)
+                {
+                    _indexedCluster.Remove(exist.UniqueIndex);
+                }
+                if (indexValue != null)
+                {
+                    _indexedCluster.AddOrUpdate(indexValue, exist);
+                }
             }
-            if (indexValue != null)
-                _indexedCluster.AddOrUpdate(indexValue, exist);
             IEnumerable<EntityConditionalIndexInfo> removeList;
             if (conditional.Any(c => c.Value == null))
             {

@@ -179,20 +179,20 @@ namespace VitalChoice.Business.Services.Products
         {
             List<MessageInfo> errors = new List<MessageInfo>();
 
-            var productSameName =
-                await
-                    _productRepository.Query(
-                        new ProductQuery().NotDeleted().Excluding(model.Id).WithName(model.Name))
-                        .SelectFirstOrDefaultAsync(false);
+            //var productSameName =
+            //    await
+            //        _productRepository.Query(
+            //            new ProductQuery().NotDeleted().Excluding(model.Id).WithName(model.Name))
+            //            .SelectFirstOrDefaultAsync(false);
 
-            if (productSameName != null)
-            {
-                errors.AddRange(
-                    model.CreateError()
-                        .Property(p => p.Name)
-                        .Error("Product name should be unique in the database")
-                        .Build());
-            }
+            //if (productSameName != null)
+            //{
+            //    errors.AddRange(
+            //        model.CreateError()
+            //            .Property(p => p.Name)
+            //            .Error("Product name should be unique in the database")
+            //            .Build());
+            //}
 
             var newSet = model.Skus.Select(s => s.Code).ToArray();
             List<int> existSkus = null;
