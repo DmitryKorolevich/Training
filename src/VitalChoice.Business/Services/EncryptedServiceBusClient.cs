@@ -25,7 +25,7 @@ namespace VitalChoice.Business.Services
 
         protected virtual int MaxSessions => 10;
 
-        protected virtual int ExpireTimeMinutes => 30;
+        protected virtual int ExpireTimeMinutes => 60;
 
         protected EncryptedServiceBusClient(IEncryptedServiceBusHostClient encryptedBusHost)
         {

@@ -332,6 +332,16 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             return main.Where(m => compareTo.All(c => allCondition(m, c)));
         }
 
+        public static IEnumerable<T> GroupByTakeLast<T, TKey>(this IEnumerable<T> item, Func<T, TKey> keySelector)
+        {
+            return item.GroupBy(keySelector).Select(g => g.Last());
+        }
+
+        public static IEnumerable<T> GroupByTakeFirst<T, TKey>(this IEnumerable<T> item, Func<T, TKey> keySelector)
+        {
+            return item.GroupBy(keySelector).Select(g => g.First());
+        }
+
         public static IEnumerable<T1> ExceptKeyedWith<T1, T2, TKey>(this IEnumerable<T1> left,
             IEnumerable<T2> right, Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector)
         {

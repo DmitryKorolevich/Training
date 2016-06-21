@@ -124,13 +124,13 @@ namespace VitalChoice.ExportService.Services
             {
                 return false;
             }
-            Parallel.ForEach(exportData.ExportInfo, async e =>
+            Parallel.ForEach(exportData.ExportInfo, e =>
             {
                 ICollection<string> errors = null;
                 bool success;
                 try
                 {
-                    success = await _orderExportService.ExportOrder(e.Id, e.OrderType, out errors);
+                    success = _orderExportService.ExportOrder(e.Id, e.OrderType, out errors).GetAwaiter().GetResult();
                 }
                 catch (Exception ex)
                 {

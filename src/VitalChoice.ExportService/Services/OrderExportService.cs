@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -12,7 +13,9 @@ using Newtonsoft.Json;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Ecommerce.Domain.Helpers.Async;
 using VitalChoice.ExportService.Context;
 using VitalChoice.ExportService.Entities;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -25,13 +28,15 @@ namespace VitalChoice.ExportService.Services
 {
     public class OrderExportService : IOrderExportService
     {
-        private readonly List<OrderCardData> _inMemoryCardDatas = new List<OrderCardData>();
+        private readonly ConcurrentQueue<OrderCardData> _inMemoryOrderCardDatas = new ConcurrentQueue<OrderCardData>();
+        private readonly ConcurrentQueue<CustomerCardData> _inMemoryCustomerCardDatas = new ConcurrentQueue<CustomerCardData>();
         private readonly IOptions<ExportOptions> _options;
         private readonly IObjectEncryptionHost _encryptionHost;
         private readonly DbContextOptions<ExportInfoContext> _contextOptions;
         private volatile bool _useInMemoryContext;
-        private readonly ManualResetEvent _lockCustomers = new ManualResetEvent(true);
-        private readonly ManualResetEvent _lockOrders = new ManualResetEvent(true);
+        private volatile bool _writeQueue;
+        private readonly AsyncManualResetEvent _lockCustomersEvent = new AsyncManualResetEvent(true);
+        private readonly AsyncManualResetEvent _lockOrdersEvent = new AsyncManualResetEvent(true);
         private int _processingCustomers;
         private int _processingOrders;
         private readonly ILogger _logger;
@@ -47,15 +52,22 @@ namespace VitalChoice.ExportService.Services
 
         public async Task UpdateCustomerPaymentMethods(ICollection<CustomerCardData> paymentMethods)
         {
-            _lockCustomers.WaitOne();
+            await _lockCustomersEvent.WaitAsync();
+            if (_writeQueue)
+            {
+                foreach (var customerCardData in paymentMethods)
+                {
+                    _inMemoryCustomerCardDatas.Enqueue(customerCardData);
+                }
+            }
             Interlocked.Increment(ref _processingCustomers);
-            await UpdateCustomerPaymentMethodsInternal(paymentMethods);
+            var context = CreateContext();
+            await UpdateCustomerPaymentMethodsInternal(paymentMethods, context);
             Interlocked.Decrement(ref _processingCustomers);
         }
 
-        private async Task UpdateCustomerPaymentMethodsInternal(ICollection<CustomerCardData> paymentMethods)
+        private async Task UpdateCustomerPaymentMethodsInternal(ICollection<CustomerCardData> paymentMethods, ExportInfoContext context)
         {
-            var context = CreateContext();
             using (var uow = new UnitOfWork(context))
             {
                 var inMemory = context is ExportInfoImMemoryContext;
@@ -78,7 +90,7 @@ namespace VitalChoice.ExportService.Services
                 var toInsert = validPaymentMethods.ExceptKeyedWith(customerPayments, data => data.IdPaymentMethod,
                     export => export.IdPaymentMethod);
 
-                var newRecords = toInsert.Select(p => new CustomerPaymentMethodExport
+                var newRecords = toInsert.GroupByTakeLast(p => p.IdPaymentMethod).Select(p => new CustomerPaymentMethodExport
                 {
                     IdCustomer = p.IdCustomer,
                     IdPaymentMethod = p.IdPaymentMethod,
@@ -102,15 +114,19 @@ namespace VitalChoice.ExportService.Services
 
         public async Task UpdateOrderPaymentMethod(OrderCardData paymentMethod)
         {
-            _lockOrders.WaitOne();
+            await _lockOrdersEvent.WaitAsync();
+            if (_writeQueue)
+            {
+                _inMemoryOrderCardDatas.Enqueue(paymentMethod);
+            }
             Interlocked.Increment(ref _processingOrders);
-            await UpdateOrderPaymentInternal(paymentMethod);
+            var context = CreateContext();
+            await UpdateOrderPaymentInternal(paymentMethod, context);
             Interlocked.Decrement(ref _processingOrders);
         }
 
-        private async Task UpdateOrderPaymentInternal(OrderCardData paymentMethod)
+        private async Task UpdateOrderPaymentInternal(OrderCardData paymentMethod, ExportInfoContext context)
         {
-            var context = CreateContext();
             using (var uow = new UnitOfWork(context))
             {
                 var inMemory = context is ExportInfoImMemoryContext;
@@ -133,15 +149,12 @@ namespace VitalChoice.ExportService.Services
                     }
                     else if (inMemory)
                     {
-                        lock (_inMemoryCardDatas)
-                        {
-                            _inMemoryCardDatas.Add(paymentMethod);
-                        }
+                        _inMemoryOrderCardDatas.Enqueue(paymentMethod);
                     }
                     else
                     {
                         // ReSharper disable once PossibleInvalidOperationException
-                        _logger.LogCritical($"Cannot find source customer payment method {paymentMethod.IdCustomerPaymentMethod.Value}");
+                        throw new ApiException($"Cannot find source customer payment method {paymentMethod.IdCustomerPaymentMethod.Value}");
                     }
                 }
                 else if (paymentMethod.IdOrderSource > 0 &&
@@ -161,15 +174,12 @@ namespace VitalChoice.ExportService.Services
                     }
                     else if (inMemory)
                     {
-                        lock (_inMemoryCardDatas)
-                        {
-                            _inMemoryCardDatas.Add(paymentMethod);
-                        }
+                        _inMemoryOrderCardDatas.Enqueue(paymentMethod);
                     }
                     else
                     {
                         // ReSharper disable once PossibleInvalidOperationException
-                        _logger.LogCritical($"Cannot find source order for payment {paymentMethod.IdOrderSource.Value}");
+                        throw new ApiException($"Cannot find source order for payment {paymentMethod.IdOrderSource.Value}");
                     }
                 }
                 else if (!string.IsNullOrWhiteSpace(paymentMethod.CardNumber) &&
@@ -228,23 +238,18 @@ namespace VitalChoice.ExportService.Services
                 dbSet.RemoveRange(dbSet);
                 memoryContext.SaveChanges();
             }
-            lock (_inMemoryCardDatas)
-            {
-                _inMemoryCardDatas.Clear();
-            }
             _useInMemoryContext = true;
         }
 
         public async Task SwitchToRealContext()
         {
-            _lockCustomers.Reset();
-            _lockOrders.Reset();
             var inMemoryContext = new ExportInfoImMemoryContext(_options, _contextOptions);
-
+            var realContext = new ExportInfoContext(_options, _contextOptions);
             using (var uow = new UnitOfWork(inMemoryContext))
             {
                 try
                 {
+                    _writeQueue = true;
                     var customerPaymentsRep = uow.ReadRepositoryAsync<CustomerPaymentMethodExport>();
                     while (Interlocked.CompareExchange(ref _processingCustomers, 0, 0) > 0)
                     {
@@ -266,7 +271,7 @@ namespace VitalChoice.ExportService.Services
                         await uow.SaveChangesAsync();
                         try
                         {
-                            await UpdateCustomerPaymentMethodsInternal(payments);
+                            await UpdateCustomerPaymentMethodsInternal(payments, realContext);
                         }
                         catch (Exception e)
                         {
@@ -293,7 +298,6 @@ namespace VitalChoice.ExportService.Services
 
                     try
                     {
-                        var realContext = new ExportInfoContext(_options, _contextOptions);
                         using (var realUow = new UnitOfWork(realContext))
                         {
                             var realOrdersRep = realUow.RepositoryAsync<OrderPaymentMethodExport>();
@@ -319,25 +323,58 @@ namespace VitalChoice.ExportService.Services
                             File.WriteAllBytes("FailedOrders.dat", _encryptionHost.LocalEncrypt(orderPayments));
                         }
                     }
-                    OrderCardData[] datas;
-                    lock (_inMemoryCardDatas)
-                    {
-                        datas = _inMemoryCardDatas.ToArray();
-                    }
                     try
                     {
-                        foreach (var cardData in datas)
+                        var ordersTask = Task.Run(async () =>
                         {
-                            await UpdateOrderPaymentInternal(cardData);
-                        }
+                            OrderCardData cardData;
+                            while (_inMemoryOrderCardDatas.TryDequeue(out cardData))
+                            {
+                                try
+                                {
+                                    await UpdateOrderPaymentInternal(cardData, realContext);
+                                }
+                                catch (Exception e)
+                                {
+                                    _logger.LogError(e.ToString());
+                                }
+                            }
+                            _lockOrdersEvent.Reset();
+                            while (_inMemoryOrderCardDatas.TryDequeue(out cardData))
+                            {
+                                try
+                                {
+                                    await UpdateOrderPaymentInternal(cardData, realContext);
+                                }
+                                catch (Exception e)
+                                {
+                                    _logger.LogError(e.ToString());
+                                }
+                            }
+                        });
+                        var customersTask = Task.Run(async () =>
+                        {
+                            CustomerCardData customerCard;
+                            List<CustomerCardData> customerCards = new List<CustomerCardData>();
+                            while (_inMemoryCustomerCardDatas.TryDequeue(out customerCard))
+                            {
+                                customerCards.Add(customerCard);
+                            }
+                            await UpdateCustomerPaymentMethodsInternal(customerCards, realContext);
+                            _lockCustomersEvent.Reset();
+                            customerCards.Clear();
+                            while (_inMemoryCustomerCardDatas.TryDequeue(out customerCard))
+                            {
+                                customerCards.Add(customerCard);
+                            }
+                            await UpdateCustomerPaymentMethodsInternal(customerCards, realContext);
+                            customerCards.Clear();
+                        });
+                        await Task.WhenAll(ordersTask, customersTask);
                     }
                     catch (Exception e)
                     {
-                        _logger.LogCritical($"Cannot move data (Orders):\n{e}");
-                        if (!File.Exists("FailedOrdersMemory.dat"))
-                        {
-                            File.WriteAllBytes("FailedOrdersMemory.dat", _encryptionHost.LocalEncrypt(datas));
-                        }
+                        _logger.LogCritical($"Cannot move data (Orders/Customers):\n{e}");
                     }
                 }
                 catch (Exception e)
@@ -346,8 +383,9 @@ namespace VitalChoice.ExportService.Services
                 }
             }
             _useInMemoryContext = false;
-            _lockCustomers.Set();
-            _lockOrders.Set();
+            _writeQueue = false;
+            _lockCustomersEvent.Set();
+            _lockOrdersEvent.Set();
         }
     }
 }
