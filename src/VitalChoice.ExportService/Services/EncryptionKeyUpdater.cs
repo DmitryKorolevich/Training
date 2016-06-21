@@ -106,18 +106,27 @@ namespace VitalChoice.ExportService.Services
         {
             string status;
             using (
-                var statusCmd = new SqlCommand("SELECT TOP 1 state_desc FROM sys.databases WHERE name = 'VitalChoice.ExportInfo.Copy';",
+                var copyStatus = new SqlCommand("SELECT TOP 1 state_desc FROM sys.databases WHERE name = 'VitalChoice.ExportInfo.Copy';",
                     conn))
             {
-                status = statusCmd.ExecuteScalar() as string;
+                status = copyStatus.ExecuteScalar() as string;
             }
             if (!string.IsNullOrEmpty(status))
             {
-                using (SqlCommand dropCmd =
-                    new SqlCommand("DROP DATABASE [VitalChoice.ExportInfo]", conn))
+                using (
+                var currentStatus = new SqlCommand("SELECT TOP 1 state_desc FROM sys.databases WHERE name = 'VitalChoice.ExportInfo';",
+                    conn))
                 {
-                    dropCmd.CommandTimeout = 0;
-                    dropCmd.ExecuteNonQuery();
+                    status = currentStatus.ExecuteScalar() as string;
+                }
+                if (!string.IsNullOrEmpty(status))
+                {
+                    using (SqlCommand dropCmd =
+                        new SqlCommand("DROP DATABASE [VitalChoice.ExportInfo]", conn))
+                    {
+                        dropCmd.CommandTimeout = 0;
+                        dropCmd.ExecuteNonQuery();
+                    }
                 }
                 using (SqlCommand renameCmd =
                     new SqlCommand("ALTER DATABASE [VitalChoice.ExportInfo.Copy] MODIFY NAME = [VitalChoice.ExportInfo]", conn))
