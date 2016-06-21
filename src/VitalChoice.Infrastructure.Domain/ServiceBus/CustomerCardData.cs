@@ -25,6 +25,9 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
         public int? IdCustomerPaymentMethod { get; set; }
 
         [DataMember]
+        public int? IdOrderSource { get; set; }
+
+        [DataMember]
         public string CardNumber { get; set; }
     }
 }

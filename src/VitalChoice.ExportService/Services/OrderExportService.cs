@@ -25,20 +25,35 @@ namespace VitalChoice.ExportService.Services
 {
     public class OrderExportService : IOrderExportService
     {
+        private readonly List<OrderCardData> _inMemoryCardDatas = new List<OrderCardData>();
         private readonly IOptions<ExportOptions> _options;
         private readonly IObjectEncryptionHost _encryptionHost;
         private readonly DbContextOptions<ExportInfoContext> _contextOptions;
         private volatile bool _useInMemoryContext;
+        private readonly ManualResetEvent _lockCustomers = new ManualResetEvent(true);
+        private readonly ManualResetEvent _lockOrders = new ManualResetEvent(true);
+        private int _processingCustomers;
+        private int _processingOrders;
+        private readonly ILogger _logger;
 
         public OrderExportService(IOptions<ExportOptions> options, IObjectEncryptionHost encryptionHost,
-            DbContextOptions<ExportInfoContext> contextOptions)
+            DbContextOptions<ExportInfoContext> contextOptions, ILoggerFactory loggerFactory)
         {
             _options = options;
             _encryptionHost = encryptionHost;
             _contextOptions = contextOptions;
+            _logger = loggerFactory.CreateLogger<OrderExportService>();
         }
 
         public async Task UpdateCustomerPaymentMethods(ICollection<CustomerCardData> paymentMethods)
+        {
+            _lockCustomers.WaitOne();
+            Interlocked.Increment(ref _processingCustomers);
+            await UpdateCustomerPaymentMethodsInternal(paymentMethods);
+            Interlocked.Decrement(ref _processingCustomers);
+        }
+
+        private async Task UpdateCustomerPaymentMethodsInternal(ICollection<CustomerCardData> paymentMethods)
         {
             var context = CreateContext();
             using (var uow = new UnitOfWork(context))
@@ -87,6 +102,14 @@ namespace VitalChoice.ExportService.Services
 
         public async Task UpdateOrderPaymentMethod(OrderCardData paymentMethod)
         {
+            _lockOrders.WaitOne();
+            Interlocked.Increment(ref _processingOrders);
+            await UpdateOrderPaymentInternal(paymentMethod);
+            Interlocked.Decrement(ref _processingOrders);
+        }
+
+        private async Task UpdateOrderPaymentInternal(OrderCardData paymentMethod)
+        {
             var context = CreateContext();
             using (var uow = new UnitOfWork(context))
             {
@@ -101,20 +124,60 @@ namespace VitalChoice.ExportService.Services
                                 .SelectFirstOrDefaultAsync(false);
                     if (customerData != null)
                     {
-                        var customerPayment = inMemory
+                        paymentMethod.CardNumber = inMemory
                             ? (string) ObjectSerializer.Deserialize(customerData.CreditCardNumber)
                             : _encryptionHost.LocalDecrypt<string>(customerData.CreditCardNumber);
-                        paymentMethod.CardNumber = customerPayment;
+
                         await UpdateOrderPayment(paymentMethod, uow, inMemory);
+                        await uow.SaveChangesAsync();
+                    }
+                    else if (inMemory)
+                    {
+                        lock (_inMemoryCardDatas)
+                        {
+                            _inMemoryCardDatas.Add(paymentMethod);
+                        }
+                    }
+                    else
+                    {
+                        // ReSharper disable once PossibleInvalidOperationException
+                        _logger.LogCritical($"Cannot find source customer payment method {paymentMethod.IdCustomerPaymentMethod.Value}");
+                    }
+                }
+                else if (paymentMethod.IdOrderSource > 0 &&
+                         ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), paymentMethod.CardNumber, "CardNumber"))
+                {
+                    var orderRep = uow.RepositoryAsync<OrderPaymentMethodExport>();
+                    var orderPayment =
+                        await orderRep.Query(o => o.IdOrder == paymentMethod.IdOrderSource.Value).SelectFirstOrDefaultAsync(false);
+                    if (orderPayment != null)
+                    {
+                        paymentMethod.CardNumber = inMemory
+                            ? (string) ObjectSerializer.Deserialize(orderPayment.CreditCardNumber)
+                            : _encryptionHost.LocalDecrypt<string>(orderPayment.CreditCardNumber);
+
+                        await UpdateOrderPayment(paymentMethod, uow, inMemory);
+                        await uow.SaveChangesAsync();
+                    }
+                    else if (inMemory)
+                    {
+                        lock (_inMemoryCardDatas)
+                        {
+                            _inMemoryCardDatas.Add(paymentMethod);
+                        }
+                    }
+                    else
+                    {
+                        // ReSharper disable once PossibleInvalidOperationException
+                        _logger.LogCritical($"Cannot find source order for payment {paymentMethod.IdOrderSource.Value}");
                     }
                 }
                 else if (!string.IsNullOrWhiteSpace(paymentMethod.CardNumber) &&
                          !ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), paymentMethod.CardNumber, "CardNumber"))
                 {
                     await UpdateOrderPayment(paymentMethod, uow, inMemory);
+                    await uow.SaveChangesAsync();
                 }
-
-                await uow.SaveChangesAsync();
             }
         }
 
@@ -165,58 +228,72 @@ namespace VitalChoice.ExportService.Services
                 dbSet.RemoveRange(dbSet);
                 memoryContext.SaveChanges();
             }
+            lock (_inMemoryCardDatas)
+            {
+                _inMemoryCardDatas.Clear();
+            }
             _useInMemoryContext = true;
         }
 
         public async Task SwitchToRealContext()
         {
-            var inMemoryContext = CreateContext();
-            _useInMemoryContext = false;
+            _lockCustomers.Reset();
+            _lockOrders.Reset();
+            var inMemoryContext = new ExportInfoImMemoryContext(_options, _contextOptions);
 
             using (var uow = new UnitOfWork(inMemoryContext))
             {
-                var customerPaymentsRep = uow.ReadRepositoryAsync<CustomerPaymentMethodExport>();
-                var payments = (await customerPaymentsRep.Query().SelectAsync(false)).Select(
-                    p => new CustomerCardData
-                    {
-                        CardNumber =
-                            ObjectSerializer.Deserialize(p.CreditCardNumber) as string,
-                        IdPaymentMethod = p.IdPaymentMethod,
-                        IdCustomer = p.IdCustomer
-                    }).ToArray();
-                while (true)
+                try
                 {
-                    try
+                    var customerPaymentsRep = uow.ReadRepositoryAsync<CustomerPaymentMethodExport>();
+                    while (Interlocked.CompareExchange(ref _processingCustomers, 0, 0) > 0)
                     {
-                        await UpdateCustomerPaymentMethods(payments);
-                        break;
+                        Thread.Sleep(TimeSpan.FromSeconds(1));
                     }
-                    catch (Exception e)
+                    var dbPayments = await customerPaymentsRep.Query().SelectAsync(false);
+
+                    if (dbPayments.Count > 0)
                     {
-                        Trace.TraceError($"Cannot move data from memory context to real context (Customers):\n{e}");
-                        if (!File.Exists("FailedCustomers.dat"))
+                        var payments = dbPayments.Select(
+                            p => new CustomerCardData
+                            {
+                                CardNumber =
+                                    ObjectSerializer.Deserialize(p.CreditCardNumber) as string,
+                                IdPaymentMethod = p.IdPaymentMethod,
+                                IdCustomer = p.IdCustomer
+                            }).ToArray();
+
+                        await uow.SaveChangesAsync();
+                        try
                         {
-                            File.WriteAllBytes("FailedCustomers.dat", _encryptionHost.LocalEncrypt(payments));
+                            await UpdateCustomerPaymentMethodsInternal(payments);
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogCritical($"Cannot move data from memory context to real context (Customers):\n{e}");
+                            if (!File.Exists("FailedCustomers.dat"))
+                            {
+                                File.WriteAllBytes("FailedCustomers.dat", _encryptionHost.LocalEncrypt(payments));
+                            }
                         }
                     }
-                    Thread.Sleep(TimeSpan.FromMinutes(1));
-                }
+                    var orderPaymentsRep = uow.ReadRepositoryAsync<OrderPaymentMethodExport>();
+                    while (Interlocked.CompareExchange(ref _processingOrders, 0, 0) > 0)
+                    {
+                        Thread.Sleep(TimeSpan.FromSeconds(1));
+                    }
+                    var orderPayments =
+                        (await orderPaymentsRep.Query().SelectAsync(false)).Select(
+                            p => new OrderCardData
+                            {
+                                CardNumber = ObjectSerializer.Deserialize(p.CreditCardNumber) as string,
+                                IdOrder = p.IdOrder,
+                                IdCustomerPaymentMethod = null
+                            }).ToArray();
 
-                var orderPaymentsRep = uow.ReadRepositoryAsync<OrderPaymentMethodExport>();
-                var orderPayments =
-                    (await orderPaymentsRep.Query().SelectAsync(false)).Select(
-                        p => new OrderCardData
-                        {
-                            CardNumber = ObjectSerializer.Deserialize(p.CreditCardNumber) as string,
-                            IdOrder = p.IdOrder,
-                            IdCustomerPaymentMethod = null
-                        }).ToArray();
-
-                while (true)
-                {
                     try
                     {
-                        var realContext = CreateContext();
+                        var realContext = new ExportInfoContext(_options, _contextOptions);
                         using (var realUow = new UnitOfWork(realContext))
                         {
                             var realOrdersRep = realUow.RepositoryAsync<OrderPaymentMethodExport>();
@@ -233,19 +310,44 @@ namespace VitalChoice.ExportService.Services
 
                             await realUow.SaveChangesAsync();
                         }
-                        break;
                     }
                     catch (Exception e)
                     {
-                        Trace.TraceError($"Cannot move data from memory context to real context (Orders):\n{e}");
+                        _logger.LogCritical($"Cannot move data from memory context to real context (Orders):\n{e}");
                         if (!File.Exists("FailedOrders.dat"))
                         {
                             File.WriteAllBytes("FailedOrders.dat", _encryptionHost.LocalEncrypt(orderPayments));
                         }
                     }
-                    Thread.Sleep(TimeSpan.FromMinutes(1));
+                    OrderCardData[] datas;
+                    lock (_inMemoryCardDatas)
+                    {
+                        datas = _inMemoryCardDatas.ToArray();
+                    }
+                    try
+                    {
+                        foreach (var cardData in datas)
+                        {
+                            await UpdateOrderPaymentInternal(cardData);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogCritical($"Cannot move data (Orders):\n{e}");
+                        if (!File.Exists("FailedOrdersMemory.dat"))
+                        {
+                            File.WriteAllBytes("FailedOrdersMemory.dat", _encryptionHost.LocalEncrypt(datas));
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    _logger.LogCritical($"Issue while moving to real payments:\n{e}");
                 }
             }
+            _useInMemoryContext = false;
+            _lockCustomers.Set();
+            _lockOrders.Set();
         }
     }
 }

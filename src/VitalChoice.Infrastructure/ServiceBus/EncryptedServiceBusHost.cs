@@ -168,6 +168,11 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         private void ProcessEncryptedMessage(BrokeredMessage message)
         {
+            if (message.CorrelationId != LocalHostName)
+            {
+                message.Abandon();
+                return;
+            }
             if (message.ExpiresAtUtc < DateTime.UtcNow)
             {
                 message.Complete();
@@ -178,11 +183,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 message.Complete();
                 return;
             }
-            if (message.CorrelationId != LocalHostName)
-            {
-                message.Abandon();
-                return;
-            }
             message.Complete();
 
             var remoteCommand = EncryptionHost.AesDecryptVerify<ServiceBusCommandBase>(message.GetBody<TransportCommandData>(),
@@ -190,7 +190,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
             if (remoteCommand == null)
             {
-                Logger.LogInformation($"Invalid sign. Session: {message.SessionId}");
+                Logger.LogWarning($"Invalid sign. Session: {message.SessionId}");
                 return;
             }
             WeakReference<ServiceBusCommandBase> commandReference;
@@ -210,20 +210,27 @@ namespace VitalChoice.Infrastructure.ServiceBus
             else
             {
                 Logger.LogInformation($"{remoteCommand.CommandName} received ({remoteCommand.CommandId})");
-
-                if (ProcessEncryptedCommand(remoteCommand))
+                Task.Run(() =>
                 {
-                    Logger.LogInformation($"{remoteCommand.CommandName} processing success ({remoteCommand.CommandId})");
-                }
-                else
-                {
-                    Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
-                }
+                    if (ProcessEncryptedCommand(remoteCommand))
+                    {
+                        Logger.LogInformation($"{remoteCommand.CommandName} processing success ({remoteCommand.CommandId})");
+                    }
+                    else
+                    {
+                        Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
+                    }
+                }).ConfigureAwait(false);
             }
         }
 
         private void ProcessPlainMessage(BrokeredMessage message)
         {
+            if (message.CorrelationId != LocalHostName)
+            {
+                message.Abandon();
+                return;
+            }
             if (message.ExpiresAtUtc < DateTime.UtcNow)
             {
                 message.Complete();
@@ -232,11 +239,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
             if (message.CorrelationId == null)
             {
                 message.Complete();
-                return;
-            }
-            if (message.CorrelationId != LocalHostName)
-            {
-                message.Abandon();
                 return;
             }
             message.Complete();
@@ -262,19 +264,22 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 else
                 {
                     Logger.LogInformation($"{remoteCommand.CommandName} received ({remoteCommand.CommandId})");
-                    if (ProcessPlainCommand(remoteCommand))
+                    Task.Run(() =>
                     {
-                        Logger.LogInformation($"{remoteCommand.CommandName} processing success ({remoteCommand.CommandId})");
-                    }
-                    else
-                    {
-                        Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
-                    }
+                        if (ProcessPlainCommand(remoteCommand))
+                        {
+                            Logger.LogInformation($"{remoteCommand.CommandName} processing success ({remoteCommand.CommandId})");
+                        }
+                        else
+                        {
+                            Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
+                        }
+                    }).ConfigureAwait(false);
                 }
             }
             else
             {
-                throw new AccessDeniedException("Invalid sign");
+                Logger.LogWarning($"Invalid Sign. Message: {message.MessageId}");
             }
         }
 

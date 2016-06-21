@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -11,17 +14,26 @@ namespace VitalChoice.Business.Services
 {
     public abstract class EncryptedServiceBusClient : IDisposable
     {
+        private static readonly List<SessionInfo> SessionPool = new List<SessionInfo>(20);
+
+        private static int _currentSession;
+
         private readonly IEncryptedServiceBusHostClient _encryptedBusHost;
         private bool IsAuthenticated =>_encryptedBusHost.IsAuthenticatedClient(SessionId);
         public string ServerHostName => _encryptedBusHost.ServerHostName;
         public string LocalHostName => _encryptedBusHost.LocalHostName;
 
+        protected virtual int MaxSessions => 10;
+
+        protected virtual int ExpireTimeMinutes => 30;
+
         protected EncryptedServiceBusClient(IEncryptedServiceBusHostClient encryptedBusHost)
         {
             _encryptedBusHost = encryptedBusHost;
+            SessionId = GetSession();
         }
 
-        public Guid SessionId { get; } = Guid.NewGuid();
+        public Guid SessionId { get; }
 
         protected async Task<T> SendCommand<T>(ServiceBusCommandWithResult command)
         {
@@ -56,6 +68,43 @@ namespace VitalChoice.Business.Services
                 GC.SuppressFinalize(this);
             }
             _encryptedBusHost.RemoveClient(SessionId);
+        }
+
+        private Guid GetSession()
+        {
+            lock (SessionPool)
+            {
+                if (_currentSession + 1 > SessionPool.Count)
+                {
+                    _currentSession = 0;
+                    if (SessionPool.Count < MaxSessions)
+                    {
+                        SessionPool.Add(new SessionInfo
+                        {
+                            SessionId = Guid.NewGuid(),
+                            CreationTime = DateTime.Now
+                        });
+                    }
+                }
+                var sessionInfo = SessionPool[_currentSession];
+                if ((DateTime.Now - sessionInfo.CreationTime).TotalMinutes > ExpireTimeMinutes)
+                {
+                    SessionPool[_currentSession] = new SessionInfo
+                    {
+                        SessionId = Guid.NewGuid(),
+                        CreationTime = DateTime.Now
+                    };
+                }
+                _currentSession++;
+                return sessionInfo.SessionId;
+            }
+        }
+
+        private struct SessionInfo
+        {
+            public Guid SessionId { get; set; }
+
+            public DateTime CreationTime { get; set; }
         }
 
         public void Dispose()

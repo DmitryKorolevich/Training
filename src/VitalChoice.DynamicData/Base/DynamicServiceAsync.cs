@@ -195,7 +195,7 @@ namespace VitalChoice.DynamicData.Base
 
             foreach (var entity in toInsertList)
             {
-                PutDynamicIdsBack(entity);
+                RestoreIdsFromEntity(entity);
             }
 
             return toInsertList;
@@ -213,7 +213,7 @@ namespace VitalChoice.DynamicData.Base
             var productRepository = uow.RepositoryAsync<TEntity>();
             await productRepository.InsertGraphAsync(entity);
             await uow.SaveChangesAsync(CancellationToken.None);
-            PutDynamicIdsBack(entity);
+            RestoreIdsFromEntity(entity);
             return entity;
         }
 
@@ -255,7 +255,7 @@ namespace VitalChoice.DynamicData.Base
                 await uow.SaveChangesAsync();
                 foreach (var entity in entities)
                 {
-                    PutDynamicIdsBack(entity);
+                    RestoreIdsFromEntity(entity);
                 }
                 return entities;
             }
@@ -286,7 +286,7 @@ namespace VitalChoice.DynamicData.Base
                         new DynamicEntityPair<TDynamic, TEntity>(model, entity) { InitialEntity = initialEntity}
                     }, bigValueRepository);
             await uow.SaveChangesAsync();
-            PutDynamicIdsBack(entity);
+            RestoreIdsFromEntity(entity);
             return entity;
         }
 
@@ -319,7 +319,7 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        private static void PutDynamicIdsBack(object entity)
+        private static void RestoreIdsFromEntity(object entity)
         {
             var entityType = entity?.GetType();
             if (entityType != null)
@@ -355,7 +355,7 @@ namespace VitalChoice.DynamicData.Base
                             {
                                 foreach (DynamicDataEntity item in collection)
                                 {
-                                    PutDynamicIdsBack(item);
+                                    RestoreIdsFromEntity(item);
                                 }
                             }
                         }
@@ -364,7 +364,7 @@ namespace VitalChoice.DynamicData.Base
                             var prop = property.Value.Get(entity) as DynamicDataEntity;
                             if (prop != null)
                             {
-                                PutDynamicIdsBack(prop);
+                                RestoreIdsFromEntity(prop);
                             }
                         }
                     }

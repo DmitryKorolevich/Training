@@ -650,7 +650,7 @@ namespace VitalChoice.Business.Services.Customers
             }
             if (!await updatePaymentsTask)
             {
-                Logger.LogError("Cannot update order payment info on remote.");
+                throw new ApiException("Cannot update customer payment info on remote.");
             }
             return entity;
         }
@@ -745,7 +745,7 @@ namespace VitalChoice.Business.Services.Customers
             }
             if (!await updatePaymentsTask)
             {
-                Logger.LogError("Cannot update order payment info on remote.");
+                throw new ApiException("Cannot update customer payment info on remote.");
             }
             return entity;
         }

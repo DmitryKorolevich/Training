@@ -17,17 +17,17 @@ namespace VitalChoice.ExportService.Services
 {
     public sealed class EncryptedServiceBusHostServer : EncryptedServiceBusHost
     {
-        private readonly ILifetimeScope _rootScope;
         private readonly EncryptionKeyUpdater _keyUpdater;
+        private readonly IOrderExportService _orderExportService;
         private readonly RSACryptoServiceProvider _keyExchangeProvider;
         public override string LocalHostName => ServerHostName;
 
-        public EncryptedServiceBusHostServer(IOptions<AppOptions> appOptions, ILoggerFactory loggerFactory, ILifetimeScope rootScope,
-            IObjectEncryptionHost encryptionHost, EncryptionKeyUpdater keyUpdater)
+        public EncryptedServiceBusHostServer(IOptions<AppOptions> appOptions, ILoggerFactory loggerFactory,
+            IObjectEncryptionHost encryptionHost, EncryptionKeyUpdater keyUpdater, IOrderExportService orderExportService)
             : base(appOptions, loggerFactory.CreateLogger<EncryptedServiceBusHostServer>(), encryptionHost)
         {
-            _rootScope = rootScope;
             _keyUpdater = keyUpdater;
+            _orderExportService = orderExportService;
             EncryptionHost.OnSessionExpired += OnSessionRemoved;
             _keyExchangeProvider = new RSACryptoServiceProvider(4096);
         }
@@ -78,20 +78,18 @@ namespace VitalChoice.ExportService.Services
                 SendCommand(new ServiceBusCommandBase(command, false));
                 return false;
             }
-            using (var scope = _rootScope.BeginLifetimeScope())
+
+            try
             {
-                var exportService = scope.Resolve<IOrderExportService>();
-                try
-                {
-                    exportService.UpdateCustomerPaymentMethods(customerPaymentInfo).GetAwaiter().GetResult();
-                }
-                catch (Exception e)
-                {
-                    Logger.LogError(e.ToString());
-                    SendCommand(new ServiceBusCommandBase(command, false));
-                    return true;
-                }
+                _orderExportService.UpdateCustomerPaymentMethods(customerPaymentInfo).GetAwaiter().GetResult();
             }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                SendCommand(new ServiceBusCommandBase(command, false));
+                return true;
+            }
+
             SendCommand(new ServiceBusCommandBase(command, true));
             return true;
         }
@@ -104,19 +102,16 @@ namespace VitalChoice.ExportService.Services
                 SendCommand(new ServiceBusCommandBase(command, false));
                 return false;
             }
-            using (var scope = _rootScope.BeginLifetimeScope())
+
+            try
             {
-                var exportService = scope.Resolve<IOrderExportService>();
-                try
-                {
-                    exportService.UpdateOrderPaymentMethod(orderPaymentInfo).GetAwaiter().GetResult();
-                }
-                catch(Exception e)
-                {
-                    Logger.LogError(e.ToString());
-                    SendCommand(new ServiceBusCommandBase(command, false));
-                    return true;
-                }
+                _orderExportService.UpdateOrderPaymentMethod(orderPaymentInfo).GetAwaiter().GetResult();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                SendCommand(new ServiceBusCommandBase(command, false));
+                return true;
             }
             SendCommand(new ServiceBusCommandBase(command, true));
             return true;
@@ -131,31 +126,27 @@ namespace VitalChoice.ExportService.Services
             }
             Parallel.ForEach(exportData.ExportInfo, async e =>
             {
-                using (var scope = _rootScope.BeginLifetimeScope())
+                ICollection<string> errors = null;
+                bool success;
+                try
                 {
-                    ICollection<string> errors = null;
-                    bool success;
-                    try
-                    {
-                        var exportService = scope.Resolve<IOrderExportService>();
-                        success = await exportService.ExportOrder(e.Id, e.OrderType, out errors);
-                    }
-                    catch (Exception ex)
-                    {
-                        if (errors == null)
-                        {
-                            errors = new List<string>();
-                        }
-                        errors.Add(ex.Message);
-                        success = false;
-                    }
-                    SendCommand(new ServiceBusCommandBase(command, new OrderExportItemResult
-                    {
-                        Id = e.Id,
-                        Success = success,
-                        Errors = errors
-                    }));
+                    success = await _orderExportService.ExportOrder(e.Id, e.OrderType, out errors);
                 }
+                catch (Exception ex)
+                {
+                    if (errors == null)
+                    {
+                        errors = new List<string>();
+                    }
+                    errors.Add(ex.Message);
+                    success = false;
+                }
+                SendCommand(new ServiceBusCommandBase(command, new OrderExportItemResult
+                {
+                    Id = e.Id,
+                    Success = success,
+                    Errors = errors
+                }));
             });
             return true;
         }
