@@ -486,6 +486,7 @@ namespace VitalChoice.DynamicData.Base
             {
                 throw new ApiException($"UpdateEntityItem<{typeof (TEntity)}> have no OptionTypes, are you forgot to pass them?");
             }
+            entity.MappedObject = dynamic;
             FillEntityOptions(dynamic, entity.OptionTypes, entity);
             entity.DateEdited = DateTime.Now;
             entity.StatusCode = dynamic.StatusCode;
@@ -501,7 +502,12 @@ namespace VitalChoice.DynamicData.Base
             {
                 throw new ApiException($"ToEntityItem<{typeof (TEntity)}> have no OptionTypes, are you forgot to pass them?");
             }
-            var entity = new TEntity {OptionValues = new List<TOptionValue>(), OptionTypes = optionTypes};
+            var entity = new TEntity
+            {
+                OptionValues = new List<TOptionValue>(),
+                OptionTypes = optionTypes,
+                MappedObject = dynamic
+            };
             FillEntityOptions(dynamic, optionTypes, entity);
             entity.Id = dynamic.Id;
             entity.DateCreated = now;

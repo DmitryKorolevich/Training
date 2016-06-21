@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Options;
@@ -71,7 +72,7 @@ namespace VitalChoice.ExportService.Services
 
         private bool ProcessUpdateCustomerPayments(ServiceBusCommandBase command)
         {
-            var customerPaymentInfo = command.Data as CustomerPaymentMethodDynamic[];
+            var customerPaymentInfo = command.Data as CustomerCardData[];
             if (customerPaymentInfo == null)
             {
                 SendCommand(new ServiceBusCommandBase(command, false));
@@ -97,7 +98,7 @@ namespace VitalChoice.ExportService.Services
 
         private bool ProcessUpdateOrderPayment(ServiceBusCommandBase command)
         {
-            var orderPaymentInfo = command.Data as OrderPaymentMethodDynamic;
+            var orderPaymentInfo = command.Data as OrderCardData;
             if (orderPaymentInfo == null)
             {
                 SendCommand(new ServiceBusCommandBase(command, false));

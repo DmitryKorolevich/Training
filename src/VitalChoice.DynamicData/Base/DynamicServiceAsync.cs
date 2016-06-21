@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -21,6 +22,7 @@ using VitalChoice.Ecommerce.Domain.Entities.History;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Base;
+using VitalChoice.ObjectMapping.Services;
 
 namespace VitalChoice.DynamicData.Base
 {
@@ -191,9 +193,9 @@ namespace VitalChoice.DynamicData.Base
             await productRepository.InsertGraphRangeAsync(toInsertList);
             await uow.SaveChangesAsync();
 
-            foreach (var mappedListItem in mappedList)
+            foreach (var entity in toInsertList)
             {
-                mappedListItem.Dynamic.Id = mappedListItem.Entity.Id;
+                PutDynamicIdsBack(entity);
             }
 
             return toInsertList;
@@ -211,9 +213,7 @@ namespace VitalChoice.DynamicData.Base
             var productRepository = uow.RepositoryAsync<TEntity>();
             await productRepository.InsertGraphAsync(entity);
             await uow.SaveChangesAsync(CancellationToken.None);
-
-            model.Id = entity.Id;
-
+            PutDynamicIdsBack(entity);
             return entity;
         }
 
@@ -252,9 +252,11 @@ namespace VitalChoice.DynamicData.Base
                     }
                 }
                 await UpdateItems(uow, items, bigValueRepository);
-                await mainRepository.UpdateRangeAsync(entities);
-                await uow.SaveChangesAsync(CancellationToken.None);
-
+                await uow.SaveChangesAsync();
+                foreach (var entity in entities)
+                {
+                    PutDynamicIdsBack(entity);
+                }
                 return entities;
             }
             throw new ApiException($"BuildQuery failed UpdateRangeAsync<{GetType()}>");
@@ -284,7 +286,7 @@ namespace VitalChoice.DynamicData.Base
                         new DynamicEntityPair<TDynamic, TEntity>(model, entity) { InitialEntity = initialEntity}
                     }, bigValueRepository);
             await uow.SaveChangesAsync();
-
+            PutDynamicIdsBack(entity);
             return entity;
         }
 
@@ -312,6 +314,59 @@ namespace VitalChoice.DynamicData.Base
                     if (obj.Id == 0)
                     {
                         await objectRepository.InsertGraphAsync(obj);
+                    }
+                }
+            }
+        }
+
+        private static void PutDynamicIdsBack(object entity)
+        {
+            var entityType = entity?.GetType();
+            if (entityType != null)
+            {
+                var dynamicEntity = entity as DynamicDataEntity;
+                var dynamicObject = dynamicEntity?.MappedObject as MappedObject;
+
+                if (dynamicObject == null)
+                    return;
+
+                dynamicObject.Id = dynamicEntity.Id;
+                dynamicEntity.MappedObject = null;
+                var cache = DynamicTypeCache.GetTypeCacheNoMap(entityType);
+                foreach (var property in cache.Properties)
+                {
+                    var itemType = property.Value.PropertyType.TryGetElementType(typeof(ICollection<>));
+                    bool isCollection;
+                    if (itemType == null)
+                    {
+                        isCollection = false;
+                        itemType = property.Value.PropertyType;
+                    }
+                    else
+                    {
+                        isCollection = true;
+                    }
+                    if (itemType.GetBaseTypes().Any(t => t == typeof(DynamicDataEntity)))
+                    {
+                        if (isCollection)
+                        {
+                            var collection = property.Value.Get(entity) as IEnumerable;
+                            if (collection != null)
+                            {
+                                foreach (DynamicDataEntity item in collection)
+                                {
+                                    PutDynamicIdsBack(item);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var prop = property.Value.Get(entity) as DynamicDataEntity;
+                            if (prop != null)
+                            {
+                                PutDynamicIdsBack(prop);
+                            }
+                        }
                     }
                 }
             }
@@ -411,7 +466,6 @@ namespace VitalChoice.DynamicData.Base
         private async Task UpdateItems(IUnitOfWorkAsync uow, ICollection<DynamicEntityPair<TDynamic, TEntity>> items,
             IRepositoryAsync<BigStringValue> bigValueRepository)
         {
-            //await SetBigValuesAsync(items.Select(i => i.Entity), true);
             foreach (var pair in items)
             {
                 await BeforeEntityChangesAsync(pair.Dynamic, pair.Entity, uow);

@@ -16,8 +16,10 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ExportService.Context;
 using VitalChoice.ExportService.Entities;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.ServiceBus.Base;
+using VitalChoice.ObjectMapping.Base;
 
 namespace VitalChoice.ExportService.Services
 {
@@ -36,29 +38,40 @@ namespace VitalChoice.ExportService.Services
             _contextOptions = contextOptions;
         }
 
-        public async Task UpdateCustomerPaymentMethods(ICollection<CustomerPaymentMethodDynamic> paymentMethods)
+        public async Task UpdateCustomerPaymentMethods(ICollection<CustomerCardData> paymentMethods)
         {
             var context = CreateContext();
             using (var uow = new UnitOfWork(context))
             {
                 var inMemory = context is ExportInfoImMemoryContext;
-                var customerIds = paymentMethods.Select(p => p.IdCustomer).Distinct().ToList();
+                var customerIds = paymentMethods.Select(p => p.IdCustomer).Where(p => p != 0).Distinct().ToList();
                 var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
                 var customerPayments = await rep.Query(c => customerIds.Contains(c.IdCustomer)).SelectAsync(true);
+                var validPaymentMethods =
+                    paymentMethods.Where(
+                        p => p.IdCustomer != 0 && p.IdPaymentMethod != 0 &&
+                             !string.IsNullOrWhiteSpace(p.CardNumber) &&
+                             ObjectMapper.IsValuesMasked(typeof(CustomerPaymentMethodDynamic), p.CardNumber, "CardNumber")).ToArray();
 
-                customerPayments.AddUpdateKeyed(paymentMethods,
+                customerPayments.UpdateKeyed(validPaymentMethods,
                     export => export.IdPaymentMethod,
-                    dynamic => dynamic.Id,
-                    dynamic => new CustomerPaymentMethodExport
-                    {
-                        IdCustomer = dynamic.IdCustomer,
-                        IdPaymentMethod = dynamic.Id,
-                        CreditCardNumber = inMemory ? ObjectSerializer.Serialize(dynamic) : _encryptionHost.LocalEncrypt(dynamic)
-                    },
+                    dynamic => dynamic.IdPaymentMethod,
                     (export, dynamic) =>
-                        export.CreditCardNumber = inMemory ? ObjectSerializer.Serialize(dynamic) : _encryptionHost.LocalEncrypt(dynamic));
+                        export.CreditCardNumber =
+                            inMemory ? ObjectSerializer.Serialize(dynamic.CardNumber) : _encryptionHost.LocalEncrypt(dynamic.CardNumber));
 
-                await rep.InsertRangeAsync(customerPayments.Where(p => p.Id == 0));
+                var toInsert = validPaymentMethods.ExceptKeyedWith(customerPayments, data => data.IdPaymentMethod,
+                    export => export.IdPaymentMethod);
+
+                var newRecords = toInsert.Select(p => new CustomerPaymentMethodExport
+                {
+                    IdCustomer = p.IdCustomer,
+                    IdPaymentMethod = p.IdPaymentMethod,
+                    CreditCardNumber = inMemory ? ObjectSerializer.Serialize(p.CardNumber) : _encryptionHost.LocalEncrypt(p.CardNumber)
+                });
+
+                await rep.InsertRangeAsync(newRecords);
+
                 await uow.SaveChangesAsync();
             }
         }
@@ -72,49 +85,61 @@ namespace VitalChoice.ExportService.Services
             return new ExportInfoContext(_options, _contextOptions);
         }
 
-        public async Task UpdateOrderPaymentMethod(OrderPaymentMethodDynamic paymentMethod)
+        public async Task UpdateOrderPaymentMethod(OrderCardData paymentMethod)
         {
             var context = CreateContext();
             using (var uow = new UnitOfWork(context))
             {
                 var inMemory = context is ExportInfoImMemoryContext;
-                if (DynamicMapper.IsValuesMasked(paymentMethod) && paymentMethod.IdCustomerPaymentMethod > 0 &&
-                    paymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
+                if (paymentMethod.IdCustomerPaymentMethod > 0 &&
+                    ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), paymentMethod.CardNumber, "CardNumber"))
                 {
                     var customerRep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
                     var customerData =
                         await
                             customerRep.Query(c => c.IdPaymentMethod == paymentMethod.IdCustomerPaymentMethod.Value)
                                 .SelectFirstOrDefaultAsync(false);
-                    var customerPayment = inMemory
-                        ? (CustomerPaymentMethodDynamic) ObjectSerializer.Deserialize(customerData.CreditCardNumber)
-                        : _encryptionHost.LocalDecrypt<CustomerPaymentMethodDynamic>(customerData.CreditCardNumber);
-                    if (customerPayment.IdObjectType == (int) PaymentMethodType.CreditCard)
+                    if (customerData != null)
                     {
-                        paymentMethod.Data.CardNumber = customerPayment.SafeData.CardNumber;
+                        var customerPayment = inMemory
+                            ? (string) ObjectSerializer.Deserialize(customerData.CreditCardNumber)
+                            : _encryptionHost.LocalDecrypt<string>(customerData.CreditCardNumber);
+                        paymentMethod.CardNumber = customerPayment;
+                        await UpdateOrderPayment(paymentMethod, uow, inMemory);
                     }
                 }
-                var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
-                var orderPayment =
-                    await rep.Query(o => o.IdOrder == paymentMethod.IdOrder).SelectFirstOrDefaultAsync(true);
-
-                if (orderPayment != null)
+                else if (!string.IsNullOrWhiteSpace(paymentMethod.CardNumber) &&
+                         !ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), paymentMethod.CardNumber, "CardNumber"))
                 {
-                    orderPayment.CreditCardNumber = inMemory
-                        ? ObjectSerializer.Serialize(paymentMethod)
-                        : _encryptionHost.LocalEncrypt(paymentMethod);
-                }
-                else
-                {
-                    await rep.InsertAsync(new OrderPaymentMethodExport
-                    {
-                        IdOrder = paymentMethod.IdOrder,
-                        CreditCardNumber =
-                            inMemory ? ObjectSerializer.Serialize(paymentMethod) : _encryptionHost.LocalEncrypt(paymentMethod)
-                    });
+                    await UpdateOrderPayment(paymentMethod, uow, inMemory);
                 }
 
                 await uow.SaveChangesAsync();
+            }
+        }
+
+        private async Task UpdateOrderPayment(OrderCardData paymentMethod, UnitOfWork uow, bool inMemory)
+        {
+            var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
+            var orderPayment =
+                await rep.Query(o => o.IdOrder == paymentMethod.IdOrder).SelectFirstOrDefaultAsync(true);
+
+            if (orderPayment != null)
+            {
+                orderPayment.CreditCardNumber = inMemory
+                    ? ObjectSerializer.Serialize(paymentMethod.CardNumber)
+                    : _encryptionHost.LocalEncrypt(paymentMethod.CardNumber);
+            }
+            else
+            {
+                await rep.InsertAsync(new OrderPaymentMethodExport
+                {
+                    IdOrder = paymentMethod.IdOrder,
+                    CreditCardNumber =
+                        inMemory
+                            ? ObjectSerializer.Serialize(paymentMethod.CardNumber)
+                            : _encryptionHost.LocalEncrypt(paymentMethod.CardNumber)
+                });
             }
         }
 
@@ -152,8 +177,13 @@ namespace VitalChoice.ExportService.Services
             {
                 var customerPaymentsRep = uow.ReadRepositoryAsync<CustomerPaymentMethodExport>();
                 var payments = (await customerPaymentsRep.Query().SelectAsync(false)).Select(
-                    p => (CustomerPaymentMethodDynamic) ObjectSerializer.Deserialize(p.CreditCardNumber))
-                    .ToArray();
+                    p => new CustomerCardData
+                    {
+                        CardNumber =
+                            ObjectSerializer.Deserialize(p.CreditCardNumber) as string,
+                        IdPaymentMethod = p.IdPaymentMethod,
+                        IdCustomer = p.IdCustomer
+                    }).ToArray();
                 while (true)
                 {
                     try
@@ -175,7 +205,12 @@ namespace VitalChoice.ExportService.Services
                 var orderPaymentsRep = uow.ReadRepositoryAsync<OrderPaymentMethodExport>();
                 var orderPayments =
                     (await orderPaymentsRep.Query().SelectAsync(false)).Select(
-                        p => (OrderPaymentMethodDynamic) ObjectSerializer.Deserialize(p.CreditCardNumber)).ToArray();
+                        p => new OrderCardData
+                        {
+                            CardNumber = ObjectSerializer.Deserialize(p.CreditCardNumber) as string,
+                            IdOrder = p.IdOrder,
+                            IdCustomerPaymentMethod = null
+                        }).ToArray();
 
                 while (true)
                 {
@@ -191,8 +226,8 @@ namespace VitalChoice.ExportService.Services
                                 dynamic => new OrderPaymentMethodExport
                                 {
                                     IdOrder = dynamic.IdOrder,
-                                    CreditCardNumber = _encryptionHost.LocalEncrypt(dynamic)
-                                }, (export, dynamic) => export.CreditCardNumber = _encryptionHost.LocalEncrypt(dynamic));
+                                    CreditCardNumber = _encryptionHost.LocalEncrypt(dynamic.CardNumber)
+                                }, (export, dynamic) => export.CreditCardNumber = _encryptionHost.LocalEncrypt(dynamic.CardNumber));
 
                             await realOrdersRep.InsertRangeAsync(realOrders.Where(r => r.Id == 0));
 

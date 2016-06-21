@@ -69,6 +69,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Avatax;
 using VitalChoice.Infrastructure.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Extensions;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using AddressType = VitalChoice.Ecommerce.Domain.Entities.Addresses.AddressType;
@@ -189,12 +190,11 @@ namespace VitalChoice.Business.Services.Orders
                     await SetSkusBornDate(new[] {model}, uow);
                     await EnsurePaymentMethod(model);
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
-                    var paymentCopy = _paymentMapper.Clone<ExpandoObject>(model.PaymentMethod, o =>
+                    var paymentCopy = new OrderCardData
                     {
-                        var result = new ExpandoObject();
-                        result.AddRange(o);
-                        return result;
-                    });
+                        CardNumber = model.PaymentMethod.SafeData.CardNumber,
+                        IdCustomerPaymentMethod = model.PaymentMethod.IdCustomerPaymentMethod
+                    };
                     (await authTask).Raise();
                     entity = await base.InsertAsync(model, uow);
                     //storefront update
@@ -238,15 +238,14 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     SetExtendedOptions(models);
                     await SetSkusBornDate(models, uow);
-                    var paymentCopies = models.Select(p => new PaymentMethodCopy
+                    var paymentCopies = models.Select(p => new OrderPaymentReference
                     {
                         OriginalReference = p,
-                        PaymentMethod = _paymentMapper.Clone<ExpandoObject>(p.PaymentMethod, o =>
+                        PaymentMethod = new OrderCardData
                         {
-                            var result = new ExpandoObject();
-                            result.AddRange(o);
-                            return result;
-                        })
+                            CardNumber = p.PaymentMethod.SafeData.CardNumber,
+                            IdCustomerPaymentMethod = p.PaymentMethod.IdCustomerPaymentMethod
+                        }
                     }).ToArray();
                     entities = await base.InsertRangeAsync(models, uow);
                     paymentCopies.ForEach(p => p.PaymentMethod.IdOrder = p.OriginalReference.Id);
@@ -290,12 +289,12 @@ namespace VitalChoice.Business.Services.Orders
                     await SetSkusBornDate(new[] {model}, uow);
                     await EnsurePaymentMethod(model);
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
-                    var paymentCopy = _paymentMapper.Clone<ExpandoObject>(model.PaymentMethod, o =>
+                    var paymentCopy = new OrderCardData
                     {
-                        var result = new ExpandoObject();
-                        result.AddRange(o);
-                        return result;
-                    });
+                        CardNumber = model.PaymentMethod.SafeData.CardNumber,
+                        IdOrder = model.Id,
+                        IdCustomerPaymentMethod = model.PaymentMethod.IdCustomerPaymentMethod
+                    };
                     (await authTask).Raise();
                     var initial = await SelectEntityFirstAsync(o => o.Id == model.Id, query => query);
                     entity = await base.UpdateAsync(model, uow);
@@ -370,12 +369,12 @@ namespace VitalChoice.Business.Services.Orders
                     SetExtendedOptions(models);
                     await SetSkusBornDate(models, uow);
                     var ids = models.Select(o => o.Id).Distinct().ToList();
-                    var paymentCopies = models.Select(p => _paymentMapper.Clone<ExpandoObject>(p.PaymentMethod, o =>
+                    var paymentCopies = models.Select(p => new OrderCardData
                     {
-                        var result = new ExpandoObject();
-                        result.AddRange(o);
-                        return result;
-                    })).ToArray();
+                        CardNumber = p.PaymentMethod.SafeData.CardNumber,
+                        IdCustomerPaymentMethod = p.PaymentMethod.IdCustomerPaymentMethod,
+                        IdOrder = p.Id
+                    }).ToArray();
                     var initialList = await SelectEntitiesAsync(o => ids.Contains(o.Id), query => query);
                     entities = await base.UpdateRangeAsync(models, uow);
                     var paymentRemoteUpdates =
@@ -2403,10 +2402,10 @@ namespace VitalChoice.Business.Services.Orders
 
         #endregion
 
-        private struct PaymentMethodCopy
+        private struct OrderPaymentReference
         {
             public OrderDynamic OriginalReference { get; set; }
-            public OrderPaymentMethodDynamic PaymentMethod { get; set; }
+            public OrderCardData PaymentMethod { get; set; }
         }
     }
 }

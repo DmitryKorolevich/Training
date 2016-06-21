@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.Extensions.Options;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
@@ -13,6 +14,7 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Orders;
+using VitalChoice.ObjectMapping.Base;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -59,9 +61,10 @@ namespace VitalChoice.Business.Services.Orders
             return results;
         }
 
-        public Task<bool> UpdateOrderPaymentMethodAsync(OrderPaymentMethodDynamic orderPaymentMethod)
+        public Task<bool> UpdateOrderPaymentMethodAsync(OrderCardData orderPaymentMethod)
         {
-            if (!DynamicMapper.IsValuesMasked(orderPaymentMethod) || orderPaymentMethod.IdCustomerPaymentMethod > 0)
+            if (!ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), orderPaymentMethod.CardNumber, "CardNumber") ||
+                orderPaymentMethod.IdCustomerPaymentMethod > 0)
                 return
                     SendCommand<bool>(new ServiceBusCommandWithResult(SessionId, OrderExportServiceCommandConstants.UpdateOrderPayment,
                         ServerHostName, LocalHostName)
@@ -71,11 +74,16 @@ namespace VitalChoice.Business.Services.Orders
             return Task.FromResult(true);
         }
 
-        public Task<bool> UpdateCustomerPaymentMethodsAsync(ICollection<CustomerPaymentMethodDynamic> paymentMethods)
+        public Task<bool> UpdateCustomerPaymentMethodsAsync(ICollection<CustomerCardData> paymentMethods)
         {
-            var paymentsToUpdate = paymentMethods.Where(p => !DynamicMapper.IsValuesMasked(p)).ToArray();
+            var paymentsToUpdate =
+                paymentMethods.Where(p => !ObjectMapper.IsValuesMasked(typeof(CustomerPaymentMethodDynamic), p.CardNumber, "CardNumber"))
+                    .ToArray();
             if (paymentsToUpdate.Any())
             {
+                if (paymentsToUpdate.Any(p => p.IdCustomer == 0 || p.IdPaymentMethod == 0))
+                    return TaskCache<bool>.DefaultCompletedTask;
+
                 return
                     SendCommand<bool>(new ServiceBusCommandWithResult(SessionId, OrderExportServiceCommandConstants.UpdateCustomerPayment,
                         ServerHostName, LocalHostName)

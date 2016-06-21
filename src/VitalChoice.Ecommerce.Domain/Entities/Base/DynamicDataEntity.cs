@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using VitalChoice.Ecommerce.Domain.Entities.Users;
 
 namespace VitalChoice.Ecommerce.Domain.Entities.Base
@@ -10,6 +11,9 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Base
         {
             StatusCode = (int)RecordStatusCode.Active;
         }
+
+        [NotMapped]
+        public object MappedObject { get; set; }
 
         public int StatusCode { get; set; }
 

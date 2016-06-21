@@ -12,6 +12,24 @@ namespace VitalChoice.ObjectMapping.Base
 {
     public static class ObjectMapper
     {
+        public static bool IsValuesMasked(Type objectType, object data, string valueName)
+        {
+            var outerCache = DynamicTypeCache.GetTypeCache(objectType, true);
+
+            if (outerCache.MaskProperties.Count == 0)
+                return false;
+
+            var masker = outerCache.MaskProperties.FirstOrDefault(m => m.Key == valueName).Value;
+            if (masker != null)
+            {
+                if (!masker.IsMasked(data as string))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public static bool IsValuesMasked(object obj)
         {
             var outerCache = DynamicTypeCache.GetTypeCache(obj.GetType(), true);

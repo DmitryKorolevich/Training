@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using VitalChoice.Business.FedEx.Ship;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Orders;
 using VitalChoice.Business.Queries.Payment;
@@ -53,10 +54,12 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Azure;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
+using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.ObjectMapping.Base;
 using VitalChoice.ObjectMapping.Interfaces;
+using Address = VitalChoice.Ecommerce.Domain.Entities.Addresses.Address;
 
 namespace VitalChoice.Business.Services.Customers
 {
@@ -602,12 +605,13 @@ namespace VitalChoice.Business.Services.Customers
             {
                 try
                 {
-                    var paymentCopies = model.CustomerPaymentMethods.Select(method => _paymentMapper.Clone<ExpandoObject>(method, o =>
-                    {
-                        var result = new ExpandoObject();
-                        result.AddRange(o);
-                        return result;
-                    })).ToArray();
+                    var paymentCopies =
+                        model.CustomerPaymentMethods.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard)
+                            .Select(method => new
+                            {
+                                method.SafeData.CardNumber,
+                                Model = method
+                            }).ToArray();
                     int[] index = { 0 };
                     await model.CustomerPaymentMethods.ForEachAsync(async method =>
                     {
@@ -627,7 +631,13 @@ namespace VitalChoice.Business.Services.Customers
 
                     await _storefrontUserService.UpdateAsync(appUser, roles, password);
 
-                    updatePaymentsTask = _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies);
+                    updatePaymentsTask =
+                        _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies.Select(p => new CustomerCardData
+                        {
+                            CardNumber = p.CardNumber,
+                            IdPaymentMethod = p.Model.Id,
+                            IdCustomer = p.Model.IdCustomer
+                        }).ToArray());
 
                     transaction.Commit();
 
@@ -688,14 +698,13 @@ namespace VitalChoice.Business.Services.Customers
                     appUser = await _storefrontUserService.CreateAsync(appUser, roles, false, false, password);
 
                     model.Id = appUser.Id;
-                    //model.User.Id = appUser.Id;
 
-                    var paymentCopies = model.CustomerPaymentMethods.Select(method => _paymentMapper.Clone<ExpandoObject>(method, o =>
-                    {
-                        var result = new ExpandoObject();
-                        result.AddRange(o);
-                        return result;
-                    })).ToArray();
+                    var paymentCopies =
+                        model.CustomerPaymentMethods.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard).Select(method => new
+                        {
+                            method.SafeData.CardNumber,
+                            Model = method
+                        }).ToArray();
                     int index = 0;
                     await model.CustomerPaymentMethods.ForEachAsync(async method =>
                     {
@@ -711,7 +720,15 @@ namespace VitalChoice.Business.Services.Customers
 
                     entity = await base.InsertAsync(model, uow);
 
-                    updatePaymentsTask = _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies);
+                    model.CustomerPaymentMethods.ForEach(p => p.IdCustomer = entity.Id);
+
+                    updatePaymentsTask =
+                        _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies.Select(p => new CustomerCardData
+                        {
+                            CardNumber = p.CardNumber,
+                            IdPaymentMethod = p.Model.Id,
+                            IdCustomer = p.Model.IdCustomer
+                        }).ToArray());
 
                     transaction.Commit();
                 }
