@@ -10,13 +10,15 @@ using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Interfaces.Services;
 using System.Linq;
+using System.Threading;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 
 namespace VitalChoice.Business.Services
 {
     public sealed class EncryptedServiceBusHostClient : EncryptedServiceBusHost, IEncryptedServiceBusHostClient
     {
-        private readonly RSACryptoServiceProvider _keyExchangeProvider;
+        private volatile RSACryptoServiceProvider _keyExchangeProvider;
+        private readonly SemaphoreSlim _publicKeyLock = new SemaphoreSlim(1);
 
         public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider, IObjectEncryptionHost encryptionHost)
             : base(appOptions, loggerProvider.CreateLogger<EncryptedServiceBusHostClient>(), encryptionHost)
@@ -26,23 +28,31 @@ namespace VitalChoice.Business.Services
 
         private async Task<RSACryptoServiceProvider> GetKeyExchangeProvider()
         {
-            if (!_keyExchangeProvider.PublicOnly)
+            await _publicKeyLock.WaitAsync();
+            try
             {
-                var publicKey =
-                    await
-                        ExecutePlainCommand<RSAParameters>(new ServiceBusCommandWithResult(Guid.NewGuid(),
-                            ServiceBusCommandConstants.GetPublicKey, ServerHostName, LocalHostName));
-                var validKey = publicKey.Modulus != null && !publicKey.Modulus.All(b => b == 0);
-                if (validKey)
+                if (!_keyExchangeProvider.PublicOnly)
                 {
-                    _keyExchangeProvider.ImportParameters(publicKey);
+                    var publicKey =
+                        await
+                            ExecutePlainCommand<RSAParameters>(new ServiceBusCommandWithResult(Guid.NewGuid(),
+                                ServiceBusCommandConstants.GetPublicKey, ServerHostName, LocalHostName));
+                    var validKey = publicKey.Modulus != null && !publicKey.Modulus.All(b => b == 0);
+                    if (validKey)
+                    {
+                        _keyExchangeProvider.ImportParameters(publicKey);
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
-                else
-                {
-                    return null;
-                }
+                return _keyExchangeProvider;
             }
-            return _keyExchangeProvider;
+            finally
+            {
+                _publicKeyLock.Release();
+            }
         }
 
         public async Task<bool> AuthenticateClient(Guid sessionId)
@@ -50,6 +60,7 @@ namespace VitalChoice.Business.Services
             var keyExchangeProvider = await GetKeyExchangeProvider();
             if (keyExchangeProvider == null)
                 return false;
+            await _publicKeyLock.WaitAsync();
             var keys = EncryptionHost.CreateSession(sessionId);
             if (keys == null)
             {
@@ -70,6 +81,14 @@ namespace VitalChoice.Business.Services
                     }))
             {
                 return EncryptionHost.RegisterSession(sessionId, keys);
+            }
+            try
+            {
+                _keyExchangeProvider = new RSACryptoServiceProvider();
+            }
+            finally
+            {
+                _publicKeyLock.Release();
             }
             return false;
         }

@@ -175,17 +175,18 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 
 
         public bool RsaVerifyWithConvert<T>(TransportCommandData command, out T result)
-            where T: ServiceBusCommandBase
+            where T : ServiceBusCommandBase
         {
             if (command == null)
                 throw new ArgumentNullException(nameof(command));
             if (command.Data?.Length > 0)
             {
+                result = (T) ObjectSerializer.Deserialize(command.Data);
                 if (RsaVerifyCommandSign(command))
                 {
-                    result = (T) ObjectSerializer.Deserialize(command.Data);
                     return true;
                 }
+                return false;
             }
             result = default(T);
             return false;

@@ -39,9 +39,13 @@ namespace VitalChoice.Business.Services
         {
             if (!IsAuthenticated)
             {
+                //double auth try to refresh broken/regenerated public key
                 if (!await _encryptedBusHost.AuthenticateClient(SessionId))
                 {
-                    return default(T);
+                    if (!await _encryptedBusHost.AuthenticateClient(SessionId))
+                    {
+                        return default(T);
+                    }
                 }
             }
 
@@ -52,9 +56,13 @@ namespace VitalChoice.Business.Services
         {
             if (!IsAuthenticated)
             {
+                //double auth try to refresh broken/regenerated public key
                 if (!await _encryptedBusHost.AuthenticateClient(SessionId))
                 {
-                    return;
+                    if (!await _encryptedBusHost.AuthenticateClient(SessionId))
+                    {
+                        return;
+                    }
                 }
             }
 
