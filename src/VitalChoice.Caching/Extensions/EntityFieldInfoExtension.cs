@@ -37,11 +37,10 @@ namespace VitalChoice.Caching.Extensions
             return new EntityIndex(GetValues(entity, indexInfo));
         }
 
-        public static IEnumerable<KeyValuePair<EntityCacheableIndexInfo, EntityIndex>> GetNonUniqueIndexes(
+        public static Dictionary<EntityCacheableIndexInfo, EntityIndex> GetNonUniqueIndexes(
             this IEnumerable<EntityCacheableIndexInfo> indexInfos, object entity)
         {
-            return indexInfos?.Select(n => new KeyValuePair<EntityCacheableIndexInfo, EntityIndex>(n, n.GetIndexValue(entity))) ??
-                   Enumerable.Empty<KeyValuePair<EntityCacheableIndexInfo, EntityIndex>>();
+            return indexInfos?.ToDictionary(n => n, n => n.GetIndexValue(entity));
         }
 
         public static EntityIndex GetConditionalIndexValue<T>(this EntityValueGroupInfo<T> conditionalInfo, object entity)
@@ -77,11 +76,10 @@ namespace VitalChoice.Caching.Extensions
             return result;
         }
 
-        public static IEnumerable<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>> GetForeignKeyValues(
+        public static Dictionary<EntityForeignKeyInfo, EntityForeignKey> GetForeignKeyValues(
             this IEnumerable<EntityForeignKeyInfo> indexInfos, object entity)
         {
-            return indexInfos?.Select(n => new KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>(n, n.GetForeignKeyValue(entity))) ??
-                   Enumerable.Empty<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>>();
+            return indexInfos?.ToDictionary(n => n, n => n.GetForeignKeyValue(entity));
         }
 
         public static EntityKey GetPrimaryKeyValue(this EntityPrimaryKeyInfo pkInfo, object entity)

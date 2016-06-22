@@ -37,8 +37,8 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
         public EntityIndex UniqueIndex { get; internal set; }
         public ICollection<KeyValuePair<EntityConditionalIndexInfo, EntityIndex>> ConditionalIndexes { get; internal set; }
-        public ICollection<KeyValuePair<EntityCacheableIndexInfo, EntityIndex>> NonUniqueIndexes { get; internal set; }
-        public ICollection<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>> ForeignKeys { get; internal set; }
+        public Dictionary<EntityCacheableIndexInfo, EntityIndex> NonUniqueIndexes { get; internal set; }
+        public Dictionary<EntityForeignKeyInfo, EntityForeignKey> ForeignKeys { get; internal set; }
 
         public abstract CachedEntity CopyUntyped();
     }

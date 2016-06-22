@@ -170,9 +170,9 @@ namespace VitalChoice.Business.Services.Products
             return TaskCache.CompletedTask;
         }
 
-        protected override async Task AfterEntityChangesAsync(ProductDynamic model, Product updated, Product initial, IUnitOfWorkAsync uow)
+        protected override async Task AfterEntityChangesAsync(ProductDynamic model, Product updated, IUnitOfWorkAsync uow)
         {
-            await SyncDbCollections<Sku, SkuOptionValue>(uow, initial.Skus, updated.Skus, false);
+            await SyncDbCollections<Sku, SkuOptionValue>(uow, updated.Skus, false);
         }
 
         protected override async Task<List<MessageInfo>> ValidateAsync(ProductDynamic model)

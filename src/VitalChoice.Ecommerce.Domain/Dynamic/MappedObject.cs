@@ -1,17 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Dynamic;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
-using System.Xml.Serialization;
 using Newtonsoft.Json;
-using Remotion.Linq.Parsing;
-using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.History;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -26,7 +17,7 @@ namespace VitalChoice.Ecommerce.Domain.Dynamic
         protected MappedObject()
         {
             StatusCode = (int) RecordStatusCode.Active;
-            DynamicData = new ExpandoObject();
+            UnsafeData = new UnsafeDynamicObject();
         }
 
         [DataMember]
@@ -50,11 +41,11 @@ namespace VitalChoice.Ecommerce.Domain.Dynamic
         [JsonIgnore]
         internal List<KeyValuePair<string, object>> DynamicValues
         {
-            get { return DynamicData.ToList(); }
+            get { return UnsafeData.Dictionary.ToList(); }
             set
             {
-                if (DynamicData == null)
-                    DynamicData = new ExpandoObject();
+                if (UnsafeData == null)
+                    UnsafeData = new UnsafeDynamicObject();
                 DictionaryData.AddRange(value);
             }
         }
@@ -82,27 +73,24 @@ namespace VitalChoice.Ecommerce.Domain.Dynamic
         }
 
         [JsonIgnore]
-        public IDictionary<string, object> DictionaryData => DynamicData as IDictionary<string, object>;
+        public IDictionary<string, object> DictionaryData => UnsafeData.Dictionary;
 
         [JsonIgnore]
-        public dynamic Data => DynamicData;
+        public dynamic Data => _unsafeData;
 
         [JsonIgnore]
-        public dynamic SafeData => _expandoData;
+        public dynamic SafeData => _safeData;
 
-        private SafeDynamicObject _expandoData;
-        private ExpandoObject _dynamicData;
+        private SafeDynamicObject _safeData;
+        private UnsafeDynamicObject _unsafeData;
 
-        public ExpandoObject DynamicData
+        public UnsafeDynamicObject UnsafeData
         {
-            get { return _dynamicData; }
+            get { return _unsafeData; }
             set
             {
-                _dynamicData = value;
-                if (_expandoData == null)
-                    _expandoData = new SafeDynamicObject(value);
-                else
-                    _expandoData.Initialize(value);
+                _unsafeData = value;
+                _safeData = new SafeDynamicObject(value);
             }
         }
 

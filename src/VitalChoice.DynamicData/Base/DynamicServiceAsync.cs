@@ -34,7 +34,7 @@ namespace VitalChoice.DynamicData.Base
         where TDynamic : MappedObject, new()
     {
         private readonly DirectMapper<TEntity> _directMapper;
-        protected readonly bool IsAfterChangesOverriden;
+        //protected readonly bool IsAfterChangesOverriden;
 
         protected DynamicServiceAsync(IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
             IRepositoryAsync<TEntity> objectRepository,
@@ -49,15 +49,15 @@ namespace VitalChoice.DynamicData.Base
                 objectLogItemExternalService, logger, queryVisitor)
         {
             _directMapper = directMapper;
-            var instanceType = GetType();
-            IsAfterChangesOverriden =
-                instanceType.GetTypeInfo().GetMethod(nameof(AfterEntityChangesAsync), BindingFlags.NonPublic | BindingFlags.DeclaredOnly) !=
-                null;
+            //var instanceType = GetType();
+            //IsAfterChangesOverriden =
+            //    instanceType.GetTypeInfo().GetMethod(nameof(AfterEntityChangesAsync), BindingFlags.NonPublic | BindingFlags.DeclaredOnly) !=
+            //    null;
         }
 
         protected abstract IUnitOfWorkAsync CreateUnitOfWork();
 
-        protected virtual Task AfterEntityChangesAsync(TDynamic model, TEntity updated, TEntity initial, IUnitOfWorkAsync uow)
+        protected virtual Task AfterEntityChangesAsync(TDynamic model, TEntity updated, IUnitOfWorkAsync uow)
         {
             return TaskCache.CompletedTask;
         }
@@ -245,11 +245,6 @@ namespace VitalChoice.DynamicData.Base
                 foreach (var item in items)
                 {
                     item.Entity.OptionTypes = DynamicMapper.FilterByType(item.Dynamic.IdObjectType);
-                    if (IsAfterChangesOverriden)
-                    {
-                        item.InitialEntity = _directMapper.Clone<Entity>(item.Entity);
-                        item.InitialEntity.OptionTypes = item.Entity.OptionTypes;
-                    }
                 }
                 await UpdateItems(uow, items, bigValueRepository);
                 await uow.SaveChangesAsync();
@@ -276,21 +271,19 @@ namespace VitalChoice.DynamicData.Base
             var entity = await query.SelectFirstOrDefaultAsync();
             if (entity == null)
                 return null;
-            var initialEntity = _directMapper.Clone<Entity>(entity);
             entity.OptionTypes = DynamicMapper.FilterByType(model.IdObjectType);
-            initialEntity.OptionTypes = entity.OptionTypes;
             await
                 UpdateItems(uow,
                     new List<DynamicEntityPair<TDynamic, TEntity>>
                     {
-                        new DynamicEntityPair<TDynamic, TEntity>(model, entity) { InitialEntity = initialEntity}
+                        new DynamicEntityPair<TDynamic, TEntity>(model, entity) /*{ InitialEntity = initialEntity}*/
                     }, bigValueRepository);
             await uow.SaveChangesAsync();
             RestoreIdsFromEntity(entity);
             return entity;
         }
 
-        protected static async Task SyncDbCollections<T, TValue>(IUnitOfWorkAsync uow, IEnumerable<T> initial, IEnumerable<T> updated, bool removePhysically)
+        protected static async Task SyncDbCollections<T, TValue>(IUnitOfWorkAsync uow, IEnumerable<T> updated, bool removePhysically)
             where T : DynamicDataEntity<TValue>
             where TValue : OptionValue
         {
@@ -488,7 +481,7 @@ namespace VitalChoice.DynamicData.Base
 
             foreach (var pair in items)
             {
-                await AfterEntityChangesAsync(pair.Dynamic, pair.Entity, pair.InitialEntity, uow);
+                await AfterEntityChangesAsync(pair.Dynamic, pair.Entity, uow);
             }
         }
 

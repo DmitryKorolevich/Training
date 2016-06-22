@@ -602,7 +602,7 @@ namespace VitalChoice.Business.Services.Orders
             return TaskCache.CompletedTask;
         }
 
-        protected override async Task AfterEntityChangesAsync(OrderDynamic model, Order updated, Order initial, IUnitOfWorkAsync uow)
+        protected override async Task AfterEntityChangesAsync(OrderDynamic model, Order updated, IUnitOfWorkAsync uow)
         {
             //We need to manually remove generated but unlinked gift certificates
             var gcRep = uow.RepositoryAsync<GiftCertificate>();

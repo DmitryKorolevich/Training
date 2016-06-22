@@ -7,12 +7,12 @@ namespace VitalChoice.Workflow.Core
 {
     public abstract class WorkflowDataContext<T>
     {
-        private readonly ExpandoObject _data;
+        private readonly UnsafeDynamicObject _data;
         private readonly SafeDynamicObject _safeData;
 
         protected WorkflowDataContext()
         {
-            _data = new ExpandoObject();
+            _data = new UnsafeDynamicObject();
             _actionRunningList = new HashSet<string>();
             _safeData = new SafeDynamicObject(_data);
         }
@@ -21,7 +21,7 @@ namespace VitalChoice.Workflow.Core
 
         public dynamic SafeData => _safeData;
 
-        public IDictionary<string, object> DictionaryData => _data as IDictionary<string, object>;
+        public IDictionary<string, object> DictionaryData => _data.Dictionary;
 
         private readonly HashSet<string> _actionRunningList;
 

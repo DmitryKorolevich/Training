@@ -97,16 +97,23 @@ namespace VitalChoice.Business.Services.Dynamic
                 {
                     paymentMethod.IdCustomer = dynamic.Id;
                 }
-                var addresses = entity.ShippingAddresses.Select(s => s.ShippingAddress).ToList();
-                await _customerAddressMapper.SyncCollectionsAsync(dynamic.ShippingAddresses, addresses);
 
-                entity.ShippingAddresses.AddKeyed(addresses,
-                    address => address.IdAddress, newAddress => newAddress.Id, dbAddress => new CustomerToShippingAddress
-                    {
-                        IdAddress = dbAddress.Id,
-                        IdCustomer = dynamic.Id,
-                        ShippingAddress = dbAddress
-                    });
+                await
+                    _customerAddressMapper.SyncCollectionsAsync(dynamic.ShippingAddresses, entity.ShippingAddresses,
+                        address => address.ShippingAddress, address => new CustomerToShippingAddress
+                        {
+                            ShippingAddress = address,
+                            IdCustomer = dynamic.Id,
+                            IdAddress = address.Id
+                        });
+
+                //entity.ShippingAddresses.AddKeyed(addresses,
+                //    address => address.IdAddress, newAddress => newAddress.Id, dbAddress => new CustomerToShippingAddress
+                //    {
+                //        IdAddress = dbAddress.Id,
+                //        IdCustomer = dynamic.Id,
+                //        ShippingAddress = dbAddress
+                //    });
 
                 await _customerNoteMapper.SyncCollectionsAsync(dynamic.CustomerNotes, entity.CustomerNotes);
                 await

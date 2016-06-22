@@ -37,7 +37,7 @@ namespace VitalChoice.DynamicData.Interfaces
         }
 
         public TEntity Entity { get; set; }
-        public TEntity InitialEntity { get; set; }
+        //public TEntity InitialEntity { get; set; }
         public TDynamic Dynamic { get; set; }
     }
 

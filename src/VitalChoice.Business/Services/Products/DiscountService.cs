@@ -129,8 +129,7 @@ namespace VitalChoice.Business.Services.Products
             await discountTierRepository.DeleteAllAsync(entity.DiscountTiers);
         }
 
-        protected override async Task AfterEntityChangesAsync(DiscountDynamic model, Discount updated, Discount initial,
-            IUnitOfWorkAsync uow)
+        protected override async Task AfterEntityChangesAsync(DiscountDynamic model, Discount updated, IUnitOfWorkAsync uow)
         {
             var discountTierRepository = uow.RepositoryAsync<DiscountTier>();
 

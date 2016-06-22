@@ -79,6 +79,47 @@ namespace VitalChoice.DynamicData.Base
             SyncCollectionsAsync(dynamics, entities, optionTypes).Wait();
         }
 
+        public virtual async Task SyncCollectionsAsync<T>(ICollection<TDynamic> dynamics, ICollection<T> entities, Func<T, TEntity> selector,
+            Func<TEntity, T> constructor,
+            ICollection<TOptionType> optionTypes = null)
+        {
+            if (dynamics != null && dynamics.Count > 0 && entities != null)
+            {
+                //Update existing
+                var itemsToUpdate = dynamics.Join(entities, sd => sd.Id, s => selector(s).Id,
+                    (@dynamic, item) =>
+                    {
+                        var entity = selector(item);
+                        if (optionTypes != null)
+                            entity.OptionTypes = optionTypes;
+                        return new DynamicEntityPair<TDynamic, TEntity>(@dynamic, entity);
+                    }).ToList();
+                await UpdateEntityRangeAsync(itemsToUpdate);
+                //foreach (var item in itemsToUpdate)
+                //{
+                //    item.Entity.StatusCode = (int)RecordStatusCode.Active;
+                //}
+
+                //Delete
+                var toDelete = entities.Where(e => dynamics.All(s => s.Id != selector(e).Id));
+                foreach (var entity in toDelete)
+                {
+                    selector(entity).StatusCode = (int) RecordStatusCode.Deleted;
+                }
+
+                //Insert
+                var list = await ToEntityRangeAsync(dynamics.Where(s => s.Id == 0).ToList(), optionTypes);
+                entities.AddRange(list.Select(constructor));
+            }
+            else if (entities != null)
+            {
+                foreach (var entity in entities)
+                {
+                    selector(entity).StatusCode = (int) RecordStatusCode.Deleted;
+                }
+            }
+        }
+
         public virtual async Task SyncCollectionsAsync(ICollection<TDynamic> dynamics, ICollection<TEntity> entities,
             ICollection<TOptionType> optionTypes = null)
         {
