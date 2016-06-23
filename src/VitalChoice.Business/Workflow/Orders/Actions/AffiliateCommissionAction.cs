@@ -19,20 +19,20 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
         public override async Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
             if (context.Order.Customer?.IdAffiliate != null && context.Order.Customer.IdAffiliate.Value > 0 &&
-                context.Order.Customer?.Id > 0)
+                context.Order.Customer.Id > 0)
             {
                 var customerService = executionContext.Resolve<ICustomerService>();
                 var affiliateService = executionContext.Resolve<IAffiliateService>();
                 var hasOrders =
                     await customerService.GetCustomerHasAffiliateOrders(context.Order.Customer.Id, context.Order.Id);
                 var affiliate = await affiliateService.SelectAsync(context.Order.Customer.IdAffiliate.Value, true);
-                if (affiliate?.StatusCode == (int)AffiliateStatus.Active)
+                if (affiliate?.StatusCode == (int) AffiliateStatus.Active)
                 {
                     decimal result;
 
                     decimal baseAmount = (decimal) context.Data.PromoProducts;
-                    object discount;
-                    if (context.DictionaryData.TryGetValue("Discount", out discount))
+                    decimal? discount = context.SafeData.Discount;
+                    if (discount.HasValue)
                     {
                         baseAmount += (decimal) discount;
                     }

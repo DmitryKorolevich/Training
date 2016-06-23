@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using VitalChoice.DynamicData.Base;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 
 namespace VitalChoice.DynamicData.Extensions

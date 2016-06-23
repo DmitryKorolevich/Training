@@ -76,7 +76,7 @@ namespace VC.Admin.Models.Orders
             ShippingOverride = dataContext.ShippingOverride;
             SurchargeOverride = dataContext.SurchargeOverride;
             TotalShipping = dataContext.TotalShipping;
-            ShouldSplit = dataContext.SplitInfo.ShouldSplit;
+            ShouldSplit = dataContext.ProductSplitInfo.ShouldSplit;
             ProductsPerishableThresholdIssue = dataContext.ProductsPerishableThresholdIssue;
 
             SkuOrdereds = dataContext.SkuOrdereds.Select(item => new SkuOrderedManageModel(item)).ToList();

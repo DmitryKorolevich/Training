@@ -16,19 +16,19 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, ITreeContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
-            if ((dataContext.Order.GiftCertificates?.Count ?? 0) == 0)
+            if ((context.Order.GiftCertificates?.Count ?? 0) == 0)
             {
                 return TaskCache<decimal>.DefaultCompletedTask;
             }
-            decimal orderSubTotal = dataContext.Data.PayableTotal;
+            decimal orderSubTotal = context.Data.PayableTotal;
             // ReSharper disable once PossibleNullReferenceException
-            foreach (var gc in dataContext.Order.GiftCertificates)
+            foreach (var gc in context.Order.GiftCertificates)
             {
                 if (gc.GiftCertificate.StatusCode != RecordStatusCode.Active)
                 {
-                    dataContext.GcMessageInfos.Add(new MessageInfo
+                    context.GcMessageInfos.Add(new MessageInfo
                     {
                         Message = "Gift Certificate not Active",
                         Field = gc.GiftCertificate.Code
@@ -38,7 +38,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
                 var totalGcAmount = gc.Amount + gc.GiftCertificate.Balance;
                 if (totalGcAmount == 0)
                 {
-                    dataContext.GcMessageInfos.Add(new MessageInfo
+                    context.GcMessageInfos.Add(new MessageInfo
                     {
                         Message = "Zero balance Gift Certificate",
                         Field = gc.GiftCertificate.Code
@@ -49,15 +49,15 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
                 gc.GiftCertificate.Balance += gc.Amount - charge;
                 gc.Amount = charge;
                 orderSubTotal -= charge;
-                dataContext.GcMessageInfos.Add(new MessageInfo
+                context.GcMessageInfos.Add(new MessageInfo
                 {
                     Message = "Successfully used Gift Certificate",
                     Field = gc.GiftCertificate.Code,
                     MessageLevel = MessageLevel.Info
                 });
             }
-            dataContext.GiftCertificatesSubtotal = orderSubTotal - (decimal) dataContext.Data.PayableTotal;
-            return Task.FromResult(dataContext.GiftCertificatesSubtotal);
+            context.GiftCertificatesSubtotal = orderSubTotal - (decimal) context.Data.PayableTotal;
+            return Task.FromResult(context.GiftCertificatesSubtotal);
         }
     }
 }

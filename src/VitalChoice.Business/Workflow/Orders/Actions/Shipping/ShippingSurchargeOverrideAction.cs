@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
@@ -11,15 +12,25 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, ITreeContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
-            decimal surchargeOverride = (decimal?)dataContext.Order.SafeData.SurchargeOverride ?? 0;
-            decimal surchargeTotal = dataContext.AlaskaHawaiiSurcharge + dataContext.CanadaSurcharge;
+            decimal surchargeOverride = (decimal?)context.Order.SafeData.SurchargeOverride ?? 0;
+            decimal surchargeTotal = context.AlaskaHawaiiSurcharge + context.CanadaSurcharge;
             if (surchargeOverride > surchargeTotal)
             {
                 surchargeOverride = surchargeTotal;
             }
-            dataContext.SurchargeOverride = surchargeOverride;
+            context.SurchargeOverride = surchargeOverride;
+
+            var perishableOverride = surchargeOverride;
+            if (perishableOverride > context.SplitInfo.PerishableSurchargeOverriden)
+            {
+                perishableOverride = context.SplitInfo.PerishableSurchargeOverriden;
+            }
+
+            context.SplitInfo.PerishableSurchargeOverriden -= perishableOverride;
+            context.SplitInfo.NonPerishableSurchargeOverriden -= surchargeOverride - perishableOverride;
+
             return Task.FromResult(-surchargeOverride);
         }
     }

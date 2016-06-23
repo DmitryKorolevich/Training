@@ -12,36 +12,52 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, ITreeContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
-            if (dataContext.Data.PromoProducts < 200 && dataContext.Data.DeliveredAmount > 0)
+            if (context.Data.PromoProducts < 200 && context.Data.DeliveredAmount > 0)
             {
-                if (dataContext.Data.PromoProducts < 50)
+                if (context.Data.PromoProducts < 50)
                 {
-                    dataContext.StandardShippingCharges = (decimal) 4.95;
-                    return Task.FromResult(dataContext.StandardShippingCharges);
+                    context.StandardShippingCharges = (decimal) 4.95;
+                    AddSplitShipping(context);
+                    return Task.FromResult(context.StandardShippingCharges);
                     //_deliveryServiceCostGroup = DeliveryServiceCostGroup.FirstCost;
                 }
-                if (dataContext.Data.PromoProducts < 100)
+                if (context.Data.PromoProducts < 100)
                 {
-                    dataContext.StandardShippingCharges = (decimal) 9.95;
-                    return Task.FromResult(dataContext.StandardShippingCharges);
+                    context.StandardShippingCharges = (decimal) 9.95;
+                    AddSplitShipping(context);
+                    return Task.FromResult(context.StandardShippingCharges);
                     //_deliveryServiceCostGroup = DeliveryServiceCostGroup.SecondCost;
                 }
-                if (dataContext.Data.PromoProducts < 150)
+                if (context.Data.PromoProducts < 150)
                 {
-                    dataContext.StandardShippingCharges = (decimal)14.95;
-                    return Task.FromResult(dataContext.StandardShippingCharges);
+                    context.StandardShippingCharges = (decimal)14.95;
+                    AddSplitShipping(context);
+                    return Task.FromResult(context.StandardShippingCharges);
                     //_deliveryServiceCostGroup = DeliveryServiceCostGroup.SecondCost;
                 }
-                if (dataContext.Data.PromoProducts < 200)
+                if (context.Data.PromoProducts < 200)
                 {
-                    dataContext.StandardShippingCharges = (decimal)19.95;
-                    return Task.FromResult(dataContext.StandardShippingCharges);
+                    context.StandardShippingCharges = (decimal)19.95;
+                    AddSplitShipping(context);
+                    return Task.FromResult(context.StandardShippingCharges);
                     //_deliveryServiceCostGroup = DeliveryServiceCostGroup.SecondCost;
                 }
             }
             return TaskCache<decimal>.DefaultCompletedTask;
+        }
+
+        private static void AddSplitShipping(OrderDataContext context)
+        {
+            if (context.ProductSplitInfo.PerishableAmount > 0)
+            {
+                context.SplitInfo.PerishableShippingOveridden += context.StandardShippingCharges;
+            }
+            else
+            {
+                context.SplitInfo.NonPerishableShippingOverriden += context.StandardShippingCharges;
+            }
         }
     }
 }

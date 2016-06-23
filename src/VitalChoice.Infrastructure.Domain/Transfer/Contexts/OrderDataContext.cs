@@ -14,6 +14,33 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 {
     public class SplitInfo
     {
+        public decimal PerishableShippingOveridden { get; set; }
+
+        public decimal NonPerishableShippingOverriden { get; set; }
+
+        public decimal PerishableSurchargeOverriden { get; set; }
+
+        public decimal NonPerishableSurchargeOverriden { get; set; }
+
+        public decimal PerishableTax { get; set; }
+
+        public decimal NonPerishableTax { get; set; }
+
+        public decimal PerishableDiscount { get; set; }
+
+        public decimal NonPerishableDiscount { get; set; }
+
+        public decimal PerishableGiftCertificateAmount { get; set; }
+
+        public decimal NonPerishableGiftCertificateAmount { get; set; }
+    }
+
+    public class ProductSplitInfo
+    {
+        public decimal DiscountablePerishable { get; set; }
+
+        public decimal DiscountableNonPerishable { get; set; }
+
         public int PerishableCount { get; set; }
 
         public decimal PerishableAmount { get; set; }
@@ -27,6 +54,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
         public int NonPerishableNonOrphanCount => NonPerishableCount - NonPerishableOrphanCount;
 
         public decimal PNpAmount => PerishableAmount + NonPerishableAmount;
+
+        public decimal OtherProductsAmount { get; set; }
 
         public bool SpecialSkuAdded { get; set; }
 
@@ -49,6 +78,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
             PromoSkus = new List<PromoOrdered>();
             SkuOrdereds = new List<SkuOrdered>();
             GcMessageInfos = new List<MessageInfo>();
+            ProductSplitInfo = new ProductSplitInfo();
             SplitInfo = new SplitInfo();
         }
 
@@ -99,6 +129,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
         public ICollection<PromoOrdered> PromoSkus { get; set; }
 
         public ICollection<MessageInfo> Messages { get; set; }
+
+        public ProductSplitInfo ProductSplitInfo { get; set; }
 
         public SplitInfo SplitInfo { get; set; }
     }

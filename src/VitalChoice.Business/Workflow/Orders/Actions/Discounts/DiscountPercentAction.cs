@@ -12,13 +12,17 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, ITreeContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
-            dataContext.DiscountMessage = dataContext.Order.Discount.GetDiscountMessage();
-            dataContext.FreeShipping = dataContext.Order.Discount.Data.FreeShipping;
-            return
-                Task.FromResult<decimal>(-dataContext.Order.Discount.Data.Percent*
-                                         (decimal) dataContext.Data.DiscountableSubtotal/100);
+            context.DiscountMessage = context.Order.Discount.GetDiscountMessage();
+            context.FreeShipping = context.Order.Discount.Data.FreeShipping;
+
+            decimal discountPercent = context.Order.Discount.Data.Percent;
+
+            context.SplitInfo.PerishableDiscount = discountPercent*context.ProductSplitInfo.DiscountablePerishable / 100;
+            context.SplitInfo.NonPerishableDiscount = discountPercent*context.ProductSplitInfo.DiscountableNonPerishable / 100;
+
+            return Task.FromResult(-discountPercent*(decimal) context.Data.DiscountableSubtotal/100);
         }
     }
 }

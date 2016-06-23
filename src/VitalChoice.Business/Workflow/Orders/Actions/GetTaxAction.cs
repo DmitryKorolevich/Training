@@ -17,11 +17,11 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
         public override async Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
             var taxService = executionContext.Resolve<IAvalaraTax>();
-            if (context.SplitInfo.ShouldSplit)
+            if (context.ProductSplitInfo.ShouldSplit)
             {
-                context.TaxTotal = (await
-                    Task.WhenAll(taxService.GetTax(context, TaxGetType.Perishable),
-                        taxService.GetTax(context, TaxGetType.NonPerishable))).Sum();
+                context.SplitInfo.PerishableTax = await taxService.GetTax(context, TaxGetType.Perishable);
+                context.SplitInfo.NonPerishableTax = await taxService.GetTax(context, TaxGetType.NonPerishable);
+                context.TaxTotal = context.SplitInfo.PerishableTax + context.SplitInfo.NonPerishableTax;
             }
             else
             {

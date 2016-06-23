@@ -105,12 +105,26 @@ namespace VitalChoice.Business.Services.Avatax
             Address destination;
             FillAddresses(context.Order.ShippingAddress, out origin, out destination);
 
-            var request = FillGetTaxBaseRequest(context.Order.Customer, context.Order.Id, -(decimal?)context.SafeData.Discount ?? 0, taxGetType, destination, origin);
+            decimal discountAmount;
 
-            var lines = ToTaxLines(context, taxGetType, 1).ToArray();
+            if (context.ProductSplitInfo.ShouldSplit)
+            {
+                discountAmount = taxGetType.HasFlag(TaxGetType.Perishable)
+                    ? context.SplitInfo.PerishableDiscount
+                    : context.SplitInfo.NonPerishableDiscount;
+            }
+            else
+            {
+                discountAmount = -(decimal?) context.SafeData.Discount ?? 0;
+            }
+
+            //discountAmount amount should be >= 0 here
+            var request = FillGetTaxBaseRequest(context.Order.Customer, context.Order.Id, discountAmount, taxGetType, destination, origin);
+
+            var products = ToTaxLines(context, taxGetType, 1);
+            var lines = UnionTaxShipping(products, context, taxGetType).ToArray();
             if (!(lines.Length > 0))
                 return 0;
-            lines = UnionTaxShipping(lines, context).ToArray();
             request.Lines = lines;
 
             var result = await _taxService.GetTax(request);
@@ -139,10 +153,10 @@ namespace VitalChoice.Business.Services.Avatax
             var request = FillGetTaxBaseRequest(context.Order.Customer, context.Order.Id, -(decimal?)context.SafeData.Discount ?? 0, taxGetType,
                 destination, origin);
 
-            var lines = ToTaxLines(context, taxGetType, 1).ToArray();
-            if (!(lines.Length > 0))
+            var products = ToTaxLines(context, taxGetType, 1);
+            var lines = UnionTaxShipping(products, context).ToArray();
+            if (!(lines.Length > 1))
                 return 0;
-            lines = UnionTaxShipping(lines, context).ToArray();
             request.Lines = lines;
 
             var result = await _taxService.GetTax(request);
@@ -222,13 +236,29 @@ namespace VitalChoice.Business.Services.Avatax
             return taxGetType;
         }
 
-        private static IEnumerable<Line> UnionTaxShipping(IEnumerable<Line> lines, OrderDataContext order)
+        private static IEnumerable<Line> UnionTaxShipping(IEnumerable<Line> lines, OrderDataContext order, TaxGetType taxGetType)
         {
-            return lines.Union(new List<Line>
+            decimal shippingTotal;
+            if (order.ProductSplitInfo.ShouldSplit)
             {
+                if (taxGetType.HasFlag(TaxGetType.Perishable))
+                {
+                    shippingTotal = order.SplitInfo.PerishableShippingOveridden + order.SplitInfo.PerishableSurchargeOverriden;
+                }
+                else
+                {
+                    shippingTotal = order.SplitInfo.NonPerishableShippingOverriden + order.SplitInfo.NonPerishableSurchargeOverriden;
+                }
+            }
+            else
+            {
+                shippingTotal = order.ShippingTotal;
+            }
+
+            return lines.Union(Enumerable.Repeat(
                 new Line
                 {
-                    Amount = order.ShippingTotal,
+                    Amount = shippingTotal,
                     Description = "Shipping Amount",
                     DestinationCode = "02",
                     OriginCode = "01",
@@ -238,11 +268,10 @@ namespace VitalChoice.Business.Services.Avatax
                     LineNo = "01-SHIP",
                     CustomerUsageType =
                         order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
-                        order.Order.Customer.SafeData.TaxExempt == 1//Yes, Current Certificate
+                        order.Order.Customer.SafeData.TaxExempt == 1 //Yes, Current Certificate
                             ? "G"
                             : null
-                }
-            });
+                }, 1));
         }
 
         private static IEnumerable<Line> UnionTaxShipping(IEnumerable<Line> lines, OrderRefundDataContext order)
@@ -326,7 +355,7 @@ namespace VitalChoice.Business.Services.Avatax
                     TaxCode = p.Sku.Product.SafeData.TaxCode,
                     Qty = p.Quantity,
                     ItemCode = p.Sku.Code,
-                    LineNo = (startNumber++).ToString(CultureInfo.InvariantCulture),
+                    LineNo = startNumber++.ToString(CultureInfo.InvariantCulture),
                     Ref1 = p.Sku.Id.ToString(CultureInfo.InvariantCulture),
                     CustomerUsageType =
                         order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
