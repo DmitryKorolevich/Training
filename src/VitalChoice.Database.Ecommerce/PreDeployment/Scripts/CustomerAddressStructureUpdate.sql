@@ -76,4 +76,11 @@ BEGIN
 	CREATE NONCLUSTERED INDEX IX_IdBigString ON [dbo].[CustomerOptionValues] ([IdBigString]) INCLUDE ([IdCustomer], [IdOptionType])
 END
 
+IF NOT EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[Customers]') AND name = N'IX_StatusCode')
+BEGIN
+	CREATE NONCLUSTERED INDEX IX_StatusCode
+	ON [dbo].[Customers] ([StatusCode])
+	INCLUDE ([Id],[IdObjectType],[DateCreated],[DateEdited],[IdEditedBy],[Email],[IdDefaultPaymentMethod],[PublicId],[IdAffiliate],[IdProfileAddress])
+END
+
 GO

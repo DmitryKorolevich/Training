@@ -120,6 +120,12 @@ END
 --		CONSTRAINT [FK_WorkflowActionDependencyToWorkflowDependentAction] FOREIGN KEY (IdDependent) REFERENCES [WorkflowExecutors] (Id)
 --END
 
+IF OBJECT_ID(N'dbo.WorkflowTreeActions') IS NOT NULL
+BEGIN
+	DROP TABLE WorkflowTreeActions
+END
+GO
+
 IF OBJECT_ID(N'dbo.WorkflowActionAggregations', N'U') IS NULL
 BEGIN
 	CREATE TABLE [dbo].[WorkflowActionAggregations]
