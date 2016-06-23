@@ -575,3 +575,298 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name]='Top Menu')
+BEGIN
+
+	INSERT INTO [dbo].[ContentAreas]
+	([Name], [Template], [StatusCode], [Created], [Updated])
+	VALUES
+	(N'Top Menu', N'<div class="top-menu-wrapper">
+    <ul class="top-menu">
+    <li><a href="#" class="drop">Shop</a>
+    
+        
+        <div class="dropdown_2columns">
+        <div class="shadowhide"></div>
+            <div class="col_1">
+                
+                <span class="ddtitle">FISH</span>
+                <ul>
+                    
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=279">Salmon</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=312">Cod</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=310">Tuna</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=309">Halibut</a></li>
+                    <li><a href="/shop/pc/viewPrd.asp?idproduct=2139">Petrale Sole</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=311">Sablefish</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=213">Smoked Fish & Lox</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=270">Salmon Burgers & Sausage</a></li>
+                </ul>
+                <span class="ddtitle">SHELLFISH</span>
+                <ul>
+                    <li><a href="/shop/pc/viewPrd.asp?idproduct=571">Wild Shrimp</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=301">Scallops</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=807">Clams, Oysters & Mussels</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=809">Lobster</a></li>
+                    <li><a href="/shop/pc/viewPrd.asp?idproduct=1452">Calamari</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=850">King Crab</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=300">See All</a></li>
+                </ul>
+                
+            </div>
+    
+            <div class="col_1">
+              
+                <span class="ddtitle">CANNED & POUCHED  SEAFOOD</span>
+                <ul>
+                    
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=851">Anchovies</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=223">Sardines</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=222">Salmon</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=224">Tuna</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=225">Canned Samplers</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=221">See All</a></li>
+                    
+                </ul>
+                
+                <span class="ddtitle">ORGANIC FOOD & SEASONINGS</span>
+                <ul>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=746">Soups & Meals</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=865">Organic Bone Broth</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=264">Chocolate</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=254">Seasonings</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=867">Seaweed & Kelp</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=275">Dried Fruit</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=234">Frozen Berries</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=274">Nuts</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=257">Oils & Vinegars</a></li>
+                    <li><a href="/shop/pc/viewPrd.asp?idproduct=1358">Garlic Flower</a></li>
+                </ul>
+                <span class="ddtitle">COOKS GIFTS & BOOKS</span>
+                <ul>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=639">Gift Certificates</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=260">Kitchen Tools</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=261">Books</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=260">See All</a></li>
+                </ul>
+            </div>
+            <div class="col_1">
+                
+                <span class="ddtitle">MEAT</span>
+                <ul>
+                    <li><a href="/shop/pc/viewcategories.asp?idcategory=878">Grass-Fed Bison</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=791">Grass Fed Beef</a></li>
+                    <li><a href="/shop/pc/viewcategories.asp?idcategory=868">Heritage Chicken</a></li>
+                    
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=865">Bone Broth</a></li>
+                    
+                    
+                </ul>
+                <span class="ddtitle">OMEGA 3''s & SUPPLEMENTS</span>
+                <ul>
+                    
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=239">Omega-3 Salmon Oil</a></li>
+                    <li><a href="/shop/pc/viewPrd.asp?idproduct=2334">DHA Prenatal Therapy</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=242">Daily Packs</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=642">Omega-3 Krill Oil</a></li>
+                    <li><a href="/shop/pc/viewPrd.asp?idproduct=1421">Vital Omega-3 & 6 Test&#8482; Kit</a></li>
+                    <li><a href="/shop/pc/viewPrd.asp?idproduct=1547">Curcumin in Wild Salmon Oil</a></li>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=238">See All</a></li>
+                    
+                </ul>
+                <span class="ddtitle">SAMPLERS & GIFT PACKS</span>
+                <ul>
+                    <li><a href="/shop/pc/viewCategories.asp?idCategory=703">Gift Packs</a></li>
+                    <li><a href="/shop/pc/viewcategories.asp?idcategory=802">Health Advisor Packs</a></li>
+                    <li><a href="/shop/pc/viewcategories.asp?idcategory=801">Samplers</a></li>
+                </ul>
+            </div>
+            <div class="col_1">
+                
+                <div class="navsaleimage"><a href="/shop/pc/viewCategories.asp?idCategory=842"><img src="/Assets/images/nav-ad-230x180-A.jpg" border="0" /></a></div>
+                
+                <span class="ddtitle"><a href="/shop/pc/viewCategories.asp?idCategory=232">VALUE PICKS</a></span>
+                <span class="ddtitle"><a href="/shop/pc/viewCategories.asp?idCategory=743">TOP SELLERS</a></span>
+                <span class="ddtitle"><a href="/shop/pc/viewcategories.asp?idcategory=880">RANDY''S PICKS</a></span>
+                <span class="ddtitle"><a href="/shop/pc/viewCategories.asp?idCategory=845">NEW PRODUCTS</a></span>
+                
+                
+                
+            </div>
+        </div>
+    </li>
+
+    <li><a href="#" class="drop">Why Vital Choice</a>
+        <div class="dropdown_2columns second">
+            <div class="shadowhide"></div>
+            <div class="col_1">
+                
+                <span class="ddtitle">WHO WE ARE :: OUR STORY</span>
+                <ul>
+                    
+                    <li><a href="/shop/pc/viewContent.asp?idpage=2">Why Vital Choice</a></li>
+                    <li><a href="/shop/pc/viewContent.asp?idpage=6">Our Mission</a></li>
+                    
+                    
+                </ul>
+                
+                
+            </div>
+    
+            <div class="col_1">
+              
+                <span class="ddtitle">WHY WE ARE DIFFERENT</span>
+                <ul>
+                    
+                    <li><a href="/shop/pc/viewContent.asp?idpage=12">Purity Promise</a></li>
+                    <li><a href="/shop/pc/viewContent.asp?idpage=7">Vital Green&#8482;</a></li>
+                    <li><a href="/shop/pc/viewContent.asp?idpage=3">Sustainability</a></li>
+                    
+                    
+                </ul>
+                
+                
+            </div>
+            <div class="col_1">
+                
+                <span class="ddtitle">WHAT WE BELIEVE</span>
+                <ul>
+                    
+                    <li><a href="/shop/pc/viewContent.asp?idpage=639">Randy''s Podcasts</a></li>
+                    <li><a href="/shop/pc/viewContent.asp?idpage=152">Giving Back</a></li>
+                    <li><a href="/shop/pc/viewContent.asp?idpage=4">Testimonials</a></li>
+               
+                    
+                </ul>
+                
+                
+            </div>
+            <div class="col_1">
+                <div class="navsaleimage2"><a href="http://www.bcorporation.net/community/vital-choice" target="_blank"><img src="/Assets/images/nav-ad-230x130-B-Corp.jpg" border="0" /></a></div>
+                
+                
+                
+            </div>
+        </div>
+    </li>
+
+    <li><a href="#" class="drop">Learn</a>
+        <div class="dropdown_2columns third">
+            <div class="shadowhide"></div>
+            <div class="col_1">
+                
+                <span class="ddtitle">RECOMMENDED READING</span>
+                <ul>
+                    
+                    <li><a href="/shop/pc/newsletter-signup.asp">Newsletter</a></li>
+                    <li><a href="/shop/pc/viewPrd.asp?idproduct=1421">Take the VitalTest</a></li>
+                    
+                    <li><a href="/shop/pc/articles.asp?cat=672">Vitamin D</a></li>
+                    <li><a href="/shop/pc/articles.asp">Newsletter Articles Archive</a></li>
+                    <li><a href="/shop/pc/faq.asp">FAQ''s</a></li>
+                    
+                </ul>
+                
+                
+            </div>
+    
+            <div class="col_1">
+              
+                <span class="ddtitle">HEALTH & NUTRITION</span>
+                <ul>
+                    <li><a href="/shop/pc/viewContent.asp?idpage=238">Omega 3 Basics</a></li>
+                    
+                    <li><a href="/shop/pc/viewContent.asp?idpage=10">Seafood Benefits</a></li>
+                    <li><a href="/shop/pc/viewContent.asp?idpage=208">Omega3/6 Balance</a></li>
+                    <li><a href="/shop/pc/viewContent.asp?idpage=14">Healthy Mom & Baby</a></li>
+                    
+                    
+                </ul>
+                
+                
+            </div>
+            <div class="col_1">
+                
+                <span class="ddtitle">ABOUT VITAL CHOICE PRODUCTS</span>
+                <ul>
+                    <li><a href="/shop/pc/viewContent.asp?idpage=713">How to: Prepare Seafood</a></li>
+                    <li><a href="/shop/pc/viewContent.asp?idpage=2#Organic">Kosher & Organic Certification</a></li>
+                    <li><a href="/shop/pc/viewContent.asp?idpage=2#Flash-Frozen">The Flash-Frozen Advantage</a></li>
+                    <li><a href="/shop/pc/viewContent.asp?idpage=2#Coastal%20Communities">Support for Coastal Communities</a></li>
+                    <li><a href="/shop/pc/viewContent.asp?idpage=2#Community%20Connections">Vital Community Connections</a></li>
+                    <li><a href="/shop/pc/viewContent.asp?idpage=12">Seafood Purity and Safety</a></li>
+                    <li><a href="/shop/pc/viewContent.asp?idpage=2#Superior%20Salmon">Superior Salmon, Naturally</a></li>
+                </ul>
+                
+                
+            </div>
+            <div class="col_1">
+                <div class="navsaleimage2"><a href="/shop/pc/viewCategories.asp?idCategory=865"><img src="/Assets/images/nav-ad-230x180-B.jpg" border="0" /></a></div>
+                
+                
+                
+            </div>
+        </div>
+    </li>
+    
+    <li><a href="#" class="drop">Cook</a>
+        <div class="dropdown_2columns fourth">
+            <div class="shadowhide"></div>
+            <div class="col_1">
+                <span class="ddtitle"><a href="/shop/pc/viewrecipes.asp?RecipeId=1490">COOKING VIDEOS</a></span>
+                <span class="ddtitle">CELEBRITY CHEF VIDEOS</span>
+                <ul>
+                    
+                    <li><a href="/shop/pc/recipes.asp?idCategory=833">Becky Selengut</a></li>
+                    <li><a href="/shop/pc/recipes.asp?idCategory=834">Myra Kornfeld</a></li>
+                    <li><a href="/shop/pc/recipes.asp?idCategory=835">Rebecca Katz</a></li>
+                    
+                </ul>
+                
+                
+            </div>
+    
+            <div class="col_1">
+              
+                <span class="ddtitle">RECIPES BY CATEGORY</span>
+                <ul>
+                    
+                    <li><a href="/shop/pc/recipes.asp?idCategory=586">Salmon</a></li>
+                    <li><a href="/shop/pc/recipes.asp?idCategory=621">Shellfish</a></li>
+                    <li><a href="/shop/pc/recipes.asp?idCategory=818">Grass Fed Beef</a></li>
+                    <li><a href="/shop/pc/recipes.asp?idCategory=870">Chicken</a></li>
+                    <li><a href="/shop/pc/in-the-kitchen.asp">See All Recipes</a></li>
+                    
+                </ul>
+                
+                
+            </div>
+            <div class="col_1">
+                
+                <span class="ddtitle">SEAFOOD HOW TO VIDEOS</span>
+                <ul>
+                    
+                    <li><a href="/shop/pc/viewrecipes.asp?RecipeId=1484">How to Broil Salmon</a></li>
+                    <li><a href="/shop/pc/viewrecipes.asp?RecipeId=1486">How to Sautee Salmon</a></li>
+                    <li><a href="/shop/pc/viewrecipes.asp?RecipeId=1479">How to Clean Spot Prawns</a></li>
+                    
+                    
+                </ul>
+                <span class="ddtitle"><a href="/shop/pc/viewContent.asp?idpage=713">HOW TO PREPARE SEAFOOD</a></span>
+                
+            </div>
+            <div class="col_1">
+                <div class="navsaleimage2"><a href="/shop/pc/viewrecipes.asp?RecipeId=1484"><img src="/Assets/images/nav-ad-230x180-C.jpg" border="0" /></a></div>
+                
+                
+                
+            </div>
+        </div>
+    </li>
+</ul>
+</div>', 2, GETDATE(), GETDATE())
+
+END
+
+GO

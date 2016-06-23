@@ -13,7 +13,8 @@ namespace VitalChoice.Infrastructure.Domain.Constants
 		    public const string UserLockedOut = "UserLockedOut";
 		    public const string IncorrectUserPassword = "IncorrectUserPassword";
 		    public const string CantFindUser = "CantFindUser";
-		    public const string CantFindLogin = "CantFindLogin";
+            public const string CantFindUserResetPassword = "CantFindUserResetPassword";
+            public const string CantFindLogin = "CantFindLogin";
 		    public const string CantSignIn = "CantSignIn";
 		    public const string UserIsDisabled = "UserIsDisabled";
             public const string EmailIsTakenAlready = "EmailTakenAlready";
@@ -70,7 +71,8 @@ namespace VitalChoice.Infrastructure.Domain.Constants
 		    {Keys.UserLockedOut, "User is locked out"},
 		    {Keys.IncorrectUserPassword, "Incorrect email or password. Trouble logging in? Please use the password reminder tool to retrieve the password associated with this email account."},
 		    {Keys.CantFindUser, "User not found"},
-		    {Keys.CantFindLogin, "Login information not found"},
+            {Keys.CantFindUserResetPassword, "The email you supplied does not match the profile email that requested this forgot password reset."},
+            {Keys.CantFindLogin, "Login information not found"},
 		    {Keys.CantSignIn, "User cannot be signed in"},
 		    {Keys.UserIsDisabled, "There seems to be an issue accessing your account. Please contact customer care at 800-608-4825 for more information. Thank you."},
             {Keys.EmailIsTakenAlready, "Email '{0}' is already in use"},

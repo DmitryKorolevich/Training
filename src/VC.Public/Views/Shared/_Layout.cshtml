@@ -29,6 +29,7 @@
 		<title>Wild Salmon | Omega-3 | Wild Seafood | Organic Foods | Vital Choice</title>
 	}
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="msvalidate.01" content="4A9D524947EE62F01A1A9607511248C4" />
     <link href="//fonts.googleapis.com/css?family=Francois+One" rel="stylesheet" type="text/css">
 	<link rel="apple-touch-icon" href="/assets/miscellaneous/apple-touch-icon.png">
 	<link rel="icon" type="img/ico" href="/assets/miscellaneous/favicon.ico">
@@ -129,7 +130,8 @@
 					<input type="image" src="/Assets/images/mag.jpg" />
 				</form>
 			</div>
-			@await Component.InvokeAsync("Menu")
+			@*@await Component.InvokeAsync("Menu")*@
+            @await Component.InvokeAsync("Area", new { name = "Top Menu" })
             @if (ViewBag.HideMenuShadow != true)
             {
                 <div class="nav-shadow"></div>
@@ -221,14 +223,20 @@
 						<div id="socialiconshome-102413">
 							<img src="/Assets/images/socialicons5-home.jpg" usemap="#Social">
 						</div>
-						<map name="Social" id="Social">
-							<area shape="rect" coords="209,0,236,25" href="https://www.youtube.com/user/VitalChoiceSeafood" alt="Youtube" target="_blank">
-							<area shape="rect" coords="165,0,192,25" href="https://instagram.com/vitalchoice" alt="Instagram" target="_blank">
-							<area shape="rect" coords="126,0,153,25" href="https://pinterest.com/vitalchoice/" alt="Pintrest" target="_blank">
-							<area shape="rect" coords="83,0,109,25" href="https://plus.google.com/109701577970251794205/posts" alt="Google+" target="_blank">
-							<area shape="rect" coords="41,0,67,25" href="https://twitter.com/vitalchoice" alt="Twitter" target="_blank">
-							<area shape="rect" coords="0,0,26,25" href="https://www.facebook.com/vitalchoice" alt="Facebook" target="_blank">
-						</map>
+					    <map name="Social" id="Social">
+					        <area shape="rect" coords="209,0,236,25" href="https://www.youtube.com/user/VitalChoiceSeafood" alt="Youtube" target="_blank">
+					        <area shape="rect" coords="165,0,192,25" href="https://instagram.com/vitalchoice" alt="Instagram" target="_blank">
+					        <area shape="rect" coords="126,0,153,25" href="https://pinterest.com/vitalchoice/" alt="Pintrest" target="_blank">
+					        <area shape="rect" coords="83,0,109,25" href="https://plus.google.com/109701577970251794205/posts" alt="Google+" target="_blank">
+					        <area shape="rect" coords="41,0,67,25" href="https://twitter.com/vitalchoice" alt="Twitter" target="_blank">
+					        <area shape="rect" coords="0,0,26,25" href="https://www.facebook.com/vitalchoice" alt="Facebook" target="_blank">
+					    </map>
+                        <div class="clear"></div>
+					    <div class="vc-www-award">
+					        <a href="/content/vital-choice-recognized">
+					            <img src="/assets/images/vc-www-award-2016.jpg">
+					        </a>
+					    </div>
 					</div>
 				</div>
 			</div>

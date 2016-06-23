@@ -392,22 +392,23 @@ namespace VC.Public.Controllers
 			var user = await _userService.FindAsync(model.Email);
 			if (user == null)
 			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserResetPassword]);
 			}
 
 			if (!user.IsConfirmed && user.Status == UserStatus.NotActive)
 				// the case when guest checkout user wants to activate himself
 			{
 				await _customerService.ActivateGuestAsync(model.Email, model.Token, model.Password);
-			}
+            }
 			else
 			{
 				await _userService.ResetPasswordAsync(model.Email, model.Token, model.Password);
-			}
+            }
 
-			await _userService.SignInAsync(await _userService.FindAsync(model.Email));
+            await _userService.SignInAsync(await _userService.FindAsync(model.Email));
 
-			return await Login(new LoginModel() { Email = model.Email, Password = model.Password }, string.Empty);
+
+            return await Login(new LoginModel() { Email = model.Email, Password = model.Password }, string.Empty);
 		}
 
         [HttpGet]
@@ -435,14 +436,15 @@ namespace VC.Public.Controllers
 	        try
 	        {
 		        await _userService.SendForgotPasswordAsync(user.PublicId);
-	        }
+                await _userService.SignOutAsync(user);
+            }
 			catch (AppValidationException e)
 			{
 				ModelState.AddModelError(string.Empty, e.Messages.First().Message);
 				return View(model);
 			}
 
-	        if (!string.IsNullOrWhiteSpace(returnUrl))
+            if (!string.IsNullOrWhiteSpace(returnUrl))
 			{
 				return Redirect(returnUrl);
 			}
