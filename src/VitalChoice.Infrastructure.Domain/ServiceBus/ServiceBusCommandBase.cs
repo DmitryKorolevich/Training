@@ -53,7 +53,7 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
         public Action<ServiceBusCommandBase, object> RequestAcqureAction { get; set; }
         public CommandCompleteEventHandler OnComplete;
 
-        protected void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
