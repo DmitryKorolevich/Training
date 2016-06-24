@@ -61,31 +61,32 @@ namespace VitalChoice.Business.Services
             var keyExchangeProvider = await GetKeyExchangeProvider();
             if (keyExchangeProvider == null)
                 return false;
+            var keys = EncryptionHost.CreateSession(sessionId);
+            if (keys == null)
+            {
+
+                if (
+                    await
+                        ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId,
+                            ServiceBusCommandConstants.CheckSessionKey,
+                            ServerHostName, LocalHostName)))
+                    return true;
+                EncryptionHost.RemoveSession(sessionId);
+                keys = EncryptionHost.CreateSession(sessionId);
+            }
+            if (
+                await
+                    ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.SetSessionKey,
+                        ServerHostName, LocalHostName)
+                    {
+                        Data = EncryptionHost.RsaEncrypt(keys.ToCombined(), keyExchangeProvider)
+                    }))
+            {
+                return EncryptionHost.RegisterSession(sessionId, keys);
+            }
             await _publicKeyLock.WaitAsync();
             try
             {
-                var keys = EncryptionHost.CreateSession(sessionId);
-                if (keys == null)
-                {
-                    if (
-                        await
-                            ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.CheckSessionKey,
-                                ServerHostName, LocalHostName)))
-                        return true;
-                    EncryptionHost.RemoveSession(sessionId);
-                    keys = EncryptionHost.CreateSession(sessionId);
-                }
-                if (
-                    await
-                        ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.SetSessionKey,
-                            ServerHostName, LocalHostName)
-                        {
-                            Data = EncryptionHost.RsaEncrypt(keys.ToCombined(), keyExchangeProvider)
-                        }))
-                {
-                    return EncryptionHost.RegisterSession(sessionId, keys);
-                }
-
                 _keyExchangeProvider = new RSACryptoServiceProvider();
             }
             finally
