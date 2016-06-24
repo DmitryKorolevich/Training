@@ -13,10 +13,15 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Discounts
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext dataContext, ITreeContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, ITreeContext executionContext)
         {
-            dataContext.DiscountMessage = dataContext.Order.Discount.GetDiscountMessage();
-            return Task.FromResult<decimal>(-Math.Min(dataContext.Data.RefundDiscountableSubtotal, dataContext.Order.Discount.Data.Amount));
+            context.DiscountMessage = context.RefundOrder.Discount.GetDiscountMessage();
+
+            decimal totalDiscount = Math.Min(context.Data.RefundDiscountableSubtotal, context.RefundOrder.Discount.Data.Amount);
+
+            context.SplitInfo.PerishableDiscount = Math.Min(context.SplitInfo.DiscountablePerishable, context.RefundOrder.Discount.Data.Amount);
+            context.SplitInfo.NonPerishableDiscount = totalDiscount - context.SplitInfo.PerishableDiscount;
+            return Task.FromResult(-totalDiscount);
         }
     }
 }

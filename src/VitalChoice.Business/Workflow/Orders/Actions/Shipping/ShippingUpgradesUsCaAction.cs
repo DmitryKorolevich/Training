@@ -21,25 +21,25 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
         {
             var upgradeP = (ShippingUpgradeOption?) context.Order.SafeData.ShippingUpgradeP;
             var upgradeNp = (ShippingUpgradeOption?) context.Order.SafeData.ShippingUpgradeNP;
-            switch (context.ProductSplitInfo.ProductTypes)
+            switch (context.SplitInfo.ProductTypes)
             {
                 case POrderType.PNP:
                 {
                     decimal upgradePerishableO;
-                    if (context.ProductSplitInfo.PerishableAmount > 165)
-                        upgradePerishableO = Math.Round(context.ProductSplitInfo.PerishableAmount*(decimal) 0.15, 2);
+                    if (context.SplitInfo.PerishableAmount > 165)
+                        upgradePerishableO = Math.Round(context.SplitInfo.PerishableAmount*(decimal) 0.15, 2);
                     else
                         upgradePerishableO = 25;
 
                     decimal upgradeNonPerishable2D;
-                    if (context.ProductSplitInfo.NonPerishableAmount > 100)
-                        upgradeNonPerishable2D = Math.Round(context.ProductSplitInfo.NonPerishableAmount*(decimal) 0.1, 2);
+                    if (context.SplitInfo.NonPerishableAmount > 100)
+                        upgradeNonPerishable2D = Math.Round(context.SplitInfo.NonPerishableAmount*(decimal) 0.1, 2);
                     else
                         upgradeNonPerishable2D = (decimal) 9.95;
 
                     decimal upgradeNonPerishableO;
-                    if (context.ProductSplitInfo.NonPerishableAmount > 165)
-                        upgradeNonPerishableO = Math.Round(context.ProductSplitInfo.NonPerishableAmount*(decimal) 0.15, 2);
+                    if (context.SplitInfo.NonPerishableAmount > 165)
+                        upgradeNonPerishableO = Math.Round(context.SplitInfo.NonPerishableAmount*(decimal) 0.15, 2);
                     else
                         upgradeNonPerishableO = 25;
                     context.ShippingUpgradePOptions = new List<LookupItem<ShippingUpgradeOption>>
@@ -84,8 +84,8 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
                 case POrderType.P:
                 {
                     decimal upgradePerishableO;
-                    if (context.ProductSplitInfo.PNpAmount > 165)
-                        upgradePerishableO = Math.Round(context.ProductSplitInfo.PNpAmount*(decimal) 0.15, 2);
+                    if (context.SplitInfo.PNpAmount > 165)
+                        upgradePerishableO = Math.Round(context.SplitInfo.PNpAmount*(decimal) 0.15, 2);
                     else
                         upgradePerishableO = 25;
 
@@ -107,14 +107,14 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
                 case POrderType.NP:
                 {
                     decimal upgradeNonPerishable2D;
-                    if (context.ProductSplitInfo.NonPerishableAmount > 100)
-                        upgradeNonPerishable2D = Math.Round(context.ProductSplitInfo.NonPerishableAmount*(decimal) 0.1, 2);
+                    if (context.SplitInfo.NonPerishableAmount > 100)
+                        upgradeNonPerishable2D = Math.Round(context.SplitInfo.NonPerishableAmount*(decimal) 0.1, 2);
                     else
                         upgradeNonPerishable2D = (decimal) 9.95;
 
                     decimal upgradeNonPerishableO;
-                    if (context.ProductSplitInfo.NonPerishableAmount > 165)
-                        upgradeNonPerishableO = Math.Round(context.ProductSplitInfo.NonPerishableAmount*(decimal) 0.15, 2);
+                    if (context.SplitInfo.NonPerishableAmount > 165)
+                        upgradeNonPerishableO = Math.Round(context.SplitInfo.NonPerishableAmount*(decimal) 0.15, 2);
                     else
                         upgradeNonPerishableO = 25;
                     context.ShippingUpgradeNpOptions = new List<LookupItem<ShippingUpgradeOption>>

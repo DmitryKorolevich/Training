@@ -786,7 +786,7 @@ namespace VitalChoice.Business.Services.Orders
             var combinedStatus = model.CombinedStatus;
             if (combinedStatus == OrderStatus.Incomplete)
             {
-                if (model.ProductSplitInfo?.ShouldSplit ?? false)
+                if (model.SplitInfo?.ShouldSplit ?? false)
                 {
                     dynamic.OrderStatus = null;
                     dynamic.POrderStatus = combinedStatus;
@@ -800,7 +800,7 @@ namespace VitalChoice.Business.Services.Orders
                 }
                 return;
             }
-            if (model.ProductSplitInfo?.ShouldSplit ?? false)
+            if (model.SplitInfo?.ShouldSplit ?? false)
             {
                 dynamic.OrderStatus = null;
                 if (combinedStatus == OrderStatus.OnHold)

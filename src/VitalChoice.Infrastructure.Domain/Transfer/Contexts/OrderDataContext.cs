@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -12,61 +13,21 @@ using VitalChoice.Workflow.Base;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 {
-    public class SplitInfo
+    public abstract class BaseOrderContext<T> : ComputableDataContext
+        where T : ItemOrdered
     {
-        public decimal PerishableShippingOveridden { get; set; }
+        public abstract SplitInfoBase<T> BaseSplitInfo { get; }
 
-        public decimal NonPerishableShippingOverriden { get; set; }
+        public abstract IEnumerable<T> ItemsOrdered { get; }
 
-        public decimal PerishableSurchargeOverriden { get; set; }
+        public virtual OrderDynamic Order { get; set; }
 
-        public decimal NonPerishableSurchargeOverriden { get; set; }
+        public virtual decimal DiscountTotal { get; set; }
 
-        public decimal PerishableTax { get; set; }
-
-        public decimal NonPerishableTax { get; set; }
-
-        public decimal PerishableDiscount { get; set; }
-
-        public decimal NonPerishableDiscount { get; set; }
-
-        public decimal PerishableGiftCertificateAmount { get; set; }
-
-        public decimal NonPerishableGiftCertificateAmount { get; set; }
+        public virtual decimal ShippingTotal { get; set; }
     }
 
-    public class ProductSplitInfo
-    {
-        public decimal DiscountablePerishable { get; set; }
-
-        public decimal DiscountableNonPerishable { get; set; }
-
-        public int PerishableCount { get; set; }
-
-        public decimal PerishableAmount { get; set; }
-
-        public int NonPerishableCount { get; set; }
-
-        public decimal NonPerishableAmount { get; set; }
-
-        public int NonPerishableOrphanCount { get; set; }
-
-        public int NonPerishableNonOrphanCount => NonPerishableCount - NonPerishableOrphanCount;
-
-        public decimal PNpAmount => PerishableAmount + NonPerishableAmount;
-
-        public decimal OtherProductsAmount { get; set; }
-
-        public bool SpecialSkuAdded { get; set; }
-
-        public bool ThresholdReached { get; set; }
-
-        public bool ShouldSplit { get; set; }
-
-        public POrderType ProductTypes { get; set; }
-    }
-
-    public class OrderDataContext : ComputableDataContext
+    public class OrderDataContext : BaseOrderContext<SkuOrdered>
     {
         public OrderStatus CombinedStatus { get; }
         public List<PromotionDynamic> Promotions { get; set; }
@@ -78,11 +39,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
             PromoSkus = new List<PromoOrdered>();
             SkuOrdereds = new List<SkuOrdered>();
             GcMessageInfos = new List<MessageInfo>();
-            ProductSplitInfo = new ProductSplitInfo();
-            SplitInfo = new SplitInfo();
+            SplitInfo = new SplitInfo<SkuOrdered>(() => SkuOrdereds.Union(PromoSkus));
         }
-
-        public OrderDynamic Order { get; set; }
 
         public decimal AlaskaHawaiiSurcharge { get; set; }
 
@@ -98,13 +56,9 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 
         public ICollection<MessageInfo> GcMessageInfos { get; set; }
 
-        public decimal ShippingTotal { get; set; }
-
         public decimal TotalShipping { get; set; }
 
         public decimal ProductsSubtotal { get; set; }
-
-        public decimal DiscountTotal { get; set; }
 
         public decimal DiscountedSubtotal { get; set; }
 
@@ -130,8 +84,10 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 
         public ICollection<MessageInfo> Messages { get; set; }
 
-        public ProductSplitInfo ProductSplitInfo { get; set; }
+        public SplitInfo<SkuOrdered> SplitInfo { get; set; }
 
-        public SplitInfo SplitInfo { get; set; }
+        public override IEnumerable<SkuOrdered> ItemsOrdered => SkuOrdereds.Union(PromoSkus);
+
+        public override SplitInfoBase<SkuOrdered> BaseSplitInfo => SplitInfo;
     }
 }

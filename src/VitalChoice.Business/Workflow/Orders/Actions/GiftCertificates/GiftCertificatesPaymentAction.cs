@@ -23,6 +23,8 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
                 return TaskCache<decimal>.DefaultCompletedTask;
             }
             decimal orderSubTotal = context.Data.PayableTotal;
+            decimal perishableSubtotal = context.SplitInfo.PerishableSubtotal;
+            decimal nonPerishableSubtotal = context.SplitInfo.NonPerishableSubtotal;
             // ReSharper disable once PossibleNullReferenceException
             foreach (var gc in context.Order.GiftCertificates)
             {
@@ -55,8 +57,18 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
                     Field = gc.GiftCertificate.Code,
                     MessageLevel = MessageLevel.Info
                 });
+
+                var perishableCharge = Math.Min(perishableSubtotal, totalGcAmount);
+                perishableSubtotal -= perishableCharge;
+                if (perishableSubtotal == 0)
+                {
+                    var nonPerishableCharge = Math.Min(nonPerishableSubtotal, totalGcAmount - perishableCharge);
+                    nonPerishableSubtotal -= nonPerishableCharge;
+                }
             }
             context.GiftCertificatesSubtotal = orderSubTotal - (decimal) context.Data.PayableTotal;
+            context.SplitInfo.PerishableGiftCertificateAmount = perishableSubtotal - context.SplitInfo.PerishableSubtotal;
+            context.SplitInfo.NonPerishableSurchargeOverriden = nonPerishableSubtotal - context.SplitInfo.NonPerishableSubtotal;
             return Task.FromResult(context.GiftCertificatesSubtotal);
         }
     }

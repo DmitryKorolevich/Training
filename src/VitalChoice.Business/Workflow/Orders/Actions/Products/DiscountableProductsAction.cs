@@ -165,11 +165,11 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
             }
             var discountableProducts = skus.Where(s => !((bool?) s.Sku.SafeData.NonDiscountable ?? false)).ToArray();
 
-            dataContext.ProductSplitInfo.DiscountablePerishable =
+            dataContext.SplitInfo.DiscountablePerishable =
                 discountableProducts.Where(p => p.Sku.IdObjectType == (int) ProductType.Perishable).Sum(p => p.Amount*p.Quantity);
 
-            dataContext.ProductSplitInfo.DiscountableNonPerishable =
-                discountableProducts.Where(p => p.Sku.IdObjectType != (int) ProductType.Perishable).Sum(p => p.Amount*p.Quantity);
+            dataContext.SplitInfo.DiscountableNonPerishable =
+                discountableProducts.Where(p => p.Sku.IdObjectType == (int) ProductType.NonPerishable).Sum(p => p.Amount*p.Quantity);
 
             return Task.FromResult(discountableProducts.Sum(s => s.Amount*s.Quantity));
         }

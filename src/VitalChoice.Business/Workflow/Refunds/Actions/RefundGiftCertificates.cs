@@ -18,9 +18,9 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
 
         public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, ITreeContext executionContext)
         {
-            decimal total = Math.Min((decimal) context.Order.Data.RefundGCsUsedOnOrder, context.AutoTotal);
+            decimal total = Math.Min((decimal) context.RefundOrder.Data.RefundGCsUsedOnOrder, context.AutoTotal);
             decimal maxRefunded = 0;
-            foreach (var gc in context.Order.RefundOrderToGiftCertificates)
+            foreach (var gc in context.RefundOrder.RefundOrderToGiftCertificates)
             {
                 var possibleToRefund = gc.AmountUsedOnSourceOrder - gc.AmountRefunded;
                 if (possibleToRefund < 0)
@@ -33,7 +33,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
                 maxRefunded += toRefundNew;
             }
             context.RefundGCsUsedOnOrder = maxRefunded;
-            context.RefundOrderToGiftCertificates = context.Order.RefundOrderToGiftCertificates;
+            context.RefundOrderToGiftCertificates = context.RefundOrder.RefundOrderToGiftCertificates;
             return Task.FromResult(-maxRefunded);
         }
     }

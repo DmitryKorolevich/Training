@@ -40,7 +40,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
 
         private static void AddSplitShipping(OrderDataContext context)
         {
-            if (context.ProductSplitInfo.PerishableAmount > 0)
+            if (context.SplitInfo.PerishableAmount > 0)
             {
                 context.SplitInfo.PerishableShippingOveridden += context.StandardShippingCharges;
             }

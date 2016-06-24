@@ -21,12 +21,12 @@ namespace VitalChoice.Business.Workflow.Refunds.ActionResolvers
         public override Task<int> GetActionKeyAsync(OrderRefundDataContext dataContext, ITreeContext executionContext)
         {
             //Reset discount tier setting
-            if (dataContext.Order.DictionaryData.ContainsKey("IdDiscountTier"))
-                dataContext.Order.DictionaryData.Remove("IdDiscountTier");
+            if (dataContext.RefundOrder.DictionaryData.ContainsKey("IdDiscountTier"))
+                dataContext.RefundOrder.DictionaryData.Remove("IdDiscountTier");
 
-            if (dataContext.Order.Discount == null)
+            if (dataContext.RefundOrder.Discount == null)
                 return TaskCache<int>.DefaultCompletedTask;
-            return Task.FromResult(dataContext.Order.Discount.IdObjectType);
+            return Task.FromResult(dataContext.RefundOrder.Discount.IdObjectType);
         }
     }
 }

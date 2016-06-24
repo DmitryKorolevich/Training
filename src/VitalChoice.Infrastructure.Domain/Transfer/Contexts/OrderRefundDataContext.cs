@@ -1,33 +1,25 @@
 ﻿using System.Collections.Generic;
-using VitalChoice.Ecommerce.Domain.Entities.Addresses;
-using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Exceptions;
-using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
-using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
-using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
-using VitalChoice.Workflow.Base;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 {
-    public class OrderRefundDataContext : ComputableDataContext
+    public class OrderRefundDataContext : BaseOrderContext<RefundSkuOrdered>
     {
         public OrderRefundDataContext()
         {
             Messages = new List<MessageInfo>();
+            SplitInfo = new SplitInfoBase<RefundSkuOrdered>(() => RefundSkus);
         }
 
-        public OrderRefundDynamic Order { get; set; }
+        public OrderRefundDynamic RefundOrder { get; set; }
 
-        public decimal ShippingTotal { get; set; }
+        public override OrderDynamic Order => RefundOrder.OriginalOrder;
 
         public decimal TotalShipping { get; set; }
 
         public decimal ProductsSubtotal { get; set; }
-
-        public decimal DiscountTotal { get; set; }
 
         public decimal DiscountedSubtotal { get; set; }
 
@@ -52,5 +44,11 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
         public ICollection<RefundOrderToGiftCertificateUsed> RefundOrderToGiftCertificates { get; set; }
 
         public ICollection<MessageInfo> Messages { get; set; }
+
+        public SplitInfoBase<RefundSkuOrdered> SplitInfo { get; set; }
+
+        public override IEnumerable<RefundSkuOrdered> ItemsOrdered => RefundSkus;
+
+        public override SplitInfoBase<RefundSkuOrdered> BaseSplitInfo => SplitInfo;
     }
 }

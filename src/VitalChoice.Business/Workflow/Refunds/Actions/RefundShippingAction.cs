@@ -17,11 +17,12 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
 
         public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, ITreeContext executionContext)
         {
-            context.ShippingRefunded = context.Order.Data.ShippingRefunded;
-            context.ManualShippingTotal = context.Order.Data.ManualShippingTotal;
+            context.ShippingRefunded = context.RefundOrder.Data.ShippingRefunded;
+            context.ManualShippingTotal = context.RefundOrder.Data.ManualShippingTotal;
             if (context.ShippingRefunded)
             {
                 context.ShippingTotal = context.ManualShippingTotal;
+                context.SplitInfo.PerishableShippingOveridden = context.ManualShippingTotal;
                 return Task.FromResult(context.ManualShippingTotal);
             }
             return TaskCache<decimal>.DefaultCompletedTask;

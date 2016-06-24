@@ -68,9 +68,9 @@ namespace VitalChoice.Business.Services.Avatax
 
         public async Task<bool> CommitTax(string orderCode, int? idState, TaxGetType taxGetType = TaxGetType.UseBoth)
         {
-            if (!idState.HasValue || 
+            if (!idState.HasValue ||
                 (!_countryNameCode.IsState(idState.Value, "us", "va") &&
-                !_countryNameCode.IsState(idState.Value, "us", "wa")))
+                 !_countryNameCode.IsState(idState.Value, "us", "wa")))
                 return true;
 
             if (_turnOffCommit)
@@ -93,7 +93,8 @@ namespace VitalChoice.Business.Services.Avatax
             return postTaxResult.ResultCode == SeverityLevel.Success;
         }
 
-        public async Task<decimal> GetTax(OrderDataContext context, TaxGetType taxGetType = TaxGetType.UseBoth)
+        public async Task<decimal> GetTax<T>(BaseOrderContext<T> context, TaxGetType taxGetType = TaxGetType.UseBoth)
+            where T: ItemOrdered
         {
             if (!_countryNameCode.IsState(context.Order.ShippingAddress, "us", "va") &&
                 !_countryNameCode.IsState(context.Order.ShippingAddress, "us", "wa"))
@@ -107,15 +108,15 @@ namespace VitalChoice.Business.Services.Avatax
 
             decimal discountAmount;
 
-            if (context.ProductSplitInfo.ShouldSplit)
+            if (context.BaseSplitInfo.ShouldSplit)
             {
                 discountAmount = taxGetType.HasFlag(TaxGetType.Perishable)
-                    ? context.SplitInfo.PerishableDiscount
-                    : context.SplitInfo.NonPerishableDiscount;
+                    ? context.BaseSplitInfo.PerishableDiscount
+                    : context.BaseSplitInfo.NonPerishableDiscount;
             }
             else
             {
-                discountAmount = -(decimal?) context.SafeData.Discount ?? 0;
+                discountAmount = context.DiscountTotal;
             }
 
             //discountAmount amount should be >= 0 here
@@ -138,37 +139,50 @@ namespace VitalChoice.Business.Services.Avatax
             return 0;
         }
 
-        public async Task<decimal> GetTax(OrderRefundDataContext context, TaxGetType taxGetType = TaxGetType.UseBoth)
-        {
-            if (!_countryNameCode.IsState(context.Order.ShippingAddress, "us", "va") &&
-                !_countryNameCode.IsState(context.Order.ShippingAddress, "us", "wa"))
-                return 0;
+        //public async Task<decimal> GetTax(OrderRefundDataContext context, TaxGetType taxGetType = TaxGetType.UseBoth)
+        //{
+        //    if (!_countryNameCode.IsState(context.Order.ShippingAddress, "us", "va") &&
+        //        !_countryNameCode.IsState(context.Order.ShippingAddress, "us", "wa"))
+        //        return 0;
 
-            taxGetType = CommitProtect(taxGetType);
+        //    taxGetType = CommitProtect(taxGetType);
 
-            Address origin;
-            Address destination;
-            FillAddresses(context.Order.ShippingAddress, out origin, out destination);
+        //    Address origin;
+        //    Address destination;
+        //    FillAddresses(context.Order.ShippingAddress, out origin, out destination);
 
-            var request = FillGetTaxBaseRequest(context.Order.Customer, context.Order.Id, -(decimal?)context.SafeData.Discount ?? 0, taxGetType,
-                destination, origin);
+        //    decimal discountAmount;
 
-            var products = ToTaxLines(context, taxGetType, 1);
-            var lines = UnionTaxShipping(products, context).ToArray();
-            if (!(lines.Length > 1))
-                return 0;
-            request.Lines = lines;
+        //    if (context.SplitInfo.ShouldSplit)
+        //    {
+        //        discountAmount = taxGetType.HasFlag(TaxGetType.Perishable)
+        //            ? context.SplitInfo.PerishableDiscount
+        //            : context.SplitInfo.NonPerishableDiscount;
+        //    }
+        //    else
+        //    {
+        //        discountAmount = context.DiscountTotal;
+        //    }
 
-            var result = await _taxService.GetTax(request);
+        //    var request = FillGetTaxBaseRequest(context.Order.Customer, context.Order.Id, -discountAmount, taxGetType,
+        //        destination, origin);
 
-            if (result.ResultCode == SeverityLevel.Success)
-            {
-                return result.TotalTax;
-            }
-            _logger.LogWarning(string.Join("\n",
-                result.Messages.Select(m => $"[{m.Source}] {m.Summary}\r\n{result.DocCode}")));
-            return 0;
-        }
+        //    var products = ToTaxLines(context, taxGetType, 1);
+        //    var lines = UnionTaxShipping(products, context, taxGetType).ToArray();
+        //    if (!(lines.Length > 1))
+        //        return 0;
+        //    request.Lines = lines;
+
+        //    var result = await _taxService.GetTax(request);
+
+        //    if (result.ResultCode == SeverityLevel.Success)
+        //    {
+        //        return result.TotalTax;
+        //    }
+        //    _logger.LogWarning(string.Join("\n",
+        //        result.Messages.Select(m => $"[{m.Source}] {m.Summary}\r\n{result.DocCode}")));
+        //    return 0;
+        //}
 
         private GetTaxRequest FillGetTaxBaseRequest(CustomerDynamic customer, int idOrder, decimal discountTotal, TaxGetType taxGetType,
             Address destinationAddress, Address originAddress)
@@ -182,7 +196,7 @@ namespace VitalChoice.Business.Services.Avatax
                 CompanyCode = _companyCode,
                 CustomerUsageType =
                     customer.IdObjectType == (int) CustomerType.Wholesale &&
-                    customer.SafeData.TaxExempt == 1//Yes, Current Certificate
+                    customer.SafeData.TaxExempt == 1 //Yes, Current Certificate
                         ? "G"
                         : null,
                 DocCode =
@@ -236,18 +250,19 @@ namespace VitalChoice.Business.Services.Avatax
             return taxGetType;
         }
 
-        private static IEnumerable<Line> UnionTaxShipping(IEnumerable<Line> lines, OrderDataContext order, TaxGetType taxGetType)
+        private static IEnumerable<Line> UnionTaxShipping<T>(IEnumerable<Line> lines, BaseOrderContext<T> order, TaxGetType taxGetType)
+            where T:ItemOrdered
         {
             decimal shippingTotal;
-            if (order.ProductSplitInfo.ShouldSplit)
+            if (order.BaseSplitInfo.ShouldSplit)
             {
                 if (taxGetType.HasFlag(TaxGetType.Perishable))
                 {
-                    shippingTotal = order.SplitInfo.PerishableShippingOveridden + order.SplitInfo.PerishableSurchargeOverriden;
+                    shippingTotal = order.BaseSplitInfo.PerishableShippingOveridden + order.BaseSplitInfo.PerishableSurchargeOverriden;
                 }
                 else
                 {
-                    shippingTotal = order.SplitInfo.NonPerishableShippingOverriden + order.SplitInfo.NonPerishableSurchargeOverriden;
+                    shippingTotal = order.BaseSplitInfo.NonPerishableShippingOverriden + order.BaseSplitInfo.NonPerishableSurchargeOverriden;
                 }
             }
             else
@@ -274,43 +289,65 @@ namespace VitalChoice.Business.Services.Avatax
                 }, 1));
         }
 
-        private static IEnumerable<Line> UnionTaxShipping(IEnumerable<Line> lines, OrderRefundDataContext order)
-        {
-            return lines.Union(new List<Line>
-            {
-                new Line
-                {
-                    Amount = order.ShippingTotal,
-                    Description = "Shipping Amount",
-                    DestinationCode = "02",
-                    OriginCode = "01",
-                    TaxCode = ShippingTaxCode,
-                    Qty = 1,
-                    ItemCode = "SHIPPING",
-                    LineNo = "01-SHIP",
-                    CustomerUsageType =
-                        order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
-                        order.Order.Customer.SafeData.TaxExempt == 1//Yes, Current Certificate
-                            ? "G"
-                            : null
-                }
-            });
-        }
+        //private static IEnumerable<Line> UnionTaxShipping(IEnumerable<Line> lines, OrderRefundDataContext order, TaxGetType taxGetType)
+        //{
+        //    decimal shippingTotal;
+        //    if (order.SplitInfo.ShouldSplit)
+        //    {
+        //        if (taxGetType.HasFlag(TaxGetType.Perishable))
+        //        {
+        //            shippingTotal = order.SplitInfo.PerishableShippingOveridden + order.SplitInfo.PerishableSurchargeOverriden;
+        //        }
+        //        else
+        //        {
+        //            shippingTotal = order.SplitInfo.NonPerishableShippingOverriden + order.SplitInfo.NonPerishableSurchargeOverriden;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        shippingTotal = order.ShippingTotal;
+        //    }
 
-        private static IEnumerable<Line> ToTaxLines(OrderDataContext order, TaxGetType taxGetType, int startNumber)
+        //    return lines.Union(new List<Line>
+        //    {
+        //        new Line
+        //        {
+        //            Amount = shippingTotal,
+        //            Description = "Shipping Amount",
+        //            DestinationCode = "02",
+        //            OriginCode = "01",
+        //            TaxCode = ShippingTaxCode,
+        //            Qty = 1,
+        //            ItemCode = "SHIPPING",
+        //            LineNo = "01-SHIP",
+        //            CustomerUsageType =
+        //                order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
+        //                order.Order.Customer.SafeData.TaxExempt == 1 //Yes, Current Certificate
+        //                    ? "G"
+        //                    : null
+        //        }
+        //    });
+        //}
+
+        private static IEnumerable<Line> ToTaxLines<T>(BaseOrderContext<T> order, TaxGetType taxGetType, int startNumber)
+            where T:ItemOrdered
         {
-            IEnumerable<SkuOrdered> items = Enumerable.Empty<SkuOrdered>();
-            if (taxGetType.HasFlag(TaxGetType.Perishable))
+            IEnumerable<ItemOrdered> items = Enumerable.Empty<ItemOrdered>();
+            if (taxGetType.HasFlag(TaxGetType.UseBoth))
             {
-                items =
-                    items.Union(order.SkuOrdereds.Union(order.PromoSkus.Where(p => p.Enabled))
-                        .Where(s => s.Sku.IdObjectType == (int) ProductType.Perishable));
+                items = order.ItemsOrdered;
             }
-            if (taxGetType.HasFlag(TaxGetType.NonPerishable))
+            else
             {
-                items =
-                    items.Union(order.SkuOrdereds.Union(order.PromoSkus.Where(p => p.Enabled))
-                        .Where(s => s.Sku.IdObjectType == (int) ProductType.NonPerishable));
+                if (taxGetType.HasFlag(TaxGetType.Perishable))
+                {
+                    items = order.BaseSplitInfo.GetPerishablePartProducts();
+                }
+                if (taxGetType.HasFlag(TaxGetType.NonPerishable))
+                {
+                    items =
+                        items.Union(order.BaseSplitInfo.GetNonPerishablePartProducts());
+                }
             }
             return items.Select(
                 p => new Line
@@ -319,7 +356,7 @@ namespace VitalChoice.Business.Services.Avatax
                     Description = p.Sku.Product.Name,
                     DestinationCode = "02",
                     OriginCode = "01",
-                    Discounted = (-(decimal?)order.SafeData.Discount ?? 0) > 0,
+                    Discounted = (-(decimal?) order.SafeData.Discount ?? 0) > 0,
                     TaxCode = p.Sku.Product.SafeData.TaxCode,
                     Qty = p.Quantity,
                     ItemCode = p.Sku.Code,
@@ -333,36 +370,44 @@ namespace VitalChoice.Business.Services.Avatax
                 });
         }
 
-        private static IEnumerable<Line> ToTaxLines(OrderRefundDataContext order, TaxGetType taxGetType, int startNumber)
-        {
-            IEnumerable<RefundSkuOrdered> items = Enumerable.Empty<RefundSkuOrdered>();
-            if (taxGetType.HasFlag(TaxGetType.Perishable))
-            {
-                items = items.Union(order.RefundSkus.Where(s => s.Sku.IdObjectType == (int) ProductType.Perishable));
-            }
-            if (taxGetType.HasFlag(TaxGetType.NonPerishable))
-            {
-                items = items.Union(order.RefundSkus.Where(s => s.Sku.IdObjectType == (int) ProductType.NonPerishable));
-            }
-            return items.Select(
-                p => new Line
-                {
-                    Amount = p.RefundValue*(decimal) p.RefundPercent/100,
-                    Description = p.Sku.Product.Name,
-                    DestinationCode = "02",
-                    OriginCode = "01",
-                    Discounted = (-(decimal?)order.SafeData.Discount ?? 0) > 0,
-                    TaxCode = p.Sku.Product.SafeData.TaxCode,
-                    Qty = p.Quantity,
-                    ItemCode = p.Sku.Code,
-                    LineNo = startNumber++.ToString(CultureInfo.InvariantCulture),
-                    Ref1 = p.Sku.Id.ToString(CultureInfo.InvariantCulture),
-                    CustomerUsageType =
-                        order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
-                        order.Order.Customer.SafeData.TaxExempt == 1 //Yes, Current Certificate
-                            ? "G"
-                            : null
-                });
-        }
+        //private static IEnumerable<Line> ToTaxLines(OrderRefundDataContext order, TaxGetType taxGetType, int startNumber)
+        //{
+        //    IEnumerable<RefundSkuOrdered> items = Enumerable.Empty<RefundSkuOrdered>();
+        //    if (taxGetType.HasFlag(TaxGetType.UseBoth))
+        //    {
+        //        items = order.RefundSkus;
+        //    }
+        //    else
+        //    {
+        //        if (taxGetType.HasFlag(TaxGetType.Perishable))
+        //        {
+        //            items = order.SplitInfo.GetPerishablePartProducts();
+        //        }
+        //        if (taxGetType.HasFlag(TaxGetType.NonPerishable))
+        //        {
+        //            items =
+        //                items.Union(order.SplitInfo.GetNonPerishablePartProducts());
+        //        }
+        //    }
+        //    return items.Select(
+        //        p => new Line
+        //        {
+        //            Amount = p.RefundValue*(decimal) p.RefundPercent/100,
+        //            Description = p.Sku.Product.Name,
+        //            DestinationCode = "02",
+        //            OriginCode = "01",
+        //            Discounted = (-(decimal?) order.SafeData.Discount ?? 0) > 0,
+        //            TaxCode = p.Sku.Product.SafeData.TaxCode,
+        //            Qty = p.Quantity,
+        //            ItemCode = p.Sku.Code,
+        //            LineNo = startNumber++.ToString(CultureInfo.InvariantCulture),
+        //            Ref1 = p.Sku.Id.ToString(CultureInfo.InvariantCulture),
+        //            CustomerUsageType =
+        //                order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
+        //                order.Order.Customer.SafeData.TaxExempt == 1 //Yes, Current Certificate
+        //                    ? "G"
+        //                    : null
+        //        });
+        //}
     }
 }

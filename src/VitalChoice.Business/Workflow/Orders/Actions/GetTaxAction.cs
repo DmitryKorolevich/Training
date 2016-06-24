@@ -17,7 +17,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
         public override async Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
             var taxService = executionContext.Resolve<IAvalaraTax>();
-            if (context.ProductSplitInfo.ShouldSplit)
+            if (context.SplitInfo.ShouldSplit)
             {
                 context.SplitInfo.PerishableTax = await taxService.GetTax(context, TaxGetType.Perishable);
                 context.SplitInfo.NonPerishableTax = await taxService.GetTax(context, TaxGetType.NonPerishable);

@@ -17,11 +17,11 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
             context.FreeShipping = true;
 
             var discountPercent =
-                (decimal?) context.Order.Skus.FirstOrDefault(s => (bool?) s.Sku.SafeData.AutoShipProduct ?? false)?.Sku.Data.OffPercent ??
+                (decimal?) context.SkuOrdereds.FirstOrDefault(s => (bool?) s.Sku.SafeData.AutoShipProduct ?? false)?.Sku.Data.OffPercent ??
                 0;
 
-            context.SplitInfo.PerishableDiscount = discountPercent*context.ProductSplitInfo.DiscountablePerishable / 100;
-            context.SplitInfo.NonPerishableDiscount = discountPercent*context.ProductSplitInfo.DiscountableNonPerishable / 100;
+            context.SplitInfo.PerishableDiscount = discountPercent*context.SplitInfo.DiscountablePerishable / 100;
+            context.SplitInfo.NonPerishableDiscount = discountPercent*context.SplitInfo.DiscountableNonPerishable / 100;
 
             return Task.FromResult(-discountPercent*(decimal) context.Data.DiscountableSubtotal/100);
         }

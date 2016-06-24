@@ -31,7 +31,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
                         case DiscountType.PriceDiscount:
                             var totalDiscount = Math.Min(discountableSubtotal, tier.Amount ?? 0);
 
-                            context.SplitInfo.PerishableDiscount = Math.Min(context.ProductSplitInfo.DiscountablePerishable,
+                            context.SplitInfo.PerishableDiscount = Math.Min(context.SplitInfo.DiscountablePerishable,
                                 tier.Amount ?? 0);
                             context.SplitInfo.NonPerishableDiscount = totalDiscount - context.SplitInfo.PerishableDiscount;
 
@@ -40,8 +40,8 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
 
                             var discountPercent = tier.Percent ?? 0;
 
-                            context.SplitInfo.PerishableDiscount = discountPercent*context.ProductSplitInfo.DiscountablePerishable/100;
-                            context.SplitInfo.NonPerishableDiscount = discountPercent*context.ProductSplitInfo.DiscountableNonPerishable/100;
+                            context.SplitInfo.PerishableDiscount = discountPercent*context.SplitInfo.DiscountablePerishable/100;
+                            context.SplitInfo.NonPerishableDiscount = discountPercent*context.SplitInfo.DiscountableNonPerishable/100;
 
                             return Task.FromResult(-discountPercent*discountableSubtotal/100);
                         default:

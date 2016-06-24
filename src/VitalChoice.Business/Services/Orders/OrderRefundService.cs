@@ -92,7 +92,7 @@ namespace VitalChoice.Business.Services.Orders
         {
             var context = new OrderRefundDataContext()
             {
-                Order = order
+                RefundOrder = order
             };
             var tree = await _treeFactory.CreateTreeAsync<OrderRefundDataContext, decimal>("Refund");
             await tree.ExecuteAsync(context);

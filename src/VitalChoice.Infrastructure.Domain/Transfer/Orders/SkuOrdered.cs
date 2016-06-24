@@ -2,24 +2,22 @@
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 {
-    public class SkuOrdered
+    public class SkuOrdered : ItemOrdered
     {
         public SkuOrdered()
         {
             Messages = new List<MessageInfo>();
         }
 
-        public SkuDynamic Sku { get; set; }
         public ICollection<GiftCertificate> GcsGenerated { get; set; }
-        public decimal Amount { get; set; }
-        public int Quantity { get; set; }
         public IList<MessageInfo> Messages { get; set; }
     }
 
-    public class PromoOrdered: SkuOrdered
+    public sealed class PromoOrdered: SkuOrdered
     {
         public PromoOrdered()
         {

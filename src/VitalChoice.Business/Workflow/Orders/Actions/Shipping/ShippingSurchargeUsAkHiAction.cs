@@ -19,8 +19,8 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
             {
                 result = context.Data.DeliveredAmount * 0.1m;
                 result = Math.Round(result, 2);
-                context.SplitInfo.PerishableSurchargeOverriden = context.ProductSplitInfo.PerishableAmount*0.1m;
-                context.SplitInfo.NonPerishableSurchargeOverriden = context.ProductSplitInfo.NonPerishableAmount*0.1m;
+                context.SplitInfo.PerishableSurchargeOverriden = context.SplitInfo.PerishableAmount*0.1m;
+                context.SplitInfo.NonPerishableSurchargeOverriden = context.SplitInfo.NonPerishableAmount*0.1m;
             }
             else
             {

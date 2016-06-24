@@ -20,11 +20,11 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
         public override async Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, ITreeContext executionContext)
         {
             var taxService = executionContext.Resolve<IAvalaraTax>();
-            if (context.Order.OriginalOrder.NPOrderStatus != null && context.Order.OriginalOrder.POrderStatus != null)
+            if (context.SplitInfo.ShouldSplit)
             {
-                context.TaxTotal = (await
-                    Task.WhenAll(taxService.GetTax(context, TaxGetType.Perishable),
-                        taxService.GetTax(context, TaxGetType.NonPerishable))).Sum();
+                context.SplitInfo.PerishableTax = await taxService.GetTax(context, TaxGetType.Perishable);
+                context.SplitInfo.NonPerishableTax = await taxService.GetTax(context, TaxGetType.NonPerishable);
+                context.TaxTotal = context.SplitInfo.PerishableTax + context.SplitInfo.NonPerishableTax;
             }
             else
             {

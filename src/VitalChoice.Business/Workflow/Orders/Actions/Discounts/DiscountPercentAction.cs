@@ -19,8 +19,8 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
 
             decimal discountPercent = context.Order.Discount.Data.Percent;
 
-            context.SplitInfo.PerishableDiscount = discountPercent*context.ProductSplitInfo.DiscountablePerishable / 100;
-            context.SplitInfo.NonPerishableDiscount = discountPercent*context.ProductSplitInfo.DiscountableNonPerishable / 100;
+            context.SplitInfo.PerishableDiscount = discountPercent*context.SplitInfo.DiscountablePerishable / 100;
+            context.SplitInfo.NonPerishableDiscount = discountPercent*context.SplitInfo.DiscountableNonPerishable / 100;
 
             return Task.FromResult(-discountPercent*(decimal) context.Data.DiscountableSubtotal/100);
         }

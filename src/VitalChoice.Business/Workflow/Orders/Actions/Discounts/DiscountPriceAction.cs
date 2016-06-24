@@ -20,7 +20,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
 
             decimal totalDiscount = Math.Min(context.Data.DiscountableSubtotal, context.Order.Discount.Data.Amount);
 
-            context.SplitInfo.PerishableDiscount = Math.Min(context.ProductSplitInfo.DiscountablePerishable, context.Order.Discount.Data.Amount);
+            context.SplitInfo.PerishableDiscount = Math.Min(context.SplitInfo.DiscountablePerishable, context.Order.Discount.Data.Amount);
             context.SplitInfo.NonPerishableDiscount = totalDiscount - context.SplitInfo.PerishableDiscount;
 
             return Task.FromResult(-totalDiscount);
