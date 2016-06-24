@@ -10,34 +10,46 @@ using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
 {
-    public class DiscountTieredAction: ComputableAction<OrderDataContext>
+    public class DiscountTieredAction : ComputableAction<OrderDataContext>
     {
         public DiscountTieredAction(ComputableTree<OrderDataContext> tree, string actionName) : base(tree, actionName)
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, ITreeContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
-            dataContext.FreeShipping = dataContext.Order.Discount.Data.FreeShipping;
-            var discountableSubtotal = (decimal)dataContext.Data.DiscountableSubtotal;
-            foreach (var tier in dataContext.Order.Discount.DiscountTiers)
+            context.FreeShipping = context.Order.Discount.Data.FreeShipping;
+            var discountableSubtotal = (decimal) context.Data.DiscountableSubtotal;
+            foreach (var tier in context.Order.Discount.DiscountTiers)
             {
                 if (discountableSubtotal >= tier.From && (tier.To == null || discountableSubtotal <= tier.To))
                 {
-                    dataContext.Order.Data.IdDiscountTier = tier.Id;
-                    dataContext.DiscountMessage = dataContext.Order.Discount.GetDiscountMessage(tier.Id);
+                    context.Order.Data.IdDiscountTier = tier.Id;
+                    context.DiscountMessage = context.Order.Discount.GetDiscountMessage(tier.Id);
                     switch (tier.IdDiscountType)
                     {
                         case DiscountType.PriceDiscount:
-                            return Task.FromResult(-Math.Min(discountableSubtotal, tier.Amount ?? 0));
+                            var totalDiscount = Math.Min(discountableSubtotal, tier.Amount ?? 0);
+
+                            context.SplitInfo.PerishableDiscount = Math.Min(context.ProductSplitInfo.DiscountablePerishable,
+                                tier.Amount ?? 0);
+                            context.SplitInfo.NonPerishableDiscount = totalDiscount - context.SplitInfo.PerishableDiscount;
+
+                            return Task.FromResult(-totalDiscount);
                         case DiscountType.PercentDiscount:
-                            return Task.FromResult(-(tier.Percent ?? 0)*discountableSubtotal/100);
+
+                            var discountPercent = tier.Percent ?? 0;
+
+                            context.SplitInfo.PerishableDiscount = discountPercent*context.ProductSplitInfo.DiscountablePerishable/100;
+                            context.SplitInfo.NonPerishableDiscount = discountPercent*context.ProductSplitInfo.DiscountableNonPerishable/100;
+
+                            return Task.FromResult(-discountPercent*discountableSubtotal/100);
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
                 }
             }
-            dataContext.Messages.Add(new MessageInfo
+            context.Messages.Add(new MessageInfo
             {
                 Message = "Cannot determine any tier from discountable products subtotal. Discount won't apply.",
                 Field = "DiscountCode"

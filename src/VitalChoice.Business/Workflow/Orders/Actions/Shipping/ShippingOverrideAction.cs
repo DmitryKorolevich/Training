@@ -11,15 +11,25 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, ITreeContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
-            decimal shippingOverride = (decimal?) dataContext.Order.SafeData.ShippingOverride ?? 0;
-            decimal shippingTotal = dataContext.StandardShippingCharges + dataContext.Data.ShippingUpgrade;
+            decimal shippingOverride = (decimal?) context.Order.SafeData.ShippingOverride ?? 0;
+            decimal shippingTotal = context.StandardShippingCharges + context.Data.ShippingUpgrade;
             if (shippingOverride > shippingTotal)
             {
                 shippingOverride = shippingTotal;
             }
-            dataContext.ShippingOverride = shippingOverride;
+            context.ShippingOverride = shippingOverride;
+
+            var perishableOverride = shippingOverride;
+            if (perishableOverride > context.SplitInfo.PerishableShippingOveridden)
+            {
+                perishableOverride = context.SplitInfo.PerishableShippingOveridden;
+            }
+
+            context.SplitInfo.PerishableShippingOveridden -= perishableOverride;
+            context.SplitInfo.NonPerishableShippingOverriden -= shippingOverride - perishableOverride;
+
             return Task.FromResult(-shippingOverride);
         }
     }

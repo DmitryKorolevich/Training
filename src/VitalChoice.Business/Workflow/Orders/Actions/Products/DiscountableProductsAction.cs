@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
@@ -162,7 +163,15 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                     skus = selectedSkus;
                 }
             }
-            return Task.FromResult(skus.Where(s => !((bool?)s.Sku.SafeData.NonDiscountable ?? false)).Sum(s => s.Amount*s.Quantity));
+            var discountableProducts = skus.Where(s => !((bool?) s.Sku.SafeData.NonDiscountable ?? false)).ToArray();
+
+            dataContext.ProductSplitInfo.DiscountablePerishable =
+                discountableProducts.Where(p => p.Sku.IdObjectType == (int) ProductType.Perishable).Sum(p => p.Amount*p.Quantity);
+
+            dataContext.ProductSplitInfo.DiscountableNonPerishable =
+                discountableProducts.Where(p => p.Sku.IdObjectType != (int) ProductType.Perishable).Sum(p => p.Amount*p.Quantity);
+
+            return Task.FromResult(discountableProducts.Sum(s => s.Amount*s.Quantity));
         }
     }
 }

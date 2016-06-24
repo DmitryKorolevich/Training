@@ -15,47 +15,51 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, ITreeContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
-            var products = dataContext.SkuOrdereds.Union(dataContext.PromoSkus.Where(p => p.Enabled)).ToArray();
+            var products = context.SkuOrdereds.Union(context.PromoSkus.Where(p => p.Enabled)).ToArray();
             var perishableProducts =
                 products.Where(s => s.Sku.IdObjectType == (int) ProductType.Perishable).ToArray();
             var nonPerishableProducts =
                 products.Where(s => s.Sku.IdObjectType == (int) ProductType.NonPerishable).ToArray();
-            dataContext.SplitInfo.PerishableCount = perishableProducts.Length;
-            dataContext.SplitInfo.NonPerishableCount = nonPerishableProducts.Length;
-            dataContext.SplitInfo.PerishableAmount = perishableProducts.Sum(p => p.Amount*p.Quantity);
-            dataContext.SplitInfo.NonPerishableAmount = nonPerishableProducts.Sum(p => p.Amount*p.Quantity);
-            dataContext.SplitInfo.NonPerishableOrphanCount =
+            context.ProductSplitInfo.PerishableCount = perishableProducts.Length;
+            context.ProductSplitInfo.NonPerishableCount = nonPerishableProducts.Length;
+            context.ProductSplitInfo.PerishableAmount = perishableProducts.Sum(p => p.Amount*p.Quantity);
+            context.ProductSplitInfo.NonPerishableAmount = nonPerishableProducts.Sum(p => p.Amount*p.Quantity);
+            context.ProductSplitInfo.NonPerishableOrphanCount =
                 products.Count(
                     s => s.Sku.IdObjectType == (int) ProductType.NonPerishable && s.Sku.Data.OrphanType);
-            dataContext.SplitInfo.ThresholdReached =
+            context.ProductSplitInfo.ThresholdReached =
                 products.Any(
                     s =>
                         s.Sku.IdObjectType == (int) ProductType.NonPerishable && s.Sku.Data.OrphanType &&
                         s.Quantity > s.Sku.Data.QTYThreshold);
-            dataContext.SplitInfo.SpecialSkuAdded = products.Any(s => s.Sku.Code.ToLowerInvariant() == "emp");
+            context.ProductSplitInfo.SpecialSkuAdded = products.Any(s => s.Sku.Code.ToLowerInvariant() == "emp");
 
             //TODO: move NonPerishableOrphanCount threshold to global admin config
-            dataContext.SplitInfo.ShouldSplit = (dataContext.SplitInfo.PerishableCount > 0 &&
-                                             dataContext.SplitInfo.NonPerishableOrphanCount > 4
+            context.ProductSplitInfo.ShouldSplit = (context.ProductSplitInfo.PerishableCount > 0 &&
+                                             context.ProductSplitInfo.NonPerishableOrphanCount > 4
                                              ||
-                                             dataContext.SplitInfo.PerishableCount > 0 && dataContext.SplitInfo.ThresholdReached
+                                             context.ProductSplitInfo.PerishableCount > 0 && context.ProductSplitInfo.ThresholdReached
                                              ||
-                                             dataContext.SplitInfo.NonPerishableNonOrphanCount > 0 &&
-                                             dataContext.SplitInfo.PerishableCount > 0)
-                                            && !dataContext.SplitInfo.SpecialSkuAdded;
-            if (dataContext.SplitInfo.ShouldSplit)
-                dataContext.SplitInfo.ProductTypes = POrderType.PNP;
+                                             context.ProductSplitInfo.NonPerishableNonOrphanCount > 0 &&
+                                             context.ProductSplitInfo.PerishableCount > 0)
+                                            && !context.ProductSplitInfo.SpecialSkuAdded;
+            if (context.ProductSplitInfo.ShouldSplit)
+                context.ProductSplitInfo.ProductTypes = POrderType.PNP;
             else
             {
-                if (dataContext.SplitInfo.PerishableCount > 0)
-                    dataContext.SplitInfo.ProductTypes = POrderType.P;
-                else if (dataContext.SplitInfo.NonPerishableCount > 0)
-                    dataContext.SplitInfo.ProductTypes = POrderType.NP;
+                if (context.ProductSplitInfo.PerishableCount > 0)
+                    context.ProductSplitInfo.ProductTypes = POrderType.P;
+                else if (context.ProductSplitInfo.NonPerishableCount > 0)
+                    context.ProductSplitInfo.ProductTypes = POrderType.NP;
                 else
-                    dataContext.SplitInfo.ProductTypes = POrderType.Other;
+                    context.ProductSplitInfo.ProductTypes = POrderType.Other;
             }
+            context.ProductSplitInfo.OtherProductsAmount =
+                products.Where(
+                    s => s.Sku.IdObjectType != (int) ProductType.Perishable && s.Sku.IdObjectType != (int) ProductType.NonPerishable)
+                    .Sum(p => p.Amount*p.Quantity);
             return TaskCache<decimal>.DefaultCompletedTask;
         }
     }
