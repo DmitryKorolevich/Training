@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Autofac.Features.Indexed;
+using VitalChoice.DynamicData.Extensions;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
@@ -39,7 +40,7 @@ namespace VitalChoice.DynamicData.Base
         private readonly IModelConverterService _converterService;
         private readonly ITypeConverter _typeConverter;
         private readonly IIndex<GenericTypePair, IOptionTypeQueryProvider> _optionTypeQueryProviderIndex;
-        private readonly MemberInfo _member;
+        private readonly MemberInfo _optionValuesMember;
 
         public DynamicDataEntityQueryBuilder(IModelConverterService converterService, ITypeConverter typeConverter,
             IIndex<GenericTypePair, IOptionTypeQueryProvider> optionTypeQueryProviderIndex)
@@ -47,7 +48,7 @@ namespace VitalChoice.DynamicData.Base
             _converterService = converterService;
             _typeConverter = typeConverter;
             _optionTypeQueryProviderIndex = optionTypeQueryProviderIndex;
-            _member = typeof(TEntity).GetMember("OptionValues").FirstOrDefault();
+            _optionValuesMember = typeof(TEntity).GetProperty("OptionValues");
         }
 
         public Expression Filter(object model, Type modelType, Expression parameter, ValuesFilterType filterType, int? idObjectType, CompareBehaviour compareBehaviour)
@@ -102,8 +103,10 @@ namespace VitalChoice.DynamicData.Base
         private static Expression BuildCollectionExpression(Expression parameter, bool all,
             Expression<Func<TEntity, bool>> conditionExpression)
         {
-            return Expression.Call(all ? GetConditionMethod("All", typeof (TEntity)) : GetConditionMethod("Any", typeof (TEntity)),
-                parameter, conditionExpression);
+            return
+                Expression.Call(
+                    all ? MethodInfoData.All.MakeGenericMethod(typeof(TEntity)) : MethodInfoData.Any.MakeGenericMethod(typeof(TEntity)),
+                    parameter, conditionExpression);
         }
 
         private IOptionTypeQueryProvider<TEntity, TOptionType, TOptionValue> GetValues(object model, Type modelType,
@@ -205,25 +208,16 @@ namespace VitalChoice.DynamicData.Base
             return result;
         }
 
-        private static MethodInfo GetConditionMethod(string name, Type itemType)
-        {
-            var method =
-                typeof (Enumerable).GetMethods()
-                    .Single(m => m.Name == name && m.GetParameters().Length == 2)
-                    .MakeGenericMethod(itemType);
-            return method;
-        }
-
         private Expression CreateExpression(OptionValueItem<TOptionType> value, Expression parameter, CompareBehaviour compareBehaviour)
         {
             Expression valuesSelector;
-            if (_member == null)
+            if (_optionValuesMember == null)
                 throw new InvalidOperationException($"Cannot obtain OptionValues member in {typeof(TEntity)} Type");
             if (value.Value == null)
             {
                 Expression<Func<TOptionValue, bool>> lambda = v => v.IdOptionType != value.IdType;
-                valuesSelector = Expression.Call(GetConditionMethod("All", typeof(TOptionValue)),
-                    Expression.MakeMemberAccess(parameter, _member), lambda);
+                valuesSelector = Expression.Call(MethodInfoData.All.MakeGenericMethod(typeof(TOptionValue)),
+                    Expression.MakeMemberAccess(parameter, _optionValuesMember), lambda);
             }
             else
             {
@@ -232,23 +226,23 @@ namespace VitalChoice.DynamicData.Base
                 {
                     case CompareBehaviour.Equals:
                         lambda = v => v.IdOptionType == value.IdType && v.Value == value.Value;
-                        valuesSelector = Expression.Call(GetConditionMethod("Any", typeof(TOptionValue)),
-                            Expression.MakeMemberAccess(parameter, _member), lambda);
+                        valuesSelector = Expression.Call(MethodInfoData.Any.MakeGenericMethod(typeof(TOptionValue)),
+                            Expression.MakeMemberAccess(parameter, _optionValuesMember), lambda);
                         break;
                     case CompareBehaviour.StartsWith:
                         lambda = v => v.IdOptionType == value.IdType && v.Value.StartsWith(value.Value);
-                        valuesSelector = Expression.Call(GetConditionMethod("Any", typeof(TOptionValue)),
-                            Expression.MakeMemberAccess(parameter, _member), lambda);
+                        valuesSelector = Expression.Call(MethodInfoData.Any.MakeGenericMethod(typeof(TOptionValue)),
+                            Expression.MakeMemberAccess(parameter, _optionValuesMember), lambda);
                         break;
                     case CompareBehaviour.EndsWith:
                         lambda = v => v.IdOptionType == value.IdType && v.Value.EndsWith(value.Value);
-                        valuesSelector = Expression.Call(GetConditionMethod("Any", typeof(TOptionValue)),
-                            Expression.MakeMemberAccess(parameter, _member), lambda);
+                        valuesSelector = Expression.Call(MethodInfoData.Any.MakeGenericMethod(typeof(TOptionValue)),
+                            Expression.MakeMemberAccess(parameter, _optionValuesMember), lambda);
                         break;
                     case CompareBehaviour.Contains:
                         lambda = v => v.IdOptionType == value.IdType && v.Value.Contains(value.Value);
-                        valuesSelector = Expression.Call(GetConditionMethod("Any", typeof(TOptionValue)),
-                            Expression.MakeMemberAccess(parameter, _member), lambda);
+                        valuesSelector = Expression.Call(MethodInfoData.Any.MakeGenericMethod(typeof(TOptionValue)),
+                            Expression.MakeMemberAccess(parameter, _optionValuesMember), lambda);
                         break;
                     default:
                         throw new NotImplementedException($"{compareBehaviour} is not implemented");

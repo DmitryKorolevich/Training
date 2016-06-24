@@ -13,6 +13,7 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.Transaction;
 using VitalChoice.DynamicData.Helpers;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
@@ -52,14 +53,13 @@ namespace VitalChoice.Business.Services.InventorySkus
             ISettingService settingService,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
-            DirectMapper<InventorySku> directMapper,
             DynamicExtensionsRewriter queryVisitor,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<SkuToInventorySku> skuToInventorySkuRepository,
-            ILoggerProviderExtended loggerProvider) : base(
+            ILoggerProviderExtended loggerProvider, IDynamicEntityOrderingExtension<InventorySku> orderingExtension) : base(
                 mapper, inventorySkuRepository, inventorySkuValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension)
         {
             _adminProfileRepository = adminProfileRepository;
             _skuToInventorySkuRepository = skuToInventorySkuRepository;

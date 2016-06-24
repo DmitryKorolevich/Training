@@ -9,6 +9,7 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Services;
+using VitalChoice.DynamicData.Extensions;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Dynamic;
@@ -32,6 +33,7 @@ namespace VitalChoice.DynamicData.Base
         protected readonly IReadRepositoryAsync<BigStringValue> BigStringRepository;
         protected readonly IObjectLogItemExternalService ObjectLogItemExternalService;
         protected readonly DynamicExtensionsRewriter QueryVisitor;
+        protected readonly IDynamicEntityOrderingExtension<TEntity> OrderingExtension;
         protected readonly ILogger Logger;
 
         protected DynamicReadServiceAsync(
@@ -40,7 +42,7 @@ namespace VitalChoice.DynamicData.Base
             IReadRepositoryAsync<BigStringValue> bigStringRepository,
             IReadRepositoryAsync<TOptionValue> optionValuesRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILogger logger, DynamicExtensionsRewriter queryVisitor)
+            ILogger logger, DynamicExtensionsRewriter queryVisitor, IDynamicEntityOrderingExtension<TEntity> orderingExtension)
         {
             DynamicMapper = mapper;
             ObjectRepository = objectRepository;
@@ -49,6 +51,7 @@ namespace VitalChoice.DynamicData.Base
             ObjectLogItemExternalService = objectLogItemExternalService;
             Logger = logger;
             QueryVisitor = queryVisitor;
+            OrderingExtension = orderingExtension;
         }
 
         #region Extension Points
@@ -81,10 +84,10 @@ namespace VitalChoice.DynamicData.Base
         {
             var queryFluent = BuildQueryFluent(query, includesOverride, orderBy);
             var entity = await queryFluent.SelectFirstOrDefaultAsync(false);
-			if (entity != null)
-			{
-				await ProcessEntities(new[] { entity });
-			}
+            if (entity != null)
+            {
+                await ProcessEntities(new[] {entity});
+            }
             return entity;
         }
 
@@ -149,7 +152,7 @@ namespace VitalChoice.DynamicData.Base
 
         public Task<List<TDynamic>> SelectAsync(IQueryObject<TEntity> queryObject = null,
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, 
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             bool withDefaults = false)
         {
             return SelectAsync(queryObject?.Query(), includesOverride, orderBy, withDefaults);
@@ -163,7 +166,7 @@ namespace VitalChoice.DynamicData.Base
             return await DynamicMapper.FromEntityRangeAsync(await SelectEntitiesAsync(query, includesOverride, orderBy), withDefaults);
         }
 
-        public Task<TDynamic> SelectFirstAsync( IQueryObject<TEntity> queryObject = null,
+        public Task<TDynamic> SelectFirstAsync(IQueryObject<TEntity> queryObject = null,
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             bool withDefaults = false)
@@ -171,7 +174,7 @@ namespace VitalChoice.DynamicData.Base
             return SelectFirstAsync(queryObject?.Query(), includesOverride, orderBy, withDefaults);
         }
 
-        public async Task<TDynamic> SelectFirstAsync(Expression<Func<TEntity, bool>> query = null, 
+        public async Task<TDynamic> SelectFirstAsync(Expression<Func<TEntity, bool>> query = null,
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             bool withDefaults = false)
@@ -179,7 +182,7 @@ namespace VitalChoice.DynamicData.Base
             return await DynamicMapper.FromEntityAsync(await SelectEntityFirstAsync(query, includesOverride, orderBy), withDefaults);
         }
 
-        public Task<PagedList<TDynamic>> SelectPageAsync(int page, int pageSize, 
+        public Task<PagedList<TDynamic>> SelectPageAsync(int page, int pageSize,
             IQueryObject<TEntity> queryObject = null, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             bool withDefaults = false)
@@ -188,7 +191,7 @@ namespace VitalChoice.DynamicData.Base
         }
 
         public async Task<PagedList<TDynamic>> SelectPageAsync(int page, int pageSize, Expression<Func<TEntity, bool>> query = null,
-             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             bool withDefaults = false)
         {
@@ -200,13 +203,13 @@ namespace VitalChoice.DynamicData.Base
         #region Synchronous Operations
 
         public List<TDynamic> Select(Expression<Func<TEntity, bool>> query = null,
-            
+
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null, bool withDefaults = false)
         {
             return SelectAsync(query, includesOverride, withDefaults: withDefaults).GetAwaiter().GetResult();
         }
 
-        public TDynamic SelectFirst( IQueryObject<TEntity> queryObject = null,
+        public TDynamic SelectFirst(IQueryObject<TEntity> queryObject = null,
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             bool withDefaults = false)
@@ -214,7 +217,7 @@ namespace VitalChoice.DynamicData.Base
             return SelectFirstAsync(queryObject?.Query(), includesOverride, orderBy, withDefaults).GetAwaiter().GetResult();
         }
 
-        public TDynamic SelectFirst(Expression<Func<TEntity, bool>> query = null, 
+        public TDynamic SelectFirst(Expression<Func<TEntity, bool>> query = null,
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             bool withDefaults = false)
@@ -223,14 +226,14 @@ namespace VitalChoice.DynamicData.Base
         }
 
         public PagedList<TDynamic> SelectPage(int page, int pageSize, Expression<Func<TEntity, bool>> query = null,
-             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             bool withDefaults = false)
         {
             return SelectPageAsync(page, pageSize, query, includesOverride, orderBy, withDefaults).GetAwaiter().GetResult();
         }
 
-        public PagedList<TDynamic> SelectPage(int page, int pageSize, 
+        public PagedList<TDynamic> SelectPage(int page, int pageSize,
             IQueryObject<TEntity> queryObject = null, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             bool withDefaults = false)
@@ -249,7 +252,7 @@ namespace VitalChoice.DynamicData.Base
             return SelectAsync(ids, withDefaults, includesOverride).GetAwaiter().GetResult();
         }
 
-        public List<TDynamic> Select( IQueryObject<TEntity> queryObject = null,
+        public List<TDynamic> Select(IQueryObject<TEntity> queryObject = null,
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
             bool withDefaults = false)
         {

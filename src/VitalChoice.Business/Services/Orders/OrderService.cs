@@ -79,10 +79,10 @@ namespace VitalChoice.Business.Services.Orders
     public class OrderService : ExtendedEcommerceDynamicService<OrderDynamic, Order, OrderOptionType, OrderOptionValue>,
         IOrderService
     {
-        private readonly IEcommerceRepositoryAsync<VOrder> _vOrderRepository;
+        //private readonly IEcommerceRepositoryAsync<VOrder> _vOrderRepository;
         private readonly IEcommerceRepositoryAsync<VOrderWithRegionInfoItem> _vOrderWithRegionInfoItemRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
-        private readonly IEcommerceRepositoryAsync<Sku> _skusRepository;
+        //private readonly IEcommerceRepositoryAsync<Sku> _skusRepository;
         private readonly ProductMapper _productMapper;
         private readonly SkuMapper _skuMapper;
         private readonly CustomerMapper _customerMapper;
@@ -93,7 +93,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IEncryptedOrderExportService _encryptedOrderExportService;
         private readonly SpEcommerceRepository _sPEcommerceRepository;
         private readonly IPaymentMethodService _paymentMethodService;
-        private readonly IObjectMapper<OrderPaymentMethodDynamic> _paymentMapper;
+        //private readonly IObjectMapper<OrderPaymentMethodDynamic> _paymentMapper;
         private readonly IEcommerceRepositoryAsync<OrderToGiftCertificate> _orderToGiftCertificateRepositoryAsync;
         private readonly ICountryService _countryService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
@@ -113,7 +113,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly OrderRepository _orderRepository;
 
         public OrderService(
-            IEcommerceRepositoryAsync<VOrder> vOrderRepository,
+            //IEcommerceRepositoryAsync<VOrder> vOrderRepository,
             IEcommerceRepositoryAsync<VOrderWithRegionInfoItem> vOrderWithRegionInfoItemRepository,
             OrderRepository orderRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
@@ -124,15 +124,14 @@ namespace VitalChoice.Business.Services.Orders
             ProductMapper productMapper,
             CustomerMapper customerMapper,
             ICustomerService customerService, IWorkflowFactory treeFactory,
-            ILoggerProviderExtended loggerProvider, IEcommerceRepositoryAsync<Sku> skusRepository,
+            ILoggerProviderExtended loggerProvider, //IEcommerceRepositoryAsync<Sku> skusRepository,
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
-            DirectMapper<Order> directMapper,
             DynamicExtensionsRewriter queryVisitor,
             IAppInfrastructureService appInfrastructureService,
             IEncryptedOrderExportService encryptedOrderExportService,
             SpEcommerceRepository sPEcommerceRepository,
             IPaymentMethodService paymentMethodService,
-            IObjectMapper<OrderPaymentMethodDynamic> paymentMapper,
+            //IObjectMapper<OrderPaymentMethodDynamic> paymentMapper,
             IEcommerceRepositoryAsync<OrderToGiftCertificate> orderToGiftCertificateRepositoryAsync,
             IExtendedDynamicServiceAsync
                 <OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType, OrderPaymentMethodOptionValue>
@@ -143,24 +142,24 @@ namespace VitalChoice.Business.Services.Orders
             ICountryService countryService, ITransactionAccessor<EcommerceContext> transactionAccessor, SkuMapper skuMapper,
             IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository, IDiscountService discountService,
             IEcommerceRepositoryAsync<VAutoShip> vAutoShipRepository, IEcommerceRepositoryAsync<VAutoShipOrder> vAutoShipOrderRepository,
-            AffiliateOrderPaymentRepository affiliateOrderPaymentRepository, ICountryNameCodeResolver codeResolver)
+            AffiliateOrderPaymentRepository affiliateOrderPaymentRepository, ICountryNameCodeResolver codeResolver, IDynamicEntityOrderingExtension<Order> orderingExtension)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension)
         {
-            _vOrderRepository = vOrderRepository;
+            //_vOrderRepository = vOrderRepository;
             _vOrderWithRegionInfoItemRepository = vOrderWithRegionInfoItemRepository;
             _adminProfileRepository = adminProfileRepository;
             _productMapper = productMapper;
             _customerService = customerService;
             _treeFactory = treeFactory;
-            _skusRepository = skusRepository;
+            //_skusRepository = skusRepository;
             _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
             _appInfrastructureService = appInfrastructureService;
             _encryptedOrderExportService = encryptedOrderExportService;
             _sPEcommerceRepository = sPEcommerceRepository;
             _paymentMethodService = paymentMethodService;
-            _paymentMapper = paymentMapper;
+            //_paymentMapper = paymentMapper;
             _customerMapper = customerMapper;
             _orderToGiftCertificateRepositoryAsync = orderToGiftCertificateRepositoryAsync;
             _paymentGenericService = paymentGenericService;
@@ -1515,6 +1514,13 @@ namespace VitalChoice.Business.Services.Orders
                     break;
                 case VOrderSortPath.DateEdited:
                     sortable = (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.DateEdited) : x.OrderByDescending(y => y.DateEdited);
+                    break;
+                case VOrderSortPath.IdOrderSource:
+                    sortable =
+                        x =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? OrderingExtension.OrderByValue(x, "OrderType")
+                                : OrderingExtension.OrderByDescendingValue(x, "OrderType");
                     break;
             }
 

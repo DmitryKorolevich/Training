@@ -24,6 +24,7 @@ using System.Linq.Expressions;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Infrastructure.Context;
 using Microsoft.Extensions.Logging;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Interfaces.Services.Products;
@@ -43,14 +44,14 @@ namespace VitalChoice.Business.Services.Orders
             IObjectLogItemExternalService objectLogItemExternalService,
             IEcommerceRepositoryAsync<OrderOptionValue> orderValueRepositoryAsync,
             ILoggerProviderExtended loggerProvider,
-            DirectMapper<Order> directMapper,
             DynamicExtensionsRewriter queryVisitor,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
             IGcService gcService,
-            IWorkflowFactory treeFactory)
+            IWorkflowFactory treeFactory, IDynamicEntityOrderingExtension<Order> orderingExtension)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension
+                )
         {
             _treeFactory = treeFactory;
             _gcService = gcService;

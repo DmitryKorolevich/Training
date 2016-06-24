@@ -23,6 +23,7 @@ using VitalChoice.Business.Queries.Customers;
 using VitalChoice.Business.Repositories;
 using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Transaction;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
@@ -73,11 +74,11 @@ namespace VitalChoice.Business.Services.Affiliates
             INotificationService notificationService,
             IAffiliateUserService affiliateUserService,
             IOptions<AppOptions> appOptions,
-            ILoggerProviderExtended loggerProvider, DirectMapper<Affiliate> directMapper, DynamicExtensionsRewriter queryVisitor, 
-            ITransactionAccessor<EcommerceContext> transactionAccessor)
+            ILoggerProviderExtended loggerProvider, DynamicExtensionsRewriter queryVisitor, 
+            ITransactionAccessor<EcommerceContext> transactionAccessor, IDynamicEntityOrderingExtension<Affiliate> orderingExtension)
             : base(
                 mapper, affiliateRepository, affiliateValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension)
         {
             _vAffiliateRepository = vAffiliateRepository;
             _vAffiliateNotPaidCommissionRepository = vAffiliateNotPaidCommissionRepository;

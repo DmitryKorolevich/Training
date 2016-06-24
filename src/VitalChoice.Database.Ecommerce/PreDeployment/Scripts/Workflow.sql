@@ -148,7 +148,7 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('dbo.WorkflowExecutors') AND Name = N'OwnedTree')
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'dbo.WorkflowExecutors') AND Name = N'IdOwnedTree')
 BEGIN
 	DELETE FROM dbo.WorkflowExecutors
 

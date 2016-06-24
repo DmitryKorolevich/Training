@@ -41,13 +41,14 @@ namespace VitalChoice.Business.Services.Settings
             IEcommerceRepositoryAsync<CatalogRequestAddress> catalogRequestAddressRepository,
             IEcommerceRepositoryAsync<CatalogRequestAddressOptionValue> catalogRequestAddressValueRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
-            DirectMapper<CatalogRequestAddress> directMapper,
             DynamicExtensionsRewriter queryVisitor,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider, ITransactionAccessor<EcommerceContext> transactionAccessor)
+            ILoggerProviderExtended loggerProvider, ITransactionAccessor<EcommerceContext> transactionAccessor,
+            IDynamicEntityOrderingExtension<CatalogRequestAddress> orderingExtension)
             : base(
                 mapper, catalogRequestAddressRepository, catalogRequestAddressValueRepository,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension
+                )
         {
             _catalogRequestAddressRepository = catalogRequestAddressRepository;
             _countryService = countryService;

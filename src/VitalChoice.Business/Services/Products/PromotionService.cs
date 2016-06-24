@@ -16,6 +16,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.Transaction;
 using VitalChoice.DynamicData.Helpers;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
@@ -38,7 +39,6 @@ namespace VitalChoice.Business.Services.Products
         private readonly IEcommerceRepositoryAsync<Promotion> _promotionRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
-        private readonly PromotionMapper _mapper;
 
         public PromotionService(
             IEcommerceRepositoryAsync<PromotionOptionValue> promotionOptionValueRepository,
@@ -47,14 +47,14 @@ namespace VitalChoice.Business.Services.Products
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, PromotionMapper mapper,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider, DirectMapper<Promotion> directMapper, DynamicExtensionsRewriter queryVisitor, ITransactionAccessor<EcommerceContext> transactionAccessor)
+            ILoggerProviderExtended loggerProvider, DynamicExtensionsRewriter queryVisitor,
+            ITransactionAccessor<EcommerceContext> transactionAccessor, IDynamicEntityOrderingExtension<Promotion> orderingExtension)
             : base(mapper, promotionRepository, promotionOptionValueRepository, bigStringRepositoryAsync, objectLogItemExternalService,
-                loggerProvider, directMapper, queryVisitor, transactionAccessor)
+                loggerProvider, queryVisitor, transactionAccessor, orderingExtension)
         {
             _promotionRepository = promotionRepository;
             _skuRepository = skuRepository;
             _adminProfileRepository = adminProfileRepository;
-            _mapper = mapper;
         }
 
         protected override Task<List<MessageInfo>> ValidateAsync(PromotionDynamic dynamic)
@@ -189,7 +189,7 @@ namespace VitalChoice.Business.Services.Products
                 item.OptionValues = new List<PromotionOptionValue>();
                 item.OptionTypes = new List<PromotionOptionType>();
             }
-            PagedList<PromotionDynamic> toReturn = new PagedList<PromotionDynamic>(result.Items.Select(p => _mapper.FromEntity(p)).ToList(), result.Count);
+            PagedList<PromotionDynamic> toReturn = new PagedList<PromotionDynamic>(result.Items.Select(p => DynamicMapper.FromEntity(p)).ToList(), result.Count);
             if (toReturn.Items.Count > 0)
             {
                 var ids = result.Items.Where(p => p.IdAddedBy.HasValue).Select(p => p.IdAddedBy.Value).Distinct().ToList();

@@ -61,7 +61,7 @@ namespace VitalChoice.Business.Services.Products
         IProductService
     {
         private readonly VProductSkuRepository _vProductSkuRepository;
-        private readonly IEcommerceRepositoryAsync<VSku> _vSkuRepository;
+        //private readonly IEcommerceRepositoryAsync<VSku> _vSkuRepository;
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoryRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
@@ -84,7 +84,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IExtendedDynamicReadServiceAsync<SkuDynamic, Sku> _skuReadServiceAsync;
 
         public ProductService(VProductSkuRepository vProductSkuRepository,
-            IEcommerceRepositoryAsync<VSku> vSkuRepository,
+            //IEcommerceRepositoryAsync<VSku> vSkuRepository,
             IEcommerceRepositoryAsync<Product> productRepository,
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoryRepository,
             IEcommerceRepositoryAsync<Sku> skuRepository,
@@ -107,14 +107,17 @@ namespace VitalChoice.Business.Services.Products
             IOptions<AppOptions> options,
             ILoggerProviderExtended loggerProvider,
             IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync,
-            SpEcommerceRepository sPEcommerceRepository,
-            DirectMapper<Product> directMapper, DynamicExtensionsRewriter queryVisitor, ITransactionAccessor<EcommerceContext> transactionAccessor, IExtendedDynamicReadServiceAsync<SkuDynamic, Sku> skuReadServiceAsync)
+            SpEcommerceRepository sPEcommerceRepository, DynamicExtensionsRewriter queryVisitor,
+            ITransactionAccessor<EcommerceContext> transactionAccessor,
+            IExtendedDynamicReadServiceAsync<SkuDynamic, Sku> skuReadServiceAsync,
+            IDynamicEntityOrderingExtension<Product> orderingExtension)
             : base(
                 mapper, productRepository, productValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, directMapper, queryVisitor, transactionAccessor)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension
+                )
         {
             _vProductSkuRepository = vProductSkuRepository;
-            _vSkuRepository = vSkuRepository;
+            //_vSkuRepository = vSkuRepository;
             _productRepository = productRepository;
             _productToCategoryRepository = productToCategoryRepository;
             _skuRepository = skuRepository;

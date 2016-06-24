@@ -35,33 +35,37 @@ namespace VitalChoice.DynamicData.Extensions
                 .GetExportedTypes()
                 .Where(
                     t =>
-                        t.IsImplementGeneric(typeof (DynamicMapper<,,,>)) && !t.GetTypeInfo().IsAbstract &&
+                        t.IsImplementGeneric(typeof(DynamicMapper<,,,>)) && !t.GetTypeInfo().IsAbstract &&
                         !t.GetTypeInfo().IsGenericType);
-            builder.RegisterGeneric(typeof (ObjectMapper<>)).As(typeof (IObjectMapper<>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof (ObjectUpdater<>)).As(typeof (IObjectUpdater<>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(ObjectMapper<>)).As(typeof(IObjectMapper<>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(ObjectUpdater<>)).As(typeof(IObjectUpdater<>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(DynamicEntityOrderingExtension<,,>)).AsSelf().InstancePerLifetimeScope();
             foreach (var mapperType in mapperTypes)
             {
-                var types = mapperType.TryGetTypeArguments(typeof (IOptionTypeQueryProvider<,,>));
+                var types = mapperType.TryGetTypeArguments(typeof(IOptionTypeQueryProvider<,,>));
 
                 if (types != null)
                 {
                     var register = builder.RegisterType(mapperType)
                         .As(
-                            typeof (IDynamicMapper<,,,>).MakeGenericType(
-                                mapperType.TryGetTypeArguments(typeof (IDynamicMapper<,,,>))))
+                            typeof(IDynamicMapper<,,,>).MakeGenericType(
+                                mapperType.TryGetTypeArguments(typeof(IDynamicMapper<,,,>))))
                         .As(
-                            typeof (IDynamicMapper<,>).MakeGenericType(mapperType.TryGetTypeArguments(typeof (IDynamicMapper<,>))))
-                        .As(typeof (IObjectMapper<>).MakeGenericType(
-                            mapperType.TryGetElementType(typeof (IDynamicMapper<,>))))
-                        .As(typeof (IOptionTypeQueryProvider<,,>).MakeGenericType(
-                            mapperType.TryGetTypeArguments(typeof (IOptionTypeQueryProvider<,,>))))
+                            typeof(IDynamicMapper<,>).MakeGenericType(mapperType.TryGetTypeArguments(typeof(IDynamicMapper<,>))))
+                        .As(typeof(IObjectMapper<>).MakeGenericType(
+                            mapperType.TryGetElementType(typeof(IDynamicMapper<,>))))
+                        .As(typeof(IOptionTypeQueryProvider<,,>).MakeGenericType(
+                            types))
                         .AsSelf()
-                        .Keyed<IObjectMapper>(mapperType.TryGetElementType(typeof (DynamicMapper<,,,>)))
+                        .Keyed<IObjectMapper>(mapperType.TryGetElementType(typeof(DynamicMapper<,,,>)))
                         .Keyed<IOptionTypeQueryProvider>(new GenericTypePair(types[0], types[1]));
 
                     register = onRegistration?.Invoke(mapperType, register) ?? register;
 
                     register.InstancePerLifetimeScope();
+
+                    builder.RegisterType(typeof(DynamicEntityOrderingExtension<,,>).MakeGenericType(types))
+                        .As(typeof(IDynamicEntityOrderingExtension<>).MakeGenericType(types[0])).InstancePerLifetimeScope();
                 }
             }
             return builder;

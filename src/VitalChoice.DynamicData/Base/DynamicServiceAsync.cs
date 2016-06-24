@@ -11,17 +11,16 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.UnitOfWork;
+using VitalChoice.DynamicData.Extensions;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
-using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Entities.History;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.ObjectMapping.Base;
 using VitalChoice.ObjectMapping.Services;
 
 namespace VitalChoice.DynamicData.Base
@@ -33,7 +32,7 @@ namespace VitalChoice.DynamicData.Base
         where TOptionValue : OptionValue<TOptionType>, new()
         where TDynamic : MappedObject, new()
     {
-        private readonly DirectMapper<TEntity> _directMapper;
+        //private readonly DirectMapper<TEntity> _directMapper;
         //protected readonly bool IsAfterChangesOverriden;
 
         protected DynamicServiceAsync(IDynamicMapper<TDynamic, TEntity, TOptionType, TOptionValue> mapper,
@@ -42,13 +41,13 @@ namespace VitalChoice.DynamicData.Base
             IReadRepositoryAsync<BigStringValue> bigStringRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
             DynamicExtensionsRewriter queryVisitor,
-            DirectMapper<TEntity> directMapper, 
-            ILogger logger)
+            //DirectMapper<TEntity> directMapper, 
+            ILogger logger, IDynamicEntityOrderingExtension<TEntity> orderingExtension)
             : base(
                 mapper, objectRepository, bigStringRepository, optionValueRepositoryAsync,
-                objectLogItemExternalService, logger, queryVisitor)
+                objectLogItemExternalService, logger, queryVisitor, orderingExtension)
         {
-            _directMapper = directMapper;
+            //_directMapper = directMapper;
             //var instanceType = GetType();
             //IsAfterChangesOverriden =
             //    instanceType.GetTypeInfo().GetMethod(nameof(AfterEntityChangesAsync), BindingFlags.NonPublic | BindingFlags.DeclaredOnly) !=

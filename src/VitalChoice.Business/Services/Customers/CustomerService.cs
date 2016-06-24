@@ -29,6 +29,7 @@ using VitalChoice.Business.Services.Ecommerce;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Transaction;
 using VitalChoice.DynamicData.Base;
+using VitalChoice.DynamicData.Extensions;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
@@ -99,18 +100,18 @@ namespace VitalChoice.Business.Services.Customers
             IOptions<AppOptions> appOptions,
             IStorefrontUserService storefrontUserService,
             IEcommerceRepositoryAsync<Affiliate> affiliateRepositoryAsync,
-            ILoggerProviderExtended loggerProvider, DirectMapper<Customer> directMapper, DynamicExtensionsRewriter queryVisitor,
+            ILoggerProviderExtended loggerProvider, DynamicExtensionsRewriter queryVisitor,
             AddressOptionValueRepository addressOptionValueRepositoryAsync, CustomerAddressMapper customerAddressMapper,
             ICountryNameCodeResolver countryNameCode, IEncryptedOrderExportService encryptedOrderExportService,
             IObjectMapper<CustomerPaymentMethodDynamic> paymentMapper, IPaymentMethodService paymentMethodService,
             IEcommerceRepositoryAsync<VWholesaleSummaryInfo> vWholesaleSummaryInfoRepositoryAsync,
             IAppInfrastructureService appInfrastructureService,
             SpEcommerceRepository sPEcommerceRepository,
-            ITransactionAccessor<EcommerceContext> transactionAccessor)
+            ITransactionAccessor<EcommerceContext> transactionAccessor, IDynamicEntityOrderingExtension<Customer> orderingExtension)
             : base(
                 customerMapper, customerRepositoryAsync,
-                customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, directMapper,
-                queryVisitor, transactionAccessor)
+                customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, 
+                queryVisitor, transactionAccessor, orderingExtension)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
             _paymentMethodRepositoryAsync = paymentMethodRepositoryAsync;
@@ -416,7 +417,6 @@ namespace VitalChoice.Business.Services.Customers
                                 : x.OrderByDescending(y => y.StatusCode);
                     break;
             }
-
             var customers =
                 await
                     SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount,

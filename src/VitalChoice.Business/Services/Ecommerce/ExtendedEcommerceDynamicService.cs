@@ -5,6 +5,7 @@ using VitalChoice.Data.Services;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Base;
+using VitalChoice.DynamicData.Extensions;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Dynamic;
@@ -31,10 +32,13 @@ namespace VitalChoice.Business.Services.Ecommerce
             IEcommerceRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider, DirectMapper<TEntity> directMapper, DynamicExtensionsRewriter queryVisitor, ITransactionAccessor<EcommerceContext> transactionAccessor)
+            ILoggerProviderExtended loggerProvider, DynamicExtensionsRewriter queryVisitor,
+            ITransactionAccessor<EcommerceContext> transactionAccessor,
+            IDynamicEntityOrderingExtension<TEntity> orderingExtension)
             : base(
                 mapper, objectRepository, optionValueRepositoryAsync, bigStringRepository, objectLogItemExternalService, queryVisitor,
-                directMapper, loggerProvider.CreateLogger<ExtendedEcommerceDynamicService<TDynamic, TEntity, TOptionType, TOptionValue>>())
+                loggerProvider.CreateLogger<ExtendedEcommerceDynamicService<TDynamic, TEntity, TOptionType, TOptionValue>>(),
+                orderingExtension)
         {
             TransactionAccessor = transactionAccessor;
         }
