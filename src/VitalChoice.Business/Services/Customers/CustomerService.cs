@@ -80,7 +80,6 @@ namespace VitalChoice.Business.Services.Customers
         private readonly CustomerAddressMapper _customerAddressMapper;
         private readonly ICountryNameCodeResolver _countryNameCode;
         private readonly IEncryptedOrderExportService _encryptedOrderExportService;
-        private readonly IObjectMapper<CustomerPaymentMethodDynamic> _paymentMapper;
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly IEcommerceRepositoryAsync<VWholesaleSummaryInfo> _vWholesaleSummaryInfoRepositoryAsync;
         private readonly IAppInfrastructureService _appInfrastructureService;
@@ -103,7 +102,7 @@ namespace VitalChoice.Business.Services.Customers
             ILoggerProviderExtended loggerProvider, DynamicExtensionsRewriter queryVisitor,
             AddressOptionValueRepository addressOptionValueRepositoryAsync, CustomerAddressMapper customerAddressMapper,
             ICountryNameCodeResolver countryNameCode, IEncryptedOrderExportService encryptedOrderExportService,
-            IObjectMapper<CustomerPaymentMethodDynamic> paymentMapper, IPaymentMethodService paymentMethodService,
+            IPaymentMethodService paymentMethodService,
             IEcommerceRepositoryAsync<VWholesaleSummaryInfo> vWholesaleSummaryInfoRepositoryAsync,
             IAppInfrastructureService appInfrastructureService,
             SpEcommerceRepository sPEcommerceRepository,
@@ -127,7 +126,6 @@ namespace VitalChoice.Business.Services.Customers
             _customerAddressMapper = customerAddressMapper;
             _countryNameCode = countryNameCode;
             _encryptedOrderExportService = encryptedOrderExportService;
-            _paymentMapper = paymentMapper;
             _paymentMethodService = paymentMethodService;
             _vWholesaleSummaryInfoRepositoryAsync = vWholesaleSummaryInfoRepositoryAsync;
             _appInfrastructureService = appInfrastructureService;
@@ -636,7 +634,7 @@ namespace VitalChoice.Business.Services.Customers
 
                     if (!await updatePaymentsTask)
                     {
-                        throw new ApiException("Cannot update customer payment info on remote.");
+                        Logger.LogError("Cannot update customer payment info on remote.");
                     }
 
                     transaction.Commit();
@@ -728,7 +726,7 @@ namespace VitalChoice.Business.Services.Customers
 
                     if (!await updatePaymentsTask)
                     {
-                        throw new ApiException("Cannot update customer payment info on remote.");
+                        Logger.LogError("Cannot update customer payment info on remote.");
                     }
 
                     transaction.Commit();

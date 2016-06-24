@@ -208,7 +208,7 @@ namespace VitalChoice.Business.Services.Orders
                     paymentCopy.IdOrder = entity.Id;
                     if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
                     {
-                        throw new ApiException("Cannot update order payment info on remote.");
+                        Logger.LogError("Cannot update order payment info on remote.");
                     }
                     transaction.Commit();
                 }
@@ -264,7 +264,7 @@ namespace VitalChoice.Business.Services.Orders
                     await uow.SaveChangesAsync();
                     if ((await Task.WhenAll(paymentRemoteUpdates)).Any(t => !t))
                     {
-                        throw new ApiException("Cannot update order payment info on remote.");
+                        Logger.LogError("Cannot update order payment info on remote.");
                     }
                     transaction.Commit();
                 }
@@ -322,7 +322,7 @@ namespace VitalChoice.Business.Services.Orders
                     paymentCopy.IdOrder = entity.Id;
                     if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
                     {
-                        throw new ApiException("Cannot update order payment info on remote.");
+                        Logger.LogError("Cannot update order payment info on remote.");
                     }
                     await uow.SaveChangesAsync();
                     transaction.Commit();
@@ -395,7 +395,7 @@ namespace VitalChoice.Business.Services.Orders
                     await uow.SaveChangesAsync();
                     if ((await Task.WhenAll(paymentRemoteUpdates)).Any(t => !t))
                     {
-                        throw new ApiException("Cannot update order payment info on remote.");
+                        Logger.LogError("Cannot update order payment info on remote.");
                     }
                     transaction.Commit();
                 }
