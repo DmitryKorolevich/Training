@@ -30,7 +30,8 @@
         "System.ServiceModel": "",
         "System.IO": "",
         "System.Net.Primitives": "",
-        "System.IO.Compression": ""
+        "System.IO.Compression": "",
+        "System.Web.Services": ""
       }
     }
   }

@@ -249,7 +249,7 @@ namespace VitalChoice.Business.Services.Orders
                     entities = await base.InsertRangeAsync(models, uow);
                     paymentCopies.ForEach(p => p.PaymentMethod.IdOrder = p.OriginalReference.Id);
                     var paymentRemoteUpdates =
-                        paymentCopies.Select(p => _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(p.PaymentMethod)).ToArray();
+                        paymentCopies.Select(p => _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(p.PaymentMethod));
                     foreach (var model in models)
                     {
                         var entity = entities.FirstOrDefault(e => e.Id == model.Id);
@@ -377,7 +377,7 @@ namespace VitalChoice.Business.Services.Orders
                     var initialList = await SelectEntitiesAsync(o => ids.Contains(o.Id), query => query);
                     entities = await base.UpdateRangeAsync(models, uow);
                     var paymentRemoteUpdates =
-                        paymentCopies.Select(p => _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(p)).ToArray();
+                        paymentCopies.Select(p => _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(p));
                     foreach (var model in models)
                     {
                         var entity = entities.FirstOrDefault(p => p.Id == model.Id);

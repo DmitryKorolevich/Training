@@ -38,13 +38,13 @@
       }
     },
     "Avatax": {
-      "AccountNumber": "1100019190",
-      "LicenseKey": "B50461EFC03F20AB",
-      "ServiceUrl": "https://avatax.avalara.net/",
+      "AccountNumber": "1100041351",
+      "LicenseKey": "6F97A11CAE9E6078",
+      "ServiceUrl": "https://development.avalara.net/",
       "AccountName": "Vital Choice Seafood Inc",
       "ProfileName": "Vital Choice",
       "CompanyCode": "VC001",
-      "TurnOffCommit": true
+      "TurnOffCommit": false
     },
     "Email": {
       "From": "admin.staging@g2designgroup.com",

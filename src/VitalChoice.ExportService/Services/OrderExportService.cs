@@ -112,7 +112,7 @@ namespace VitalChoice.ExportService.Services
             return new ExportInfoContext(_options, _contextOptions);
         }
 
-        public async Task UpdateOrderPaymentMethod(OrderCardData paymentMethod)
+        public async Task<bool> UpdateOrderPaymentMethod(OrderCardData paymentMethod)
         {
             await _lockOrdersEvent.WaitAsync();
             if (_writeQueue)
@@ -121,11 +121,12 @@ namespace VitalChoice.ExportService.Services
             }
             Interlocked.Increment(ref _processingOrders);
             var context = CreateContext();
-            await UpdateOrderPaymentInternal(paymentMethod, context);
+            var result = await UpdateOrderPaymentInternal(paymentMethod, context);
             Interlocked.Decrement(ref _processingOrders);
+            return result;
         }
 
-        private async Task UpdateOrderPaymentInternal(OrderCardData paymentMethod, ExportInfoContext context)
+        private async Task<bool> UpdateOrderPaymentInternal(OrderCardData paymentMethod, ExportInfoContext context)
         {
             using (var uow = new UnitOfWork(context))
             {
@@ -154,7 +155,8 @@ namespace VitalChoice.ExportService.Services
                     else
                     {
                         // ReSharper disable once PossibleInvalidOperationException
-                        throw new ApiException($"Cannot find source customer payment method {paymentMethod.IdCustomerPaymentMethod.Value}");
+                        _logger.LogWarning($"Cannot find source customer payment method {paymentMethod.IdCustomerPaymentMethod.Value}");
+                        return false;
                     }
                 }
                 else if (paymentMethod.IdOrderSource > 0 &&
@@ -179,7 +181,8 @@ namespace VitalChoice.ExportService.Services
                     else
                     {
                         // ReSharper disable once PossibleInvalidOperationException
-                        throw new ApiException($"Cannot find source order for payment {paymentMethod.IdOrderSource.Value}");
+                        _logger.LogWarning($"Cannot find source order for payment {paymentMethod.IdOrderSource.Value}");
+                        return false;
                     }
                 }
                 else if (!string.IsNullOrWhiteSpace(paymentMethod.CardNumber) &&
@@ -189,6 +192,7 @@ namespace VitalChoice.ExportService.Services
                     await uow.SaveChangesAsync();
                 }
             }
+            return true;
         }
 
         private async Task UpdateOrderPayment(OrderCardData paymentMethod, UnitOfWork uow, bool inMemory)

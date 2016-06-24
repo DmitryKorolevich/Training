@@ -102,10 +102,11 @@ namespace VitalChoice.ExportService.Services
                 SendCommand(new ServiceBusCommandBase(command, false));
                 return false;
             }
-
             try
             {
-                _orderExportService.UpdateOrderPaymentMethod(orderPaymentInfo).GetAwaiter().GetResult();
+                var updateResult = _orderExportService.UpdateOrderPaymentMethod(orderPaymentInfo).GetAwaiter().GetResult();
+                SendCommand(new ServiceBusCommandBase(command, updateResult));
+                return true;
             }
             catch (Exception e)
             {
@@ -113,8 +114,6 @@ namespace VitalChoice.ExportService.Services
                 SendCommand(new ServiceBusCommandBase(command, false));
                 return true;
             }
-            SendCommand(new ServiceBusCommandBase(command, true));
-            return true;
         }
 
         private bool ProcessExportOrders(ServiceBusCommandBase command)

@@ -634,6 +634,11 @@ namespace VitalChoice.Business.Services.Customers
                             IdCustomer = p.Model.IdCustomer
                         }).ToArray());
 
+                    if (!await updatePaymentsTask)
+                    {
+                        throw new ApiException("Cannot update customer payment info on remote.");
+                    }
+
                     transaction.Commit();
 
                 }
@@ -642,10 +647,6 @@ namespace VitalChoice.Business.Services.Customers
                     transaction.Rollback();
                     throw;
                 }
-            }
-            if (!await updatePaymentsTask)
-            {
-                throw new ApiException("Cannot update customer payment info on remote.");
             }
             return entity;
         }
@@ -725,6 +726,11 @@ namespace VitalChoice.Business.Services.Customers
                             IdCustomer = p.Model.IdCustomer
                         }).ToArray());
 
+                    if (!await updatePaymentsTask)
+                    {
+                        throw new ApiException("Cannot update customer payment info on remote.");
+                    }
+
                     transaction.Commit();
                 }
                 catch
@@ -737,10 +743,6 @@ namespace VitalChoice.Business.Services.Customers
                     transaction.Rollback();
                     throw;
                 }
-            }
-            if (!await updatePaymentsTask)
-            {
-                throw new ApiException("Cannot update customer payment info on remote.");
             }
             return entity;
         }

@@ -9,7 +9,7 @@ namespace VitalChoice.ExportService.Services
     public interface IOrderExportService
     {
         Task UpdateCustomerPaymentMethods(ICollection<CustomerCardData> paymentMethods);
-        Task UpdateOrderPaymentMethod(OrderCardData paymentMethod);
+        Task<bool> UpdateOrderPaymentMethod(OrderCardData paymentMethod);
         Task<bool> ExportOrder(int idOrder, POrderType orderType, out ICollection<string> errors);
         void SwitchToInMemoryContext();
         Task SwitchToRealContext();
