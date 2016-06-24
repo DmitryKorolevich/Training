@@ -129,7 +129,17 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                     {
                         if (messages.Count > 0)
                         {
-                            Sender.SendBatch(messages);
+                            if (EnableBatching)
+                            {
+                                Sender.SendBatch(messages);
+                            }
+                            else
+                            {
+                                foreach (var brokeredMessage in messages)
+                                {
+                                    Sender.Send(brokeredMessage);
+                                }
+                            }
                             messages.Clear();
                             batchSize = 0;
                             if (_sendQue.Count == 0)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Autofac;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Domain.Transfer;
@@ -23,8 +24,8 @@ namespace VitalChoice.ExportService.Services
         public override string LocalHostName => ServerHostName;
 
         public EncryptedServiceBusHostServer(IOptions<AppOptions> appOptions, ILoggerFactory loggerFactory,
-            IObjectEncryptionHost encryptionHost, EncryptionKeyUpdater keyUpdater, IOrderExportService orderExportService)
-            : base(appOptions, loggerFactory.CreateLogger<EncryptedServiceBusHostServer>(), encryptionHost)
+            IObjectEncryptionHost encryptionHost, EncryptionKeyUpdater keyUpdater, IOrderExportService orderExportService, IHostingEnvironment env)
+            : base(appOptions, loggerFactory.CreateLogger<EncryptedServiceBusHostServer>(), encryptionHost, env)
         {
             _keyUpdater = keyUpdater;
             _orderExportService = orderExportService;

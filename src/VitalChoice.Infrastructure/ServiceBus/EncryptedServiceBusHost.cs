@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Data.Extensions;
@@ -25,10 +26,10 @@ namespace VitalChoice.Infrastructure.ServiceBus
         public virtual string LocalHostName { get; }
         public string ServerHostName { get; }
 
-        protected EncryptedServiceBusHost(IOptions<AppOptions> appOptions, ILogger logger, IObjectEncryptionHost encryptionHost)
+        protected EncryptedServiceBusHost(IOptions<AppOptions> appOptions, ILogger logger, IObjectEncryptionHost encryptionHost, IHostingEnvironment env)
         {
             ServerHostName = appOptions.Value.ExportService.ServerHostName;
-            LocalHostName = Guid.NewGuid().ToString();
+            LocalHostName = env.ApplicationName;
             EncryptionHost = encryptionHost;
             Logger = logger;
             _commands = new ConcurrentDictionary<CommandItem, WeakReference<ServiceBusCommandBase>>();
@@ -173,11 +174,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 message.Abandon();
                 return;
             }
-            if (message.ExpiresAtUtc < DateTime.UtcNow)
-            {
-                message.Complete();
-                return;
-            }
             if (message.CorrelationId == null)
             {
                 message.Complete();
@@ -229,11 +225,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
             if (message.CorrelationId != LocalHostName)
             {
                 message.Abandon();
-                return;
-            }
-            if (message.ExpiresAtUtc < DateTime.UtcNow)
-            {
-                message.Complete();
                 return;
             }
             if (message.CorrelationId == null)

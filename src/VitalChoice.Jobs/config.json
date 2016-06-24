@@ -20,6 +20,16 @@
       "ServiceBusQueueName": "caching",
       "Enabled": true
     },
+    "ExportService": {
+      "PlainConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=NPK6TEiwcPKxJGg308KkkXIaNatnqkKE64hFarSE2MY=",
+      "EncryptedConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=84NxAhwRn3vd2gDWgPWIDi14x+s3JWe2NFvBx1mTtq8=",
+      "PlainQueueName": "plainexport",
+      "EncryptedQueueName": "encryptedexport",
+      "CertThumbprint": "E2603D85F0E4B59448FD3D380FEFF740B28B3215",
+      "RootThumbprint": "89735BE3169BE34AB67B65C7D9EFFD2C230A9D98",
+      "EncryptionHostSessionExpire": false,
+      "ServerHostName": "export-server"
+    },
     "AzureStorage": {
       "StorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=stagingvcfiles;AccountKey=RxGv/t6KyB7aFPKaKIljivC0YtoYv/FR+0f5uGcORdie1h5WGigJKazfMiYL/gNJz+fGUWsUhEvGjdfwfZAq6A==;BlobEndpoint=https://stagingvcfiles.blob.core.windows.net/;TableEndpoint=https://stagingvcfiles.table.core.windows.net/;QueueEndpoint=https://stagingvcfiles.queue.core.windows.net/;FileEndpoint=https://stagingvcfiles.file.core.windows.net/",
       "CustomerContainerName": "customer-files",

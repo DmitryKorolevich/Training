@@ -11,6 +11,7 @@ using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Interfaces.Services;
 using System.Linq;
 using System.Threading;
+using Microsoft.AspNetCore.Hosting;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 
 namespace VitalChoice.Business.Services
@@ -20,8 +21,8 @@ namespace VitalChoice.Business.Services
         private volatile RSACryptoServiceProvider _keyExchangeProvider;
         private readonly SemaphoreSlim _publicKeyLock = new SemaphoreSlim(1);
 
-        public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerProviderExtended loggerProvider, IObjectEncryptionHost encryptionHost)
-            : base(appOptions, loggerProvider.CreateLogger<EncryptedServiceBusHostClient>(), encryptionHost)
+        public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerFactory loggerProvider, IObjectEncryptionHost encryptionHost, IHostingEnvironment env)
+            : base(appOptions, loggerProvider.CreateLogger<EncryptedServiceBusHostClient>(), encryptionHost, env)
         {
             _keyExchangeProvider = new RSACryptoServiceProvider();
         }
