@@ -1,0 +1,106 @@
+﻿<div class="container-fluid matchback-report">
+    <div class="well">
+        <span class="legend">Matchback and Post-Season Analysis </span>
+        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+            <fieldset>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="From" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.From.$invalid">
+                            <small class="error" ng-show="forms.form.From.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","From")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="To" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.To.$invalid">
+                            <small class="error" ng-show="forms.form.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" name="IdOrderSource" data-ng-change="filterChanged();" data-ng-model="filter.IdOrderSource" ng-options="item.Key as item.Text for item in orderSourceTypes"></select>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
+                        <a target="_self" class="btn btn-primary pull-right" data-ng-href="{{options.exportUrl}}">Export</a>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <spinner-overlay data-loading="refreshTracker.active()">            
+            <div>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Order Source</th>
+                            <th>Customer #</th>
+                            <th>Order Date</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Address1</th>
+                            <th>Address2</th>
+                            <th>Country</th>
+                            <th>State</th>
+                            <th>City</th>
+                            <th>Zip</th>
+                            <th>Key Code</th>
+                            <th>“Heard Of”</th>
+                            <th>Discount Code</th>
+                            <th>Products Total</th>
+                            <th>Shipping Total</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="item in items">
+                            <td>
+                                <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.IdOrder })' : item.IdObjectType==6 ? 'index.oneCol.orderRefundDetail({id: item.IdOrder })' : 'index.oneCol.orderDetail({id: item.IdOrder })'}}">{{::item.IdOrder}}</a>
+                            </td>
+                            <td>{{::item.OrderSource}}</td>
+                            <td>
+                                <a ui-sref="index.oneCol.customerDetail({id: {{::item.IdCustomer}}})">{{::item.IdCustomer}}</a>
+                            </td>
+                            <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
+                            <td>{{::item.BillingFirstName}}</td>
+                            <td>{{::item.BillingLastName}}</td>
+                            <td>{{::item.BillingAddress1}}</td>
+                            <td>{{::item.BillingAddress2}}</td>
+                            <td>{{::item.BillingCountyCode}}</td>
+                            <td>{{::item.BillingStateCode}}</td>
+                            <td>{{::item.BillingCity}}</td>
+                            <td>{{::item.BillingZip}}</td>
+                            <td>{{::item.KeyCode}}</td>
+                            <td>{{::item.Source}}</td>
+                            <td>{{::item.DiscountCode}}</td>
+                            <td>{{::item.ProductsSubtotal | currency}}</td>
+                            <td>{{::item.ShippingTotal | currency}}</td>
+                            <td>{{::item.Total | currency}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </spinner-overlay>
+        <uib-pagination boundary-links="true"
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        previous-text="&lsaquo;"
+                        next-text="&rsaquo;"
+                        first-text="&laquo;"
+                        last-text="&raquo;"
+                        data-ng-change="pageChanged()">
+        </uib-pagination>
+    </div>
+</div>

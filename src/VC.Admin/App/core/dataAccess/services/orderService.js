@@ -224,5 +224,14 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	        return baseUrl + ('GetSkuAddressReportItemsReportFile?from={0}&to={1}&idcustomertype={2}&skucode={3}&discountcode={4}&withoutdiscount={5}&buildNumber={6}')
                 .format(filter.From, filter.To, filter.IdCustomerType, filter.SkuCode, filter.DiscountCode, filter.WithoutDiscount, buildNumber);
 	    },
+	    getMatchbackReportItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetMatchbackReportItems', filter, getConfig(tracker));
+	    },
+	    getMatchbackItemsReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + ('GetMatchbackItemsReportFile?from={0}&to={1}&idordersource={2}&buildNumber={3}')
+                .format(filter.From, filter.To, filter.IdOrderSource, buildNumber);
+	    },
 	};
 }]);

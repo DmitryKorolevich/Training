@@ -1639,7 +1639,7 @@ namespace VitalChoice.Business.Services.Orders
 
         #region OrdersImport
 
-        public async Task<bool> ImportOrders(byte[] file, string fileName, OrderType orderType, int idCustomer, int idPaymentMethod, int idAddedBy)
+        public async Task<bool> ImportOrders(byte[] file, string fileName, OrderType orderType, int idCustomer, int? idPaymentMethod, int idAddedBy)
         {
             var customer = await _customerService.SelectAsync(idCustomer);
             if (customer == null)
@@ -1718,9 +1718,9 @@ namespace VitalChoice.Business.Services.Orders
             var orders = map.Select(p => p.Order).ToList();
             orders = await InsertRangeAsync(orders);
 
-            if (orderType == OrderType.GiftList)
+            if (orderType == OrderType.GiftList && idPaymentMethod.HasValue)
             {
-                await SendGLOrdersImportEmailAsync(orders, customer, idPaymentMethod, idAddedBy);
+                await SendGLOrdersImportEmailAsync(orders, customer, idPaymentMethod.Value, idAddedBy);
             }
 
             return true;

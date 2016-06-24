@@ -7,7 +7,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
 {
-    public class SkuAddressReportAddressItem
+    public class ReportAddressItem
     {
         [Map]
         public string Company { get; set; }
