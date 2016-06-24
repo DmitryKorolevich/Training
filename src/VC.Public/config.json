@@ -50,8 +50,8 @@
       "LocatorServiceUrl": "https://gateway.fedex.com/web-services"
     },
     "Avatax": {
-      "AccountNumber": "1100041351",
-      "LicenseKey": "6F97A11CAE9E6078",
+      "AccountNumber": "1100142393",
+      "LicenseKey": "FE7FB6CFF1D5ECD2",
       "ServiceUrl": "https://development.avalara.net/",
       "AccountName": "Vital Choice Seafood Inc",
       "ProfileName": "Vital Choice",

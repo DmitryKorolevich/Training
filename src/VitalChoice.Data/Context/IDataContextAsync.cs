@@ -5,6 +5,6 @@ namespace VitalChoice.Data.Context
 {
     public interface IDataContextAsync : IDataContext
     {
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
     }
 }

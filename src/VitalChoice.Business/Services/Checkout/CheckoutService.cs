@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Mail;
 using VitalChoice.Business.Services.Dynamic;
@@ -199,24 +200,29 @@ namespace VitalChoice.Business.Services.Checkout
                     CartExtended cart;
                     if (uid.HasValue)
                     {
-                        cart =
-                            await _cartRepository.Query(c => c.CartUid == uid.Value).SelectFirstOrDefaultAsync(false) ??
-                            await CreateNew(idCustomer);
-
+                        cart = await BuildIncludes(_cartRepository.Query(c => c.CartUid == uid.Value)).SelectFirstOrDefaultAsync(false);
+                        if (cart != null)
+                        {
+                            if (cart.IdCustomer == null)
+                            {
+                                _context.Entry(cart).State = EntityState.Unchanged;
+                                cart.IdCustomer = idCustomer;
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+                        else
+                        {
+                            cart = await CreateNew(idCustomer);
+                        }
                         result = new CustomerCartOrder
                         {
                             CartUid = cart.CartUid
                         };
-                        if (cart.IdCustomer == null)
-                        {
-                            cart.IdCustomer = idCustomer;
-                            await _cartRepository.UpdateAsync(cart);
-                        }
                     }
                     else
                     {
                         cart =
-                            await _cartRepository.Query(c => c.IdCustomer == idCustomer).SelectFirstOrDefaultAsync(false) ??
+                            await BuildIncludes(_cartRepository.Query(c => c.IdCustomer == idCustomer)).SelectFirstOrDefaultAsync(false) ??
                             await CreateNew(idCustomer);
                         result = new CustomerCartOrder
                         {
@@ -230,9 +236,10 @@ namespace VitalChoice.Business.Services.Checkout
                         anonymCart.Order.Customer = customer;
                         anonymCart.Order = await _orderService.InsertAsync(anonymCart.Order);
 
-                        cart = await _cartRepository.Query(c => c.CartUid == anonymCart.CartUid).SelectFirstOrDefaultAsync();
+                        _context.Entry(cart).State = EntityState.Unchanged;
                         cart.IdOrder = anonymCart.Order.Id;
                         await _context.SaveChangesAsync();
+
                         anonymCart.Order.Customer = customer;
                         result.Order = anonymCart.Order;
                     }
