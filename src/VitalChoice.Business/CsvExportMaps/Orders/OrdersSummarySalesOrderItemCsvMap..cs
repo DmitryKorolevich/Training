@@ -36,7 +36,7 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
             Map(m => m.DiscountCode).Name("Discount Code").Index(10);
             Map(m => m.IdAffiliate).Name("Affiliate Id").Index(11);
             Map(m => m.KeyCode).Name("Key Code").Index(12);
-            Map(m => m.SourceName).Name("“Heard of”").Index(13);
+            Map(m => m.SourceName).Name("\"Heard Of\"").Index(13);
             Map(m => m.SourceDetails).Name("Details").Index(14);
             Map(m => m.OrdersCount).Name("Repeat").Index(15);
             Map(m => m.FirstOrderDate).Name("Inception Date").Index(16).TypeConverterOption(CultureInfo.InvariantCulture).TypeConverterOption("MM/dd/yyyy");

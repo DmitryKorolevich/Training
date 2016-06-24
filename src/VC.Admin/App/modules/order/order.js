@@ -21,7 +21,8 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.wholesaleDropShipReportController',
 	'app.modules.order.controllers.transactionsAndRefundsReportController',
 	'app.modules.order.controllers.ordersSummarySalesReportController',
-	'app.modules.order.controllers.skuAddressReportController'
+	'app.modules.order.controllers.skuAddressReportController',
+	'app.modules.order.controllers.matchbackReportController'
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -117,6 +118,11 @@ angular.module('app.modules.order', [
 				    url: '/report/sku-address',
 				    templateUrl: 'app/modules/order/partials/skuAddressReport.html',
 				    controller: 'skuAddressReportController'
+				})
+				.state('index.oneCol.matchbackReport', {
+				    url: '/report/matchback-analysis',
+				    templateUrl: 'app/modules/order/partials/matchbackReport.html',
+				    controller: 'matchbackReportController'
 				});
 		}
 ]);

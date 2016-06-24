@@ -78,7 +78,8 @@ angular.module('app.modules.customer.controllers.customerManagementController', 
                     (!$scope.address.SearchText || $scope.address.SearchText.length < 3) &&
                     (!$scope.defaultShippingAddress.City || $scope.defaultShippingAddress.City.length < 3) &&
                     (!$scope.defaultShippingAddress.Zip || $scope.defaultShippingAddress.Zip.length < 3) &&
-                    (!$scope.address.Phone || $scope.address.Phone.length < 3))
+                    (!$scope.address.Phone || $scope.address.Phone.length < 3) &&
+                    (!$scope.address.Company || $scope.address.Company.length < 3))
 		        {
 		            toaster.pop('error', "Info", "At least one field should be filled with at least 3 characters.");
 		            return false;

@@ -747,7 +747,7 @@ namespace VitalChoice.Business.Services.Orders
             item.Source = _appInfrastructureService.Data().OrderSources.FirstOrDefault(p => (order.Customer.SafeData.Source ?? 0) == p.Key)?.Text;
             item.DoNotMail = order.Customer.SafeData.DoNotMail ?? false;
 
-            var shippingAddress = _addresMapper.ToModelAsync<SkuAddressReportAddressItem>(order.ShippingAddress).Result;
+            var shippingAddress = _addresMapper.ToModelAsync<ReportAddressItem>(order.ShippingAddress).Result;
             shippingAddress.CountyCode = countries.FirstOrDefault(x => x.Id == shippingAddress.IdCountry)?.CountryCode;
             shippingAddress.StateCode = countries.SelectMany(x => x.States).FirstOrDefault(x => x.Id == shippingAddress.IdState)?.StateCode;
 
@@ -763,29 +763,109 @@ namespace VitalChoice.Business.Services.Orders
             item.ShippingZip = shippingAddress.Zip;
             item.ShippingPhone = shippingAddress.Phone;
 
-            SkuAddressReportAddressItem billingAddress;
+            ReportAddressItem billingAddress;
             if (order.PaymentMethod.Address != null)
             {
-                billingAddress = _addresMapper.ToModelAsync<SkuAddressReportAddressItem>(order.PaymentMethod.Address).Result;
+                billingAddress = _addresMapper.ToModelAsync<ReportAddressItem>(order.PaymentMethod.Address).Result;
                 billingAddress.CountyCode = countries.FirstOrDefault(x => x.Id == order.PaymentMethod.Address?.IdCountry)?.CountryCode;
                 billingAddress.StateCode = countries.SelectMany(x => x.States).FirstOrDefault(x => x.Id == order.PaymentMethod.Address?.IdState)?.StateCode;
             }
             else
             {
-                billingAddress = new SkuAddressReportAddressItem();
+                billingAddress = new ReportAddressItem();
             }
 
-            item.BillingFirstName = shippingAddress.FirstName;
-            item.BillingLastName = shippingAddress.LastName;
-            item.BillingCompany = shippingAddress.Company;
-            item.BillingAddress1 = shippingAddress.Address1;
-            item.BillingAddress2 = shippingAddress.Address2;
-            item.BillingCity = shippingAddress.City;
-            item.BillingCounty = shippingAddress.County;
-            item.BillingCountyCode = shippingAddress.CountyCode;
-            item.BillingStateCode = shippingAddress.StateCode;
-            item.BillingZip = shippingAddress.Zip;
-            item.BillingPhone = shippingAddress.Phone;
+            item.BillingFirstName = billingAddress.FirstName;
+            item.BillingLastName = billingAddress.LastName;
+            item.BillingCompany = billingAddress.Company;
+            item.BillingAddress1 = billingAddress.Address1;
+            item.BillingAddress2 = billingAddress.Address2;
+            item.BillingCity = billingAddress.City;
+            item.BillingCounty = billingAddress.County;
+            item.BillingCountyCode = billingAddress.CountyCode;
+            item.BillingStateCode = billingAddress.StateCode;
+            item.BillingZip = billingAddress.Zip;
+            item.BillingPhone = billingAddress.Phone;
+        }
+
+        public async Task<PagedList<MatchbackReportItem>> GetMatchbackReportItemsAsync(MatchbackReportFilter filter)
+        {
+            var toReturn = new PagedList<MatchbackReportItem>();
+
+            OrderQuery conditions = new OrderQuery().NotDeleted().WithCreatedDate(filter.From, filter.To).WithActualStatusOnly().
+                    WithOrderTypes(new[] { OrderType.AutoShipOrder, OrderType.DropShip, OrderType.GiftList, OrderType.Normal }).
+                    WithOrderDynamicValues(filter.IdOrderSource,null, null);
+
+            Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderByDescending(y => y.Id);
+            Func<IQueryLite<Order>, IQueryLite<Order>> includes = p => p.Include(c => c.OptionValues).
+                Include(c => c.PaymentMethod).ThenInclude(c => c.BillingAddress).ThenInclude(c => c.OptionValues).
+                Include(c => c.Customer).ThenInclude(c => c.OptionValues).
+                Include(c => c.Discount);
+
+            PagedList<OrderDynamic> orders;
+            if (filter.Paging != null)
+            {
+                orders = await _orderService.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, conditions,
+                        includes, orderBy: sortable, withDefaults: true);
+            }
+            else
+            {
+                var data = await _orderService.SelectAsync(conditions, includes, orderBy: sortable, withDefaults: true);
+                orders = new PagedList<OrderDynamic>();
+                orders.Items = data;
+                orders.Count = data.Count;
+            }
+
+            toReturn.Count = orders.Count;
+
+            var countries = await _countryService.GetCountriesAsync();
+
+            foreach (var order in orders.Items)
+            {
+                MatchbackReportItem item = new MatchbackReportItem();
+                item.IdOrder = order.Id;
+                item.DateCreated = order.DateCreated;
+                item.IdObjectType = order.IdObjectType;
+                item.OrderStatus = order.OrderStatus;
+                item.POrderStatus = order.POrderStatus;
+                item.NPOrderStatus = order.NPOrderStatus;
+                item.IdCustomer = order.Customer.Id;
+
+                item.OrderSource = _appInfrastructureService.Data().OrderSourceTypes.FirstOrDefault(p => (order.SafeData.OrderType ?? 0) == p.Key)?.Text;
+                item.DiscountCode = order.Discount?.Code;
+                item.KeyCode = order.SafeData.KeyCode;
+                item.Source = _appInfrastructureService.Data().OrderSources.FirstOrDefault(p => (order.Customer.SafeData.Source ?? 0) == p.Key)?.Text;
+                item.ProductsSubtotal = order.ProductsSubtotal;
+                item.ShippingTotal = order.ShippingTotal;
+                item.Total = order.Total;
+
+                ReportAddressItem billingAddress;
+                if (order.PaymentMethod.Address != null)
+                {
+                    billingAddress = _addresMapper.ToModelAsync<ReportAddressItem>(order.PaymentMethod.Address).Result;
+                    billingAddress.CountyCode = countries.FirstOrDefault(x => x.Id == order.PaymentMethod.Address?.IdCountry)?.CountryCode;
+                    billingAddress.StateCode = countries.SelectMany(x => x.States).FirstOrDefault(x => x.Id == order.PaymentMethod.Address?.IdState)?.StateCode;
+                }
+                else
+                {
+                    billingAddress = new ReportAddressItem();
+                }
+
+                item.BillingFirstName = billingAddress.FirstName;
+                item.BillingLastName = billingAddress.LastName;
+                item.BillingCompany = billingAddress.Company;
+                item.BillingAddress1 = billingAddress.Address1;
+                item.BillingAddress2 = billingAddress.Address2;
+                item.BillingCity = billingAddress.City;
+                item.BillingCounty = billingAddress.County;
+                item.BillingCountyCode = billingAddress.CountyCode;
+                item.BillingStateCode = billingAddress.StateCode;
+                item.BillingZip = billingAddress.Zip;
+                item.BillingPhone = billingAddress.Phone;
+                toReturn.Items.Add(item);
+            }
+
+            return toReturn;
         }
     }
 }

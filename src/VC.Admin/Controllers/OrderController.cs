@@ -81,6 +81,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<TransactionAndRefundReportItem, TransactionAndRefundReportItemCsvMap> _transactionAndRefundReportItemCSVExportService;
         private readonly ICsvExportService<OrdersSummarySalesOrderItem, OrdersSummarySalesOrderItemCsvMap> _ordersSummarySalesOrderItemSVExportService;
         private readonly ICsvExportService<SkuAddressReportItem, SkuAddressReportItemCsvMap> _skuAddressReportItemSVExportService;
+        private readonly ICsvExportService<MatchbackReportItem, MatchbackReportItemCsvMap> _matchbackReportItemСSVExportService;
         private readonly INotificationService _notificationService;
         private readonly BrontoService _brontoService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
@@ -108,6 +109,7 @@ namespace VC.Admin.Controllers
                 transactionAndRefundReportItemCSVExportService,
             ICsvExportService<OrdersSummarySalesOrderItem, OrdersSummarySalesOrderItemCsvMap> ordersSummarySalesOrderItemSVExportService,
             ICsvExportService<SkuAddressReportItem, SkuAddressReportItemCsvMap> skuAddressReportItemSVExportService,
+            ICsvExportService<MatchbackReportItem, MatchbackReportItemCsvMap> matchbackReportItemСSVExportService,
             INotificationService notificationService,
             BrontoService brontoService,
             IOrderReportService orderReportService,
@@ -133,6 +135,7 @@ namespace VC.Admin.Controllers
             _transactionAndRefundReportItemCSVExportService = transactionAndRefundReportItemCSVExportService;
             _ordersSummarySalesOrderItemSVExportService = ordersSummarySalesOrderItemSVExportService;
             _skuAddressReportItemSVExportService = skuAddressReportItemSVExportService;
+            _matchbackReportItemСSVExportService = matchbackReportItemСSVExportService;
             _notificationService = notificationService;
             _brontoService = brontoService;
             _orderReportService = orderReportService;
@@ -1279,6 +1282,47 @@ namespace VC.Admin.Controllers
             return File(result, "text/csv");
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<PagedList<MatchbackReportItem>>> GetMatchbackReportItems([FromBody]MatchbackReportFilter filter)
+        {
+            var toReturn = await _orderReportService.GetMatchbackReportItemsAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<FileResult> GetMatchbackItemsReportFile([FromQuery]string from, [FromQuery]string to,
+            [FromQuery]int? idordersource = null)
+        {
+            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+
+            MatchbackReportFilter filter = new MatchbackReportFilter()
+            {
+                From = dFrom.Value,
+                To = dTo.Value.AddDays(1),
+                IdOrderSource = idordersource,
+            };
+            filter.Paging = null;
+
+            var data = await _orderReportService.GetMatchbackReportItemsAsync(filter);
+
+            var result = _matchbackReportItemСSVExportService.ExportToCsv(data.Items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.MATCHBACK_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
         #endregion
 
         #region GCOrders
@@ -1301,8 +1345,16 @@ namespace VC.Admin.Controllers
             var form = await Request.ReadFormAsync();
 
             var idCustomer = Int32.Parse(form["idcustomer"]);
-            var idPaymentMethod = Int32.Parse(form["idpaymentmethod"]);
+            int? idPaymentMethod = null;
             OrderType orderType = (OrderType)Int32.Parse(form["ordertype"]);
+            if (form.ContainsKey("idpaymentmethod"))
+            {
+                idPaymentMethod = Int32.Parse(form["idpaymentmethod"]);
+            }
+            if (orderType == OrderType.GiftList && idPaymentMethod == null)
+            {
+                throw new AppValidationException("Payment method isn't specified.");
+            }
 
             var parsedContentDisposition = ContentDispositionHeaderValue.Parse(form.Files[0].ContentDisposition);
 

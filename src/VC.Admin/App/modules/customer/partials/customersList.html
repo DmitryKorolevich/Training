@@ -58,6 +58,17 @@
                     <input type="text" class="form-control" placeholder="Phone" data-ng-model="address.Phone" autocomplete="off">
                 </div>
             </div>
+            <div class="row form-group">
+                <div class="col-md-3">
+                    <div class="input-group autocomplete">
+                        <input type="text" name="Company" class="form-control" placeholder="Company" data-ng-model="address.Company" autocomplete="off"
+                               typeahead-min-length="1" uib-typeahead="item as item for item in getByProfileAddressAutoComplete($viewValue,'Company')" typeahead-loading="loadingByCompany">
+                        <span class="input-group-addon">
+                            <i ng-show="loadingByCompany" class="glyphicon glyphicon-refresh"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
         </form>
         <div class="row form-group">
             <div class="col-md-4">
@@ -153,15 +164,15 @@
             </table>
         </spinner-overlay>
         <uib-pagination boundary-links="true"
-                    total-items="totalItems"
-                    items-per-page="filter.Paging.PageItemCount"
-                    data-ng-model="filter.Paging.PageIndex"
-                    previous-text="&lsaquo;"
-                    next-text="&rsaquo;"
-                    first-text="&laquo;"
-                    last-text="&raquo;"
-                    max-size="10"
-                    data-ng-change="pageChanged()">
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        previous-text="&lsaquo;"
+                        next-text="&rsaquo;"
+                        first-text="&laquo;"
+                        last-text="&raquo;"
+                        max-size="10"
+                        data-ng-change="pageChanged()">
         </uib-pagination>
     </div>
 </div>
