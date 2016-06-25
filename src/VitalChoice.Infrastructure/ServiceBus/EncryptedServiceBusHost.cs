@@ -169,14 +169,14 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         private void ProcessEncryptedMessage(BrokeredMessage message)
         {
-            if (message.CorrelationId != LocalHostName)
-            {
-                message.Abandon();
-                return;
-            }
             if (message.CorrelationId == null)
             {
                 message.Complete();
+                return;
+            }
+            if (message.CorrelationId != LocalHostName)
+            {
+                message.Abandon();
                 return;
             }
             message.Complete();
@@ -222,14 +222,14 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         private void ProcessPlainMessage(BrokeredMessage message)
         {
-            if (message.CorrelationId != LocalHostName)
-            {
-                message.Abandon();
-                return;
-            }
             if (message.CorrelationId == null)
             {
                 message.Complete();
+                return;
+            }
+            if (message.CorrelationId != LocalHostName)
+            {
+                message.Abandon();
                 return;
             }
             message.Complete();
