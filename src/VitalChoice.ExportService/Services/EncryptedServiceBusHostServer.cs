@@ -24,7 +24,8 @@ namespace VitalChoice.ExportService.Services
         public override string LocalHostName => ServerHostName;
 
         public EncryptedServiceBusHostServer(IOptions<AppOptions> appOptions, ILoggerFactory loggerFactory,
-            IObjectEncryptionHost encryptionHost, EncryptionKeyUpdater keyUpdater, IOrderExportService orderExportService, IHostingEnvironment env)
+            IObjectEncryptionHost encryptionHost, EncryptionKeyUpdater keyUpdater, IOrderExportService orderExportService,
+            IHostingEnvironment env)
             : base(appOptions, loggerFactory.CreateLogger<EncryptedServiceBusHostServer>(), encryptionHost, env)
         {
             _keyUpdater = keyUpdater;
@@ -35,23 +36,50 @@ namespace VitalChoice.ExportService.Services
 
         protected override bool ProcessPlainCommand(ServiceBusCommandBase command)
         {
-            switch (command.CommandName)
+            try
             {
-                case ServiceBusCommandConstants.GetPublicKey:
-                    RSAParameters publicKey = _keyExchangeProvider.ExportParameters(false);
-                    SendPlainCommand(new ServiceBusCommandBase(command, publicKey));
-                    break;
-                case ServiceBusCommandConstants.SetSessionKey:
-                    var keyCombined = (byte[]) command.Data;
-                    SendPlainCommand(new ServiceBusCommandBase(command,
-                        EncryptionHost.RegisterSession(command.SessionId, command.Source,
-                            new KeyExchange(EncryptionHost.RsaDecrypt(keyCombined, _keyExchangeProvider)))));
-                    break;
-                case ServiceBusCommandConstants.CheckSessionKey:
-                    SendPlainCommand(new ServiceBusCommandBase(command, EncryptionHost.SessionExist(command.SessionId)));
-                    break;
-                default:
-                    return false;
+                switch (command.CommandName)
+                {
+                    case ServiceBusCommandConstants.GetPublicKey:
+                        RSAParameters publicKey = _keyExchangeProvider.ExportParameters(false);
+                        SendPlainCommand(new ServiceBusCommandBase(command, publicKey));
+                        break;
+                    case ServiceBusCommandConstants.SetSessionKey:
+                        try
+                        {
+                            var keyCombined = (byte[]) command.Data;
+                            var keyExchange = new KeyExchange(EncryptionHost.RsaDecrypt(keyCombined, _keyExchangeProvider));
+                            SendPlainCommand(new ServiceBusCommandBase(command,
+                                EncryptionHost.RegisterSession(command.SessionId, command.Source, keyExchange)));
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.LogError(e.ToString());
+                            SendPlainCommand(new ServiceBusCommandBase(command, false));
+                            return false;
+                        }
+                        break;
+                    case ServiceBusCommandConstants.CheckSessionKey:
+                        try
+                        {
+                            SendPlainCommand(new ServiceBusCommandBase(command, EncryptionHost.SessionExist(command.SessionId)));
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.LogError(e.ToString());
+                            SendPlainCommand(new ServiceBusCommandBase(command, false));
+                            return false;
+                        }
+                        break;
+
+                    default:
+                        return false;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
             }
             return true;
         }

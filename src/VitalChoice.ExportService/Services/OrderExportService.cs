@@ -70,15 +70,22 @@ namespace VitalChoice.ExportService.Services
         {
             using (var uow = new UnitOfWork(context))
             {
+                _logger.LogInformation($"Received {paymentMethods.Count} items to update");
+
                 var inMemory = context is ExportInfoImMemoryContext;
                 var customerIds = paymentMethods.Select(p => p.IdCustomer).Where(p => p != 0).Distinct().ToList();
                 var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
                 var customerPayments = await rep.Query(c => customerIds.Contains(c.IdCustomer)).SelectAsync(true);
+
+                _logger.LogInformation($"Existing Count: {customerPayments.Count}");
+
                 var validPaymentMethods =
                     paymentMethods.Where(
                         p => p.IdCustomer != 0 && p.IdPaymentMethod != 0 &&
                              !string.IsNullOrWhiteSpace(p.CardNumber) &&
-                             ObjectMapper.IsValuesMasked(typeof(CustomerPaymentMethodDynamic), p.CardNumber, "CardNumber")).ToArray();
+                             !ObjectMapper.IsValuesMasked(typeof(CustomerPaymentMethodDynamic), p.CardNumber, "CardNumber")).ToArray();
+
+                _logger.LogInformation($"Valid Count: {validPaymentMethods.Length}");
 
                 customerPayments.UpdateKeyed(validPaymentMethods,
                     export => export.IdPaymentMethod,
@@ -88,14 +95,18 @@ namespace VitalChoice.ExportService.Services
                             inMemory ? ObjectSerializer.Serialize(dynamic.CardNumber) : _encryptionHost.LocalEncrypt(dynamic.CardNumber));
 
                 var toInsert = validPaymentMethods.ExceptKeyedWith(customerPayments, data => data.IdPaymentMethod,
-                    export => export.IdPaymentMethod);
+                    export => export.IdPaymentMethod).ToArray();
+
+                _logger.LogInformation($"To Insert Non-Unique Count: {toInsert.Length}");
 
                 var newRecords = toInsert.GroupByTakeLast(p => p.IdPaymentMethod).Select(p => new CustomerPaymentMethodExport
                 {
                     IdCustomer = p.IdCustomer,
                     IdPaymentMethod = p.IdPaymentMethod,
                     CreditCardNumber = inMemory ? ObjectSerializer.Serialize(p.CardNumber) : _encryptionHost.LocalEncrypt(p.CardNumber)
-                });
+                }).ToArray();
+
+                _logger.LogInformation($"Inserting new {newRecords.Length} records");
 
                 await rep.InsertRangeAsync(newRecords);
 
