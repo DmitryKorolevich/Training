@@ -91,10 +91,14 @@ namespace VitalChoice.Caching.Services.Cache
                 var cached = data.Get(index);
                 if (cached != null)
                 {
-                    if (cached.NeedUpdate)
+                    using (cached.Lock())
                     {
-                        yield return CacheGetResult.Update;
-                        yield break;
+                        if (cached.NeedUpdate)
+                        {
+                            yield return CacheGetResult.Update;
+                            yield break;
+                        }
+                        yield return cached;
                     }
                 }
                 else
@@ -102,7 +106,6 @@ namespace VitalChoice.Caching.Services.Cache
                     yield return CacheGetResult.Update;
                     yield break;
                 }
-                yield return cached;
             }
         }
 
@@ -126,10 +129,14 @@ namespace VitalChoice.Caching.Services.Cache
                 var cached = data.Get(conditionalInfo, index);
                 if (cached != null)
                 {
-                    if (cached.NeedUpdate)
+                    using (cached.Lock())
                     {
-                        yield return CacheGetResult.Update;
-                        yield break;
+                        if (cached.NeedUpdate)
+                        {
+                            yield return CacheGetResult.Update;
+                            yield break;
+                        }
+                        yield return cached;
                     }
                 }
                 else
@@ -137,7 +144,6 @@ namespace VitalChoice.Caching.Services.Cache
                     yield return CacheGetResult.Update;
                     yield break;
                 }
-                yield return cached;
             }
         }
 
@@ -273,21 +279,23 @@ namespace VitalChoice.Caching.Services.Cache
 
         public EntityKey MarkForAdd(T entity)
         {
+
+            foreach (var data in CacheStorage.AllCacheDatas)
             {
-                foreach (var data in CacheStorage.AllCacheDatas)
+                lock (data)
                 {
                     if (data.FullCollection)
                     {
                         data.NeedUpdate = true;
                     }
                 }
-                Update(entity, (DbContext)null);
-                var pk = EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
-                var foreignKeys = EntityInfo.ForeignKeys.GetForeignKeyValues(entity);
-                MarkForUpdateForeignKeys(foreignKeys);
-                MarkForUpdateDependent(pk);
-                return pk;
             }
+            Update(entity, (DbContext) null);
+            var pk = EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
+            var foreignKeys = EntityInfo.ForeignKeys.GetForeignKeyValues(entity);
+            MarkForUpdateForeignKeys(foreignKeys);
+            MarkForUpdateDependent(pk);
+            return pk;
         }
 
         public ICollection<EntityKey> MarkForAdd(ICollection<T> entities)

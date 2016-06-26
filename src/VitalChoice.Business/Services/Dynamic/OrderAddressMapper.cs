@@ -9,6 +9,7 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.ObjectMapping.Interfaces;
 
@@ -43,8 +44,11 @@ namespace VitalChoice.Business.Services.Dynamic
             {
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
-
-                entity.IdCountry = dynamic.IdCountry ?? 0;
+                if (dynamic.IdCountry == null)
+                {
+                    throw new AppValidationException("Country", "Country is required");
+                }
+                entity.IdCountry = dynamic.IdCountry.Value;
                 entity.County = dynamic.County;
                 entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
                 entity.StatusCode = (int)RecordStatusCode.Active;
@@ -59,7 +63,11 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
 
-                entity.IdCountry = dynamic.IdCountry ?? 0;
+                if (dynamic.IdCountry == null)
+                {
+                    throw new AppValidationException("Country", "Country is required");
+                }
+                entity.IdCountry = dynamic.IdCountry.Value;
                 entity.County = dynamic.County;
                 entity.IdState = dynamic.IdState == 0 ? null : dynamic.IdState;
                 entity.StatusCode = (int)RecordStatusCode.Active;

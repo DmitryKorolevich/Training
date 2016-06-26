@@ -29,7 +29,7 @@ namespace VitalChoice.Caching.Iterators
                 {
                     return await _action(cancellationToken);
                 }
-                catch (SqlException e) when (e.ErrorCode == 1205)
+                catch (SqlException e) when (e.Number == 1205)
                 {
                     if (retryCount < _retryMaxCount)
                     {
@@ -76,7 +76,7 @@ namespace VitalChoice.Caching.Iterators
                 {
                     return await _action(_state, cancellationToken);
                 }
-                catch (SqlException e) when (e.ErrorCode == 1205)
+                catch (SqlException e) when (e.Number == 1205)
                 {
                     if (retryCount < _retryMaxCount)
                     {
@@ -124,7 +124,7 @@ namespace VitalChoice.Caching.Iterators
                 {
                     return await _action(_state, retryResult, cancellationToken);
                 }
-                catch (SqlException e) when (e.ErrorCode == 1205)
+                catch (SqlException e) when (e.Number == 1205)
                 {
                     if (retryCount < _retryMaxCount)
                     {
@@ -166,7 +166,7 @@ namespace VitalChoice.Caching.Iterators
                 {
                     return _action();
                 }
-                catch (SqlException e) when (e.ErrorCode == 1205)
+                catch (SqlException e) when (e.Number == 1205)
                 {
                     if (retryCount < _retryMaxCount)
                     {
@@ -210,7 +210,7 @@ namespace VitalChoice.Caching.Iterators
                 {
                     return _action(_state);
                 }
-                catch (SqlException e) when (e.ErrorCode == 1205)
+                catch (SqlException e) when (e.Number == 1205)
                 {
                     if (retryCount < _retryMaxCount)
                     {
@@ -255,7 +255,7 @@ namespace VitalChoice.Caching.Iterators
                 {
                     return _action(_state, retryResult);
                 }
-                catch (SqlException e) when (e.ErrorCode == 1205)
+                catch (SqlException e) when (e.Number == 1205)
                 {
                     if (retryCount < _retryMaxCount)
                     {

@@ -9,7 +9,7 @@ namespace VitalChoice.Infrastructure.Domain.Entities.CatalogRequests
 {
     public class CatalogRequestAddress : DynamicDataEntity<CatalogRequestAddressOptionValue, AddressOptionType>
     {
-        public int IdCountry { get; set; }
+        public int? IdCountry { get; set; }
 
         public string County { get; set; }
 

@@ -1532,7 +1532,23 @@ namespace VitalChoice.Business.Services.Orders
             {
                 var newItem = new OrderInfoItem
                 {
-                    Id = item.Id, IdObjectType = (OrderType) item.IdObjectType, OrderStatus = item.OrderStatus, POrderStatus = item.POrderStatus, NPOrderStatus = item.NPOrderStatus, IdPaymentMethod = item.PaymentMethod?.IdObjectType, DateCreated = item.DateCreated, Total = item.Total, IdEditedBy = item.IdEditedBy, DateEdited = item.DateEdited, IdCustomerType = item.Customer.IdObjectType, IdCustomer = item.Customer.Id, Company = item.Customer?.ProfileAddress.SafeData.Company, Customer = item.Customer?.ProfileAddress.SafeData.FirstName + " " + item.Customer?.ProfileAddress.SafeData.LastName, StateCode = _codeResolver.GetStateCode(item.ShippingAddress?.IdCountry ?? 0, item.ShippingAddress?.IdState ?? 0), ShipTo = item.ShippingAddress?.SafeData.FirstName + " " + item.ShippingAddress?.SafeData.LastName, PreferredShipMethod = item.ShippingAddress?.SafeData.PreferredShipMethod
+                    Id = item.Id,
+                    IdObjectType = (OrderType) item.IdObjectType,
+                    OrderStatus = item.OrderStatus,
+                    POrderStatus = item.POrderStatus,
+                    NPOrderStatus = item.NPOrderStatus,
+                    IdPaymentMethod = item.PaymentMethod?.IdObjectType,
+                    DateCreated = item.DateCreated,
+                    Total = item.Total,
+                    IdEditedBy = item.IdEditedBy,
+                    DateEdited = item.DateEdited,
+                    IdCustomerType = item.Customer.IdObjectType,
+                    IdCustomer = item.Customer.Id,
+                    Company = item.Customer?.ProfileAddress.SafeData.Company,
+                    Customer = item.Customer?.ProfileAddress.SafeData.FirstName + " " + item.Customer?.ProfileAddress.SafeData.LastName,
+                    StateCode = _codeResolver.GetStateCode(item.ShippingAddress?.IdCountry ?? 0, item.ShippingAddress?.IdState ?? 0),
+                    ShipTo = item.ShippingAddress?.SafeData.FirstName + " " + item.ShippingAddress?.SafeData.LastName,
+                    PreferredShipMethod = item.ShippingAddress?.SafeData.PreferredShipMethod
                 };
                 await DynamicMapper.UpdateModelAsync(newItem, item);
                 resultList.Add(newItem);

@@ -28,14 +28,14 @@ namespace VC.Admin.ModelConverters
 	        return TaskCache.CompletedTask;
 	    }
 
-	    public override Task ModelToDynamicAsync(AddressModel model, AddressDynamic dynamic)
-	    {
-		    dynamic.IdCountry = model.Country.Id;
-	        if (model.Country.States == null || model.Country.States.Count == 0)
-	        {
-	            dynamic.IdState = null;
-	        }
+        public override Task ModelToDynamicAsync(AddressModel model, AddressDynamic dynamic)
+        {
+            dynamic.IdCountry = model.Country?.Id == 0 ? null : model.Country?.Id;
+            if (model.Country?.States == null || model.Country?.States?.Count == 0)
+            {
+                dynamic.IdState = null;
+            }
             return TaskCache.CompletedTask;
         }
-	}
+    }
 }
