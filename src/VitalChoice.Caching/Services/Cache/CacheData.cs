@@ -151,11 +151,11 @@ namespace VitalChoice.Caching.Services.Cache
 
         public CachedEntity<T> TryRemove(EntityKey key)
         {
-            var removed = _mainCluster.Remove(key);
-            if (removed == null)
-                return null;
-            using(removed.Lock())
+            lock (this)
             {
+                var removed = _mainCluster.Remove(key);
+                if (removed == null)
+                    return null;
                 if (removed.UniqueIndex != null)
                     _indexedCluster.Remove(removed.UniqueIndex);
                 removed.ConditionalIndexes.ForEach(
