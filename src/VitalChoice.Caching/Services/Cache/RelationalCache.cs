@@ -25,6 +25,7 @@ namespace VitalChoice.Caching.Services.Cache
     {
         private readonly IInternalCache<T> _internalCache;
         private readonly IEntityInfoStorage _infoStorage;
+        private readonly EntityInfo _entityInfo;
         private readonly DbContext _context;
         private readonly ILogger _logger;
         private IDictionary<TrackedEntityKey, InternalEntityEntry> _trackData;
@@ -36,6 +37,7 @@ namespace VitalChoice.Caching.Services.Cache
             _logger = logger;
             _internalCache = internalCache;
             _infoStorage = infoStorage;
+            infoStorage.GetEntityInfo<T>(out _entityInfo);
         }
 
         public CacheGetResult TryGetCached(QueryData<T> query, out List<T> entities)
@@ -276,7 +278,7 @@ namespace VitalChoice.Caching.Services.Cache
         private CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryData<T> queryData, out T entity)
         {
             var compiled = queryData.WhereExpression?.Compiled.Value;
-            CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
+            CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled, entityInfo: _entityInfo, trackData: _trackData);
             var orderedResult = Order(cacheIterator, queryData);
             entity = orderedResult.FirstOrDefault();
             if (queryData.Tracked)
@@ -289,7 +291,7 @@ namespace VitalChoice.Caching.Services.Cache
         private CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryData<T> queryData, out List<T> entities)
         {
             var compiled = queryData.WhereExpression?.Compiled.Value;
-            CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
+            CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled, entityInfo: _entityInfo, trackData: _trackData);
             var orderedResult = Order(cacheIterator, queryData);
             entities = orderedResult.ToList();
             if (queryData.Tracked)
@@ -351,10 +353,6 @@ namespace VitalChoice.Caching.Services.Cache
 
         private void AttachGraph(object item, RelationInfo relationInfo)
         {
-            //InternalEntityEntry entry;
-            //var trackKey = new TrackedEntityKey(relationInfo.RelationType,
-            //    _infoStorage.GetPrimaryKeyInfo(relationInfo.RelationType).GetPrimaryKeyValue(item));
-            //if (_trackData.TryGetValue(trackKey, out entry))
             //{
             //    var internalEntry = _context.StateManager.GetOrCreateEntry(entry.Entity);
             //    var entity = entry.Entity;
@@ -394,23 +392,44 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 _trackedObjects.Add(item);
                 var internalEntry = _context.StateManager.GetOrCreateEntry(item);
-                internalEntry.SetEntityState(EntityState.Unchanged);
-                //_trackData.Add(trackKey, internalEntry);
                 foreach (var relation in relationInfo.Relations)
                 {
                     var value = relation.GetRelatedObject(item);
                     if (value != null)
                     {
+                        var pkInfo = _infoStorage.GetPrimaryKeyInfo(relation.RelationType);
                         if (relation.IsCollection)
                         {
-                            ((IEnumerable<object>) value).ForEach(singleValue => AttachGraph(singleValue, relation));
+                            ((IEnumerable<object>) value).ForEach(singleValue =>
+                            {
+                                InternalEntityEntry entry;
+                                var trackKey = new TrackedEntityKey(relation.RelationType, pkInfo.GetPrimaryKeyValue(singleValue));
+                                if (_trackData.TryGetValue(trackKey, out entry))
+                                {
+                                    if (entry.EntityState != EntityState.Detached)
+                                    {
+                                        entry.SetEntityState(EntityState.Detached);
+                                    }
+                                }
+                                AttachGraph(singleValue, relation);
+                            });
                         }
                         else
                         {
+                            InternalEntityEntry entry;
+                            var trackKey = new TrackedEntityKey(relation.RelationType, pkInfo.GetPrimaryKeyValue(value));
+                            if (_trackData.TryGetValue(trackKey, out entry))
+                            {
+                                if (entry.EntityState != EntityState.Detached)
+                                {
+                                    entry.SetEntityState(EntityState.Detached);
+                                }
+                            }
                             AttachGraph(value, relation);
                         }
                     }
                 }
+                internalEntry.SetEntityState(EntityState.Unchanged);
             }
             //}
         }

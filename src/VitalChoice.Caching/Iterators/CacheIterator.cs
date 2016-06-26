@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
+using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.ObjectMapping.Base;
@@ -14,12 +17,16 @@ namespace VitalChoice.Caching.Iterators
     {
         private readonly IEnumerable<CacheResult<TSource>> _source;
         private readonly Func<TSource, bool> _predicate;
+        private readonly IDictionary<TrackedEntityKey, InternalEntityEntry> _trackData;
+        private readonly EntityInfo _entityInfo;
         private IEnumerator<CacheResult<TSource>> _enumerator;
 
-        public CacheIterator(IEnumerable<CacheResult<TSource>> source, Func<TSource, bool> predicate)
+        public CacheIterator(IEnumerable<CacheResult<TSource>> source, Func<TSource, bool> predicate, EntityInfo entityInfo = null, IDictionary<TrackedEntityKey, InternalEntityEntry> trackData = null)
         {
             _source = source;
             _predicate = predicate;
+            _trackData = trackData;
+            _entityInfo = entityInfo;
             HasResults = true;
         }
 
@@ -60,6 +67,20 @@ namespace VitalChoice.Caching.Iterators
                         }
                         if (item.Entity != null && _predicate(item))
                         {
+                            if (_trackData != null && _entityInfo != null)
+                            {
+                                var trackKey = new TrackedEntityKey(typeof(TSource),
+                                    _entityInfo.PrimaryKey.GetPrimaryKeyValue(item.Entity));
+
+                                InternalEntityEntry entry;
+                                if (_trackData.TryGetValue(trackKey, out entry))
+                                {
+                                    if (entry.EntityState != EntityState.Detached)
+                                    {
+                                        entry.SetEntityState(EntityState.Detached);
+                                    }
+                                }
+                            }
                             CurrentValue = item;
                             return true;
                         }
@@ -76,6 +97,20 @@ namespace VitalChoice.Caching.Iterators
                             AggregatedResult = item.Result;
                             Dispose();
                             break;
+                        }
+                        if (_trackData != null && _entityInfo != null && item.Entity != null)
+                        {
+                            var trackKey = new TrackedEntityKey(typeof(TSource),
+                                _entityInfo.PrimaryKey.GetPrimaryKeyValue(item.Entity));
+
+                            InternalEntityEntry entry;
+                            if (_trackData.TryGetValue(trackKey, out entry))
+                            {
+                                if (entry.EntityState != EntityState.Detached)
+                                {
+                                    entry.SetEntityState(EntityState.Detached);
+                                }
+                            }
                         }
                         CurrentValue = item;
                         return true;
