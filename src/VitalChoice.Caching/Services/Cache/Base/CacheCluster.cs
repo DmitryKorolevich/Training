@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -7,19 +8,22 @@ namespace VitalChoice.Caching.Services.Cache.Base
 {
     public class CacheCluster<TKey, T>
     {
-        private readonly Dictionary<TKey, CachedEntity<T>> _cluster = new Dictionary<TKey, CachedEntity<T>>();
+        private readonly ConcurrentDictionary<TKey, CachedEntity<T>> _cluster = new ConcurrentDictionary<TKey, CachedEntity<T>>();
 
         public CachedEntity<T> Remove(TKey pk)
         {
-            return _cluster.TryRemove(pk);
+            CachedEntity<T> cached;
+            if (_cluster.TryRemove(pk, out cached))
+            {
+                return cached;
+            }
+            return null;
         }
 
         public CachedEntity<T> AddOrUpdate(TKey pk, T entity, Func<T, CachedEntity<T>> createFunc,
             Func<T, CachedEntity<T>, CachedEntity<T>> updateFunc)
         {
-            return _cluster.AddOrUpdate(pk,
-                () => createFunc(entity),
-                exist => updateFunc(entity, exist));
+            return _cluster.AddOrUpdate(pk, key => createFunc(entity), (key, exist) => updateFunc(entity, exist));
         }
 
         public CachedEntity<T> Update(TKey pk, T entity, Func<T, CachedEntity<T>, CachedEntity<T>> updateFunc)
@@ -27,20 +31,21 @@ namespace VitalChoice.Caching.Services.Cache.Base
             var exist = Get(pk);
             if (exist != null)
             {
-                _cluster[pk] = updateFunc(entity, exist);
+                _cluster.TryUpdate(pk, updateFunc(entity, exist), exist);
             }
             return exist;
         }
 
         public void AddOrUpdate(TKey pk, CachedEntity<T> newCached)
         {
-            if (_cluster.ContainsKey(pk))
+            CachedEntity<T> cached;
+            if (_cluster.TryGetValue(pk, out cached))
             {
-                _cluster[pk] = newCached;
+                _cluster.TryUpdate(pk, newCached, cached);
             }
             else
             {
-                _cluster.Add(pk, newCached);
+                _cluster.TryAdd(pk, newCached);
             }
         }
 

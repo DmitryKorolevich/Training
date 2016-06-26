@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
+using VitalChoice.Caching.Relational;
 using VitalChoice.Ecommerce.Domain.Options;
 
 namespace VitalChoice.Caching.GC
@@ -70,33 +71,39 @@ namespace VitalChoice.Caching.GC
                         var internalCache = _cacheFactory.GetCache(entityType);
                         foreach (var cache in internalCache.GetAllCaches())
                         {
-                            if (cache.FullCollection)
+                            lock (cache)
                             {
-                                lock (cache.LockObj)
+                                if (cache.FullCollection)
                                 {
                                     if (cache.GetAllUntyped().Any(e => now - e.LastUpdateTime < _timeToLeave))
                                     {
                                         foreach (
-                                            var entity in cache.GetAllUntyped().Where(entity => now - entity.LastUpdateTime < _timeToLeave)
+                                            var cached in cache.GetAllUntyped().Where(entity => now - entity.LastUpdateTime < _timeToLeave)
                                             )
                                         {
-                                            var pk = internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity.EntityUntyped);
-                                            internalCache.MarkForUpdate(pk);
+                                            using (cached.Lock())
+                                            {
+                                                var pk = internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(cached.EntityUntyped);
+                                                internalCache.MarkForUpdate(pk);
+                                            }
                                         }
                                         cache.Clear();
                                     }
+
                                 }
-                            }
-                            else
-                            {
-                                lock (cache.LockObj)
+                                else
                                 {
-                                    foreach (var entity in cache.GetAllUntyped().Where(entity => now - entity.LastUpdateTime < _timeToLeave)
+                                    foreach (
+                                        var cached in cache.GetAllUntyped().Where(entity => now - entity.LastUpdateTime < _timeToLeave)
                                         )
                                     {
-                                        var pk = internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity.EntityUntyped);
-                                        internalCache.MarkForUpdate(pk);
-                                        cache.TryRemoveUntyped(internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity.EntityUntyped));
+                                        using (cached.Lock())
+                                        {
+                                            var pk = internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(cached.EntityUntyped);
+                                            internalCache.MarkForUpdate(pk);
+                                            cache.TryRemoveUntyped(
+                                                internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(cached.EntityUntyped));
+                                        }
                                     }
                                 }
                             }

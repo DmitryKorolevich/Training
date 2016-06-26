@@ -13,7 +13,6 @@ namespace VitalChoice.Caching.Interfaces
 {
     public interface ICacheData
     {
-        object LockObj { get; }
         void Clear();
         IEnumerable<CachedEntity> GetUntyped(EntityCacheableIndexInfo nonUniqueIndexInfo, EntityIndex index);
         CachedEntity GetUntyped(EntityKey pk);

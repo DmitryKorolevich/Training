@@ -21,7 +21,7 @@ namespace VitalChoice.Caching.Extensions
 
         public static object DeepCloneItem(this object oldItem, RelationInfo relations)
         {
-            var newItem = oldItem.Clone(relations.RelationType, relations.HasRelation);
+            var newItem = oldItem.Clone(relations.RelationType, type => !type.GetTypeInfo().IsValueType && type != typeof(string));
             oldItem.UpdateCloneRelations(relations.Relations, newItem);
             return newItem;
         }
@@ -33,7 +33,7 @@ namespace VitalChoice.Caching.Extensions
                 var value = relation.GetRelatedObject(relationsSrc);
                 if (value != null)
                 {
-                    var replacementValue = value.GetType().IsImplementGeneric(typeof(ICollection<>))
+                    var replacementValue = relation.IsCollection
                         ? DeepCloneCreateList((IEnumerable<object>) value, relation)
                         : DeepCloneItem(value, relation);
                     relation.SetRelatedObject(dest, replacementValue);

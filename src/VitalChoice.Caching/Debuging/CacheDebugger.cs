@@ -45,7 +45,10 @@ namespace VitalChoice.Caching.Debuging
                                 var cached = data.GetUntyped(pk);
                                 if (cached != null)
                                 {
-                                    cachedList.Add(cached.EntityUntyped);
+                                    using (cached.Lock())
+                                    {
+                                        cachedList.Add(cached.EntityUntyped.DeepCloneItem(data.Relations));
+                                    }
                                 }
                             }
                             yield return new CacheUpdateData

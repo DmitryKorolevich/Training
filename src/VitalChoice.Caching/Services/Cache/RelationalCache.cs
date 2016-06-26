@@ -161,14 +161,14 @@ namespace VitalChoice.Caching.Services.Cache
                 return false;
             }
 
-            var clonedItems = DeepCloneList(entities, query.RelationInfo);
+            //var clonedItems = DeepCloneList(entities, query.RelationInfo);
 
             if (fullCollection)
             {
-                return _internalCache.UpdateAll(clonedItems, query.RelationInfo);
+                return _internalCache.UpdateAll(entities, query.RelationInfo);
             }
 
-            return _internalCache.Update(clonedItems, query.RelationInfo);
+            return _internalCache.Update(entities, query.RelationInfo);
         }
 
         public bool Update(QueryData<T> queryData, T entity)
@@ -197,7 +197,6 @@ namespace VitalChoice.Caching.Services.Cache
                     $"<Cache Update> can't update cache, preconditions not met: {typeof(T)}\r\nExpression:\r\n{queryData.WhereExpression?.Expression.AsString()}");
                 return false;
             }
-            entity = DeepCloneItem(entity, queryData.RelationInfo);
             return _internalCache.Update(entity, queryData.RelationInfo);
         }
 
@@ -279,10 +278,11 @@ namespace VitalChoice.Caching.Services.Cache
             var compiled = queryData.WhereExpression?.Compiled.Value;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
             var orderedResult = Order(cacheIterator, queryData);
-            orderedResult = queryData.Tracked
-                ? AttachNotTracked(orderedResult, queryData.RelationInfo)
-                : DeepCloneList(orderedResult, queryData.RelationInfo);
             entity = orderedResult.FirstOrDefault();
+            if (queryData.Tracked)
+            {
+                AttachNotTracked(entity, queryData.RelationInfo);
+            }
             return CreateGetResult(cacheIterator);
         }
 
@@ -291,10 +291,11 @@ namespace VitalChoice.Caching.Services.Cache
             var compiled = queryData.WhereExpression?.Compiled.Value;
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
             var orderedResult = Order(cacheIterator, queryData);
-            orderedResult = queryData.Tracked
-                ? AttachNotTracked(orderedResult, queryData.RelationInfo)
-                : DeepCloneList(orderedResult, queryData.RelationInfo);
             entities = orderedResult.ToList();
+            if (queryData.Tracked)
+            {
+                AttachNotTracked(entities, queryData.RelationInfo);
+            }
             return CreateGetResult(cacheIterator);
         }
 
@@ -311,21 +312,14 @@ namespace VitalChoice.Caching.Services.Cache
             return _internalCache.CanAddUpCache() ? CacheGetResult.Update : CacheGetResult.NotFound;
         }
 
-        private IEnumerable<T> AttachNotTracked(IEnumerable<T> items, RelationInfo relationInfo)
+        private void AttachNotTracked(T item, RelationInfo relationInfo)
         {
-            return items.Select(item => AttachGraph(item, relationInfo)).Cast<T>();
+            AttachGraph(item, relationInfo);
         }
 
-        private static IEnumerable<T> DeepCloneList(IEnumerable<T> entities, RelationInfo relations)
+        private void AttachNotTracked(IEnumerable<T> items, RelationInfo relationInfo)
         {
-            return entities.Select(item => DeepCloneItem(item, relations));
-        }
-
-        private static T DeepCloneItem(T item, RelationInfo relations)
-        {
-            var newItem = item.Clone(relations.HasRelation);
-            item.UpdateCloneRelations(relations.Relations, newItem);
-            return newItem;
+            items.ForEach(item => AttachGraph(item, relationInfo));
         }
 
         //private void AttachGraph(object item, RelationInfo relationInfo)
@@ -355,74 +349,70 @@ namespace VitalChoice.Caching.Services.Cache
         //    }
         //}
 
-        private object AttachGraph(object item, RelationInfo relationInfo)
+        private void AttachGraph(object item, RelationInfo relationInfo)
         {
-            object result;
-            InternalEntityEntry entry;
-            var trackKey = new TrackedEntityKey(relationInfo.RelationType,
-                _infoStorage.GetPrimaryKeyInfo(relationInfo.RelationType).GetPrimaryKeyValue(item));
-            if (_trackData.TryGetValue(trackKey, out entry))
+            //InternalEntityEntry entry;
+            //var trackKey = new TrackedEntityKey(relationInfo.RelationType,
+            //    _infoStorage.GetPrimaryKeyInfo(relationInfo.RelationType).GetPrimaryKeyValue(item));
+            //if (_trackData.TryGetValue(trackKey, out entry))
+            //{
+            //    var internalEntry = _context.StateManager.GetOrCreateEntry(entry.Entity);
+            //    var entity = entry.Entity;
+            //    foreach (var relation in relationInfo.Relations)
+            //    {
+            //        var value = relation.GetRelatedObject(item);
+            //        if (value != null)
+            //        {
+            //            if (!_trackedObjects.Contains(value))
+            //            {
+            //                _trackedObjects.Add(value);
+            //                if (value.GetType().IsImplementGeneric(typeof(ICollection<>)))
+            //                {
+            //                    ((IEnumerable<object>) value).ForEach(singleValue =>
+            //                    {
+            //                        if (!_trackedObjects.Contains(singleValue))
+            //                        {
+            //                            _trackedObjects.Add(singleValue);
+            //                            AttachGraph(singleValue, relation);
+            //                        }
+            //                    });
+            //                }
+            //                else
+            //                {
+            //                    AttachGraph(value, relation);
+            //                }
+            //            }
+            //        }
+            //    }
+            //    internalEntry.SetEntityState(EntityState.Unchanged);
+            //}
+            //else
+            //{
+            if (item == null)
+                return;
+            if (!_trackedObjects.Contains(item))
             {
-                var internalEntry = _context.StateManager.GetOrCreateEntry(entry.Entity);
-                result = entry.Entity;
+                _trackedObjects.Add(item);
+                var internalEntry = _context.StateManager.GetOrCreateEntry(item);
+                internalEntry.SetEntityState(EntityState.Unchanged);
+                //_trackData.Add(trackKey, internalEntry);
                 foreach (var relation in relationInfo.Relations)
                 {
                     var value = relation.GetRelatedObject(item);
                     if (value != null)
                     {
-                        if (value.GetType().IsImplementGeneric(typeof(ICollection<>)))
+                        if (relation.IsCollection)
                         {
-                            var trackedRelation = relation.GetRelatedObject(result);
-                            if (trackedRelation == null || !_trackedObjects.Contains(trackedRelation))
-                            {
-                                var newItems =
-                                    ((IEnumerable<object>) value).Select(singleValue => AttachGraph(singleValue, relation));
-                                var set = typeof(HashSet<>).CreateGenericCollection(relation.RelationType, newItems);
-                                relation.SetRelatedObject(result, set.CollectionObject);
-                                _trackedObjects.Add(set.CollectionObject);
-                            }
+                            ((IEnumerable<object>) value).ForEach(singleValue => AttachGraph(singleValue, relation));
                         }
                         else
                         {
-                            var trackedRelation = relation.GetRelatedObject(result);
-                            if (trackedRelation == null || !_trackedObjects.Contains(trackedRelation))
-                            {
-                                var newRelation = AttachGraph(value, relation);
-                                relation.SetRelatedObject(result, newRelation);
-                                _trackedObjects.Add(newRelation);
-                            }
+                            AttachGraph(value, relation);
                         }
                     }
                 }
-                internalEntry.SetEntityState(EntityState.Unchanged);
             }
-            else
-            {
-                result = item.Clone(relationInfo.RelationType);
-                foreach (var relation in relationInfo.Relations)
-                {
-                    var value = relation.GetRelatedObject(item);
-                    if (value != null)
-                    {
-                        if (value.GetType().IsImplementGeneric(typeof(ICollection<>)))
-                        {
-                            var newItems =
-                                ((IEnumerable<object>) value).Select(singleValue => AttachGraph(singleValue, relation));
-                            var set = typeof(HashSet<>).CreateGenericCollection(relation.RelationType, newItems);
-                            relation.SetRelatedObject(result, set.CollectionObject);
-                        }
-                        else
-                        {
-                            relation.SetRelatedObject(result, AttachGraph(value, relation));
-                        }
-                    }
-                }
-                var internalEntry = _context.StateManager.GetOrCreateEntry(result);
-                internalEntry.SetEntityState(EntityState.Unchanged);
-                _trackData.Add(trackKey, internalEntry);
-                _trackedObjects.Add(result);
-            }
-            return result;
+            //}
         }
     }
 }

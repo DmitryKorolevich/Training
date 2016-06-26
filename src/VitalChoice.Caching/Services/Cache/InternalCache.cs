@@ -149,18 +149,16 @@ namespace VitalChoice.Caching.Services.Cache
                 yield return CacheGetResult.NotFound;
                 yield break;
             }
-            lock (data.LockObj)
+
+            var allItems = data.GetAll();
+            if (data.Empty || allItems.Any(cached => cached.NeedUpdate))
             {
-                var allItems = data.GetAll();
-                if (data.Empty || allItems.Any(cached => cached.NeedUpdate))
-                {
-                    yield return CacheGetResult.Update;
-                    yield break;
-                }
-                foreach (var cached in allItems.Where(cached => whereFunc(cached)))
-                {
-                    yield return cached;
-                }
+                yield return CacheGetResult.Update;
+                yield break;
+            }
+            foreach (var cached in allItems.Where(cached => whereFunc(cached)))
+            {
+                yield return cached;
             }
         }
 
@@ -177,18 +175,15 @@ namespace VitalChoice.Caching.Services.Cache
                 yield return CacheGetResult.NotFound;
                 yield break;
             }
-            lock (data.LockObj)
+            var allItems = data.GetAll();
+            if (data.NeedUpdate || data.Empty || allItems.Any(cached => cached.NeedUpdate))
             {
-                var allItems = data.GetAll();
-                if (data.NeedUpdate || data.Empty || allItems.Any(cached => cached.NeedUpdate))
-                {
-                    yield return CacheGetResult.Update;
-                    yield break;
-                }
-                foreach (var cached in allItems)
-                {
-                    yield return cached;
-                }
+                yield return CacheGetResult.Update;
+                yield break;
+            }
+            foreach (var cached in allItems)
+            {
+                yield return cached;
             }
         }
 
@@ -451,17 +446,27 @@ namespace VitalChoice.Caching.Services.Cache
                 return pks;
             foreach (var data in CacheStorage.AllCacheDatas)
             {
-                if (data.FullCollection)
+                lock (data)
                 {
-                    data.NeedUpdate = true;
-                }
-                var cachedList = pks.Where(p => p.IsValid).Select(pk => data.Get(pk));
-
-                foreach (var cached in cachedList)
-                {
-                    if (cached != null)
+                    if (data.FullCollection)
                     {
-                        cached.NeedUpdate = true;
+                        data.NeedUpdate = true;
+                    }
+                    var cachedList = pks.Where(p => p.IsValid).Select(pk => data.Get(pk)).ToArray();
+                    var lockList = cachedList.Where(c => c != null).Select(c => c.Lock()).ToArray();
+                    try
+                    {
+                        foreach (var cached in cachedList)
+                        {
+                            if (cached != null)
+                            {
+                                cached.NeedUpdate = true;
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        lockList.ForEach(l => l.Dispose());
                     }
                 }
             }
@@ -487,41 +492,53 @@ namespace VitalChoice.Caching.Services.Cache
             foreach (var data in cacheDatas)
             {
                 var cachedList = pks.Where(p => p.IsValid).Select(pk => data.Get(pk)).ToArray();
+                var lockList = cachedList.Where(c => c != null).Select(c => c.Lock()).ToArray();
+                try
+                {
+                    Dictionary<EntityForeignKeyInfo, HashSet<EntityForeignKey>> foreignKeys =
+                        new Dictionary<EntityForeignKeyInfo, HashSet<EntityForeignKey>>();
+                    lock (data)
+                    {
+                        foreach (var cached in cachedList)
+                        {
+                            if (cached == null && data.FullCollection)
+                            {
+                                data.NeedUpdate = true;
+                            }
+                        }
+                        foreach (var group in cachedList.Where(cached =>
+                        {
+                            if (cached == null)
+                            {
+                                return false;
+                            }
+                            if (!string.IsNullOrWhiteSpace(markRelated) && !cached.NeedUpdateRelated.Contains(markRelated))
+                            {
+                                cached.NeedUpdateRelated.Add(markRelated);
+                                return true;
+                            }
+                            if (cached.NeedUpdate)
+                            {
+                                cached.NeedUpdateRelated.AddRange(EntityInfo.ImplicitUpdateMarkedEntities.Where(r => data.GetHasRelation(r)));
+                                return false;
+                            }
+                            cached.NeedUpdateRelated.AddRange(EntityInfo.ImplicitUpdateMarkedEntities.Where(r => data.GetHasRelation(r)));
+                            cached.NeedUpdate = true;
 
-                foreach (var cached in cachedList)
-                {
-                    if (cached == null && data.FullCollection)
-                    {
-                        data.NeedUpdate = true;
+                            return true;
+                        }).Where(c => c.ForeignKeys != null).SelectMany(c => c.ForeignKeys).Where(f => f.Key != null).GroupBy(k => k.Key))
+                        {
+                            var keySet = new HashSet<EntityForeignKey>();
+                            keySet.AddRange(group.Select(g => g.Value));
+                            foreignKeys.Add(group.Key, keySet);
+                        }
+                        MarkForUpdateForeignKeys(foreignKeys);
                     }
                 }
-                var foreignKeys = new Dictionary<EntityForeignKeyInfo, HashSet<EntityForeignKey>>();
-                foreach (var group in cachedList.Where(cached =>
+                finally
                 {
-                    if (cached == null)
-                    {
-                        return false;
-                    }
-                    if (!string.IsNullOrWhiteSpace(markRelated) && !cached.NeedUpdateRelated.Contains(markRelated))
-                    {
-                        cached.NeedUpdateRelated.Add(markRelated);
-                        return true;
-                    }
-                    if (cached.NeedUpdate)
-                    {
-                        cached.NeedUpdateRelated.AddRange(EntityInfo.ImplicitUpdateMarkedEntities.Where(r => data.GetHasRelation(r)));
-                        return false;
-                    }
-                    cached.NeedUpdateRelated.AddRange(EntityInfo.ImplicitUpdateMarkedEntities.Where(r => data.GetHasRelation(r)));
-                    cached.NeedUpdate = true;
-                    return true;
-                }).Where(c => c.ForeignKeys != null).SelectMany(c => c.ForeignKeys).Where(f => f.Key != null).GroupBy(k => k.Key))
-                {
-                    var keySet = new HashSet<EntityForeignKey>();
-                    keySet.AddRange(group.Select(g => g.Value));
-                    foreignKeys.Add(group.Key, keySet);
+                    lockList.ForEach(l => l.Dispose());
                 }
-                MarkForUpdateForeignKeys(foreignKeys);
             }
             foreach (var pk in pks)
             {
@@ -536,27 +553,33 @@ namespace VitalChoice.Caching.Services.Cache
             foreach (var data in cacheDatas)
             {
                 var cached = data.Get(pk);
-                if (cached != null)
+                lock (data)
                 {
-                    if (!string.IsNullOrWhiteSpace(markRelated) && !cached.NeedUpdateRelated.Contains(markRelated))
+                    if (cached != null)
                     {
-                        cached.NeedUpdateRelated.Add(markRelated);
-                        MarkForUpdateForeignKeys(cached.ForeignKeys);
+                        using (cached.Lock())
+                        {
+                            if (!string.IsNullOrWhiteSpace(markRelated) && !cached.NeedUpdateRelated.Contains(markRelated))
+                            {
+                                cached.NeedUpdateRelated.Add(markRelated);
+                                MarkForUpdateForeignKeys(cached.ForeignKeys);
+                            }
+                            else if (!cached.NeedUpdate)
+                            {
+                                cached.NeedUpdateRelated.AddRange(EntityInfo.ImplicitUpdateMarkedEntities.Where(r => data.GetHasRelation(r)));
+                                cached.NeedUpdate = true;
+                                MarkForUpdateForeignKeys(cached.ForeignKeys);
+                            }
+                            else
+                            {
+                                cached.NeedUpdateRelated.AddRange(EntityInfo.ImplicitUpdateMarkedEntities.Where(r => data.GetHasRelation(r)));
+                            }
+                        }
                     }
-                    else if (!cached.NeedUpdate)
+                    else if (data.FullCollection)
                     {
-                        cached.NeedUpdateRelated.AddRange(EntityInfo.ImplicitUpdateMarkedEntities.Where(r => data.GetHasRelation(r)));
-                        cached.NeedUpdate = true;
-                        MarkForUpdateForeignKeys(cached.ForeignKeys);
+                        data.NeedUpdate = true;
                     }
-                    else
-                    {
-                        cached.NeedUpdateRelated.AddRange(EntityInfo.ImplicitUpdateMarkedEntities.Where(r => data.GetHasRelation(r)));
-                    }
-                }
-                else if (data.FullCollection)
-                {
-                    data.NeedUpdate = true;
                 }
             }
             MarkForUpdateDependent(pk);
@@ -576,12 +599,22 @@ namespace VitalChoice.Caching.Services.Cache
                     foreach (var data in cacheDatas)
                     {
                         var index = dependentType.Value.KeyMapping.MapPrincipalToForeign(pk);
-                        var cachedItems = data.GetUntyped(dependentType.Value, index);
+                        var cachedItems = data.GetUntyped(dependentType.Value, index)?.ToArray();
                         if (cachedItems != null)
                         {
-                            var itemsList = cachedItems.Where(c => !c.NeedUpdate)
-                                .Select(entity => cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity.EntityUntyped)).ToArray();
-                            cache.MarkForUpdate(itemsList, dependentType.Value.Name);
+                            var lockList = cachedItems.Select(c => c.Lock()).ToArray();
+                            try
+                            {
+                                var itemsList =
+                                    cachedItems.Where(c => !c.NeedUpdate)
+                                        .Select(cached => cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(cached.EntityUntyped))
+                                        .ToArray();
+                                cache.MarkForUpdate(itemsList, dependentType.Value.Name);
+                            }
+                            finally
+                            {
+                                lockList.ForEach(l => l.Dispose());
+                            }
                         }
                     }
                 }

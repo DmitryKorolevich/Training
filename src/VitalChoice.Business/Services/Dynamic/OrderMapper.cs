@@ -133,6 +133,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     {
                         var productContents =
                             await _productService.SelectProductContents(dynamic.Skus.Select(p => p.Sku.IdProduct).Distinct().ToList());
+
                         foreach (var productContent in productContents)
                         {
                             var sku = dynamic.Skus.FirstOrDefault(p => p.Sku.IdProduct == productContent.Id);

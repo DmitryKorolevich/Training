@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using VitalChoice.Caching.Services;
 
 namespace VitalChoice.Caching.Iterators
@@ -37,11 +40,11 @@ namespace VitalChoice.Caching.Iterators
             else
             {
 #pragma warning disable 4014
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
 #pragma warning restore 4014
                 {
                     _cacheExecutor.UpdateList(_items);
-                }, cancellationToken);
+                }, cancellationToken).ConfigureAwait(false);
             }
             return result;
         }

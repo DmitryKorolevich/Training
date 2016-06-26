@@ -19,7 +19,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Services
 {
-    public class CacheEntityQueryProvider : EntityQueryProvider
+    public class CacheEntityQueryProvider : SqlErrorTrapEntityQueryProvider
     {
         private readonly IQueryParserFactory _queryParserFactory;
         private readonly IInternalEntityCacheFactory _cacheFactory;
@@ -67,10 +67,10 @@ namespace VitalChoice.Caching.Services
                             return entity;
                         case CacheGetResult.Update:
                             entity = base.Execute<TResult>(expression);
-                            Task.Factory.StartNew(() =>
+                            Task.Run(() =>
                             {
                                 cacheExecutor.Update(entity);
-                            });
+                            }).ConfigureAwait(false);
                             return entity;
                     }
                 }
@@ -145,11 +145,11 @@ namespace VitalChoice.Caching.Services
                         case CacheGetResult.Update:
                             entity = await base.ExecuteAsync<TResult>(expression, cancellationToken);
 #pragma warning disable 4014
-                            Task.Factory.StartNew(() =>
+                            Task.Run(() =>
 #pragma warning restore 4014
                             {
                                 cacheExecutor.Update(entity);
-                            }, cancellationToken);
+                            }, cancellationToken).ConfigureAwait(false);
                             return entity;
                     }
                 }

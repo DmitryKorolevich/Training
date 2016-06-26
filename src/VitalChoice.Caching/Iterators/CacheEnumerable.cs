@@ -55,10 +55,10 @@ namespace VitalChoice.Caching.Iterators
             //Enumeration ended, update cache
             else
             {
-                Task.Factory.StartNew(() =>
+                Task.Run(() =>
                 {
                     _cacheExecutor.UpdateList(_items);
-                });
+                }).ConfigureAwait(false);
             }
             return result;
         }
