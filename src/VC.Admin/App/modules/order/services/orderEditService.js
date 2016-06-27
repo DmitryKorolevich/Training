@@ -760,9 +760,14 @@ angular.module('app.modules.order.services.orderEditService', [])
 
     var initRecalculate = function (uiScope)
     {
-        uiScope.requestRecalculate = function (callback) {
+        uiScope.requestRecalculate = function (callback, rejectCallback) {
             //additional client validation
-            if (!uiScope.skusClientValid()) {
+            if (!uiScope.skusClientValid())
+            {
+                if (rejectCallback)
+                {
+                    rejectCallback();
+                }
                 return;
             }
 

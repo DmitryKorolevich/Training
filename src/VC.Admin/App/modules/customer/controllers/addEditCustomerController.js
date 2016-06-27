@@ -544,20 +544,19 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			    {
 			        if ($scope.options.selectedOrderImportFile)
 			        {
-			            var idPaymentMethod = $scope.options.UploadOrderCreditCard;
-			            if ($scope.options.UploadOrderType == 3)//dropship
+			            var data = {
+			                idcustomer: $scope.currentCustomer.Id,
+			                ordertype: $scope.options.UploadOrderType
+			            };
+			            if ($scope.options.UploadOrderType == 4)//gl
 			            {
-			                idPaymentMethod = null;
+			                data.idpaymentmethod = $scope.options.UploadOrderCreditCard;
 			            }
 			            $scope.options.uploadingOrdersImport = true;
 			            var deferred = $scope.addEditTracker.createPromise();
 			            Upload.upload({
 			                url: '/api/order/ImportOrders',
-			                data: {
-			                    idcustomer: $scope.currentCustomer.Id,
-			                    idpaymentmethod: idPaymentMethod,
-			                    ordertype: $scope.options.UploadOrderType
-			                },
+			                data: data,
 			                file: $scope.options.selectedOrderImportFile
 			            }).progress(function (evt)
 			            {

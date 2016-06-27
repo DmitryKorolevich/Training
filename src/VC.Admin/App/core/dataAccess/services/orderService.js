@@ -12,6 +12,19 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    return config;
 	};
 
+	function generateQueryParamsBasedOnFilter(filter)
+	{
+	    var url = '';
+	    $.each(filter, function(index, item)
+	    {
+	        if(index != 'Paging' && index!= 'Sorting')
+	        {
+	            url+='{0}={1}&'.format(index.toLowerCase(), item);
+	        }
+	    });
+	    return url;
+	}
+
 	return {
 	    //orders
 	    getShortOrders: function (filter, tracker)
@@ -232,6 +245,15 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return baseUrl + ('GetMatchbackItemsReportFile?from={0}&to={1}&idordersource={2}&buildNumber={3}')
                 .format(filter.From, filter.To, filter.IdOrderSource, buildNumber);
+	    },
+	    getMailingReportItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetMailingReportItems', filter, getConfig(tracker));
+	    },
+	    getMailingReportItemsReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + ('GetMailingReportItemsReportFile?{0}buildNumber={1}')
+                .format(generateQueryParamsBasedOnFilter(filter), buildNumber);
 	    },
 	};
 }]);

@@ -99,11 +99,11 @@ namespace VitalChoice.Business.Services.VeraCore
 
         public async Task ProcessFiles()
         {
-            _logger.LogWarning("Initiating FTP Scan");
+            _logger.LogInformation("Initiating FTP Scan");
             try
             {
                 var fileList = _veraCoreSFTPService.GetFileList(VeraCoreSFTPOptions.Export);
-                _logger.LogWarning("List Done");
+                _logger.LogInformation("List Done");
 
                 using (var uow = _transactionEcommerceAccessor.CreateUnitOfWork())
                 {
@@ -125,7 +125,7 @@ namespace VitalChoice.Business.Services.VeraCore
                         }
                     }
 
-                    _logger.LogWarning("Downloading files");
+                    _logger.LogInformation("Downloading files");
                     var files = new List<VeraCoreFile>();
                     foreach (var fileName in fileNames)
                     {
@@ -183,7 +183,7 @@ namespace VitalChoice.Business.Services.VeraCore
                     }
                 }
 
-                _logger.LogWarning("SFTP files are processed succefully");
+                _logger.LogInformation("SFTP files are processed succefully");
             }
             catch (Exception e)
             {
@@ -219,7 +219,7 @@ namespace VitalChoice.Business.Services.VeraCore
                 updated = await ProcessShipment(items.Where(p => p.IdType == VeraCoreProcessItemType.Ship).ToList());
                 updated = await ProcessCancel(items.Where(p => p.IdType == VeraCoreProcessItemType.Cancel).ToList()) || updated;
 
-                _logger.LogWarning(updated ? "Orders and Cache updated successfully" : "No updates in queue");
+                _logger.LogInformation(updated ? "Orders and Cache updated successfully" : "No updates in queue");
             }
             catch (Exception e)
             {

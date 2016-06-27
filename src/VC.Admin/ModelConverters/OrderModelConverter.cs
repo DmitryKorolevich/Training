@@ -535,7 +535,7 @@ namespace VC.Admin.ModelConverters
                     // ReSharper disable once PossibleInvalidOperationException
                     model.SkuOrdereds.Where(s => s.Id.HasValue).ToDictionary(s => s.Id.Value, s => s);
                 Dictionary<string, SkuOrderedManageModel> notValid =
-                    model.SkuOrdereds.Where(s => !s.Id.HasValue).ToDictionary(s => s.Code, s => s);
+                    model.SkuOrdereds.Where(s => !s.Id.HasValue && s.Code!=null).ToDictionary(s => s.Code, s => s);
                 foreach (var sku in validSkus)
                 {
                     var item = valid[sku.Sku.Id];

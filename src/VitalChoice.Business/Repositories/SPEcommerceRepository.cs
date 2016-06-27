@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain;
+using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
@@ -300,6 +301,27 @@ namespace VitalChoice.Business.Repositories
             var toReturn = await _context.Set<SkuPOrderTypeFutureBreakDownReportRawItem>().FromSql
                 ("[dbo].[SPGetSkuPOrderTypeFutureBreakDownReport] @from={0}, @to={1}",
                 filter.From, filter.To).ToListAsync();
+            return toReturn;
+        }
+
+        public async Task<ICollection<MailingReportItem>> GetMailingReportRawItemsAsync(MailingReportFilter filter)
+        {
+            if (string.IsNullOrEmpty(filter.DiscountCodeFirst))
+                filter.DiscountCodeFirst = null;
+            if (string.IsNullOrEmpty(filter.KeyCodeFirst))
+                filter.KeyCodeFirst = null;
+
+            var toReturn = await _context.Set<MailingReportItem>().FromSql
+                ("[dbo].[SPGetMailingListReport] @from={0}, @to={1}," +
+                " @idcustomertype={2}, @fromordercount={3}, @toordercount={4}, @fromfirst={5}, @tofirst={6}," +
+                " @fromlast={7}, @tolast={8}, @lastfromtotal={9}, @lasttototal={10}, @dnm={11}, @dnr={12}," +
+                " @idcustomerordersource={13}, @keycodefirst={14}, @discountcodefirst={15}," +
+                " @pageindex={16}, @pagesize={17}",
+                filter.From, filter.To,
+                filter.CustomerIdObjectType, filter.FromOrderCount, filter.ToOrderCount, filter.FromFirst, filter.ToFirst,
+                filter.FromLast, filter.ToLast, filter.LastFromTotal, filter.LastToTotal, filter.DNM, filter.DNR,
+                filter.IdCustomerOrderSource, filter.KeyCodeFirst, filter.DiscountCodeFirst,
+                filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
             return toReturn;
         }
     }

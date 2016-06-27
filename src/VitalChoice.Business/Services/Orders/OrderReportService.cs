@@ -867,5 +867,26 @@ namespace VitalChoice.Business.Services.Orders
 
             return toReturn;
         }
+
+        public async Task<PagedList<MailingReportItem>> GetMailingReportItemsAsync(MailingReportFilter filter)
+        {
+            PagedList<MailingReportItem> toReturn = new PagedList<MailingReportItem>();
+
+            toReturn.Items = (await _sPEcommerceRepository.GetMailingReportRawItemsAsync(filter)).ToList();
+
+            var countries = await _countryService.GetCountriesAsync();
+
+            toReturn.Items.ForEach(p =>
+            {
+                p.CustomerOrderSource = p.IdCustomerOrderSource.HasValue ? _appInfrastructureService.Data().OrderSources.FirstOrDefault(pp => p.IdCustomerOrderSource.Value == pp.Key)?.Text : null;
+                p.CountryCode = countries.FirstOrDefault(x => x.Id == p.IdCountry)?.CountryCode;
+                p.StateCode = countries.SelectMany(x => x.States).FirstOrDefault(x => x.Id == p.IdState)?.StateCode;
+            });
+            toReturn.Count = toReturn.Items.Count > 0 ?
+                toReturn.Items.First().Count !=0 ? toReturn.Items.First().Count : toReturn.Items.Count 
+                : 0;
+
+            return toReturn;
+        }
     }
 }

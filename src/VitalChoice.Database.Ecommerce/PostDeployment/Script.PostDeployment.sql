@@ -55,3 +55,4 @@ Post-Deployment Script Template
 :r .\Scripts\AddressOptionsUpdate.sql
 
 :r .\Scripts\Skus.sql
+:r .\Scripts\SPGetMailingListReport.sql

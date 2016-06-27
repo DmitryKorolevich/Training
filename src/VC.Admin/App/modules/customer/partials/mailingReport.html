@@ -1,0 +1,215 @@
+﻿<div class="container-fluid matchback-report">
+    <div class="well">
+        <span class="legend">Matchback and Post-Season Analysis </span>
+        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+            <fieldset>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <strong>Order Date</strong>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="From" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.From.$invalid">
+                            <small class="error" ng-show="forms.form.From.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","From")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="To" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.To.$invalid">
+                            <small class="error" ng-show="forms.form.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <strong>Entry Date</strong>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="FromFirst" placeholder="From" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.FromFirst" is-open="FromFirstOpened" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); FromFirstOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="ToFirst" placeholder="To" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.ToFirst" is-open="ToFirstOpened" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); ToFirstOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <strong>Last Order Date</strong>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="FromLast" placeholder="From" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.FromLast" is-open="FromLastOpened" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); FromLastOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="ToLast" placeholder="To" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.ToLast" is-open="ToLastOpened" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); ToLastOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="LastFromTotal" class="form-control" placeholder="From Last Order Total" data-ng-change="filterChanged();" data-ng-model="filter.LastFromTotal" money autocomplete="off">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.LastFromTotal.$invalid">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="LastToTotal" class="form-control" placeholder="To Last Order Total" data-ng-change="filterChanged();" data-ng-model="filter.LastToTotal" money autocomplete="off">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.LastToTotal.$invalid">
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <strong>Order Frequency</strong>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <input type="text" name="FromOrderCount" class="form-control" placeholder="From" data-ng-change="filterChanged();" data-ng-model="filter.FromOrderCount" numbers-only autocomplete="off">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.FromOrderCount.$invalid">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="ToOrderCount" class="form-control" placeholder="From" data-ng-change="filterChanged();" data-ng-model="filter.ToOrderCount" numbers-only autocomplete="off">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.ToOrderCount.$invalid">
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <select class="form-control" name="CustomerIdObjectType" data-ng-change="filterChanged();" data-ng-model="filter.CustomerIdObjectType" ng-options="item.Key as item.Text for item in customerTypes"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" name="IdCustomerOrderSource" data-ng-change="filterChanged();" data-ng-model="filter.IdCustomerOrderSource" ng-options="item.Key as item.Text for item in orderSources"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="KeyCodeFirst" data-ng-change="filterChanged();" placeholder="First Key Code" data-ng-model="filter.KeyCodeFirst" autocomplete="off">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="DiscountCodeFirst" data-ng-change="filterChanged();" placeholder="First Discount Code" data-ng-model="filter.DiscountCodeFirst" autocomplete="off">
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3 checkbox-select-wrapper">
+                        <select class="form-control" name="DNM" data-ng-change="filterChanged();" data-ng-model="filter.DNM" ng-options="item.Key as item.Text for item in checkboxOptions"></select>
+                        <label>DNM</label>
+                    </div>
+                    <div class="col-md-3 checkbox-select-wrapper">
+                        <select class="form-control" name="DNR" data-ng-change="filterChanged();" data-ng-model="filter.DNR" ng-options="item.Key as item.Text for item in checkboxOptions"></select>
+                        <label>DNR</label>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
+                        <a target="_self" class="btn btn-primary pull-right" data-ng-href="{{options.exportUrl}}">Export</a>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <div>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Customer #</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Address 1</th>
+                            <th>Address 2</th>
+                            <th>Country</th>
+                            <th>State</th>
+                            <th>City</th>
+                            <th>Zip</th>
+                            <th>Phone</th>
+                            <th>First Discount Code</th>
+                            <th>Type</th>
+                            <th>Email</th>
+                            <th>Last Order Date</th>
+                            <th>Last Order Amout</th>
+                            <th>Entry Date</th>
+                            <th>Order Frequency</th>
+                            <th>Total Of Sales</th>
+                            <th>First Source</th>
+                            <th>Key Code</th>
+                            <th>DNM</th>
+                            <th>DNR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="item in items">
+                            <td>
+                                <a ui-sref="index.oneCol.customerDetail({id:item.Id})">{{::item.Id}}</a>
+                            </td>
+                            <td>{{::item.FirstName}}</td>
+                            <td>{{::item.LastName}}</td>
+                            <td>{{::item.Address1}}</td>
+                            <td>{{::item.Address2}}</td>
+                            <td>{{::item.CountryCode}}</td>
+                            <td>{{::item.StateCode}}</td>
+                            <td>{{::item.City}}</td>
+                            <td>{{::item.Zip}}</td>
+                            <td>{{::item.Phone}}</td>
+                            <td>{{::item.FirstDiscountCode}}</td>
+                            <td>
+                                <span data-ng-if="item.CustomerIdObjectType == 1" class="label label-retail font-default">{{getReferenceItem(ReferenceData.ShortCustomerTypes, item.CustomerIdObjectType).Text}}</span>
+                                <span data-ng-if="item.CustomerIdObjectType == 2" class="label label-wholesale font-default">{{getReferenceItem(ReferenceData.ShortCustomerTypes, item.CustomerIdObjectType).Text}}</span>
+                            </td>
+                            <td>{{::item.Email}}</td>
+                            <td>{{::item.LastOrderDateCreated | date:"MM/dd/yy"}}<br />{{::item.LastOrderDateCreated | date:"h:mm a"}}</td>
+                            <td>{{::item.LastOrderTotal | currency}}</td>
+                            <td>{{::item.FirstOrderDateCreated | date:"MM/dd/yy"}}<br />{{::item.FirstOrderDateCreated | date:"h:mm a"}}</td>
+                            <td>{{::item.OrdersCount}}</td>
+                            <td>{{::item.OrdersTotal | currency}}</td>
+                            <td>{{::item.CustomerOrderSource}}</td>
+                            <td>{{::item.FirstKeyCode}}</td>
+                            <td>{{::item.DoNotMail}}</td>
+                            <td>{{::item.DoNotRent}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </spinner-overlay>
+        <uib-pagination boundary-links="true"
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        previous-text="&lsaquo;"
+                        next-text="&rsaquo;"
+                        first-text="&laquo;"
+                        last-text="&raquo;"
+                        data-ng-change="pageChanged()">
+        </uib-pagination>
+    </div>
+</div>

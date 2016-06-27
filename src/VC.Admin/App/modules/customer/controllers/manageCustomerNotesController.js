@@ -54,7 +54,7 @@
         {
             if ($scope.childForms.customerNote.$valid)
             {
-                $scope.customerNotes.push(angular.copy($scope.customerNote));
+                $scope.customerNotes.splice(0,0,angular.copy($scope.customerNote));
                 createCustomerNoteProto();
             } else
             {

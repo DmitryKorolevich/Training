@@ -480,7 +480,7 @@ namespace VC.Admin.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
 			}
 
-			customerModel.IsConfirmed = login.IsConfirmed;
+			customerModel.IsConfirmed = login.PasswordHash !=null;
 			customerModel.PublicUserId = login.PublicId;
 
             await PrepareCustomerNotes(result,customerModel);

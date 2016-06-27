@@ -520,6 +520,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
                 deferredRecalculate.reject();
             }
+        }, function ()
+        {
+            deferredRecalculate.reject();
+            toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
         });
     };
 

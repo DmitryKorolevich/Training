@@ -37,6 +37,8 @@ namespace VC.Admin.ModelConverters
 			    {
 					model.CustomerNotes.Add(await _customerNoteMapper.ToModelAsync<CustomerNoteModel>(customerNote));
                 }
+		        model.CustomerNotes = model.CustomerNotes.OrderByDescending(p => p.DateEdited).ToList();
+
 		    }
             model.ProfileAddress = await _addressMapper.ToModelAsync<AddressModel>(dynamic.ProfileAddress);
             if (dynamic.ShippingAddresses.Count > 0)

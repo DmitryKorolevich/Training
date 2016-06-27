@@ -30,7 +30,7 @@ namespace VC.Public.Components.Profile
 			var userId = Convert.ToInt32(_userManager.GetUserId(_actionContextAccessor.ActionContext.HttpContext.User));
 
 			var user = await _storefrontUserService.GetAsync(userId);
-		    if (user != null && user.IsConfirmed && user.Status == UserStatus.Active)
+		    if (user != null && user.Status == UserStatus.Active)
 		    {
 
 		        return View("Sidebar", new SidebarModel()

@@ -44,6 +44,7 @@ using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using VitalChoice.Business.CsvExportMaps.Customers;
 using VitalChoice.Business.Services.Orders;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Infrastructure.Domain.Avatax;
@@ -82,6 +83,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<OrdersSummarySalesOrderItem, OrdersSummarySalesOrderItemCsvMap> _ordersSummarySalesOrderItemSVExportService;
         private readonly ICsvExportService<SkuAddressReportItem, SkuAddressReportItemCsvMap> _skuAddressReportItemSVExportService;
         private readonly ICsvExportService<MatchbackReportItem, MatchbackReportItemCsvMap> _matchbackReportItemСSVExportService;
+        private readonly ICsvExportService<MailingReportItem, MailingReportItemCsvMap> _mailingReportItemСSVExportService;
         private readonly INotificationService _notificationService;
         private readonly BrontoService _brontoService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
@@ -110,6 +112,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<OrdersSummarySalesOrderItem, OrdersSummarySalesOrderItemCsvMap> ordersSummarySalesOrderItemSVExportService,
             ICsvExportService<SkuAddressReportItem, SkuAddressReportItemCsvMap> skuAddressReportItemSVExportService,
             ICsvExportService<MatchbackReportItem, MatchbackReportItemCsvMap> matchbackReportItemСSVExportService,
+            ICsvExportService<MailingReportItem, MailingReportItemCsvMap> mailingReportItemСSVExportService,
             INotificationService notificationService,
             BrontoService brontoService,
             IOrderReportService orderReportService,
@@ -136,6 +139,7 @@ namespace VC.Admin.Controllers
             _ordersSummarySalesOrderItemSVExportService = ordersSummarySalesOrderItemSVExportService;
             _skuAddressReportItemSVExportService = skuAddressReportItemSVExportService;
             _matchbackReportItemСSVExportService = matchbackReportItemСSVExportService;
+            _mailingReportItemСSVExportService = mailingReportItemСSVExportService;
             _notificationService = notificationService;
             _brontoService = brontoService;
             _orderReportService = orderReportService;
@@ -1317,6 +1321,67 @@ namespace VC.Admin.Controllers
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileName = String.Format(FileConstants.MATCHBACK_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<PagedList<MailingReportItem>>> GetMailingReportItems([FromBody]MailingReportFilter filter)
+        {
+            var toReturn = await _orderReportService.GetMailingReportItemsAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<FileResult> GetMailingReportItemsReportFile([FromQuery]string from, [FromQuery]string to,
+            [FromQuery]int? customeridobjecttype = null, [FromQuery]int? fromordercount = null, [FromQuery]int? toordercount = null,
+            [FromQuery]string fromfirst = null, [FromQuery]string tofirst = null, [FromQuery]string fromlast = null, [FromQuery]string tolast = null,
+            [FromQuery]int? lastfromtotal = null, [FromQuery]int? lasttototal = null, [FromQuery]bool? dnm = null, [FromQuery]bool? dnr = null,
+            [FromQuery]int? idcustomerordersource = null, [FromQuery]string keycodefirst = null, [FromQuery]string discountcodefirst = null)
+        {
+            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+            DateTime? dFromFirst = !string.IsNullOrEmpty(fromfirst) ? fromfirst.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
+            DateTime? dToFirst = !string.IsNullOrEmpty(tofirst) ? tofirst.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
+            DateTime? dFromLast = !string.IsNullOrEmpty(fromlast) ? fromlast.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
+            DateTime? dToLast = !string.IsNullOrEmpty(tolast) ? tolast.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
+
+            MailingReportFilter filter = new MailingReportFilter()
+            {
+                From = dFrom.Value,
+                To = dTo.Value.AddDays(1),
+                CustomerIdObjectType = customeridobjecttype,
+                FromOrderCount = fromordercount,
+                ToOrderCount = toordercount,
+                FromFirst = dFromFirst,
+                ToFirst = dToFirst,
+                FromLast = dFromLast,
+                ToLast = dToLast,
+                LastFromTotal = lastfromtotal,
+                LastToTotal = lasttototal,
+                DNM = dnm,
+                DNR = dnr,
+                IdCustomerOrderSource = idcustomerordersource,
+                KeyCodeFirst = keycodefirst,
+                DiscountCodeFirst = discountcodefirst,
+            };
+            filter.Paging = null;
+
+            var data = await _orderReportService.GetMailingReportItemsAsync(filter);
+
+            var result = _mailingReportItemСSVExportService.ExportToCsv(data.Items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.MAILING_REPORT, DateTime.Now)
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
