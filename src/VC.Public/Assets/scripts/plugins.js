@@ -265,6 +265,10 @@ function refreshAjaxForm(data)
             });
         });
     };
+    if ($(data).find('form').length > 0)
+    {
+        reparseElementValidators($(data).find('form').selector);
+    }
 }
 
 function ajaxFormSubmitError(data)

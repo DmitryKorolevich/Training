@@ -42,3 +42,10 @@ function closeCartLite()
     $("#" + $("#lnkClose").closest("div[aria-describedby]").attr('aria-describedby')).dialog('close');
     return false;
 }
+
+function addCrossToCart()
+{
+    closeCartLite();
+    addToCart(null, $(this).attr("data-sku-code"));
+    return false;
+}

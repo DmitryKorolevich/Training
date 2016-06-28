@@ -146,9 +146,3 @@ function addToCartSelectedSku()
     return false;
 }
 
-function addCrossToCart() {
-	closeCartLite();
-	addToCart(null, $(this).attr("data-sku-code"));
-	return false;
-}
-

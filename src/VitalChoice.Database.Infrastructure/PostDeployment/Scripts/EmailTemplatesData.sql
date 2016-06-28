@@ -2676,3 +2676,56 @@ INSERT INTO [dbo].[ContentPages]
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[EmailTemplates] WHERE [Name] = 'EGiftNotificationEmail')
+BEGIN
+
+DECLARE @contentItemId int
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,'<%
+<body:body>
+{{
+	@(Recipient)
+	@(Email)
+	@(Message)
+	@(EGiftsBlock)
+}}
+%>'
+           ,''
+           ,'Vital Choice - E-Gift Notification Email'
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[EmailTemplates]
+           ([Name]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[UserId]
+           ,[ModelType]
+           ,[EmailDescription])
+     VALUES
+           ('EGiftNotificationEmail'
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='StoreFront Email Template')
+           ,2
+           ,NULL
+           ,'EGiftNotificationEmail'
+           ,'E-Gift StoreFront Notification Email')
+
+END
+
+GO

@@ -196,6 +196,23 @@ namespace VitalChoice.Business.Mail
             }
         }
 
+        public async Task SendEGiftNotificationEmailAsync(string email, EGiftNotificationEmail model)
+        {
+            model.EGiftsBlock = "<p>";
+            foreach (var item in model.EGifts)
+            {
+                model.EGiftsBlock += $"{item}<br/>";
+            }
+            model.EGiftsBlock += "</p>";
+
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.EGiftNotificationEmail, model);
+
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body, toDisplayName: model.Recipient);
+            }
+        }
+
         public async Task SendContentUrlNotificationForArticleAsync(string email, ContentUrlNotificationEmail model)
         {
             var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.EmailArticle, model);

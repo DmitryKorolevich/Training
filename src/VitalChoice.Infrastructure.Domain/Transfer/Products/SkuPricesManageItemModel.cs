@@ -9,6 +9,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 
         public int IdProduct { get; set; }
 
+        public string ProductName { get; set; }
+
         public string Code { get; set; }
 
         public RecordStatusCode StatusCode { get; set; }

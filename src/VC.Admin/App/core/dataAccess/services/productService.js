@@ -100,6 +100,14 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    {
 	        return $http.post(baseUrl + 'GetHistoryReport', filter, getConfig(tracker));
 	    },
+	    getSkusPrices: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetSkusPrices', filter, getConfig(tracker));
+	    },
+	    updateSkusPrices: function (items, tracker)
+	    {
+	        return $http.post(baseUrl + 'UpdateSkusPrices', items, getConfig(tracker));
+	    },
 
 	    //product reviews
 	    getProductsWithReviews: function (filter, tracker) {

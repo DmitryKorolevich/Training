@@ -495,3 +495,14 @@ BEGIN
 
 END
 GO
+
+IF NOT EXISTS(SELECT Id FROM OrderOptionTypes WHERE [Name]=N'IgnoneMinimumPerishableThreshold' AND [IdObjectType]=5)
+BEGIN
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'IgnoneMinimumPerishableThreshold', 5, NULL, 5, N'False')
+
+END
+GO

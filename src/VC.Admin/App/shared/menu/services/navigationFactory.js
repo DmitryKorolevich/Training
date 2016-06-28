@@ -43,6 +43,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'manageInventorySkuCategories', stateName: 'index.oneCol.manageInventorySkuCategories', stateLabel: 'Manage Parts Categories', access: 17 },
 				{ name: 'manageInventorySkus', stateName: 'index.oneCol.manageInventorySkus', stateLabel: 'Manage Parts', access: 17 },
 				{ name: 'downloadGoogleFeed', href: 'https://staging.g2-dg.com/google/datafeed.csv', stateLabel: 'Download Google Data Feed', access: 4 },
+				{ name: 'manageSkuPrices', stateName: 'index.oneCol.manageSkuPrices', stateLabel: 'Bulk Product Price Update', access: 4 },
 			]
 		},
         {

@@ -67,6 +67,8 @@ namespace VitalChoice.Interfaces.Services.Products
 
 	    Task<PagedList<SkuPricesManageItemModel>> GetSkusPricesAsync(FilterBase filter);
 
+	    Task<bool> UpdateSkusPricesAsync(ICollection<SkuPricesManageItemModel> items);
+
         Task<byte[]> GenerateSkuGoogleItemsReportFile();
 
 	    Task UpdateSkuGoogleItemsReportFile();
@@ -95,11 +97,15 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<ProductDynamic> UpdateAsync(ProductContentTransferEntity model);
 
-	    Task<ProductContentTransferEntity> SelectTransferByIdOldAsync(int id);
+	    Task<List<ProductDynamic>> UpdateRangeAsync(ICollection<ProductContentTransferEntity> models);
+
+        Task<ProductContentTransferEntity> SelectTransferByIdOldAsync(int id);
 
         Task<ProductContentTransferEntity> SelectTransferAsync(int id, bool withDefaults = false);
 
-	    Task<ICollection<ProductContentTransferEntity>> SelectTransferAsync(bool withDefaults = false);
+	    Task<ICollection<ProductContentTransferEntity>> SelectTransfersAsync(ICollection<int> ids, bool withDefaults = false);
+
+        Task<ICollection<ProductContentTransferEntity>> SelectTransferAsync(bool withDefaults = false);
 
         Task<ProductContentTransferEntity> SelectTransferAsync(Guid id, bool withDefaults = false);
 

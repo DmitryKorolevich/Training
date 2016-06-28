@@ -18,6 +18,12 @@ namespace VitalChoice.Business.Queries.Products
             return this;
         }
 
+        public SkuQuery ProductNotDeleted()
+        {
+            Add(s => s.Product.StatusCode != (int)RecordStatusCode.Deleted);
+            return this;
+        }
+
         public SkuQuery Excluding(ICollection<int> ids)
         {
             if (ids != null && ids.Count > 0)

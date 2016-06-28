@@ -26,6 +26,7 @@ angular.module('app.modules.product', [
 	'app.modules.product.controllers.manageProductsOrderController',
 	'app.modules.product.controllers.skuBreakDownReportController',
 	'app.modules.product.controllers.skuPOrderTypeBreakDownReportController',
+	'app.modules.product.controllers.skuPricesController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -76,10 +77,15 @@ angular.module('app.modules.product', [
 				    controller: 'productManageController'
 				})
 		        .state('index.oneCol.manageProductTaxCodes', {
-		            url: '/tools/producttaxcodes',
+		            url: '/tools/product-tax-codes',
 		            templateUrl: 'app/modules/product/partials/productTaxCodesList.html',
 		            controller: 'productTaxCodesController'
 		        })
+				.state('index.oneCol.manageSkuPrices', {
+				    url: '/tools/sku-prices',
+				    templateUrl: 'app/modules/product/partials/skuPrices.html',
+				    controller: 'skuPricesController'
+				})
 		        /*discounts*/
 		        .state('index.oneCol.manageDiscounts', {
 		            url: '/discounts',
