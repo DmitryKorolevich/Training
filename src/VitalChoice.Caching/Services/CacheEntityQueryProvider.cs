@@ -221,7 +221,7 @@ namespace VitalChoice.Caching.Services
                 _logger = logger;
                 var queryCache = queryParserFactory.GetQueryCache<T>();
                 _cache = new RelationalCache<T>(queryCache.InternalCache, infoStorage, context, logger);
-                _queryData = queryCache.ParseQuery(expression, out _reparsedExpression);
+                _queryData = queryCache.ParseQuery(expression, context.Model, out _reparsedExpression);
             }
 
             public Expression ReparsedExpression => _reparsedExpression;

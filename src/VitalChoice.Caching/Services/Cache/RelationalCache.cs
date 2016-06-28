@@ -6,6 +6,8 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
@@ -25,11 +27,11 @@ namespace VitalChoice.Caching.Services.Cache
     {
         private readonly IInternalCache<T> _internalCache;
         private readonly IEntityInfoStorage _infoStorage;
-        private readonly EntityInfo _entityInfo;
+        //private readonly EntityInfo _entityInfo;
         private readonly DbContext _context;
         private readonly ILogger _logger;
-        private IDictionary<TrackedEntityKey, InternalEntityEntry> _trackData;
-        private HashSet<object> _trackedObjects;
+        //private IDictionary<TrackedEntityKey, InternalEntityEntry> _trackData;
+        //private HashSet<object> _trackedObjects;
 
         public RelationalCache(IInternalCache<T> internalCache, IEntityInfoStorage infoStorage, DbContext context, ILogger logger)
         {
@@ -37,7 +39,7 @@ namespace VitalChoice.Caching.Services.Cache
             _logger = logger;
             _internalCache = internalCache;
             _infoStorage = infoStorage;
-            infoStorage.GetEntityInfo<T>(out _entityInfo);
+            //infoStorage.GetEntityInfo<T>(out _entityInfo);
         }
 
         public CacheGetResult TryGetCached(QueryData<T> query, out List<T> entities)
@@ -53,7 +55,7 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 if (query.Tracked)
                 {
-                    _trackData = _infoStorage.GetTrackData(_context, out _trackedObjects);
+                    //_trackData = _infoStorage.GetTrackData(_context, out _trackedObjects);
                 }
 
                 IEnumerable<CacheResult<T>> results;
@@ -106,7 +108,7 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 if (query.Tracked)
                 {
-                    _trackData = _infoStorage.GetTrackData(_context, out _trackedObjects);
+                    //_trackData = _infoStorage.GetTrackData(_context, out _trackedObjects);
                 }
 
                 IEnumerable<CacheResult<T>> results;
@@ -278,7 +280,7 @@ namespace VitalChoice.Caching.Services.Cache
         private CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryData<T> queryData, out T entity)
         {
             var compiled = queryData.WhereExpression?.Compiled.Value;
-            CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled, entityInfo: _entityInfo, trackData: _trackData);
+            CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
             var orderedResult = Order(cacheIterator, queryData);
             entity = orderedResult.FirstOrDefault();
             if (queryData.Tracked)
@@ -291,7 +293,7 @@ namespace VitalChoice.Caching.Services.Cache
         private CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryData<T> queryData, out List<T> entities)
         {
             var compiled = queryData.WhereExpression?.Compiled.Value;
-            CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled, entityInfo: _entityInfo, trackData: _trackData);
+            CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
             var orderedResult = Order(cacheIterator, queryData);
             entities = orderedResult.ToList();
             if (queryData.Tracked)
@@ -316,73 +318,67 @@ namespace VitalChoice.Caching.Services.Cache
 
         private void AttachNotTracked(T item, RelationInfo relationInfo)
         {
-            if (item != null)
-            {
-                DetachGraph(item, relationInfo);
-                _context.Attach(item);
-            }
+            //if (item != null)
+            //{
+            _context.StateManager.BeginTrackingQuery();
+                AttachGraph(item, relationInfo);
+                //_context.Attach(item);
+            //}
         }
 
         private void AttachNotTracked(ICollection<T> items, RelationInfo relationInfo)
         {
-            if (items != null)
-            {
-                items.ForEach(item => DetachGraph(item, relationInfo));
-                _context.AttachRange(items);
-            }
+            //if (items != null)
+            //{
+            _context.StateManager.BeginTrackingQuery();
+            items.ForEach(item => AttachGraph(item, relationInfo));
+                //_context.AttachRange(items);
+            //}
         }
 
-        private void DetachGraph(object item, RelationInfo relationInfo)
+        private void AttachGraph(object item, RelationInfo relationInfo)
         {
             if (item == null)
                 return;
-            if (!_trackedObjects.Contains(item))
+            //if (!_trackedObjects.Contains(item))
             {
-                _trackedObjects.Add(item);
-                var mainPkInfo = _infoStorage.GetPrimaryKeyInfo(relationInfo.RelationType);
-                var mainTrackKey = new TrackedEntityKey(relationInfo.RelationType, mainPkInfo.GetPrimaryKeyValue(item));
-                InternalEntityEntry trackedEntry;
-                if (_trackData.TryGetValue(mainTrackKey, out trackedEntry))
-                {
-                    if (trackedEntry.EntityState != EntityState.Detached)
-                    {
-                        trackedEntry.SetEntityState(EntityState.Detached);
-                    }
-                }
+                //_trackedObjects.Add(item);
+                _context.StateManager.StartTrackingFromQuery(relationInfo.EntityType, item,
+                    ValueBuffer.Empty);
                 foreach (var relation in relationInfo.Relations)
                 {
                     var value = relation.GetRelatedObject(item);
                     if (value != null)
                     {
-                        var pkInfo = _infoStorage.GetPrimaryKeyInfo(relation.RelationType);
+                        //var pkInfo = _infoStorage.GetPrimaryKeyInfo(relation.RelationType);
                         if (relation.IsCollection)
                         {
                             ((IEnumerable<object>) value).ForEach(singleValue =>
                             {
-                                InternalEntityEntry entry;
-                                var trackKey = new TrackedEntityKey(relation.RelationType, pkInfo.GetPrimaryKeyValue(singleValue));
-                                if (_trackData.TryGetValue(trackKey, out entry))
-                                {
-                                    if (entry.EntityState != EntityState.Detached)
-                                    {
-                                        entry.SetEntityState(EntityState.Detached);
-                                    }
-                                }
-                                DetachGraph(singleValue, relation);
+                                //InternalEntityEntry entry;
+                                //var trackKey = new TrackedEntityKey(relation.RelationType, pkInfo.GetPrimaryKeyValue(singleValue));
+                                //if (_trackData.TryGetValue(trackKey, out entry))
+                                //{
+                                //    if (entry.EntityState != EntityState.Detached)
+                                //    {
+                                //        entry.SetEntityState(EntityState.Detached);
+                                //    }
+                                //}
+                                AttachGraph(singleValue, relation);
                             });
                         }
                         else
                         {
-                            InternalEntityEntry entry;
-                            var trackKey = new TrackedEntityKey(relation.RelationType, pkInfo.GetPrimaryKeyValue(value));
-                            if (_trackData.TryGetValue(trackKey, out entry))
-                            {
-                                if (entry.EntityState != EntityState.Detached)
-                                {
-                                    entry.SetEntityState(EntityState.Detached);
-                                }
-                            }
-                            DetachGraph(value, relation);
+                            //InternalEntityEntry entry;
+                            //var trackKey = new TrackedEntityKey(relation.RelationType, pkInfo.GetPrimaryKeyValue(value));
+                            //if (_trackData.TryGetValue(trackKey, out entry))
+                            //{
+                            //    if (entry.EntityState != EntityState.Detached)
+                            //    {
+                            //        entry.SetEntityState(EntityState.Detached);
+                            //    }
+                            //}
+                            AttachGraph(value, relation);
                         }
                     }
                 }

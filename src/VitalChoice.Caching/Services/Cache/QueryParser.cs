@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore.Metadata;
 using VitalChoice.Caching.Expressions.Analyzers;
 using VitalChoice.Caching.Expressions.Visitors;
 using VitalChoice.Caching.Interfaces;
@@ -37,9 +38,9 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        public QueryData<T> ParseQuery(Expression query, out Expression newExpression)
+        public QueryData<T> ParseQuery(Expression query, IModel model, out Expression newExpression)
         {
-            QueryParseVisitor<T> parseVisitor = new QueryParseVisitor<T>();
+            QueryParseVisitor<T> parseVisitor = new QueryParseVisitor<T>(model);
             query = parseVisitor.Visit(query);
 
             if (parseVisitor.NonCached)

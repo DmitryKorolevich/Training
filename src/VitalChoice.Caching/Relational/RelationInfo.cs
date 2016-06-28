@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore.Metadata;
 using VitalChoice.Caching.Expressions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
@@ -25,28 +26,30 @@ namespace VitalChoice.Caching.Relational
         public string Name { get; }
         public Type RelationType { get; }
         public Type OwnedType { get; }
+        public IEntityType EntityType { get; }
         internal Dictionary<string, RelationInfo> RelationsDict { get; set; }
         public ICollection<RelationInfo> Relations => RelationsDict.Values;
         private readonly IRelationAccessor _relationAccessor;
         private static readonly IRelationAccessor NullAccessor = new NullRelationAccessor();
 
-        internal RelationInfo(string name, Type relatedType, Type ownedType, IRelationAccessor relationAccessor,
+        internal RelationInfo(string name, Type relatedType, Type elementType, bool isCollection, Type ownedType, IEntityType entityType, IRelationAccessor relationAccessor, 
             IEnumerable<RelationInfo> subRelations = null)
         {
+            EntityType = entityType;
             Name = name;
             PropertyType = relatedType;
-            var elementType = relatedType.TryGetElementType(typeof(ICollection<>));
-            RelationType = elementType ?? relatedType;
-            IsCollection = elementType != null;
+            RelationType = elementType;
+            IsCollection = isCollection;
             OwnedType = ownedType;
             _relationAccessor = relationAccessor;
             RelationsDict = subRelations?.ToDictionary(r => r.Name) ??
                             new Dictionary<string, RelationInfo>();
         }
 
-        public RelationInfo(string name, Type relatedType, Type ownedType, LambdaExpression relationExpression = null,
+        public RelationInfo(string name, Type relatedType, Type ownedType, IEntityType entityType, LambdaExpression relationExpression = null,
             IEnumerable<RelationInfo> subRelations = null)
         {
+            EntityType = entityType;
             RelationType = relatedType;
             OwnedType = ownedType;
             Name = name;

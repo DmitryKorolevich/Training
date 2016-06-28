@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Ordering;
@@ -14,9 +15,12 @@ namespace VitalChoice.Caching.Expressions.Visitors
 {
     public class QueryParseVisitor<T> : ExpressionVisitor
     {
-        public QueryParseVisitor()
+        private readonly IModel _model;
+
+        public QueryParseVisitor(IModel model)
         {
-            Relations = new RelationInfo(string.Empty, typeof(T), typeof(T));
+            _model = model;
+            Relations = new RelationInfo(string.Empty, typeof(T), typeof(T), model.FindEntityType(typeof(T)));
         }
 
         // ReSharper disable once StaticMemberInGenericType
@@ -140,7 +144,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
                         if (!Relations.RelationsDict.TryGetValue(name, out _currentRelation))
                         {
-                            _currentRelation = CompiledRelationsCache.GetRelation(name, relationType, ownType, lambda);
+                            _currentRelation = CompiledRelationsCache.GetRelation(name, relationType, ownType, lambda, _model);
                             Relations.RelationsDict.Add(_currentRelation.Name, _currentRelation);
                         }
                         break;
@@ -163,7 +167,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         if (!_currentRelation.RelationsDict.TryGetValue(name, out newCurrent))
                         {
                             var relationInfo = CompiledRelationsCache.GetRelation(name, relationType, _currentRelation.RelationType,
-                                lambdaExpression);
+                                lambdaExpression, _model);
                             _currentRelation.RelationsDict.Add(name, relationInfo);
                             newCurrent = relationInfo;
                         }
