@@ -114,6 +114,14 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(f => f.Id);
             });
 
+            builder.Entity<MailingReportItem>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+                entity.Ignore(f => f.CustomerOrderSource);
+                entity.Ignore(f => f.CountryCode);
+                entity.Ignore(f => f.StateCode);
+            });
+
             #endregion
 
             builder.Entity<VCustomerFavorite>(entity =>

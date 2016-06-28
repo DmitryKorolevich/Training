@@ -10,5 +10,7 @@ namespace VC.Public.Models.Checkout
 
 		[Display(Name = "Order Date")]
 		public DateTime OrderDate { get; set; }
+
+        public bool ShowEGiftEmailForm { get; set; }
     }
 }

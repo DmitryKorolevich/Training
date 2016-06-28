@@ -9,5 +9,7 @@
         });
 
         $("body").on("click", "#lnkClose", closeCartLite);
+
+        $("body").on("click", ".proposals-item-link", addCrossToCart);
     });
 });

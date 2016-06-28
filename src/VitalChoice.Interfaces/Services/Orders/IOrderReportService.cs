@@ -38,5 +38,7 @@ namespace VitalChoice.Interfaces.Services.Orders
 	    Task<PagedList<SkuAddressReportItem>> GetSkuAddressReportItemsAsync(SkuAddressReportFilter filter);
 
 	    Task<PagedList<MatchbackReportItem>> GetMatchbackReportItemsAsync(MatchbackReportFilter filter);
+
+	    Task<PagedList<MailingReportItem>> GetMailingReportItemsAsync(MailingReportFilter filter);
 	}
 }

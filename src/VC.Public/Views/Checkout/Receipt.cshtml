@@ -284,7 +284,7 @@
         </div>
     }
     @if (!string.IsNullOrEmpty(Model.GiftMessage))
-            {
+    {
 
         <div class="reivew-order-info receipt-step">
             <div class="reivew-info-box">
@@ -296,5 +296,9 @@
                 </div>
             </div>
         </div>
+    }
+    @if (Model.ShowEGiftEmailForm)
+    {
+        await Html.RenderPartialAsync("_SendEGiftEmail", new VC.Public.Models.Checkout.EGiftSendEmailModel());
     }
 </div>

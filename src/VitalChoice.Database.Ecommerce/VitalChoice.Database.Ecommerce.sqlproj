@@ -314,4 +314,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\AddressOptionsUpdate.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetMailingListReport.sql" />
+  </ItemGroup>
 </Project>

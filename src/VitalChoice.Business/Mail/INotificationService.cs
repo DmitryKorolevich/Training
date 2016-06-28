@@ -39,6 +39,8 @@ namespace VitalChoice.Business.Mail
 
         Task SendGCNotificationEmailAsyn(string email, GCNotificationEmail model);
 
+        Task SendEGiftNotificationEmailAsync(string email, EGiftNotificationEmail model);
+
         Task SendContentUrlNotificationForArticleAsync(string email, ContentUrlNotificationEmail model);
 
         Task SendContentUrlNotificationForRecipeAsync(string email, ContentUrlNotificationEmail model);

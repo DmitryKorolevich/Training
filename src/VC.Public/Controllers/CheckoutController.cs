@@ -29,6 +29,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Helpers;
+using VitalChoice.Business.Mail;
 using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Core.Services;
 using VitalChoice.Data.Transaction;
@@ -37,6 +38,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
@@ -62,11 +64,13 @@ namespace VC.Public.Controllers
         private readonly BrontoService _brontoService;
         private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
         private readonly IAffiliateService _affiliateService;
+        private readonly INotificationService _notificationService;
         private readonly ILogger _logger;
 
         public CheckoutController(IStorefrontUserService storefrontUserService,
             ICustomerService customerService,
             IAffiliateService affiliateService,
+            INotificationService notificationService,
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
             IOrderService orderService, IProductService productService, IAppInfrastructureService infrastructureService,
             IAuthorizationService authorizationService, ICheckoutService checkoutService,
@@ -90,6 +94,7 @@ namespace VC.Public.Controllers
             _brontoService = brontoService;
             _transactionAccessor = transactionAccessor;
             _affiliateService = affiliateService;
+            _notificationService = notificationService;
             _appInfrastructure = appInfrastructureService.Data();
             _logger = loggerProvider.CreateLogger<CheckoutController>();
         }
@@ -606,7 +611,41 @@ namespace VC.Public.Controllers
             receiptModel.OrderNumber = order.Id.ToString();
             receiptModel.OrderDate = order.DateCreated;
 
+            if (order.Skus.Where(p => p.Sku.Product.IdObjectType == (int) ProductType.EGс).
+                SelectMany(p => p.GcsGenerated).Any())
+            {
+                receiptModel.ShowEGiftEmailForm = true;
+            }
+
             return View(receiptModel);
+        }
+
+        [HttpPost]
+        [CustomerStatusCheck]
+        public async Task<IActionResult> SendEGiftEmail(EGiftSendEmailModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            var idOrder = HttpContext.Session.GetInt32(CheckoutConstants.ReceiptSessionOrderId);
+            if (!idOrder.HasValue)
+            {
+                return PartialView("_SendEGiftEmail", model);
+            }
+
+            var order = await OrderService.SelectAsync(idOrder.Value);
+            var emailModel = new EGiftNotificationEmail();
+            emailModel.Recipient = model.Recipient;
+            emailModel.Email = model.Email;
+            emailModel.Message = model.Message;
+            emailModel.EGifts = order.Skus.Where(p=>p.Sku.Product.IdObjectType==(int)ProductType.EGс).
+                SelectMany(p => p.GcsGenerated).Select(p => p.Code).ToList();
+            await _notificationService.SendEGiftNotificationEmailAsync(model.Email, emailModel);
+
+            ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullySent];
+            ModelState.Clear();
+            return PartialView("_SendEGiftEmail", new EGiftSendEmailModel());
         }
 
         private List<KeyValuePair<string, AddressDynamic>> GetShippingAddresses(OrderDynamic order, CustomerDynamic currentCustomer)

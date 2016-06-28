@@ -329,6 +329,20 @@ namespace VC.Admin.Controllers
             return await productService.DeleteAsync(id);
         }
 
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Products)]
+        public async Task<Result<PagedList<SkuPricesManageItemModel>>> GetSkusPrices([FromBody] FilterBase filter)
+        {
+            return await productService.GetSkusPricesAsync(filter);
+        }
+
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Products)]
+        public async Task<bool> UpdateSkusPrices([FromBody] ICollection<SkuPricesManageItemModel> items)
+        {
+            return await productService.UpdateSkusPricesAsync(items);
+        }
+
         #endregion
 
         #region ProductCategories

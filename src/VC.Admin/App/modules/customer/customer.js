@@ -8,6 +8,7 @@ angular.module('app.modules.customer', [
 	'app.modules.customer.controllers.manageCustomerNotesController',
 	'app.modules.customer.controllers.wholesaleSummaryReportController',
 	'app.modules.customer.controllers.wholesalesReportController',
+	'app.modules.customer.controllers.mailingReportController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -37,6 +38,11 @@ angular.module('app.modules.customer', [
                     url: '/report/wholesale-list',
                     templateUrl: 'app/modules/customer/partials/wholesalesReport.html',
 			        controller: 'wholesalesReportController'
-			    });
+                })
+                .state('index.oneCol.mailingReport', {
+                    url: '/report/mailing-list',
+                    templateUrl: 'app/modules/customer/partials/mailingReport.html',
+                    controller: 'mailingReportController'
+                });
 		}
 	]);
