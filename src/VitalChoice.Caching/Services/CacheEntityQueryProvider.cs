@@ -56,11 +56,14 @@ namespace VitalChoice.Caching.Services
             {
                 if (cacheObjectType == typeof(TResult))
                 {
-                    var cacheExecutor = new CacheExecutor<TResult>(expression, _context, _infoStorage, _queryParserFactory, _logger);
+                    var cacheExecutor =
+                        (ICacheExecutor)
+                            Activator.CreateInstance(typeof(CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
+                                _context, _infoStorage, _queryParserFactory, _logger);
                     if (cacheExecutor.ReparsedExpression != null)
                         return base.Execute<TResult>(cacheExecutor.ReparsedExpression);
                     CacheGetResult cacheGetResult;
-                    var entity = cacheExecutor.ExecuteTypedFirst(out cacheGetResult);
+                    var entity = (TResult)cacheExecutor.ExecuteFirst(out cacheGetResult);
                     switch (cacheGetResult)
                     {
                         case CacheGetResult.Found:
@@ -103,11 +106,14 @@ namespace VitalChoice.Caching.Services
         {
             if (_cacheFactory.CanCache(typeof(TResult)))
             {
-                var cacheExecutor = new CacheExecutor<TResult>(expression, _context, _infoStorage, _queryParserFactory, _logger);
+                var cacheExecutor =
+                    (ICacheExecutor)
+                        Activator.CreateInstance(typeof(CacheExecutor<>).MakeGenericType(typeof(TResult)), expression,
+                            _context, _infoStorage, _queryParserFactory, _logger);
                 if (cacheExecutor.ReparsedExpression != null)
                     return base.ExecuteAsync<TResult>(cacheExecutor.ReparsedExpression);
                 CacheGetResult cacheGetResult;
-                var result = cacheExecutor.ExecuteTyped(out cacheGetResult);
+                var result = (List<TResult>) cacheExecutor.Execute(out cacheGetResult);
 
                 switch (cacheGetResult)
                 {
@@ -133,15 +139,18 @@ namespace VitalChoice.Caching.Services
             {
                 if (cacheObjectType == typeof(TResult))
                 {
-                    var cacheExecutor = new CacheExecutor<TResult>(expression, _context, _infoStorage, _queryParserFactory, _logger);
+                    var cacheExecutor =
+                        (ICacheExecutor)
+                            Activator.CreateInstance(typeof(CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
+                                _context, _infoStorage, _queryParserFactory, _logger);
                     if (cacheExecutor.ReparsedExpression != null)
                         return base.Execute<TResult>(cacheExecutor.ReparsedExpression);
                     CacheGetResult cacheGetResult;
-                    var entity = cacheExecutor.ExecuteTypedFirst(out cacheGetResult);
+                    var entity = cacheExecutor.ExecuteFirst(out cacheGetResult);
                     switch (cacheGetResult)
                     {
                         case CacheGetResult.Found:
-                            return entity;
+                            return (TResult)entity;
                         case CacheGetResult.Update:
                             entity = await base.ExecuteAsync<TResult>(expression, cancellationToken);
 #pragma warning disable 4014
@@ -150,7 +159,7 @@ namespace VitalChoice.Caching.Services
                             {
                                 cacheExecutor.Update(entity);
                             }, cancellationToken).ConfigureAwait(false);
-                            return entity;
+                            return (TResult)entity;
                     }
                 }
                 else
@@ -185,6 +194,8 @@ namespace VitalChoice.Caching.Services
             object ExecuteFirst(out CacheGetResult cacheResult);
             bool Update(object entity);
             object UpdateList(object entities);
+
+            IAsyncEnumerable<T> UpdateListAsync<T>(IAsyncEnumerable<T> entities);
         }
 
         internal interface ICacheExecutor<T> : ICacheExecutor
@@ -196,6 +207,7 @@ namespace VitalChoice.Caching.Services
         }
 
         internal class CacheExecutor<T> : ICacheExecutor<T>
+            where T: class
         {
             private readonly ILogger _logger;
             private readonly QueryData<T> _queryData;
@@ -298,6 +310,11 @@ namespace VitalChoice.Caching.Services
                     _logger.LogError(e.ToString());
                 }
                 return false;
+            }
+
+            public IAsyncEnumerable<TT> UpdateListAsync<TT>(IAsyncEnumerable<TT> entities)
+            {
+                return (IAsyncEnumerable<TT>) new AsyncCacheEnumerable<T>((IAsyncEnumerable<T>) entities, this);
             }
 
             public IAsyncEnumerable<T> UpdateListAsync(IAsyncEnumerable<T> entities)

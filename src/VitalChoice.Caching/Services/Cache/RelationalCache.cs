@@ -21,7 +21,7 @@ using VitalChoice.ObjectMapping.Extensions;
 
 namespace VitalChoice.Caching.Services.Cache
 {
-    public class RelationalCache<T> : IRelationalCache<T>
+    public class RelationalCache<T> : IRelationalCache<T> where T : class
     {
         private readonly IInternalCache<T> _internalCache;
         private readonly IEntityInfoStorage _infoStorage;
@@ -316,82 +316,31 @@ namespace VitalChoice.Caching.Services.Cache
 
         private void AttachNotTracked(T item, RelationInfo relationInfo)
         {
-            AttachGraph(item, relationInfo);
+            if (item != null)
+            {
+                DetachGraph(item, relationInfo);
+                _context.Attach(item);
+            }
         }
 
-        private void AttachNotTracked(IEnumerable<T> items, RelationInfo relationInfo)
+        private void AttachNotTracked(ICollection<T> items, RelationInfo relationInfo)
         {
-            items.ForEach(item => AttachGraph(item, relationInfo));
+            if (items != null)
+            {
+                items.ForEach(item => DetachGraph(item, relationInfo));
+                _context.AttachRange(items);
+            }
         }
 
-        //private void AttachGraph(object item, RelationInfo relationInfo)
-        //{
-        //    EntityEntry entry;
-        //    if (!_trackData.TryGetValue(
-        //        new TrackedEntityKey(relationInfo.RelationType,
-        //            _infoStorage.GetPrimaryKeyInfo(relationInfo.RelationType).GetPrimaryKeyValue(item)), out entry) ||
-        //        entry.State == EntityState.Detached)
-        //    {
-        //        foreach (var relation in relationInfo.Relations)
-        //        {
-        //            var value = relation.GetRelatedObject(item);
-        //            if (value != null)
-        //            {
-        //                if (value.GetType().IsImplementGeneric(typeof (ICollection<>)))
-        //                {
-        //                    ((IEnumerable) value).Cast<object>().ForEach(singleValue => AttachGraph(singleValue, relation));
-        //                }
-        //                else
-        //                {
-        //                    AttachGraph(value, relation);
-        //                }
-        //            }
-        //        }
-        //        _context.Attach(item, GraphBehavior.SingleObject);
-        //    }
-        //}
-
-        private void AttachGraph(object item, RelationInfo relationInfo)
+        private void DetachGraph(object item, RelationInfo relationInfo)
         {
-            //{
-            //    var internalEntry = _context.StateManager.GetOrCreateEntry(entry.Entity);
-            //    var entity = entry.Entity;
-            //    foreach (var relation in relationInfo.Relations)
-            //    {
-            //        var value = relation.GetRelatedObject(item);
-            //        if (value != null)
-            //        {
-            //            if (!_trackedObjects.Contains(value))
-            //            {
-            //                _trackedObjects.Add(value);
-            //                if (value.GetType().IsImplementGeneric(typeof(ICollection<>)))
-            //                {
-            //                    ((IEnumerable<object>) value).ForEach(singleValue =>
-            //                    {
-            //                        if (!_trackedObjects.Contains(singleValue))
-            //                        {
-            //                            _trackedObjects.Add(singleValue);
-            //                            AttachGraph(singleValue, relation);
-            //                        }
-            //                    });
-            //                }
-            //                else
-            //                {
-            //                    AttachGraph(value, relation);
-            //                }
-            //            }
-            //        }
-            //    }
-            //    internalEntry.SetEntityState(EntityState.Unchanged);
-            //}
-            //else
-            //{
             if (item == null)
                 return;
             if (!_trackedObjects.Contains(item))
             {
                 _trackedObjects.Add(item);
-                var mainTrackKey = new TrackedEntityKey(relationInfo.RelationType, _entityInfo.PrimaryKey.GetPrimaryKeyValue(item));
+                var mainPkInfo = _infoStorage.GetPrimaryKeyInfo(relationInfo.RelationType);
+                var mainTrackKey = new TrackedEntityKey(relationInfo.RelationType, mainPkInfo.GetPrimaryKeyValue(item));
                 InternalEntityEntry trackedEntry;
                 if (_trackData.TryGetValue(mainTrackKey, out trackedEntry))
                 {
@@ -400,7 +349,6 @@ namespace VitalChoice.Caching.Services.Cache
                         trackedEntry.SetEntityState(EntityState.Detached);
                     }
                 }
-                var internalEntry = _context.StateManager.GetOrCreateEntry(item);
                 foreach (var relation in relationInfo.Relations)
                 {
                     var value = relation.GetRelatedObject(item);
@@ -420,7 +368,7 @@ namespace VitalChoice.Caching.Services.Cache
                                         entry.SetEntityState(EntityState.Detached);
                                     }
                                 }
-                                AttachGraph(singleValue, relation);
+                                DetachGraph(singleValue, relation);
                             });
                         }
                         else
@@ -434,13 +382,11 @@ namespace VitalChoice.Caching.Services.Cache
                                     entry.SetEntityState(EntityState.Detached);
                                 }
                             }
-                            AttachGraph(value, relation);
+                            DetachGraph(value, relation);
                         }
                     }
                 }
-                internalEntry.SetEntityState(EntityState.Unchanged);
             }
-            //}
         }
     }
 }
