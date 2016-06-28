@@ -3,8 +3,8 @@
   "description": "VitalChoice.Infrastructure.Domain Class Library",
   "authors": [ "multi_000" ],
   "dependencies": {
-    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0-fixed-*",
-    "Microsoft.EntityFrameworkCore": "1.0.0-fixed-*",
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0.*",
+    "Microsoft.EntityFrameworkCore": "1.0.0.*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Workflow": "1.0.0-*"
   },

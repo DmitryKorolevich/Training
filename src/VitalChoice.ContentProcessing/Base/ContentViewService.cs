@@ -174,7 +174,8 @@ namespace VitalChoice.ContentProcessing.Base
                 parameters = new Dictionary<string, object>();
             foreach (var actionParam in context.ActionDescriptor.Parameters)
             {
-                var values = context.ValueProviders.SelectMany(p => p.GetValue(actionParam.Name).Values);
+                var valueProvider = CompositeValueProvider.CreateAsync(context).GetAwaiter().GetResult();
+                var values = valueProvider.GetValue(actionParam.Name);
                 foreach (var stringValue in values.Where(v => v != null))
                 {
                     parameters.Add(actionParam.Name, stringValue);

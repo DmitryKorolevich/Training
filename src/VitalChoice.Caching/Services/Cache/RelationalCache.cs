@@ -391,6 +391,15 @@ namespace VitalChoice.Caching.Services.Cache
             if (!_trackedObjects.Contains(item))
             {
                 _trackedObjects.Add(item);
+                var mainTrackKey = new TrackedEntityKey(relationInfo.RelationType, _entityInfo.PrimaryKey.GetPrimaryKeyValue(item));
+                InternalEntityEntry trackedEntry;
+                if (_trackData.TryGetValue(mainTrackKey, out trackedEntry))
+                {
+                    if (trackedEntry.EntityState != EntityState.Detached)
+                    {
+                        trackedEntry.SetEntityState(EntityState.Detached);
+                    }
+                }
                 var internalEntry = _context.StateManager.GetOrCreateEntry(item);
                 foreach (var relation in relationInfo.Relations)
                 {

@@ -12,7 +12,7 @@ namespace VitalChoice.ExportService.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder builder)
         {
-            builder.UseInMemoryDatabase(options => options.IgnoreTransactions());
+            builder.UseInMemoryDatabase();
         }
     }
 }

@@ -2,11 +2,11 @@
   
   "version": "1.0.0-*",
   "dependencies": {
-    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0-fixed-*",
-    "Autofac.Extensions.DependencyInjection": "4.0.0-fixed-*",
-    "Microsoft.EntityFrameworkCore": "1.0.0-fixed-*",
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0.*",
+    "Autofac.Extensions.DependencyInjection": "4.0.0-*",
+    "Microsoft.EntityFrameworkCore": "1.0.0.*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
-    "Microsoft.AspNetCore.Mvc.Core": "1.0.0-rc2-final"
+    "Microsoft.AspNetCore.Mvc.Core": "1.0.0-*"
   },
 
   "frameworks": {

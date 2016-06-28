@@ -1724,6 +1724,7 @@ namespace VitalChoice.Ecommerce.Context
             builder.Entity<FieldTypeEntity>(entity =>
             {
                 entity.HasKey(f => f.Id);
+                entity.Property(f => f.TypeName).HasMaxLength(250);
                 entity.ToTable("FieldTypes");
             });
         }
@@ -1731,6 +1732,8 @@ namespace VitalChoice.Ecommerce.Context
         protected virtual void AppOptions(ModelBuilder builder)
         {
             builder.Entity<AppOption>().HasKey(f => f.OptionName);
+            builder.Entity<AppOption>().Property(p => p.OptionName).HasMaxLength(250);
+            builder.Entity<AppOption>().Property(p => p.OptionValue).HasMaxLength(250);
             builder.Entity<AppOption>().Ignore(f => f.Id);
             builder.Entity<AppOption>().ToTable("AppOptions");
         }

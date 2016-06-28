@@ -17,8 +17,9 @@
     "VitalChoice.Infrastructure": "1.0.0-*",
     "VitalChoice.Business": "1.0.0-*",
     "VitalChoice.Core": "1.0.0-*",
-    "Microsoft.EntityFrameworkCore.InMemory": "1.0.0-fixed-*",
-    "Microsoft.Extensions.Configuration.Json": "1.0.0-rc2-final"
+    "Microsoft.EntityFrameworkCore.InMemory": "1.0.0.*",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
+    "Microsoft.AspNetCore.Hosting" : "1.0.0"
   },
   "frameworks": {
     "net451": {

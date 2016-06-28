@@ -16,11 +16,12 @@
   },
   "dependencies": {
     "xunit": "2.1.0",
-    "dotnet-test-xunit": "1.0.0-rc2-*",
-    "Autofac": "4.0.0-fixed-*",
+    "dotnet-test-xunit": "1.0.0-*",
+    "Autofac": "4.0.0-*",
     "VitalChoice.Business": "1.0.0-*",
     "VitalChoice.Core": "1.0.0-*",
-    "VitalChoice.Interfaces": "1.0.0-*"
+    "VitalChoice.Interfaces": "1.0.0-*",
+    "Microsoft.AspNetCore.Hosting": "1.0.0"
   },
 
   "commands": {

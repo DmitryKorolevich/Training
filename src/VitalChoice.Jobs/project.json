@@ -23,11 +23,12 @@
   "authors": [ "Dima" ],
 
   "dependencies": {
-    "Autofac": "4.0.0-fixed-*",
+    "Autofac": "4.0.0-*",
     "Quartz": "2.3.3",
     "VitalChoice.Business": "1.0.0-*",
     "VitalChoice.Core": "1.0.0-*",
-    "VitalChoice.Interfaces": "1.0.0-*"
+    "VitalChoice.Interfaces": "1.0.0-*",
+    "Microsoft.AspNetCore.Hosting": "1.0.0"
   },
 
   "commands": {

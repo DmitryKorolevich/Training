@@ -4,8 +4,8 @@
   "description": "",
   "authors": [ "" ],
   "dependencies": {
-    "Microsoft.AspNetCore.Mvc": "1.0.0-rc2-final",
-    "FluentValidation": "5.6.0.5-fixed-*",
+    "Microsoft.AspNetCore.Mvc": "1.0.0-*",
+    "FluentValidation": "6.4.0-beta1",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*"
   },
 

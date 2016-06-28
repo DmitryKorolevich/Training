@@ -136,7 +136,10 @@ namespace VitalChoice.Business.Services.Users
 
         private HashSet<string> GetRoleNamesByIds(IList<RoleType> roles)
         {
-            return new HashSet<string>(RoleManager.Roles.Where(x => roles.Contains((RoleType) x.Id)).Select(x => x.Name));
+            return
+                new HashSet<string>(RoleManager.Roles.Where(x => roles.Contains((RoleType) x.Id))
+                    .ToList()
+                    .Select(x => x.Name));
         }
 
 		private PermissionType RoleClaimValueToPermission(string value)
@@ -329,12 +332,12 @@ namespace VitalChoice.Business.Services.Users
 
 		public async Task<ApplicationUser> GetAsync(Guid publicId)
 		{
-			return await UserManager.Users.SingleOrDefaultAsync(x => x.PublicId == publicId);
+			return await UserManager.Users.FirstOrDefaultAsync(x => x.PublicId == publicId);
 		}
 
 		public async Task<ApplicationUser> GetAsync(int internalId)
 		{
-			return await UserManager.Users.SingleOrDefaultAsync(x => x.Id == internalId);
+			return await UserManager.Users.FirstOrDefaultAsync(x => x.Id == internalId);
 		}
 
 		public async Task<ApplicationUser> GetByTokenAsync(Guid token)
@@ -344,7 +347,7 @@ namespace VitalChoice.Business.Services.Users
 				throw new ArgumentException("Token can't be null or empty");
 			}
 
-			var user = await UserManager.Users.SingleOrDefaultAsync(x => x.ConfirmationToken == token);
+			var user = await UserManager.Users.FirstOrDefaultAsync(x => x.ConfirmationToken == token);
 
 			if (user == null)
 			{
@@ -496,7 +499,7 @@ namespace VitalChoice.Business.Services.Users
 									   x.Email.ToLower().Contains(keyword));
 			}
 
-			var queryable = UserManager.Users.Include(p=>p.Profile).ThenInclude(p=>p.AdminTeam).AsNoTracking().Where(query);
+		    var queryable = UserManager.Users.Include(p => p.Profile).ThenInclude(p => p.AdminTeam).Where(query);
 			var overallCount = queryable.Count();
 
 			var sortOrder = filter.Sorting.SortOrder;

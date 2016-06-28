@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Microsoft.Extensions.Caching.Memory;
@@ -66,6 +67,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.Formatters.Json.Internal;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -99,6 +101,8 @@ using VitalChoice.Profiling;
 using VitalChoice.Profiling.Base;
 using VitalChoice.Profiling.Interfaces;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.ObjectPool;
+using Newtonsoft.Json.Serialization;
 using NLog;
 using VitalChoice.Business.Services.VeraCore;
 using VitalChoice.Caching.Services.Cache.Base;
@@ -162,7 +166,6 @@ namespace VitalChoice.Core.DependencyInjection
                 .AddDbContext<LogsContext>()
                 .AddEntityFrameworkSqlServer();
 #endif
-            services.TryAddEnumerable(ServiceDescriptor.Transient<IActionInvokerProvider, CustomControllerActionInvokerProvider>());
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddScoped<IPerformanceRequest, PerformanceRequestService>();
             // Add Identity services to the services container.
@@ -229,59 +232,27 @@ namespace VitalChoice.Core.DependencyInjection
             return container;
         }
 
-        private void ConfigureMvcOptions(MvcOptions o, ILoggerFactory loggerFactory)
-        {
-            var inputFormatter =
-                (JsonInputFormatter)
-                    o.InputFormatters.SingleOrDefault(f => f.GetType() == typeof(JsonInputFormatter));
-            var outputFormatter =
-                (JsonOutputFormatter)
-                    o.OutputFormatters.SingleOrDefault(f => f.GetType() == typeof(JsonOutputFormatter));
+        //private void ConfigureMvcOptions(MvcOptions o, ILoggerFactory loggerFactory, ArrayPool<char> charPool,
+        //    ObjectPoolProvider objectPoolProvider)
+        //{
+        //    o.InputFormatters.RemoveType<JsonInputFormatter>();
+        //    o.OutputFormatters.RemoveType<JsonOutputFormatter>();
 
-            if (inputFormatter != null)
-            {
-                inputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-                inputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-                inputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Unspecified;
-                inputFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
-            }
-            else
-            {
-                var newFormatter = new JsonInputFormatter(loggerFactory.CreateLogger<JsonInputFormatter>())
-                {
-                    SerializerSettings =
-                    {
-                        DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                        DateParseHandling = DateParseHandling.DateTime,
-                        DateTimeZoneHandling = DateTimeZoneHandling.Unspecified
-                    }
-                };
-                newFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
-                o.InputFormatters.Add(newFormatter);
-            }
+        //    var settings = new JsonSerializerSettings
+        //    {
+        //        DateFormatHandling = DateFormatHandling.IsoDateFormat,
+        //        DateParseHandling = DateParseHandling.DateTime,
+        //        DateTimeZoneHandling = DateTimeZoneHandling.Unspecified
+        //    };
+        //    settings.Converters.Add(new PstLocalIsoDateTimeConverter());
 
-            if (outputFormatter != null)
-            {
-                outputFormatter.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-                outputFormatter.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
-                outputFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Unspecified;
-                outputFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
-            }
-            else
-            {
-                var newFormatter = new JsonOutputFormatter
-                {
-                    SerializerSettings =
-                    {
-                        DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                        DateParseHandling = DateParseHandling.DateTime,
-                        DateTimeZoneHandling = DateTimeZoneHandling.Unspecified
-                    }
-                };
-                newFormatter.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
-                o.OutputFormatters.Add(newFormatter);
-            }
-        }
+        //    var inputFormatter = new JsonInputFormatter(loggerFactory.CreateLogger<JsonInputFormatter>(), settings, charPool,
+        //        objectPoolProvider);
+        //    o.InputFormatters.Add(inputFormatter);
+
+        //    var outputFormatter = new JsonOutputFormatter(settings, charPool);
+        //    o.OutputFormatters.Add(outputFormatter);
+        //}
 
         protected virtual void ConfigureOptions(IConfiguration configuration, IServiceCollection services, IHostingEnvironment environment)
         {
@@ -297,7 +268,14 @@ namespace VitalChoice.Core.DependencyInjection
                 };
             });
 
-            services.Configure<MvcOptions>(o => ConfigureMvcOptions(o, new LoggerProviderExtended(environment).Factory));
+            services.Configure<MvcJsonOptions>(o =>
+            {
+                o.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+                o.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
+                o.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Unspecified;
+                o.SerializerSettings.Converters.Add(new PstLocalIsoDateTimeConverter());
+                o.SerializerSettings.ContractResolver = new DefaultContractResolver();
+            });
         }
 
         private static void ConfigureBaseOptions(IConfiguration configuration, AppOptionsBase options)

@@ -15,21 +15,24 @@ namespace VitalChoice.Core.GlobalFilters
 {
     public class AntiXssModelBinderProvider : IModelBinderProvider
     {
-        private readonly AntiXssModelBinder _binder = new AntiXssModelBinder();
-
         public IModelBinder GetBinder(ModelBinderProviderContext context)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
             if (!context.Metadata.IsComplexType)
-                return _binder;
+                return new AntiXssModelBinder(context.Metadata.ModelType);
             return null;
         }
     }
 
     public class AntiXssModelBinder : IModelBinder
     {
-        private readonly SimpleTypeModelBinder _simpleTypeModelBinder = new SimpleTypeModelBinder();
+        public AntiXssModelBinder(Type type)
+        {
+            _simpleTypeModelBinder = new SimpleTypeModelBinder(type);
+        }
+
+        private readonly SimpleTypeModelBinder _simpleTypeModelBinder;
         // < > " ' &
         // \u5F
         // \u{F9}
@@ -41,9 +44,9 @@ namespace VitalChoice.Core.GlobalFilters
         public async Task BindModelAsync(ModelBindingContext bindingContext)
         {
             await _simpleTypeModelBinder.BindModelAsync(bindingContext);
-            if (bindingContext.Result?.IsModelSet ?? false)
+            if (bindingContext?.Result.IsModelSet ?? false)
             {
-                var modelAsString = bindingContext.Result.Value.Model as string;
+                var modelAsString = bindingContext.Result.Model as string;
                 if (modelAsString != null)
                 {
                     var metadata = bindingContext.ModelMetadata as DefaultModelMetadata;

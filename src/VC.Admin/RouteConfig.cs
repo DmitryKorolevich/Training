@@ -8,13 +8,18 @@ namespace VC.Admin
 {
     public class HomeRouter : IRouter
     {
-        private readonly MvcRouteHandler _mvcRouter = new MvcRouteHandler();
+        private readonly IRouter _defaultHandler;
+
+        public HomeRouter(IRouter defaultHandler)
+        {
+            _defaultHandler = defaultHandler;
+        }
 
         public Task RouteAsync(RouteContext context)
         {
             if (context.HttpContext.Request.Headers["Accept"].Any(h => h.ToLower().Contains("text/html")))
             {
-                return _mvcRouter.RouteAsync(context);
+                return _defaultHandler.RouteAsync(context);
             }
             return TaskCache.CompletedTask;
         }
@@ -33,7 +38,7 @@ namespace VC.Admin
                 name: "defaultApi",
                 template: "api/{controller}/{action}/{id?}");
 
-            routeBuilder.Routes.Add(new Route(new HomeRouter(), "default",
+            routeBuilder.Routes.Add(new Route(new HomeRouter(routeBuilder.DefaultHandler), "default",
                 "{*url}",
                 new RouteValueDictionary(new {controller = "Home", action = "Index"}), null, null, inlineConstraintResolver));
         }

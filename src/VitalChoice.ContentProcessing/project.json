@@ -7,13 +7,13 @@
     "VitalChoice.DynamicData": "1.0.0-*",
     "VitalChoice.Infrastructure": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
-    "Autofac": "4.0.0-fixed-*",
-    "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.0-rc2-final",
-    "Microsoft.AspNetCore.Mvc.Core": "1.0.0-rc2-final",
-    "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.0.0-rc2-final",
-    "Microsoft.Extensions.Logging": "1.0.0-rc2-final",
-    "Microsoft.Extensions.Logging.Console": "1.0.0-rc2-final",
-    "Templates": "2.7.13-rc2"
+    "Autofac": "4.0.0-*",
+    "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.0-*",
+    "Microsoft.AspNetCore.Mvc.Core": "1.0.0-*",
+    "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.0.0-*",
+    "Microsoft.Extensions.Logging": "1.0.0-*",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-*",
+    "Templates": "2.7.13"
   },
   "frameworks": {
     "net451": { }

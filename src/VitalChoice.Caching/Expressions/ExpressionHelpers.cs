@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Internal;
+using System;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using VitalChoice.Caching.Expressions.Visitors;

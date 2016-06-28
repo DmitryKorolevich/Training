@@ -3,7 +3,7 @@
   "description": "Authorize.Net Class Library",
   "authors": [ "multi_000" ],
   "dependencies": {
-    "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc2-final"
+    "Microsoft.Extensions.Logging.Abstractions": "1.0.0-*"
   },
   "frameworks": {
     "net451": {

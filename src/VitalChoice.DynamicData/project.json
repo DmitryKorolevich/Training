@@ -4,10 +4,10 @@
   "description": "",
   "authors": [ "" ],
   "dependencies": {
-    "Newtonsoft.Json": "8.0.3",
+    "Newtonsoft.Json": "9.0.1",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
-    "Autofac.Extensions.DependencyInjection": "4.0.0-fixed-*",
+    "Autofac.Extensions.DependencyInjection": "4.0.0-*",
     "VitalChoice.ObjectMapping": "1.0.0-*",
     "VitalChoice.Profiling": "1.0.0-*"
   },

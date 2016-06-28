@@ -1,12 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using FluentValidation.Validators;
 
 namespace VitalChoice.Business.Helpers
 {
     public static class Extensions
     {
+        private static readonly Regex EmailValidationRegex = new Regex(new EmailValidator().Expression,
+            RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        public static bool IsValidEmail(this string text)
+        {
+            return !string.IsNullOrWhiteSpace(text) && EmailValidationRegex.IsMatch(text);
+        }
+
         public static string ClearPhone(this string data)
         {
             return !string.IsNullOrEmpty(data)

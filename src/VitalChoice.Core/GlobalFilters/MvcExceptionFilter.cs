@@ -8,6 +8,7 @@ using VitalChoice.Core.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Internal;
@@ -164,10 +165,11 @@ namespace VitalChoice.Core.GlobalFilters
                         fakeContext.Request.Path = new PathString(uri.AbsolutePath);
                         var routeContext = new RouteContext(fakeContext);
                         var actionSelector = context.HttpContext.RequestServices.GetService<IActionSelector>();
-                        var actionDescriptor = actionSelector.Select(routeContext);
-                        if (!string.IsNullOrEmpty(actionDescriptor?.Name))
+                        var refferedActionName = (actionSelector.SelectBestCandidate(routeContext,
+                            actionSelector.SelectCandidates(routeContext)) as ControllerActionDescriptor)?.MethodInfo?.Name;
+                        if (!string.IsNullOrEmpty(refferedActionName))
                         {
-                            return actionDescriptor.Name;
+                            return refferedActionName;
                         }
                     }
                 }

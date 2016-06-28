@@ -23,6 +23,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using FluentValidation.Validators;
 using Microsoft.Extensions.Options;
+using VitalChoice.Business.Helpers;
 
 namespace VitalChoice.Business.Services.Bronto
 {
@@ -115,7 +116,7 @@ namespace VitalChoice.Business.Services.Bronto
 
         public async Task<bool> Subscribe(string email)
         {
-            if (!EmailValidator.RegexExpression.IsMatch(email))
+            if (!email.IsValidEmail())
                 return false;
 
             try

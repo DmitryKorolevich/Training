@@ -2,15 +2,15 @@
   
   "version": "1.0.0-*",
   "dependencies": {
-    "Microsoft.EntityFrameworkCore": "1.0.0-fixed-*",
-    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0-fixed-*",
-    "Microsoft.AspNetCore.Mvc": "1.0.0-rc2-final",
-    "Microsoft.Extensions.Logging": "1.0.0-rc2-final",
-    "Microsoft.Extensions.Logging.Console": "1.0.0-rc2-final",
-    "Autofac.Extensions.DependencyInjection": "4.0.0-fixed-*",
+    "Microsoft.EntityFrameworkCore": "1.0.0.*",
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0.*",
+    "Microsoft.AspNetCore.Mvc": "1.0.0-*",
+    "Microsoft.Extensions.Logging": "1.0.0-*",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-*",
+    "Autofac.Extensions.DependencyInjection": "4.0.0-*",
     "Avalara.Avatax.Rest": "1.0.0-*",
-    "CsvHelper": "2.14.2-fixed-*",
-    "FluentValidation": "5.6.0.5-fixed-*",
+    "CsvHelper": "2.15.0.1",
+    "FluentValidation": "6.4.0-beta1",
     "VitalChoice.Infrastructure": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
@@ -26,6 +26,7 @@
 
   "frameworks": {
     "net451": {
+      "imports": "net45",
       "frameworkAssemblies": {
         "System.ServiceModel": "",
         "System.IO": "",
