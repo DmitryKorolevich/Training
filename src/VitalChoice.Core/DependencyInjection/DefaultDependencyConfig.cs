@@ -145,11 +145,12 @@ namespace VitalChoice.Core.DependencyInjection
                                 {
                                     serviceCollection.AddSingleton(appEnv)
                                         .AddSingleton(new LoggerProviderExtended(appEnv).Factory)
-                                        .InjectProfiler().Configure<AppOptionsBase>(
+                                        .InjectProfiler()
+                                        .Configure<AppOptionsBase>(
                                             appOptions => ConfigureBaseOptions(configuration, appOptions));
                                 }))
                     .AddDbContext<LogsContext>()
-                    .AddEntityFrameworkSqlServer().InjectProfiler();
+                    .AddEntityFrameworkSqlServer();
             }
             else
             {
@@ -157,7 +158,7 @@ namespace VitalChoice.Core.DependencyInjection
                     .AddDbContext<VitalChoiceContext>()
                     .AddDbContext<EcommerceContext>()
                     .AddDbContext<LogsContext>()
-                    .AddEntityFrameworkSqlServer().InjectProfiler();
+                    .AddEntityFrameworkSqlServer();
             }
 #else
             services.AddEntityFramework()

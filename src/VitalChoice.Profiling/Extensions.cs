@@ -25,12 +25,8 @@ namespace VitalChoice.Profiling
         public static IServiceCollection InjectProfiler(this IServiceCollection services)
         {
             services.AddScoped<IPerformanceRequest, DefaultPerformanceRequest>();
-            services
-                .Replace(new ServiceDescriptor(typeof(IRelationalCommandBuilderFactory), typeof(RelationalCommandBuilderFactoryProxy),
-                    ServiceLifetime.Scoped));
-            services
-                .Replace(new ServiceDescriptor(typeof(SqlServerQuerySqlGeneratorFactory), typeof(SqlServerQuerySqlGeneratorFactoryProxy),
-                    ServiceLifetime.Scoped));
+            services.Replace(ServiceDescriptor.Scoped<IRelationalCommandBuilderFactory, RelationalCommandBuilderFactoryProxy>());
+            services.Replace(ServiceDescriptor.Scoped<SqlServerQuerySqlGeneratorFactory, SqlServerQuerySqlGeneratorFactoryProxy>());
             return services;
         }
     }

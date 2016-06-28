@@ -26,20 +26,14 @@ namespace VitalChoice.Caching.Services.Cache
     public class RelationalCache<T> : IRelationalCache<T> where T : class
     {
         private readonly IInternalCache<T> _internalCache;
-        private readonly IEntityInfoStorage _infoStorage;
-        //private readonly EntityInfo _entityInfo;
         private readonly DbContext _context;
         private readonly ILogger _logger;
-        //private IDictionary<TrackedEntityKey, InternalEntityEntry> _trackData;
-        //private HashSet<object> _trackedObjects;
 
-        public RelationalCache(IInternalCache<T> internalCache, IEntityInfoStorage infoStorage, DbContext context, ILogger logger)
+        public RelationalCache(IInternalCache<T> internalCache, DbContext context, ILogger logger)
         {
             _context = context;
             _logger = logger;
             _internalCache = internalCache;
-            _infoStorage = infoStorage;
-            //infoStorage.GetEntityInfo<T>(out _entityInfo);
         }
 
         public CacheGetResult TryGetCached(QueryData<T> query, out List<T> entities)
@@ -53,11 +47,6 @@ namespace VitalChoice.Caching.Services.Cache
 
             if (_internalCache.GetCacheExist(query.RelationInfo))
             {
-                if (query.Tracked)
-                {
-                    //_trackData = _infoStorage.GetTrackData(_context, out _trackedObjects);
-                }
-
                 IEnumerable<CacheResult<T>> results;
                 if (query.FullCollection)
                 {
@@ -106,11 +95,6 @@ namespace VitalChoice.Caching.Services.Cache
 
             if (_internalCache.GetCacheExist(query.RelationInfo))
             {
-                if (query.Tracked)
-                {
-                    //_trackData = _infoStorage.GetTrackData(_context, out _trackedObjects);
-                }
-
                 IEnumerable<CacheResult<T>> results;
                 if (query.FullCollection)
                 {
@@ -164,8 +148,6 @@ namespace VitalChoice.Caching.Services.Cache
                     $"<Cache Update> can't update cache, preconditions not met: {typeof(T)}\r\n{query.WhereExpression?.Expression.AsString()}");
                 return false;
             }
-
-            //var clonedItems = DeepCloneList(entities, query.RelationInfo);
 
             if (fullCollection)
             {
@@ -318,68 +300,40 @@ namespace VitalChoice.Caching.Services.Cache
 
         private void AttachNotTracked(T item, RelationInfo relationInfo)
         {
-            //if (item != null)
-            //{
-            _context.StateManager.BeginTrackingQuery();
-                AttachGraph(item, relationInfo);
-                //_context.Attach(item);
-            //}
+            if (item != null)
+            {
+                _context.StateManager.BeginTrackingQuery();
+            }
+            AttachGraph(item, relationInfo);
         }
 
         private void AttachNotTracked(ICollection<T> items, RelationInfo relationInfo)
         {
-            //if (items != null)
-            //{
-            _context.StateManager.BeginTrackingQuery();
+            if (items != null)
+            {
+                _context.StateManager.BeginTrackingQuery();
+            }
             items.ForEach(item => AttachGraph(item, relationInfo));
-                //_context.AttachRange(items);
-            //}
         }
 
         private void AttachGraph(object item, RelationInfo relationInfo)
         {
             if (item == null)
                 return;
-            //if (!_trackedObjects.Contains(item))
+            _context.StateManager.StartTrackingFromQuery(relationInfo.EntityType, item,
+                ValueBuffer.Empty);
+            foreach (var relation in relationInfo.Relations)
             {
-                //_trackedObjects.Add(item);
-                _context.StateManager.StartTrackingFromQuery(relationInfo.EntityType, item,
-                    ValueBuffer.Empty);
-                foreach (var relation in relationInfo.Relations)
+                var value = relation.GetRelatedObject(item);
+                if (value != null)
                 {
-                    var value = relation.GetRelatedObject(item);
-                    if (value != null)
+                    if (relation.IsCollection)
                     {
-                        //var pkInfo = _infoStorage.GetPrimaryKeyInfo(relation.RelationType);
-                        if (relation.IsCollection)
-                        {
-                            ((IEnumerable<object>) value).ForEach(singleValue =>
-                            {
-                                //InternalEntityEntry entry;
-                                //var trackKey = new TrackedEntityKey(relation.RelationType, pkInfo.GetPrimaryKeyValue(singleValue));
-                                //if (_trackData.TryGetValue(trackKey, out entry))
-                                //{
-                                //    if (entry.EntityState != EntityState.Detached)
-                                //    {
-                                //        entry.SetEntityState(EntityState.Detached);
-                                //    }
-                                //}
-                                AttachGraph(singleValue, relation);
-                            });
-                        }
-                        else
-                        {
-                            //InternalEntityEntry entry;
-                            //var trackKey = new TrackedEntityKey(relation.RelationType, pkInfo.GetPrimaryKeyValue(value));
-                            //if (_trackData.TryGetValue(trackKey, out entry))
-                            //{
-                            //    if (entry.EntityState != EntityState.Detached)
-                            //    {
-                            //        entry.SetEntityState(EntityState.Detached);
-                            //    }
-                            //}
-                            AttachGraph(value, relation);
-                        }
+                        ((IEnumerable<object>) value).ForEach(singleValue => AttachGraph(singleValue, relation));
+                    }
+                    else
+                    {
+                        AttachGraph(value, relation);
                     }
                 }
             }
