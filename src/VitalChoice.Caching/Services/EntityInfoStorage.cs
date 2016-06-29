@@ -630,7 +630,7 @@ namespace VitalChoice.Caching.Services
                     Expression.Equal(
                         Expression.MakeMemberAccess(parameter, typeof (T).GetRuntimeProperty(keyValue.ValueInfo.Name)),
                         Expression.Constant(keyValue.Value.GetValue()));
-                conditionalExpression = conditionalExpression == null ? part : Expression.And(conditionalExpression, part);
+                conditionalExpression = conditionalExpression == null ? part : Expression.AndAlso(conditionalExpression, part);
             }
             return conditionalExpression;
         }
@@ -647,7 +647,7 @@ namespace VitalChoice.Caching.Services
                     Expression.Equal(
                         Expression.MakeMemberAccess(parameter, typeof (T).GetRuntimeProperty(keyValue.Name)),
                         Expression.Constant(keyValue.Value));
-                conditionalExpression = conditionalExpression == null ? part : Expression.And(conditionalExpression, part);
+                conditionalExpression = conditionalExpression == null ? part : Expression.AndAlso(conditionalExpression, part);
             }
             return conditionalExpression;
         }
