@@ -108,35 +108,36 @@ angular.module('app.modules.product.controllers.productManageController', [])
             $scope.defaultSeller = null;
 
             $scope.productTypeDefaults = {};
-
+            $scope.options = {};
             $scope.parentDetailsTab = {
-                active: true,
+                index: 1,
                 formName: 'parentDetails',
             };
             $scope.imagesTab = {
-                active: false,
+                index: 2,
                 formName: 'images',
             };
             $scope.subProductsTab = {
-                active: false,
+                index: 3,
                 formName: 'SKUs',
             };
             $scope.nutritionalTab = {
-                active: false,
+                index: 4,
                 formName: 'nutritional',
             };
             $scope.categoriesTab = {
-                active: false,
+                index: 5,
                 formName: 'categories',
             };
             $scope.salesCategoriesTab = {
-                active: false,
+                index: 6,
                 formName: 'salesCategories',
             };
             $scope.crossSellProductsAndVideosTab = {
-                active: false,
+                index: 7,
                 formName: 'crossSellProductsAndVideos',
             };
+            $scope.options.activeTabIndex = $scope.parentDetailsTab.index;
             var tabs = [];
             tabs.push($scope.parentDetailsTab);
             tabs.push($scope.imagesTab);
@@ -595,7 +596,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
                     formName = 'crossSellProductsAndVideos';
                 }
                 if (item.formName == formName) {
-                    item.active = true;
+                    $scope.options.activeTabIndex = item.index;
                     return false;
                 }
             });

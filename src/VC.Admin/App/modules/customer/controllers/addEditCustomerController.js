@@ -118,31 +118,32 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				$scope.options = {};
 
 				$scope.accountProfileTab = {
-					active: true,
+				    index: 1,
 					formName: 'profile',
 				};
 				$scope.shippingAddressTab = {
-					active: false,
+				    index: 2,
 					formName: 'shipping',
 					ShippingEditModels: {}
 				};
 				$scope.customerNotesTab = {
-					active: false,
+				    index: 3,
 					formName: 'customerNote'
 				};
 				$scope.paymentInfoTab = {
-					active: false,
+				    index: 4,
 					formNames: ['card', 'oac', 'check', 'wiretransfer', 'marketing', 'vcwellness'],
 					AddressEditModels: {}
 				};
 				$scope.customerFilesTab = {
-					active: false,
+				    index: 5,
 					formName: 'customerFile'
 				};
 				$scope.additionalActionsTab = {
-				    active: false,
+				    index: 6,
 				    formName: 'uploadOrderType'
 				};
+				$scope.options.activeTabIndex = $scope.accountProfileTab.index;
 				$scope.creditCardTypes = $rootScope.ReferenceData.CreditCardTypes;
 				var tabs = [];
 				tabs.push($scope.accountProfileTab);
@@ -273,7 +274,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				    }
 				    if (itemForActive)
 				    {
-				        itemForActive.active = true;
+				        $scope.options.activeTabIndex = itemForActive.index;
 				        return false;
 				    }
 				});

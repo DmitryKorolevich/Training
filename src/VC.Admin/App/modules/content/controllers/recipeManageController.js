@@ -85,13 +85,15 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
             $scope.previewUrl = null;
 
             $scope.detailsTab = {
-            	active: true,
+                index: 1,
 				formName: 'details'
             };
             $scope.crossSellProductsAndVideosTab = {
-            	active: false,
+                index: 2,
             	formName: 'crossSellRelatedRecipes',
             };
+            $scope.options = {};
+            $scope.options.activeTabIndex = $scope.detailsTab.index;
             var tabs = [];
             tabs.push($scope.detailsTab);
             tabs.push($scope.crossSellProductsAndVideosTab);
@@ -344,8 +346,9 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
         		if (formName.indexOf('RelatedRecipes') == 0) {
         			temp = 'crossSellRelatedRecipes';
         		}
-        		if (item.formName == temp) {
-        			item.active = true;
+        		if (item.formName == temp)
+        		{
+        		    $scope.options.activeTabIndex = item.index;
         			return false;
         		}
         	});
