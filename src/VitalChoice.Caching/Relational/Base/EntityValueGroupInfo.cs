@@ -6,7 +6,7 @@ using VitalChoice.Caching.Extensions;
 namespace VitalChoice.Caching.Relational.Base
 {
     public abstract class EntityValueGroupInfo<TInfo> : IEquatable<EntityValueGroupInfo<TInfo>>
-        where TInfo: EntityValueInfo
+        where TInfo : EntityValueInfo
     {
         public virtual int Count => InfoDictionary.Count;
 
@@ -26,9 +26,9 @@ namespace VitalChoice.Caching.Relational.Base
 
         public bool Equals(EntityValueGroupInfo<TInfo> other)
         {
-            if ((object)this == (object)other)
+            if ((object) this == (object) other)
                 return true;
-            if ((object)other == null)
+            if ((object) other == null)
                 return false;
             if (InfoDictionary.Count != other.InfoDictionary.Count)
                 return false;
@@ -37,7 +37,7 @@ namespace VitalChoice.Caching.Relational.Base
 
         public override bool Equals(object obj)
         {
-            if ((object)this == obj)
+            if ((object) this == obj)
                 return true;
             var groupInfo = obj as EntityValueGroupInfo<TInfo>;
             return groupInfo != null && Equals(groupInfo);
@@ -75,37 +75,6 @@ namespace VitalChoice.Caching.Relational.Base
         public virtual bool TryGet(string name, out TInfo valueInfo)
         {
             return InfoDictionary.TryGetValue(name, out valueInfo);
-        }
-
-        public virtual bool EntityEquals(object one, object two)
-        {
-            // ReSharper disable once ForCanBeConvertedToForeach
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            for (var i = 0; i < Infos.Length; i++)
-            {
-                var info = Infos[i];
-                if (info.GetClrValue(one) != info.GetClrValue(two))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        public virtual int EntityGetHashCode(object entity)
-        {
-            unchecked
-            {
-                int result = 0;
-                // ReSharper disable once ForCanBeConvertedToForeach
-                // ReSharper disable once LoopCanBeConvertedToQuery
-                for (var i = 0; i < Infos.Length; i++)
-                {
-                    var value = Infos[i].GetClrValue(entity);
-                    result = (result*397) ^ value.GetHashCode();
-                }
-                return result;
-            }
         }
     }
 }

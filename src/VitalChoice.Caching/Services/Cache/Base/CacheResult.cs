@@ -24,10 +24,13 @@ namespace VitalChoice.Caching.Services.Cache.Base
                     Result = CacheGetResult.Update;
                     Entity = default(T);
                 }
-                Result = CacheGetResult.Found;
-                Entity = track
-                    ? DeepCloneItemForTrack(cached.Entity, cached.Cache.Relations)
-                    : DeepCloneItem(cached.Entity, cached.Cache.Relations);
+                else
+                {
+                    Result = CacheGetResult.Found;
+                    Entity = track
+                        ? DeepCloneItemForTrack(cached.Entity, cached.Cache.Relations)
+                        : DeepCloneItem(cached.Entity, cached.Cache.Relations);
+                }
             }
         }
 
