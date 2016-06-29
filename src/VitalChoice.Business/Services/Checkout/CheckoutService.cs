@@ -206,9 +206,8 @@ namespace VitalChoice.Business.Services.Checkout
                         {
                             if (cart.IdCustomer == null)
                             {
-                                _context.Entry(cart).State = EntityState.Unchanged;
-                                tracked = true;
-                                cart.IdCustomer = idCustomer;
+                                var dbCart = await _cartRepository.Query(c => c.CartUid == cart.CartUid).SelectFirstOrDefaultAsync();
+                                dbCart.IdCustomer = idCustomer;
                                 await _context.SaveChangesAsync();
                             }
                         }
@@ -238,11 +237,8 @@ namespace VitalChoice.Business.Services.Checkout
                         anonymCart.Order.Customer = customer;
                         anonymCart.Order = await _orderService.InsertAsync(anonymCart.Order);
 
-                        if (!tracked)
-                        {
-                            _context.Entry(cart).State = EntityState.Unchanged;
-                        }
-                        cart.IdOrder = anonymCart.Order.Id;
+                        var dbCart = await _cartRepository.Query(c => c.CartUid == cart.CartUid).SelectFirstOrDefaultAsync();
+                        dbCart.IdOrder = anonymCart.Order.Id;
                         await _context.SaveChangesAsync();
 
                         anonymCart.Order.Customer = customer;
