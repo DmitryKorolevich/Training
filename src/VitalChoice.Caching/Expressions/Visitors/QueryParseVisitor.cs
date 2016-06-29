@@ -6,8 +6,10 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using VitalChoice.Caching.Extensions;
+using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Ordering;
+using VitalChoice.Caching.Services;
 using VitalChoice.Caching.Services.Cache;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
@@ -16,11 +18,13 @@ namespace VitalChoice.Caching.Expressions.Visitors
     public class QueryParseVisitor<T> : ExpressionVisitor
     {
         private readonly IModel _model;
+        private readonly IEntityInfoStorage _infoStorage;
 
-        public QueryParseVisitor(IModel model)
+        public QueryParseVisitor(IModel model, IEntityInfoStorage infoStorage, EntityPrimaryKeyInfo keyInfo, IEntityType entityType)
         {
             _model = model;
-            Relations = new RelationInfo(string.Empty, typeof(T), typeof(T), model.FindEntityType(typeof(T)));
+            _infoStorage = infoStorage;
+            Relations = new RelationInfo(string.Empty, typeof(T), typeof(T), entityType, keyInfo);
         }
 
         // ReSharper disable once StaticMemberInGenericType
@@ -144,7 +148,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
 
                         if (!Relations.RelationsDict.TryGetValue(name, out _currentRelation))
                         {
-                            _currentRelation = CompiledRelationsCache.GetRelation(name, relationType, ownType, lambda, _model);
+                            _currentRelation = CompiledRelationsCache.GetRelation(name, relationType, ownType, lambda, _model, _infoStorage);
                             Relations.RelationsDict.Add(_currentRelation.Name, _currentRelation);
                         }
                         break;
@@ -167,7 +171,7 @@ namespace VitalChoice.Caching.Expressions.Visitors
                         if (!_currentRelation.RelationsDict.TryGetValue(name, out newCurrent))
                         {
                             var relationInfo = CompiledRelationsCache.GetRelation(name, relationType, _currentRelation.RelationType,
-                                lambdaExpression, _model);
+                                lambdaExpression, _model, _infoStorage);
                             _currentRelation.RelationsDict.Add(name, relationInfo);
                             newCurrent = relationInfo;
                         }

@@ -7,16 +7,16 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
 {
     public static class GenericCollectionExtension
     {
-        public static IGenericCollection CreateGenericCollection(this Type collectionPrototype, Type elementType,
-            IEnumerable initializationEnumerable = null)
+        public static IGenericCollection CreateGenericCollection(this Type collectionPrototype, Type elementType, 
+            IEnumerable initializationEnumerable = null, object comparer = null)
         {
             var collectionType = collectionPrototype.MakeGenericType(elementType);
 
             if (!collectionType.IsImplement(typeof (ICollection<>).MakeGenericType(elementType)))
                 throw new InvalidOperationException($"Collection Prototype type doesn't seem to implement ICollection<{elementType}>");
             var result = (IGenericCollection)
-                Activator.CreateInstance(typeof (GenericCollection<>).MakeGenericType(elementType),
-                    Activator.CreateInstance(collectionType));
+                Activator.CreateInstance(typeof(GenericCollection<>).MakeGenericType(elementType),
+                    comparer == null ? Activator.CreateInstance(collectionType) : Activator.CreateInstance(collectionType, comparer));
             if (initializationEnumerable != null)
             {
                 foreach (var item in initializationEnumerable)

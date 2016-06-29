@@ -54,7 +54,7 @@ namespace VitalChoice.Caching.Services.Cache
                     {
                         return TranslateResult(query, Enumerable.Repeat<CacheResult<T>>(CacheGetResult.Update, 1), out entities);
                     }
-                    results = _internalCache.GetAll(query.RelationInfo);
+                    results = _internalCache.GetAll(query.RelationInfo, query.Tracked);
                     return TranslateResult(query, results,
                         out entities);
                 }
@@ -72,7 +72,7 @@ namespace VitalChoice.Caching.Services.Cache
                     return TranslateResult(query, results,
                         out entities);
 
-                results = _internalCache.GetWhere(query.RelationInfo, query.WhereExpression.Compiled.Value);
+                results = _internalCache.GetWhere(query.RelationInfo, query.WhereExpression.Compiled.Value, query.Tracked);
                 return TranslateResult(query,
                     results, out entities);
             }
@@ -102,7 +102,7 @@ namespace VitalChoice.Caching.Services.Cache
                     {
                         return TranslateFirstResult(query, Enumerable.Repeat<CacheResult<T>>(CacheGetResult.Update, 1), out entity);
                     }
-                    results = _internalCache.GetAll(query.RelationInfo);
+                    results = _internalCache.GetAll(query.RelationInfo, query.Tracked);
                     return TranslateFirstResult(query, results,
                         out entity);
                 }
@@ -120,7 +120,7 @@ namespace VitalChoice.Caching.Services.Cache
                     return TranslateFirstResult(query, results,
                         out entity);
 
-                results = _internalCache.GetWhere(query.RelationInfo, query.WhereExpression.Compiled.Value);
+                results = _internalCache.GetWhere(query.RelationInfo, query.WhereExpression.Compiled.Value, query.Tracked);
                 return TranslateFirstResult(query,
                     results, out entity);
             }
@@ -186,16 +186,16 @@ namespace VitalChoice.Caching.Services.Cache
             return _internalCache.Update(entity, queryData.RelationInfo);
         }
 
-        private bool TryConditionalIndexes(QueryData<T> queryData,
+        private bool TryConditionalIndexes(QueryData<T> query,
             out IEnumerable<CacheResult<T>> results)
         {
-            var conditionalIndexes = queryData.ConditionalIndexes;
+            var conditionalIndexes = query.ConditionalIndexes;
             if (conditionalIndexes.Count > 0)
             {
                 IEnumerable<CacheResult<T>> result = null;
                 foreach (var indexPair in conditionalIndexes.Where(c => c.Value != null))
                 {
-                    var enumerable = _internalCache.TryGetEntities(indexPair.Value, indexPair.Key, queryData.RelationInfo);
+                    var enumerable = _internalCache.TryGetEntities(indexPair.Value, indexPair.Key, query.RelationInfo, query.Tracked);
                     result = result?.Union(enumerable) ?? enumerable;
                 }
                 if (result == null)
@@ -216,7 +216,7 @@ namespace VitalChoice.Caching.Services.Cache
             var indexes = query.UniqueIndexes;
             if (indexes != null)
             {
-                results = _internalCache.TryGetEntities(indexes, query.RelationInfo);
+                results = _internalCache.TryGetEntities(indexes, query.RelationInfo, query.Tracked);
                 return true;
             }
             results = null;
@@ -229,7 +229,7 @@ namespace VitalChoice.Caching.Services.Cache
             var pks = query.PrimaryKeys;
             if (pks != null)
             {
-                results = _internalCache.TryGetEntities(pks, query.RelationInfo);
+                results = _internalCache.TryGetEntities(pks, query.RelationInfo, query.Tracked);
                 return true;
             }
             results = null;

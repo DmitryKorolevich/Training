@@ -51,7 +51,15 @@ namespace VitalChoice.Caching.Relational.Base
         {
             unchecked
             {
-                return Values.Aggregate(0, (current, entityKey) => (current*397) ^ entityKey.GetHashCode());
+                int result = 0;
+                // ReSharper disable once ForCanBeConvertedToForeach
+                // ReSharper disable once LoopCanBeConvertedToQuery
+                for (var i = 0; i < Values.Length; i++)
+                {
+                    var value = Values[i];
+                    result = (result*397) ^ value.GetHashCode();
+                }
+                return result;
             }
         }
 

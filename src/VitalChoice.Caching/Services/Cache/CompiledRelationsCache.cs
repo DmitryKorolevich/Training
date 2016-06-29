@@ -8,15 +8,19 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using VitalChoice.Caching.Expressions;
 using VitalChoice.Caching.Relational;
 using Microsoft.EntityFrameworkCore;
+using VitalChoice.Caching.Interfaces;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Services.Cache
 {
     internal static class CompiledRelationsCache
     {
-        private static readonly ConcurrentDictionary<RelationCacheInfo, Tuple<IRelationAccessor, IEntityType, Type, bool>> Cache = new ConcurrentDictionary<RelationCacheInfo, Tuple<IRelationAccessor, IEntityType, Type, bool>>();
+        private static readonly
+            ConcurrentDictionary<RelationCacheInfo, Tuple<IRelationAccessor, IEntityType, Type, bool, EntityPrimaryKeyInfo>> Cache =
+                new ConcurrentDictionary<RelationCacheInfo, Tuple<IRelationAccessor, IEntityType, Type, bool, EntityPrimaryKeyInfo>>();
 
-        public static RelationInfo GetRelation(string name, Type relatedType, Type ownedType, LambdaExpression lambda, IModel model)
+        public static RelationInfo GetRelation(string name, Type relatedType, Type ownedType, LambdaExpression lambda, IModel model,
+            IEntityInfoStorage infoStorage)
         {
             var searchKey = new RelationCacheInfo(name, ownedType);
             var cache = Cache.GetOrAdd(searchKey,
@@ -29,10 +33,12 @@ namespace VitalChoice.Caching.Services.Cache
                     {
                         throw new InvalidOperationException($"Cannot find entity type {relatedObjectType} in model");
                     }
-                    return new Tuple<IRelationAccessor, IEntityType, Type, bool>(RelationInfo.CreateAccessor(ownedType, lambda),
-                        entityType, relatedObjectType, elementType != null);
+                    return
+                        new Tuple<IRelationAccessor, IEntityType, Type, bool, EntityPrimaryKeyInfo>(
+                            RelationInfo.CreateAccessor(ownedType, lambda),
+                            entityType, relatedObjectType, elementType != null, infoStorage.GetPrimaryKeyInfo(relatedObjectType));
                 });
-            return new RelationInfo(name, relatedType, cache.Item3, cache.Item4, ownedType, cache.Item2, cache.Item1);
+            return new RelationInfo(name, relatedType, cache.Item3, cache.Item4, ownedType, cache.Item2, cache.Item1, cache.Item5);
         }
 
         private struct RelationCacheInfo : IEquatable<RelationCacheInfo>

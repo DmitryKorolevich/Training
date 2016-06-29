@@ -76,5 +76,36 @@ namespace VitalChoice.Caching.Relational.Base
         {
             return InfoDictionary.TryGetValue(name, out valueInfo);
         }
+
+        public virtual bool EntityEquals(object one, object two)
+        {
+            // ReSharper disable once ForCanBeConvertedToForeach
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            for (var i = 0; i < Infos.Length; i++)
+            {
+                var info = Infos[i];
+                if (info.GetClrValue(one) != info.GetClrValue(two))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public virtual int EntityGetHashCode(object entity)
+        {
+            unchecked
+            {
+                int result = 0;
+                // ReSharper disable once ForCanBeConvertedToForeach
+                // ReSharper disable once LoopCanBeConvertedToQuery
+                for (var i = 0; i < Infos.Length; i++)
+                {
+                    var value = Infos[i].GetClrValue(entity);
+                    result = (result*397) ^ value.GetHashCode();
+                }
+                return result;
+            }
+        }
     }
 }

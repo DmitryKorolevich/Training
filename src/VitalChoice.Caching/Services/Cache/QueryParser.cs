@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using Microsoft.EntityFrameworkCore.Metadata;
 using VitalChoice.Caching.Expressions.Analyzers;
 using VitalChoice.Caching.Expressions.Visitors;
@@ -10,11 +11,15 @@ using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Ordering;
 using VitalChoice.Caching.Services.Cache.Base;
+using Microsoft.EntityFrameworkCore;
 
 namespace VitalChoice.Caching.Services.Cache
 {
     public class QueryParser<T> : IQueryParser<T>
     {
+        private readonly IEntityInfoStorage _entityInfo;
+        private IEntityType _entityType;
+        private readonly EntityPrimaryKeyInfo _primaryKeyInfo;
         public IInternalCache<T> InternalCache { get; }
 
         private readonly ConcurrentDictionary<OrderBy, QueryInternalCache> _orderByCaches =
@@ -27,10 +32,12 @@ namespace VitalChoice.Caching.Services.Cache
 
         public QueryParser(IEntityInfoStorage entityInfo, IInternalCache<T> internalCache)
         {
+            _entityInfo = entityInfo;
             InternalCache = internalCache;
             EntityInfo info;
             if (entityInfo.GetEntityInfo<T>(out info))
             {
+                _primaryKeyInfo = info.PrimaryKey;
                 _primaryKeyAnalyzer = new PrimaryKeyAnalyzer<T>(info.PrimaryKey);
                 _indexAnalyzer = new IndexAnalyzer<T>(info.CacheableIndex);
                 _conditionalIndexAnalyzers = info.ConditionalIndexes.Select(i => new ConditionalIndexAnalyzer<T>(i)).ToArray();
@@ -40,7 +47,11 @@ namespace VitalChoice.Caching.Services.Cache
 
         public QueryData<T> ParseQuery(Expression query, IModel model, out Expression newExpression)
         {
-            QueryParseVisitor<T> parseVisitor = new QueryParseVisitor<T>(model);
+            if (_entityType == null)
+            {
+                Interlocked.CompareExchange(ref _entityType, model.FindEntityType(typeof(T)), null);
+            }
+            QueryParseVisitor<T> parseVisitor = new QueryParseVisitor<T>(model, _entityInfo, _primaryKeyInfo, _entityType);
             query = parseVisitor.Visit(query);
 
             if (parseVisitor.NonCached)

@@ -14,6 +14,23 @@ namespace VitalChoice.Caching.Services.Cache.Base
             Result = result;
         }
 
+        public CacheResult(CachedEntity<T> cached, bool track)
+        {
+            using (cached.Lock())
+            {
+                var needUpdate = cached.NeedUpdate;
+                if (needUpdate)
+                {
+                    Result = CacheGetResult.Update;
+                    Entity = default(T);
+                }
+                Result = CacheGetResult.Found;
+                Entity = track
+                    ? DeepCloneItemForTrack(cached.Entity, cached.Cache.Relations)
+                    : DeepCloneItem(cached.Entity, cached.Cache.Relations);
+            }
+        }
+
         public T Entity;
 
         public CacheGetResult Result;
@@ -23,22 +40,19 @@ namespace VitalChoice.Caching.Services.Cache.Base
             return result.Entity;
         }
 
-        public static implicit operator CacheResult<T>(CachedEntity<T> cached)
-        {
-            using (cached.Lock())
-            {
-                var needUpdate = cached.NeedUpdate;
-                if (needUpdate)
-                {
-                    return new CacheResult<T>(default(T), CacheGetResult.Update);
-                }
-                return new CacheResult<T>(DeepCloneItem(cached.Entity, cached.Cache.Relations), CacheGetResult.Found);
-            }
-        }
-
         public static implicit operator CacheResult<T>(CacheGetResult result)
         {
             return new CacheResult<T>(default(T), result);
+        }
+
+        internal static T DeepCloneItemForTrack(T item, RelationInfo relations)
+        {
+            return (T)item.DeepCloneItemForTrack(relations);
+        }
+
+        internal static IEnumerable<T> DeepCloneListForTrack(IEnumerable<T> entities, RelationInfo relations)
+        {
+            return entities.Select(item => (T) item.DeepCloneItemForTrack(relations));
         }
 
         internal static T DeepCloneItem(T item, RelationInfo relations)
@@ -48,7 +62,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
         internal static IEnumerable<T> DeepCloneList(IEnumerable<T> entities, RelationInfo relations)
         {
-            return entities.Select(item => DeepCloneItem(item, relations));
+            return entities.Select(item => (T) item.DeepCloneItem(relations));
         }
     }
 }
