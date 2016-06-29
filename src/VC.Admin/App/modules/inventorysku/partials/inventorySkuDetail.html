@@ -15,8 +15,8 @@
     <div class="right-pane-main">
         <div class="container-fluid">
             <div class="row">
-                <uib-tabset>
-                    <uib-tab heading="Details" active="detailsTab.active">
+                <uib-tabset active="options.activeTabIndex">
+                    <uib-tab heading="Details" index="detailsTab.index">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -127,7 +127,7 @@
                             </div>
                         </div>
                     </uib-tab>             
-                    <uib-tab heading="Parts Category" active="categoriesTab.active">
+                    <uib-tab heading="Parts Category" index="categoriesTab.index">
                         <div class="container container-left">
                             <div class="well row categories sales">
                                 <spinner-overlay data-loading="refreshTracker.active()">

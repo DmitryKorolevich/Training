@@ -18,8 +18,8 @@
     <div class="right-pane-main">
         <div class="container-fluid">
             <div class="row">
-                <uib-tabset>
-                    <uib-tab heading="Details" active="detailsTab.active">
+                <uib-tabset active="options.activeTabIndex">
+                    <uib-tab heading="Details" index="detailsTab.index">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -167,7 +167,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Categories">
+                    <uib-tab heading="Categories" index="11">
                         <div class="container container-left">
                             <div class="well row categories">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -185,7 +185,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Products">
+                    <uib-tab heading="Products" index="12">
                         <div class="container container-left big-container">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -212,7 +212,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Template">
+                    <uib-tab heading="Template" index="13">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -235,7 +235,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Cross Sell Products & Related Recipes" active="crossSellProductsAndVideosTab.active">
+                    <uib-tab heading="Cross Sell Products & Related Recipes" index="crossSellProductsAndVideosTab.index">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">

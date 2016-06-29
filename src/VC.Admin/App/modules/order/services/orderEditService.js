@@ -32,7 +32,7 @@ angular.module('app.modules.order.services.orderEditService', [])
                 }
                 if (itemForActive)
                 {
-                    itemForActive.active = true;
+                    uiScope.options.activeTabIndex = itemForActive.index;
                     return false;
                 }
             });

@@ -50,13 +50,15 @@ angular.module('app.modules.inventorysku.controllers.inventorySkuManageControlle
             $scope.forms = {};
 
             $scope.detailsTab = {
-                active: true,
+                index: 1,
                 formName: 'details',
             };
             $scope.categoriesTab = {
-                active: false,
+                index: 2,
                 formName: 'categories',
             };
+            $scope.options = {};
+            $scope.options.activeTabIndex = $scope.detailsTab.index;
             var tabs = [];
             tabs.push($scope.detailsTab);
             tabs.push($scope.categoriesTab);
@@ -245,8 +247,9 @@ angular.module('app.modules.inventorysku.controllers.inventorySkuManageControlle
 
         function activateTab(formName) {
             $.each($scope.tabs, function (index, item) {
-                if (item.formName == formName) {
-                    item.active = true;
+                if (item.formName == formName)
+                {
+                    $scope.options.activeTabIndex = item.index;
                     return false;
                 }
             });

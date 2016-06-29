@@ -18,8 +18,8 @@
     <div class="right-pane-main">
         <div class="container-fluid">
             <div class="row">
-                <uib-tabset>
-                    <uib-tab heading="Parent Details" active="parentDetailsTab.active">
+                <uib-tabset active="options.activeTabIndex">
+                    <uib-tab heading="Parent Details" index="parentDetailsTab.index">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -348,7 +348,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Images" active="imagesTab.active">
+                    <uib-tab heading="Images" index="imagesTab.index">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -373,7 +373,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Sub Products" active="subProductsTab.active">
+                    <uib-tab heading="Sub Products" index="subProductsTab.index">
                         <div class="container container-left big-container">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -717,7 +717,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Nutritional" active="nutritionalTab.active" data-ng-if="!(product.Type==3 || product.Type==4)">
+                    <uib-tab heading="Nutritional" index="nutritionalTab.index" data-ng-if="!(product.Type==3 || product.Type==4)">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -947,7 +947,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Categories" active="categoriesTab.active">
+                    <uib-tab heading="Categories" index="categoriesTab.index">
                         <div class="container container-left">
                             <div class="well row categories public">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -964,7 +964,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Cross Sell & Videos" active="crossSellProductsAndVideosTab.active">
+                    <uib-tab heading="Cross Sell & Videos" index="crossSellProductsAndVideosTab.index">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -1126,7 +1126,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Sales Category" active="salesCategoriesTab.active">
+                    <uib-tab heading="Sales Category" index="salesCategoriesTab.index">
                         <div class="container container-left">
                             <div class="well row categories sales">
                                 <spinner-overlay data-loading="refreshTracker.active()">
@@ -1143,7 +1143,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Template">
+                    <uib-tab heading="Template" index="11">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">

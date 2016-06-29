@@ -16,8 +16,8 @@
     <div class="right-pane-main">
         <div class="container-fluid">
             <div class="row">
-                <uib-tabset>
-                    <uib-tab heading="Account Profile" active="accountProfileTab.active">
+                <uib-tabset active="options.activeTabIndex">
+                    <uib-tab heading="Account Profile" index="accountProfileTab.index">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="addEditTracker.active()">
@@ -263,7 +263,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Shipping Address" active="shippingAddressTab.active">
+                    <uib-tab heading="Shipping Address" index="shippingAddressTab.index">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="addEditTracker.active()">
@@ -273,7 +273,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Payment Information" active="paymentInfoTab.active">
+                    <uib-tab heading="Payment Information" index="paymentInfoTab.index">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="addEditTracker.active()">
@@ -567,27 +567,27 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab data-ng-show="currentCustomer.Id" heading="Order History">
+                    <uib-tab data-ng-show="currentCustomer.Id" heading="Order History" index="11">
                         <div class="container-fluid">
                             <div ng-controller="customerOrdersController" onload="name = 'CustomerOrders'" data-ng-include="'app/modules/order/partials/customerOrdersList.html'"></div>
                         </div>
                     </uib-tab>
-                    <uib-tab data-ng-show="currentCustomer.Id" heading="Auto-Ship">
+                    <uib-tab data-ng-show="currentCustomer.Id" heading="Auto-Ship" index="12">
                         <div class="container-fluid">
                             <div ng-controller="customerAutoShipsController" data-ng-include="'app/modules/order/partials/autoShipList.html'"></div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Notes" active="customerNotesTab.active">
+                    <uib-tab heading="Notes" index="customerNotesTab.index">
                         <div class="container-fluid">
                             <div ng-controller="manageCustomerNotesController" onload="name = 'CustomerNotes'" data-ng-include="'app/modules/customer/partials/manageCustomerNotes.html'"></div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Files" active="customerFilesTab.active">
+                    <uib-tab heading="Files" index="customerFilesTab.index">
                         <div class="container-fluid">
                             <div ng-controller="manageCustomerFilesController" onload="name = 'CustomerFiles'" data-ng-include="'app/modules/customer/partials/manageCustomerFiles.html'"></div>
                         </div>
                     </uib-tab>
-                    <uib-tab data-ng-show="currentCustomer.Id" heading="Additional Actions" active="additionalActionsTab.active">
+                    <uib-tab data-ng-show="currentCustomer.Id" heading="Additional Actions" index="additionalActionsTab.index">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="addEditTracker.active()">

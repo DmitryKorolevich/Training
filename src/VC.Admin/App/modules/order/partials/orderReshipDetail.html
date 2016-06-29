@@ -38,8 +38,8 @@
                 </span>
             </div>
             <div class="row">
-                <uib-tabset>
-                    <uib-tab heading="{{mainTab.name}}" active="mainTab.active">
+                <uib-tabset active="options.activeTabIndex">
+                    <uib-tab heading="{{mainTab.name}}" index="mainTab.index">
                         <div class="container container-left xbig-container">
                             <div class="well row">
                                 <spinner-overlay data-loading="addEditTracker.active()">
@@ -429,7 +429,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Shipping Address" active="shippingAddressTab.active">
+                    <uib-tab heading="Shipping Address" index="shippingAddressTab.index">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="addEditTracker.active()">
@@ -438,7 +438,7 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Payment Information" active="paymentInfoTab.active">
+                    <uib-tab heading="Payment Information" index="paymentInfoTab.index">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="addEditTracker.active()">

@@ -85,32 +85,33 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         $scope.legend = {};
 
         $scope.mainTab = {
-            active: true,
+            index: 1,
             formNames: ['topForm', 'mainForm', 'mainForm2', 'GCs'],
             name: $scope.id ? 'Edit Order' : 'New Order',
         };
         $scope.accountProfileTab = {
-            active: false,
+            index: 2,
             formName: 'profile',
         };
         $scope.shippingAddressTab = {
-            active: false,
+            index: 3,
             formName: 'shipping',
             ShippingEditModels: {}
         };
         $scope.paymentInfoTab = {
-            active: false,
+            index: 4,
             formNames: ['card', 'oac', 'check', 'wiretransfer', 'marketing', 'vcwellness'],
             AddressEditModels: {}
         };
         $scope.customerNotesTab = {
-            active: false,
+            index: 5,
             formName: 'customerNote',
         };
         $scope.customerFilesTab = {
-            active: false,
+            index: 6,
             formName: 'customerFile'
         };
+        $scope.options.activeTabIndex = $scope.mainTab.index;
         var tabs = [];
         tabs.push($scope.mainTab);
         tabs.push($scope.accountProfileTab);
