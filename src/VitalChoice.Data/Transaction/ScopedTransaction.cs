@@ -6,13 +6,13 @@ using VitalChoice.Data.Context;
 
 namespace VitalChoice.Data.Transaction
 {
-    public class InnerEmbeddingTransaction : IInnerEmbeddingTransaction
+    public class ScopedTransaction : IScopedTransaction
     {
         private readonly IDbContextTransaction _transaction;
         public IDataContextAsync DbContext { get; }
         private int _referenceCount;
 
-        public InnerEmbeddingTransaction(IDbContextTransaction transaction, IDataContextAsync dbContext)
+        public ScopedTransaction(IDbContextTransaction transaction, IDataContextAsync dbContext)
         {
             _transaction = transaction;
             DbContext = dbContext;

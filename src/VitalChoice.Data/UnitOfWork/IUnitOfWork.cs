@@ -7,7 +7,7 @@ namespace VitalChoice.Data.UnitOfWork
     public interface IUnitOfWork : IDisposable
     {
         int SaveChanges();
-        IInnerEmbeddingTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted);
+        IScopedTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted);
         void Dispose(bool disposing);
     }
 }

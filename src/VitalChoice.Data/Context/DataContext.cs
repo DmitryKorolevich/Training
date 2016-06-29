@@ -10,7 +10,7 @@ namespace VitalChoice.Data.Context
 {
     public abstract class DataContext : DbContext, IDataContextAsync
     {
-        private IInnerEmbeddingTransaction _transaction;
+        private IScopedTransaction _transaction;
 
         protected DataContext(DbContextOptions contextOptions) :base(contextOptions)
         {
@@ -21,11 +21,11 @@ namespace VitalChoice.Data.Context
         public bool Disposed { get; private set; }
         public Guid InstanceId { get; }
 
-	    public IInnerEmbeddingTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
+	    public IScopedTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
 	    {
 	        if (_transaction == null || _transaction.Closed)
 	        {
-                _transaction = new InnerEmbeddingTransaction(Database.BeginTransaction(isolation), this);
+                _transaction = new ScopedTransaction(Database.BeginTransaction(isolation), this);
                 _transaction.TransactionCommit += OnTransactionCommit;
 	            _transaction.TransactionRollback += OnTransactionRollback;
 	        }

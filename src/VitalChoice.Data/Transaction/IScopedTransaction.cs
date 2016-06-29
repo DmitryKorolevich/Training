@@ -4,7 +4,7 @@ using VitalChoice.Data.Context;
 
 namespace VitalChoice.Data.Transaction
 {
-    public interface IInnerEmbeddingTransaction: IDbContextTransaction
+    public interface IScopedTransaction: IDbContextTransaction
     {
         IDataContextAsync DbContext { get; }
         bool Closed { get; }

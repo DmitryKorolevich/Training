@@ -13,7 +13,7 @@ namespace VitalChoice.Data.Context
 
         Guid InstanceId { get; }
 
-        IInnerEmbeddingTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted);
+        IScopedTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted);
 
         bool InTransaction { get; }
 

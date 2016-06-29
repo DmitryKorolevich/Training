@@ -11,7 +11,7 @@ namespace VitalChoice.Data.Transaction
     public interface ITransactionAccessor<TContext> 
         where TContext : DbContext, IDataContextAsync
     {
-        IInnerEmbeddingTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted);
+        IScopedTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted);
         IUnitOfWorkAsync CreateUnitOfWork();
     }
 
@@ -21,7 +21,7 @@ namespace VitalChoice.Data.Transaction
         private readonly IOptions<AppOptionsBase> _appOptions;
         private readonly DbContextOptions<TContext> _contextOptions;
         private readonly TContext _context;
-        private IInnerEmbeddingTransaction _transaction;
+        private IScopedTransaction _transaction;
 
         public TransactionAccessor(IOptions<AppOptionsBase> appOptions, DbContextOptions<TContext> contextOptions, TContext context)
         {
@@ -30,7 +30,7 @@ namespace VitalChoice.Data.Transaction
             _context = context;
         }
 
-        public IInnerEmbeddingTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
+        public IScopedTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted)
         {
             if (_transaction == null || _transaction.Closed)
             {

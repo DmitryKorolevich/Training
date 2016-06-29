@@ -36,7 +36,7 @@ namespace VitalChoice.Data.UnitOfWork
 			_uow.Dispose(disposing);
 		}
 
-	    public IInnerEmbeddingTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted)
+	    public IScopedTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted)
 	    {
 		    return _uow.BeginTransaction(isolation);
 	    }
