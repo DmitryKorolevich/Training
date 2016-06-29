@@ -870,3 +870,48 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name]='Affiliate Landing LEAN Area')
+BEGIN
+
+	INSERT INTO [dbo].[ContentAreas]
+	([Name], [Template], [StatusCode], [Created], [Updated])
+	VALUES
+	(N'Affiliate Landing LEAN Area', N'<h4>Vital Choice Web Affiliate Program</h4>
+<p>
+    Greetings {Name}, 
+</p>
+<p>
+    Your special Dr. Sears LEAN affiliate account is ready for use.<br />
+    FOR THE SPECIAL LEAN DISCOUNT FOR YOU AND YOUR CLIENTS PLEASE DIRECT READERS TO: 
+    <a href="https://{PublicHost}/?idaffiliate={Id}">https://{PublicHost}/?idaffiliate={Id}</a> 
+    This hyperlink includes you affiliate code so any sales from this link would be counted as a commission.
+</p>
+<p>
+    Here is the same link with your affiliate number embedded in the code:
+    <a href="https://{PublicHost}/?idaffiliate={Id}">Vital Choice LEAN Program</a> 
+</p>
+<p>
+    When your readers make their purchase using the discount code they get 10% off their purchase and you get 8% of the first sale. 
+    Then all lifetime purchases made by that customer (by calling us, using vitalchoice.com, or via your product and banner links) earn you 5% of each sale.
+    You get a commission when your readers continue to use the LEAN discount code or respond to other special offers such as our 
+    Weekly Bonus Offers promoted through the Vital Choice Newsletter and through occasional Discount Codes. 
+    For general Affiliate Program information see the Program overview for more information.
+<p>
+    Vital Choice extends this commission and the LEAN discount to your personal purchase, so that you can try our products and share your first hand experience when reaching out to new customers.
+    To set this, you simply click the above link and make a purchase. 
+    Just like your customers, you only need to do it once to start earning commissions on all future purchases. 
+</p>
+<p>
+    Vital Choice also offers a Wholesale Program for purchasing larger volumes for your company.<br />
+    We appreciate your advocacy and interest in promoting wild seafood nutrition. We are looking forward to working together.<br />
+    Questions or comments? Contact us at <a href="mailto:affiliatesupport@vitalchoice.com ">affiliatesupport@vitalchoice.com</a>
+</p>
+<p>
+    Kind regards,<br />
+    The Vital Choice Team
+</p>', 2, GETDATE(), GETDATE())
+
+END
+
+GO

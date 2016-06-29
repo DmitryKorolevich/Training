@@ -10,7 +10,14 @@
     </div>
     <div class="right-pane clean-indent">
         <div class="border-form-left">
-            @await Component.InvokeAsync("Area", new { name = "Affiliate Landing Area", data = Model })
+            @if (Model.ContainsKey("LEAN"))
+            {
+                @await Component.InvokeAsync("Area", new {name = "Affiliate Landing LEAN Area", data = Model})
+            }
+            else
+            {
+                @await Component.InvokeAsync("Area", new { name = "Affiliate Landing Area", data = Model })
+            }
         </div>
     </div>
 </div>

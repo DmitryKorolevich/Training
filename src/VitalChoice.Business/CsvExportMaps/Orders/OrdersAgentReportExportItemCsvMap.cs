@@ -16,13 +16,14 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
         private void MapValues()
         {
             Map(m => m.Agent).Index(0);
-            Map(m => m.OrdersCount).Index(1);
-            Map(m => m.TotalOrdersAmount).Index(2);
-            Map(m => m.AverageOrdersAmount).Index(3);
-            Map(m => m.LowestOrderAmount).Index(4);
-            Map(m => m.HighestOrderAmount).Index(5);
-            Map(m => m.RefundsCount).Index(6);
-            Map(m => m.ReshipsCount).Index(7);
+            Map(m => m.AgentName).Index(1);
+            Map(m => m.OrdersCount).Index(2);
+            Map(m => m.TotalOrdersAmount).Index(3);
+            Map(m => m.AverageOrdersAmount).Index(4);
+            Map(m => m.LowestOrderAmount).Index(5);
+            Map(m => m.HighestOrderAmount).Index(6);
+            Map(m => m.RefundsCount).Index(7);
+            Map(m => m.ReshipsCount).Index(8);
         }
     }
 }

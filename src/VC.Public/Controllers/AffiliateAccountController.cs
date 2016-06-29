@@ -284,9 +284,8 @@ namespace VC.Public.Controllers
                 {
                     return RedirectToAction("Login", new { alreadyTakenEmail = model.Email });
                 }
-
-                //BUG: affiliate type 1?! WTF?
-                var affiliate = await _affiliateMapper.FromModelAsync(model, 1);
+                
+                var affiliate = await _affiliateMapper.FromModelAsync(model);
 
                 affiliate.StatusCode = (int)AffiliateStatus.Pending;
                 affiliate.CommissionAll = AffiliateConstants.DefaultCommissionAll;
@@ -354,7 +353,7 @@ namespace VC.Public.Controllers
                 };
             }
 
-            return RedirectToAction("ChangeProfile", "AffiliateProfile");
+            return RedirectToAction("Index", "AffiliateProfile");
         }
 
         private void InitRegisterModel(AffiliateManageModel model,bool refresh=false)
