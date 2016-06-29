@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.Logging;
@@ -23,15 +24,17 @@ namespace VitalChoice.Caching.Services
     {
         private readonly IQueryParserFactory _queryParserFactory;
         private readonly IInternalEntityCacheFactory _cacheFactory;
+        private readonly IChangeDetector _changeDetector;
         private readonly DbContext _context;
         private readonly ILogger<CacheEntityQueryProvider> _logger;
 
         public CacheEntityQueryProvider(IQueryCompiler queryCompiler, IQueryParserFactory queryParserFactory,
             IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage infoStorage,
-            ILoggerFactory logger, ICurrentDbContext currentContext) : base(queryCompiler)
+            ILoggerFactory logger, ICurrentDbContext currentContext, IChangeDetector changeDetector) : base(queryCompiler)
         {
             _queryParserFactory = queryParserFactory;
             _cacheFactory = cacheFactory;
+            _changeDetector = changeDetector;
             _context = currentContext.Context;
             _logger = logger.CreateLogger<CacheEntityQueryProvider>();
             infoStorage.Initialize(_context);
@@ -57,7 +60,7 @@ namespace VitalChoice.Caching.Services
                     var cacheExecutor =
                         (ICacheExecutor)
                             Activator.CreateInstance(typeof(CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                                _context, _queryParserFactory, _logger);
+                                _context, _queryParserFactory, _logger, _changeDetector);
                     if (cacheExecutor.ReparsedExpression != null)
                         return base.Execute<TResult>(cacheExecutor.ReparsedExpression);
                     CacheGetResult cacheGetResult;
@@ -77,7 +80,7 @@ namespace VitalChoice.Caching.Services
                     var cacheExecutor =
                         (ICacheExecutor)
                             Activator.CreateInstance(typeof(CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                                _context, _queryParserFactory, _logger);
+                                _context, _queryParserFactory, _logger, _changeDetector);
                     if (cacheExecutor.ReparsedExpression != null)
                         return base.Execute<TResult>(cacheExecutor.ReparsedExpression);
 
@@ -104,7 +107,7 @@ namespace VitalChoice.Caching.Services
                 var cacheExecutor =
                     (ICacheExecutor)
                         Activator.CreateInstance(typeof(CacheExecutor<>).MakeGenericType(typeof(TResult)), expression,
-                            _context, _queryParserFactory, _logger);
+                            _context, _queryParserFactory, _logger, _changeDetector);
                 if (cacheExecutor.ReparsedExpression != null)
                     return base.ExecuteAsync<TResult>(cacheExecutor.ReparsedExpression);
                 CacheGetResult cacheGetResult;
@@ -137,7 +140,7 @@ namespace VitalChoice.Caching.Services
                     var cacheExecutor =
                         (ICacheExecutor)
                             Activator.CreateInstance(typeof(CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                                _context, _queryParserFactory, _logger);
+                                _context, _queryParserFactory, _logger, _changeDetector);
                     if (cacheExecutor.ReparsedExpression != null)
                         return base.Execute<TResult>(cacheExecutor.ReparsedExpression);
                     CacheGetResult cacheGetResult;
@@ -157,7 +160,7 @@ namespace VitalChoice.Caching.Services
                     var cacheExecutor =
                         (ICacheExecutor)
                             Activator.CreateInstance(typeof(CacheExecutor<>).MakeGenericType(cacheObjectType), expression,
-                                _context, _queryParserFactory, _logger);
+                                _context, _queryParserFactory, _logger, _changeDetector);
                     if (cacheExecutor.ReparsedExpression != null)
                         return base.Execute<TResult>(cacheExecutor.ReparsedExpression);
 
@@ -204,11 +207,11 @@ namespace VitalChoice.Caching.Services
             private readonly IRelationalCache<T> _cache;
             private readonly Expression _reparsedExpression;
 
-            public CacheExecutor(Expression expression, DbContext context, IQueryParserFactory queryParserFactory, ILogger logger)
+            public CacheExecutor(Expression expression, DbContext context, IQueryParserFactory queryParserFactory, ILogger logger, IChangeDetector changeDetector)
             {
                 _logger = logger;
                 var queryCache = queryParserFactory.GetQueryCache<T>();
-                _cache = new RelationalCache<T>(queryCache.InternalCache, context, logger);
+                _cache = new RelationalCache<T>(queryCache.InternalCache, context.StateManager, changeDetector, logger);
                 _queryData = queryCache.ParseQuery(expression, context.Model, out _reparsedExpression);
             }
 

@@ -33,7 +33,8 @@ namespace VitalChoice.Caching.Relational
         private readonly IRelationAccessor _relationAccessor;
         private static readonly IRelationAccessor NullAccessor = new NullRelationAccessor();
 
-        internal RelationInfo(string name, Type relatedType, Type elementType, bool isCollection, Type ownedType, IEntityType entityType, IRelationAccessor relationAccessor,
+        internal RelationInfo(string name, Type relatedType, Type elementType, bool isCollection, Type ownedType, IEntityType entityType,
+            IRelationAccessor relationAccessor,
             EntityPrimaryKeyInfo keyInfo, IEnumerable<RelationInfo> subRelations = null)
         {
             ItemKeyInfo = keyInfo;
@@ -48,7 +49,8 @@ namespace VitalChoice.Caching.Relational
                             new Dictionary<string, RelationInfo>();
         }
 
-        public RelationInfo(string name, Type relatedType, Type ownedType, IEntityType entityType, EntityPrimaryKeyInfo keyInfo, LambdaExpression relationExpression = null,
+        public RelationInfo(string name, Type relatedType, Type ownedType, IEntityType entityType, EntityPrimaryKeyInfo keyInfo,
+            LambdaExpression relationExpression = null,
             IEnumerable<RelationInfo> subRelations = null)
         {
             ItemKeyInfo = keyInfo;

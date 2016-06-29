@@ -26,12 +26,14 @@ namespace VitalChoice.Caching.Services.Cache
     public class RelationalCache<T> : IRelationalCache<T> where T : class
     {
         private readonly IInternalCache<T> _internalCache;
-        private readonly DbContext _context;
+        private readonly IStateManager _stateManager;
+        private readonly IChangeDetector _changeDetector;
         private readonly ILogger _logger;
 
-        public RelationalCache(IInternalCache<T> internalCache, DbContext context, ILogger logger)
+        public RelationalCache(IInternalCache<T> internalCache, IStateManager stateManager, IChangeDetector changeDetector, ILogger logger)
         {
-            _context = context;
+            _stateManager = stateManager;
+            _changeDetector = changeDetector;
             _logger = logger;
             _internalCache = internalCache;
         }
@@ -300,28 +302,24 @@ namespace VitalChoice.Caching.Services.Cache
 
         private void AttachNotTracked(T item, RelationInfo relationInfo)
         {
-            if (item != null)
-            {
-                _context.StateManager.BeginTrackingQuery();
-            }
             AttachGraph(item, relationInfo);
+            item.UpdateRelationsAfterTrack(relationInfo.Relations);
         }
 
         private void AttachNotTracked(ICollection<T> items, RelationInfo relationInfo)
         {
-            if (items != null)
+            items.ForEach(item =>
             {
-                _context.StateManager.BeginTrackingQuery();
-            }
-            items.ForEach(item => AttachGraph(item, relationInfo));
+                AttachGraph(item, relationInfo);
+                item.UpdateRelationsAfterTrack(relationInfo.Relations);
+            });
         }
 
         private void AttachGraph(object item, RelationInfo relationInfo)
         {
             if (item == null)
                 return;
-            _context.StateManager.StartTrackingFromQuery(relationInfo.EntityType, item,
-                ValueBuffer.Empty);
+            _stateManager.StartTrackingFromCache(relationInfo.EntityType, item);
             foreach (var relation in relationInfo.Relations)
             {
                 var value = relation.GetRelatedObject(item);
