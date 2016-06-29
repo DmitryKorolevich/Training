@@ -77,7 +77,7 @@ namespace VitalChoice.Caching.Extensions
         public static object DeepCloneCreateList(this IEnumerable<object> entities, RelationInfo relations)
         {
             return
-                typeof(HashSet<>).CreateGenericCollection(relations.RelationType, entities.Select(item => DeepCloneItem(item, relations)))
+                typeof(List<>).CreateGenericCollection(relations.RelationType, entities.Select(item => DeepCloneItem(item, relations)))
                     .CollectionObject;
         }
 
