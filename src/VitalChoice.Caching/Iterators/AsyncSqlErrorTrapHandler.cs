@@ -5,19 +5,30 @@ using System.Threading.Tasks;
 
 namespace VitalChoice.Caching.Iterators
 {
+    public static class SqlErrorTrapConfiguration
+    {
+        public const int RetryMaxCount = 30;
+        public const int RetryWaitTimeMin = 10; //ms
+        public const int RetryWaitTimeMax = 200; //ms
+        public const int SqlDeadLockedTransactionError = 1205;
+    }
+
     public class AsyncSqlErrorTrapHandler<TResult>
     {
         private readonly Func<CancellationToken, Task<TResult>> _action;
         private readonly Func<CancellationToken, Task> _retryAction;
         private readonly int _retryMaxCount;
+        private readonly int _errorNumber;
         private readonly Random _rnd = new Random();
 
         public AsyncSqlErrorTrapHandler(Func<CancellationToken, Task<TResult>> action,
-            Func<CancellationToken, Task> retryAction = null, int retryMaxCount = 100)
+            Func<CancellationToken, Task> retryAction = null, int retryMaxCount = SqlErrorTrapConfiguration.RetryMaxCount,
+            int errorNumber = SqlErrorTrapConfiguration.SqlDeadLockedTransactionError)
         {
             _action = action;
             _retryAction = retryAction;
             _retryMaxCount = retryMaxCount;
+            _errorNumber = errorNumber;
         }
 
         public async Task<TResult> GetResult(CancellationToken cancellationToken = default(CancellationToken))
@@ -29,7 +40,7 @@ namespace VitalChoice.Caching.Iterators
                 {
                     return await _action(cancellationToken);
                 }
-                catch (SqlException e) when (e.Number == 1205)
+                catch (SqlException e) when (e.Number == _errorNumber)
                 {
                     if (retryCount < _retryMaxCount)
                     {
@@ -40,7 +51,11 @@ namespace VitalChoice.Caching.Iterators
                         throw;
                     }
                     await
-                        Task.Run(() => Thread.Sleep(TimeSpan.FromMilliseconds(_rnd.Next(10, 500))), cancellationToken).ConfigureAwait(true);
+                        Task.Run(
+                            () =>
+                                Thread.Sleep(
+                                    TimeSpan.FromMilliseconds(_rnd.Next(SqlErrorTrapConfiguration.RetryWaitTimeMin,
+                                        SqlErrorTrapConfiguration.RetryWaitTimeMax))), cancellationToken).ConfigureAwait(true);
                     var task = _retryAction?.Invoke(cancellationToken);
                     if (task != null)
                         await task;
@@ -56,15 +71,19 @@ namespace VitalChoice.Caching.Iterators
         private readonly Func<TState, CancellationToken, Task> _retryAction;
         private readonly TState _state;
         private readonly int _retryMaxCount;
+        private readonly int _errorNumber;
         private readonly Random _rnd = new Random();
 
         public AsyncSqlErrorTrapHandler(Func<TState, CancellationToken, Task<TResult>> action,
-            TState state, Func<TState, CancellationToken, Task> retryAction = null, int retryMaxCount = 100)
+            TState state, Func<TState, CancellationToken, Task> retryAction = null,
+            int retryMaxCount = SqlErrorTrapConfiguration.RetryMaxCount,
+            int errorNumber = SqlErrorTrapConfiguration.SqlDeadLockedTransactionError)
         {
             _action = action;
             _retryAction = retryAction;
             _state = state;
             _retryMaxCount = retryMaxCount;
+            _errorNumber = errorNumber;
         }
 
         public async Task<TResult> GetResult(CancellationToken cancellationToken = default(CancellationToken))
@@ -76,7 +95,7 @@ namespace VitalChoice.Caching.Iterators
                 {
                     return await _action(_state, cancellationToken);
                 }
-                catch (SqlException e) when (e.Number == 1205)
+                catch (SqlException e) when (e.Number == _errorNumber)
                 {
                     if (retryCount < _retryMaxCount)
                     {
@@ -87,7 +106,11 @@ namespace VitalChoice.Caching.Iterators
                         throw;
                     }
                     await
-                        Task.Run(() => Thread.Sleep(TimeSpan.FromMilliseconds(_rnd.Next(10, 500))), cancellationToken).ConfigureAwait(true);
+                        Task.Run(
+                            () =>
+                                Thread.Sleep(
+                                    TimeSpan.FromMilliseconds(_rnd.Next(SqlErrorTrapConfiguration.RetryWaitTimeMin,
+                                        SqlErrorTrapConfiguration.RetryWaitTimeMax))), cancellationToken).ConfigureAwait(true);
                     var task = _retryAction?.Invoke(_state, cancellationToken);
                     if (task != null)
                         await task;
@@ -103,15 +126,19 @@ namespace VitalChoice.Caching.Iterators
         private readonly Func<TState, CancellationToken, Task<TRetryResult>> _retryAction;
         private readonly TState _state;
         private readonly int _retryMaxCount;
+        private readonly int _errorNumber;
         private readonly Random _rnd = new Random();
 
         public AsyncSqlErrorTrapHandler(Func<TState, TRetryResult, CancellationToken, Task<TResult>> action,
-            Func<TState, CancellationToken, Task<TRetryResult>> retryAction, TState state, int retryMaxCount = 100)
+            Func<TState, CancellationToken, Task<TRetryResult>> retryAction, TState state,
+            int retryMaxCount = SqlErrorTrapConfiguration.RetryMaxCount,
+            int errorNumber = SqlErrorTrapConfiguration.SqlDeadLockedTransactionError)
         {
             _action = action;
             _retryAction = retryAction;
             _state = state;
             _retryMaxCount = retryMaxCount;
+            _errorNumber = errorNumber;
         }
 
         public async Task<TResult> GetResult(CancellationToken cancellationToken = default(CancellationToken))
@@ -124,7 +151,7 @@ namespace VitalChoice.Caching.Iterators
                 {
                     return await _action(_state, retryResult, cancellationToken);
                 }
-                catch (SqlException e) when (e.Number == 1205)
+                catch (SqlException e) when (e.Number == _errorNumber)
                 {
                     if (retryCount < _retryMaxCount)
                     {
@@ -135,7 +162,11 @@ namespace VitalChoice.Caching.Iterators
                         throw;
                     }
                     await
-                        Task.Run(() => Thread.Sleep(TimeSpan.FromMilliseconds(_rnd.Next(10, 500))), cancellationToken).ConfigureAwait(true);
+                        Task.Run(
+                            () =>
+                                Thread.Sleep(
+                                    TimeSpan.FromMilliseconds(_rnd.Next(SqlErrorTrapConfiguration.RetryWaitTimeMin,
+                                        SqlErrorTrapConfiguration.RetryWaitTimeMax))), cancellationToken).ConfigureAwait(true);
                     retryResult = await _retryAction(_state, cancellationToken);
                 }
             }
@@ -147,14 +178,17 @@ namespace VitalChoice.Caching.Iterators
         private readonly Func<TResult> _action;
         private readonly Action _retryAction;
         private readonly int _retryMaxCount;
+        private readonly int _errorNumber;
         private readonly Random _rnd = new Random();
 
         public SqlErrorTrapHandler(Func<TResult> action,
-            Action retryAction = null, int retryMaxCount = 100)
+            Action retryAction = null, int retryMaxCount = SqlErrorTrapConfiguration.RetryMaxCount,
+            int errorNumber = SqlErrorTrapConfiguration.SqlDeadLockedTransactionError)
         {
             _action = action;
             _retryAction = retryAction;
             _retryMaxCount = retryMaxCount;
+            _errorNumber = errorNumber;
         }
 
         public TResult GetResult(CancellationToken cancellationToken = default(CancellationToken))
@@ -166,7 +200,7 @@ namespace VitalChoice.Caching.Iterators
                 {
                     return _action();
                 }
-                catch (SqlException e) when (e.Number == 1205)
+                catch (SqlException e) when (e.Number == _errorNumber)
                 {
                     if (retryCount < _retryMaxCount)
                     {
@@ -176,7 +210,9 @@ namespace VitalChoice.Caching.Iterators
                     {
                         throw;
                     }
-                    Thread.Sleep(TimeSpan.FromMilliseconds(_rnd.Next(10, 500)));
+                    Thread.Sleep(
+                        TimeSpan.FromMilliseconds(_rnd.Next(SqlErrorTrapConfiguration.RetryWaitTimeMin,
+                            SqlErrorTrapConfiguration.RetryWaitTimeMax)));
                     _retryAction?.Invoke();
                 }
             }
@@ -190,15 +226,18 @@ namespace VitalChoice.Caching.Iterators
         private readonly Action<TState> _retryAction;
         private readonly TState _state;
         private readonly int _retryMaxCount;
+        private readonly int _errorNumber;
         private readonly Random _rnd = new Random();
 
         public SqlErrorTrapHandler(Func<TState, TResult> action,
-            TState state, Action<TState> retryAction = null, int retryMaxCount = 100)
+            TState state, Action<TState> retryAction = null, int retryMaxCount = SqlErrorTrapConfiguration.RetryMaxCount,
+            int errorNumber = SqlErrorTrapConfiguration.SqlDeadLockedTransactionError)
         {
             _action = action;
             _retryAction = retryAction;
             _state = state;
             _retryMaxCount = retryMaxCount;
+            _errorNumber = errorNumber;
         }
 
         public TResult GetResult(CancellationToken cancellationToken = default(CancellationToken))
@@ -210,7 +249,7 @@ namespace VitalChoice.Caching.Iterators
                 {
                     return _action(_state);
                 }
-                catch (SqlException e) when (e.Number == 1205)
+                catch (SqlException e) when (e.Number == _errorNumber)
                 {
                     if (retryCount < _retryMaxCount)
                     {
@@ -220,7 +259,9 @@ namespace VitalChoice.Caching.Iterators
                     {
                         throw;
                     }
-                    Thread.Sleep(TimeSpan.FromMilliseconds(_rnd.Next(10, 500)));
+                    Thread.Sleep(
+                        TimeSpan.FromMilliseconds(_rnd.Next(SqlErrorTrapConfiguration.RetryWaitTimeMin,
+                            SqlErrorTrapConfiguration.RetryWaitTimeMax)));
                     _retryAction?.Invoke(_state);
                 }
             }
@@ -234,15 +275,18 @@ namespace VitalChoice.Caching.Iterators
         private readonly Func<TState, TRetryResult> _retryAction;
         private readonly TState _state;
         private readonly int _retryMaxCount;
+        private readonly int _errorNumber;
         private readonly Random _rnd = new Random();
 
         public SqlErrorTrapHandler(Func<TState, TRetryResult, TResult> action,
-            Func<TState, TRetryResult> retryAction, TState state, int retryMaxCount = 100)
+            Func<TState, TRetryResult> retryAction, TState state, int retryMaxCount = SqlErrorTrapConfiguration.RetryMaxCount,
+            int errorNumber = SqlErrorTrapConfiguration.SqlDeadLockedTransactionError)
         {
             _action = action;
             _retryAction = retryAction;
             _state = state;
             _retryMaxCount = retryMaxCount;
+            _errorNumber = errorNumber;
         }
 
         public TResult GetResult(CancellationToken cancellationToken = default(CancellationToken))
@@ -255,7 +299,7 @@ namespace VitalChoice.Caching.Iterators
                 {
                     return _action(_state, retryResult);
                 }
-                catch (SqlException e) when (e.Number == 1205)
+                catch (SqlException e) when (e.Number == _errorNumber)
                 {
                     if (retryCount < _retryMaxCount)
                     {
@@ -265,7 +309,9 @@ namespace VitalChoice.Caching.Iterators
                     {
                         throw;
                     }
-                    Thread.Sleep(TimeSpan.FromMilliseconds(_rnd.Next(10, 500)));
+                    Thread.Sleep(
+                        TimeSpan.FromMilliseconds(_rnd.Next(SqlErrorTrapConfiguration.RetryWaitTimeMin,
+                            SqlErrorTrapConfiguration.RetryWaitTimeMax)));
                     retryResult = _retryAction(_state);
                 }
             }

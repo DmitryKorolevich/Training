@@ -39,12 +39,7 @@ namespace VitalChoice.Caching.Iterators
             //Enumeration ended, update cache
             else
             {
-#pragma warning disable 4014
-                Task.Run(() =>
-#pragma warning restore 4014
-                {
-                    _cacheExecutor.UpdateList(_items);
-                }, cancellationToken).ConfigureAwait(false);
+                _cacheExecutor.UpdateList(_items);
             }
             return result;
         }

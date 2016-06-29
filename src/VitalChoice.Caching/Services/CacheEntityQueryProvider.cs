@@ -68,10 +68,7 @@ namespace VitalChoice.Caching.Services
                             return entity;
                         case CacheGetResult.Update:
                             entity = base.Execute<TResult>(expression);
-                            Task.Run(() =>
-                            {
-                                cacheExecutor.Update(entity);
-                            }).ConfigureAwait(false);
+                            cacheExecutor.Update(entity);
                             return entity;
                     }
                 }
@@ -151,12 +148,7 @@ namespace VitalChoice.Caching.Services
                             return (TResult) entity;
                         case CacheGetResult.Update:
                             entity = await base.ExecuteAsync<TResult>(expression, cancellationToken);
-#pragma warning disable 4014
-                            Task.Run(() =>
-#pragma warning restore 4014
-                            {
-                                cacheExecutor.Update(entity);
-                            }, cancellationToken).ConfigureAwait(false);
+                            cacheExecutor.Update(entity);
                             return (TResult) entity;
                     }
                 }

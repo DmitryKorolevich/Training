@@ -193,6 +193,7 @@ namespace VitalChoice.Business.Services.Checkout
         public async Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, int idCustomer)
         {
             CustomerCartOrder result = null;
+            bool tracked = false;
             using (var transaction = _context.BeginTransaction())
             {
                 try
@@ -206,6 +207,7 @@ namespace VitalChoice.Business.Services.Checkout
                             if (cart.IdCustomer == null)
                             {
                                 _context.Entry(cart).State = EntityState.Unchanged;
+                                tracked = true;
                                 cart.IdCustomer = idCustomer;
                                 await _context.SaveChangesAsync();
                             }
@@ -236,7 +238,10 @@ namespace VitalChoice.Business.Services.Checkout
                         anonymCart.Order.Customer = customer;
                         anonymCart.Order = await _orderService.InsertAsync(anonymCart.Order);
 
-                        _context.Entry(cart).State = EntityState.Unchanged;
+                        if (!tracked)
+                        {
+                            _context.Entry(cart).State = EntityState.Unchanged;
+                        }
                         cart.IdOrder = anonymCart.Order.Id;
                         await _context.SaveChangesAsync();
 
