@@ -193,7 +193,6 @@ namespace VitalChoice.Business.Services.Checkout
         public async Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, int idCustomer)
         {
             CustomerCartOrder result = null;
-            bool tracked = false;
             using (var transaction = _context.BeginTransaction())
             {
                 try

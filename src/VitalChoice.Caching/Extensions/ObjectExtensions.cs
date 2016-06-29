@@ -32,7 +32,7 @@ namespace VitalChoice.Caching.Extensions
     }
 
     internal class PrimaryKeyComparer<T> : IEqualityComparer<T>
-        where T: class
+        where T : class
     {
         private readonly EntityPrimaryKeyInfo _primaryKeyInfo;
 
@@ -51,14 +51,20 @@ namespace VitalChoice.Caching.Extensions
             {
                 return false;
             }
-            return _primaryKeyInfo.EntityEquals(x, y);
+            var pkTwo = _primaryKeyInfo.GetPrimaryKeyValue(y);
+            if (!pkTwo.IsValid)
+                return false;
+            var pkOne = _primaryKeyInfo.GetPrimaryKeyValue(x);
+            if (!pkOne.IsValid)
+                return false;
+            return pkOne == pkTwo;
         }
 
         public int GetHashCode(T obj)
         {
             if (obj == null)
                 return 0;
-            return _primaryKeyInfo.EntityGetHashCode(obj);
+            return _primaryKeyInfo.GetPrimaryKeyValue(obj).GetHashCode();
         }
     }
 
