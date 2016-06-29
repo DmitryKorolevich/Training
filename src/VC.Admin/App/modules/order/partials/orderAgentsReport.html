@@ -63,6 +63,13 @@
                                             <i class='glyphicon glyphicon-chevron-down' data-ng-if="team.Sorting.SortOrder == 'Desc'"></i>
                                         </span>
                                     </th>
+                                    <th class="sortable-column" data-ng-click="team.Sorting.applySort('AgentName')">
+                                        <span>Name</span>
+                                        <span data-ng-if="team.Sorting.Path == 'AgentName'">
+                                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="team.Sorting.SortOrder == 'Asc'"></i>
+                                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="team.Sorting.SortOrder == 'Desc'"></i>
+                                        </span>
+                                    </th>
                                     <th class="sortable-column" data-ng-click="team.Sorting.applySort('OrdersCount')">
                                         <span># of Orders</span>
                                         <span data-ng-if="team.Sorting.Path == 'OrdersCount'">
@@ -117,6 +124,7 @@
                             <tbody>
                                 <tr data-ng-repeat="agent in team.Agents">
                                     <td class="agent">{{agent.AgentId}}</td>
+                                    <td class="agent-name">{{agent.AgentName}}</td>
                                     <td class="orders-count">{{agent.OrdersCount}}</td>
                                     <td class="orders-total-amount">{{agent.TotalOrdersAmount | currency}}</td>
                                     <td class="orders-average-amount">{{agent.AverageOrdersAmount | currency}}</td>
@@ -131,6 +139,7 @@
                             <tbody>
                                 <tr>
                                     <td class="agent"><strong>Team Total</strong></td>
+                                    <td class="agent-name"></td>
                                     <td class="orders-count"><strong>{{team.OrdersCount}}</strong></td>
                                     <td class="orders-total-amount"><strong>{{team.TotalOrdersAmount | currency}}</strong></td>
                                     <td class="orders-average-amount"><strong>{{team.AverageOrdersAmount | currency}}</strong></td>
@@ -145,6 +154,7 @@
                             <tbody>
                                 <tr>
                                     <td class="agent">% of total phone orders</td>
+                                    <td class="agent-name"></td>
                                     <td class="orders-count">{{team.AgentOrdersPercent}}%</td>
                                     <td class="orders-total-amount"></td>
                                     <td data-ng-if="team.AverageOrdersAmountDifference>=0" class="orders-average-amount">{{team.AverageOrdersAmountDifference | currency}}</td>
@@ -163,6 +173,7 @@
                         <tbody>
                             <tr>
                                 <td class="agent"><strong>Overall Teams Total(phone orders)</strong></td>
+                                <td class="agent-name"></td>
                                 <td class="orders-count"><strong>{{period.OrdersCount}}</strong></td>
                                 <td class="orders-total-amount"><strong>{{period.TotalOrdersAmount | currency}}</strong></td>
                                 <td class="orders-average-amount"><strong>{{period.AverageOrdersAmount | currency}}</strong></td>
@@ -177,6 +188,7 @@
                         <tbody>
                             <tr>
                                 <td class="agent">% of total orders</td>
+                                <td class="agent-name"></td>
                                 <td class="orders-count">{{period.AgentOrdersPercent}}%</td>
                                 <td class="orders-total-amount"></td>
                                 <td data-ng-if="period.AverageOrdersAmountDifference>=0" class="orders-average-amount">{{period.AverageOrdersAmountDifference | currency}}</td>
@@ -192,6 +204,7 @@
                         <tbody>
                             <tr>
                                 <td class="agent"><strong>Total Orders</strong></td>
+                                <td class="agent-name"></td>
                                 <td class="orders-count"><strong>{{period.AllOrdersCount}}</strong></td>
                                 <td class="orders-total-amount"><strong>{{period.AllTotalOrdersAmount | currency}}</strong></td>
                                 <td class="orders-average-amount"><strong>{{period.AllAverageOrdersAmount | currency}}</strong></td>

@@ -10,6 +10,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public string AgentId { get; set; }
 
+        public string AgentName { get; set; }
+
         public int OrdersCount { get; set; }
 
         public decimal TotalOrdersAmount { get; set; }

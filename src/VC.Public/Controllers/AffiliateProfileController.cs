@@ -86,12 +86,15 @@ namespace VC.Public.Controllers
             var affiliate = await _affiliateService.SelectAsync(internalId);
             if (affiliate != null)
             {
+                if (affiliate.SafeData.PromoteByDrSearsLEANCoachAmbassador == true)
+                {
+                    model.Add("LEAN", true.ToString());
+                }
                 model.Add("Id", affiliate.Id.ToString());
                 model.Add("Name", affiliate.Name);
                 model.Add("CommissionFirst", affiliate.CommissionFirst.ToString());
                 model.Add("CommissionAll", affiliate.CommissionAll.ToString());
                 model.Add("PublicHost", _appOptions.Value.PublicHost);
-
             }
             return View(model);
         }

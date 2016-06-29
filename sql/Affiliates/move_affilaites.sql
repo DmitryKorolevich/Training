@@ -1641,3 +1641,12 @@ INSERT INTO AffiliateOptionValues
 SELECT c.Id, t.Id, t.DefaultValue FROM Affiliates AS c
 CROSS JOIN AffiliateOptionTypes AS t
 WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM AffiliateOptionValues AS v WHERE v.IdAffiliate = c.Id AND v.IdOptionType = t.Id)
+
+GO
+
+INSERT CustomerOptionValues
+(IdCustomer, IdOptionType, Value, IdBigString)
+(SELECT IdCustomer,11, '10', null FROM CustomerOptionValues
+WHERE Value='empty' AND IdCustomer NOT IN
+(SELECT IdCustomer  FROM CustomerOptionValues
+WHERE IdOptionType=11))

@@ -38,7 +38,7 @@
                                     <a ui-sref="index.oneCol.productDetail({id:item.IdProduct})">{{::item.ProductName}}</a>
                                 </td>
                                 <td>
-                                    <div class="text">{{::item.Price}}</div>
+                                    <div class="text">{{::item.Price | currency}}</div>
                                 </td>
                                 <td>
                                     <div class="input-group">
@@ -53,7 +53,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="text">{{::item.WholesalePrice}}</div>
+                                    <div class="text">{{::item.WholesalePrice | currency}}</div>
                                 </td>
                                 <td>
                                     <div class="input-group">

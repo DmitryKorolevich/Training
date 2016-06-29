@@ -327,6 +327,7 @@ namespace VitalChoice.Business.Services.Orders
                         toReturn.Add(new OrdersAgentReportExportItem()
                         {
                             Agent = "Agent",
+                            AgentName = "Name",
                             OrdersCount = "# of Orders",
                             TotalOrdersAmount = "Total Order Value",
                             AverageOrdersAmount = "Average Order Value",
@@ -341,6 +342,7 @@ namespace VitalChoice.Business.Services.Orders
                         toReturn.Add(new OrdersAgentReportExportItem()
                         {
                             Agent = agent.AgentId,
+                            AgentName = agent.AgentName,
                             OrdersCount = agent.OrdersCount.ToString(),
                             TotalOrdersAmount = agent.TotalOrdersAmount.ToString("C2"),
                             AverageOrdersAmount = agent.AverageOrdersAmount.ToString("C2"),
@@ -439,6 +441,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         IdAdmin = p.Id,
                         AgentId = p.AgentId,
+                        AgentName = $"{p.User.FirstName} {p.User.LastName}",
                     }).OrderBy(p => p.AgentId).ToList();
                     period.Teams.Add(teamItem);
                 }
@@ -451,6 +454,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         IdAdmin = p.Id,
                         AgentId = p.AgentId,
+                        AgentName = $"{p.User.FirstName} {p.User.LastName}",
                     }).OrderBy(p => p.AgentId).ToList();
                     period.Teams.Add(teamItem);
                 }
@@ -462,6 +466,7 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     IdAdmin = p.Id,
                     AgentId = p.AgentId,
+                    AgentName = $"{p.User.FirstName} {p.User.LastName}",
                 }).ToList();
                 period.Teams.Add(teamItem);
             }
