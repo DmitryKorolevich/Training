@@ -86,7 +86,7 @@
                                                         <td class="sku">
                                                             <div class="input-group autocomplete">
                                                                 <input type="text" name="SKU{{$index}}" class="form-control" placeholder="SKU" data-ng-model="item.Code"
-                                                                       typeahead-min-length="1" uib-typeahead="sku.Code as sku.Code for sku in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU"
+                                                                       typeahead-min-length="1" uib-typeahead="sku.Code as (sku.Code+' - '+ sku.DescriptionName) for sku in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU"
                                                                        typeahead-on-select="skuChanged($index)" data-ng-blur="skuChanged($index)"
                                                                        typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
                                                             </div>
