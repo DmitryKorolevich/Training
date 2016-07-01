@@ -22,7 +22,8 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.transactionsAndRefundsReportController',
 	'app.modules.order.controllers.ordersSummarySalesReportController',
 	'app.modules.order.controllers.skuAddressReportController',
-	'app.modules.order.controllers.matchbackReportController'
+	'app.modules.order.controllers.matchbackReportController',
+	'app.modules.order.controllers.orderSkuCountReportController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -123,6 +124,11 @@ angular.module('app.modules.order', [
 				    url: '/report/matchback-analysis',
 				    templateUrl: 'app/modules/order/partials/matchbackReport.html',
 				    controller: 'matchbackReportController'
+				})
+				.state('index.oneCol.orderSkuCountReport', {
+				    url: '/report/sku-count',
+				    templateUrl: 'app/modules/order/partials/orderSkuCountReport.html',
+				    controller: 'orderSkuCountReportController'
 				});
 		}
 ]);

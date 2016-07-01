@@ -1388,6 +1388,14 @@ namespace VC.Admin.Controllers
             return File(result, "text/csv");
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<OrderSkuCountReport>> GetOrderSkuCountReport([FromBody]OrderSkuCountReportFilter filter)
+        {
+            var toReturn = await _orderReportService.GetOrderSkuCountReportAsync(filter);
+            return toReturn;
+        }
+
         #endregion
 
         #region GCOrders
