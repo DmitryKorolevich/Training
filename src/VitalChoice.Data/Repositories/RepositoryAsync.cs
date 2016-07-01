@@ -275,8 +275,7 @@ namespace VitalChoice.Data.Repositories
         {
             if (ids == null || ids.Count == 0)
                 return false;
-            var entitySet = DbSet.Where(e => ids.Any(id => id == e.Id));
-            DbSet.AttachRange(entitySet);
+            var entitySet = DbSet.Where(e => ids.Contains(e.Id));
             foreach (var entity in entitySet)
             {
                 Context.SetState(entity, EntityState.Deleted);

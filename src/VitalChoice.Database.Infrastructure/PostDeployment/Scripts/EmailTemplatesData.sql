@@ -2788,7 +2788,7 @@ INSERT INTO [dbo].[ContentItems]
 }} :: VitalChoice.Ecommerce.Domain.Mail.EGiftNotificationEmail
 %>'
            ,''
-           ,'Vital Choice - E-Gift Notification Email'
+           ,'@(Sender) purchased a Gift Certificate for you!'
            ,NULL
            ,NULL)
 
