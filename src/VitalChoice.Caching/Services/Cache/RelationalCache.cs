@@ -303,7 +303,7 @@ namespace VitalChoice.Caching.Services.Cache
         private void AttachNotTracked(T item, RelationInfo relationInfo)
         {
             AttachGraph(item, relationInfo);
-            item.UpdateRelationsAfterTrack(relationInfo.Relations);
+            //item.UpdateRelationsAfterTrack(relationInfo.Relations);
         }
 
         private void AttachNotTracked(ICollection<T> items, RelationInfo relationInfo)
@@ -311,7 +311,7 @@ namespace VitalChoice.Caching.Services.Cache
             items.ForEach(item =>
             {
                 AttachGraph(item, relationInfo);
-                item.UpdateRelationsAfterTrack(relationInfo.Relations);
+                //item.UpdateRelationsAfterTrack(relationInfo.Relations);
             });
         }
 

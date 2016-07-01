@@ -170,11 +170,10 @@ namespace VitalChoice.Caching.Extensions
     {
         public static object DeepCloneCreateListForTrack(this IEnumerable<object> entities, RelationInfo relations)
         {
-            var comparer = KeyComparerLookup.GetComparer(relations.RelationType, relations.ItemKeyInfo);
+            //var comparer = KeyComparerLookup.GetComparer(relations.RelationType, relations.ItemKeyInfo);
             return
-                typeof(ResetableHashSet<>).CreateGenericCollection(relations.RelationType,
-                    entities.Select(item => DeepCloneItemForTrack(item, relations)),
-                    comparer)
+                typeof(List<>).CreateGenericCollection(relations.RelationType,
+                    entities.Select(item => DeepCloneItemForTrack(item, relations)))
                     .CollectionObject;
         }
 
@@ -199,29 +198,29 @@ namespace VitalChoice.Caching.Extensions
             return newItem;
         }
 
-        public static void UpdateRelationsAfterTrack(this object entity, IEnumerable<RelationInfo> relations)
-        {
-            foreach (var relation in relations)
-            {
-                var value = relation.GetRelatedObject(entity);
-                if (value != null)
-                {
-                    if (relation.IsCollection)
-                    {
-                        var resetable = value as IResetableCollection;
-                        resetable?.Reset();
-                        foreach (var item in (IEnumerable<object>) value)
-                        {
-                            UpdateRelationsAfterTrack(item, relation.Relations);
-                        }
-                    }
-                    else
-                    {
-                        UpdateRelationsAfterTrack(value, relation.Relations);
-                    }
-                }
-            }
-        }
+        //public static void UpdateRelationsAfterTrack(this object entity, IEnumerable<RelationInfo> relations)
+        //{
+        //    foreach (var relation in relations)
+        //    {
+        //        var value = relation.GetRelatedObject(entity);
+        //        if (value != null)
+        //        {
+        //            if (relation.IsCollection)
+        //            {
+        //                var resetable = value as IResetableCollection;
+        //                resetable?.Reset();
+        //                foreach (var item in (IEnumerable<object>) value)
+        //                {
+        //                    UpdateRelationsAfterTrack(item, relation.Relations);
+        //                }
+        //            }
+        //            else
+        //            {
+        //                UpdateRelationsAfterTrack(value, relation.Relations);
+        //            }
+        //        }
+        //    }
+        //}
 
         public static void UpdateCloneRelations<T>(this T relationsSrc, IEnumerable<RelationInfo> relations, T dest)
         {
