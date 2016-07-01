@@ -15,7 +15,7 @@ namespace VitalChoice.Business.Mail
 {
     public class NotificationService : INotificationService
     {
-	    private readonly IEmailSender emailSender;
+        private readonly IEmailSender emailSender;
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IEcommerceRepositoryAsync<NewsletterBlockedEmail> _newsletterBlockedEmailRepository;
         private static string _mainSuperAdminEmail;
@@ -26,8 +26,8 @@ namespace VitalChoice.Business.Mail
             IEmailTemplateService emailTemplateService,
             IEcommerceRepositoryAsync<NewsletterBlockedEmail> newsletterBlockedEmailRepository,
             IOptions<AppOptions> appOptions)
-	    {
-		    this.emailSender = emailSender;
+        {
+            this.emailSender = emailSender;
             _emailTemplateService = emailTemplateService;
             _newsletterBlockedEmailRepository = newsletterBlockedEmailRepository;
             _mainSuperAdminEmail = appOptions.Value.MainSuperAdminEmail;
@@ -38,17 +38,17 @@ namespace VitalChoice.Business.Mail
         #region SendEmails
 
         public async Task SendAdminUserActivationAsync(string email, UserActivation activation)
-	    {
+        {
             var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.AdminRegistration, activation);
 
             if (generatedEmail != null)
             {
                 await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
             }
-	    }
+        }
 
-		public async Task SendAdminPasswordResetAsync(string email, PasswordReset passwordReset)
-	    {
+        public async Task SendAdminPasswordResetAsync(string email, PasswordReset passwordReset)
+        {
             var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.AdminPasswordForgot, passwordReset);
 
             if (generatedEmail != null)
@@ -120,14 +120,14 @@ namespace VitalChoice.Business.Mail
         }
 
         public async Task SendCustomerRegistrationSuccess(string email, SuccessfulUserRegistration registration)
-	    {
+        {
             var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.CustomerRegistrationViaWeb, registration);
 
             if (generatedEmail != null)
             {
                 await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
             }
-		}
+        }
 
         public async Task SendWholesaleCustomerRegistrationSuccess(string email, SuccessfulUserRegistration registration)
         {
@@ -161,7 +161,7 @@ namespace VitalChoice.Business.Mail
 
         public async Task SendUserPasswordForgotAsync(string email, PasswordReset passwordReset)
         {
-            var generatedEmail =  await _emailTemplateService.GenerateEmailAsync(EmailConstants.UserPasswordForgot, passwordReset);
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.UserPasswordForgot, passwordReset);
 
             if (generatedEmail != null)
             {
@@ -198,12 +198,14 @@ namespace VitalChoice.Business.Mail
 
         public async Task SendEGiftNotificationEmailAsync(string email, EGiftNotificationEmail model)
         {
-            model.EGiftsBlock = "<p>";
-            foreach (var item in model.EGifts)
+            if (model.EGifts != null)
             {
-                model.EGiftsBlock += $"{item}<br/>";
+                for (int i = 0; i < model.EGifts.Count; i++)
+                {
+                    model.EGifts[i].ShowDots = i != model.EGifts.Count - 1;
+                }
             }
-            model.EGiftsBlock += "</p>";
+            model.PublicHost = _publicHost;
 
             var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.EGiftNotificationEmail, model);
 
@@ -295,7 +297,7 @@ namespace VitalChoice.Business.Mail
 
         public async Task<bool> IsEmailUnsubscribedAsync(int idNewsletter, string email)
         {
-            return await _newsletterBlockedEmailRepository.Query(p=>p.IdNewsletter== idNewsletter && p.Email==email).SelectAnyAsync();
+            return await _newsletterBlockedEmailRepository.Query(p => p.IdNewsletter == idNewsletter && p.Email == email).SelectAnyAsync();
         }
 
         public async Task<bool> UpdateUnsubscribeEmailAsync(int idNewsletter, string email, bool unsubscribe)
@@ -303,7 +305,7 @@ namespace VitalChoice.Business.Mail
             var dbItem = (await _newsletterBlockedEmailRepository.Query(p => p.IdNewsletter == idNewsletter && p.Email == email).SelectAsync()).FirstOrDefault();
             if (unsubscribe)
             {
-                if (dbItem==null)
+                if (dbItem == null)
                 {
                     dbItem = new NewsletterBlockedEmail();
                     dbItem.IdNewsletter = idNewsletter;
@@ -313,7 +315,7 @@ namespace VitalChoice.Business.Mail
             }
             else
             {
-                if (dbItem!=null)
+                if (dbItem != null)
                 {
                     await _newsletterBlockedEmailRepository.DeleteAsync(dbItem);
                 }

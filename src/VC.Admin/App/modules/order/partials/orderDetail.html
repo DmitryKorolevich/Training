@@ -86,7 +86,7 @@
                                                         <td class="sku">
                                                             <div class="input-group autocomplete">
                                                                 <input type="text" name="SKU{{$index}}" class="form-control" placeholder="SKU" data-ng-model="item.Code"
-                                                                       typeahead-min-length="1" uib-typeahead="sku.Code as sku.Code for sku in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU"
+                                                                       typeahead-min-length="1" uib-typeahead="sku.Code as (sku.Code+' - '+ sku.DescriptionName) for sku in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU"
                                                                        typeahead-on-select="skuChanged($index)" data-ng-blur="skuChanged($index)"
                                                                        typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
                                                             </div>
@@ -664,7 +664,7 @@
                                             <div data-ng-if="currentCustomer.Email" class="form-group">
                                                 <div class="col-md-3"></div>
                                                 <div class="col-md-9">
-                                                    <button class="btn btn-info" data-ng-if="currentCustomer.StatusCode == 2" ladda="resetTracker.active()" data-ng-click="resetPassword()">Reset Password</button>
+                                                    <button class="btn btn-info" data-ng-if="currentCustomer.StatusCode == 2" ladda="resetTracker.active()" data-ng-click="resetPassword()">Send Reset Password Email</button>
                                                     <button class="btn btn-info" data-ng-if="currentCustomer.StatusCode == 1" ladda="resendTracker.active()" data-ng-click="resend()">Resend Activation Email</button>
                                                 </div>
                                             </div>

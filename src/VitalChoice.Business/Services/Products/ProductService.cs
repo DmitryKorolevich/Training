@@ -617,8 +617,8 @@ namespace VitalChoice.Business.Services.Products
                 return
                     results.Where(
                         r =>
-                            $"{r.Product?.Name ?? string.Empty} {r.Product?.SafeData.SubTitle ?? string.Empty} ({r.SafeData.QTY ?? 0})" ==
-                            filter.ExactDescriptionName).ToList();
+                            StringComparer.OrdinalIgnoreCase.Equals($"{r.Product?.Name ?? string.Empty} {r.Product?.SafeData.SubTitle ?? string.Empty} ({r.SafeData.QTY ?? 0})",
+                            filter.ExactDescriptionName)).ToList();
             }
             if (!string.IsNullOrEmpty(filter.DescriptionName))
             {
@@ -626,7 +626,7 @@ namespace VitalChoice.Business.Services.Products
                     results.Where(
                         r =>
                             $"{r.Product?.Name ?? string.Empty} {r.Product?.SafeData.SubTitle ?? string.Empty} ({r.SafeData.QTY ?? 0})"
-                                .StartsWith(filter.DescriptionName)).ToList();
+                                .StartsWith(filter.DescriptionName, StringComparison.OrdinalIgnoreCase)).ToList();
             }
             return results;
         }

@@ -635,12 +635,18 @@ namespace VC.Public.Controllers
             }
 
             var order = await OrderService.SelectAsync(idOrder.Value);
+            var customer = await CustomerService.SelectAsync(order.Customer.Id);
             var emailModel = new EGiftNotificationEmail();
+            emailModel.Sender = $"{customer.ProfileAddress.SafeData.FirstName} {customer.ProfileAddress.SafeData.LastName}";
             emailModel.Recipient = model.Recipient;
             emailModel.Email = model.Email;
             emailModel.Message = model.Message;
             emailModel.EGifts = order.Skus.Where(p=>p.Sku.Product.IdObjectType==(int)ProductType.EGс).
-                SelectMany(p => p.GcsGenerated).Select(p => p.Code).ToList();
+                SelectMany(p => p.GcsGenerated).Select(p => new EGiftEmailModel()
+                {
+                    Code = p.Code,
+                    Amount = p.Balance
+                }).ToList();
             await _notificationService.SendEGiftNotificationEmailAsync(model.Email, emailModel);
 
             ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullySent];

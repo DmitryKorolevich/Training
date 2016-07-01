@@ -108,6 +108,18 @@ namespace VitalChoice.Business.Queries.Orders
             return this;
         }
 
+        public OrderQuery WithOrderStatuses(ICollection<OrderStatus> orderStatuses)
+        {
+            var items = orderStatuses.Select(p => (OrderStatus?) p).ToList();
+            if (orderStatuses!=null && orderStatuses.Count>0)
+            {
+                Add(x => items.Contains(x.OrderStatus) ||
+                    items.Contains(x.POrderStatus) ||
+                    items.Contains(x.NPOrderStatus));
+            }
+            return this;
+        }
+
         public OrderQuery WithoutIncomplete(OrderStatus? orderStatus = null, bool ignoreNotShowingIncomplete = false)
         {
             if (!ignoreNotShowingIncomplete)

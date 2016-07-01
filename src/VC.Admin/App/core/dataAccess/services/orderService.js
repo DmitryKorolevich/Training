@@ -255,5 +255,9 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	        return baseUrl + ('GetMailingReportItemsReportFile?{0}buildNumber={1}')
                 .format(generateQueryParamsBasedOnFilter(filter), buildNumber);
 	    },
+	    getOrderSkuCountReport: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetOrderSkuCountReport', filter, getConfig(tracker));
+	    },
 	};
 }]);

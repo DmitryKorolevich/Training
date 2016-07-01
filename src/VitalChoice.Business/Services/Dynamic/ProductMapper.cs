@@ -109,6 +109,16 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 if (entity.Skus == null)
                     entity.Skus = new List<Sku>();
+
+                Lazy<ProductDynamic> clone = new Lazy<ProductDynamic>(() => dynamic.Clone());
+                foreach (var sku in dynamic.Skus)
+                {
+                    if (sku.Product == null)
+                    {
+                        sku.Product = clone.Value;
+                        sku.Product.Skus = null;
+                    }
+                }
                 entity.Skus.AddRange(await _skuMapper.ToEntityRangeAsync(dynamic.Skus));
             });
         }

@@ -893,5 +893,229 @@ namespace VitalChoice.Business.Services.Orders
 
             return toReturn;
         }
+
+        public async Task<OrderSkuCountReport> GetOrderSkuCountReportAsync(OrderSkuCountReportFilter filter)
+        {
+            OrderSkuCountReport toReturn = new OrderSkuCountReport();
+            int? idSku = null;
+            if (!string.IsNullOrEmpty(filter.SkuCode))
+            {
+                idSku = (await _productService.GetSkuAsync(filter.SkuCode))?.Id;
+                if (!idSku.HasValue)
+                {
+                    return toReturn;
+                }
+            }
+
+            OrderQuery conditions =new OrderQuery().NotDeleted().WithFromDate(filter.From).WithToDate(filter.To)
+                .WithIdSku(idSku)
+                .WithOrderTypes(new[] { OrderType.AutoShipOrder, OrderType.DropShip, OrderType.GiftList, OrderType.Normal })
+                .WithOrderStatuses(new[] { OrderStatus.Processed, OrderStatus.Exported, OrderStatus.Shipped });
+            var orders = await _orderService.SelectAsync(conditions,
+                p => p.Include(x => x.Skus).ThenInclude(x => x.Sku).ThenInclude(x => x.Product).
+                    Include(x => x.PromoSkus).ThenInclude(x => x.Sku).ThenInclude(x => x.Product));
+
+
+            foreach (var order in orders)
+            {
+                //perishable
+                int perishableCount = 0;
+                if (filter.Unique)
+                {
+                    var items = order.Skus.Where(p => p.Sku.Product.IdObjectType == (int)ProductType.Perishable).Select(p => p.Sku.Id).ToList();
+                    items.AddRange(order.PromoSkus.Where(p => !p.Enabled && p.Sku.Product.IdObjectType == (int)ProductType.Perishable).Select(p => p.Sku.Id));
+                    perishableCount = items.Distinct().Count();
+                }
+                else
+                {
+                    perishableCount = order.Skus.Where(p => p.Sku.Product.IdObjectType == (int)ProductType.Perishable).Sum(p=>p.Quantity) +
+                        order.PromoSkus.Where(p => !p.Sku.Hidden && p.Sku.Product.IdObjectType == (int)ProductType.Perishable).
+                        Sum(p=>p.Quantity);
+                }
+                if (perishableCount > 0)
+                {
+                    toReturn.PerishableTotalOrders++;
+                }
+                if (perishableCount == 1)
+                {
+                    toReturn.PerishableSku1Orders++;
+                } else if (perishableCount == 2)
+                {
+                    toReturn.PerishableSku2Orders++;
+                }
+                else if (perishableCount == 3)
+                {
+                    toReturn.PerishableSku3Orders++;
+                }
+                else if (perishableCount == 4)
+                {
+                    toReturn.PerishableSku4Orders++;
+                }
+                else if (perishableCount >= 5)
+                {
+                    toReturn.PerishableSku5Orders++;
+                }
+
+                //non-perishable
+                int nonPerishableCount = 0;
+                if (filter.Unique)
+                {
+                    var items = order.Skus.Where(p => p.Sku.Product.IdObjectType != (int)ProductType.Perishable).Select(p=>p.Sku.Id).ToList();
+                    items.AddRange(order.PromoSkus.Where(p => !p.Enabled && p.Sku.Product.IdObjectType != (int)ProductType.Perishable).Select(p=>p.Sku.Id));
+                    nonPerishableCount = items.Distinct().Count();
+                }
+                else
+                {
+                    nonPerishableCount = order.Skus.Where(p => p.Sku.Product.IdObjectType != (int)ProductType.Perishable).Sum(p => p.Quantity) +
+                        order.PromoSkus.Where(p => !p.Enabled && p.Sku.Product.IdObjectType != (int)ProductType.Perishable).
+                        Sum(p => p.Quantity);
+                }
+                if (nonPerishableCount > 0)
+                {
+                    toReturn.NonPerishableTotalOrders++;
+                }
+                if (nonPerishableCount == 1)
+                {
+                    toReturn.NonPerishableSku1Orders++;
+                }
+                else if (nonPerishableCount == 2)
+                {
+                    toReturn.NonPerishableSku2Orders++;
+                }
+                else if (nonPerishableCount == 3)
+                {
+                    toReturn.NonPerishableSku3Orders++;
+                }
+                else if (nonPerishableCount == 4)
+                {
+                    toReturn.NonPerishableSku4Orders++;
+                }
+                else if (nonPerishableCount >= 5)
+                {
+                    toReturn.NonPerishableSku5Orders++;
+                }
+
+                //skus
+                var skus = order.Skus;
+                skus.AddRange(order.PromoSkus.Where(p=>p.Enabled));
+                foreach (var skuOrdered in skus)
+                {
+                    var skuModel = toReturn.Skus.FirstOrDefault(p => p.IdSku == skuOrdered.Sku.Id);
+                    if (skuModel == null)
+                    {
+                        skuModel=new OrderSkuCountReportSkuItem();
+                        skuModel.IdSku = skuOrdered.Sku.Id;
+                        skuModel.Code = skuOrdered.Sku.Code;
+                        toReturn.Skus.Add(skuModel);
+                    }
+
+                    var orderModel = skuModel.Orders.FirstOrDefault(p => p.IdOrder == order.Id);
+                    if (orderModel == null)
+                    {
+                        orderModel = new OrderSkuCountReportOrderItem();
+                        orderModel.IdOrder = order.Id;
+                        skuModel.Orders.Add(orderModel);
+
+                        var count = perishableCount + nonPerishableCount;
+                        orderModel.SkuCount = count;
+
+                        if (count > 0)
+                        {
+                            skuModel.TotalOrders++;
+                        }
+                        if (count == 1)
+                        {
+                            skuModel.Sku1Orders++;
+                        }
+                        else if (count == 2)
+                        {
+                            skuModel.Sku2Orders++;
+                        }
+                        else if (count == 3)
+                        {
+                            skuModel.Sku3Orders++;
+                        }
+                        else if (count == 4)
+                        {
+                            skuModel.Sku4Orders++;
+                        }
+                        else if (count >= 5)
+                        {
+                            skuModel.Sku5Orders++;
+                        }
+                    }
+
+                    if (filter.Unique)
+                    {
+                        orderModel.CountOfGivenSku ++;
+                    }
+                    else
+                    {
+                        orderModel.CountOfGivenSku += skuOrdered.Quantity;
+                    }
+                }
+            }
+
+            toReturn.PerishableSku1OrderPercent = toReturn.PerishableTotalOrders != 0
+                ? Math.Round(((decimal) toReturn.PerishableSku1Orders * 100) /toReturn.PerishableTotalOrders, 2)
+                : (decimal)0;
+            toReturn.PerishableSku2OrderPercent = toReturn.PerishableTotalOrders != 0
+                ? Math.Round(((decimal)toReturn.PerishableSku2Orders * 100) / toReturn.PerishableTotalOrders, 2)
+                : (decimal)0;
+            toReturn.PerishableSku3OrderPercent = toReturn.PerishableTotalOrders != 0
+                ? Math.Round(((decimal)toReturn.PerishableSku3Orders * 100) / toReturn.PerishableTotalOrders, 2)
+                : (decimal)0;
+            toReturn.PerishableSku4OrderPercent = toReturn.PerishableTotalOrders != 0
+                ? Math.Round(((decimal)toReturn.PerishableSku4Orders * 100) / toReturn.PerishableTotalOrders, 2)
+                : (decimal)0;
+            toReturn.PerishableSku5OrderPercent = toReturn.PerishableTotalOrders != 0
+                ? Math.Round(((decimal)toReturn.PerishableSku5Orders * 100) / toReturn.PerishableTotalOrders, 2)
+                : (decimal)0;
+
+            toReturn.NonPerishableSku1OrderPercent = toReturn.NonPerishableTotalOrders != 0
+                ? Math.Round(((decimal)toReturn.NonPerishableSku1Orders * 100) / toReturn.NonPerishableTotalOrders, 2)
+                : (decimal)0;
+            toReturn.NonPerishableSku2OrderPercent = toReturn.NonPerishableTotalOrders != 0
+                ? Math.Round(((decimal)toReturn.NonPerishableSku2Orders * 100) / toReturn.NonPerishableTotalOrders, 2)
+                : (decimal)0;
+            toReturn.NonPerishableSku3OrderPercent = toReturn.NonPerishableTotalOrders != 0
+                ? Math.Round(((decimal)toReturn.NonPerishableSku3Orders * 100) / toReturn.NonPerishableTotalOrders, 2)
+                : (decimal)0;
+            toReturn.NonPerishableSku4OrderPercent = toReturn.NonPerishableTotalOrders != 0
+                ? Math.Round(((decimal)toReturn.NonPerishableSku4Orders * 100) / toReturn.NonPerishableTotalOrders, 2)
+                : (decimal)0;
+            toReturn.NonPerishableSku5OrderPercent = toReturn.NonPerishableTotalOrders != 0
+                ? Math.Round(((decimal)toReturn.NonPerishableSku5Orders * 100) / toReturn.NonPerishableTotalOrders, 2)
+                : (decimal)0;
+
+            foreach (var orderSkuCountReportSkuItem in toReturn.Skus)
+            {
+                orderSkuCountReportSkuItem.Sku1OrderPercent = orderSkuCountReportSkuItem.TotalOrders != 0
+                    ? Math.Round(((decimal)orderSkuCountReportSkuItem.Sku1Orders*100) / orderSkuCountReportSkuItem.TotalOrders, 2)
+                    : (decimal)0;
+                orderSkuCountReportSkuItem.Sku2OrderPercent = orderSkuCountReportSkuItem.TotalOrders != 0
+                    ? Math.Round(((decimal)orderSkuCountReportSkuItem.Sku2Orders * 100) / orderSkuCountReportSkuItem.TotalOrders, 2)
+                    : (decimal)0;
+                orderSkuCountReportSkuItem.Sku3OrderPercent = orderSkuCountReportSkuItem.TotalOrders != 0
+                    ? Math.Round(((decimal)orderSkuCountReportSkuItem.Sku3Orders * 100) / orderSkuCountReportSkuItem.TotalOrders, 2)
+                    : (decimal)0;
+                orderSkuCountReportSkuItem.Sku4OrderPercent = orderSkuCountReportSkuItem.TotalOrders != 0
+                    ? Math.Round(((decimal)orderSkuCountReportSkuItem.Sku4Orders * 100) / orderSkuCountReportSkuItem.TotalOrders, 2)
+                    : (decimal)0;
+                orderSkuCountReportSkuItem.Sku5OrderPercent = orderSkuCountReportSkuItem.TotalOrders != 0
+                    ? Math.Round(((decimal)orderSkuCountReportSkuItem.Sku5Orders * 100) / orderSkuCountReportSkuItem.TotalOrders, 2)
+                    : (decimal)0;
+
+                var allGivenSkus = orderSkuCountReportSkuItem.Orders.Sum(p => p.CountOfGivenSku);
+                foreach (var orderSkuCountReportOrderItem in orderSkuCountReportSkuItem.Orders)
+                {
+                    orderSkuCountReportOrderItem.PercentOfTotal = allGivenSkus != 0
+                        ? Math.Round(((decimal) orderSkuCountReportOrderItem.CountOfGivenSku*100)/allGivenSkus, 2)
+                        : 0;
+                }
+            }
+
+            return toReturn;
+        }
     }
 }

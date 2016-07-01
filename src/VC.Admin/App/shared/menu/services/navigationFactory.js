@@ -17,8 +17,6 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 			subMenu: [
 				{ name: 'viewAllOrders', stateName: 'index.oneCol.manageOrders', stateLabel: 'Manage Orders', access: 2 },
 				{ name: 'manageHelpTickets', stateName: 'index.oneCol.manageHelpTickets', stateLabel: 'Manage Help Tickets', access: 2 },
-				{ name: 'moveOrder', stateName: 'index.oneCol.moveOrder', stateLabel: 'Reassign Transaction', access: 2 },
-				{ name: 'changeOrderStatus', stateName: 'index.oneCol.changeOrderStatus', stateLabel: 'Change Order Status', access: 2 },
 			]
 		},
 		{
@@ -68,6 +66,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
                         { name: 'productCategoriesStatistic', stateName: 'index.oneCol.productCategoriesStatistic', stateLabel: 'Category Sales Report', access: 3 },
                         { name: 'healthwisePeriods', stateName: 'index.oneCol.healthwisePeriods', stateLabel: 'HealthWise Customer Report', access: 3 },
                         { name: 'orderSKUAddressReport', stateName: 'index.oneCol.orderSKUAddressReport', stateLabel: 'Order SKU and Address Report', access: 3 },
+                        { name: 'orderSkuCountReport', stateName: 'index.oneCol.orderSkuCountReport', stateLabel: 'Order SKU Counts', access: 3 },
                         { name: 'inventorySkusUsageReport', stateName: 'index.oneCol.inventorySkusUsageReport', stateLabel: 'Parts Usage Report', access: 3 },
                         { name: 'inventoriesSummaryUsageReport', stateName: 'index.oneCol.inventoriesSummaryUsageReport', stateLabel: 'Product Shipment Summary', access: 3 },
                         { name: 'ordersRegionStatistic', stateName: 'index.oneCol.ordersRegionStatistic', stateLabel: 'Regional Sales Summary', access: 3 },
@@ -75,7 +74,6 @@ angular.module('app.shared.menu.services.navigationFactory', [])
                         { name: 'ordersSummarySalesReport', stateName: 'index.oneCol.ordersSummarySalesReport', stateLabel: 'Summary Sales Report', access: 3 },
                         { name: 'transactionsAndRefundsReport', stateName: 'index.oneCol.transactionsAndRefundsReport', stateLabel: 'Transaction & Refund Report', access: 3 },
                         //{ name: 'deletedOrdersReport', stateName: 'index.oneCol.deletedOrdersReport', stateLabel: 'Deleted Orders Report', access: 3 },
-                        //{ name: 'orderSKUCounts', stateName: 'index.oneCol.orderSKUCounts', stateLabel: 'Order SKU Counts', access: 3 },
                         //{ name: 'shippedViaReport', stateName: 'index.oneCol.shippedViaReport', stateLabel: 'Shipped Via Report', access: 3 },
 				    ]
 				},
@@ -163,6 +161,8 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'manageOrderNotes', stateName: 'index.oneCol.manageOrderNotes', stateLabel: 'Manage Automatic Order Specific Notes', access: 10 },
 				{ name: 'manageLookups', stateName: 'index.oneCol.manageLookups', stateLabel: 'Manage Lookups', access: 10 },
 				{ name: 'manageProductTaxCodes', stateName: 'index.oneCol.manageProductTaxCodes', stateLabel: 'Manage Product Tax Codes', access: 10 },
+				{ name: 'moveOrder', stateName: 'index.oneCol.moveOrder', stateLabel: 'Reassign Transaction', access: 2 },
+				{ name: 'changeOrderStatus', stateName: 'index.oneCol.changeOrderStatus', stateLabel: 'Change Order Status', access: 2 },
 			]
 		},
 		{

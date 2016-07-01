@@ -2,13 +2,20 @@
 
 namespace VitalChoice.Ecommerce.Domain.Mail
 {
+    public class EGiftEmailModel
+    {
+        public string Code { get; set; }
+        public decimal Amount { get; set; }
+        public bool ShowDots { get; set; }
+    }
+
     public class EGiftNotificationEmail : EmailTemplateDataModel
     {
+        public string Sender { get; set; }
 	    public string Recipient { get; set; }
         public string Email { get; set; }
         public string Message { get; set; }
-        [IgnoreUserTemplateUse]
-        public ICollection<string> EGifts { get; set; }
-        public string EGiftsBlock { get; set; }
+        public string PublicHost { get; set; }
+        public IList<EGiftEmailModel> EGifts { get; set; }
     }
 }
