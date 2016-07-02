@@ -14,7 +14,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
             Result = result;
         }
 
-        public CacheResult(CachedEntity<T> cached, bool track)
+        public CacheResult(CachedEntity<T> cached)
         {
             using (cached.Lock())
             {
@@ -27,9 +27,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
                 else
                 {
                     Result = CacheGetResult.Found;
-                    Entity = track
-                        ? DeepCloneItemForTrack(cached.Entity, cached.Cache.Relations)
-                        : DeepCloneItem(cached.Entity, cached.Cache.Relations);
+                    Entity = DeepCloneItem(cached.Entity, cached.Cache.Relations);
                 }
             }
         }
@@ -48,14 +46,9 @@ namespace VitalChoice.Caching.Services.Cache.Base
             return new CacheResult<T>(default(T), result);
         }
 
-        internal static T DeepCloneItemForTrack(T item, RelationInfo relations)
+        public static implicit operator CacheResult<T>(CachedEntity<T> cached)
         {
-            return (T)item.DeepCloneItemForTrack(relations);
-        }
-
-        internal static IEnumerable<T> DeepCloneListForTrack(IEnumerable<T> entities, RelationInfo relations)
-        {
-            return entities.Select(item => (T) item.DeepCloneItemForTrack(relations));
+            return new CacheResult<T>(cached);
         }
 
         internal static T DeepCloneItem(T item, RelationInfo relations)

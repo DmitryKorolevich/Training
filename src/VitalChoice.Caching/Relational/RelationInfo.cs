@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Internal;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -7,6 +8,7 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore.Metadata;
 using VitalChoice.Caching.Expressions;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.ObjectMapping.Base;
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
@@ -15,7 +17,12 @@ namespace VitalChoice.Caching.Relational
     public interface IRelationAccessor
     {
         object GetRelatedObject(object entity);
-        void SetRelatedObject(object entity, object relation);
+        void SetOrUpdateRelatedObject(object entity, object relation);
+
+        void AddToCollection(object entity, object relatedCollection);
+
+        void UpdateRelatedObject(object entity, object relatedObject);
+
         bool CanSet { get; }
     }
 
@@ -159,18 +166,22 @@ namespace VitalChoice.Caching.Relational
 
         public object GetRelatedObject(object entity)
         {
-            if (entity == null)
-                return null;
-
             return _relationAccessor.GetRelatedObject(entity);
         }
 
-        public void SetRelatedObject(object entity, object relation)
+        public void SetOrUpdateRelatedObject(object entity, object relation)
         {
-            if (entity == null)
-                return;
+            _relationAccessor.SetOrUpdateRelatedObject(entity, relation);
+        }
 
-            _relationAccessor.SetRelatedObject(entity, relation);
+        public void AddToCollection(object entity, object relatedCollection)
+        {
+            _relationAccessor.AddToCollection(entity, relatedCollection);
+        }
+
+        public void UpdateRelatedObject(object entity, object relatedObject)
+        {
+            _relationAccessor.UpdateRelatedObject(entity, relatedObject);
         }
 
         public bool CanSet => _relationAccessor.CanSet;
@@ -199,6 +210,7 @@ namespace VitalChoice.Caching.Relational
         {
             private readonly Func<TEntity, TRelation> _getFunc;
             private readonly Action<TEntity, TRelation> _setFunc;
+            private readonly Type _genericCollectionType;
 
             public RelationAccessor(Expression<Func<TEntity, TRelation>> getExpression)
             {
@@ -207,18 +219,68 @@ namespace VitalChoice.Caching.Relational
                 var property = member?.Member as PropertyInfo;
                 if (property != null)
                 {
-                    _setFunc = (Action<TEntity, TRelation>) property.GetSetMethod()?.CreateDelegate(typeof (Action<TEntity, TRelation>));
+                    _setFunc = (Action<TEntity, TRelation>) property.GetSetMethod()?.CreateDelegate(typeof(Action<TEntity, TRelation>));
+                }
+                var elementType = typeof(TRelation).TryGetElementType(typeof(ICollection<>));
+                if (elementType != null)
+                {
+                    _genericCollectionType = typeof(GenericCollection<>).MakeGenericType(elementType);
                 }
             }
 
             public object GetRelatedObject(object entity)
             {
+                if (entity == null)
+                    return null;
+
                 return _getFunc((TEntity) entity);
             }
 
-            public void SetRelatedObject(object entity, object relation)
+            public void SetOrUpdateRelatedObject(object entity, object relation)
             {
-                _setFunc?.Invoke((TEntity) entity, (TRelation) relation);
+                if (entity == null)
+                    return;
+
+                if (CanSet)
+                {
+                    _setFunc?.Invoke((TEntity) entity, (TRelation) relation);
+                }
+                else if (_genericCollectionType != null)
+                {
+                    AddToCollection(entity, relation);
+                }
+                else
+                {
+                    UpdateRelatedObject(entity, relation);
+                }
+            }
+
+            public void AddToCollection(object entity, object relatedCollection)
+            {
+                if (_genericCollectionType == null || !(relatedCollection is IEnumerable))
+                    return;
+
+                var reference = _getFunc((TEntity) entity);
+                if (reference != null)
+                {
+                    var collection = (IGenericCollection) Activator.CreateInstance(_genericCollectionType, reference);
+                    foreach (var item in (IEnumerable) relatedCollection)
+                    {
+                        collection.Add(item);
+                    }
+                }
+            }
+
+            public void UpdateRelatedObject(object entity, object relatedObject)
+            {
+                if (_genericCollectionType != null)
+                    return;
+
+                var reference = _getFunc((TEntity) entity);
+                if (reference != null)
+                {
+                    TypeConverter.CopyInto(reference, relatedObject, typeof(TRelation));
+                }
             }
 
             public bool CanSet => _setFunc != null;
@@ -231,7 +293,15 @@ namespace VitalChoice.Caching.Relational
                 return null;
             }
 
-            public void SetRelatedObject(object entity, object relation)
+            public void SetOrUpdateRelatedObject(object entity, object relation)
+            {
+            }
+
+            public void AddToCollection(object entity, object relatedCollection)
+            {
+            }
+
+            public void UpdateRelatedObject(object entity, object relatedObject)
             {
             }
 
