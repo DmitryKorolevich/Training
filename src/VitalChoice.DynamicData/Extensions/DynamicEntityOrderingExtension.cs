@@ -163,25 +163,31 @@ namespace VitalChoice.DynamicData.Extensions
                 switch (fieldType)
                 {
                     case FieldType.Decimal:
-                        return GetValueSelectorExpression<TEntity, TOptionType, TOptionValue, decimal>(valueFilter, valueParam);
+                        return GetValueSelectorExpression<TEntity, TOptionType, TOptionValue, decimal>(valueFilter, valueParam,
+                            MethodInfoData.ConvertToDecimal);
                     case FieldType.Double:
-                        return GetValueSelectorExpression<TEntity, TOptionType, TOptionValue, double>(valueFilter, valueParam);
+                        return GetValueSelectorExpression<TEntity, TOptionType, TOptionValue, double>(valueFilter, valueParam,
+                            MethodInfoData.ConvertToDouble);
                     case FieldType.Int:
-                        return GetValueSelectorExpression<TEntity, TOptionType, TOptionValue, int>(valueFilter, valueParam);
+                        return GetValueSelectorExpression<TEntity, TOptionType, TOptionValue, int>(valueFilter, valueParam,
+                            MethodInfoData.ConvertToInt32);
                     case FieldType.String:
-                        return GetValueSelectorExpression<TEntity, TOptionType, TOptionValue, string>(valueFilter, valueParam);
+                        return GetValueSelectorExpression<TEntity, TOptionType, TOptionValue, string>(valueFilter, valueParam, null);
                     case FieldType.Bool:
-                        return GetValueSelectorExpression<TEntity, TOptionType, TOptionValue, bool>(valueFilter, valueParam);
+                        return GetValueSelectorExpression<TEntity, TOptionType, TOptionValue, bool>(valueFilter, valueParam,
+                            MethodInfoData.ConvertToBoolean);
                     case FieldType.DateTime:
-                        return GetValueSelectorExpression<TEntity, TOptionType, TOptionValue, DateTime>(valueFilter, valueParam);
+                        return GetValueSelectorExpression<TEntity, TOptionType, TOptionValue, DateTime>(valueFilter, valueParam,
+                            MethodInfoData.ConvertToDateTime);
                     case FieldType.Int64:
-                        return GetValueSelectorExpression<TEntity, TOptionType, TOptionValue, long>(valueFilter, valueParam);
+                        return GetValueSelectorExpression<TEntity, TOptionType, TOptionValue, long>(valueFilter, valueParam,
+                            MethodInfoData.ConvertToInt64);
                     default:
                         throw new NotSupportedException($"{fieldType} type ordering is not supported.");
                 }
             }
             resultFieldType = FieldType.String;
-            return GetValueSelectorExpression<TEntity, TOptionType, TOptionValue, string>(valueFilter, valueParam);
+            return GetValueSelectorExpression<TEntity, TOptionType, TOptionValue, string>(valueFilter, valueParam, null);
         }
 
         private static Expression CreateOrderKeySelectors<T, TType, TValue>(
@@ -201,25 +207,31 @@ namespace VitalChoice.DynamicData.Extensions
                 switch (fieldType)
                 {
                     case FieldType.Decimal:
-                        return CreateSelector<T, TType, TValue, decimal>(objectSelector, valueFilter, valueParam, innerParam);
+                        return CreateSelector<T, TType, TValue, decimal>(objectSelector, valueFilter, valueParam, innerParam,
+                            MethodInfoData.ConvertToDecimal);
                     case FieldType.Double:
-                        return CreateSelector<T, TType, TValue, double>(objectSelector, valueFilter, valueParam, innerParam);
+                        return CreateSelector<T, TType, TValue, double>(objectSelector, valueFilter, valueParam, innerParam,
+                            MethodInfoData.ConvertToDouble);
                     case FieldType.Int:
-                        return CreateSelector<T, TType, TValue, int>(objectSelector, valueFilter, valueParam, innerParam);
+                        return CreateSelector<T, TType, TValue, int>(objectSelector, valueFilter, valueParam, innerParam,
+                            MethodInfoData.ConvertToInt32);
                     case FieldType.String:
-                        return CreateSelector<T, TType, TValue, string>(objectSelector, valueFilter, valueParam, innerParam);
+                        return CreateSelector<T, TType, TValue, string>(objectSelector, valueFilter, valueParam, innerParam, null);
                     case FieldType.Bool:
-                        return CreateSelector<T, TType, TValue, bool>(objectSelector, valueFilter, valueParam, innerParam);
+                        return CreateSelector<T, TType, TValue, bool>(objectSelector, valueFilter, valueParam, innerParam,
+                            MethodInfoData.ConvertToBoolean);
                     case FieldType.DateTime:
-                        return CreateSelector<T, TType, TValue, DateTime>(objectSelector, valueFilter, valueParam, innerParam);
+                        return CreateSelector<T, TType, TValue, DateTime>(objectSelector, valueFilter, valueParam, innerParam,
+                            MethodInfoData.ConvertToDateTime);
                     case FieldType.Int64:
-                        return CreateSelector<T, TType, TValue, long>(objectSelector, valueFilter, valueParam, innerParam);
+                        return CreateSelector<T, TType, TValue, long>(objectSelector, valueFilter, valueParam, innerParam,
+                            MethodInfoData.ConvertToInt64);
                     default:
                         throw new NotSupportedException($"{fieldType} type ordering is not supported.");
                 }
             }
             resultFieldType = FieldType.String;
-            return CreateSelector<T, TType, TValue, string>(objectSelector, valueFilter, valueParam, innerParam);
+            return CreateSelector<T, TType, TValue, string>(objectSelector, valueFilter, valueParam, innerParam, null);
         }
 
         private static Expression<Func<TOptionValue, bool>> ParseOptions(string fieldName, IEnumerable<TOptionType> optionTypes,
@@ -244,13 +256,13 @@ namespace VitalChoice.DynamicData.Extensions
 
         private static Expression CreateSelector<T, TType, TValue, TKey>(Expression<Func<TEntity, T>> objectSelector,
             Expression<Func<TValue, bool>> valueFilter, ParameterExpression valueParam,
-            ParameterExpression innerParam) where T : DynamicDataEntity<TValue, TType> where TType : OptionType
+            ParameterExpression innerParam, MethodInfo convertMethod) where T : DynamicDataEntity<TValue, TType> where TType : OptionType
             where TValue : OptionValue<TType>
         {
             return
                 Expression.Lambda<Func<TEntity, TKey>>(
                     Expression.Invoke(
-                        GetValueSelectorExpression<T, TType, TValue, TKey>(valueFilter, valueParam),
+                        GetValueSelectorExpression<T, TType, TValue, TKey>(valueFilter, valueParam, convertMethod),
                         Expression.Invoke(objectSelector, innerParam)),
                     innerParam);
         }
@@ -310,12 +322,13 @@ namespace VitalChoice.DynamicData.Extensions
         }
 
         private static Expression<Func<T, TKey>> GetValueSelectorExpression<T, TType, TValue, TKey>(
-            Expression<Func<TValue, bool>> valueFilter, ParameterExpression valueParam) where T : DynamicDataEntity<TValue, TType>
+            Expression<Func<TValue, bool>> valueFilter, ParameterExpression valueParam, MethodInfo convertMethod)
+            where T : DynamicDataEntity<TValue, TType>
             where TType : OptionType where TValue : OptionValue<TType>
         {
             var parentValueParam = Expression.Parameter(typeof(T));
 
-            if (typeof(TKey) == typeof(string))
+            if (convertMethod == null)
             {
                 var orderByValue =
                     Expression.Lambda<Func<T, TKey>>(
@@ -330,8 +343,6 @@ namespace VitalChoice.DynamicData.Extensions
             }
             else
             {
-                MethodInfo convertMethod = MethodInfoData.GetStringConversionMethod(typeof(TKey));
-
                 var orderByValue =
                     Expression.Lambda<Func<T, TKey>>(
                         Expression.Call(MethodInfoData.FirstOrDefault.MakeGenericMethod(typeof(TKey)),

@@ -54,34 +54,5 @@ namespace VitalChoice.DynamicData.Extensions
 
             ConvertToDouble = typeof(Convert).GetMethod("ToDouble", new[] {typeof(string)});
         }
-
-        public static MethodInfo GetStringConversionMethod(Type destinationType)
-        {
-            if (destinationType == typeof(int))
-            {
-                return ConvertToInt32;
-            }
-            if (destinationType == typeof(long))
-            {
-                return ConvertToInt64;
-            }
-            if (destinationType == typeof(decimal))
-            {
-                return ConvertToDecimal;
-            }
-            if (destinationType == typeof(double))
-            {
-                return ConvertToDouble;
-            }
-            if (destinationType == typeof(bool))
-            {
-                return ConvertToBoolean;
-            }
-            if (destinationType == typeof(DateTime))
-            {
-                return ConvertToDateTime;
-            }
-            throw new NotSupportedException($"Type conversion from {typeof(string)} to {destinationType} is not supported.");
-        }
     }
 }
