@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VitalChoice.Data.Helpers;
@@ -84,11 +85,11 @@ namespace VitalChoice.DynamicData.Interfaces
     }
 
     public interface IOptionTypeQueryProvider<TEntity, TOptionType, TOptionValue> : IOptionTypeQueryProvider
-        where TEntity: DynamicDataEntity<TOptionValue, TOptionType>
+        where TEntity : DynamicDataEntity<TOptionValue, TOptionType>
         where TOptionType : OptionType
-        where TOptionValue: OptionValue<TOptionType>
+        where TOptionValue : OptionValue<TOptionType>
     {
-        //IQueryOptionType<TOptionType> GetOptionTypeQuery();
+        Expression<Func<TOptionValue, int>> ObjectIdSelector { get; }
         ICollection<TOptionType> OptionTypes { get; }
         ICollection<TOptionType> FilterByType(int? objectType);
         IEnumerable<TOptionType> OptionsForType(int? objectType);

@@ -23,6 +23,8 @@ namespace VitalChoice.Business.Services.Dynamic
         {
         }
 
+        public override Expression<Func<AddressOptionValue, int>> ObjectIdSelector => a => a.IdAddress;
+
         protected override Task FromEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<AddressDynamic, Address>> items, bool withDefaults = false)
         {

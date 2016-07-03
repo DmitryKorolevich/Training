@@ -28,6 +28,8 @@ namespace VitalChoice.Business.Services.Dynamic
 
         public override Func<CustomerNoteOptionType, int?, bool> FilterFunc => null;
 
+        public override Expression<Func<CustomerNoteOptionValue, int>> ObjectIdSelector => n => n.IdCustomerNote;
+
         protected override Task FromEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<CustomerNoteDynamic, CustomerNote>> items, bool withDefaults = false)
         {

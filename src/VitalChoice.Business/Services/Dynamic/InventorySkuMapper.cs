@@ -24,6 +24,8 @@ namespace VitalChoice.Business.Services.Dynamic
         {
         }
 
+        public override Expression<Func<InventorySkuOptionValue, int>> ObjectIdSelector => s => s.IdInventorySku;
+
         protected override Task FromEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<InventorySkuDynamic, InventorySku>> items, bool withDefaults = false)
         {

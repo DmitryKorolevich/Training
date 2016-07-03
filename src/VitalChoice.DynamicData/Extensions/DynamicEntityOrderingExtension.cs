@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Autofac;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -82,7 +83,7 @@ namespace VitalChoice.DynamicData.Extensions
 
             var optionTypes = typeProvider.FilterByType(idObjectType).Where(t => t.Name == fieldName);
 
-            return CreateOrderBy(entity, fieldName, optionTypes);
+            return CreateOrderBy(entity, typeProvider, fieldName, optionTypes);
         }
 
         public IOrderedQueryable<TEntity> OrderByDescendingValue(IQueryable<TEntity> entity,
@@ -102,7 +103,7 @@ namespace VitalChoice.DynamicData.Extensions
 
             var optionTypes = typeProvider.OptionTypes.Where(t => t.Name == fieldName);
 
-            return CreateOrderBy(entity, fieldName, optionTypes);
+            return CreateOrderBy(entity, typeProvider, fieldName, optionTypes);
         }
 
         public IOrderedQueryable<TEntity> OrderByDescendingValue(IQueryable<TEntity> entity, string fieldName)
@@ -134,9 +135,28 @@ namespace VitalChoice.DynamicData.Extensions
             return InvokeOrderByDescending(entity, orderBy, resultFieldType);
         }
 
-        private static IOrderedQueryable<TEntity> CreateOrderBy(IQueryable<TEntity> entity, string fieldName,
+        //TODO: revisit to use LEFT JOIN when https://github.com/aspnet/EntityFramework/issues/4588 is fixed.
+        //private static IQueryable<T> Where<T, TV>(IQueryable<T> query, Expression<Func<T, TV>> valueSelector, Expression<Func<TV, bool>> where)
+        //    where TV : OptionValue
+        //{
+        //    var parameter = Expression.Parameter(typeof(T));
+        //    var filterExpression = Expression.Lambda<Func<T, bool>>(Expression.Invoke(where, Expression.Invoke(valueSelector, parameter)),
+        //        parameter);
+        //    return query.Where(filterExpression);
+        //}
+
+        private static IOrderedQueryable<TEntity> CreateOrderBy(IQueryable<TEntity> entity,
+            IOptionTypeQueryProvider<TEntity, TOptionType, TOptionValue> typeQueryProvider, string fieldName,
             IEnumerable<TOptionType> optionTypes)
         {
+            //TODO: revisit to use LEFT JOIN when https://github.com/aspnet/EntityFramework/issues/4588 is fixed.
+            //var valueParam = Expression.Parameter(typeof(TOptionValue));
+            //bool needTypeCast;
+            //FieldType fieldType;
+            //var valueFilter = ParseOptions(fieldName, optionTypes, valueParam, out fieldType, out needTypeCast);
+            //var optionsQuery = new EntityQueryable<TOptionValue>((IAsyncQueryProvider)entity.Provider);
+            //return Where(entity.Join(optionsQuery, e => e.Id, typeQueryProvider.ObjectIdSelector, (e, v) => new {e, v}).DefaultIfEmpty(),
+            //    arg => arg.v, valueFilter).OrderBy(v => v.v.Value).Select(v => v.e);
             FieldType resultFieldType;
             var selectorExpression = CreateOrderKeySelectors(fieldName, optionTypes, out resultFieldType);
             return InvokeOrderBy(entity, selectorExpression, resultFieldType);

@@ -31,6 +31,8 @@ namespace VitalChoice.Business.Services.Dynamic
             _skuMapper = skuMapper;
         }
 
+        public override Expression<Func<ProductOptionValue, int>> ObjectIdSelector => p => p.IdProduct;
+
         protected override async Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items,
             bool withDefaults = false)
         {

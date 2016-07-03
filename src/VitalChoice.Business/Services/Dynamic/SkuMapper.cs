@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Data.Repositories.Specifics;
@@ -26,6 +27,8 @@ namespace VitalChoice.Business.Services.Dynamic
             : base(converter, converterService, productRepositoryAsync)
         {
         }
+
+        public override Expression<Func<SkuOptionValue, int>> ObjectIdSelector => s => s.IdSku;
 
         protected override async Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<SkuDynamic, Sku>> items,
             bool withDefaults = false)

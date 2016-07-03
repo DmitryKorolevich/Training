@@ -1488,23 +1488,44 @@ namespace VitalChoice.Business.Services.Orders
             }
             conditions = conditions.WithId(filter.Id)
                 //TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
-                .WithOrderType(filter.IdObjectType).WithOrderStatus(filter.OrderStatus).WithCustomerType(filter.IdCustomerType).WithoutIncomplete(filter.OrderStatus, filter.IgnoreNotShowingIncomplete).WithIdSku(filter.IdSku).WithShipState(filter.IdShipState).WithOrderDynamicValues(filter.IdOrderSource, filter.POrderType, filter.IdShippingMethod).WithCustomerDynamicValues(filter.CustomerFirstName, filter.CustomerLastName, filter.CustomerCompany).NotAutoShip();
+                .WithOrderType(filter.IdObjectType)
+                .WithOrderStatus(filter.OrderStatus)
+                .WithCustomerType(filter.IdCustomerType)
+                .WithoutIncomplete(filter.OrderStatus, filter.IgnoreNotShowingIncomplete)
+                .WithIdSku(filter.IdSku)
+                .WithShipState(filter.IdShipState)
+                .WithOrderDynamicValues(filter.IdOrderSource, filter.POrderType, filter.IdShippingMethod)
+                .WithCustomerDynamicValues(filter.CustomerFirstName, filter.CustomerLastName, filter.CustomerCompany)
+                .NotAutoShip();
 
             Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderByDescending(y => y.DateCreated);
             var sortOrder = filter.Sorting.SortOrder;
             switch (filter.Sorting.Path)
             {
                 case VOrderSortPath.IdPaymentMethod:
-                    sortable = (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.PaymentMethod.IdObjectType) : x.OrderByDescending(y => y.PaymentMethod.IdObjectType);
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.PaymentMethod.IdObjectType)
+                                : x.OrderByDescending(y => y.PaymentMethod.IdObjectType);
                     break;
                 case VOrderSortPath.DateCreated:
-                    sortable = (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.DateCreated).ThenBy(y => y.Id) : x.OrderByDescending(y => y.DateCreated).ThenByDescending(y => y.Id);
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.DateCreated).ThenBy(y => y.Id)
+                                : x.OrderByDescending(y => y.DateCreated).ThenByDescending(y => y.Id);
                     break;
                 case VOrderSortPath.IdCustomerType:
-                    sortable = (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.Customer.IdObjectType) : x.OrderByDescending(y => y.Customer.IdObjectType);
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.Customer.IdObjectType)
+                                : x.OrderByDescending(y => y.Customer.IdObjectType);
                     break;
                 case VOrderSortPath.IdObjectType:
-                    sortable = (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.IdObjectType) : x.OrderByDescending(y => y.IdObjectType);
+                    sortable =
+                        (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.IdObjectType) : x.OrderByDescending(y => y.IdObjectType);
                     break;
                 case VOrderSortPath.Id:
                     sortable = (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.Id) : x.OrderByDescending(y => y.Id);
@@ -1513,7 +1534,8 @@ namespace VitalChoice.Business.Services.Orders
                     sortable = (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.Total) : x.OrderByDescending(y => y.Total);
                     break;
                 case VOrderSortPath.DateEdited:
-                    sortable = (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.DateEdited) : x.OrderByDescending(y => y.DateEdited);
+                    sortable =
+                        (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.DateEdited) : x.OrderByDescending(y => y.DateEdited);
                     break;
                 case VOrderSortPath.IdOrderSource:
                     sortable =

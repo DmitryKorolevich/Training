@@ -23,6 +23,8 @@ namespace VitalChoice.Business.Services.Dynamic
         {
         }
 
+        public override Expression<Func<AffiliateOptionValue, int>> ObjectIdSelector => a => a.IdAffiliate;
+
         protected override Task FromEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<AffiliateDynamic, Affiliate>> items, bool withDefaults = false)
         {

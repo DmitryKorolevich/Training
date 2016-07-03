@@ -56,6 +56,8 @@ namespace VitalChoice.Business.Services.Dynamic
             _gcService = gcService;
         }
 
+        public override Expression<Func<OrderOptionValue, int>> ObjectIdSelector => o => o.IdOrder;
+
         protected override async Task FromEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<OrderDynamic, Order>> items, bool withDefaults = false)
         {

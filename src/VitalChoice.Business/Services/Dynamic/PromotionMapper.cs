@@ -24,6 +24,8 @@ namespace VitalChoice.Business.Services.Dynamic
         {
         }
 
+        public override Expression<Func<PromotionOptionValue, int>> ObjectIdSelector => p => p.IdPromotion;
+
         protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<PromotionDynamic, Promotion>> items, bool withDefaults = false)
         {
             items.ForEach(pair =>

@@ -24,6 +24,8 @@ namespace VitalChoice.Business.Services.Dynamic
         {
         }
 
+        public override Expression<Func<CatalogRequestAddressOptionValue, int>> ObjectIdSelector => c => c.IdCatalogRequestAddress;
+
         protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<AddressDynamic, CatalogRequestAddress>> items, bool withDefaults = false)
         {
             items.ForEach(item =>

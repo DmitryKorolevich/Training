@@ -28,6 +28,8 @@ namespace VitalChoice.Business.Services.Dynamic
             _productService = productService;
         }
 
+        public override Expression<Func<DiscountOptionValue, int>> ObjectIdSelector => d => d.IdDiscount;
+
         protected override async Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<DiscountDynamic, Discount>> items, bool withDefaults = false)
         {
             await items.ForEachAsync(async pair =>
