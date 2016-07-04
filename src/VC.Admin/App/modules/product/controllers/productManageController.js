@@ -734,10 +734,9 @@ angular.module('app.modules.product.controllers.productManageController', [])
 
         var initCrossses = function () {
             $.each($scope.product.CrossSellProducts, function (index, item) {
-                if (item.Image) {
+                if (item.Image || item.Url)
+                {
                     item.ImageUse = true;
-                }
-                if (item.Url) {
                     item.UrlUse = true;
                 }
             });
@@ -756,13 +755,10 @@ angular.module('app.modules.product.controllers.productManageController', [])
 
         var initVideos = function () {
             $.each($scope.product.Videos, function (index, item) {
-                if (item.Video) {
+                if (item.Video || item.Image || item.Text)
+                {
                     item.VideoUse = true;
-                }
-                if (item.Image) {
                     item.ImageUse = true;
-                }
-                if (item.Text) {
                     item.TextUse = true;
                 }
             });
