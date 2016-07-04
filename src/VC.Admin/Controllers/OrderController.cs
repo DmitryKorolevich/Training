@@ -56,6 +56,7 @@ using VitalChoice.Interfaces.Services.VeraCore;
 using Address = VitalChoice.Ecommerce.Domain.Entities.Addresses.Address;
 using AddressType = VitalChoice.Ecommerce.Domain.Entities.Addresses.AddressType;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.ServiceBus;
 
 namespace VC.Admin.Controllers
 {
@@ -93,6 +94,7 @@ namespace VC.Admin.Controllers
         private readonly IOrderReportService _orderReportService;
         private readonly IAvalaraTax _avalaraTax;
         private readonly IVeraCoreNotificationService _testService;
+        private readonly IEncryptedOrderExportService _exportService;
 
         public OrderController(
             IOrderService orderService,
@@ -123,7 +125,7 @@ namespace VC.Admin.Controllers
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMethodMapper,
             IDynamicMapper<AddressDynamic, Address> addressMapper, ExtendedUserManager userManager,
             IAvalaraTax avalaraTax,
-            IVeraCoreNotificationService testService)
+            IVeraCoreNotificationService testService, IEncryptedOrderExportService exportService)
         {
             _orderService = orderService;
             _orderRefundService = orderRefundService;
@@ -156,9 +158,19 @@ namespace VC.Admin.Controllers
             loggerProvider.CreateLogger<OrderController>();
             _avalaraTax = avalaraTax;
             _testService = testService;
+            _exportService = exportService;
         }
 
         #region BaseOrderLogic
+
+        [HttpPost]
+        public async Task<Result<List<OrderExportItemResult>>> ExportOrders([FromBody] List<OrderExportItem> itemsToExport)
+        {
+            return await _exportService.ExportOrdersAsync(new OrderExportData
+            {
+                ExportInfo = itemsToExport
+            });
+        }
 
         [HttpPost]
         public async Task<Result<PagedList<ShortOrderListItemModel>>> GetShortOrders([FromBody]OrderFilter filter)
