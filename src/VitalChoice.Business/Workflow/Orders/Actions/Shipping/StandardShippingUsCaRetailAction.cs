@@ -23,14 +23,14 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
                 if (context.Data.PromoProducts < 50)
                 {
                     context.StandardShippingCharges = (decimal) 4.95;
-                    AddSplitShipping(context);
+                    AddSplitShipping(context, DeliveryServiceCostGroup.FirstCost);
                     return Task.FromResult(context.StandardShippingCharges);
                     //_deliveryServiceCostGroup = DeliveryServiceCostGroup.FirstCost;
                 }
                 if (context.Data.PromoProducts < 99)
                 {
                     context.StandardShippingCharges = (decimal) 9.95;
-                    AddSplitShipping(context);
+                    AddSplitShipping(context, DeliveryServiceCostGroup.SecondCost);
                     return Task.FromResult(context.StandardShippingCharges);
                     //_deliveryServiceCostGroup = DeliveryServiceCostGroup.SecondCost;
                 }
@@ -38,15 +38,18 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
             return TaskCache<decimal>.DefaultCompletedTask;
         }
 
-        private static void AddSplitShipping(OrderDataContext context)
+        private static void AddSplitShipping(OrderDataContext context, DeliveryServiceCostGroup costGroup)
         {
+            context.ShippingCostGroup = costGroup;
             if (context.SplitInfo.PerishableAmount > 0)
             {
                 context.SplitInfo.PerishableShippingOveridden += context.StandardShippingCharges;
+                context.SplitInfo.PerishableCostGroup = costGroup;
             }
             else
             {
                 context.SplitInfo.NonPerishableShippingOverriden += context.StandardShippingCharges;
+                context.SplitInfo.NonPerishableCostGroup = costGroup;
             }
         }
     }

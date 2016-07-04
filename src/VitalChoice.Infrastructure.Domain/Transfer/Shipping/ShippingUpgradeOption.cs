@@ -2,6 +2,7 @@
 {
     public enum ShippingUpgradeOption
     {
+        None = 0,
         Overnight = 1,
         SecondDay = 2
     }

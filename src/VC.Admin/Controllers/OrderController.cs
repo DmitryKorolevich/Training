@@ -86,7 +86,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<MailingReportItem, MailingReportItemCsvMap> _mailingReportItemСSVExportService;
         private readonly INotificationService _notificationService;
         private readonly BrontoService _brontoService;
-        private readonly TimeZoneInfo _pstTimeZoneInfo;
+        private static readonly TimeZoneInfo PstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
         private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
         private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
@@ -153,7 +153,6 @@ namespace VC.Admin.Controllers
             _customerPaymentMethodMapper = customerPaymentMethodMapper;
             _addressMapper = addressMapper;
             _userManager = userManager;
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             loggerProvider.CreateLogger<OrderController>();
             _avalaraTax = avalaraTax;
             _testService = testService;
@@ -965,7 +964,7 @@ namespace VC.Admin.Controllers
             var data = await _orderService.GetOrderWithRegionInfoItemsAsync(filter);
             foreach (var item in data.Items)
             {
-                item.DateCreated = TimeZoneInfo.ConvertTime(item.DateCreated, TimeZoneInfo.Local, _pstTimeZoneInfo);
+                item.DateCreated = TimeZoneInfo.ConvertTime(item.DateCreated, TimeZoneInfo.Local, PstTimeZoneInfo);
             }
 
             var result = _vOrderWithRegionInfoItemCSVExportService.ExportToCsv(data.Items);
@@ -1007,8 +1006,8 @@ namespace VC.Admin.Controllers
         public async Task<FileResult> GetOrdersAgentReportFile([FromQuery]string from, [FromQuery]string to,
             [FromQuery]FrequencyType frequencytype, [FromQuery]string idadminteams = null, [FromQuery]int? idadmin = null)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;
@@ -1042,8 +1041,8 @@ namespace VC.Admin.Controllers
             }
             foreach (var item in data.Periods)
             {
-                item.From = TimeZoneInfo.ConvertTime(item.From, TimeZoneInfo.Local, _pstTimeZoneInfo);
-                item.To = TimeZoneInfo.ConvertTime(item.To, TimeZoneInfo.Local, _pstTimeZoneInfo);
+                item.From = TimeZoneInfo.ConvertTime(item.From, TimeZoneInfo.Local, PstTimeZoneInfo);
+                item.To = TimeZoneInfo.ConvertTime(item.To, TimeZoneInfo.Local, PstTimeZoneInfo);
             }
 
             var items = _orderReportService.ConvertOrdersAgentReportToExportItems(data, fullReport);
@@ -1082,14 +1081,14 @@ namespace VC.Admin.Controllers
             [FromQuery]string shipfirstname = null, [FromQuery]string shiplastname = null, [FromQuery]string shipidconfirm = null, [FromQuery]int? idorder = null,
             [FromQuery]string ponumber = null)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;
             }
-            DateTime? dShipFrom = !string.IsNullOrEmpty(shipfrom) ? shipfrom.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
-            DateTime? dShipTo = !string.IsNullOrEmpty(shipto) ? shipto.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
+            DateTime? dShipFrom = !string.IsNullOrEmpty(shipfrom) ? shipfrom.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
+            DateTime? dShipTo = !string.IsNullOrEmpty(shipto) ? shipto.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
 
             WholesaleDropShipReportFilter filter = new WholesaleDropShipReportFilter()
             {
@@ -1137,8 +1136,8 @@ namespace VC.Admin.Controllers
             [FromQuery]int? idcustomer = null, [FromQuery]int? idorder = null,
             [FromQuery]int? idorderstatus = null, [FromQuery]int? idordertype = null)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;
@@ -1197,16 +1196,16 @@ namespace VC.Admin.Controllers
             [FromQuery]int? idcustomer = null, [FromQuery]string keycode = null, [FromQuery]string discountcode = null, [FromQuery]bool? isaffiliate = null,
             [FromQuery]int? fromcount = null, [FromQuery]int? tocount = null)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;
             }
-            DateTime? dShipFrom = !string.IsNullOrEmpty(shipfrom) ? shipfrom.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
-            DateTime? dShipTo = !string.IsNullOrEmpty(shipto) ? shipto.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
-            DateTime? dFirstOrderFrom = !string.IsNullOrEmpty(firstorderfrom) ? shipfrom.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
-            DateTime? dFirstOrderTo = !string.IsNullOrEmpty(firstorderto) ? shipto.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
+            DateTime? dShipFrom = !string.IsNullOrEmpty(shipfrom) ? shipfrom.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
+            DateTime? dShipTo = !string.IsNullOrEmpty(shipto) ? shipto.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
+            DateTime? dFirstOrderFrom = !string.IsNullOrEmpty(firstorderfrom) ? shipfrom.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
+            DateTime? dFirstOrderTo = !string.IsNullOrEmpty(firstorderto) ? shipto.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
 
 
             OrdersSummarySalesReportFilter filter = new OrdersSummarySalesReportFilter()
@@ -1255,8 +1254,8 @@ namespace VC.Admin.Controllers
         public async Task<FileResult> GetSkuAddressReportItemsReportFile([FromQuery]string from, [FromQuery]string to,
             [FromQuery]int? idcustomertype = null, [FromQuery]string skucode = null, [FromQuery]string discountcode = null, [FromQuery]bool withoutdiscount = false)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;
@@ -1299,8 +1298,8 @@ namespace VC.Admin.Controllers
         public async Task<FileResult> GetMatchbackItemsReportFile([FromQuery]string from, [FromQuery]string to,
             [FromQuery]int? idordersource = null)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;
@@ -1343,16 +1342,16 @@ namespace VC.Admin.Controllers
             [FromQuery]int? lastfromtotal = null, [FromQuery]int? lasttototal = null, [FromQuery]bool? dnm = null, [FromQuery]bool? dnr = null,
             [FromQuery]int? idcustomerordersource = null, [FromQuery]string keycodefirst = null, [FromQuery]string discountcodefirst = null)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;
             }
-            DateTime? dFromFirst = !string.IsNullOrEmpty(fromfirst) ? fromfirst.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
-            DateTime? dToFirst = !string.IsNullOrEmpty(tofirst) ? tofirst.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
-            DateTime? dFromLast = !string.IsNullOrEmpty(fromlast) ? fromlast.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
-            DateTime? dToLast = !string.IsNullOrEmpty(tolast) ? tolast.GetDateFromQueryStringInPst(_pstTimeZoneInfo) : null;
+            DateTime? dFromFirst = !string.IsNullOrEmpty(fromfirst) ? fromfirst.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
+            DateTime? dToFirst = !string.IsNullOrEmpty(tofirst) ? tofirst.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
+            DateTime? dFromLast = !string.IsNullOrEmpty(fromlast) ? fromlast.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
+            DateTime? dToLast = !string.IsNullOrEmpty(tolast) ? tolast.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
 
             MailingReportFilter filter = new MailingReportFilter()
             {

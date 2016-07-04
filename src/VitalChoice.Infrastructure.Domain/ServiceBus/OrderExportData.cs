@@ -11,7 +11,9 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
     {
         public int Id { get; set; }
 
-        public POrderType OrderType { get; set; }
+        public ExportSide OrderType { get; set; }
+
+        public bool IsRefund { get; set; }
     }
 
 #if !NETSTANDARD1_5
@@ -29,7 +31,7 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
     {
         public int Id { get; set; }
 
-        public ICollection<string> Errors { get; set; }
+        public string Error { get; set; }
 
         public bool Success { get; set; }
     }

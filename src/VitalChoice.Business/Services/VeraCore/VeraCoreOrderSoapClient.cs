@@ -7,6 +7,7 @@ using System.Xml.Serialization;
 using System.CodeDom.Compiler;
 using System.ComponentModel;
 using System.Web.Services.Description;
+using VitalChoice.Ecommerce.Domain.Attributes;
 
 
 namespace VitalChoice.Business.Services.VeraCore
@@ -18,7 +19,7 @@ namespace VitalChoice.Business.Services.VeraCore
     [WebServiceBinding(Name = "OrderSoap", Namespace = "http://sma-promail/")]
     [XmlInclude(typeof(MarshalByRefObject))]
     [XmlInclude(typeof(PersistentObject))]
-    public partial class VeraCoreOrder : SoapHttpClientProtocol
+    public partial class VeraCoreOrderSoapClient : SoapHttpClientProtocol
     {
         private SendOrPostCallback AddProductOperationCompleted;
 
@@ -79,7 +80,7 @@ namespace VitalChoice.Business.Services.VeraCore
         private SendOrPostCallback GetExpectedArrivalsOperationCompleted;
 
         /// <remarks/>
-        public VeraCoreOrder()
+        public VeraCoreOrderSoapClient()
         {
             Url = "https://rhu003.veracore.com/pmomsws/order.asmx";
         }
@@ -1188,7 +1189,7 @@ namespace VitalChoice.Business.Services.VeraCore
         [SoapHeader("DebugHeaderValue", Direction = SoapHeaderDirection.InOut)]
         [SoapDocumentMethod("http://sma-promail/AddOrder", RequestNamespace = "http://sma-promail/",
             ResponseNamespace = "http://sma-promail/", Use = SoapBindingUse.Literal, ParameterStyle = SoapParameterStyle.Wrapped)]
-        public AddOrderResult AddOrder(VeraCoreOrder1 order)
+        public AddOrderResult AddOrder(VeraCoreExportOrder order)
         {
             object[] results = Invoke("AddOrder", new object[]
             {
@@ -1198,7 +1199,7 @@ namespace VitalChoice.Business.Services.VeraCore
         }
 
         /// <remarks/>
-        public IAsyncResult BeginAddOrder(VeraCoreOrder1 order, AsyncCallback callback, object asyncState)
+        public IAsyncResult BeginAddOrder(VeraCoreExportOrder order, AsyncCallback callback, object asyncState)
         {
             return BeginInvoke("AddOrder", new object[]
             {
@@ -1214,13 +1215,13 @@ namespace VitalChoice.Business.Services.VeraCore
         }
 
         /// <remarks/>
-        public void AddOrderAsync(VeraCoreOrder1 order)
+        public void AddOrderAsync(VeraCoreExportOrder order)
         {
             AddOrderAsync(order, null);
         }
 
         /// <remarks/>
-        public void AddOrderAsync(VeraCoreOrder1 order, object userState)
+        public void AddOrderAsync(VeraCoreExportOrder order, object userState)
         {
             if ((AddOrderOperationCompleted == null))
             {
@@ -2242,7 +2243,7 @@ namespace VitalChoice.Business.Services.VeraCore
     [XmlInclude(typeof(ResponseMedia))]
     [XmlInclude(typeof(OrderClassification))]
     [XmlInclude(typeof(OrderHeader))]
-    [XmlInclude(typeof(VeraCoreOrder1))]
+    [XmlInclude(typeof(VeraCoreExportOrder))]
     [XmlInclude(typeof(ShippingCharges))]
     [XmlInclude(typeof(ProductReturns))]
     [XmlInclude(typeof(ShippingActivity))]
@@ -2413,7 +2414,7 @@ namespace VitalChoice.Business.Services.VeraCore
     [XmlInclude(typeof(ResponseMedia))]
     [XmlInclude(typeof(OrderClassification))]
     [XmlInclude(typeof(OrderHeader))]
-    [XmlInclude(typeof(VeraCoreOrder1))]
+    [XmlInclude(typeof(VeraCoreExportOrder))]
     [XmlInclude(typeof(ShippingCharges))]
     [XmlInclude(typeof(ProductReturns))]
     [XmlInclude(typeof(ShippingActivity))]
@@ -13117,6 +13118,7 @@ namespace VitalChoice.Business.Services.VeraCore
         }
 
         /// <remarks/>
+        [Map("DeliveryInstructions")]
         public string Comments
         {
             get { return commentsField; }
@@ -13356,6 +13358,7 @@ namespace VitalChoice.Business.Services.VeraCore
         }
 
         /// <remarks/>
+        [Map("Company")]
         public string CompanyName
         {
             get { return companyNameField; }
@@ -13370,6 +13373,7 @@ namespace VitalChoice.Business.Services.VeraCore
         }
 
         /// <remarks/>
+        [Map]
         public string Address1
         {
             get { return address1Field; }
@@ -13377,6 +13381,7 @@ namespace VitalChoice.Business.Services.VeraCore
         }
 
         /// <remarks/>
+        [Map]
         public string Address2
         {
             get { return address2Field; }
@@ -13391,6 +13396,7 @@ namespace VitalChoice.Business.Services.VeraCore
         }
 
         /// <remarks/>
+        [Map]
         public string City
         {
             get { return cityField; }
@@ -13405,6 +13411,7 @@ namespace VitalChoice.Business.Services.VeraCore
         }
 
         /// <remarks/>
+        [Map("Zip")]
         public string PostalCode
         {
             get { return postalCodeField; }
@@ -13419,6 +13426,7 @@ namespace VitalChoice.Business.Services.VeraCore
         }
 
         /// <remarks/>
+        [Map]
         public string Phone
         {
             get { return phoneField; }
@@ -13426,6 +13434,7 @@ namespace VitalChoice.Business.Services.VeraCore
         }
 
         /// <remarks/>
+        [Map]
         public string Fax
         {
             get { return faxField; }
@@ -13433,6 +13442,7 @@ namespace VitalChoice.Business.Services.VeraCore
         }
 
         /// <remarks/>
+        [Map]
         public string Email
         {
             get { return emailField; }
@@ -14670,7 +14680,7 @@ namespace VitalChoice.Business.Services.VeraCore
     [DebuggerStepThrough()]
     [DesignerCategory("code")]
     [XmlType(TypeName = "Order", Namespace = "http://sma-promail/")]
-    public partial class VeraCoreOrder1 : PMObject
+    public partial class VeraCoreExportOrder : PMObject
     {
 
         private OrderHeader headerField;

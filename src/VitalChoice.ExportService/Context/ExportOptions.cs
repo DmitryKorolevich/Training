@@ -14,9 +14,18 @@ namespace VitalChoice.ExportService.Context
         public string AdminPassword { get; set; }
     }
 
+    public class VeraCoreAuth
+    {
+        public string Password { get; set; }
+
+        public string UserName { get; set; }
+    }
+
     public class ExportOptions : AppOptions
     {
         public int ScheduleDayTimeHour { get; set; }
         public ExportDbConnection ExportConnection { get; set; }
+
+        public VeraCoreAuth VeraCore { get; set; }
     }
 }

@@ -680,7 +680,6 @@ namespace VitalChoice.Business.Services.Orders
                 case OrderType.AutoShip:
                 case OrderType.DropShip:
                 case OrderType.GiftList:
-                case OrderType.Refund:
                 case OrderType.AutoShipOrder:
                     tree = await _treeFactory.CreateTreeAsync<OrderDataContext, decimal>("Order");
                     break;
@@ -841,7 +840,8 @@ namespace VitalChoice.Business.Services.Orders
                 dynamic.OrderStatus = combinedStatus;
                 dynamic.POrderStatus = null;
                 dynamic.NPOrderStatus = null;
-                if (dynamic.OrderStatus == OrderStatus.Incomplete || dynamic.OrderStatus == OrderStatus.Processed || dynamic.OrderStatus == OrderStatus.ShipDelayed)
+                if (dynamic.OrderStatus == OrderStatus.Incomplete || dynamic.OrderStatus == OrderStatus.Processed ||
+                    dynamic.OrderStatus == OrderStatus.ShipDelayed)
                 {
                     if ((int?) dynamic.SafeData.ShipDelayType == (int) ShipDelayType.EntireOrder && dynamic.SafeData.ShipDelayDate != null)
                     {
