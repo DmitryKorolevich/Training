@@ -69,17 +69,15 @@ namespace VitalChoice.Business.Services.Orders
                                 });
                                 doneAllEvent.Set();
                             }
-                            if (sentItems.Count == 0)
+                            else
                             {
-                                return;
-                            }
-
-                            var exportResult = (OrderExportItemResult) o.Data;
-                            results.Add(exportResult);
-                            sentItems.Remove(exportResult.Id);
-                            if (sentItems.Count == 0)
-                            {
-                                doneAllEvent.Set();
+                                var exportResult = (OrderExportItemResult) o.Data;
+                                results.Add(exportResult);
+                                sentItems.Remove(exportResult.Id);
+                                if (sentItems.Count == 0)
+                                {
+                                    doneAllEvent.Set();
+                                }
                             }
                         }
                     });
