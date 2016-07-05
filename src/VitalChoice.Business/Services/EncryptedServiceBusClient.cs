@@ -39,7 +39,7 @@ namespace VitalChoice.Business.Services
         {
             if (!await EnsureAuthenticated())
             {
-                return default(T);
+                throw new Exception("Cannot authenticate export client");
             }
 
             return await _encryptedBusHost.ExecuteCommand<T>(command);
@@ -73,7 +73,10 @@ namespace VitalChoice.Business.Services
         {
             if (!await EnsureAuthenticated())
             {
-                throw new ApiException("Cannot authenticate export client");
+                requestAcqureAction?.Invoke(command, new ServiceBusCommandData
+                {
+                    Error = "Cannot authenticate export client"
+                });
             }
 
             _encryptedBusHost.ExecuteCommand(command, requestAcqureAction);
