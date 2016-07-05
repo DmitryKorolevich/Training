@@ -40,13 +40,33 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 {
                     var plainFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.PlainConnectionString);
                     return plainFactory.CreateQueueClient(appOptions.Value.ExportService.PlainQueueName, ReceiveMode.PeekLock);
-                }, ProcessPlainMessage);
+                }, m =>
+                {
+                    try
+                    {
+                        ProcessPlainMessage(m);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogError(e.ToString());
+                    }
+                });
                 _encryptedClient = new ServiceBusHostOneToOne(logger, () =>
                 {
                     var encryptedFactory =
                         MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.EncryptedConnectionString);
                     return encryptedFactory.CreateQueueClient(appOptions.Value.ExportService.EncryptedQueueName, ReceiveMode.PeekLock);
-                }, ProcessEncryptedMessage);
+                }, m =>
+                {
+                    try
+                    {
+                        ProcessEncryptedMessage(m);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogError(e.ToString());
+                    }
+                });
 
                 //_plainClient.ReceiveMessagesEvent += messages => messages.ForEach(ProcessPlainMessage);
                 _plainClient.Start();
@@ -211,15 +231,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 if (commandReference.TryGetTarget(out command))
                 {
                     Logger.LogInformation($"{command.CommandName} answer received ({command.CommandId})");
-                    try
-                    {
-                        command.RequestAcqureAction?.Invoke(command, remoteCommand.Data);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.LogError(e.ToString());
-                        Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
-                    }
+                    command.RequestAcqureAction?.Invoke(command, remoteCommand.Data);
                 }
             }
             else
@@ -277,14 +289,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                     if (commandReference.TryGetTarget(out command))
                     {
                         Logger.LogInformation($"{command.CommandName} answer received ({command.CommandId})");
-                        try
-                        {
-                            command.RequestAcqureAction?.Invoke(command, remoteCommand.Data);
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.LogError(e.ToString());
-                        }
+                        command.RequestAcqureAction?.Invoke(command, remoteCommand.Data);
                     }
                 }
                 else
