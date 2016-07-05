@@ -26,6 +26,7 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.orderSkuCountReportController',
 	'app.modules.order.controllers.shippedViaSummaryReportController',
 	'app.modules.order.controllers.shippedViaDetailsReportController',
+	'app.modules.order.controllers.exportResultController'
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

@@ -89,5 +89,11 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
         public override IEnumerable<SkuOrdered> ItemsOrdered => SkuOrdereds.Union(PromoSkus);
 
         public override SplitInfoBase<SkuOrdered> BaseSplitInfo => SplitInfo;
+
+        public DeliveryServiceCostGroup ShippingCostGroup { get; set; }
+
+        public decimal StandardShippingOverriden => StandardShippingCharges + Data.ShippingUpgrade + Data.ShippingOverride;
+
+        public decimal SurchargeShippingOverriden => CanadaSurcharge + AlaskaHawaiiSurcharge + Data.SurchargeOverride;
     }
 }

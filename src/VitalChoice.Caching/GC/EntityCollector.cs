@@ -12,12 +12,14 @@ namespace VitalChoice.Caching.GC
 {
     public class EntityCollector : IEntityCollectorInfo, IDisposable
     {
+        private readonly ManualResetEvent _disposingEvent = new ManualResetEvent(false);
         private readonly IEntityInfoStorage _entityInfoStorage;
         private readonly IInternalEntityCacheFactory _cacheFactory;
         private readonly ILogger _logger;
         private readonly TimeSpan _timeToLeave;
         private readonly TimeSpan _scanPeriod;
         private readonly long _maxSize;
+        private readonly Thread _thread;
 
         public EntityCollector(IEntityInfoStorage entityInfoStorage, IInternalEntityCacheFactory cacheFactory,
             IOptions<AppOptionsBase> options, ILogger logger)
@@ -28,15 +30,14 @@ namespace VitalChoice.Caching.GC
             _maxSize = options.Value.CacheSettings.MaxProcessHeapsSizeBytes;
             _timeToLeave = TimeSpan.FromSeconds(options.Value.CacheSettings.CacheTimeToLeaveSeconds);
             _scanPeriod = TimeSpan.FromSeconds(options.Value.CacheSettings.CacheScanPeriodSeconds);
-            new Thread(ProcessObjects).Start();
+            _thread = new Thread(ProcessObjects);
+            _thread.Start();
         }
 
         public bool CanAddUpCache()
         {
             return System.GC.GetTotalMemory(false) < _maxSize;
         }
-
-        private readonly ManualResetEvent _disposingEvent = new ManualResetEvent(false);
 
         ~EntityCollector()
         {
@@ -46,6 +47,7 @@ namespace VitalChoice.Caching.GC
         public void Dispose()
         {
             _disposingEvent.Set();
+            _thread.Abort();
         }
 
         private void ProcessObjects()

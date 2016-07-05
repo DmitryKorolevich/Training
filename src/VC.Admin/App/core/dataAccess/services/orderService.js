@@ -31,6 +31,9 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.post(baseUrl + 'GetShortOrders', filter, getConfig(tracker));
 	    },
+	    exportOrders: function (filter, tracker) {
+	        return $http.post(baseUrl + 'exportorders', filter, getConfig(tracker));
+	    },
 	    getOrders: function (filter, tracker)
 	    {
 	        return $http.post(baseUrl + 'GetOrders', filter, getConfig(tracker));

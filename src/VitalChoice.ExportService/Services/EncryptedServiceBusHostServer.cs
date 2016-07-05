@@ -18,20 +18,18 @@ namespace VitalChoice.ExportService.Services
 {
     public sealed class EncryptedServiceBusHostServer : EncryptedServiceBusHost
     {
-        private readonly EncryptionKeyUpdater _keyUpdater;
-        private readonly IOrderExportService _orderExportService;
+        private readonly ILifetimeScope _rootScope;
         private readonly RSACryptoServiceProvider _keyExchangeProvider;
         public override string LocalHostName => ServerHostName;
 
         public EncryptedServiceBusHostServer(IOptions<AppOptions> appOptions, ILoggerFactory loggerFactory,
-            IObjectEncryptionHost encryptionHost, EncryptionKeyUpdater keyUpdater, IOrderExportService orderExportService,
-            IHostingEnvironment env)
+            IObjectEncryptionHost encryptionHost, IHostingEnvironment env, ILifetimeScope rootScope)
             : base(appOptions, loggerFactory.CreateLogger<EncryptedServiceBusHostServer>(), encryptionHost, env)
         {
-            _keyUpdater = keyUpdater;
-            _orderExportService = orderExportService;
+            _rootScope = rootScope;
             EncryptionHost.OnSessionExpired += OnSessionRemoved;
             _keyExchangeProvider = new RSACryptoServiceProvider(4096);
+            Logger.LogInformation("Started SB Server");
         }
 
         protected override bool ProcessPlainCommand(ServiceBusCommandBase command)
@@ -110,7 +108,11 @@ namespace VitalChoice.ExportService.Services
 
             try
             {
-                _orderExportService.UpdateCustomerPaymentMethods(customerPaymentInfo).GetAwaiter().GetResult();
+                using (var scope = _rootScope.BeginLifetimeScope())
+                {
+                    var orderExportService = scope.Resolve<IOrderExportService>();
+                    orderExportService.UpdateCustomerPaymentMethods(customerPaymentInfo).GetAwaiter().GetResult();
+                }
             }
             catch (Exception e)
             {
@@ -133,8 +135,12 @@ namespace VitalChoice.ExportService.Services
             }
             try
             {
-                var updateResult = _orderExportService.UpdateOrderPaymentMethod(orderPaymentInfo).GetAwaiter().GetResult();
-                SendCommand(new ServiceBusCommandBase(command, updateResult));
+                using (var scope = _rootScope.BeginLifetimeScope())
+                {
+                    var orderExportService = scope.Resolve<IOrderExportService>();
+                    orderExportService.UpdateOrderPaymentMethod(orderPaymentInfo).GetAwaiter().GetResult();
+                }
+                SendCommand(new ServiceBusCommandBase(command, true));
                 return true;
             }
             catch (Exception e)
@@ -154,27 +160,31 @@ namespace VitalChoice.ExportService.Services
             }
             Parallel.ForEach(exportData.ExportInfo, e =>
             {
-                ICollection<string> errors = null;
-                bool success;
                 try
                 {
-                    success = _orderExportService.ExportOrder(e.Id, e.OrderType, out errors).GetAwaiter().GetResult();
+                    using (var scope = _rootScope.BeginLifetimeScope())
+                    {
+                        var orderExportService = scope.Resolve<IOrderExportService>();
+                        if (e.IsRefund)
+                        {
+                            orderExportService.ExportRefund(e.Id).GetAwaiter().GetResult();
+                        }
+                        else
+                        {
+                            orderExportService.ExportOrder(e.Id, e.OrderType).GetAwaiter().GetResult();
+                        }
+                    }
+                    SendCommand(new ServiceBusCommandBase(command, new OrderExportItemResult {Id = e.Id, Success = true}));
                 }
                 catch (Exception ex)
                 {
-                    if (errors == null)
+                    SendCommand(new ServiceBusCommandBase(command, new OrderExportItemResult
                     {
-                        errors = new List<string>();
-                    }
-                    errors.Add(ex.Message);
-                    success = false;
+                        Id = e.Id,
+                        Success = false,
+                        Error = ex.ToString()
+                    }));
                 }
-                SendCommand(new ServiceBusCommandBase(command, new OrderExportItemResult
-                {
-                    Id = e.Id,
-                    Success = success,
-                    Errors = errors
-                }));
             });
             return true;
         }
@@ -188,7 +198,6 @@ namespace VitalChoice.ExportService.Services
         public override void Dispose()
         {
             base.Dispose();
-            _keyUpdater.Dispose();
             _keyExchangeProvider.Dispose();
         }
     }

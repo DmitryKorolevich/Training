@@ -290,10 +290,55 @@
             }
         };
 
-        $scope.exportOrders = function ()
-        {
+        $scope.exportOrders = function () {
+            var exportItems = [];
 
+            $.each($scope.items, function (index, item) {
+                if (item.IsSelected || item.IsPSelected || item.IsNPSelected) {
+                    var exportItem = {};
+                    exportItem.Id = item.Id;
+                    exportItem.IsRefund = item.IdObjectType == 6;
+                    exportItem.OrderType = (item.IsSelected || (item.IsNPSelected && item.IsPSelected))
+                        ? 0
+                        : (item.IsPSelected ? 1 : 2);
+
+                    exportItems.push(exportItem);
+                }
+            });
+
+            orderService.exportOrders(exportItems, $scope.refreshTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success) {
+                            openExportResultModal(result.Data);
+
+                            toaster.pop('success', "Success!", "Export completed");
+                            refreshOrders();
+                        } else
+                        {
+                            var messages = "";
+                            if (result.Messages) {
+                                $.each(result.Messages, function (index, value) {
+                                    messages += value.Message + "<br />";
+                                });
+                            } else {
+                                messages = "Can't export orders";
+                            }
+
+                            toaster.pop('error', 'Error!', messages, null, 'trustedHtml');
+                        }
+                    })
+                    .error(function (result)
+                    {
+                        errorHandler(result);
+                    });
         };
+
+        function openExportResultModal(exportRes) {
+            modalUtil.open('app/modules/order/partials/exportResult.html', 'exportResultController', {
+                exportRes: exportRes
+            });
+        }
 
         $scope.openOrder = function (id)
         {

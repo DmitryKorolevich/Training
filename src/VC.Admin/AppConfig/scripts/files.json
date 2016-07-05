@@ -228,6 +228,7 @@
     "app/modules/order/controllers/orderSkuCountReportController.js",
     "app/modules/order/controllers/shippedViaSummaryReportController.js",
     "app/modules/order/controllers/shippedViaDetailsReportController.js",
+    "app/modules/order/controllers/exportResultController.js",
     "app/modules/order/order.js",
     "app/modules/affiliate/controllers/affiliatesController.js",
     "app/modules/affiliate/controllers/affiliateManageController.js",

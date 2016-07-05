@@ -34,6 +34,10 @@
       "EncryptionHostSessionExpire": true,
       "ServerHostName": "export-server"
     },
+    "VeraCore": {
+      "UserName": "g2dev",
+      "Password": "G2dev2016#"
+    },
     "AuthorizeNet": {
       "ApiLogin": "36qq5ECXB",
       "ApiKey": "4r5Zv38R56BY6tLW",

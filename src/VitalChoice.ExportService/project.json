@@ -2,7 +2,18 @@
   "version": "1.0.0-*",
   "description": "ExportWorkerRoleWithSBQueue Class Library",
   "authors": [ "multi_000" ],
-  "buildOptions": { "emitEntryPoint": true },
+  "buildOptions": {
+    "copyToOutput": {
+      "include": [
+        "config.json",
+        "config.local.json",
+        "nlog.config",
+        "CSharpClassTemplate.tcs",
+        "CSharpPreparseTemplate.tcs"
+      ]
+    },
+    "emitEntryPoint": true
+  },
   "publishOptions": {
     "include": [
       "config.json",
@@ -17,8 +28,7 @@
     "VitalChoice.Infrastructure": "1.0.0-*",
     "VitalChoice.Business": "1.0.0-*",
     "VitalChoice.Core": "1.0.0-*",
-    "Microsoft.EntityFrameworkCore.InMemory": "1.0.0.*",
-    "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0",
     "Microsoft.AspNetCore.Hosting" : "1.0.0"
   },
   "frameworks": {

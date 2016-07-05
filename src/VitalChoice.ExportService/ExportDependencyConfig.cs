@@ -19,9 +19,10 @@ namespace VitalChoice.ExportService
         {
             base.StartCustomServicesRegistration(services);
             services.AddSingleton<IServer, DummyServer>();
-            services.AddDbContext<ExportInfoContext>().AddDbContext<ExportInfoCopyContext>().AddDbContext<ExportInfoImMemoryContext>();
-            services.AddSingleton<IOrderExportService, OrderExportService>();
-            services.AddSingleton<EncryptionKeyUpdater>();
+            services.AddDbContext<ExportInfoContext>().AddDbContext<ExportInfoCopyContext>();
+            services.AddScoped<IOrderExportService, OrderExportService>();
+            services.AddScoped<IVeraCoreExportService, VeraCoreExportService>();
+            services.AddScoped<EncryptionKeyUpdater>();
             services.AddSingleton<EncryptedServiceBusHostServer>();
         }
 
@@ -40,6 +41,12 @@ namespace VitalChoice.ExportService
                     AdminPassword = section.GetSection("AdminPassword").Value,
                     AdminUserName = section.GetSection("AdminUserName").Value,
                     Encrypt = Convert.ToBoolean(section.GetSection("Encrypt").Value)
+                };
+                var veraCoreSection = configuration.GetSection("App:VeraCore");
+                export.VeraCore = new VeraCoreAuth
+                {
+                    UserName = veraCoreSection.GetSection("UserName").Value,
+                    Password = veraCoreSection.GetSection("Password").Value
                 };
                 export.ScheduleDayTimeHour = int.Parse(configuration.GetSection("App:ScheduleDayTimeHour").Value);
             });

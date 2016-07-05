@@ -1,5 +1,12 @@
 ﻿namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 {
+    public enum ExportSide
+    {
+        All = 0,
+        Perishable = 1,
+        NonPerishable = 2
+    }
+
     public enum POrderType
     {
         All = 0,

@@ -15,7 +15,7 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
             CommandId = commandId ?? Guid.NewGuid();
             Destination = destination;
             Source = source;
-            TimeToLeave = ttl ?? TimeSpan.FromSeconds(30);
+            TimeToLeave = ttl ?? TimeSpan.FromSeconds(60);
         }
 
         public ServiceBusCommandBase(ServiceBusCommandBase remoteCommand, object data)

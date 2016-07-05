@@ -6,30 +6,24 @@ using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Workflow.Orders.Actions
 {
-    public class OrderSubTotalAction: ComputableAction<OrderDataContext>
+    public class OrderSubTotalAction : ComputableAction<OrderDataContext>
     {
         public OrderSubTotalAction(ComputableTree<OrderDataContext> tree, string actionName) : base(tree, actionName)
         {
         }
 
-        public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, ITreeContext executionContext)
+        public override Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
-	        decimal discount = 0;
-	        if (dataContext.DictionaryData.Keys.Contains("Discount"))
-	        {
-		        discount = dataContext.Data.Discount;
-	        }
-	  //      else if(dataContext.DictionaryData.Keys.Contains("AutoShip"))
-	  //      {
-			//	discounts = dataContext.Data.AutoShip;
-			//}
+            decimal discount = 0;
+            if (context.DictionaryData.Keys.Contains("Discount"))
+            {
+                discount = context.Data.Discount;
+            }
 
-            dataContext.DiscountTotal = - discount;
-            dataContext.DiscountedSubtotal = dataContext.Data.PromoProducts + discount;
-            dataContext.ShippingTotal = dataContext.StandardShippingCharges + dataContext.CanadaSurcharge +
-                                    dataContext.AlaskaHawaiiSurcharge + dataContext.Data.ShippingUpgrade +
-                                    dataContext.Data.ShippingOverride + dataContext.Data.SurchargeOverride;
-            dataContext.TotalShipping = dataContext.StandardShippingCharges + dataContext.Data.ShippingUpgrade;
+            context.DiscountTotal = -discount;
+            context.DiscountedSubtotal = context.Data.PromoProducts + discount;
+            context.ShippingTotal = context.StandardShippingOverriden + context.SurchargeShippingOverriden;
+            context.TotalShipping = context.StandardShippingCharges + context.Data.ShippingUpgrade;
             return TaskCache<decimal>.DefaultCompletedTask;
         }
     }

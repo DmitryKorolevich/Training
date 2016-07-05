@@ -18,8 +18,9 @@ namespace VitalChoice.ExportService
     public class ExportServiceInstance : ServiceBase
     {
         private EncryptedServiceBusHostServer _server;
+        private EncryptionKeyUpdater _keyUpdater;
         private ILogger _logger;
-        private IServiceProvider _container;
+        private ILifetimeScope _startupScope;
 
         public ExportServiceInstance()
         {
@@ -48,7 +49,6 @@ namespace VitalChoice.ExportService
 
             try
             {
-
                 Host = new WebHostBuilder()
                     .UseContentRoot(Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]))
                     .UseStartup<Startup>()
@@ -56,11 +56,13 @@ namespace VitalChoice.ExportService
 
                 Host.Start();
 
-                _container = Host.Services;
-                var factory = _container.GetRequiredService<ILoggerFactory>();
+                var rootScope = Host.Services.GetRequiredService<ILifetimeScope>();
+                var factory = rootScope.Resolve<ILoggerFactory>();
                 _logger = factory.CreateLogger<ExportServiceInstance>();
                 Trace.WriteLine("Starting processing of messages");
-                _server = _container.GetRequiredService<EncryptedServiceBusHostServer>();
+                _server = rootScope.Resolve<EncryptedServiceBusHostServer>();
+                _startupScope = rootScope.BeginLifetimeScope();
+                _keyUpdater = _startupScope.Resolve<EncryptionKeyUpdater>();
             }
             catch (Exception e)
             {
@@ -74,6 +76,8 @@ namespace VitalChoice.ExportService
         protected override void OnStop()
         {
             _server.Dispose();
+            _keyUpdater.Dispose();
+            _startupScope.Dispose();
             Host.Dispose();
             base.OnStop();
         }
