@@ -17,22 +17,22 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 
         public Task<BrokeredMessage> ReceiveAsync()
         {
-            return _queue.ReceiveAsync(TimeSpan.FromSeconds(5));
+            return _queue.ReceiveAsync();
         }
 
         public BrokeredMessage Receive()
         {
-            return _queue.Receive(TimeSpan.FromSeconds(5));
+            return _queue.Receive();
         }
 
         public Task<IEnumerable<BrokeredMessage>> ReceiveBatchAsync(int count)
         {
-            return _queue.ReceiveBatchAsync(count, TimeSpan.FromSeconds(5));
+            return _queue.ReceiveBatchAsync(count);
         }
 
         public IEnumerable<BrokeredMessage> ReceiveBatch(int count)
         {
-            return _queue.ReceiveBatch(count, TimeSpan.FromSeconds(5));
+            return _queue.ReceiveBatch(count);
         }
 
         public void Dispose()
@@ -41,4 +41,5 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         }
     }
 }
+
 #endif
