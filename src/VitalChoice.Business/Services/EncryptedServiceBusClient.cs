@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
@@ -33,7 +34,7 @@ namespace VitalChoice.Business.Services
             SessionId = GetSession();
         }
 
-        public Guid SessionId { get; }
+        public Guid SessionId { get; private set; }
 
         protected async Task<T> SendCommand<T>(ServiceBusCommandWithResult command)
         {
@@ -49,17 +50,25 @@ namespace VitalChoice.Business.Services
         {
             if (!IsAuthenticated)
             {
+                var sessionId = SessionId;
                 //double auth try to refresh broken/regenerated public key
                 try
                 {
-                    if (!await _encryptedBusHost.AuthenticateClient(SessionId))
+                    if (!await _encryptedBusHost.AuthenticateClient(sessionId))
                     {
-                        return false;
+                        SetInvalid(sessionId);
+                        sessionId = SessionId;
+                        if (!await _encryptedBusHost.AuthenticateClient(sessionId))
+                        {
+                            return false;
+                        }
                     }
                 }
                 catch (ApiException)
                 {
-                    if (!await _encryptedBusHost.AuthenticateClient(SessionId))
+                    SetInvalid(sessionId);
+                    sessionId = SessionId;
+                    if (!await _encryptedBusHost.AuthenticateClient(sessionId))
                     {
                         return false;
                     }
@@ -88,7 +97,6 @@ namespace VitalChoice.Business.Services
             {
                 GC.SuppressFinalize(this);
             }
-            _encryptedBusHost.RemoveClient(SessionId);
         }
 
         private Guid GetSession()
@@ -110,14 +118,48 @@ namespace VitalChoice.Business.Services
                 var sessionInfo = SessionPool[_currentSession];
                 if ((DateTime.Now - sessionInfo.CreationTime).TotalMinutes > ExpireTimeMinutes)
                 {
-                    SessionPool[_currentSession] = new SessionInfo
+                    sessionInfo = new SessionInfo
                     {
                         SessionId = Guid.NewGuid(),
                         CreationTime = DateTime.Now
                     };
+                    SessionPool[_currentSession] = sessionInfo;
                 }
                 _currentSession++;
                 return sessionInfo.SessionId;
+            }
+        }
+
+        private void SetInvalid(Guid session)
+        {
+            lock (SessionPool)
+            {
+                if (SessionPool[_currentSession].SessionId == session)
+                {
+                    var sessionInfo = new SessionInfo
+                    {
+                        SessionId = Guid.NewGuid(),
+                        CreationTime = DateTime.Now
+                    };
+                    SessionPool[_currentSession] = sessionInfo;
+                    SessionId = sessionInfo.SessionId;
+                    return;
+                }
+                for (var i = 0; i < SessionPool.Count; i++)
+                {
+                    if (SessionPool[i].SessionId == session)
+                    {
+                        var sessionInfo = new SessionInfo
+                        {
+                            SessionId = Guid.NewGuid(),
+                            CreationTime = DateTime.Now
+                        };
+                        SessionPool[i] = sessionInfo;
+                        SessionId = sessionInfo.SessionId;
+                        return;
+                    }
+                }
+                SessionId = GetSession();
             }
         }
 

@@ -64,15 +64,13 @@ namespace VitalChoice.Business.Services
             var keys = EncryptionHost.CreateSession(sessionId);
             if (keys == null)
             {
-
                 if (
                     await
                         ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId,
                             ServiceBusCommandConstants.CheckSessionKey,
                             ServerHostName, LocalHostName)))
                     return true;
-                EncryptionHost.RemoveSession(sessionId);
-                keys = EncryptionHost.CreateSession(sessionId);
+                return false;
             }
             if (
                 await

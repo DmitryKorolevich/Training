@@ -650,7 +650,10 @@ namespace VitalChoice.Business.Services.Orders
         public async Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false)
         {
             var order = await SelectAsync(id, withDefaults);
-            order.Customer = await _customerService.SelectAsync(order.Customer.Id, withDefaults);
+            if (order != null)
+            {
+                order.Customer = await _customerService.SelectAsync(order.Customer.Id, withDefaults);
+            }
             return order;
         }
 
