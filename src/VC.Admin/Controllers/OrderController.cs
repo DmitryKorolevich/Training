@@ -166,6 +166,11 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<List<OrderExportItemResult>>> ExportOrders([FromBody] List<OrderExportItem> itemsToExport)
         {
+            if (!itemsToExport.Any())
+            {
+                throw new AppValidationException("Please select orders to export first");
+            }
+
             return await _exportService.ExportOrdersAsync(new OrderExportData
             {
                 ExportInfo = itemsToExport

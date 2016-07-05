@@ -24,6 +24,7 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.skuAddressReportController',
 	'app.modules.order.controllers.matchbackReportController',
 	'app.modules.order.controllers.orderSkuCountReportController',
+	'app.modules.order.controllers.exportResultController'
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
