@@ -10,10 +10,14 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 {
     public class ServiceBusHostOneToMany : ServiceBusAbstractHost
     {
-        public ServiceBusHostOneToMany(ILogger logger, Func<TopicClient> topicFactory, Func<SubscriptionClient> subscriptionFactory)
-            : base(logger, new ServiceBusTopicSender(topicFactory()), new ServiceBusSubscriptionReceiver(subscriptionFactory()), true)
+        public ServiceBusHostOneToMany(ILogger logger, Func<TopicClient> topicFactory, Func<SubscriptionClient> subscriptionFactory,
+            Action<BrokeredMessage> onReceive = null)
+            : base(
+                logger, new ServiceBusTopicSender(topicFactory()), new ServiceBusSubscriptionReceiver(subscriptionFactory(), onReceive),
+                onReceive == null)
         {
         }
     }
 }
+
 #endif

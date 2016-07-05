@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.ServiceBus;
 using VitalChoice.Data.Extensions;
 using Microsoft.ServiceBus.Messaging;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
@@ -17,8 +18,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
 {
     public abstract class EncryptedServiceBusHost : IEncryptedServiceBusHost
     {
-        private readonly ServiceBusHostOneToOne _plainClient;
-        private readonly ServiceBusHostOneToOne _encryptedClient;
+        private ServiceBusHostOneToMany _plainClient;
+        private ServiceBusHostOneToMany _encryptedClient;
         private readonly ConcurrentDictionary<CommandItem, WeakReference<ServiceBusCommandBase>> _commands;
 
         protected readonly IObjectEncryptionHost EncryptionHost;
@@ -36,47 +37,94 @@ namespace VitalChoice.Infrastructure.ServiceBus
             _commands = new ConcurrentDictionary<CommandItem, WeakReference<ServiceBusCommandBase>>();
             try
             {
-                _plainClient = new ServiceBusHostOneToOne(logger, () =>
-                {
-                    var plainFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.PlainConnectionString);
-                    return plainFactory.CreateQueueClient(appOptions.Value.ExportService.PlainQueueName, ReceiveMode.PeekLock);
-                }, m =>
-                {
-                    try
-                    {
-                        ProcessPlainMessage(m);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.LogError(e.ToString());
-                    }
-                });
-                _encryptedClient = new ServiceBusHostOneToOne(logger, () =>
-                {
-                    var encryptedFactory =
-                        MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.EncryptedConnectionString);
-                    return encryptedFactory.CreateQueueClient(appOptions.Value.ExportService.EncryptedQueueName, ReceiveMode.PeekLock);
-                }, m =>
-                {
-                    try
-                    {
-                        ProcessEncryptedMessage(m);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.LogError(e.ToString());
-                    }
-                });
-
-                //_plainClient.ReceiveMessagesEvent += messages => messages.ForEach(ProcessPlainMessage);
-                _plainClient.Start();
-
-                //_encryptedClient.ReceiveMessagesEvent += messages => messages.ForEach(ProcessEncryptedMessage);
-                _encryptedClient.Start();
+                Initialize(appOptions, logger);
             }
             catch (Exception e)
             {
                 logger.LogCritical(e.Message, e);
+            }
+        }
+
+        private void Initialize(IOptions<AppOptions> appOptions, ILogger logger)
+        {
+            EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.PlainConnectionString,
+                appOptions.Value.ExportService.PlainQueueName, LocalHostName);
+            EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.EncryptedConnectionString,
+                appOptions.Value.ExportService.EncryptedQueueName, LocalHostName);
+
+            _plainClient = new ServiceBusHostOneToMany(logger, () =>
+            {
+                var plainFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.PlainConnectionString);
+                return plainFactory.CreateTopicClient(appOptions.Value.ExportService.PlainQueueName);
+            }, () =>
+            {
+                var factory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.PlainConnectionString);
+                return factory.CreateSubscriptionClient(appOptions.Value.ExportService.PlainQueueName, LocalHostName,
+                    ReceiveMode.ReceiveAndDelete);
+            }, m =>
+            {
+                try
+                {
+                    ProcessPlainMessage(m);
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError(e.ToString());
+                }
+            });
+            _encryptedClient = new ServiceBusHostOneToMany(logger, () =>
+            {
+                var plainFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.EncryptedConnectionString);
+                return plainFactory.CreateTopicClient(appOptions.Value.ExportService.EncryptedQueueName);
+            }, () =>
+            {
+                var factory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.EncryptedConnectionString);
+                return factory.CreateSubscriptionClient(appOptions.Value.ExportService.EncryptedQueueName, LocalHostName,
+                    ReceiveMode.ReceiveAndDelete);
+            }, m =>
+            {
+                try
+                {
+                    ProcessEncryptedMessage(m);
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError(e.ToString());
+                }
+            });
+            _plainClient.Start();
+            _encryptedClient.Start();
+        }
+
+        private void EnsureTopicAndSubscriptionExists(string connectionString, string topicName, string subscriptionName)
+        {
+            var ns = NamespaceManager.CreateFromConnectionString(connectionString);
+            if (!ns.TopicExists(topicName))
+            {
+                TopicDescription topic = new TopicDescription(topicName)
+                {
+                    EnableExpress = true,
+                    EnablePartitioning = true,
+                    EnableBatchedOperations = true,
+                    DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
+                    RequiresDuplicateDetection = false
+                };
+
+                ns.CreateTopic(topic);
+            }
+            if (!ns.SubscriptionExists(topicName, subscriptionName))
+            {
+                SubscriptionDescription subscription = new SubscriptionDescription(topicName, subscriptionName)
+                {
+                    EnableBatchedOperations = true,
+                    DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
+                    RequiresSession = false,
+                    EnableDeadLetteringOnFilterEvaluationExceptions = false,
+                    EnableDeadLetteringOnMessageExpiration = false,
+                    AutoDeleteOnIdle = TimeSpan.FromMinutes(20),
+                    MaxDeliveryCount = 1
+                };
+                ns.CreateSubscription(subscription);
             }
         }
 
@@ -200,17 +248,10 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         private void ProcessEncryptedMessage(BrokeredMessage message)
         {
-            if (message.CorrelationId == null)
+            if (message.CorrelationId == null || message.CorrelationId != LocalHostName)
             {
-                message.Complete();
                 return;
             }
-            if (message.CorrelationId != LocalHostName)
-            {
-                message.Abandon();
-                return;
-            }
-            message.Complete();
 
             var remoteCommand = EncryptionHost.AesDecryptVerify<ServiceBusCommandBase>(message.GetBody<TransportCommandData>(),
                 Guid.Parse(message.SessionId));
@@ -262,17 +303,10 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         private void ProcessPlainMessage(BrokeredMessage message)
         {
-            if (message.CorrelationId == null)
+            if (message.CorrelationId == null || message.CorrelationId != LocalHostName)
             {
-                message.Complete();
                 return;
             }
-            if (message.CorrelationId != LocalHostName)
-            {
-                message.Abandon();
-                return;
-            }
-            message.Complete();
             ServiceBusCommandBase remoteCommand;
             if (EncryptionHost.RsaVerifyWithConvert(message.GetBody<TransportCommandData>(), out remoteCommand))
             {
