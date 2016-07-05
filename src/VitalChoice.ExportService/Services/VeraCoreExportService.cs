@@ -428,7 +428,7 @@ namespace VitalChoice.ExportService.Services
                     var expDate = (DateTime) order.PaymentMethod.Data.ExpDate;
                     exportOrder.Payment.PaymentType.Sequence = 1;
                     //BUG: revisit manual CC payment
-                    exportOrder.Payment.PaymentType.Description = FormatCcType(order.PaymentMethod.Data.CardType);
+                    exportOrder.Payment.PaymentType.Description = FormatCcType((CreditCardType) order.PaymentMethod.Data.CardType);
                     exportOrder.Payment.CCExpirationDate = $"{expDate.Month:D2}{expDate.Year%100:D2}";
                     exportOrder.Payment.CCNumber = order.PaymentMethod.Data.CardNumber;
                     exportOrder.Payment.PaymentAmount = chargeAmount;
