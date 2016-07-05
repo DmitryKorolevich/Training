@@ -368,6 +368,19 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             }
         }
 
+        public KeyExchange GetSession(Guid session)
+        {
+            lock (_sessions)
+            {
+                SessionInfo sessionInfo;
+                if (_sessions.TryGetValue(session, out sessionInfo))
+                {
+                    return new KeyExchange(sessionInfo.Aes.Key, sessionInfo.Aes.IV);
+                }
+                return null;
+            }
+        }
+
         public bool RemoveSession(Guid session)
         {
             lock (_sessions)

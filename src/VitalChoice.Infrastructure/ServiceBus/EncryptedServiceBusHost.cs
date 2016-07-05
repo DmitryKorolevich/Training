@@ -1,13 +1,11 @@
 ﻿#if !NETSTANDARD1_5
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.ServiceBus;
-using VitalChoice.Data.Extensions;
 using Microsoft.ServiceBus.Messaging;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus.Base;
@@ -200,11 +198,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
             {
                 Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
             }
-        }
-
-        public bool IsAuthenticatedClient(Guid sessionId)
-        {
-            return EncryptionHost.SessionExist(sessionId);
         }
 
         protected virtual BrokeredMessage CreatePlainMessage(ServiceBusCommandBase command)

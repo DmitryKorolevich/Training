@@ -1,14 +1,8 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using VitalChoice.Ecommerce.Domain.Exceptions;
-using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
-using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services
@@ -20,7 +14,11 @@ namespace VitalChoice.Business.Services
         private static int _currentSession;
 
         private readonly IEncryptedServiceBusHostClient _encryptedBusHost;
-        private bool IsAuthenticated =>_encryptedBusHost.IsAuthenticatedClient(SessionId);
+        private readonly IObjectEncryptionHost _encryptionHost;
+        private bool IsAuthenticated => _session.Authenticated;
+
+        public Guid SessionId => _session.SessionId;
+
         public string ServerHostName => _encryptedBusHost.ServerHostName;
         public string LocalHostName => _encryptedBusHost.LocalHostName;
 
@@ -28,13 +26,14 @@ namespace VitalChoice.Business.Services
 
         protected virtual int ExpireTimeMinutes => 60;
 
-        protected EncryptedServiceBusClient(IEncryptedServiceBusHostClient encryptedBusHost)
+        protected EncryptedServiceBusClient(IEncryptedServiceBusHostClient encryptedBusHost, IObjectEncryptionHost encryptionHost)
         {
             _encryptedBusHost = encryptedBusHost;
-            SessionId = GetSession();
+            _encryptionHost = encryptionHost;
+            _session = GetSession();
         }
 
-        public Guid SessionId { get; private set; }
+        private SessionInfo _session;
 
         protected async Task<T> SendCommand<T>(ServiceBusCommandWithResult command)
         {
@@ -50,31 +49,19 @@ namespace VitalChoice.Business.Services
         {
             if (!IsAuthenticated)
             {
-                var sessionId = SessionId;
+                var sessionId = _session.SessionId;
                 //double auth try to refresh broken/regenerated public key
-                try
-                {
-                    if (!await _encryptedBusHost.AuthenticateClient(sessionId))
-                    {
-                        SetInvalid(sessionId);
-                        sessionId = SessionId;
-                        if (!await _encryptedBusHost.AuthenticateClient(sessionId))
-                        {
-                            SetInvalid(sessionId);
-                            return false;
-                        }
-                    }
-                }
-                catch (ApiException)
+                if (!await _encryptedBusHost.AuthenticateClient(sessionId))
                 {
                     SetInvalid(sessionId);
-                    sessionId = SessionId;
+                    sessionId = _session.SessionId;
                     if (!await _encryptedBusHost.AuthenticateClient(sessionId))
                     {
                         SetInvalid(sessionId);
                         return false;
                     }
                 }
+                _session.Authenticated = true;
             }
             return true;
         }
@@ -101,7 +88,7 @@ namespace VitalChoice.Business.Services
             }
         }
 
-        private Guid GetSession()
+        private SessionInfo GetSession()
         {
             lock (SessionPool)
             {
@@ -110,11 +97,13 @@ namespace VitalChoice.Business.Services
                     _currentSession = 0;
                     if (SessionPool.Count < MaxSessions)
                     {
-                        SessionPool.Add(new SessionInfo
+                        var newInfo = new SessionInfo
                         {
                             SessionId = Guid.NewGuid(),
                             CreationTime = DateTime.Now
-                        });
+                        };
+                        CreateAndRegisterSession(newInfo);
+                        SessionPool.Add(newInfo);
                     }
                 }
                 var sessionInfo = SessionPool[_currentSession];
@@ -125,11 +114,18 @@ namespace VitalChoice.Business.Services
                         SessionId = Guid.NewGuid(),
                         CreationTime = DateTime.Now
                     };
+                    CreateAndRegisterSession(sessionInfo);
                     SessionPool[_currentSession] = sessionInfo;
                 }
                 _currentSession++;
-                return sessionInfo.SessionId;
+                return sessionInfo;
             }
+        }
+
+        private void CreateAndRegisterSession(SessionInfo sessionInfo)
+        {
+            var keys = _encryptionHost.CreateSession(sessionInfo.SessionId);
+            _encryptionHost.RegisterSession(sessionInfo.SessionId, keys);
         }
 
         private void SetInvalid(Guid session)
@@ -143,8 +139,9 @@ namespace VitalChoice.Business.Services
                         SessionId = Guid.NewGuid(),
                         CreationTime = DateTime.Now
                     };
+                    CreateAndRegisterSession(sessionInfo);
                     SessionPool[_currentSession] = sessionInfo;
-                    SessionId = sessionInfo.SessionId;
+                    _session = sessionInfo;
                     return;
                 }
                 for (var i = 0; i < SessionPool.Count; i++)
@@ -156,20 +153,23 @@ namespace VitalChoice.Business.Services
                             SessionId = Guid.NewGuid(),
                             CreationTime = DateTime.Now
                         };
+                        CreateAndRegisterSession(sessionInfo);
                         SessionPool[i] = sessionInfo;
-                        SessionId = sessionInfo.SessionId;
+                        _session = sessionInfo;
                         return;
                     }
                 }
-                SessionId = GetSession();
+                _session = GetSession();
             }
         }
 
-        private struct SessionInfo
+        private class SessionInfo
         {
             public Guid SessionId { get; set; }
 
             public DateTime CreationTime { get; set; }
+
+            public bool Authenticated { get; set; }
         }
 
         public void Dispose()

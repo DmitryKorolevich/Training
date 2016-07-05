@@ -206,13 +206,24 @@ namespace VitalChoice.Caching.Services
             private readonly QueryData<T> _queryData;
             private readonly IRelationalCache<T> _cache;
             private readonly Expression _reparsedExpression;
+            private readonly bool _initSuccess;
 
-            public CacheExecutor(Expression expression, DbContext context, IQueryParserFactory queryParserFactory, ILogger logger, IChangeDetector changeDetector)
+            public CacheExecutor(Expression expression, DbContext context, IQueryParserFactory queryParserFactory, ILogger logger,
+                IChangeDetector changeDetector)
             {
                 _logger = logger;
-                var queryCache = queryParserFactory.GetQueryCache<T>();
-                _cache = new RelationalCache<T>(queryCache.InternalCache, context.StateManager, changeDetector, logger);
-                _queryData = queryCache.ParseQuery(expression, context.Model, out _reparsedExpression);
+                try
+                {
+                    var queryCache = queryParserFactory.GetQueryCache<T>();
+                    _cache = new RelationalCache<T>(queryCache.InternalCache, context.StateManager, changeDetector, logger);
+                    _queryData = queryCache.ParseQuery(expression, context.Model, out _reparsedExpression);
+                    _initSuccess = true;
+                }
+                catch (Exception e)
+                {
+                    _initSuccess = false;
+                    _logger.LogError(e.ToString());
+                }
             }
 
             public Expression ReparsedExpression => _reparsedExpression;
@@ -234,11 +245,20 @@ namespace VitalChoice.Caching.Services
 
             public object UpdateList(object entities)
             {
+                if (!_initSuccess)
+                {
+                    return entities;
+                }
                 return new CacheEnumerable<T>((IEnumerable<T>) entities, this);
             }
 
             public List<T> ExecuteTyped(out CacheGetResult cacheResult)
             {
+                if (!_initSuccess)
+                {
+                    cacheResult = CacheGetResult.NotFound;
+                    return null;
+                }
                 try
                 {
                     List<T> entities;
@@ -255,6 +275,11 @@ namespace VitalChoice.Caching.Services
 
             public T ExecuteTypedFirst(out CacheGetResult cacheResult)
             {
+                if (!_initSuccess)
+                {
+                    cacheResult = CacheGetResult.NotFound;
+                    return null;
+                }
                 try
                 {
                     T entity;
@@ -271,6 +296,10 @@ namespace VitalChoice.Caching.Services
 
             public bool Update(T entity)
             {
+                if (!_initSuccess)
+                {
+                    return false;
+                }
                 if (!_queryData.CanCache)
                 {
                     return false;
@@ -288,6 +317,10 @@ namespace VitalChoice.Caching.Services
 
             public bool UpdateList(IEnumerable<T> entities)
             {
+                if (!_initSuccess)
+                {
+                    return false;
+                }
                 if (!_queryData.CanCollectionCache)
                 {
                     return false;
@@ -305,11 +338,19 @@ namespace VitalChoice.Caching.Services
 
             public IAsyncEnumerable<TT> UpdateListAsync<TT>(IAsyncEnumerable<TT> entities)
             {
+                if (!_initSuccess)
+                {
+                    return entities;
+                }
                 return (IAsyncEnumerable<TT>) new AsyncCacheEnumerable<T>((IAsyncEnumerable<T>) entities, this);
             }
 
             public IAsyncEnumerable<T> UpdateListAsync(IAsyncEnumerable<T> entities)
             {
+                if (!_initSuccess)
+                {
+                    return entities;
+                }
                 return new AsyncCacheEnumerable<T>(entities, this);
             }
         }

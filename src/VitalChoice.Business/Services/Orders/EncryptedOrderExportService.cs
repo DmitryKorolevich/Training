@@ -15,6 +15,7 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
+using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.ObjectMapping.Base;
@@ -23,7 +24,8 @@ namespace VitalChoice.Business.Services.Orders
 {
     public class EncryptedOrderExportService : EncryptedServiceBusClient, IEncryptedOrderExportService
     {
-        public EncryptedOrderExportService(IEncryptedServiceBusHostClient encryptedBusHost) : base(encryptedBusHost)
+        public EncryptedOrderExportService(IEncryptedServiceBusHostClient encryptedBusHost, IObjectEncryptionHost encryptionHost)
+            : base(encryptedBusHost, encryptionHost)
         {
         }
 
