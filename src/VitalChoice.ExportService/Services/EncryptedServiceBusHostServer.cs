@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Autofac;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Constants;
-using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus;
@@ -29,55 +26,28 @@ namespace VitalChoice.ExportService.Services
             _rootScope = rootScope;
             EncryptionHost.OnSessionExpired += OnSessionRemoved;
             _keyExchangeProvider = new RSACryptoServiceProvider(4096);
-            Logger.LogInformation("Started SB Server");
         }
 
         protected override bool ProcessPlainCommand(ServiceBusCommandBase command)
         {
-            try
+            switch (command.CommandName)
             {
-                switch (command.CommandName)
-                {
-                    case ServiceBusCommandConstants.GetPublicKey:
-                        RSAParameters publicKey = _keyExchangeProvider.ExportParameters(false);
-                        SendPlainCommand(new ServiceBusCommandBase(command, publicKey));
-                        break;
-                    case ServiceBusCommandConstants.SetSessionKey:
-                        try
-                        {
-                            var keyCombined = (byte[]) command.Data;
-                            var keyExchange = new KeyExchange(EncryptionHost.RsaDecrypt(keyCombined, _keyExchangeProvider));
-                            SendPlainCommand(new ServiceBusCommandBase(command,
-                                EncryptionHost.RegisterSession(command.SessionId, command.Source, keyExchange)));
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.LogError(e.ToString());
-                            SendPlainCommand(new ServiceBusCommandBase(command, false));
-                            return false;
-                        }
-                        break;
-                    case ServiceBusCommandConstants.CheckSessionKey:
-                        try
-                        {
-                            SendPlainCommand(new ServiceBusCommandBase(command, EncryptionHost.SessionExist(command.SessionId)));
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.LogError(e.ToString());
-                            SendPlainCommand(new ServiceBusCommandBase(command, false));
-                            return false;
-                        }
-                        break;
+                case ServiceBusCommandConstants.GetPublicKey:
+                    RSAParameters publicKey = _keyExchangeProvider.ExportParameters(false);
+                    SendPlainCommand(new ServiceBusCommandBase(command, publicKey));
+                    break;
+                case ServiceBusCommandConstants.SetSessionKey:
+                    var keyCombined = (byte[]) command.Data.Data;
+                    var keyExchange = new KeyExchange(EncryptionHost.RsaDecrypt(keyCombined, _keyExchangeProvider));
+                    SendPlainCommand(new ServiceBusCommandBase(command,
+                        EncryptionHost.RegisterSession(command.SessionId, command.Source, keyExchange)));
+                    break;
+                case ServiceBusCommandConstants.CheckSessionKey:
+                    SendPlainCommand(new ServiceBusCommandBase(command, EncryptionHost.SessionExist(command.SessionId)));
+                    break;
 
-                    default:
-                        return false;
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                return false;
+                default:
+                    return false;
             }
             return true;
         }
@@ -99,63 +69,45 @@ namespace VitalChoice.ExportService.Services
 
         private bool ProcessUpdateCustomerPayments(ServiceBusCommandBase command)
         {
-            var customerPaymentInfo = command.Data as CustomerCardData[];
+            var customerPaymentInfo = command.Data.Data as CustomerCardData[];
             if (customerPaymentInfo == null)
             {
-                SendCommand(new ServiceBusCommandBase(command, false));
+                SendCommand(new ServiceBusCommandBase(command, "Customer payment data is empty"));
                 return false;
             }
 
-            try
+            using (var scope = _rootScope.BeginLifetimeScope())
             {
-                using (var scope = _rootScope.BeginLifetimeScope())
-                {
-                    var orderExportService = scope.Resolve<IOrderExportService>();
-                    orderExportService.UpdateCustomerPaymentMethods(customerPaymentInfo).GetAwaiter().GetResult();
-                }
+                var orderExportService = scope.Resolve<IOrderExportService>();
+                orderExportService.UpdateCustomerPaymentMethods(customerPaymentInfo).GetAwaiter().GetResult();
             }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                SendCommand(new ServiceBusCommandBase(command, false));
-                return true;
-            }
-
             SendCommand(new ServiceBusCommandBase(command, true));
             return true;
         }
 
         private bool ProcessUpdateOrderPayment(ServiceBusCommandBase command)
         {
-            var orderPaymentInfo = command.Data as OrderCardData;
+            var orderPaymentInfo = command.Data.Data as OrderCardData;
             if (orderPaymentInfo == null)
             {
-                SendCommand(new ServiceBusCommandBase(command, false));
+                SendCommand(new ServiceBusCommandBase(command, "Payment method info is empty"));
                 return false;
             }
-            try
+            using (var scope = _rootScope.BeginLifetimeScope())
             {
-                using (var scope = _rootScope.BeginLifetimeScope())
-                {
-                    var orderExportService = scope.Resolve<IOrderExportService>();
-                    orderExportService.UpdateOrderPaymentMethod(orderPaymentInfo).GetAwaiter().GetResult();
-                }
-                SendCommand(new ServiceBusCommandBase(command, true));
-                return true;
+                var orderExportService = scope.Resolve<IOrderExportService>();
+                orderExportService.UpdateOrderPaymentMethod(orderPaymentInfo).GetAwaiter().GetResult();
             }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                SendCommand(new ServiceBusCommandBase(command, false));
-                return true;
-            }
+            SendCommand(new ServiceBusCommandBase(command, true));
+            return true;
         }
 
         private bool ProcessExportOrders(ServiceBusCommandBase command)
         {
-            var exportData = command.Data as OrderExportData;
+            var exportData = command.Data.Data as OrderExportData;
             if (exportData == null)
             {
+                SendCommand(new ServiceBusCommandBase(command, "Export data is empty"));
                 return false;
             }
             Parallel.ForEach(exportData.ExportInfo, e =>

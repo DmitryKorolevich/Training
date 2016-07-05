@@ -196,6 +196,13 @@ namespace VitalChoice.Business.Services.Orders
                     };
                     (await authTask).Raise();
                     entity = await base.InsertAsync(model, uow);
+
+                    paymentCopy.IdOrder = entity.Id;
+                    if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
+                    {
+                        throw new ApiException("Cannot update order payment info on remote.");
+                    }
+
                     //storefront update
                     if (model.IsAnyNotIncomplete())
                     {
@@ -205,16 +212,6 @@ namespace VitalChoice.Business.Services.Orders
                         await ChargeOnetimeDiscount(model);
                         await uow.SaveChangesAsync();
                     }
-                    paymentCopy.IdOrder = entity.Id;
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                    Task.Run(async () =>
-                    {
-                        if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
-                        {
-                            Logger.LogError("Cannot update order payment info on remote.");
-                        }
-                    }).ConfigureAwait(false);
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                     transaction.Commit();
                 }
                 catch
@@ -252,9 +249,16 @@ namespace VitalChoice.Business.Services.Orders
                         }
                     }).ToArray();
                     entities = await base.InsertRangeAsync(models, uow);
+
                     paymentCopies.ForEach(p => p.PaymentMethod.IdOrder = p.OriginalReference.Id);
                     var paymentRemoteUpdates =
                         paymentCopies.Select(p => _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(p.PaymentMethod));
+
+                    if ((await Task.WhenAll(paymentRemoteUpdates)).Any(t => !t))
+                    {
+                        throw new ApiException("Cannot update order payment info on remote.");
+                    }
+
                     foreach (var model in models)
                     {
                         var entity = entities.FirstOrDefault(e => e.Id == model.Id);
@@ -267,15 +271,6 @@ namespace VitalChoice.Business.Services.Orders
                         await ChargeGiftCertificates(model, uow);
                     }
                     await uow.SaveChangesAsync();
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                    Task.Run(async () =>
-                    {
-                        if ((await Task.WhenAll(paymentRemoteUpdates)).Any(t => !t))
-                        {
-                            Logger.LogError("Cannot update order payment info on remote.");
-                        }
-                    }).ConfigureAwait(false);
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                     transaction.Commit();
                 }
                 catch
@@ -308,6 +303,12 @@ namespace VitalChoice.Business.Services.Orders
                     var initial = await SelectEntityFirstAsync(o => o.Id == model.Id, query => query);
                     entity = await base.UpdateAsync(model, uow);
 
+                    paymentCopy.IdOrder = entity.Id;
+                    if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
+                    {
+                        throw new ApiException("Cannot update order payment info on remote.");
+                    }
+
                     //Update date created if order was incomplete and become processed
                     if (initial.IsAnyIncomplete() && model.IsAnyNotIncomplete())
                     {
@@ -329,16 +330,6 @@ namespace VitalChoice.Business.Services.Orders
                         await UpdateHealthwiseOrderWithOrder(model, uow);
                         //charge one-time discount, remove old charge if different
                     }
-                    paymentCopy.IdOrder = entity.Id;
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                    Task.Run(async () =>
-                    {
-                        if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
-                        {
-                            Logger.LogError("Cannot update order payment info on remote.");
-                        }
-                    }).ConfigureAwait(false);
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                     await uow.SaveChangesAsync();
                     transaction.Commit();
                 }
@@ -391,8 +382,15 @@ namespace VitalChoice.Business.Services.Orders
                     }).ToArray();
                     var initialList = await SelectEntitiesAsync(o => ids.Contains(o.Id), query => query);
                     entities = await base.UpdateRangeAsync(models, uow);
+
                     var paymentRemoteUpdates =
                         paymentCopies.Select(p => _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(p));
+
+                    if ((await Task.WhenAll(paymentRemoteUpdates)).Any(t => !t))
+                    {
+                        throw new ApiException("Cannot update order payment info on remote.");
+                    }
+
                     foreach (var model in models)
                     {
                         var entity = entities.FirstOrDefault(p => p.Id == model.Id);
@@ -408,15 +406,6 @@ namespace VitalChoice.Business.Services.Orders
                         await UpdateHealthwiseOrderWithOrder(model, uow);
                     }
                     await uow.SaveChangesAsync();
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                    Task.Run(async () =>
-                    {
-                        if ((await Task.WhenAll(paymentRemoteUpdates)).Any(t => !t))
-                        {
-                            Logger.LogError("Cannot update order payment info on remote.");
-                        }
-                    }).ConfigureAwait(false);
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                     transaction.Commit();
                 }
                 catch

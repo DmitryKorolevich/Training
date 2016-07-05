@@ -79,7 +79,7 @@ namespace VitalChoice.Business.Services
                     ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.SetSessionKey,
                         ServerHostName, LocalHostName)
                     {
-                        Data = EncryptionHost.RsaEncrypt(keys.ToCombined(), keyExchangeProvider)
+                        Data = new ServiceBusCommandData(EncryptionHost.RsaEncrypt(keys.ToCombined(), keyExchangeProvider))
                     }))
             {
                 return EncryptionHost.RegisterSession(sessionId, keys);
@@ -105,7 +105,7 @@ namespace VitalChoice.Business.Services
         {
             if (command.CommandName == ServiceBusCommandConstants.SessionExpired)
             {
-                var session = (Guid) command.Data;
+                var session = (Guid) command.Data.Data;
                 if (EncryptionHost.RemoveSession(session))
                 {
                     return true;

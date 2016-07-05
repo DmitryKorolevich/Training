@@ -26,7 +26,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
         public virtual string LocalHostName { get; }
         public string ServerHostName { get; }
 
-        protected EncryptedServiceBusHost(IOptions<AppOptions> appOptions, ILogger logger, IObjectEncryptionHost encryptionHost, IHostingEnvironment env)
+        protected EncryptedServiceBusHost(IOptions<AppOptions> appOptions, ILogger logger, IObjectEncryptionHost encryptionHost,
+            IHostingEnvironment env)
         {
             ServerHostName = appOptions.Value.ExportService.ServerHostName;
             LocalHostName = env.ApplicationName;
@@ -62,7 +63,9 @@ namespace VitalChoice.Infrastructure.ServiceBus
         protected void SendPlainCommand(ServiceBusCommandBase command)
         {
             if (SendPlain(command))
-            Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
+            {
+                Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
+            }
         }
 
         protected async Task<T> ExecutePlainCommand<T>(ServiceBusCommandWithResult command)
@@ -80,9 +83,11 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 }
 
                 CommandComplete(command);
-                if (command.Result == null)
-                    return default(T);
-                return (T) command.Result;
+                if (!string.IsNullOrEmpty(command.Result.Error))
+                {
+                    throw new ApiException(command.Result.Error);
+                }
+                return (T) command.Result.Data;
             }
             return default(T);
         }
@@ -90,7 +95,9 @@ namespace VitalChoice.Infrastructure.ServiceBus
         public void SendCommand(ServiceBusCommandBase command)
         {
             if (SendEncrypted(command))
-            Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
+            {
+                Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
+            }
         }
 
         public async Task<T> ExecuteCommand<T>(ServiceBusCommandWithResult command)
@@ -107,9 +114,11 @@ namespace VitalChoice.Infrastructure.ServiceBus
                     return default(T);
                 }
                 CommandComplete(command);
-                if (command.Result == null)
-                    return default(T);
-                return (T) command.Result;
+                if (!string.IsNullOrEmpty(command.Result.Error))
+                {
+                    throw new ApiException(command.Result.Error);
+                }
+                return (T) command.Result.Data;
             }
             return default(T);
         }
@@ -120,14 +129,16 @@ namespace VitalChoice.Infrastructure.ServiceBus
             TrackCommand(command);
             command.RequestAcqureAction = commandResultAction;
             if (SendEncrypted(command))
-            Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
+            {
+                Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
+            }
         }
 
         public bool IsAuthenticatedClient(Guid sessionId)
         {
             return EncryptionHost.SessionExist(sessionId);
         }
-        
+
         protected virtual BrokeredMessage CreatePlainMessage(ServiceBusCommandBase command)
         {
             return new BrokeredMessage(EncryptionHost.RsaSignWithConvert(command))
@@ -208,13 +219,21 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 Logger.LogInformation($"{remoteCommand.CommandName} received ({remoteCommand.CommandId})");
                 Task.Run(() =>
                 {
-                    if (ProcessEncryptedCommand(remoteCommand))
+                    try
                     {
-                        Logger.LogInformation($"{remoteCommand.CommandName} processing success ({remoteCommand.CommandId})");
+                        if (ProcessEncryptedCommand(remoteCommand))
+                        {
+                            Logger.LogInformation($"{remoteCommand.CommandName} processing success ({remoteCommand.CommandId})");
+                        }
+                        else
+                        {
+                            Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
                         Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
+                        SendEncrypted(new ServiceBusCommandBase(remoteCommand, e.ToString()));
                     }
                 }).ConfigureAwait(false);
             }
@@ -257,13 +276,21 @@ namespace VitalChoice.Infrastructure.ServiceBus
                     Logger.LogInformation($"{remoteCommand.CommandName} received ({remoteCommand.CommandId})");
                     Task.Run(() =>
                     {
-                        if (ProcessPlainCommand(remoteCommand))
+                        try
                         {
-                            Logger.LogInformation($"{remoteCommand.CommandName} processing success ({remoteCommand.CommandId})");
+                            if (ProcessPlainCommand(remoteCommand))
+                            {
+                                Logger.LogInformation($"{remoteCommand.CommandName} processing success ({remoteCommand.CommandId})");
+                            }
+                            else
+                            {
+                                Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
+                            }
                         }
-                        else
+                        catch (Exception e)
                         {
                             Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
+                            SendPlainCommand(new ServiceBusCommandBase(remoteCommand, e.ToString()));
                         }
                     }).ConfigureAwait(false);
                 }
@@ -326,14 +353,14 @@ namespace VitalChoice.Infrastructure.ServiceBus
             public override bool Equals(object obj)
             {
                 if (ReferenceEquals(null, obj)) return false;
-                return obj is CommandItem && Equals((CommandItem)obj);
+                return obj is CommandItem && Equals((CommandItem) obj);
             }
 
             public override int GetHashCode()
             {
                 unchecked
                 {
-                    return (_sessionId.GetHashCode() * 397) ^ _commandId.GetHashCode();
+                    return (_sessionId.GetHashCode()*397) ^ _commandId.GetHashCode();
                 }
             }
 
@@ -349,4 +376,5 @@ namespace VitalChoice.Infrastructure.ServiceBus
         }
     }
 }
+
 #endif

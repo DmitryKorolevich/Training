@@ -33,7 +33,7 @@ namespace VitalChoice.Business.Services.Orders
             await SendCommand(
                 new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName)
                 {
-                    Data = exportData
+                    Data = new ServiceBusCommandData(exportData)
                 },
                 (command, o) =>
                 {
@@ -53,7 +53,7 @@ namespace VitalChoice.Business.Services.Orders
                 SendCommand(
                     new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName)
                     {
-                        Data = exportData
+                        Data = new ServiceBusCommandData(exportData)
                     },
                     (command, o) =>
                     {
@@ -83,7 +83,7 @@ namespace VitalChoice.Business.Services.Orders
                     SendCommand<bool>(new ServiceBusCommandWithResult(SessionId, OrderExportServiceCommandConstants.UpdateOrderPayment,
                         ServerHostName, LocalHostName)
                     {
-                        Data = orderPaymentMethod
+                        Data = new ServiceBusCommandData(orderPaymentMethod)
                     });
             return Task.FromResult(true);
         }
@@ -102,7 +102,7 @@ namespace VitalChoice.Business.Services.Orders
                     SendCommand<bool>(new ServiceBusCommandWithResult(SessionId, OrderExportServiceCommandConstants.UpdateCustomerPayment,
                         ServerHostName, LocalHostName)
                     {
-                        Data = paymentsToUpdate
+                        Data = new ServiceBusCommandData(paymentsToUpdate)
                     });
             }
             return Task.FromResult(true);

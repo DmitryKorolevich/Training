@@ -10,7 +10,8 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
     [DataContract]
     public class ServiceBusCommandWithResult : ServiceBusCommandBase
     {
-        public ServiceBusCommandWithResult(Guid sessionId, string commandName, string destination, string source, Guid? commandId = null) : base(sessionId, commandName, destination, source, commandId)
+        public ServiceBusCommandWithResult(Guid sessionId, string commandName, string destination, string source, Guid? commandId = null)
+            : base(sessionId, commandName, destination, source, commandId)
         {
             ReadyEvent = new AsyncManualResetEvent(false);
             RequestAcqureAction = (command, result) =>
@@ -26,13 +27,24 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
             ReadyEvent = new AsyncManualResetEvent(false);
             RequestAcqureAction = (command, result) =>
             {
-                var currentCommand = (ServiceBusCommandWithResult)command;
+                var currentCommand = (ServiceBusCommandWithResult) command;
+                currentCommand.Result = result;
+                currentCommand.ReadyEvent.Set();
+            };
+        }
+
+        public ServiceBusCommandWithResult(ServiceBusCommandBase remoteCommand, string error) : base(remoteCommand, error)
+        {
+            ReadyEvent = new AsyncManualResetEvent(false);
+            RequestAcqureAction = (command, result) =>
+            {
+                var currentCommand = (ServiceBusCommandWithResult) command;
                 currentCommand.Result = result;
                 currentCommand.ReadyEvent.Set();
             };
         }
 
         public AsyncManualResetEvent ReadyEvent { get; }
-        public object Result { get; set; }
+        public ServiceBusCommandData Result { get; set; }
     }
 }
