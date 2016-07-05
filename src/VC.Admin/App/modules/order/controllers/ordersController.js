@@ -294,13 +294,13 @@
             var exportItems = [];
 
             $.each($scope.items, function (index, item) {
-                if (item.IsSelected || item.IsPSelected || item.IsNPSelected) {
+                if (item.IsSelected && item.OrderStatus == 2 || item.IsPSelected && item.POrderStatus == 2 || item.IsNPSelected && item.NPOrderStatus == 2) {
                     var exportItem = {};
                     exportItem.Id = item.Id;
                     exportItem.IsRefund = item.IdObjectType == 6;
-                    exportItem.OrderType = (item.IsSelected || (item.IsNPSelected && item.IsPSelected))
+                    exportItem.OrderType = (item.IsSelected && item.OrderStatus == 2 || (item.IsNPSelected && item.NPOrderStatus == 2 && item.IsPSelected && item.POrderStatus == 2))
                         ? 0
-                        : (item.IsPSelected ? 1 : 2);
+                        : (item.IsPSelected && item.POrderStatus == 2 ? 1 : 2);
 
                     exportItems.push(exportItem);
                 }
