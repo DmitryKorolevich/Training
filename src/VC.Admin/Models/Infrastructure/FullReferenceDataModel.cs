@@ -64,8 +64,11 @@ namespace VC.Admin.Models.Infrastructure
         public IList<LookupItem<int>> PromotionBuyTypes { get; set; }
         public IList<LookupItem<int>> ShippingUpgrades { get; set; }
         public IList<LookupItem<string>> PersonTitles { get; set; }
+        public IList<LookupItem<int>> ShipMethodTypes { get; set; }
         public IList<LookupItem<int>> RefundRedeemOptions { get; set; }
         public IList<LookupItem<int>> ProductSellers { get; set; }
         public IList<LookupItem<int>> GoogleCategories { get; set; }
+        public IList<LookupItem<string>> Carriers { get; set; }
+        public IList<LookupItem<int>> Warehouses { get; set; }
     }
 }

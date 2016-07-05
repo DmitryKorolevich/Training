@@ -406,6 +406,9 @@ namespace VitalChoice.Business.Services
                     Text = x.ValueVariant
                 }).ToList();
             referenceData.PersonTitles = LookupHelper.GetPersonTitles();
+            referenceData.ShipMethodTypes = LookupHelper.GetShipMethodTypes();
+            referenceData.Carriers = LookupHelper.GetCarriers();
+            referenceData.Warehouses = LookupHelper.GetWarehouses();
 
             //BUG: shoule be moved to the specific worker
             SetupAppSettings();

@@ -56,3 +56,4 @@ Post-Deployment Script Template
 
 :r .\Scripts\Skus.sql
 :r .\Scripts\SPGetMailingListReport.sql
+:r .\Scripts\SPsForShippedViaReport.sql

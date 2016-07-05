@@ -262,5 +262,18 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.post(baseUrl + 'GetOrderSkuCountReport', filter, getConfig(tracker));
 	    },
+	    getShippedViaSummaryReport: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetShippedViaSummaryReport', filter, getConfig(tracker));
+	    },
+	    getShippedViaItemsReportOrderItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetShippedViaItemsReportOrderItems', filter, getConfig(tracker));
+	    },
+	    getShippedViaItemsReportOrderItemsReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + ('GetShippedViaItemsReportOrderItemsReportFile?{0}buildNumber={1}')
+                .format(generateQueryParamsBasedOnFilter(filter), buildNumber);
+	    },
 	};
 }]);

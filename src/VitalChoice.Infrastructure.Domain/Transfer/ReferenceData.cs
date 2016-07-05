@@ -119,5 +119,11 @@ namespace VitalChoice.Infrastructure.Domain.Transfer
         public IList<LookupItem<int>> AutoShipOptions { get; set; }
 
         public IList<LookupItem<int>> RefundRedeemOptions { get; set; }
+
+        public IList<LookupItem<int>> ShipMethodTypes { get; set; }
+
+        public IList<LookupItem<string>> Carriers { get; set; }
+
+        public IList<LookupItem<int>> Warehouses { get; set; }
     }
 }

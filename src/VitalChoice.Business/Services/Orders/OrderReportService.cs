@@ -1117,5 +1117,107 @@ namespace VitalChoice.Business.Services.Orders
 
             return toReturn;
         }
+
+        public async Task<ShippedViaSummaryReport> GetShippedViaSummaryReportAsync(ShippedViaReportFilter filter)
+        {
+            ShippedViaSummaryReport report = new ShippedViaSummaryReport();
+            var items = await _sPEcommerceRepository.GetShippedViaSummaryReportRawItemsAsync(filter);
+
+            var warehouse = new ShippedViaSummaryReportWarehouseItem();
+            warehouse.Warehouse = Warehouse.WA;
+            warehouse.WarehouseName = _appInfrastructureService.Data().Warehouses.FirstOrDefault(p=>p.Key==(int)Warehouse.WA)?.Text;
+            CreateShipMethodTypes(warehouse);
+            report.Warehouses.Add(warehouse);
+
+            warehouse = new ShippedViaSummaryReportWarehouseItem();
+            warehouse.Warehouse = Warehouse.VA;
+            warehouse.WarehouseName = _appInfrastructureService.Data().Warehouses.FirstOrDefault(p => p.Key == (int)Warehouse.VA)?.Text;
+            CreateShipMethodTypes(warehouse);
+            report.Warehouses.Add(warehouse);
+
+            foreach (var item in items)
+            {
+                warehouse = report.Warehouses.FirstOrDefault(p => (int) p.Warehouse == item.IdWarehouse);
+                if (warehouse != null)
+                {
+                    foreach (var shipMethodItem in warehouse.ShipMethods)
+                    {
+                        var carrier = shipMethodItem.Carriers.FirstOrDefault(p=>p.Carrier==item.ShipMethodFreightCarrier);
+                        if (carrier == null)
+                        {
+                            carrier = new ShippedViaSummaryReportCarrierItem()
+                            {
+                                Carrier = item.ShipMethodFreightCarrier,
+                            };
+                            shipMethodItem.Carriers.Add(carrier);
+                        }
+                    }
+
+                    var shipMethod = warehouse.ShipMethods.FirstOrDefault(p => (int) p.ShipMethodType == item.IdShipMethodFreightService);
+                    var carrierItem = shipMethod?.Carriers.FirstOrDefault(p => p.Carrier == item.ShipMethodFreightCarrier);
+                    if (carrierItem != null)
+                    {
+                        carrierItem.Count += item.Count;
+                    }
+                }
+            }
+
+            return report;
+        }
+
+        private void CreateShipMethodTypes(ShippedViaSummaryReportWarehouseItem warehouse)
+        {
+            warehouse.ShipMethods.Add(new ShippedViaSummaryReportShipMethodItem()
+            {
+                ShipMethodType = ShipMethodType.Standard,
+                ShipMethodTypeName =
+                    _appInfrastructureService.Data()
+                        .ShipMethodTypes.FirstOrDefault(p => p.Key == (int) ShipMethodType.Standard)?
+                        .Text,
+            });
+            warehouse.ShipMethods.Add(new ShippedViaSummaryReportShipMethodItem()
+            {
+                ShipMethodType = ShipMethodType.SecondDayAir,
+                ShipMethodTypeName =
+                    _appInfrastructureService.Data()
+                        .ShipMethodTypes.FirstOrDefault(p => p.Key == (int) ShipMethodType.SecondDayAir)?
+                        .Text,
+            });
+            warehouse.ShipMethods.Add(new ShippedViaSummaryReportShipMethodItem()
+            {
+                ShipMethodType = ShipMethodType.NextDayAir,
+                ShipMethodTypeName =
+                    _appInfrastructureService.Data()
+                        .ShipMethodTypes.FirstOrDefault(p => p.Key == (int) ShipMethodType.NextDayAir)?
+                        .Text,
+            });
+        }
+
+        public async Task<PagedList<ShippedViaReportRawOrderItem>> GetShippedViaItemsReportOrderItemsAsync(ShippedViaReportFilter filter)
+        {
+            PagedList<ShippedViaReportRawOrderItem> toReturn = new PagedList<ShippedViaReportRawOrderItem>();
+            toReturn.Items = (await _sPEcommerceRepository.GetShippedViaItemsReportRawOrderItemsAsync(filter)).ToList();
+
+            var countries = await _countryService.GetCountriesAsync();
+
+            toReturn.Items.ForEach(p =>
+            {
+                p.ServiceCodeName = p.ServiceCode.HasValue ? 
+                    _appInfrastructureService.Data().OrderSources.FirstOrDefault(pp => p.ServiceCode.Value == pp.Key)?.Text 
+                    : null;
+                p.ShipMethodFreightServiceName = p.IdShipMethodFreightService.HasValue ?
+                    _appInfrastructureService.Data().ShipMethodTypes.FirstOrDefault(pp => p.IdShipMethodFreightService.Value == pp.Key)?.Text
+                    : null;
+                p.WarehouseName = p.IdWarehouse.HasValue ?
+                    Enum.GetName(typeof(Warehouse), p.IdWarehouse.Value)
+                    : null;
+                p.StateCode = countries.SelectMany(x => x.States).FirstOrDefault(x => x.Id == p.IdState)?.StateCode;
+            });
+            toReturn.Count = toReturn.Items.Count > 0 ?
+                toReturn.Items.First().Count != 0 ? toReturn.Items.First().Count : toReturn.Items.Count
+                : 0;
+
+            return toReturn;
+        }
     }
 }

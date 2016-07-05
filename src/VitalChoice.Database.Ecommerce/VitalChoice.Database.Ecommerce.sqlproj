@@ -317,4 +317,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPGetMailingListReport.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPsForShippedViaReport.sql" />
+  </ItemGroup>
 </Project>

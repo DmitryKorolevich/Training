@@ -122,6 +122,21 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(f => f.StateCode);
             });
 
+            builder.Entity<ShippedViaSummaryReportRawItem>(entity =>
+            {
+                entity.HasKey(f => new {f.IdWarehouse,f.IdShipMethodFreightService, f.ShipMethodFreightCarrier });
+                entity.Ignore(f => f.Id);
+            });
+
+            builder.Entity<ShippedViaReportRawOrderItem>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+                entity.Ignore(f => f.ServiceCodeName);
+                entity.Ignore(f => f.WarehouseName);
+                entity.Ignore(f => f.ShipMethodFreightServiceName);
+                entity.Ignore(f => f.StateCode);
+            });
+
             #endregion
 
             builder.Entity<VCustomerFavorite>(entity =>
