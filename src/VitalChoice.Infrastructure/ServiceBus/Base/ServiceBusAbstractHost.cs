@@ -16,7 +16,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         private readonly ManualResetEvent _readyToDisposeSend = new ManualResetEvent(true);
         private readonly ManualResetEvent _newMessageSignal = new ManualResetEvent(false);
         private volatile bool _terminated;
-        private readonly List<Thread> _runningThreads = new List<Thread>();
+        private Thread _sendThread;
+        private Thread _receiveThread;
 
         protected readonly ILogger Logger;
         protected readonly IServiceBusSender Sender;
@@ -34,18 +35,10 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 
         public virtual void Start()
         {
-            for (var i = 0; i < SendThreadCount; i++)
-            {
-                var thread = new Thread(SendMessages);
-                _runningThreads.Add(thread);
-                thread.Start();
-            }
-            for (var i = 0; i < ReceiveThreadCount; i++)
-            {
-                var thread = new Thread(ReceiveMessages);
-                _runningThreads.Add(thread);
-                thread.Start();
-            }
+            _sendThread = new Thread(SendMessages);
+            _sendThread.Start();
+            _receiveThread = new Thread(ReceiveMessages);
+            _receiveThread.Start();
         }
 
         public virtual void Stop()
@@ -55,13 +48,9 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             Receiver.Dispose();
             Sender.Dispose();
             ReceiveMessagesEvent = null;
-            _runningThreads.ForEach(t => t.Abort());
-            _runningThreads.Clear();
+            _sendThread.Abort();
+            _receiveThread.Abort();
         }
-
-        public virtual int SendThreadCount { get; set; } = 1;
-
-        public virtual int ReceiveThreadCount { get; set; } = 2;
 
         public virtual int BatchSize { get; set; } = 100;
 
@@ -75,7 +64,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 {
                     if (EnableBatching)
                     {
-                        var messages = Receiver.ReceiveBatch(BatchSize);
+                        var messages = Receiver.ReceiveBatchAsync(BatchSize).GetAwaiter().GetResult();
                         if (messages != null)
                         {
                             _readyToDisposeReceive.Reset();
@@ -85,7 +74,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                     }
                     else
                     {
-                        var message = Receiver.Receive();
+                        var message = Receiver.ReceiveAsync().GetAwaiter().GetResult();
                         if (message != null)
                         {
                             _readyToDisposeReceive.Reset();
@@ -131,13 +120,13 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                         {
                             if (EnableBatching)
                             {
-                                Sender.SendBatch(messages);
+                                Sender.SendBatchAsync(messages).GetAwaiter().GetResult();
                             }
                             else
                             {
                                 foreach (var brokeredMessage in messages)
                                 {
-                                    Sender.Send(brokeredMessage);
+                                    Sender.SendAsync(brokeredMessage).GetAwaiter().GetResult();
                                 }
                             }
                             messages.Clear();
