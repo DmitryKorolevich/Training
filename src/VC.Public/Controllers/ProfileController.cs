@@ -747,11 +747,11 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<bool>> ActivatePauseAutoShip(int id)
+        public async Task<Result<bool>> ActivatePauseAutoShip(int id, bool activate)
         {
             var internalId = GetInternalCustomerId();
 
-            await _orderService.ActivatePauseAutoShipAsync(internalId, id);
+            await _orderService.ActivatePauseAutoShipAsync(internalId, id, activate);
 
             return true;
         }

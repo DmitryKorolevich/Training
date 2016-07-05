@@ -47,8 +47,8 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    updateAutoShipBilling: function (model, orderId, tracker) {
 	    	return $http.post(baseUrl + 'UpdateAutoShipBilling?orderId=' + orderId, model, getConfig(tracker));
 	    },
-	    activatePauseAutoShip: function (id, customerId, tracker) {
-	    	return $http.post(baseUrl + 'ActivatePauseAutoShip?id=' +id +'&customerId=' + customerId, getConfig(tracker));
+	    activatePauseAutoShip: function (id, customerId, activate, tracker) {
+	        return $http.post(baseUrl + 'ActivatePauseAutoShip?id=' + id + '&customerId=' + customerId + '&activate=' + activate, getConfig(tracker));
 	    },
 	    deleteAutoShip: function (id, customerId, tracker) {
 	    	return $http.post(baseUrl + 'DeleteAutoShip?id=' + id + '&customerId=' + customerId, getConfig(tracker));

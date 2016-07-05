@@ -534,9 +534,9 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
-        public async Task<Result<bool>> ActivatePauseAutoShip([FromQuery]int customerId, [FromQuery]int id)
+        public async Task<Result<bool>> ActivatePauseAutoShip([FromQuery]int customerId, [FromQuery]int id, [FromQuery]bool activate)
         {
-            await _orderService.ActivatePauseAutoShipAsync(customerId, id);
+            await _orderService.ActivatePauseAutoShipAsync(customerId, id, activate);
 
             return true;
         }

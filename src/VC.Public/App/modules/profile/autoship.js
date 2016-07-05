@@ -17,7 +17,7 @@
 		var id = $(this).attr("data-autoship-id");
 		confirmAction(function () {
 			$(".overlay").show();
-			activatePauseAutoShip(id, function (result) {
+			activatePauseAutoShip(id, false, function (result) {
 				successHandler(result, "Successfully paused");
 			}, function (errorResult) {
 				$(".overlay").hide();
@@ -31,7 +31,7 @@
 		
 		confirmAction(function () {
 			$(".overlay").show();
-			activatePauseAutoShip(id, function (result) {
+			activatePauseAutoShip(id, true, function (result) {
 				successHandler(result, "Successfully started");
 			}, function (errorResult) {
 				$(".overlay").hide();
@@ -70,10 +70,10 @@ function deleteAutoShip(id, successCallback, errorCallback) {
 	});
 }
 
-function activatePauseAutoShip(id, successCallback, errorCallback) {
+function activatePauseAutoShip(id, activate, successCallback, errorCallback) {
 	$.ajax({
 		type: "POST",
-		url: "/Profile/ActivatePauseAutoShip/" + id,
+		url: "/Profile/ActivatePauseAutoShip?id=" + id + "&activate=" + activate,
 		dataType: "json"
 	}).success(function (result) {
 		if (successCallback) {

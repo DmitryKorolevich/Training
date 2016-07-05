@@ -906,11 +906,21 @@ namespace VitalChoice.Business.Services.Orders
             return orders;
         }
 
-        public async Task ActivatePauseAutoShipAsync(int customerId, int autoShipId)
+        public async Task ActivatePauseAutoShipAsync(int customerId, int autoShipId, bool activate)
         {
             var autoShip = await FindAutoShipToChangeStatusAsync(customerId, autoShipId);
 
-            autoShip.StatusCode = autoShip.StatusCode == (int) RecordStatusCode.Active ? (int) RecordStatusCode.NotActive : (int) RecordStatusCode.Active;
+            if (activate && autoShip.StatusCode == (int)RecordStatusCode.Active)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AutoShipAlreadyStarted]);
+            }
+
+            if (!activate && autoShip.StatusCode == (int)RecordStatusCode.NotActive)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AutoShipAlreadyPaused]);
+            }
+
+            autoShip.StatusCode = activate ? (int) RecordStatusCode.Active : (int) RecordStatusCode.NotActive;
 
             await _orderRepository.UpdateAsync(autoShip);
         }
