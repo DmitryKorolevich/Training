@@ -211,7 +211,15 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 if (commandReference.TryGetTarget(out command))
                 {
                     Logger.LogInformation($"{command.CommandName} answer received ({command.CommandId})");
-                    command.RequestAcqureAction?.Invoke(command, remoteCommand.Data);
+                    try
+                    {
+                        command.RequestAcqureAction?.Invoke(command, remoteCommand.Data);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogError(e.ToString());
+                        Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
+                    }
                 }
             }
             else
@@ -232,6 +240,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                     }
                     catch (Exception e)
                     {
+                        Logger.LogError(e.ToString());
                         Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
                         SendEncrypted(new ServiceBusCommandBase(remoteCommand, e.ToString()));
                     }
@@ -268,7 +277,14 @@ namespace VitalChoice.Infrastructure.ServiceBus
                     if (commandReference.TryGetTarget(out command))
                     {
                         Logger.LogInformation($"{command.CommandName} answer received ({command.CommandId})");
-                        command.RequestAcqureAction?.Invoke(command, remoteCommand.Data);
+                        try
+                        {
+                            command.RequestAcqureAction?.Invoke(command, remoteCommand.Data);
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.LogError(e.ToString());
+                        }
                     }
                 }
                 else
@@ -289,6 +305,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                         }
                         catch (Exception e)
                         {
+                            Logger.LogError(e.ToString());
                             Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
                             SendPlainCommand(new ServiceBusCommandBase(remoteCommand, e.ToString()));
                         }
