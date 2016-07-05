@@ -59,7 +59,7 @@ namespace VitalChoice.Business.Services
             return await _encryptedBusHost.ExecuteCommand<T>(command);
         }
 
-        protected async Task SendCommand(ServiceBusCommandBase command, Action<ServiceBusCommandBase, object> requestAcqureAction)
+        protected async Task SendCommand(ServiceBusCommandBase command, Action<ServiceBusCommandBase, ServiceBusCommandData> requestAcqureAction)
         {
             if (!IsAuthenticated)
             {

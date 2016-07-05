@@ -37,7 +37,7 @@ namespace VitalChoice.Business.Services.Orders
                 },
                 (command, o) =>
                 {
-                    var exportResult = (OrderExportItemResult) o;
+                    var exportResult = (OrderExportItemResult) o.Data;
                     exportedAction(exportResult);
                     awaitItems[exportResult.Id].Set();
                 });
@@ -57,7 +57,7 @@ namespace VitalChoice.Business.Services.Orders
                     },
                     (command, o) =>
                     {
-                        var exportResult = (OrderExportItemResult) o;
+                        var exportResult = (OrderExportItemResult) o.Data;
                         lock (sentItems)
                         {
                             results.Add(exportResult);

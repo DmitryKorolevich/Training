@@ -124,7 +124,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         }
 
         public void ExecuteCommand(ServiceBusCommandBase command,
-            Action<ServiceBusCommandBase, object> commandResultAction)
+            Action<ServiceBusCommandBase, ServiceBusCommandData> commandResultAction)
         {
             TrackCommand(command);
             command.RequestAcqureAction = commandResultAction;
