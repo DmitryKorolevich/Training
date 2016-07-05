@@ -40,7 +40,14 @@ namespace VitalChoice.Business.Services
             if (!IsAuthenticated)
             {
                 //double auth try to refresh broken/regenerated public key
-                if (!await _encryptedBusHost.AuthenticateClient(SessionId))
+                try
+                {
+                    if (!await _encryptedBusHost.AuthenticateClient(SessionId))
+                    {
+                        return default(T);
+                    }
+                }
+                catch (ApiException)
                 {
                     if (!await _encryptedBusHost.AuthenticateClient(SessionId))
                     {
