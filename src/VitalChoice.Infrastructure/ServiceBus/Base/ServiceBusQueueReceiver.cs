@@ -10,9 +10,13 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
     {
         private readonly QueueClient _queue;
 
-        public ServiceBusQueueReceiver(QueueClient queue)
+        public ServiceBusQueueReceiver(QueueClient queue, Action<BrokeredMessage> onReceive = null)
         {
             _queue = queue;
+            if (onReceive != null)
+            {
+                _queue.OnMessage(onReceive);
+            }
         }
 
         public Task<BrokeredMessage> ReceiveAsync()

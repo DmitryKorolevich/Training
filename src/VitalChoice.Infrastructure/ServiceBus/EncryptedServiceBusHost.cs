@@ -40,18 +40,18 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 {
                     var plainFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.PlainConnectionString);
                     return plainFactory.CreateQueueClient(appOptions.Value.ExportService.PlainQueueName, ReceiveMode.PeekLock);
-                });
+                }, ProcessPlainMessage);
                 _encryptedClient = new ServiceBusHostOneToOne(logger, () =>
                 {
                     var encryptedFactory =
                         MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.EncryptedConnectionString);
                     return encryptedFactory.CreateQueueClient(appOptions.Value.ExportService.EncryptedQueueName, ReceiveMode.PeekLock);
-                });
+                }, ProcessEncryptedMessage);
 
-                _plainClient.ReceiveMessagesEvent += messages => messages.ForEach(ProcessPlainMessage);
+                //_plainClient.ReceiveMessagesEvent += messages => messages.ForEach(ProcessPlainMessage);
                 _plainClient.Start();
 
-                _encryptedClient.ReceiveMessagesEvent += messages => messages.ForEach(ProcessEncryptedMessage);
+                //_encryptedClient.ReceiveMessagesEvent += messages => messages.ForEach(ProcessEncryptedMessage);
                 _encryptedClient.Start();
             }
             catch (Exception e)

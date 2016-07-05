@@ -22,8 +22,9 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         protected readonly ILogger Logger;
         protected readonly IServiceBusSender Sender;
         protected readonly IServiceBusReceiver Receiver;
+        private readonly bool _needReveiverThread;
 
-        protected ServiceBusAbstractHost(ILogger logger, IServiceBusSender sender, IServiceBusReceiver receiver)
+        protected ServiceBusAbstractHost(ILogger logger, IServiceBusSender sender, IServiceBusReceiver receiver, bool needReveiverThread)
         {
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
@@ -31,14 +32,18 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             Logger = logger;
             Sender = sender;
             Receiver = receiver;
+            _needReveiverThread = needReveiverThread;
         }
 
         public virtual void Start()
         {
             _sendThread = new Thread(SendMessages);
             _sendThread.Start();
-            _receiveThread = new Thread(ReceiveMessages);
-            _receiveThread.Start();
+            if (_needReveiverThread)
+            {
+                _receiveThread = new Thread(ReceiveMessages);
+                _receiveThread.Start();
+            }
         }
 
         public virtual void Stop()
@@ -64,7 +69,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 {
                     if (EnableBatching)
                     {
-                        var messages = Receiver.ReceiveBatchAsync(BatchSize).GetAwaiter().GetResult();
+                        var messages = Receiver.ReceiveBatch(BatchSize);
                         if (messages != null)
                         {
                             _readyToDisposeReceive.Reset();
@@ -74,7 +79,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                     }
                     else
                     {
-                        var message = Receiver.ReceiveAsync().GetAwaiter().GetResult();
+                        var message = Receiver.Receive();
                         if (message != null)
                         {
                             _readyToDisposeReceive.Reset();

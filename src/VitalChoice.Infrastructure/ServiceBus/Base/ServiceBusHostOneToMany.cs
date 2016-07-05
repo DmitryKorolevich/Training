@@ -11,7 +11,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
     public class ServiceBusHostOneToMany : ServiceBusAbstractHost
     {
         public ServiceBusHostOneToMany(ILogger logger, Func<TopicClient> topicFactory, Func<SubscriptionClient> subscriptionFactory)
-            : base(logger, new ServiceBusTopicSender(topicFactory()), new ServiceBusSubscriptionReceiver(subscriptionFactory()))
+            : base(logger, new ServiceBusTopicSender(topicFactory()), new ServiceBusSubscriptionReceiver(subscriptionFactory()), true)
         {
         }
     }
