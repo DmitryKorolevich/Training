@@ -206,10 +206,15 @@ namespace VitalChoice.Business.Services.Orders
                         await uow.SaveChangesAsync();
                     }
                     paymentCopy.IdOrder = entity.Id;
-                    if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                    Task.Run(async () =>
                     {
-                        Logger.LogError("Cannot update order payment info on remote.");
-                    }
+                        if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
+                        {
+                            Logger.LogError("Cannot update order payment info on remote.");
+                        }
+                    }).ConfigureAwait(false);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                     transaction.Commit();
                 }
                 catch
@@ -262,10 +267,15 @@ namespace VitalChoice.Business.Services.Orders
                         await ChargeGiftCertificates(model, uow);
                     }
                     await uow.SaveChangesAsync();
-                    if ((await Task.WhenAll(paymentRemoteUpdates)).Any(t => !t))
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                    Task.Run(async () =>
                     {
-                        Logger.LogError("Cannot update order payment info on remote.");
-                    }
+                        if ((await Task.WhenAll(paymentRemoteUpdates)).Any(t => !t))
+                        {
+                            Logger.LogError("Cannot update order payment info on remote.");
+                        }
+                    }).ConfigureAwait(false);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                     transaction.Commit();
                 }
                 catch
@@ -320,10 +330,15 @@ namespace VitalChoice.Business.Services.Orders
                         //charge one-time discount, remove old charge if different
                     }
                     paymentCopy.IdOrder = entity.Id;
-                    if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                    Task.Run(async () =>
                     {
-                        Logger.LogError("Cannot update order payment info on remote.");
-                    }
+                        if (!await _encryptedOrderExportService.UpdateOrderPaymentMethodAsync(paymentCopy))
+                        {
+                            Logger.LogError("Cannot update order payment info on remote.");
+                        }
+                    }).ConfigureAwait(false);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                     await uow.SaveChangesAsync();
                     transaction.Commit();
                 }
@@ -393,10 +408,15 @@ namespace VitalChoice.Business.Services.Orders
                         await UpdateHealthwiseOrderWithOrder(model, uow);
                     }
                     await uow.SaveChangesAsync();
-                    if ((await Task.WhenAll(paymentRemoteUpdates)).Any(t => !t))
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                    Task.Run(async () =>
                     {
-                        Logger.LogError("Cannot update order payment info on remote.");
-                    }
+                        if ((await Task.WhenAll(paymentRemoteUpdates)).Any(t => !t))
+                        {
+                            Logger.LogError("Cannot update order payment info on remote.");
+                        }
+                    }).ConfigureAwait(false);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                     transaction.Commit();
                 }
                 catch

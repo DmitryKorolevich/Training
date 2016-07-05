@@ -560,16 +560,16 @@ namespace VitalChoice.Business.Services.Customers
 
             switch (model.StatusCode)
             {
-                case (int)CustomerStatus.Active:
+                case (int) CustomerStatus.Active:
                     appUser.Status = UserStatus.Active;
                     break;
-                case (int)CustomerStatus.PhoneOnly:
+                case (int) CustomerStatus.PhoneOnly:
                     appUser.Status = UserStatus.NotActive;
                     break;
-                case (int)CustomerStatus.Suspended:
+                case (int) CustomerStatus.Suspended:
                     appUser.Status = UserStatus.Disabled;
                     break;
-                case (int)CustomerStatus.Deleted:
+                case (int) CustomerStatus.Deleted:
                     appUser.Status = UserStatus.NotActive;
                     appUser.DeletedDate = DateTime.Now;
                     break;
@@ -592,20 +592,19 @@ namespace VitalChoice.Business.Services.Customers
             appUser.FirstName = profileAddress.Data.FirstName;
             appUser.LastName = profileAddress.Data.LastName;
 
-            Task<bool> updatePaymentsTask;
             Customer entity;
+            var paymentCopies =
+                model.CustomerPaymentMethods.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard)
+                    .Select(method => new
+                    {
+                        method.SafeData.CardNumber,
+                        Model = method
+                    }).ToArray();
             using (var transaction = uow.BeginTransaction())
             {
                 try
                 {
-                    var paymentCopies =
-                        model.CustomerPaymentMethods.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard)
-                            .Select(method => new
-                            {
-                                method.SafeData.CardNumber,
-                                Model = method
-                            }).ToArray();
-                    int[] index = { 0 };
+                    int[] index = {0};
                     await model.CustomerPaymentMethods.ForEachAsync(async method =>
                     {
                         var errors = await _paymentMethodService.AuthorizeCreditCard(method);
@@ -624,19 +623,6 @@ namespace VitalChoice.Business.Services.Customers
 
                     await _storefrontUserService.UpdateAsync(appUser, roles, password);
 
-                    updatePaymentsTask =
-                        _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies.Select(p => new CustomerCardData
-                        {
-                            CardNumber = p.CardNumber,
-                            IdPaymentMethod = p.Model.Id,
-                            IdCustomer = p.Model.IdCustomer
-                        }).ToArray());
-
-                    if (!await updatePaymentsTask)
-                    {
-                        Logger.LogError("Cannot update customer payment info on remote.");
-                    }
-
                     transaction.Commit();
 
                 }
@@ -646,6 +632,20 @@ namespace VitalChoice.Business.Services.Customers
                     throw;
                 }
             }
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            Task.Run(async () =>
+            {
+                if (!await _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies.Select(p => new CustomerCardData
+                {
+                    CardNumber = p.CardNumber,
+                    IdPaymentMethod = p.Model.Id,
+                    IdCustomer = p.Model.IdCustomer
+                }).ToArray()))
+                {
+                    Logger.LogError("Cannot update customer payment info on remote.");
+                }
+            }).ConfigureAwait(false);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             return entity;
         }
 
@@ -716,18 +716,23 @@ namespace VitalChoice.Business.Services.Customers
 
                     model.CustomerPaymentMethods.ForEach(p => p.IdCustomer = entity.Id);
 
-                    updatePaymentsTask =
-                        _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies.Select(p => new CustomerCardData
-                        {
-                            CardNumber = p.CardNumber,
-                            IdPaymentMethod = p.Model.Id,
-                            IdCustomer = p.Model.IdCustomer
-                        }).ToArray());
-
-                    if (!await updatePaymentsTask)
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                    Task.Run(async () =>
                     {
-                        Logger.LogError("Cannot update customer payment info on remote.");
-                    }
+                        updatePaymentsTask =
+                            _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies.Select(p => new CustomerCardData
+                            {
+                                CardNumber = p.CardNumber,
+                                IdPaymentMethod = p.Model.Id,
+                                IdCustomer = p.Model.IdCustomer
+                            }).ToArray());
+
+                        if (!await updatePaymentsTask)
+                        {
+                            Logger.LogError("Cannot update customer payment info on remote.");
+                        }
+                    }).ConfigureAwait(false);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
                     transaction.Commit();
                 }
