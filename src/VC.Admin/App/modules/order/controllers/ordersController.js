@@ -298,7 +298,13 @@
                     var exportItem = {};
                     exportItem.Id = item.Id;
                     exportItem.IsRefund = item.IdObjectType == 6;
-                    exportItem.OrderType = (item.IsSelected && item.OrderStatus == 2 || (item.IsNPSelected && item.NPOrderStatus == 2 && item.IsPSelected && item.POrderStatus == 2))
+                    exportItem.OrderType = (
+                            item.IsSelected && item.OrderStatus == 2
+                            || (
+                                item.IsNPSelected && item.NPOrderStatus == 2
+                                && item.IsPSelected && item.POrderStatus == 2
+                            )
+                        )
                         ? 0
                         : (item.IsPSelected && item.POrderStatus == 2 ? 1 : 2);
 
