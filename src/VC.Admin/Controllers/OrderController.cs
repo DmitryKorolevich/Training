@@ -1437,8 +1437,8 @@ namespace VC.Admin.Controllers
             [FromQuery]int? idstate = null, [FromQuery]int? idservicecode = null, [FromQuery]int? idwarehouse = null,
             [FromQuery]string carrier = null, [FromQuery]int? idshipservice = null)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;
