@@ -84,6 +84,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<SkuAddressReportItem, SkuAddressReportItemCsvMap> _skuAddressReportItemSVExportService;
         private readonly ICsvExportService<MatchbackReportItem, MatchbackReportItemCsvMap> _matchbackReportItemСSVExportService;
         private readonly ICsvExportService<MailingReportItem, MailingReportItemCsvMap> _mailingReportItemСSVExportService;
+        private readonly ICsvExportService<ShippedViaReportRawOrderItem, ShippedViaItemsReportOrderItemCsvMap> _shippedViaItemsReportOrderItemCsvMapСSVExportService;
         private readonly INotificationService _notificationService;
         private readonly BrontoService _brontoService;
         private readonly TimeZoneInfo _pstTimeZoneInfo;
@@ -113,6 +114,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<SkuAddressReportItem, SkuAddressReportItemCsvMap> skuAddressReportItemSVExportService,
             ICsvExportService<MatchbackReportItem, MatchbackReportItemCsvMap> matchbackReportItemСSVExportService,
             ICsvExportService<MailingReportItem, MailingReportItemCsvMap> mailingReportItemСSVExportService,
+            ICsvExportService<ShippedViaReportRawOrderItem, ShippedViaItemsReportOrderItemCsvMap> shippedViaItemsReportOrderItemCsvMapСSVExportService,
             INotificationService notificationService,
             BrontoService brontoService,
             IOrderReportService orderReportService,
@@ -140,6 +142,7 @@ namespace VC.Admin.Controllers
             _skuAddressReportItemSVExportService = skuAddressReportItemSVExportService;
             _matchbackReportItemСSVExportService = matchbackReportItemСSVExportService;
             _mailingReportItemСSVExportService = mailingReportItemСSVExportService;
+            _shippedViaItemsReportOrderItemCsvMapСSVExportService = shippedViaItemsReportOrderItemCsvMapСSVExportService;
             _notificationService = notificationService;
             _brontoService = brontoService;
             _orderReportService = orderReportService;
@@ -1394,6 +1397,60 @@ namespace VC.Admin.Controllers
         {
             var toReturn = await _orderReportService.GetOrderSkuCountReportAsync(filter);
             return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<ShippedViaSummaryReport>> GetShippedViaSummaryReport([FromBody]ShippedViaReportFilter filter)
+        {
+            var toReturn = await _orderReportService.GetShippedViaSummaryReportAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<PagedList<ShippedViaReportRawOrderItem>>> GetShippedViaItemsReportOrderItems([FromBody]ShippedViaReportFilter filter)
+        {
+            var toReturn = await _orderReportService.GetShippedViaItemsReportOrderItemsAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<FileResult> GetShippedViaItemsReportOrderItemsReportFile([FromQuery]string from, [FromQuery]string to,
+            [FromQuery]int? idstate = null, [FromQuery]int? idservicecode = null, [FromQuery]int? idwarehouse = null,
+            [FromQuery]string carrier = null, [FromQuery]int? idshipservice = null)
+        {
+            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+
+            ShippedViaReportFilter filter = new ShippedViaReportFilter()
+            {
+                From = dFrom.Value,
+                To = dTo.Value.AddDays(1),
+                IdState = idstate,
+                IdServiceCode = idservicecode,
+                IdWarehouse = idwarehouse,
+                Carrier = carrier,
+                IdShipService = idshipservice,
+            };
+            filter.Paging = null;
+
+            var data = await _orderReportService.GetShippedViaItemsReportOrderItemsAsync(filter);
+
+            var result = _shippedViaItemsReportOrderItemCsvMapСSVExportService.ExportToCsv(data.Items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.SHIPPED_ORDERS_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
         }
 
         #endregion

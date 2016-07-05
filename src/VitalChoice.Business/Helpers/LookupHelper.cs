@@ -12,6 +12,7 @@ using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Entities.Help;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 
 namespace VitalChoice.Business.Helpers
@@ -642,6 +643,44 @@ namespace VitalChoice.Business.Helpers
                 new LookupItem<int?>() {Key= (int?) null, Text= "All P/NP Orders"},
                 new LookupItem<int?>(){Key = (int?) POrderType.P, Text = "P Only Orders"},
                 new LookupItem<int?>(){Key = (int?) POrderType.NP, Text = "NP Only Orders"},
+            };
+            return toReturn;
+        }
+
+        public static IList<LookupItem<int>> GetShipMethodTypes()
+        {
+            IList<LookupItem<int>> toReturn = new List<LookupItem<int>>
+            {
+                new LookupItem<int>() {Key= (int)ShipMethodType.Standard, Text= "Standard"},
+                new LookupItem<int>(){Key = (int)ShipMethodType.SecondDayAir, Text = "2nd Day Air"},
+                new LookupItem<int>(){Key = (int)ShipMethodType.NextDayAir, Text = "Next Day Air"},
+            };
+            return toReturn;
+        }
+
+        public static IList<LookupItem<string>> GetCarriers()
+        {
+            IList<LookupItem<string>> toReturn = new List<LookupItem<string>>
+            {
+                new LookupItem<string>() {Key= "DHL", Text= "DHL"},
+                new LookupItem<string>() {Key= "FEDEX", Text= "FEDEX"},
+                new LookupItem<string>() {Key= "FEDEX GROUND", Text= "FEDEX GROUND"},
+                new LookupItem<string>() {Key= "Ontrac", Text= "Ontrac"},
+                new LookupItem<string>() {Key= "OTHER", Text= "OTHER"},
+                new LookupItem<string>() {Key= "PUROLATOR", Text= "PUROLATOR"},
+                new LookupItem<string>() {Key= "SKYNET", Text= "SKYNET"},
+                new LookupItem<string>() {Key= "UPS", Text= "UPS"},
+                new LookupItem<string>() {Key= "USPS", Text= "USPS"},
+            };
+            return toReturn;
+        }
+
+        public static IList<LookupItem<int>> GetWarehouses()
+        {
+            IList<LookupItem<int>> toReturn = new List<LookupItem<int>>
+            {
+                new LookupItem<int>() {Key= (int)Warehouse.WA, Text= "Ferndale, WA Warehouse"},
+                new LookupItem<int>(){Key = (int)Warehouse.VA, Text = "Richmond, VA Warehouse"},
             };
             return toReturn;
         }

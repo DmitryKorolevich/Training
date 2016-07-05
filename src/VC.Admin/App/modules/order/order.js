@@ -24,6 +24,8 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.skuAddressReportController',
 	'app.modules.order.controllers.matchbackReportController',
 	'app.modules.order.controllers.orderSkuCountReportController',
+	'app.modules.order.controllers.shippedViaSummaryReportController',
+	'app.modules.order.controllers.shippedViaDetailsReportController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -129,6 +131,16 @@ angular.module('app.modules.order', [
 				    url: '/report/sku-count',
 				    templateUrl: 'app/modules/order/partials/orderSkuCountReport.html',
 				    controller: 'orderSkuCountReportController'
+				})
+				.state('index.oneCol.shippedViaSummaryReport', {
+				    url: '/report/shipped-via-summary',
+				    templateUrl: 'app/modules/order/partials/shippedViaSummaryReport.html',
+				    controller: 'shippedViaSummaryReportController'
+				})
+				.state('index.oneCol.shippedViaDetailsReport', {
+				    url: '/report/shipped-via-details?{from:string}{to:string}{idstate:int}{idservicecode:int}{warehouse:int}{shipmethodtype:int}{carrier:string}',
+				    templateUrl: 'app/modules/order/partials/shippedViaDetailsReport.html',
+				    controller: 'shippedViaDetailsReportController'
 				});
 		}
 ]);

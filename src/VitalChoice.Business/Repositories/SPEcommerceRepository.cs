@@ -324,5 +324,27 @@ namespace VitalChoice.Business.Repositories
                 filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
             return toReturn;
         }
+
+        public async Task<ICollection<ShippedViaSummaryReportRawItem>> GetShippedViaSummaryReportRawItemsAsync(ShippedViaReportFilter filter)
+        {
+            var toReturn = await _context.Set<ShippedViaSummaryReportRawItem>().FromSql
+                ("[dbo].[SPGetShippedViaSummaryReport] @from={0}, @to={1}," +
+                " @idstate={2}, @idservicecode={3}",
+                filter.From, filter.To,
+                filter.IdState, filter.IdServiceCode).ToListAsync();
+            return toReturn;
+        }
+
+        public async Task<ICollection<ShippedViaReportRawOrderItem>> GetShippedViaItemsReportRawOrderItemsAsync(ShippedViaReportFilter filter)
+        {
+            var toReturn = await _context.Set<ShippedViaReportRawOrderItem>().FromSql
+                ("[dbo].[SPGetShippedViaItemsReport] @from={0}, @to={1}," +
+                " @idstate={2}, @idservicecode={3}, @idwarehouse={4}, @carrier={5}, @idshipservice={6}," +
+                " @pageindex={7}, @pagesize={8}",
+                filter.From, filter.To,
+                filter.IdState, filter.IdServiceCode, filter.IdWarehouse, filter.Carrier, filter.IdShipService,
+                filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
+            return toReturn;
+        }
     }
 }

@@ -47,20 +47,21 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         $scope.legend = {};
 
         $scope.mainTab = {
-            active: true,
+            index: 1,
             formNames: ['topForm', 'mainForm', 'mainForm2', ],
             name: $scope.id ? 'Refund Order' : 'New Refund Order',
         };
         $scope.shippingAddressTab = {
-            active: false,
+            index: 2,
             formName: 'shipping',
             ShippingEditModels: {}
         };
         $scope.paymentInfoTab = {
-            active: false,
+            index: 3,
             formNames: ['oac'],
             AddressEditModels: {}
         };
+        $scope.options.activeTabIndex = $scope.mainTab.index;
         var tabs = [];
         tabs.push($scope.mainTab);
         tabs.push($scope.shippingAddressTab);
