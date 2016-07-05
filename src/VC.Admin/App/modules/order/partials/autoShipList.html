@@ -58,10 +58,10 @@
 						<button title="Edit Billing" class="btn btn-default btn-primary btn-xs" data-ng-click="editBilling(item.Id)">
 							Edit Billing Details
 						</button>
-		                <button title="Pause" data-ng-if="item.Active" class="btn btn-default btn-info btn-xs" data-ng-click="activatePause(item.Id)">
+		                <button title="Pause" data-ng-if="item.Active" class="btn btn-default btn-info btn-xs" data-ng-click="activatePause(item.Id, false)">
 			                Pause
 		                </button>
-		                <button title="Pause" data-ng-if="!item.Active" class="btn btn-default btn-success btn-xs" data-ng-click="activatePause(item.Id)">
+		                <button title="Pause" data-ng-if="!item.Active" class="btn btn-default btn-success btn-xs" data-ng-click="activatePause(item.Id, true)">
 			                Start
 		                </button>
 		                <button title="Delete" class="btn btn-default btn-danger btn-xs" data-ng-click="delete(item.Id)">
