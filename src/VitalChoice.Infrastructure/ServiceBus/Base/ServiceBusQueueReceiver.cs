@@ -15,7 +15,10 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             _queue = queue;
             if (onReceive != null)
             {
-                _queue.OnMessage(onReceive);
+                _queue.OnMessage(onReceive, new OnMessageOptions()
+                {
+                    MaxConcurrentCalls = 4
+                });
             }
         }
 

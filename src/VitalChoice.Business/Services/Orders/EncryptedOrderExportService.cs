@@ -57,6 +57,20 @@ namespace VitalChoice.Business.Services.Orders
                     },
                     (command, o) =>
                     {
+                        if (!string.IsNullOrEmpty(o.Error))
+                        {
+                            lock (sentItems)
+                            {
+                                sentItems.Clear();
+                                results.Add(new OrderExportItemResult
+                                {
+                                    Error = o.Error,
+                                    Success = false
+                                });
+                                doneAllEvent.Set();
+                                throw new ApiException("Export error");
+                            }
+                        }
                         var exportResult = (OrderExportItemResult) o.Data;
                         lock (sentItems)
                         {
