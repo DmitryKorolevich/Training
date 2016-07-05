@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -8,6 +9,8 @@ using Microsoft.Extensions.Options;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Helpers.Async;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Options;
@@ -43,8 +46,9 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<List<OrderExportItemResult>> ExportOrdersAsync(OrderExportData exportData)
         {
-            Dictionary<int, ManualResetEvent> awaitItems = exportData.ExportInfo.ToDictionary(o => o.Id, o => new ManualResetEvent(false));
-            List<OrderExportItemResult> results = new List<OrderExportItemResult>();
+            var sentItems = new HashSet<int>(exportData.ExportInfo.Select(o => o.Id));
+            var results = new List<OrderExportItemResult>();
+            var doneAllEvent = new AsyncManualResetEvent(false);
             await
                 SendCommand(
                     new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName)
@@ -54,10 +58,20 @@ namespace VitalChoice.Business.Services.Orders
                     (command, o) =>
                     {
                         var exportResult = (OrderExportItemResult) o;
-                        results.Add(exportResult);
-                        awaitItems[exportResult.Id].Set();
+                        lock (sentItems)
+                        {
+                            results.Add(exportResult);
+                            sentItems.Remove(exportResult.Id);
+                            if (sentItems.Count == 0)
+                            {
+                                doneAllEvent.Set();
+                            }
+                        }
                     });
-            WaitHandle.WaitAll(awaitItems.Values.Cast<WaitHandle>().ToArray());
+            if (!await doneAllEvent.WaitAsync(TimeSpan.FromMinutes(20)))
+            {
+                throw new ApiException("Export timeout");
+            }
             return results;
         }
 
