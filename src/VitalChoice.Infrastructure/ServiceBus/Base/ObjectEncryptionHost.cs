@@ -343,9 +343,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             lock (_sessions)
             {
                 if (_sessions.ContainsKey(session))
-                    _sessions[session] = encryption;
-                else
-                    _sessions.Add(session, encryption);
+                    return false;
+                _sessions.Add(session, encryption);
             }
             return true;
         }

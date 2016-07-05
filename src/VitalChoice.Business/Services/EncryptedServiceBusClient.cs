@@ -60,6 +60,7 @@ namespace VitalChoice.Business.Services
                         sessionId = SessionId;
                         if (!await _encryptedBusHost.AuthenticateClient(sessionId))
                         {
+                            SetInvalid(sessionId);
                             return false;
                         }
                     }
@@ -70,6 +71,7 @@ namespace VitalChoice.Business.Services
                     sessionId = SessionId;
                     if (!await _encryptedBusHost.AuthenticateClient(sessionId))
                     {
+                        SetInvalid(sessionId);
                         return false;
                     }
                 }
