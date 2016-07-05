@@ -68,7 +68,6 @@ namespace VitalChoice.Business.Services.Orders
                                     Success = false
                                 });
                                 doneAllEvent.Set();
-                                throw new ApiException("Export error");
                             }
                         }
                         var exportResult = (OrderExportItemResult) o.Data;
