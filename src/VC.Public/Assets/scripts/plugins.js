@@ -484,6 +484,10 @@ $(function () {
 	        });
 	        Cookies.set("bronto-signup", "hidden", { expires: 1 });
 	    });
+
+	    $("body").on("dblclick", "input[type=submit], input[type=button], button, a", function (e) {
+	        e.preventDefault();
+	    });
 	};
 });
 
