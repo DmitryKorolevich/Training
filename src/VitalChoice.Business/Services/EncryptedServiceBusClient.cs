@@ -37,6 +37,16 @@ namespace VitalChoice.Business.Services
 
         protected async Task<T> SendCommand<T>(ServiceBusCommandWithResult command)
         {
+            if (!await EnsureAuthenticated())
+            {
+                return default(T);
+            }
+
+            return await _encryptedBusHost.ExecuteCommand<T>(command);
+        }
+
+        private async Task<bool> EnsureAuthenticated()
+        {
             if (!IsAuthenticated)
             {
                 //double auth try to refresh broken/regenerated public key
@@ -44,33 +54,26 @@ namespace VitalChoice.Business.Services
                 {
                     if (!await _encryptedBusHost.AuthenticateClient(SessionId))
                     {
-                        return default(T);
+                        return false;
                     }
                 }
                 catch (ApiException)
                 {
                     if (!await _encryptedBusHost.AuthenticateClient(SessionId))
                     {
-                        return default(T);
+                        return false;
                     }
                 }
             }
-
-            return await _encryptedBusHost.ExecuteCommand<T>(command);
+            return true;
         }
 
-        protected async Task SendCommand(ServiceBusCommandBase command, Action<ServiceBusCommandBase, ServiceBusCommandData> requestAcqureAction)
+        protected async Task SendCommand(ServiceBusCommandBase command,
+            Action<ServiceBusCommandBase, ServiceBusCommandData> requestAcqureAction)
         {
-            if (!IsAuthenticated)
+            if (!await EnsureAuthenticated())
             {
-                //double auth try to refresh broken/regenerated public key
-                if (!await _encryptedBusHost.AuthenticateClient(SessionId))
-                {
-                    if (!await _encryptedBusHost.AuthenticateClient(SessionId))
-                    {
-                        return;
-                    }
-                }
+                throw new ApiException("Cannot authenticate export client");
             }
 
             _encryptedBusHost.ExecuteCommand(command, requestAcqureAction);
