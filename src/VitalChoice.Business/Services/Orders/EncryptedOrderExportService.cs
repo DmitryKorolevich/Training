@@ -57,9 +57,9 @@ namespace VitalChoice.Business.Services.Orders
                     },
                     (command, o) =>
                     {
-                        if (!string.IsNullOrEmpty(o.Error))
+                        lock (sentItems)
                         {
-                            lock (sentItems)
+                            if (!string.IsNullOrEmpty(o.Error))
                             {
                                 sentItems.Clear();
                                 results.Add(new OrderExportItemResult
@@ -69,10 +69,12 @@ namespace VitalChoice.Business.Services.Orders
                                 });
                                 doneAllEvent.Set();
                             }
-                        }
-                        var exportResult = (OrderExportItemResult) o.Data;
-                        lock (sentItems)
-                        {
+                            if (sentItems.Count == 0)
+                            {
+                                return;
+                            }
+
+                            var exportResult = (OrderExportItemResult) o.Data;
                             results.Add(exportResult);
                             sentItems.Remove(exportResult.Id);
                             if (sentItems.Count == 0)
@@ -81,7 +83,7 @@ namespace VitalChoice.Business.Services.Orders
                             }
                         }
                     });
-            if (!await doneAllEvent.WaitAsync(TimeSpan.FromMinutes(20)))
+            if (!await doneAllEvent.WaitAsync(TimeSpan.FromMinutes(2)))
             {
                 throw new ApiException("Export timeout");
             }
