@@ -30,7 +30,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             IHostingEnvironment env)
         {
             ServerHostName = appOptions.Value.ExportService.ServerHostName;
-            LocalHostName = env.ApplicationName;
+            LocalHostName = env.ApplicationName + Guid.NewGuid().ToString("N");
             EncryptionHost = encryptionHost;
             Logger = logger;
             _commands = new ConcurrentDictionary<CommandItem, WeakReference<ServiceBusCommandBase>>();
