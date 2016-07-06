@@ -94,10 +94,10 @@ namespace VitalChoice.Business.Queries.Products
             {
                 Add(x => x.Product.Name.StartsWith(name) || name.StartsWith(x.Product.Name));
                 //Add(x => x.Product.WhenValues(new {SubTitle = name}, ValuesFilterType.And, CompareBehaviour.Equals));
-                if (qty.HasValue)
-                {
-                    Add(x => x.WhenValues(new {QTY = qty.Value}, ValuesFilterType.And, CompareBehaviour.Equals));
-                }
+                //if (qty.HasValue)
+                //{
+                //    Add(x => x.WhenValues(new {QTY = qty.Value}, ValuesFilterType.And, CompareBehaviour.Equals));
+                //}
             }
             return this;
         }
@@ -176,10 +176,10 @@ namespace VitalChoice.Business.Queries.Products
                 if (!string.IsNullOrEmpty(subTitle))
                 {
                     Add(x => x.Product.Name.StartsWith(subTitle) || subTitle.StartsWith(x.Product.Name));
-                    if (qty.HasValue)
-                    {
-                        Add(x => x.WhenValues(new {QTY = qty.Value}, ValuesFilterType.And, CompareBehaviour.StartsWith));
-                    }
+                    //if (qty.HasValue)
+                    //{
+                    //    Add(x => x.WhenValues(new {QTY = qty.Value}, ValuesFilterType.And, CompareBehaviour.StartsWith));
+                    //}
                 }
             }
             return this;

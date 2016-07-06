@@ -77,7 +77,8 @@ namespace VitalChoice.Business.Queries.Orders
         {
             if (idOrderSource.HasValue)
             {
-                Add(x => x.SIdOrderSource == idOrderSource.Value.ToString());
+                var sourceString = idOrderSource.Value.ToString();
+                Add(x => x.SIdOrderSource == sourceString);
             }
             return this;
         }
@@ -86,7 +87,8 @@ namespace VitalChoice.Business.Queries.Orders
         {
             if (pOrderType.HasValue)
             {
-                Add(x => x.SPOrderType == pOrderType.Value.ToString());
+                var porderString = pOrderType.Value.ToString();
+                Add(x => x.SPOrderType == porderString);
             }
             return this;
         }

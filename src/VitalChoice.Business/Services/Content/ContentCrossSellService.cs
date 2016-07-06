@@ -44,8 +44,8 @@ namespace VitalChoice.Business.Services.Content
 	    }
 
 	    public async Task<IList<ContentCrossSell>> GetContentCrossSellsAsync(ContentCrossSellType type)
-		{
-			var crossLines = await _repository.Query(x => x.Type == type).SelectAsync();
+	    {
+	        var crossLines = await _repository.Query(x => x.Type == type).SelectAsync(false);
 
 			return crossLines.OrderBy(x=>x.Order).ToList();
 		}
@@ -59,13 +59,13 @@ namespace VitalChoice.Business.Services.Content
 
 			var ids = contentCrossSells.Select(x => x.IdSku).Distinct().ToList();
 
-			var notValidSku = await _skuRepositoryAsync.Query()
-				.Include(x => x.Product)
-				.Where(
-					x => ids.Contains(x.Id) &&
-						(x.Hidden || x.StatusCode != (int) RecordStatusCode.Active || !x.Product.IdVisibility.HasValue ||
-						x.Product.StatusCode != (int) RecordStatusCode.Active))
-				.SelectFirstOrDefaultAsync();
+		    var notValidSku = await _skuRepositoryAsync.Query()
+		        .Include(x => x.Product)
+		        .Where(
+		            x => ids.Contains(x.Id) &&
+		                 (x.Hidden || x.StatusCode != (int) RecordStatusCode.Active || x.Product.IdVisibility == null ||
+		                  x.Product.StatusCode != (int) RecordStatusCode.Active))
+		        .SelectFirstOrDefaultAsync(false);
 			if (notValidSku != null)
 			{
 				throw new AppValidationException($"Only active and not hidden SKUs are available. Replace {notValidSku.Code} with active and not hidden SKU");

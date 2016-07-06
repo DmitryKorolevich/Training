@@ -63,7 +63,7 @@ namespace VitalChoice.Business.Queries.Products
             if (validFrom.HasValue)
             {
                 var from = validFrom;
-                Add(x => !x.StartDate.HasValue || x.StartDate.Value >= from);
+                Add(x => x.StartDate == null || x.StartDate.Value >= from);
             }
             return this;
         }
@@ -73,7 +73,7 @@ namespace VitalChoice.Business.Queries.Products
             if (validTo.HasValue)
             {
                 var to = validTo;
-                Add(x => !x.ExpirationDate.HasValue || x.ExpirationDate.Value <= to);
+                Add(x => x.ExpirationDate == null || x.ExpirationDate.Value <= to);
             }
             return this;
         }
@@ -119,7 +119,7 @@ namespace VitalChoice.Business.Queries.Products
 
         public PromotionQuery AllowCustomerType(CustomerType customerType)
         {
-            Add(p => p.Assigned == null || p.Assigned == customerType);
+            Add(p => p.Assigned == null || p.Assigned.Value == customerType);
             return this;
         }
     }

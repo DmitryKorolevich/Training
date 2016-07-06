@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using VC.Admin.Models.Customer;
 using VC.Admin.Models.Setting;
-using VitalChoice.Business.Queries.User;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Infrastructure.Helpers;

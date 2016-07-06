@@ -36,7 +36,7 @@ namespace VitalChoice.Business.Queries.Payment
 
 		public PaymentMethodQuery CreditCard()
 		{
-			Add(x => x.Name.Equals("Credit Card", StringComparison.OrdinalIgnoreCase));
+		    Add(x => x.Name == "Credit Card");
 
 			return this;
 		}

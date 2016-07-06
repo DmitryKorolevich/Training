@@ -13,7 +13,7 @@ namespace VitalChoice.Business.Queries.Healthwise
         {
             if (notBilled && ordersCount.HasValue)
             {
-                Add(x => !x.PaidDate.HasValue && x.OrdersCount>= ordersCount.Value);
+                Add(x => x.PaidDate == null && x.OrdersCount >= ordersCount.Value);
             }
             return this;
         }
@@ -49,7 +49,7 @@ namespace VitalChoice.Business.Queries.Healthwise
         {
             if (notPaid)
             {
-                Add(x => !x.PaidDate.HasValue);
+                Add(x => x.PaidDate == null);
             }
             return this;
         }

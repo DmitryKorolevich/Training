@@ -10,7 +10,7 @@ namespace VitalChoice.Business.Queries.Content
     {
         public ArticleQuery WithId(int id)
         {
-            And(x => x.Id.Equals(id));
+            And(x => x.Id == id);
             return this;
         }
 
@@ -32,7 +32,7 @@ namespace VitalChoice.Business.Queries.Content
 
         public ArticleQuery WithCategoryId(int id)
         {
-            Add(x => x.ArticlesToContentCategories.Select(p => p.ContentCategoryId).Any(p=>p==id));
+            Add(x => x.ArticlesToContentCategories.Any(p => p.ContentCategoryId == id));
             return this;
         }
 

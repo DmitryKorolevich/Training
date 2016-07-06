@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using VitalChoice.Data.Helpers;
 using VitalChoice.DynamicData.Base;
@@ -51,7 +52,8 @@ namespace VitalChoice.Business.Queries.Customers
         {
             if (status.HasValue)
             {
-                Add(x => x.StatusCode == (int)status.Value);
+                var statusInt = (int) status.Value;
+                Add(x => x.StatusCode == statusInt);
             }
 
             return this;
@@ -61,7 +63,8 @@ namespace VitalChoice.Business.Queries.Customers
         {
             if (type.HasValue)
             {
-                Add(x => x.IdObjectType == (int)type.Value);
+                var typeInt = (int) type.Value;
+                Add(x => x.IdObjectType == typeInt);
             }
 
             return this;

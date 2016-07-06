@@ -8,7 +8,7 @@ namespace VitalChoice.Business.Queries.Products
     {
         public ProductReviewQuery WithId(int id)
         {
-            Add(x => x.Id.Equals(id));
+            Add(x => x.Id == id);
             return this;
         }
 

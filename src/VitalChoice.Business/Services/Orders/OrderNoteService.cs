@@ -4,7 +4,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Queries.Orders;
-using VitalChoice.Business.Queries.User;
 using VitalChoice.Business.Queries.Users;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;

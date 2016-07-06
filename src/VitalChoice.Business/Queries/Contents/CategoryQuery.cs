@@ -48,7 +48,7 @@ namespace VitalChoice.Business.Queries.Content
         {
             if (status == RecordStatusCode.Active || status == RecordStatusCode.NotActive)
             {
-                Add(x => x.StatusCode ==status);
+                Add(x => x.StatusCode == status.Value);
             }
 
             return this;
@@ -56,7 +56,7 @@ namespace VitalChoice.Business.Queries.Content
 
         public CategoryQuery RootCategory()
         {
-            Add(x => !x.ParentId.HasValue);
+            Add(x => x.ParentId == null);
 
             return this;
         }

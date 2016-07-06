@@ -46,10 +46,7 @@ namespace VitalChoice.Business.Queries.Content
         {
             if (ids.Count > 0)
             {
-                foreach (var id in ids)
-                {
-                    And(x => !ids.Contains(x.Id));
-                }
+                And(x => !ids.Contains(x.Id));
             }
             return this;
         }
