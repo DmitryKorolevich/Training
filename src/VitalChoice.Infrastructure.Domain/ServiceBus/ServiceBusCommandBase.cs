@@ -26,7 +26,18 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
             TimeToLeave = remoteCommand.TimeToLeave;
             Destination = remoteCommand.Source;
             Source = remoteCommand.Destination;
-            Data = data;
+            Data = new ServiceBusCommandData(data);
+        }
+
+        public ServiceBusCommandBase(ServiceBusCommandBase remoteCommand, string error)
+        {
+            CommandName = remoteCommand.CommandName;
+            SessionId = remoteCommand.SessionId;
+            CommandId = remoteCommand.CommandId;
+            TimeToLeave = remoteCommand.TimeToLeave;
+            Destination = remoteCommand.Source;
+            Source = remoteCommand.Destination;
+            Data = new ServiceBusCommandData(error);
         }
 
         [DataMember]
@@ -48,9 +59,9 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
         public string Source { get; set; }
 
         [DataMember]
-        public object Data { get; set; }
+        public ServiceBusCommandData Data { get; set; }
 
-        public Action<ServiceBusCommandBase, object> RequestAcqureAction { get; set; }
+        public Action<ServiceBusCommandBase, ServiceBusCommandData> RequestAcqureAction { get; set; }
         public CommandCompleteEventHandler OnComplete;
 
         protected virtual void Dispose(bool disposing)

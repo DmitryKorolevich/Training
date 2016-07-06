@@ -1,13 +1,9 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using VitalChoice.Ecommerce.Domain.Exceptions;
-using VitalChoice.Infrastructure.Domain.Options;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
-using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services
@@ -19,7 +15,12 @@ namespace VitalChoice.Business.Services
         private static int _currentSession;
 
         private readonly IEncryptedServiceBusHostClient _encryptedBusHost;
-        private bool IsAuthenticated =>_encryptedBusHost.IsAuthenticatedClient(SessionId);
+        private readonly IObjectEncryptionHost _encryptionHost;
+        private bool _authenticated;
+        protected readonly ILogger Logger;
+
+        public Guid SessionId => _session.SessionId;
+
         public string ServerHostName => _encryptedBusHost.ServerHostName;
         public string LocalHostName => _encryptedBusHost.LocalHostName;
 
@@ -27,43 +28,64 @@ namespace VitalChoice.Business.Services
 
         protected virtual int ExpireTimeMinutes => 60;
 
-        protected EncryptedServiceBusClient(IEncryptedServiceBusHostClient encryptedBusHost)
+        protected EncryptedServiceBusClient(IEncryptedServiceBusHostClient encryptedBusHost, IObjectEncryptionHost encryptionHost, ILogger logger)
         {
             _encryptedBusHost = encryptedBusHost;
-            SessionId = GetSession();
+            _encryptionHost = encryptionHost;
+            Logger = logger;
+            _session = GetSession();
         }
 
-        public Guid SessionId { get; }
+        private SessionInfo _session;
 
         protected async Task<T> SendCommand<T>(ServiceBusCommandWithResult command)
         {
-            if (!IsAuthenticated)
+            if (!await EnsureAuthenticated())
             {
-                //double auth try to refresh broken/regenerated public key
-                if (!await _encryptedBusHost.AuthenticateClient(SessionId))
-                {
-                    if (!await _encryptedBusHost.AuthenticateClient(SessionId))
-                    {
-                        return default(T);
-                    }
-                }
+                throw new Exception("Cannot authenticate export client");
             }
 
             return await _encryptedBusHost.ExecuteCommand<T>(command);
         }
 
-        protected async Task SendCommand(ServiceBusCommandBase command, Action<ServiceBusCommandBase, object> requestAcqureAction)
+        private async Task<bool> EnsureAuthenticated()
         {
-            if (!IsAuthenticated)
+            if (!_authenticated)
             {
-                //double auth try to refresh broken/regenerated public key
-                if (!await _encryptedBusHost.AuthenticateClient(SessionId))
+                var sessionId = _session.SessionId;
+                while (!_encryptionHost.SessionExist(sessionId))
                 {
-                    if (!await _encryptedBusHost.AuthenticateClient(SessionId))
+                    SetInvalid(sessionId);
+                    sessionId = _session.SessionId;
+                }
+                //double auth try to refresh broken/regenerated public key
+                if (!await _encryptedBusHost.AuthenticateClient(sessionId))
+                {
+                    Logger.LogWarning("Authentication failed, retrying");
+                    SetInvalid(sessionId);
+                    sessionId = _session.SessionId;
+                    if (!await _encryptedBusHost.AuthenticateClient(sessionId))
                     {
-                        return;
+                        Logger.LogError("Authentication failed");
+                        SetInvalid(sessionId);
+                        return false;
                     }
                 }
+                _authenticated = true;
+            }
+            return true;
+        }
+
+        protected async Task SendCommand(ServiceBusCommandBase command,
+            Action<ServiceBusCommandBase, ServiceBusCommandData> requestAcqureAction)
+        {
+            if (!await EnsureAuthenticated())
+            {
+                requestAcqureAction?.Invoke(command, new ServiceBusCommandData
+                {
+                    Error = "Cannot authenticate export client"
+                });
+                return;
             }
 
             _encryptedBusHost.ExecuteCommand(command, requestAcqureAction);
@@ -75,10 +97,9 @@ namespace VitalChoice.Business.Services
             {
                 GC.SuppressFinalize(this);
             }
-            _encryptedBusHost.RemoveClient(SessionId);
         }
 
-        private Guid GetSession()
+        private SessionInfo GetSession()
         {
             lock (SessionPool)
             {
@@ -87,28 +108,73 @@ namespace VitalChoice.Business.Services
                     _currentSession = 0;
                     if (SessionPool.Count < MaxSessions)
                     {
-                        SessionPool.Add(new SessionInfo
+                        var newInfo = new SessionInfo
                         {
                             SessionId = Guid.NewGuid(),
                             CreationTime = DateTime.Now
-                        });
+                        };
+                        CreateAndRegisterSession(newInfo);
+                        SessionPool.Add(newInfo);
                     }
                 }
                 var sessionInfo = SessionPool[_currentSession];
                 if ((DateTime.Now - sessionInfo.CreationTime).TotalMinutes > ExpireTimeMinutes)
                 {
-                    SessionPool[_currentSession] = new SessionInfo
+                    sessionInfo = new SessionInfo
                     {
                         SessionId = Guid.NewGuid(),
                         CreationTime = DateTime.Now
                     };
+                    CreateAndRegisterSession(sessionInfo);
+                    SessionPool[_currentSession] = sessionInfo;
                 }
                 _currentSession++;
-                return sessionInfo.SessionId;
+                return sessionInfo;
             }
         }
 
-        private struct SessionInfo
+        private void CreateAndRegisterSession(SessionInfo sessionInfo)
+        {
+            var keys = _encryptionHost.CreateSession(sessionInfo.SessionId);
+            _encryptionHost.RegisterSession(sessionInfo.SessionId, keys);
+        }
+
+        private void SetInvalid(Guid session)
+        {
+            lock (SessionPool)
+            {
+                if (SessionPool[_currentSession].SessionId == session)
+                {
+                    var sessionInfo = new SessionInfo
+                    {
+                        SessionId = Guid.NewGuid(),
+                        CreationTime = DateTime.Now
+                    };
+                    CreateAndRegisterSession(sessionInfo);
+                    SessionPool[_currentSession] = sessionInfo;
+                    _session = sessionInfo;
+                    return;
+                }
+                for (var i = 0; i < SessionPool.Count; i++)
+                {
+                    if (SessionPool[i].SessionId == session)
+                    {
+                        var sessionInfo = new SessionInfo
+                        {
+                            SessionId = Guid.NewGuid(),
+                            CreationTime = DateTime.Now
+                        };
+                        CreateAndRegisterSession(sessionInfo);
+                        SessionPool[i] = sessionInfo;
+                        _session = sessionInfo;
+                        return;
+                    }
+                }
+                _session = GetSession();
+            }
+        }
+
+        private class SessionInfo
         {
             public Guid SessionId { get; set; }
 

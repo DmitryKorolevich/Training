@@ -621,6 +621,16 @@ namespace VitalChoice.Business.Services.Customers
 
                     var roles = MapCustomerTypeToRole(model);
 
+                    if (!await _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies.Select(p => new CustomerCardData
+                    {
+                        CardNumber = p.CardNumber,
+                        IdPaymentMethod = p.Model.Id,
+                        IdCustomer = p.Model.IdCustomer
+                    }).ToArray()))
+                    {
+                        Logger.LogError("Cannot update customer payment info on remote.");
+                    }
+
                     await _storefrontUserService.UpdateAsync(appUser, roles, password);
 
                     transaction.Commit();
@@ -632,20 +642,6 @@ namespace VitalChoice.Business.Services.Customers
                     throw;
                 }
             }
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-            Task.Run(async () =>
-            {
-                if (!await _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies.Select(p => new CustomerCardData
-                {
-                    CardNumber = p.CardNumber,
-                    IdPaymentMethod = p.Model.Id,
-                    IdCustomer = p.Model.IdCustomer
-                }).ToArray()))
-                {
-                    Logger.LogError("Cannot update customer payment info on remote.");
-                }
-            }).ConfigureAwait(false);
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             return entity;
         }
 
@@ -716,23 +712,18 @@ namespace VitalChoice.Business.Services.Customers
 
                     model.CustomerPaymentMethods.ForEach(p => p.IdCustomer = entity.Id);
 
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                    Task.Run(async () =>
-                    {
-                        updatePaymentsTask =
-                            _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies.Select(p => new CustomerCardData
-                            {
-                                CardNumber = p.CardNumber,
-                                IdPaymentMethod = p.Model.Id,
-                                IdCustomer = p.Model.IdCustomer
-                            }).ToArray());
-
-                        if (!await updatePaymentsTask)
+                    updatePaymentsTask =
+                        _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies.Select(p => new CustomerCardData
                         {
-                            Logger.LogError("Cannot update customer payment info on remote.");
-                        }
-                    }).ConfigureAwait(false);
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                            CardNumber = p.CardNumber,
+                            IdPaymentMethod = p.Model.Id,
+                            IdCustomer = p.Model.IdCustomer
+                        }).ToArray());
+
+                    if (!await updatePaymentsTask)
+                    {
+                        throw new ApiException("Cannot update customer payment info on remote.");
+                    }
 
                     transaction.Commit();
                 }

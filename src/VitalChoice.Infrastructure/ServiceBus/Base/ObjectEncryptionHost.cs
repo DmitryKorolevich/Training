@@ -320,9 +320,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             lock (_sessions)
             {
                 if (_sessions.ContainsKey(session))
-                    _sessions[session] = encryption;
-                else
-                    _sessions.Add(session, encryption);
+                    return false;
+                _sessions.Add(session, encryption);
             }
             return true;
         }
@@ -344,9 +343,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             lock (_sessions)
             {
                 if (_sessions.ContainsKey(session))
-                    _sessions[session] = encryption;
-                else
-                    _sessions.Add(session, encryption);
+                    return false;
+                _sessions.Add(session, encryption);
             }
             return true;
         }
@@ -367,6 +365,19 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 aes.GenerateIV();
                 aes.Padding = PaddingMode.PKCS7;
                 return new KeyExchange(aes.Key, aes.IV);
+            }
+        }
+
+        public KeyExchange GetSession(Guid session)
+        {
+            lock (_sessions)
+            {
+                SessionInfo sessionInfo;
+                if (_sessions.TryGetValue(session, out sessionInfo))
+                {
+                    return new KeyExchange(sessionInfo.Aes.Key, sessionInfo.Aes.IV);
+                }
+                return null;
             }
         }
 

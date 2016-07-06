@@ -521,9 +521,10 @@ namespace VC.Admin.Controllers
             var addressId = order.PaymentMethod.Address.Id;
             await _orderPaymentMethodMapper.UpdateObjectAsync(model, order.PaymentMethod,
                                (int)PaymentMethodType.CreditCard);
-            await _addressMapper.UpdateObjectAsync(model, order.PaymentMethod.Address, (int)AddressType.Billing);
-
+            await _addressMapper.UpdateObjectAsync(model, order.PaymentMethod.Address, (int)AddressType.Billing, false);
+             
             order.PaymentMethod.Address.Id = addressId;
+            order.PaymentMethod.Address.IdObjectType = (int)AddressType.Billing;
 
             order = await _orderService.UpdateAsync(order);
             var orderCreditCard = await _addressMapper.ToModelAsync<CreditCardModel>(order.PaymentMethod.Address);
@@ -534,9 +535,9 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
-        public async Task<Result<bool>> ActivatePauseAutoShip([FromQuery]int customerId, [FromQuery]int id)
+        public async Task<Result<bool>> ActivatePauseAutoShip([FromQuery]int customerId, [FromQuery]int id, [FromQuery]bool activate)
         {
-            await _orderService.ActivatePauseAutoShipAsync(customerId, id);
+            await _orderService.ActivatePauseAutoShipAsync(customerId, id, activate);
 
             return true;
         }

@@ -51,7 +51,7 @@ namespace VitalChoice.Business.Services.Cache
                             EnablePartitioning = true,
                             EnableBatchedOperations = true,
                             DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
-                            RequiresDuplicateDetection = false
+                            RequiresDuplicateDetection = false                            
                         };
 
                         ns.CreateTopic(topic);
@@ -62,7 +62,11 @@ namespace VitalChoice.Business.Services.Cache
                         {
                             EnableBatchedOperations = true,
                             DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
-                            RequiresSession = false
+                            RequiresSession = false,
+                            EnableDeadLetteringOnFilterEvaluationExceptions = false,
+                            EnableDeadLetteringOnMessageExpiration = false,
+                            AutoDeleteOnIdle = TimeSpan.FromMinutes(20),
+                            MaxDeliveryCount = 1
                         };
                         ns.CreateSubscription(subscription);
                     }

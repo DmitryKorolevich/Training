@@ -17,6 +17,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.ServiceBus.Base;
+using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.ObjectMapping.Base;
 
@@ -33,6 +34,7 @@ namespace VitalChoice.ExportService.Services
         private readonly IOrderService _orderService;
         private readonly ExportInfoContext _infoContext;
         private readonly IOrderRefundService _refundService;
+        private readonly ICustomerService _customerService;
         private static volatile bool _writeQueue;
         private static readonly AsyncManualResetEvent LockCustomersEvent = new AsyncManualResetEvent(true);
         private static readonly AsyncManualResetEvent LockOrdersEvent = new AsyncManualResetEvent(true);
@@ -41,7 +43,7 @@ namespace VitalChoice.ExportService.Services
         public OrderExportService(IOptions<ExportOptions> options, IObjectEncryptionHost encryptionHost,
             DbContextOptions<ExportInfoContext> contextOptions, ILoggerFactory loggerFactory,
             IVeraCoreExportService veraCoreExportService, IOrderService orderService, ExportInfoContext infoContext,
-            IOrderRefundService refundService)
+            IOrderRefundService refundService, ICustomerService customerService)
         {
             _options = options;
             _encryptionHost = encryptionHost;
@@ -50,6 +52,7 @@ namespace VitalChoice.ExportService.Services
             _orderService = orderService;
             _infoContext = infoContext;
             _refundService = refundService;
+            _customerService = customerService;
             _logger = loggerFactory.CreateLogger<OrderExportService>();
         }
 
@@ -196,7 +199,7 @@ namespace VitalChoice.ExportService.Services
             {
                 throw new ApiException("Orders cannot be exported while encrypted database update is in progress");
             }
-            var order = await _orderService.SelectAsync(idOrder, true);
+            var order = await _orderService.SelectWithCustomerAsync(idOrder, true);
             if (order.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
             {
                 var uow = new UnitOfWork(_infoContext);
@@ -218,6 +221,7 @@ namespace VitalChoice.ExportService.Services
         public async Task ExportRefund(int idOrder)
         {
             var refund = await _refundService.SelectAsync(idOrder, true);
+            refund.Customer = await _customerService.SelectAsync(refund.Customer.Id, true);
             await _veraCoreExportService.ExportRefund(refund);
         }
 

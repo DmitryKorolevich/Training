@@ -10,6 +10,7 @@ using VitalChoice.Core.DependencyInjection;
 using VitalChoice.ExportService.Context;
 using VitalChoice.ExportService.Services;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.ExportService
 {
@@ -24,6 +25,11 @@ namespace VitalChoice.ExportService
             services.AddScoped<IVeraCoreExportService, VeraCoreExportService>();
             services.AddScoped<EncryptionKeyUpdater>();
             services.AddSingleton<EncryptedServiceBusHostServer>();
+        }
+
+        protected override void FinishCustomRegistrations(ContainerBuilder builder)
+        {
+            builder.RegisterType<DummyHostClient>().As<IEncryptedServiceBusHostClient>().SingleInstance();
         }
 
         protected override void ConfigureOptions(IConfiguration configuration, IServiceCollection services, IHostingEnvironment environment)

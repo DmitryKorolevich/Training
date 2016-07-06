@@ -29,8 +29,8 @@
         	refreshAutoShips();
         };
 
-		$scope.activatePause = function(id) {
-			orderService.activatePauseAutoShip(id, $scope.idCustomer, $scope.addEditTracker)
+		$scope.activatePause = function(id, activate) {
+		    orderService.activatePauseAutoShip(id, $scope.idCustomer, activate, $scope.addEditTracker)
 			.success(function (result) {
 				if (result.Success) {
 					refreshAutoShips();
@@ -38,11 +38,11 @@
 					if (result.Messages) {
 						toaster.pop('error', 'Error!', result.Messages[0].Message);
 					} else {
-						toaster.pop('error', 'Error!', "Can't pause Auto-Ship");
+						toaster.pop('error', 'Error!', "Can't start / pause Auto-Ship");
 					}
 				}
 			}).error(function (result) {
-				toaster.pop('error', 'Error!', "Can't pause Auto-Ship");
+			    toaster.pop('error', 'Error!', "Can't start / pause Auto-Ship");
 			});
 		}
 

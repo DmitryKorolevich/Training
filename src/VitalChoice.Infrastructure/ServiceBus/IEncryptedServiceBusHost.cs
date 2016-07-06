@@ -8,8 +8,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
     {
         void SendCommand(ServiceBusCommandBase command);
         Task<T> ExecuteCommand<T>(ServiceBusCommandWithResult command);
-        void ExecuteCommand(ServiceBusCommandBase command, Action<ServiceBusCommandBase, object> commandResultAction);
-        bool IsAuthenticatedClient(Guid sessionId);
+        void ExecuteCommand(ServiceBusCommandBase command, Action<ServiceBusCommandBase, ServiceBusCommandData> commandResultAction);
         string LocalHostName { get; }
         string ServerHostName { get; }
     }

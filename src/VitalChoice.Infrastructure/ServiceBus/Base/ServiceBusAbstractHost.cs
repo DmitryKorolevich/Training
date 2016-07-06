@@ -16,13 +16,15 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         private readonly ManualResetEvent _readyToDisposeSend = new ManualResetEvent(true);
         private readonly ManualResetEvent _newMessageSignal = new ManualResetEvent(false);
         private volatile bool _terminated;
-        private readonly List<Thread> _runningThreads = new List<Thread>();
+        private Thread _sendThread;
+        private Thread _receiveThread;
 
         protected readonly ILogger Logger;
         protected readonly IServiceBusSender Sender;
         protected readonly IServiceBusReceiver Receiver;
+        private readonly bool _needReceiverThread;
 
-        protected ServiceBusAbstractHost(ILogger logger, IServiceBusSender sender, IServiceBusReceiver receiver)
+        protected ServiceBusAbstractHost(ILogger logger, IServiceBusSender sender, IServiceBusReceiver receiver, bool needReceiverThread)
         {
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
@@ -30,21 +32,17 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             Logger = logger;
             Sender = sender;
             Receiver = receiver;
+            _needReceiverThread = needReceiverThread;
         }
 
         public virtual void Start()
         {
-            for (var i = 0; i < SendThreadCount; i++)
+            _sendThread = new Thread(SendMessages);
+            _sendThread.Start();
+            if (_needReceiverThread)
             {
-                var thread = new Thread(SendMessages);
-                _runningThreads.Add(thread);
-                thread.Start();
-            }
-            for (var i = 0; i < ReceiveThreadCount; i++)
-            {
-                var thread = new Thread(ReceiveMessages);
-                _runningThreads.Add(thread);
-                thread.Start();
+                _receiveThread = new Thread(ReceiveMessages);
+                _receiveThread.Start();
             }
         }
 
@@ -55,13 +53,9 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             Receiver.Dispose();
             Sender.Dispose();
             ReceiveMessagesEvent = null;
-            _runningThreads.ForEach(t => t.Abort());
-            _runningThreads.Clear();
+            _sendThread.Abort();
+            _receiveThread.Abort();
         }
-
-        public virtual int SendThreadCount { get; set; } = 1;
-
-        public virtual int ReceiveThreadCount { get; set; } = 2;
 
         public virtual int BatchSize { get; set; } = 100;
 
@@ -131,13 +125,13 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                         {
                             if (EnableBatching)
                             {
-                                Sender.SendBatch(messages);
+                                Sender.SendBatchAsync(messages).GetAwaiter().GetResult();
                             }
                             else
                             {
                                 foreach (var brokeredMessage in messages)
                                 {
-                                    Sender.Send(brokeredMessage);
+                                    Sender.SendAsync(brokeredMessage).GetAwaiter().GetResult();
                                 }
                             }
                             messages.Clear();

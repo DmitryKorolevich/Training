@@ -34,6 +34,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         bool RegisterSession(Guid session, string hostName, KeyExchange keyCombined);
         bool RegisterSession(Guid session, KeyExchange keyCombined);
         KeyExchange CreateSession(Guid session);
+        KeyExchange GetSession(Guid session);
         bool RemoveSession(Guid session);
         event SessionExpiredEventHandler OnSessionExpired;
         void Dispose();

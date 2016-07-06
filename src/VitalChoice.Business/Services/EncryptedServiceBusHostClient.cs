@@ -12,6 +12,7 @@ using VitalChoice.Interfaces.Services;
 using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Hosting;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 
 namespace VitalChoice.Business.Services
@@ -21,7 +22,8 @@ namespace VitalChoice.Business.Services
         private volatile RSACryptoServiceProvider _keyExchangeProvider;
         private readonly SemaphoreSlim _publicKeyLock = new SemaphoreSlim(1);
 
-        public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerFactory loggerProvider, IObjectEncryptionHost encryptionHost, IHostingEnvironment env)
+        public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerFactory loggerProvider,
+            IObjectEncryptionHost encryptionHost, IHostingEnvironment env)
             : base(appOptions, loggerProvider.CreateLogger<EncryptedServiceBusHostClient>(), encryptionHost, env)
         {
             _keyExchangeProvider = new RSACryptoServiceProvider();
@@ -58,42 +60,65 @@ namespace VitalChoice.Business.Services
 
         public async Task<bool> AuthenticateClient(Guid sessionId)
         {
-            var keyExchangeProvider = await GetKeyExchangeProvider();
+            var keyExchangeProvider = await TryGetKeyProvider();
             if (keyExchangeProvider == null)
                 return false;
-            var keys = EncryptionHost.CreateSession(sessionId);
-            if (keys == null)
+            if (EncryptionHost.SessionExist(sessionId))
             {
-
-                if (
-                    await
-                        ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId,
-                            ServiceBusCommandConstants.CheckSessionKey,
-                            ServerHostName, LocalHostName)))
-                    return true;
-                EncryptionHost.RemoveSession(sessionId);
-                keys = EncryptionHost.CreateSession(sessionId);
-            }
-            if (
-                await
-                    ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.SetSessionKey,
-                        ServerHostName, LocalHostName)
+                try
+                {
+                    if (
+                        await
+                            ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.CheckSessionKey,
+                                ServerHostName, LocalHostName)))
                     {
-                        Data = EncryptionHost.RsaEncrypt(keys.ToCombined(), keyExchangeProvider)
-                    }))
-            {
-                return EncryptionHost.RegisterSession(sessionId, keys);
-            }
-            await _publicKeyLock.WaitAsync();
-            try
-            {
-                _keyExchangeProvider = new RSACryptoServiceProvider();
-            }
-            finally
-            {
-                _publicKeyLock.Release();
+                        return true;
+                    }
+                    var existingKeys = EncryptionHost.GetSession(sessionId);
+                    if (existingKeys == null)
+                        return false;
+
+                    return await
+                        ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.SetSessionKey,
+                            ServerHostName, LocalHostName)
+                        {
+                            Data = new ServiceBusCommandData(EncryptionHost.RsaEncrypt(existingKeys.ToCombined(), keyExchangeProvider))
+                        });
+                }
+                catch (ApiException e)
+                {
+                    Logger.LogError(e.ToString());
+                    await _publicKeyLock.WaitAsync();
+                    try
+                    {
+                        _keyExchangeProvider = new RSACryptoServiceProvider();
+                    }
+                    finally
+                    {
+                        _publicKeyLock.Release();
+                    }
+                    return false;
+                }
             }
             return false;
+        }
+
+        private async Task<RSACryptoServiceProvider> TryGetKeyProvider()
+        {
+            var keyExchangeProvider = await GetKeyExchangeProvider();
+            if (keyExchangeProvider == null)
+            {
+                try
+                {
+                    _keyExchangeProvider = new RSACryptoServiceProvider();
+                }
+                finally
+                {
+                    _publicKeyLock.Release();
+                }
+                keyExchangeProvider = await GetKeyExchangeProvider();
+            }
+            return keyExchangeProvider;
         }
 
         public void RemoveClient(Guid sessionId)
@@ -105,7 +130,7 @@ namespace VitalChoice.Business.Services
         {
             if (command.CommandName == ServiceBusCommandConstants.SessionExpired)
             {
-                var session = (Guid) command.Data;
+                var session = (Guid) command.Data.Data;
                 if (EncryptionHost.RemoveSession(session))
                 {
                     return true;

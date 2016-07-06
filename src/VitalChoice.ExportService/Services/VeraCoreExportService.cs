@@ -28,6 +28,7 @@ namespace VitalChoice.ExportService.Services
         private readonly IOrderService _orderService;
         private readonly IAvalaraTax _avalaraTax;
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
+        private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _paymentMapper;
         private readonly IOrderRefundService _refundService;
         private readonly VeraCoreOrderSoapClient _client;
         private const string OacDescription = "On Approved Credit";
@@ -40,12 +41,14 @@ namespace VitalChoice.ExportService.Services
 
 
         public VeraCoreExportService(IOptions<ExportOptions> options, IOrderService orderService, IAvalaraTax avalaraTax,
-            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper, IOrderRefundService refundService)
+            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper, IOrderRefundService refundService,
+            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> paymentMapper)
         {
             _orderService = orderService;
             _avalaraTax = avalaraTax;
             _addressMapper = addressMapper;
             _refundService = refundService;
+            _paymentMapper = paymentMapper;
             _client = new VeraCoreOrderSoapClient
             {
                 DebugHeaderValue = new DebugHeader(),
@@ -195,6 +198,10 @@ namespace VitalChoice.ExportService.Services
             else
             {
                 order.OrderStatus = OrderStatus.Exported;
+            }
+            if (order.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
+            {
+                _paymentMapper.SecureObject(order.PaymentMethod);
             }
             await _orderService.UpdateAsync(order);
         }

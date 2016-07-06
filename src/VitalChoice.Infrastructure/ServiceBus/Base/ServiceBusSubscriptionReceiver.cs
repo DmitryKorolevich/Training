@@ -1,4 +1,5 @@
 #if !NETSTANDARD1_5
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.ServiceBus.Messaging;
@@ -9,9 +10,13 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
     {
         private readonly SubscriptionClient _subscription;
 
-        public ServiceBusSubscriptionReceiver(SubscriptionClient subscription)
+        public ServiceBusSubscriptionReceiver(SubscriptionClient subscription, Action<BrokeredMessage> receiveAction = null)
         {
             _subscription = subscription;
+            if (receiveAction != null)
+            {
+                _subscription.OnMessage(receiveAction);
+            }
         }
 
         public Task<BrokeredMessage> ReceiveAsync()

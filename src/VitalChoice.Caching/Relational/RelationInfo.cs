@@ -46,6 +46,11 @@ namespace VitalChoice.Caching.Relational
         {
             ItemKeyInfo = keyInfo;
             EntityType = entityType;
+            if (entityType.ClrType != elementType)
+            {
+                throw new InvalidOperationException(
+                    $"Most likely relation has wrong type reference defined {elementType} != {entityType.ClrType} ({elementType})");
+            }
             Name = name;
             PropertyType = relatedType;
             RelationType = elementType;
@@ -60,6 +65,11 @@ namespace VitalChoice.Caching.Relational
             LambdaExpression relationExpression = null,
             IEnumerable<RelationInfo> subRelations = null)
         {
+            if (entityType.ClrType != relatedType)
+            {
+                throw new InvalidOperationException(
+                    $"Most likely relation has wrong type reference defined {relatedType} != {entityType.ClrType} ({relatedType})");
+            }
             ItemKeyInfo = keyInfo;
             EntityType = entityType;
             RelationType = relatedType;

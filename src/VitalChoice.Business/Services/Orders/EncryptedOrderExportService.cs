@@ -1,20 +1,15 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
-using Microsoft.Extensions.Options;
-using VitalChoice.DynamicData.Base;
-using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers.Async;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
-using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
+using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.ObjectMapping.Base;
@@ -23,25 +18,36 @@ namespace VitalChoice.Business.Services.Orders
 {
     public class EncryptedOrderExportService : EncryptedServiceBusClient, IEncryptedOrderExportService
     {
-        public EncryptedOrderExportService(IEncryptedServiceBusHostClient encryptedBusHost) : base(encryptedBusHost)
+        public EncryptedOrderExportService(IEncryptedServiceBusHostClient encryptedBusHost, IObjectEncryptionHost encryptionHost,
+            ILoggerFactory loggerFactory)
+            : base(encryptedBusHost, encryptionHost, loggerFactory.CreateLogger<EncryptedOrderExportService>())
         {
         }
 
         public async Task ExportOrdersAsync(OrderExportData exportData, Action<OrderExportItemResult> exportedAction)
         {
-            Dictionary<int, ManualResetEvent> awaitItems = exportData.ExportInfo.ToDictionary(o => o.Id, o => new ManualResetEvent(false));
             await SendCommand(
                 new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName)
                 {
-                    Data = exportData
+                    Data = new ServiceBusCommandData(exportData)
                 },
                 (command, o) =>
                 {
-                    var exportResult = (OrderExportItemResult) o;
-                    exportedAction(exportResult);
-                    awaitItems[exportResult.Id].Set();
+                    if (!string.IsNullOrEmpty(o.Error))
+                    {
+                        Logger.LogError(o.Error);
+                        exportedAction(new OrderExportItemResult()
+                        {
+                            Success = false,
+                            Error = o.Error
+                        });
+                    }
+                    else
+                    {
+                        var exportResult = (OrderExportItemResult) o.Data;
+                        exportedAction(exportResult);
+                    }
                 });
-            WaitHandle.WaitAll(awaitItems.Values.Cast<WaitHandle>().ToArray());
         }
 
         public async Task<List<OrderExportItemResult>> ExportOrdersAsync(OrderExportData exportData)
@@ -53,23 +59,39 @@ namespace VitalChoice.Business.Services.Orders
                 SendCommand(
                     new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName)
                     {
-                        Data = exportData
+                        Data = new ServiceBusCommandData(exportData)
                     },
                     (command, o) =>
                     {
-                        var exportResult = (OrderExportItemResult) o;
                         lock (sentItems)
                         {
-                            results.Add(exportResult);
-                            sentItems.Remove(exportResult.Id);
-                            if (sentItems.Count == 0)
+                            if (!string.IsNullOrEmpty(o.Error))
                             {
+                                sentItems.Clear();
+                                results.Add(new OrderExportItemResult
+                                {
+                                    Error = o.Error,
+                                    Success = false
+                                });
+                                Logger.LogError(o.Error);
                                 doneAllEvent.Set();
+                            }
+                            else
+                            {
+                                var exportResult = (OrderExportItemResult) o.Data;
+                                results.Add(exportResult);
+                                sentItems.Remove(exportResult.Id);
+                                if (sentItems.Count == 0)
+                                {
+                                    doneAllEvent.Set();
+                                }
                             }
                         }
                     });
-            if (!await doneAllEvent.WaitAsync(TimeSpan.FromMinutes(20)))
+            if (!await doneAllEvent.WaitAsync(TimeSpan.FromSeconds(110)))
             {
+                // ReSharper disable once InconsistentlySynchronizedField
+                Logger.LogError("Export timeout");
                 throw new ApiException("Export timeout");
             }
             return results;
@@ -83,7 +105,7 @@ namespace VitalChoice.Business.Services.Orders
                     SendCommand<bool>(new ServiceBusCommandWithResult(SessionId, OrderExportServiceCommandConstants.UpdateOrderPayment,
                         ServerHostName, LocalHostName)
                     {
-                        Data = orderPaymentMethod
+                        Data = new ServiceBusCommandData(orderPaymentMethod)
                     });
             return Task.FromResult(true);
         }
@@ -102,7 +124,7 @@ namespace VitalChoice.Business.Services.Orders
                     SendCommand<bool>(new ServiceBusCommandWithResult(SessionId, OrderExportServiceCommandConstants.UpdateCustomerPayment,
                         ServerHostName, LocalHostName)
                     {
-                        Data = paymentsToUpdate
+                        Data = new ServiceBusCommandData(paymentsToUpdate)
                     });
             }
             return Task.FromResult(true);
