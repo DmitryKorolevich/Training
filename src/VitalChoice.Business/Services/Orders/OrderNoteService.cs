@@ -124,7 +124,7 @@ namespace VitalChoice.Business.Services.Orders
 		{
 			var condition = new OrderNoteQuery().NotDeleted().MatchByid(id);
 
-			var orderNote = (await _orderNoteRepository.Query(condition).Include(x => x.CustomerTypes).SelectAsync(false)).SingleOrDefault();
+			var orderNote = await _orderNoteRepository.Query(condition).Include(x => x.CustomerTypes).SelectFirstOrDefaultAsync(false)
 
 			return orderNote;
 		}
@@ -196,7 +196,7 @@ namespace VitalChoice.Business.Services.Orders
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.HasAssignments]);
 			}
 
-			var orderNote = (await _orderNoteRepository.Query(new OrderNoteQuery().NotDeleted().MatchByid(id)).SelectAsync(false)).SingleOrDefault();
+		    var orderNote = await _orderNoteRepository.Query(new OrderNoteQuery().NotDeleted().MatchByid(id)).SelectFirstOrDefaultAsync(false);
 
 			if (orderNote != null)
 			{
