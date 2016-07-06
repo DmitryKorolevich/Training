@@ -136,13 +136,13 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                         {
                             if (EnableBatching)
                             {
-                                Sender.SendBatchAsync(messages).GetAwaiter().GetResult();
+                                Sender.SendBatch(messages);
                             }
                             else
                             {
                                 foreach (var brokeredMessage in messages)
                                 {
-                                    Sender.SendAsync(brokeredMessage).GetAwaiter().GetResult();
+                                    Sender.Send(brokeredMessage);
                                 }
                             }
                             messages.Clear();
