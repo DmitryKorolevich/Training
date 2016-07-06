@@ -617,18 +617,21 @@ namespace VitalChoice.Business.Services.Products
                 return
                     results.Where(
                         r =>
-                            StringComparer.OrdinalIgnoreCase.Equals($"{r.Product?.Name ?? string.Empty} {r.Product?.SafeData.SubTitle ?? string.Empty} ({r.SafeData.QTY ?? 0})",
-                            filter.ExactDescriptionName)).ToList();
+                            StringComparer.OrdinalIgnoreCase.Equals(FormatProductName(r),
+                                filter.ExactDescriptionName)).ToList();
             }
             if (!string.IsNullOrEmpty(filter.DescriptionName))
             {
                 return
-                    results.Where(
-                        r =>
-                            $"{r.Product?.Name ?? string.Empty} {r.Product?.SafeData.SubTitle ?? string.Empty} ({r.SafeData.QTY ?? 0})"
-                                .StartsWith(filter.DescriptionName, StringComparison.OrdinalIgnoreCase)).ToList();
+                    results.Where(r => FormatProductName(r).StartsWith(filter.DescriptionName, StringComparison.OrdinalIgnoreCase)).ToList();
             }
             return results;
+        }
+
+        private static string FormatProductName(SkuDynamic r)
+        {
+            return
+                $"{r.Product?.Name ?? string.Empty} {(string) r.Product?.SafeData.SubTitle ?? string.Empty}{(r.Product?.SafeData.SubTitle != null ? " " : string.Empty)}({r.SafeData.QTY ?? 0})";
         }
 
         public async Task<List<SkuDynamic>> GetSkusAsync(ICollection<SkuInfo> skuInfos, bool withDefaults = false)
