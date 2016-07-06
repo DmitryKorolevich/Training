@@ -15,7 +15,10 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             _subscription = subscription;
             if (receiveAction != null)
             {
-                _subscription.OnMessage(receiveAction);
+                _subscription.OnMessage(receiveAction, new OnMessageOptions
+                {
+                    MaxConcurrentCalls = 2
+                });
             }
         }
 

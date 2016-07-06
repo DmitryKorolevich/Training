@@ -14,6 +14,8 @@ namespace VitalChoice.ExportService.Services
         {
         }
 
+        public bool InitSuccess => false;
+
         public void SendCommand(ServiceBusCommandBase command)
         {
         }
@@ -29,7 +31,7 @@ namespace VitalChoice.ExportService.Services
 
         public bool IsAuthenticatedClient(Guid sessionId)
         {
-            return true;
+            return false;
         }
 
         public string LocalHostName => string.Empty;

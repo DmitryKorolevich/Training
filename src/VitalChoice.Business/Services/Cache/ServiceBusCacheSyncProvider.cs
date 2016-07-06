@@ -13,6 +13,7 @@ using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Infrastructure.ServiceBus.Base;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Business.Services.Cache
 {
@@ -73,7 +74,7 @@ namespace VitalChoice.Business.Services.Cache
                 }
                 catch (Exception e)
                 {
-                    Logger.LogInformation(e.Message, e);
+                    Logger.LogWarn(ex => ex.ToString(), e);
                 }
 
                 _serviceBusClient = new ServiceBusHostOneToMany(Logger, () =>
@@ -184,8 +185,7 @@ namespace VitalChoice.Business.Services.Cache
                         if (syncOp.SyncType != SyncType.Ping)
                         {
                             var ping = (DateTime.UtcNow - syncOp.SendTime).Milliseconds;
-                            if (Logger.IsEnabled(LogLevel.Information))
-                                Logger.LogInformation($"{syncOp} Message lag: {ping} ms");
+                            Logger.LogInfo((op, p) => $"{op} Message lag: {p} ms", syncOp, ping);
                             lock (_lockObject)
                             {
                                 _pingMilliseconds[_totalMessagesReceived] = ping;

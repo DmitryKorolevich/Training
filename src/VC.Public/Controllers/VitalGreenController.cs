@@ -151,7 +151,7 @@ namespace VC.Public.Controllers
                 catch (Exception e)
                 {
                     Response.Cookies.Delete(VITAL_GREEN_COOKIE_NAME);
-                    _logger.LogInformation(e.ToString());
+                    _logger.LogWarning(e.ToString());
                 }
             }
             return model;

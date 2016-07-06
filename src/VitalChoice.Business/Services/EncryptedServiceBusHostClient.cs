@@ -130,7 +130,7 @@ namespace VitalChoice.Business.Services
         {
             if (command.CommandName == ServiceBusCommandConstants.SessionExpired)
             {
-                var session = (Guid) command.Data.Data;
+                var session = command.SessionId;
                 if (EncryptionHost.RemoveSession(session))
                 {
                     return true;

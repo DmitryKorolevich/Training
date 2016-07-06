@@ -42,7 +42,7 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (_internalCache == null)
             {
-                _logger.LogInformation($"Cache doesn't exist for type: {typeof(T)}");
+                _logger.LogInfo(type => $"Cache doesn't exist for type: {type}", typeof(T));
                 entities = null;
                 return CacheGetResult.NotFound;
             }
@@ -90,7 +90,7 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (_internalCache == null)
             {
-                _logger.LogInformation($"Cache doesn't exist for type: {typeof(T)}");
+                _logger.LogInfo(type => $"Cache doesn't exist for type: {type}", typeof(T));
                 entity = default(T);
                 return CacheGetResult.NotFound;
             }

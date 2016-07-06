@@ -16,8 +16,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         private readonly ManualResetEvent _readyToDisposeSend = new ManualResetEvent(true);
         private readonly ManualResetEvent _newMessageSignal = new ManualResetEvent(false);
         private volatile bool _terminated;
-        private Thread _sendThread;
-        private Thread _receiveThread;
+        private readonly List<Thread> _sendThreads = new List<Thread>();
+        private readonly List<Thread> _receiveThreads = new List<Thread>();
 
         protected readonly ILogger Logger;
         protected readonly IServiceBusSender Sender;
@@ -37,12 +37,21 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 
         public virtual void Start()
         {
-            _sendThread = new Thread(SendMessages);
-            _sendThread.Start();
+            for (var i = 0; i < ThreadCount; i++)
+            {
+                var thread = new Thread(SendMessages);
+                thread.Start();
+                _sendThreads.Add(thread);
+            }
+
             if (_needReceiverThread)
             {
-                _receiveThread = new Thread(ReceiveMessages);
-                _receiveThread.Start();
+                for (var i = 0; i < ThreadCount; i++)
+                {
+                    var thread = new Thread(ReceiveMessages);
+                    thread.Start();
+                    _receiveThreads.Add(thread);
+                }
             }
         }
 
@@ -53,9 +62,11 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             Receiver.Dispose();
             Sender.Dispose();
             ReceiveMessagesEvent = null;
-            _sendThread.Abort();
-            _receiveThread.Abort();
+            _sendThreads.ForEach(t => t.Abort());
+            _receiveThreads.ForEach(t => t.Abort());
         }
+
+        public virtual int ThreadCount { get; set; } = 2;
 
         public virtual int BatchSize { get; set; } = 100;
 
@@ -125,13 +136,13 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                         {
                             if (EnableBatching)
                             {
-                                Sender.SendBatchAsync(messages).GetAwaiter().GetResult();
+                                Sender.SendBatch(messages);
                             }
                             else
                             {
                                 foreach (var brokeredMessage in messages)
                                 {
-                                    Sender.SendAsync(brokeredMessage).GetAwaiter().GetResult();
+                                    Sender.Send(brokeredMessage);
                                 }
                             }
                             messages.Clear();

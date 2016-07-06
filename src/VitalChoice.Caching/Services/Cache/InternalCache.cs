@@ -525,7 +525,7 @@ namespace VitalChoice.Caching.Services.Cache
                                 cached.NeedUpdateRelated.Add(markRelated);
                                 return true;
                             }
-                            if (cached.NeedUpdate)
+                            if (cached.NeedUpdateEntity)
                             {
                                 cached.NeedUpdateRelated.AddRange(EntityInfo.ImplicitUpdateMarkedEntities.Where(r => data.GetHasRelation(r)));
                                 return false;
@@ -572,7 +572,7 @@ namespace VitalChoice.Caching.Services.Cache
                                 cached.NeedUpdateRelated.Add(markRelated);
                                 MarkForUpdateForeignKeys(cached.ForeignKeys);
                             }
-                            else if (!cached.NeedUpdate)
+                            else if (!cached.NeedUpdateEntity)
                             {
                                 cached.NeedUpdateRelated.AddRange(EntityInfo.ImplicitUpdateMarkedEntities.Where(r => data.GetHasRelation(r)));
                                 cached.NeedUpdate = true;
@@ -614,7 +614,7 @@ namespace VitalChoice.Caching.Services.Cache
                             try
                             {
                                 var itemsList =
-                                    cachedItems.Where(c => !c.NeedUpdate)
+                                    cachedItems.Where(c => !c.NeedUpdateEntity)
                                         .Select(cached => cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(cached.EntityUntyped))
                                         .ToArray();
                                 cache.MarkForUpdate(itemsList, dependentType.Value.Name);
