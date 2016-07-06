@@ -27,6 +27,7 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using VitalChoice.Infrastructure.Domain.Entities.Settings;
 
 namespace VitalChoice.Business.Services
 {
@@ -437,7 +438,13 @@ namespace VitalChoice.Business.Services
 
         private ReferenceData SetAppSettings(ReferenceData referenceData)
         {
-            referenceData.AppSettings = settingService.GetAppSettingsAsync().GetAwaiter().GetResult();
+            var settings = settingService.GetSettingsAsync().GetAwaiter().GetResult();;
+            referenceData.AppSettings = new AppSettings()
+            {
+                CreditCardAuthorizations = settings.SafeData.CreditCardAuthorizations,
+                GlobalPerishableThreshold = settings.SafeData.GlobalPerishableThreshold,
+                HealthwisePeriodMaxItemsCount = settings.SafeData.HealthwisePeriodMaxItemsCount
+            };
             return referenceData;
         }
 

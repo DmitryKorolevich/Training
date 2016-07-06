@@ -87,7 +87,7 @@ namespace VC.Public.Controllers
             }
             else
             {
-                var globalThreshold = (await SettingService.GetAppSettingsAsync()).GlobalPerishableThreshold;
+                decimal? globalThreshold = (await SettingService.GetSettingsAsync()).SafeData.GlobalPerishableThreshold;
                 cartModel.TopGlobalMessage = globalThreshold.HasValue && globalThreshold.Value > 0
                     ? $"Frozen products must total {globalThreshold.Value.ToString("c")}, to prevent thawing during shipping. Please add frozen items until they total {globalThreshold.Value.ToString("c")}."
                     : null;

@@ -1037,12 +1037,12 @@ namespace VitalChoice.Business.Services.Products
             {
                 if (messageFormat == null)
                 {
-                    var setting = (await _settingService.GetAppSettingItemsAsync(new List<string>() { SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE })).FirstOrDefault();
-                    if (setting == null)
+                    var settings = await _settingService.GetSettingsAsync();
+                    if (settings == null || settings.SafeData.ProductOutOfStockEmailTemplate == null)
                     {
                         throw new NotSupportedException($"{SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE} not configurated.");
                     }
-                    messageFormat = setting.Value;
+                    messageFormat = settings.SafeData.ProductOutOfStockEmailTemplate;
                 }
 
                 var items = await _productOutOfStockRequestRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);

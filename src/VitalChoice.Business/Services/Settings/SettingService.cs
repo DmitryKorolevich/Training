@@ -15,6 +15,11 @@ using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
 using Microsoft.EntityFrameworkCore;
+using VitalChoice.Business.Services.Dynamic;
+using VitalChoice.Business.Services.Ecommerce;
+using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
+using VitalChoice.Ecommerce.Domain.Entities.Settings;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VitalChoice.Business.Services.Settings
 {
@@ -22,102 +27,45 @@ namespace VitalChoice.Business.Services.Settings
     {
         private readonly IRepositoryAsync<AppSettingItem> _appSettingRepository;
         private readonly IEcommerceRepositoryAsync<Lookup> _lookupRepository;
+        private readonly IEcommerceRepositoryAsync<SettingOptionType> _settingOptionTypeRepository;
+        private readonly SettingMapper _settingMapper;
         private readonly ILogger _logger;
 
         public SettingService(IRepositoryAsync<AppSettingItem> appSettingRepository,
             IEcommerceRepositoryAsync<Lookup> lookupRepository,
+            IEcommerceRepositoryAsync<SettingOptionType> settingOptionTypeRepository,
+            SettingMapper settingMapper,
             ILoggerProviderExtended loggerProvider)
         {
             _appSettingRepository = appSettingRepository;
             _lookupRepository = lookupRepository;
+            _settingOptionTypeRepository = settingOptionTypeRepository;
+            _settingMapper = settingMapper;
             _logger = loggerProvider.CreateLogger<SettingService>();
         }
 
-        public Task<List<AppSettingItem>> GetAppSettingItemsAsync(ICollection<string> names)
+        public async Task<SettingDynamic> GetSettingsAsync()
         {
-            return _appSettingRepository.Query(p => names.Contains(p.Name)).SelectAsync(false);
-        }
-
-        public Task<AppSettingItem> GetAppSettingAsync(string name)
-        {
-            return _appSettingRepository.Query(p => p.Name == name).SelectFirstOrDefaultAsync(false);
-        }
-
-        public async Task<List<AppSettingItem>> UpdateAppSettingItemsAsync(ICollection<AppSettingItem> items)
-        {
-            var names = items.Select(p => p.Name).ToArray();
-            var dbItems = await _appSettingRepository.Query(p => names.Contains(p.Name)).SelectAsync(true);
-            foreach (var dbItem in dbItems)
-            {
-                foreach (var item in items)
-                {
-                    if (dbItem.Name == item.Name)
-                    {
-                        dbItem.Value = item.Value;
-                    }
-                }
-            }
-            await _appSettingRepository.UpdateRangeAsync(dbItems);
-
-            return dbItems;
-        }
-
-        public async Task<AppSettings> GetAppSettingsAsync()
-        {
-            var appSettings = await _appSettingRepository.Query().SelectAsync(false);
-
-            AppSettings toReturn = CreateAppSettings(appSettings);
-
+            var toReturn = await _settingMapper.GetDefaultAsync(null);
             return toReturn;
         }
 
-        private AppSettings CreateAppSettings(ICollection<AppSettingItem> items)
+        public async Task<bool> UpdateSettingsAsync(SettingDynamic settings)
         {
-            AppSettings toReturn = new AppSettings();
-            foreach (var property in typeof(AppSettings).GetRuntimeProperties())
+            var entity = _settingMapper.ConvertDefaultAsync(settings);
+            var optionTypes = await _settingOptionTypeRepository.Query().SelectAsync();
+            var forUpdate = new List<SettingOptionType>();
+            foreach (var settingOptionValue in entity.OptionValues)
             {
-                AppSettingItem setting = items.FirstOrDefault(p => p.Name == property.Name);
-                if (setting != null)
+                var optionType = optionTypes.FirstOrDefault(p => p.Id == settingOptionValue.IdOptionType);
+                if (optionType != null && optionType.DefaultValue != settingOptionValue.Value)
                 {
-                    try
-                    {
-                        if (property.PropertyType == typeof(bool))
-                        {
-                            bool value;
-                            if (bool.TryParse(setting.Value, out value))
-                            {
-                                property.SetValue(toReturn, value, null);
-                            }
-                        }
-                        if (property.PropertyType == typeof(int?) || property.PropertyType == typeof(int))
-                        {
-                            int value;
-                            if (int.TryParse(setting.Value, out value))
-                            {
-                                property.SetValue(toReturn, value, null);
-                            }
-                        }
-                        if (property.PropertyType == typeof(decimal?) || property.PropertyType == typeof(decimal))
-                        {
-                            decimal value;
-                            if (decimal.TryParse(setting.Value, out value))
-                            {
-                                property.SetValue(toReturn, value, null);
-                            }
-                        }
-                        if (property.PropertyType == typeof(string))
-                        {
-                            property.SetValue(toReturn, setting.Value, null);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogCritical(0, e.Message, e);
-                        throw;
-                    }
+                    optionType.DefaultValue = settingOptionValue.Value;
+                    forUpdate.Add(optionType);
                 }
             }
-            return toReturn;
+            await _settingOptionTypeRepository.UpdateRangeAsync(forUpdate);
+            return true;
         }
 
         public async Task<IList<Lookup>> GetLookupsAsync(ICollection<string> names)

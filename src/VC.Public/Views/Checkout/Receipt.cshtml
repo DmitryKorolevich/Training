@@ -299,6 +299,6 @@
     }
     @if (Model.ShowEGiftEmailForm)
     {
-        await Html.RenderPartialAsync("_SendEGiftEmail", new VC.Public.Models.Checkout.EGiftSendEmailModel());
+        await Html.RenderPartialAsync("_SendEGiftEmail", Model.EGiftSendEmail);
     }
 </div>

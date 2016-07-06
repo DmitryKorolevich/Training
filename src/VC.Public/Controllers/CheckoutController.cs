@@ -615,6 +615,13 @@ namespace VC.Public.Controllers
                 SelectMany(p => p.GcsGenerated).Any())
             {
                 receiptModel.ShowEGiftEmailForm = true;
+                receiptModel.EGiftSendEmail = new EGiftSendEmailModel();
+                receiptModel.EGiftSendEmail.All = true;
+                receiptModel.EGiftSendEmail.Codes = order.Skus.Where(p => p.Sku.Product.IdObjectType == (int)ProductType.EGс).
+                    SelectMany(p => p.GcsGenerated).Select(p => new EGiftSendEmailCodeModel()
+                    {
+                        Code = p.Code,
+                    }).ToList(); 
             }
 
             return View(receiptModel);
@@ -633,7 +640,7 @@ namespace VC.Public.Controllers
             {
                 return PartialView("_SendEGiftEmail", model);
             }
-
+            
             var order = await OrderService.SelectAsync(idOrder.Value);
             var customer = await CustomerService.SelectAsync(order.Customer.Id);
             var emailModel = new EGiftNotificationEmail();
@@ -642,7 +649,7 @@ namespace VC.Public.Controllers
             emailModel.Email = model.Email;
             emailModel.Message = model.Message;
             emailModel.EGifts = order.Skus.Where(p=>p.Sku.Product.IdObjectType==(int)ProductType.EGс).
-                SelectMany(p => p.GcsGenerated).Select(p => new EGiftEmailModel()
+                SelectMany(p => p.GcsGenerated).Where(p=>model.All || model.SelectedCodes.Contains(p.Code)).Select(p => new EGiftEmailModel()
                 {
                     Code = p.Code,
                     Amount = p.Balance
@@ -651,7 +658,14 @@ namespace VC.Public.Controllers
 
             ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullySent];
             ModelState.Clear();
-            return PartialView("_SendEGiftEmail", new EGiftSendEmailModel());
+            var newModel = new EGiftSendEmailModel();
+            newModel.All = false;
+            newModel.Codes = order.Skus.Where(p => p.Sku.Product.IdObjectType == (int)ProductType.EGс).
+                    SelectMany(p => p.GcsGenerated).Select(p => new EGiftSendEmailCodeModel()
+                    {
+                        Code = p.Code,
+                    }).ToList();
+            return PartialView("_SendEGiftEmail", newModel);
         }
 
         private List<KeyValuePair<string, AddressDynamic>> GetShippingAddresses(OrderDynamic order, CustomerDynamic currentCustomer)

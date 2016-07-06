@@ -24,6 +24,7 @@ using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Ecommerce.Domain.Entities.InventorySkus;
 using VitalChoice.Ecommerce.Domain.Entities.VeraCore;
+using VitalChoice.Ecommerce.Domain.Entities.Settings;
 
 namespace VitalChoice.Ecommerce.Context
 {
@@ -1182,6 +1183,22 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(s => s.Id)
                     .IsRequired();
                 entity.Ignore(v => v.Id);
+            });
+
+            #endregion
+
+            #region Settings
+
+            builder.Entity<SettingOptionType>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+                entity.ToTable("SettingOptionTypes");
+                entity.HasOne(p => p.Lookup)
+                    .WithMany()
+                    .HasForeignKey(p => p.IdLookup)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
+                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
             });
 
             #endregion

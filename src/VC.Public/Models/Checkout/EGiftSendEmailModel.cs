@@ -1,11 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace VC.Public.Models.Checkout
 {
+    public class EGiftSendEmailCodeModel
+    {
+        public string Code { get; set; }
+    }
+
     public class EGiftSendEmailModel
 	{
-		[Display(Name = "Recipient Email")]
+        public EGiftSendEmailModel()
+        {
+            SelectedCodes = new List<string>();
+        }
+
+        [Display(Name = "Recipient Email")]
         [EmailAddress]
         [Required]
         [MaxLength(250)]
@@ -19,5 +30,12 @@ namespace VC.Public.Models.Checkout
         [Display(Name = "Message")]
         [MaxLength(500)]
         public string Message { get; set; }
+
+        [Display(Name = "All")]
+        public bool All { get; set; }
+
+        public IList<EGiftSendEmailCodeModel> Codes { get; set; }
+
+        public IList<string> SelectedCodes { get; set; }
     }
 }

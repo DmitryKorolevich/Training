@@ -201,12 +201,12 @@ namespace VC.Admin.Controllers
             toReturn.Subject = "Your Vital Choice affiliate account is ready.";
             if (id == 2)//email
             {
-                var setting = (await _settingService.GetAppSettingItemsAsync(new List<string>() { SettingConstants.AFFILIATE_EMAIL_TEMPLATE })).FirstOrDefault();
-                if (setting == null)
+                var settings = await _settingService.GetSettingsAsync();
+                if (settings == null || settings.SafeData.AffiliateEmailTemplate==null)
                 {
                     throw new NotSupportedException($"{SettingConstants.AFFILIATE_EMAIL_TEMPLATE} not configurated.");
                 }
-                var template = setting.Value;
+                string template = settings.SafeData.AffiliateEmailTemplate;
                 template = template.Replace(SettingConstants.AFFILIATE_EMAIL_TEMPLATE_NAME_HOLDER, "{1}")
                     .Replace(SettingConstants.AFFILIATE_EMAIL_TEMPLATE_ID_HOLDER, "{0}")
                     .Replace(SettingConstants.TEMPLATE_PUBLIC_URL_HOLDER, $"https://{_appOptions.Value.PublicHost}/");

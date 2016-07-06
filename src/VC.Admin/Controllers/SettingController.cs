@@ -188,26 +188,27 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Settings)]
         public async Task<Result<GlobalSettingsManageModel>> GetGlobalSettings()
         {
-            var items = await settingService.GetAppSettingItemsAsync(new List<string>
-            {
-                SettingConstants.GLOBAL_PERISHABLE_THRESHOLD_NAME,
-                SettingConstants.GLOBAL_CREDIT_CARD_AUTHORIZATIONS_NAME,
-            });
+            var settings = await settingService.GetSettingsAsync();
 
-            return new GlobalSettingsManageModel(items);
+            return new GlobalSettingsManageModel()
+            {
+                GlobalPerishableThreshold = settings.SafeData.GlobalPerishableThreshold,
+                CreditCardAuthorizations = settings.SafeData.CreditCardAuthorizations,
+            };
         }
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Settings)]
-        public async Task<Result<GlobalSettingsManageModel>> UpdateGlobalSettings([FromBody]GlobalSettingsManageModel model)
+        public async Task<Result<bool>> UpdateGlobalSettings([FromBody]GlobalSettingsManageModel model)
         {
             if (!Validate(model))
-                return null;
-            var item = model.Convert();
+                return false;
 
-            var appSettingItems = await settingService.UpdateAppSettingItemsAsync(item);
+            var settings = await settingService.GetSettingsAsync();
+            settings.Data.GlobalPerishableThreshold = model.GlobalPerishableThreshold;
+            settings.Data.CreditCardAuthorizations = model.CreditCardAuthorizations;
 
-            return new GlobalSettingsManageModel(appSettingItems);
+            return await settingService.UpdateSettingsAsync(settings);
         }
 
         #endregion

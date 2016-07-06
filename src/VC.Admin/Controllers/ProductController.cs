@@ -619,12 +619,12 @@ namespace VC.Admin.Controllers
         [HttpGet]
         public async Task<Result<string>> GetProductOutOfStockRequestsMessageFormat()
         {
-            var setting = (await settingService.GetAppSettingItemsAsync(new List<string>() { SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE })).FirstOrDefault();
-            if (setting == null)
+            var settings = await settingService.GetSettingsAsync();
+            if (settings == null || settings.SafeData.ProductOutOfStockEmailTemplate==null)
             {
                 throw new NotSupportedException($"{SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE} not configurated.");
             }
-            return setting.Value;
+            return settings.SafeData.ProductOutOfStockEmailTemplate;
         }
 
         [HttpPost]

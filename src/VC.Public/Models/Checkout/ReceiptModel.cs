@@ -12,5 +12,7 @@ namespace VC.Public.Models.Checkout
 		public DateTime OrderDate { get; set; }
 
         public bool ShowEGiftEmailForm { get; set; }
+
+        public EGiftSendEmailModel EGiftSendEmail { get; set; }
     }
 }

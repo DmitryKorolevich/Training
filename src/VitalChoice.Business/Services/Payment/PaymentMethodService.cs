@@ -196,7 +196,7 @@ namespace VitalChoice.Business.Services.Payment
                 return errors;
             }
 
-            if (_options.Value.AuthorizeNet.TestEnv || paymentMethod.IdObjectType != (int)PaymentMethodType.CreditCard || !(await _settingService.GetAppSettingsAsync()).CreditCardAuthorizations)
+            if (_options.Value.AuthorizeNet.TestEnv || paymentMethod.IdObjectType != (int)PaymentMethodType.CreditCard || !(await _settingService.GetSettingsAsync()).SafeData.CreditCardAuthorizations)
                 return errors;
 
             creditCardType creditCard;

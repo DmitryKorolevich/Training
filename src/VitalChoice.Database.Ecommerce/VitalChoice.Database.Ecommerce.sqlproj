@@ -320,4 +320,10 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPsForShippedViaReport.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Settings.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SettingsData.sql" />
+  </ItemGroup>
 </Project>

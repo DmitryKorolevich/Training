@@ -23,8 +23,8 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                 .Sum(s => s.Amount*s.Quantity);
             var perishableCount = perishableList.Length;
             var settingsService = executionContext.Resolve<ISettingService>();
-            var settings = await settingsService.GetAppSettingsAsync();
-            if (perishableCount > 0 && perishableAmount < settings.GlobalPerishableThreshold)
+            var settings = await settingsService.GetSettingsAsync();
+            if (perishableCount > 0 && perishableAmount < settings.SafeData.GlobalPerishableThreshold)
             {
                 dataContext.ProductsPerishableThresholdIssue = true;
             }

@@ -761,5 +761,21 @@ namespace VitalChoice.DynamicData.Base
         {
             return await ToModelAsync<TModel>(await CreatePrototypeAsync(idObjectType));
         }
+
+        public virtual async Task<TDynamic> GetDefaultAsync(int? idObjectType)
+        {
+            var optionTypes = FilterByType(idObjectType);
+            var entity = new TEntity { OptionTypes = optionTypes, OptionValues = new List<TOptionValue>() };
+            return await FromEntityAsync(entity, true);
+        }
+
+        public virtual TEntity ConvertDefaultAsync(TDynamic dynamic)
+        {
+            var optionTypes = FilterByType(dynamic.IdObjectType);
+            var entity = new TEntity { OptionTypes = optionTypes, OptionValues = new List<TOptionValue>() };
+            FillEntityOptions(dynamic, optionTypes, entity);
+            
+            return entity;
+        }
     }
 }

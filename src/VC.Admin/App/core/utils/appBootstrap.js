@@ -203,9 +203,10 @@ angular.module('app.core.utils.appBootstrap', [])
                         }
                     });
                 $rootScope.$on('$stateChangeSuccess',
-                    function(event, toState, toParams, fromState) {
+                    function(event, toState, toParams, fromState, fromParams) {
                         ngProgress.complete();
-                        $rootScope.$state.previous = fromState;
+                        $rootScope.$state.previous = angular.copy(fromState);
+                        $rootScope.$state.previous.params = fromParams;
                     });
                 $rootScope.$on('$stateChangeError',
                     function() {

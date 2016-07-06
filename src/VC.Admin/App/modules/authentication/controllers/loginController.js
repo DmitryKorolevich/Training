@@ -31,17 +31,23 @@ angular.module('app.modules.authentication.controllers.loginController', [])
 								if (res.Success) {
 									$rootScope.ReferenceData = res.Data;
 
-									var stateToRedirect = $state.previous != null
+									var stateToRedirect = "index.oneCol.dashboard";
+									var paramsToRedirect = null;
+                                    if($state.previous != null
 										&& $state.previous.name !== ''
-										&& !$rootScope.unauthorizedArea($state.href($state.previous))
-										? $state.previous.name : "index.oneCol.dashboard";
+										&& !$rootScope.unauthorizedArea($state.href($state.previous.name, $state.previous.params)))
+									{
+                                        stateToRedirect = $state.previous.name;
+                                        paramsToRedirect = $state.previous.params;
+									}
 
 									if (stateToRedirect == 'index.oneCol.dashboard' && ($rootScope.currentUser.IsSuperAdmin || $.inArray(2, $rootScope.currentUser.Permissions) >= 0)) //orders
 									{
-										stateToRedirect = "index.oneCol.manageOrders";
+									    stateToRedirect = "index.oneCol.manageOrders";
+									    paramsToRedirect = null;
 									}
 
-									$state.go(stateToRedirect);
+									$state.go(stateToRedirect, paramsToRedirect);
 								} else {
 									toaster.pop('error', 'Error!', "Unable to refresh reference data");
 								}

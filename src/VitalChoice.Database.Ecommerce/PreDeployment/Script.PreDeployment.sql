@@ -64,3 +64,4 @@
 :r .\Scripts\VeraCore.sql
 
 :r .\Scripts\Skus.sql
+:r .\Scripts\Settings.sql

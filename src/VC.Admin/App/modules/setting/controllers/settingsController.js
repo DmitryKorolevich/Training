@@ -9,7 +9,14 @@ angular.module('app.modules.setting.controllers.settingsController', [])
         function successSaveHandler(result) {
             if (result.Success) {
                 toaster.pop('success', "Success!", "Successfully saved.");
-                $scope.setting = result.Data;
+                if (result.Data)
+                {
+                    refreshItems();
+                }
+                else
+                {
+                    toaster.pop('error', "Error!", "Server error occured");
+                }
             } else {
                 var messages = "";
                 if (result.Messages) {
@@ -35,18 +42,27 @@ angular.module('app.modules.setting.controllers.settingsController', [])
 
             $scope.settings={};
 
-            settingService.getGlobalSettings($scope.refreshTracker)
-                .success(function (result) {
-                    if (result.Success) {
-                        $scope.settings = result.Data;
-                    } else {
-                        errorHandler(result);
-                    }
-                }).
-                error(function (result) {
-                    errorHandler(result);
-                });
+            refreshItems();
         }
+
+        function refreshItems()
+        {
+            settingService.getGlobalSettings($scope.refreshTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            $scope.settings = result.Data;
+                        } else
+                        {
+                            errorHandler(result);
+                        }
+                    }).
+                    error(function (result)
+                    {
+                        errorHandler(result);
+                    });
+        };
 
         $scope.save = function () {
             $.each($scope.forms.form, function (index, element) {
@@ -63,7 +79,7 @@ angular.module('app.modules.setting.controllers.settingsController', [])
                         errorHandler(result);
                     });
             } else {
-                $scope.forms.submitted = true;
+                $scope.forms.form.submitted = true;
             }
         };
 
