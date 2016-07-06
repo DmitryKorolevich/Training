@@ -1,5 +1,13 @@
-﻿function addToCart(event, sku)
+﻿function addToCart(elem, sku)
 {
+    var l = null;
+    if (elem != null) {
+        l = Ladda.create(elem)
+        l.start();
+    }
+
+    $(".overlay").show();
+
     $.ajax({
         url: "/Cart/AddToCartView?skuCode=" + sku,
         dataType: "html",
@@ -32,6 +40,12 @@
     }).error(function (result)
     {
         notifyError();
+    }).complete(function () {
+        if (l != null) {
+            l.stop();
+        }
+
+        $(".overlay").hide();
     });
 
     return false;
