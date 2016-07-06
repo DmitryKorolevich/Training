@@ -22,9 +22,9 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         protected readonly ILogger Logger;
         protected readonly IServiceBusSender Sender;
         protected readonly IServiceBusReceiver Receiver;
-        private readonly bool _needReveiverThread;
+        private readonly bool _needReceiverThread;
 
-        protected ServiceBusAbstractHost(ILogger logger, IServiceBusSender sender, IServiceBusReceiver receiver, bool needReveiverThread)
+        protected ServiceBusAbstractHost(ILogger logger, IServiceBusSender sender, IServiceBusReceiver receiver, bool needReceiverThread)
         {
             if (logger == null)
                 throw new ArgumentNullException(nameof(logger));
@@ -32,14 +32,14 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             Logger = logger;
             Sender = sender;
             Receiver = receiver;
-            _needReveiverThread = needReveiverThread;
+            _needReceiverThread = needReceiverThread;
         }
 
         public virtual void Start()
         {
             _sendThread = new Thread(SendMessages);
             _sendThread.Start();
-            if (_needReveiverThread)
+            if (_needReceiverThread)
             {
                 _receiveThread = new Thread(ReceiveMessages);
                 _receiveThread.Start();

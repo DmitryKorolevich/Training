@@ -50,6 +50,11 @@ namespace VitalChoice.Business.Services
             if (!IsAuthenticated)
             {
                 var sessionId = _session.SessionId;
+                while (!_encryptionHost.SessionExist(sessionId))
+                {
+                    SetInvalid(sessionId);
+                    sessionId = _session.SessionId;
+                }
                 //double auth try to refresh broken/regenerated public key
                 if (!await _encryptedBusHost.AuthenticateClient(sessionId))
                 {
