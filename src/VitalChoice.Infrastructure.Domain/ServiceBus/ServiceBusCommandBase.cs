@@ -8,7 +8,8 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
     [DataContract]
     public class ServiceBusCommandBase : IDisposable
     {
-        public ServiceBusCommandBase(Guid sessionId, string commandName, string destination, string source, Guid? commandId = null, TimeSpan? ttl = null)
+        public ServiceBusCommandBase(Guid sessionId, string commandName, string destination, string source, Guid? commandId = null,
+            TimeSpan? ttl = null)
         {
             CommandName = commandName;
             SessionId = sessionId;
@@ -16,6 +17,7 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
             Destination = destination;
             Source = source;
             TimeToLeave = ttl ?? TimeSpan.FromSeconds(60);
+            Data = new ServiceBusCommandData();
         }
 
         public ServiceBusCommandBase(ServiceBusCommandBase remoteCommand, object data)

@@ -24,8 +24,18 @@ namespace VitalChoice.Business.Services.Orders
         {
         }
 
+        public bool InitSuccess => EncryptedBusHost.InitSuccess;
+
         public async Task ExportOrdersAsync(OrderExportData exportData, Action<OrderExportItemResult> exportedAction)
         {
+            if (!InitSuccess)
+            {
+                exportedAction(new OrderExportItemResult
+                {
+                    Error = "Cannot initialize export service client",
+                    Success = false
+                });
+            }
             await SendCommand(
                 new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName)
                 {
@@ -52,6 +62,17 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<List<OrderExportItemResult>> ExportOrdersAsync(OrderExportData exportData)
         {
+            if (!InitSuccess)
+            {
+                return new List<OrderExportItemResult>
+                {
+                    new OrderExportItemResult
+                    {
+                        Error = "Cannot initialize export service client",
+                        Success = false
+                    }
+                };
+            }
             var sentItems = new HashSet<int>(exportData.ExportInfo.Select(o => o.Id));
             var results = new List<OrderExportItemResult>();
             var doneAllEvent = new AsyncManualResetEvent(false);
@@ -99,6 +120,10 @@ namespace VitalChoice.Business.Services.Orders
 
         public Task<bool> UpdateOrderPaymentMethodAsync(OrderCardData orderPaymentMethod)
         {
+            if (!InitSuccess)
+            {
+                return Task.FromResult(true);
+            }
             if (!ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), orderPaymentMethod.CardNumber, "CardNumber") ||
                 orderPaymentMethod.IdCustomerPaymentMethod > 0)
                 return
@@ -112,6 +137,10 @@ namespace VitalChoice.Business.Services.Orders
 
         public Task<bool> UpdateCustomerPaymentMethodsAsync(ICollection<CustomerCardData> paymentMethods)
         {
+            if (!InitSuccess)
+            {
+                return Task.FromResult(true);
+            }
             var paymentsToUpdate =
                 paymentMethods.Where(p => !ObjectMapper.IsValuesMasked(typeof(CustomerPaymentMethodDynamic), p.CardNumber, "CardNumber"))
                     .ToArray();

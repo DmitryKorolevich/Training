@@ -14,15 +14,15 @@ namespace VitalChoice.Business.Services
 
         private static int _currentSession;
 
-        private readonly IEncryptedServiceBusHostClient _encryptedBusHost;
-        private readonly IObjectEncryptionHost _encryptionHost;
+        protected readonly IEncryptedServiceBusHostClient EncryptedBusHost;
+        protected readonly IObjectEncryptionHost EncryptionHost;
         private bool _authenticated;
         protected readonly ILogger Logger;
 
         public Guid SessionId => _session.SessionId;
 
-        public string ServerHostName => _encryptedBusHost.ServerHostName;
-        public string LocalHostName => _encryptedBusHost.LocalHostName;
+        public string ServerHostName => EncryptedBusHost.ServerHostName;
+        public string LocalHostName => EncryptedBusHost.LocalHostName;
 
         protected virtual int MaxSessions => 10;
 
@@ -30,8 +30,8 @@ namespace VitalChoice.Business.Services
 
         protected EncryptedServiceBusClient(IEncryptedServiceBusHostClient encryptedBusHost, IObjectEncryptionHost encryptionHost, ILogger logger)
         {
-            _encryptedBusHost = encryptedBusHost;
-            _encryptionHost = encryptionHost;
+            EncryptedBusHost = encryptedBusHost;
+            EncryptionHost = encryptionHost;
             Logger = logger;
             _session = GetSession();
         }
@@ -45,7 +45,7 @@ namespace VitalChoice.Business.Services
                 throw new Exception("Cannot authenticate export client");
             }
 
-            return await _encryptedBusHost.ExecuteCommand<T>(command);
+            return await EncryptedBusHost.ExecuteCommand<T>(command);
         }
 
         private async Task<bool> EnsureAuthenticated()
@@ -53,18 +53,18 @@ namespace VitalChoice.Business.Services
             if (!_authenticated)
             {
                 var sessionId = _session.SessionId;
-                while (!_encryptionHost.SessionExist(sessionId))
+                while (!EncryptionHost.SessionExist(sessionId))
                 {
                     SetInvalid(sessionId);
                     sessionId = _session.SessionId;
                 }
                 //double auth try to refresh broken/regenerated public key
-                if (!await _encryptedBusHost.AuthenticateClient(sessionId))
+                if (!await EncryptedBusHost.AuthenticateClient(sessionId))
                 {
                     Logger.LogWarning("Authentication failed, retrying");
                     SetInvalid(sessionId);
                     sessionId = _session.SessionId;
-                    if (!await _encryptedBusHost.AuthenticateClient(sessionId))
+                    if (!await EncryptedBusHost.AuthenticateClient(sessionId))
                     {
                         Logger.LogError("Authentication failed");
                         SetInvalid(sessionId);
@@ -88,7 +88,7 @@ namespace VitalChoice.Business.Services
                 return;
             }
 
-            _encryptedBusHost.ExecuteCommand(command, requestAcqureAction);
+            EncryptedBusHost.ExecuteCommand(command, requestAcqureAction);
         }
 
         protected void Dispose(bool disposing)
@@ -135,8 +135,8 @@ namespace VitalChoice.Business.Services
 
         private void CreateAndRegisterSession(SessionInfo sessionInfo)
         {
-            var keys = _encryptionHost.CreateSession(sessionInfo.SessionId);
-            _encryptionHost.RegisterSession(sessionInfo.SessionId, keys);
+            var keys = EncryptionHost.CreateSession(sessionInfo.SessionId);
+            EncryptionHost.RegisterSession(sessionInfo.SessionId, keys);
         }
 
         private void SetInvalid(Guid session)

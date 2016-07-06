@@ -22,6 +22,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         protected readonly IObjectEncryptionHost EncryptionHost;
         protected readonly ILogger Logger;
+        public bool InitSuccess { get; }
         public virtual string LocalHostName { get; }
         public string ServerHostName { get; }
 
@@ -36,10 +37,12 @@ namespace VitalChoice.Infrastructure.ServiceBus
             try
             {
                 Initialize(appOptions, logger);
+                InitSuccess = true;
             }
             catch (Exception e)
             {
-                logger.LogCritical(e.Message, e);
+                InitSuccess = false;
+                logger.LogCritical(e.ToString());
             }
         }
 

@@ -9,7 +9,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
 {
     public interface ICachedEntity
     {
-        DateTime LastUpdateTime { get; }
+        DateTime CreatedDate { get; }
         bool NeedUpdate { get; set; }
         object EntityUntyped { get; }
     }
@@ -37,10 +37,9 @@ namespace VitalChoice.Caching.Services.Cache.Base
             return statement;
         }
 
-        protected DateTime LastUpdate = DateTime.Now;
         private volatile bool _needUpdate;
 
-        public DateTime LastUpdateTime => LastUpdate;
+        public DateTime CreatedDate { get; protected set; } = DateTime.Now;
 
         public HashSet<string> NeedUpdateRelated { get; } = new HashSet<string>();
 
@@ -50,14 +49,14 @@ namespace VitalChoice.Caching.Services.Cache.Base
             set { _needUpdate = value; }
         }
 
+        public bool NeedUpdateEntity => _needUpdate;
+
         public abstract object EntityUntyped { get; }
 
         public EntityIndex UniqueIndex { get; internal set; }
         public ICollection<KeyValuePair<EntityConditionalIndexInfo, EntityIndex>> ConditionalIndexes { get; internal set; }
         public Dictionary<EntityCacheableIndexInfo, EntityIndex> NonUniqueIndexes { get; internal set; }
         public Dictionary<EntityForeignKeyInfo, EntityForeignKey> ForeignKeys { get; internal set; }
-
-        public abstract CachedEntity CopyUntyped();
 
         private struct LockStatement : IDisposable
         {
@@ -104,13 +103,10 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
         public T Entity
         {
-            get
-            {
-                return _value;
-            }
+            get { return _value; }
             set
             {
-                LastUpdate = DateTime.Now;
+                CreatedDate = DateTime.Now;
                 _value = value;
             }
         }
@@ -124,23 +120,6 @@ namespace VitalChoice.Caching.Services.Cache.Base
         public override object EntityUntyped => _value;
 
         internal ICacheData<T> Cache => _cacheData;
-
-        public override CachedEntity CopyUntyped()
-        {
-            return Copy();
-        }
-
-        public CachedEntity<T> Copy()
-        {
-            return new CachedEntity<T>(_value, _cacheData)
-            {
-                LastUpdate = LastUpdate,
-                ConditionalIndexes = ConditionalIndexes,
-                ForeignKeys = ForeignKeys,
-                NonUniqueIndexes = NonUniqueIndexes,
-                UniqueIndex = UniqueIndex
-            };
-        }
 
         public static implicit operator T(CachedEntity<T> cached)
         {

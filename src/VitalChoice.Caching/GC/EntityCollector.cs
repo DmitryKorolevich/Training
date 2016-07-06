@@ -16,7 +16,7 @@ namespace VitalChoice.Caching.GC
         private readonly IEntityInfoStorage _entityInfoStorage;
         private readonly IInternalEntityCacheFactory _cacheFactory;
         private readonly ILogger _logger;
-        private readonly TimeSpan _timeToLeave;
+        private readonly TimeSpan _latestTimeFrame;
         private readonly TimeSpan _scanPeriod;
         private readonly long _maxSize;
         private readonly Thread _thread;
@@ -28,7 +28,7 @@ namespace VitalChoice.Caching.GC
             _cacheFactory = cacheFactory;
             _logger = logger;
             _maxSize = options.Value.CacheSettings.MaxProcessHeapsSizeBytes;
-            _timeToLeave = TimeSpan.FromSeconds(options.Value.CacheSettings.CacheTimeToLeaveSeconds);
+            _latestTimeFrame = TimeSpan.FromSeconds(options.Value.CacheSettings.CacheTimeToLeaveSeconds);
             _scanPeriod = TimeSpan.FromSeconds(options.Value.CacheSettings.CacheScanPeriodSeconds);
             _thread = new Thread(ProcessObjects);
             _thread.Start();
@@ -77,26 +77,22 @@ namespace VitalChoice.Caching.GC
                             {
                                 if (cache.FullCollection)
                                 {
-                                    if (cache.GetAllUntyped().Any(e => now - e.LastUpdateTime < _timeToLeave))
+                                    foreach (
+                                        var cached in cache.GetAllUntyped().Where(entity => now - entity.CreatedDate < _latestTimeFrame)
+                                        )
                                     {
-                                        foreach (
-                                            var cached in cache.GetAllUntyped().Where(entity => now - entity.LastUpdateTime < _timeToLeave)
-                                            )
+                                        using (cached.Lock())
                                         {
-                                            using (cached.Lock())
-                                            {
-                                                var pk = internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(cached.EntityUntyped);
-                                                internalCache.MarkForUpdate(pk);
-                                            }
+                                            var pk = internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(cached.EntityUntyped);
+                                            internalCache.MarkForUpdate(pk);
                                         }
-                                        cache.Clear();
                                     }
-
+                                    cache.Clear();
                                 }
                                 else
                                 {
                                     foreach (
-                                        var cached in cache.GetAllUntyped().Where(entity => now - entity.LastUpdateTime < _timeToLeave)
+                                        var cached in cache.GetAllUntyped().Where(entity => now - entity.CreatedDate < _latestTimeFrame)
                                         )
                                     {
                                         using (cached.Lock())
