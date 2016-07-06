@@ -351,8 +351,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 
         public KeyExchange CreateSession(Guid session)
         {
-            if (_sessionExpires)
-                throw new InvalidOperationException("Cannot create client sessions as it's state controlled by expiration.");
             lock (_sessions)
             {
                 if (_sessions.ContainsKey(session))
