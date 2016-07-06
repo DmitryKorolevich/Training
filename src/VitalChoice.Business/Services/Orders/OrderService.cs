@@ -965,7 +965,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 var autoShip = await SelectAsync(id);
 
-                Logger.LogInformation($"AutoShip {autoShip.Id} suitable for order submit");
+                Logger.LogInfo(i => $"AutoShip {i} suitable for order submit", autoShip.Id);
 
                 OrderDynamic standardOrder = null;
 
@@ -992,7 +992,7 @@ namespace VitalChoice.Business.Services.Orders
 
                             transaction.Commit();
 
-                            Logger.LogInformation($"AutoShip {autoShip.Id} handled successfully");
+                            Logger.LogInfo(i => $"AutoShip {i} handled successfully", autoShip.Id);
 
                             success = true;
 

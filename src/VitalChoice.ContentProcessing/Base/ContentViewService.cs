@@ -142,7 +142,7 @@ namespace VitalChoice.ContentProcessing.Base
 
             if (viewContext.Entity == null)
             {
-                Logger.LogInformation("The item could not be found {" + queryData.FormatDictionary() + "}");
+                Logger.LogInfo(data => $"The item could not be found {{{data.FormatDictionary()}}}", queryData);
                 //return explicitly null to see the real result of operation and don't look over code above regarding the real value
                 return viewContext;
             }

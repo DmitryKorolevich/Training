@@ -11,6 +11,7 @@ using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Infrastructure.ServiceBus
 {
@@ -133,7 +134,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             if (SendPlain(command))
             {
-                Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
+                Logger.LogInfo(cmd => $"{cmd.CommandName} sent ({cmd.CommandId})", command);
             }
         }
 
@@ -143,7 +144,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             TrackCommand(command);
             if (SendPlain(command))
             {
-                Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
+                Logger.LogInfo(cmd => $"{cmd.CommandName} sent ({cmd.CommandId})", command);
                 if (!await command.ReadyEvent.WaitAsync(command.TimeToLeave))
                 {
                     Logger.LogWarning($"Command timeout. <{command.CommandName}>({command.CommandId})");
@@ -165,7 +166,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
         {
             if (SendEncrypted(command))
             {
-                Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
+                Logger.LogInfo(cmd => $"{cmd.CommandName} sent ({cmd.CommandId})", command);
             }
         }
 
@@ -175,7 +176,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             TrackCommand(command);
             if (SendEncrypted(command))
             {
-                Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
+                Logger.LogInfo(cmd => $"{cmd.CommandName} sent ({cmd.CommandId})", command);
                 if (!await command.ReadyEvent.WaitAsync(command.TimeToLeave))
                 {
                     Logger.LogWarning($"Command timeout. <{command.CommandName}>({command.CommandId})");
@@ -199,7 +200,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             command.RequestAcqureAction = commandResultAction;
             if (SendEncrypted(command))
             {
-                Logger.LogInformation($"{command.CommandName} sent ({command.CommandId})");
+                Logger.LogInfo(cmd => $"{cmd.CommandName} sent ({cmd.CommandId})", command);
             }
         }
 
@@ -267,20 +268,20 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 ServiceBusCommandBase command;
                 if (commandReference.TryGetTarget(out command))
                 {
-                    Logger.LogInformation($"{command.CommandName} answer received ({command.CommandId})");
+                    Logger.LogInfo(cmd => $"{cmd.CommandName} answer received ({cmd.CommandId})", command);
                     command.RequestAcqureAction?.Invoke(command, remoteCommand.Data);
                 }
             }
             else
             {
-                Logger.LogInformation($"{remoteCommand.CommandName} received ({remoteCommand.CommandId})");
+                Logger.LogInfo(cmd => $"{cmd.CommandName} received ({cmd.CommandId})", remoteCommand);
                 Task.Run(() =>
                 {
                     try
                     {
                         if (ProcessEncryptedCommand(remoteCommand))
                         {
-                            Logger.LogInformation($"{remoteCommand.CommandName} processing success ({remoteCommand.CommandId})");
+                            Logger.LogInfo(cmd => $"{cmd.CommandName} processing success ({cmd.CommandId})", remoteCommand);
                         }
                         else
                         {
@@ -318,20 +319,20 @@ namespace VitalChoice.Infrastructure.ServiceBus
                     ServiceBusCommandBase command;
                     if (commandReference.TryGetTarget(out command))
                     {
-                        Logger.LogInformation($"{command.CommandName} answer received ({command.CommandId})");
+                        Logger.LogInfo(cmd => $"{cmd.CommandName} answer received ({cmd.CommandId})", command);
                         command.RequestAcqureAction?.Invoke(command, remoteCommand.Data);
                     }
                 }
                 else
                 {
-                    Logger.LogInformation($"{remoteCommand.CommandName} received ({remoteCommand.CommandId})");
+                    Logger.LogInfo(cmd => $"{cmd.CommandName} received ({cmd.CommandId})", remoteCommand);
                     Task.Run(() =>
                     {
                         try
                         {
                             if (ProcessPlainCommand(remoteCommand))
                             {
-                                Logger.LogInformation($"{remoteCommand.CommandName} processing success ({remoteCommand.CommandId})");
+                                Logger.LogInfo(cmd => $"{cmd.CommandName} processing success ({cmd.CommandId})", remoteCommand);
                             }
                             else
                             {

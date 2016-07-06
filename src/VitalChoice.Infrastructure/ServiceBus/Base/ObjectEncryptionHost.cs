@@ -428,7 +428,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                     _logger.LogCritical(
                         $"Cannot find Certificate in Store <{certStore.Name}:{certStore.Location}> with thumbprint <{thumbprint}>");
                     var certs = certStore.Certificates.Cast<X509Certificate2>();
-                    _logger.LogInformation(storeName + "\n" + string.Join("\n", certs.Select(c => $"{c.SubjectName.Name}:[{c.Thumbprint}]")));
+                    _logger.LogWarning(storeName + "\n" + string.Join("\n", certs.Select(c => $"{c.SubjectName.Name}:[{c.Thumbprint}]")));
                     return null;
                 }
                 var cert = localCerts[0];
