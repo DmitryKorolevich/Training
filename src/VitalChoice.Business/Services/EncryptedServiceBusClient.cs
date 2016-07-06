@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Interfaces.Services;
@@ -15,6 +16,7 @@ namespace VitalChoice.Business.Services
 
         private readonly IEncryptedServiceBusHostClient _encryptedBusHost;
         private readonly IObjectEncryptionHost _encryptionHost;
+        protected readonly ILogger Logger;
         private bool IsAuthenticated => _session.Authenticated;
 
         public Guid SessionId => _session.SessionId;
@@ -26,10 +28,11 @@ namespace VitalChoice.Business.Services
 
         protected virtual int ExpireTimeMinutes => 60;
 
-        protected EncryptedServiceBusClient(IEncryptedServiceBusHostClient encryptedBusHost, IObjectEncryptionHost encryptionHost)
+        protected EncryptedServiceBusClient(IEncryptedServiceBusHostClient encryptedBusHost, IObjectEncryptionHost encryptionHost, ILogger logger)
         {
             _encryptedBusHost = encryptedBusHost;
             _encryptionHost = encryptionHost;
+            Logger = logger;
             _session = GetSession();
         }
 
@@ -58,10 +61,12 @@ namespace VitalChoice.Business.Services
                 //double auth try to refresh broken/regenerated public key
                 if (!await _encryptedBusHost.AuthenticateClient(sessionId))
                 {
+                    Logger.LogWarning("Authentication failed, retrying");
                     SetInvalid(sessionId);
                     sessionId = _session.SessionId;
                     if (!await _encryptedBusHost.AuthenticateClient(sessionId))
                     {
+                        Logger.LogError("Authentication failed");
                         SetInvalid(sessionId);
                         return false;
                     }

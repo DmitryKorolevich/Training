@@ -22,7 +22,8 @@ namespace VitalChoice.Business.Services
         private volatile RSACryptoServiceProvider _keyExchangeProvider;
         private readonly SemaphoreSlim _publicKeyLock = new SemaphoreSlim(1);
 
-        public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerFactory loggerProvider, IObjectEncryptionHost encryptionHost, IHostingEnvironment env)
+        public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerFactory loggerProvider,
+            IObjectEncryptionHost encryptionHost, IHostingEnvironment env)
             : base(appOptions, loggerProvider.CreateLogger<EncryptedServiceBusHostClient>(), encryptionHost, env)
         {
             _keyExchangeProvider = new RSACryptoServiceProvider();
@@ -73,7 +74,6 @@ namespace VitalChoice.Business.Services
                     {
                         return true;
                     }
-
                     var existingKeys = EncryptionHost.GetSession(sessionId);
                     if (existingKeys == null)
                         return false;
@@ -85,8 +85,9 @@ namespace VitalChoice.Business.Services
                             Data = new ServiceBusCommandData(EncryptionHost.RsaEncrypt(existingKeys.ToCombined(), keyExchangeProvider))
                         });
                 }
-                catch (ApiException)
+                catch (ApiException e)
                 {
+                    Logger.LogError(e.ToString());
                     await _publicKeyLock.WaitAsync();
                     try
                     {

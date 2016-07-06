@@ -1,19 +1,13 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
-using Microsoft.Extensions.Options;
-using VitalChoice.DynamicData.Base;
-using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers.Async;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
-using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Interfaces.Services;
@@ -24,8 +18,9 @@ namespace VitalChoice.Business.Services.Orders
 {
     public class EncryptedOrderExportService : EncryptedServiceBusClient, IEncryptedOrderExportService
     {
-        public EncryptedOrderExportService(IEncryptedServiceBusHostClient encryptedBusHost, IObjectEncryptionHost encryptionHost)
-            : base(encryptedBusHost, encryptionHost)
+        public EncryptedOrderExportService(IEncryptedServiceBusHostClient encryptedBusHost, IObjectEncryptionHost encryptionHost,
+            ILoggerFactory loggerFactory)
+            : base(encryptedBusHost, encryptionHost, loggerFactory.CreateLogger<EncryptedOrderExportService>())
         {
         }
 
@@ -38,8 +33,20 @@ namespace VitalChoice.Business.Services.Orders
                 },
                 (command, o) =>
                 {
-                    var exportResult = (OrderExportItemResult) o.Data;
-                    exportedAction(exportResult);
+                    if (!string.IsNullOrEmpty(o.Error))
+                    {
+                        Logger.LogError(o.Error);
+                        exportedAction(new OrderExportItemResult()
+                        {
+                            Success = false,
+                            Error = o.Error
+                        });
+                    }
+                    else
+                    {
+                        var exportResult = (OrderExportItemResult) o.Data;
+                        exportedAction(exportResult);
+                    }
                 });
         }
 
@@ -66,6 +73,7 @@ namespace VitalChoice.Business.Services.Orders
                                     Error = o.Error,
                                     Success = false
                                 });
+                                Logger.LogError(o.Error);
                                 doneAllEvent.Set();
                             }
                             else
@@ -82,6 +90,8 @@ namespace VitalChoice.Business.Services.Orders
                     });
             if (!await doneAllEvent.WaitAsync(TimeSpan.FromSeconds(110)))
             {
+                // ReSharper disable once InconsistentlySynchronizedField
+                Logger.LogError("Export timeout");
                 throw new ApiException("Export timeout");
             }
             return results;
