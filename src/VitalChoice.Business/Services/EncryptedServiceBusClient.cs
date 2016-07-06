@@ -16,6 +16,7 @@ namespace VitalChoice.Business.Services
 
         private readonly IEncryptedServiceBusHostClient _encryptedBusHost;
         private readonly IObjectEncryptionHost _encryptionHost;
+        private bool _authenticated;
         protected readonly ILogger Logger;
 
         public Guid SessionId => _session.SessionId;
@@ -49,24 +50,28 @@ namespace VitalChoice.Business.Services
 
         private async Task<bool> EnsureAuthenticated()
         {
-            var sessionId = _session.SessionId;
-            while (!_encryptionHost.SessionExist(sessionId))
+            if (!_authenticated)
             {
-                SetInvalid(sessionId);
-                sessionId = _session.SessionId;
-            }
-            //double auth try to refresh broken/regenerated public key
-            if (!await _encryptedBusHost.AuthenticateClient(sessionId))
-            {
-                Logger.LogWarning("Authentication failed, retrying");
-                SetInvalid(sessionId);
-                sessionId = _session.SessionId;
+                var sessionId = _session.SessionId;
+                while (!_encryptionHost.SessionExist(sessionId))
+                {
+                    SetInvalid(sessionId);
+                    sessionId = _session.SessionId;
+                }
+                //double auth try to refresh broken/regenerated public key
                 if (!await _encryptedBusHost.AuthenticateClient(sessionId))
                 {
-                    Logger.LogError("Authentication failed");
+                    Logger.LogWarning("Authentication failed, retrying");
                     SetInvalid(sessionId);
-                    return false;
+                    sessionId = _session.SessionId;
+                    if (!await _encryptedBusHost.AuthenticateClient(sessionId))
+                    {
+                        Logger.LogError("Authentication failed");
+                        SetInvalid(sessionId);
+                        return false;
+                    }
                 }
+                _authenticated = true;
             }
             return true;
         }
