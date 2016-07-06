@@ -50,14 +50,14 @@ namespace VitalChoice.Business.Services
 
         private async Task<bool> EnsureAuthenticated()
         {
+            var sessionId = _session.SessionId;
+            while (!_encryptionHost.SessionExist(sessionId))
+            {
+                SetInvalid(sessionId);
+                sessionId = _session.SessionId;
+            }
             if (!IsAuthenticated)
             {
-                var sessionId = _session.SessionId;
-                while (!_encryptionHost.SessionExist(sessionId))
-                {
-                    SetInvalid(sessionId);
-                    sessionId = _session.SessionId;
-                }
                 //double auth try to refresh broken/regenerated public key
                 if (!await _encryptedBusHost.AuthenticateClient(sessionId))
                 {
