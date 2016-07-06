@@ -17,7 +17,6 @@ namespace VitalChoice.Business.Services
         private readonly IEncryptedServiceBusHostClient _encryptedBusHost;
         private readonly IObjectEncryptionHost _encryptionHost;
         protected readonly ILogger Logger;
-        private bool IsAuthenticated => _session.Authenticated;
 
         public Guid SessionId => _session.SessionId;
 
@@ -56,22 +55,18 @@ namespace VitalChoice.Business.Services
                 SetInvalid(sessionId);
                 sessionId = _session.SessionId;
             }
-            if (!IsAuthenticated)
+            //double auth try to refresh broken/regenerated public key
+            if (!await _encryptedBusHost.AuthenticateClient(sessionId))
             {
-                //double auth try to refresh broken/regenerated public key
+                Logger.LogWarning("Authentication failed, retrying");
+                SetInvalid(sessionId);
+                sessionId = _session.SessionId;
                 if (!await _encryptedBusHost.AuthenticateClient(sessionId))
                 {
-                    Logger.LogWarning("Authentication failed, retrying");
+                    Logger.LogError("Authentication failed");
                     SetInvalid(sessionId);
-                    sessionId = _session.SessionId;
-                    if (!await _encryptedBusHost.AuthenticateClient(sessionId))
-                    {
-                        Logger.LogError("Authentication failed");
-                        SetInvalid(sessionId);
-                        return false;
-                    }
+                    return false;
                 }
-                _session.Authenticated = true;
             }
             return true;
         }
@@ -179,8 +174,6 @@ namespace VitalChoice.Business.Services
             public Guid SessionId { get; set; }
 
             public DateTime CreationTime { get; set; }
-
-            public bool Authenticated { get; set; }
         }
 
         public void Dispose()
