@@ -1,7 +1,12 @@
 ﻿function addToCart(elem, sku)
 {
-    var l = Ladda.create(elem)
-    l.start();
+    var l = null;
+    if (elem != null) {
+        l = Ladda.create(elem)
+        l.start();
+    }
+
+    $(".overlay").show();
 
     $.ajax({
         url: "/Cart/AddToCartView?skuCode=" + sku,
@@ -35,8 +40,12 @@
     }).error(function (result)
     {
         notifyError();
-    }).complete(function() {
-        l.stop();
+    }).complete(function () {
+        if (l != null) {
+            l.stop();
+        }
+
+        $(".overlay").hide();
     });
 
     return false;

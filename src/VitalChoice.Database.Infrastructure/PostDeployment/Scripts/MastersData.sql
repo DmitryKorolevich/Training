@@ -2968,7 +2968,7 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like N'%<a href="javascript:void()" id="lnkAddToCart" class="ladda-button" data-style="zoom-in">%' AND [Name] = 'Product page')
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE Template like N'%<div class="product-main relative">%' AND [Name] = 'Product page')
 BEGIN
 	UPDATE [dbo].[MasterContentItems]
 	SET [Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage}}
@@ -3414,7 +3414,10 @@ BEGIN
 	
 <layout> -> (ProductPage)
 {{
-    <div class="product-main">
+    <div class="product-main relative">
+        <div class="overlay hide">
+				<div class="loading">Loading…</div>
+		</div>
         @product_breadcrumb()
         <section class="product-intro-container">
 	        @product_introduction()    
