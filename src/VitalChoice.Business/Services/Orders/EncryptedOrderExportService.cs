@@ -31,7 +31,6 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task ExportOrdersAsync(OrderExportData exportData, Action<OrderExportItemResult> exportedAction)
         {
-            Dictionary<int, ManualResetEvent> awaitItems = exportData.ExportInfo.ToDictionary(o => o.Id, o => new ManualResetEvent(false));
             await SendCommand(
                 new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName)
                 {
@@ -41,9 +40,7 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     var exportResult = (OrderExportItemResult) o.Data;
                     exportedAction(exportResult);
-                    awaitItems[exportResult.Id].Set();
                 });
-            WaitHandle.WaitAll(awaitItems.Values.Cast<WaitHandle>().ToArray());
         }
 
         public async Task<List<OrderExportItemResult>> ExportOrdersAsync(OrderExportData exportData)
@@ -83,7 +80,7 @@ namespace VitalChoice.Business.Services.Orders
                             }
                         }
                     });
-            if (!await doneAllEvent.WaitAsync(TimeSpan.FromMinutes(2)))
+            if (!await doneAllEvent.WaitAsync(TimeSpan.FromSeconds(110)))
             {
                 throw new ApiException("Export timeout");
             }

@@ -75,6 +75,7 @@ namespace VitalChoice.Business.Services
                 {
                     Error = "Cannot authenticate export client"
                 });
+                return;
             }
 
             _encryptedBusHost.ExecuteCommand(command, requestAcqureAction);
