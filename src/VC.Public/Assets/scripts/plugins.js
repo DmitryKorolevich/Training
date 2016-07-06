@@ -280,7 +280,9 @@ var successMessage;
 var defaultModalSize = 461;
 
 $(function () {
-	registerRequiredIf();
+    registerRequiredIf();
+
+    Ladda.bind('button[type=submit]');
 
 	//fix for IE7 and IE8
 	if (!$.support.placeholder) {
@@ -483,10 +485,6 @@ $(function () {
 	            header.find(".bronto-subscribe-top-wrapper").hide();
 	        });
 	        Cookies.set("bronto-signup", "hidden", { expires: 1 });
-	    });
-
-	    $("body").on("dblclick", "input[type=submit], input[type=button], button, a", function (e) {
-	        e.preventDefault();
 	    });
 	};
 });

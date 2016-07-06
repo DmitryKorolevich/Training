@@ -2590,7 +2590,8 @@ footer {
 
     input[type=submit],
     input[type=button],
-    a.button {
+    a.button,
+    button {
         border-radius: 3px;
         font-size: 13px;
         font-weight: normal;
@@ -2628,6 +2629,7 @@ footer {
     }
 
 
+    button.inline-button,
     input[type=submit].inline-button,
     input[type=button].inline-button {
         vertical-align: top;
@@ -3110,7 +3112,7 @@ footer {
                 margin-right: 5px;
             }
 
-            input[type=button], input[type=submit] {
+            input[type=button], input[type=submit], button {
                 padding: 2px 8px;
                 vertical-align: top;
             }
@@ -3398,7 +3400,7 @@ footer {
                 margin-right: 5px;
             }
 
-            input[type=button], input[type=submit] {
+            input[type=button], input[type=submit], button {
                 padding: 2px 8px;
                 vertical-align: top;
             }
@@ -5024,7 +5026,7 @@ body.view-cart-background {
         }
     }
 
-    input[type=submit], input[type=button], a.button {
+    button, input[type=submit], input[type=button], a.button {
         border-radius: 3px;
         font-size: 13px;
         background-color: #C3392F;
@@ -5935,7 +5937,7 @@ h6.cart-head {
 .autoship-actions-container {
     margin-top: 20px;
 
-    input[type=button] {
+    input[type=button], button {
         float: left;
         margin-right: 20px;
     }
@@ -6213,4 +6215,8 @@ h6.cart-head {
 
 .top-menu .a span.ddtitle:hover {
 	color:#f34d20;
+}
+
+#lnkAddToCart .ladda-label{
+    display:block;
 }

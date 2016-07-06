@@ -20,6 +20,8 @@
     "assets/scripts/vendor/knockout.mapping-latest.js",
     "assets/scripts/plugins.js",
     "assets/scripts/vendor/modernizr-2.8.3.min.js",
-    "lib/js-cookie/js.cookie.js"
+    "lib/js-cookie/js.cookie.js",
+    "lib/ladda/spin.min.js",
+    "lib/ladda/ladda.min.js"
   ]
 }

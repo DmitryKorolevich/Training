@@ -1,5 +1,8 @@
-﻿function addToCart(event, sku)
+﻿function addToCart(elem, sku)
 {
+    var l = Ladda.create(elem)
+    l.start();
+
     $.ajax({
         url: "/Cart/AddToCartView?skuCode=" + sku,
         dataType: "html",
@@ -32,6 +35,8 @@
     }).error(function (result)
     {
         notifyError();
+    }).complete(function() {
+        l.stop();
     });
 
     return false;
