@@ -103,7 +103,7 @@ namespace VitalChoice.Business.Services.Orders
 				return new ExtendedOrderNote
 				{
 					AdminProfile =
-						(await _adminProfileRepository.Query(x => x.Id == id).SelectAsync(false)).SingleOrDefault(
+						(await _adminProfileRepository.Query(x => x.Id == id).SelectAsync(false)).FirstOrDefault(
 							x => x.Id == orderNote.IdEditedBy),
 					IdEditedBy = orderNote.IdEditedBy,
 					CustomerTypes = orderNote.CustomerTypes,
