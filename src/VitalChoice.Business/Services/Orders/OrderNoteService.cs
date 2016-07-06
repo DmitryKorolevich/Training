@@ -124,7 +124,7 @@ namespace VitalChoice.Business.Services.Orders
 		{
 			var condition = new OrderNoteQuery().NotDeleted().MatchByid(id);
 
-			var orderNote = await _orderNoteRepository.Query(condition).Include(x => x.CustomerTypes).SelectFirstOrDefaultAsync(false)
+		    var orderNote = await _orderNoteRepository.Query(condition).Include(x => x.CustomerTypes).SelectFirstOrDefaultAsync(false);
 
 			return orderNote;
 		}
