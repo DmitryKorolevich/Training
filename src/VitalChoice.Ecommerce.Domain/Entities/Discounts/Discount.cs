@@ -13,7 +13,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Discounts
 
         public string Description { get; set; }
 
-        public DateTime? StartDate { get; set; }
+        public DateTime StartDate { get; set; }
 
         public DateTime? ExpirationDate { get; set; }
 

@@ -224,3 +224,17 @@ BEGIN
 END
 
 GO
+
+IF ('YES' =(select TOP 1 IS_NULLABLE from INFORMATION_SCHEMA.COLUMNS 
+where TABLE_NAME ='Discounts' and COLUMN_NAME ='StartDate'))
+BEGIN
+
+UPDATE Discounts
+SET StartDate=N'2000-01-01 00:00:00.0000000'
+WHERE StartDate IS NULL
+
+ALTER TABLE Discounts ALTER COLUMN StartDate datetime2 NOT NULL
+
+END
+
+GO

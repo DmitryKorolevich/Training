@@ -2,13 +2,13 @@
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Help;
 
-namespace VitalChoice.Business.Queries.Help
+namespace VitalChoice.Business.Queries.Helps
 {
     public class HelpTicketQuery : QueryObject<HelpTicket>
     {
         public HelpTicketQuery WithId(int id)
         {
-            Add(x => x.Id >= id);
+            Add(x => x.Id == id);
             return this;
         }
 

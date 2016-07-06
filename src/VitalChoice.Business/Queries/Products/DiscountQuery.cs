@@ -72,7 +72,7 @@ namespace VitalChoice.Business.Queries.Products
             if (validFrom.HasValue)
             {
                 var from = validFrom;
-                Add(x => !x.StartDate.HasValue || x.StartDate.Value>= from);
+                Add(x => x.StartDate>= from);
             }
             return this;
         }

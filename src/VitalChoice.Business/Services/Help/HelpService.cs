@@ -12,7 +12,7 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Help;
 using VitalChoice.Interfaces.Services.Customers;
-using VitalChoice.Business.Queries.Help;
+using VitalChoice.Business.Queries.Helps;
 using VitalChoice.Business.Mail;
 using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Business.Queries.Users;

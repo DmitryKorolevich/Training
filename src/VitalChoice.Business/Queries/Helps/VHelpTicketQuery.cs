@@ -4,7 +4,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Help;
 using VitalChoice.Infrastructure.Domain.Transfer.Help;
 
-namespace VitalChoice.Business.Queries.Help
+namespace VitalChoice.Business.Queries.Helps
 {
     public class VHelpTicketQuery : QueryObject<VHelpTicket>
     {

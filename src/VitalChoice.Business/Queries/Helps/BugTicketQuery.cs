@@ -3,7 +3,7 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Help;
 
-namespace VitalChoice.Business.Queries.Help
+namespace VitalChoice.Business.Queries.Helps
 {
     public class BugTicketQuery : QueryObject<BugTicket>
     {

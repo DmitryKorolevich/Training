@@ -26,7 +26,7 @@ namespace VitalChoice.Business.Queries.Orders
 		{
 			if (!string.IsNullOrWhiteSpace(keyword))
 			{
-				Add(x => x.Title.ToLower().Contains(keyword.ToLower()) || x.Description.ToLower().Contains(keyword.ToLower()));
+				Add(x => x.Title.Contains(keyword) || x.Description.Contains(keyword));
 			}
 
 			return this;
@@ -36,7 +36,7 @@ namespace VitalChoice.Business.Queries.Orders
 		{
 			if (!string.IsNullOrWhiteSpace(name))
 			{
-				Add(x => x.Title.ToLower().Equals(name.ToLower()));
+				Add(x => x.Title == name.ToLower());
 			}
 			if (id.HasValue)
 			{

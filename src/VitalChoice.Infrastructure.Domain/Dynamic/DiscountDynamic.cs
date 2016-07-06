@@ -16,7 +16,7 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
         public CustomerType? Assigned { get; set; }
 
-        public DateTime? StartDate { get; set; }
+        public DateTime StartDate { get; set; }
 
         public DateTime? ExpirationDate { get; set; }
 
