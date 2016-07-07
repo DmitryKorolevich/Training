@@ -246,7 +246,8 @@ namespace VitalChoice.ExportService.Services
                     results.Add(new OrderExportItemResult
                     {
                         Id = order.Id,
-                        Error = "Cannot find order credit card in encrypted store"
+                        Error = "Cannot find order credit card in encrypted store",
+                        Success = false
                     });
                     orderList.Remove(order);
                 }

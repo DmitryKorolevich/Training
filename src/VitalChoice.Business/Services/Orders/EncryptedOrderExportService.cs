@@ -115,8 +115,9 @@ namespace VitalChoice.Business.Services.Orders
                             }
                         });
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Logger.LogError(e.ToString());
                 EncryptionHost.UnlockSession(command.SessionId);
                 doneAllEvent.Set();
                 throw;
@@ -125,7 +126,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 EncryptionHost.UnlockSession(command.SessionId);
                 // ReSharper disable once InconsistentlySynchronizedField
-                Logger.LogError("Export timeout");
+                Logger.LogError($"Export timeout, items left: {sentItems.Count}");
                 throw new ApiException("Export timeout");
             }
             return results;
