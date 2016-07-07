@@ -134,8 +134,8 @@ namespace VitalChoice.Business.Services.Avatax
             {
                 return result.TotalTax;
             }
-            _logger.LogWarning(string.Join("\n",
-                result.Messages.Select(m => $"[{m.Source}] {m.Summary}\r\n{result.DocCode}")));
+            _logger.LogError(string.Join("\n",
+                result.Messages.Select(m => $"[{result.DocCode}]({m.Source}) {m.Summary}")));
             return 0;
         }
 

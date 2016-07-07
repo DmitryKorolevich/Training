@@ -59,11 +59,11 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         {
             _terminated = true;
             WaitHandle.WaitAll(new WaitHandle[] {_readyToDisposeReceive, _readyToDisposeSend}, TimeSpan.FromSeconds(20));
+            _sendThreads.ForEach(t => t.Abort());
+            _receiveThreads.ForEach(t => t.Abort());
             Receiver.Dispose();
             Sender.Dispose();
             ReceiveMessagesEvent = null;
-            _sendThreads.ForEach(t => t.Abort());
-            _receiveThreads.ForEach(t => t.Abort());
         }
 
         public virtual int ThreadCount { get; set; } = 2;
