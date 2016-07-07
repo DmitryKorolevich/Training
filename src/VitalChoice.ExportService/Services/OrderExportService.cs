@@ -287,7 +287,7 @@ namespace VitalChoice.ExportService.Services
                         }
                     }
                 }
-            }));
+            })).ConfigureAwait(false);
             
             await _orderService.UpdateRangeAsync(orderList);
         }

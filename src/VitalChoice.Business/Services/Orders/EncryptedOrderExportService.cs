@@ -121,7 +121,7 @@ namespace VitalChoice.Business.Services.Orders
                 doneAllEvent.Set();
                 throw;
             }
-            if (!await doneAllEvent.WaitAsync(TimeSpan.FromSeconds(110)))
+            if (!await doneAllEvent.WaitAsync(TimeSpan.FromMinutes(5)))
             {
                 EncryptionHost.UnlockSession(command.SessionId);
                 // ReSharper disable once InconsistentlySynchronizedField
