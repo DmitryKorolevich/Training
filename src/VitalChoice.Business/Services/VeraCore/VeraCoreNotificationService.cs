@@ -303,10 +303,6 @@ namespace VitalChoice.Business.Services.VeraCore
                             foreach (PurchaseOrderInformation orderInfo in shipNotice.PurchaseOrderInformation)
                             {
                                 string sNumber = orderInfo.PurchaseOrderNumber;
-                                if (sNumber.Contains('-'))
-                                {
-                                    sNumber = orderInfo.PurchaseOrderNumber.Split(new[] { '-' })[0];
-                                }
                                 if (sNumber.EndsWith("-NP"))
                                 {
                                     pOrderType = (int)POrderType.NP;
@@ -316,6 +312,10 @@ namespace VitalChoice.Business.Services.VeraCore
                                 {
                                     pOrderType = (int)POrderType.P;
                                     sNumber = sNumber.Replace("-P", "");
+                                }
+                                if (sNumber.Contains('-'))
+                                {
+                                    sNumber = orderInfo.PurchaseOrderNumber.Split(new[] { '-' })[0];
                                 }
 
                                 if (_numberPattern.IsMatch(sNumber))
