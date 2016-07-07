@@ -10,7 +10,8 @@
     "font-awesome": "~4.6.1",
     "knockout": "~3.4.0",
     "moment": "~2.12.0",
-    "js-cookie": "~2.1.1"
+    "js-cookie": "~2.1.1",
+    "ladda": "~1.0.0"
   },
   "exportsOverride": {
     "jQuery": {
@@ -22,6 +23,13 @@
     },
     "normalize.css": {
       ".": "normalize.css"
+    },
+    "ladda": {
+      ".": [
+        "./dist/ladda-themeless.min.css",
+        "./dist/ladda.min.js",
+        "./dist/spin.min.js"
+      ]
     }
   }
 }

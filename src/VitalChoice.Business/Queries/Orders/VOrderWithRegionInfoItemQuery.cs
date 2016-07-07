@@ -20,14 +20,14 @@ namespace VitalChoice.Business.Queries.Orders
         {
             if (idOrderType.HasValue)
             {
-                Add(x => x.OrderType == idOrderType.Value.ToString());
+                Add(x => x.OrderType == Convert.ToString(idOrderType.Value));
             }
             return this;
         }
 
         public VOrderWithRegionInfoItemQuery WithDates(DateTime from, DateTime to)
         {
-            Add(x => x.DateCreated>= from && x.DateCreated< to);
+            Add(x => x.DateCreated >= from && x.DateCreated < to);
             return this;
         }
 

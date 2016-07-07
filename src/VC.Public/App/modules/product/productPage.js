@@ -36,7 +36,11 @@ $(document).ready(function ()
 
     $("body").on("change", "input[name=sku]", setSelectedSku);
 
-    $("body").on("click", "#lnkAddToCart", addToCartSelectedSku);
+    $("body").on("click", "#lnkAddToCart",
+        function (e) {
+            e.preventDefault();
+            addToCartSelectedSku(this);
+        });
     $("body").on("click", "#lnkClose", closeCartLite);
 
     $("body").on("click", ".proposals-item-link", addCrossToCart);
@@ -137,12 +141,12 @@ function addOutOfStockProductRequestFormSubmitSuccess(data)
     }
 }
 
-function addToCartSelectedSku()
+function addToCartSelectedSku(elem)
 {
     var jChecked = $("input[name=sku]:checked");
     sku = jChecked.val();
 
-    addToCart(null, sku);
+    addToCart(elem, sku);
     return false;
 }
 

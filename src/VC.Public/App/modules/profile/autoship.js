@@ -40,7 +40,7 @@
 		});
 	});
 
-	$("body").on("click", ".edit-billing", function() { billingDetailsDialog($(this).attr("data-autoship-billing")) });
+	$("body").on("click", ".edit-billing", function() { billingDetailsDialog(this, $(this).attr("data-autoship-billing")) });
 });
 
 function successHandler(result, successMessage) {
@@ -109,7 +109,10 @@ function refreshGrid() {
 	});
 }
 
-function billingDetailsDialog(s) {
+function billingDetailsDialog(jSelf, s) {
+    var l = Ladda.create(jSelf)
+    l.start();
+
 	$.ajax({
 		url: "/Profile/AutoShipBillingDetails?orderId=" + s,
 		dataType: "html"
@@ -150,6 +153,8 @@ function billingDetailsDialog(s) {
 		});
 	}).error(function (result) {
 		notifyError();
+	}).complete(function() {
+	    l.stop();
 	});
 
 	return false;

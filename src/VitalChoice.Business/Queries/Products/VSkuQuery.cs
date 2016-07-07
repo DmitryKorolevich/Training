@@ -125,7 +125,7 @@ namespace VitalChoice.Business.Queries.Product
 	    {
 			if (notHidden)
 			{
-				Add(x => !x.Hidden && x.ProductIdVisibility.HasValue);
+				Add(x => !x.Hidden && x.ProductIdVisibility != null);
 			}
 
 			return this;

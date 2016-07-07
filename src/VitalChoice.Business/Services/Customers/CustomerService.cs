@@ -10,7 +10,6 @@ using VitalChoice.Business.FedEx.Ship;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Orders;
 using VitalChoice.Business.Queries.Payment;
-using VitalChoice.Business.Queries.User;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;

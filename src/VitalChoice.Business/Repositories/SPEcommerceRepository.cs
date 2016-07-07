@@ -105,8 +105,8 @@ namespace VitalChoice.Business.Repositories
                 }
             }
 
-            var toReturn = await _context.Set<InventoriesSummaryUsageRawReportItem>().FromSql("[dbo].[SPGetInventoriesSummaryUsageReport] @from={0}, @to={1}, @sku={2}, @invsku={3}, @assemble={4}, @idsinvcat={5}",
-                filter.From, filter.To, filter.Sku, filter.InvSku, filter.Assemble, sIdsInvCat).ToListAsync();
+            var toReturn = await _context.Set<InventoriesSummaryUsageRawReportItem>().FromSql("[dbo].[SPGetInventoriesSummaryUsageReport] @from={0}, @to={1}, @sku={2}, @invsku={3}, @assemble={4}, @idsinvcat={5}, @shipdate={6}",
+                filter.From, filter.To, filter.Sku, filter.InvSku, filter.Assemble, sIdsInvCat, filter.ShipDate).ToListAsync();
             return toReturn;
         }
 

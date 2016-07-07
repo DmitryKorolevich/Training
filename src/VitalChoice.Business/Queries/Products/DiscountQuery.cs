@@ -43,7 +43,8 @@ namespace VitalChoice.Business.Queries.Products
         {
             if (status.HasValue)
             {
-                Add(x => x.StatusCode == (int)status.Value);
+                var statusInt = (int) status.Value;
+                Add(x => x.StatusCode == statusInt);
             }
             return this;
         }
@@ -52,7 +53,14 @@ namespace VitalChoice.Business.Queries.Products
         {
             if (searchByAssigned)
             {
-                Add(x => x.Assigned == type);
+                if (type.HasValue)
+                {
+                    Add(x => x.Assigned != null && x.Assigned.Value == type.Value);
+            }
+                else
+                {
+                    Add(x => x.Assigned == null);
+                }
             }
             return this;
         }
@@ -61,7 +69,8 @@ namespace VitalChoice.Business.Queries.Products
         {
             if (type.HasValue)
             {
-                Add(x => x.IdObjectType == (int?)type);
+                var typeInt = (int) type;
+                Add(x => x.IdObjectType == typeInt);
             }
 
             return this;
@@ -72,7 +81,7 @@ namespace VitalChoice.Business.Queries.Products
             if (validFrom.HasValue)
             {
                 var from = validFrom;
-                Add(x => x.StartDate>= from);
+                Add(x => x.StartDate >= from);
             }
             return this;
         }
@@ -82,7 +91,7 @@ namespace VitalChoice.Business.Queries.Products
             if (validTo.HasValue)
             {
                 var to = validTo;
-                Add(x => !x.ExpirationDate.HasValue || x.ExpirationDate.Value <= to);
+                Add(x => x.ExpirationDate == null || x.ExpirationDate.Value <= to);
             }
             return this;
         }
@@ -94,11 +103,11 @@ namespace VitalChoice.Business.Queries.Products
                 DateTime endNow = DateTime.Now.AddDays(-1);//Discount is valid the entire end date
                 if (expiredType.Value==ExpiredType.Expired)
                 {
-                    Add(x => x.ExpirationDate <= endNow);
+                    Add(x => x.ExpirationDate != null && x.ExpirationDate.Value <= endNow);
                 }
                 if (expiredType.Value == ExpiredType.NotExpired)
                 {
-                    Add(x => x.ExpirationDate > endNow);
+                    Add(x => x.ExpirationDate != null && x.ExpirationDate.Value > endNow);
                 }
             }
             return this;
@@ -112,11 +121,11 @@ namespace VitalChoice.Business.Queries.Products
                 DateTime dayBeforeNow = now.AddDays(-1);//Discount is valid the entire end date
                 if (dateStatus.Value == DateStatus.Expired)
                 {
-                    Add(x => x.ExpirationDate <= dayBeforeNow);
+                    Add(x => x.ExpirationDate != null && x.ExpirationDate.Value <= dayBeforeNow);
                 }
                 if (dateStatus.Value == DateStatus.Live)
                 {
-                    Add(x => x.ExpirationDate > dayBeforeNow && now>=x.StartDate);
+                    Add(x => x.ExpirationDate != null && x.ExpirationDate.Value > dayBeforeNow && now >= x.StartDate);
                 }
                 if (dateStatus.Value == DateStatus.Future)
                 {

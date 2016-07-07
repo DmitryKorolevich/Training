@@ -24,7 +24,10 @@ namespace VitalChoice.Business.Queries.Orders
 
         public OrderQuery WithCustomerIds(ICollection<int> ids)
         {
-            Add(x => (ids ?? new List<int>()).Contains(x.IdCustomer));
+            if (ids != null && ids.Count > 0)
+            {
+                Add(x => ids.Contains(x.IdCustomer));
+            }
             return this;
         }
 
@@ -84,7 +87,8 @@ namespace VitalChoice.Business.Queries.Orders
         {
             if (idObjectType.HasValue)
             {
-                Add(x => x.IdObjectType == (int)idObjectType.Value);
+                var orderTypeInt = (int) idObjectType.Value;
+                Add(x => x.IdObjectType == orderTypeInt);
             }
             return this;
         }
@@ -135,7 +139,8 @@ namespace VitalChoice.Business.Queries.Orders
 
 		public OrderQuery NotAutoShip()
 		{
-			Add(x => x.IdObjectType != (int)OrderType.AutoShip);
+		    var typeInt = (int) OrderType.AutoShip;
+		    Add(x => x.IdObjectType != typeInt);
 			return this;
 		}
 
@@ -272,9 +277,12 @@ namespace VitalChoice.Business.Queries.Orders
 
         #region AffiliateOrders
 
-        public OrderQuery WithIdAffiliate(int? IdAffiliate)
+        public OrderQuery WithIdAffiliate(int? idAffiliate)
         {
-            Add(x => x.AffiliateOrderPayment.IdAffiliate == IdAffiliate);
+            if (idAffiliate.HasValue)
+            {
+                Add(x => x.AffiliateOrderPayment.IdAffiliate == idAffiliate.Value);
+            }
             return this;
         }
 
@@ -298,10 +306,9 @@ namespace VitalChoice.Business.Queries.Orders
 
         public OrderQuery WithCreatedByAgentsOrWithout(ICollection<int> agentIds)
         {
-            if (agentIds!=null)
+            if (agentIds != null)
             {
-                var tAgentIds = agentIds.Select(p => (int?) p).ToList();
-                Add(x => !x.IdAddedBy.HasValue || tAgentIds.Contains(x.IdAddedBy));
+                Add(x => x.IdAddedBy == null || agentIds.Contains(x.IdAddedBy.Value));
             }
             return this;
         }

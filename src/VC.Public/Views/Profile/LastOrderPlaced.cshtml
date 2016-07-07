@@ -15,51 +15,54 @@
 		@await Component.InvokeAsync("ProfileSidebar")
 	</div>
 	<div class="right-pane clean-indent">
-		<div class="border-form-left">
-			<h4>Items On Your Last Order</h4>
-			@if (Model!=null && Model.Count > 0)
-			{
-				<table class="last-order-lines">
-					<thead>
-					<tr>
-						<th>
-							QTY Ordered
-						</th>
-						<th></th>
-						<th></th>
-					</tr>
-					</thead>
-					<tbody>
-					@foreach (var item in Model)
-					{
-						<tr>
-							<td class="qty-cell">@item.Quantity</td>
-							<td class="icon-container">
-								<a href="@item.ProductUrl">
-									<img class="product-icon" title="@item.ProductName" src="@item.IconLink	"/>
-								</a>
-							</td>
-							<td>
-								<a href="@item.ProductUrl">
-									<span class="product-title">
+	    <div class="border-form-left relative">
+            <div class="overlay hide">
+                <div class="loading">Loading…</div>
+            </div>
+	        <h4>Items On Your Last Order</h4>
+	        @if (Model != null && Model.Count > 0)
+	        {
+	            <table class="last-order-lines">
+	                <thead>
+	                <tr>
+	                    <th>
+	                        QTY Ordered
+	                    </th>
+	                    <th></th>
+	                    <th></th>
+	                </tr>
+	                </thead>
+	                <tbody>
+	                @foreach (var item in Model)
+	                {
+	                    <tr>
+	                        <td class="qty-cell">@item.Quantity</td>
+	                        <td class="icon-container">
+	                            <a href="@item.ProductUrl">
+	                                <img class="product-icon" title="@item.ProductName" src="@item.IconLink	"/>
+	                            </a>
+	                        </td>
+	                        <td>
+	                            <a href="@item.ProductUrl">
+	                                <span class="product-title">
 											@item.ProductName<br/>
                                             @($"{item.ProductSubTitle} ({item.PortionsCount})")
 										</span>
-								</a>
-								<span class="sku-code">Product #@item.SkuCode</span>
-								<span class="selected-price">Selected Price @item.SelectedPrice</span>
-								<a href="#" class="add-to-cart block" data-sku-code="@item.SkuCode">
-									<img src="/assets/images/addtocartorange.jpg"/>
-								</a>
-								<a class="review-product-link" href="@($"{item.ProductUrl}?review=true")">
-									Review this product
-								</a>
-							</td>
-						</tr>
-					}
-					</tbody>
-				</table>
-			}
-		</div>
+	                            </a>
+	                            <span class="sku-code">Product #@item.SkuCode</span>
+	                            <span class="selected-price">Selected Price @item.SelectedPrice</span>
+	                            <a href="#" class="add-to-cart block" data-sku-code="@item.SkuCode">
+	                                <img src="/assets/images/addtocartorange.jpg"/>
+	                            </a>
+	                            <a class="review-product-link" href="@($"{item.ProductUrl}?review=true")">
+	                                Review this product
+	                            </a>
+	                        </td>
+	                    </tr>
+	                }
+	                </tbody>
+	            </table>
+	        }
+	    </div>
 		</div>
 </div>

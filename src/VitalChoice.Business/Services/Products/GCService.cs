@@ -93,12 +93,17 @@ namespace VitalChoice.Business.Services.Products
 	        }
 
 	        PagedList<GiftCertificate> toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            var users = await userManager.Users.Where(p=>toReturn.Items.Select(pp=>pp.UserId).Contains(p.Id)).Include(x => x.Profile).ToListAsync();
-            foreach(var item in toReturn.Items)
+            var userIds = toReturn.Items.Select(pp => pp.UserId).Where(u => u.HasValue).Select(u => u.Value).Distinct().ToList();
+            var users =
+                await
+                    userManager.Users.AsNoTracking().Where(p => userIds.Contains(p.Id))
+                        .Include(x => x.Profile)
+                        .ToListAsync();
+            foreach (var item in toReturn.Items)
             {
-                foreach(var user in users)
+                foreach (var user in users)
                 {
-                    if(item.UserId==user.Id)
+                    if (item.UserId == user.Id)
                     {
                         item.AgentId = user.Profile?.AgentId;
                         break;

@@ -90,7 +90,7 @@ namespace VitalChoice.Business.Services.Users
 				return;
 			}
 
-			var ids = roles.Select(x => (int)x).ToList();
+            var ids = roles.Select(x => (int) x).Distinct().ToList();
 			if (RoleManager.Roles.Any(x => x.IdUserType != UserType.Affiliate && ids.Contains(x.Id)))
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AttemptToAssignWrongRole]);

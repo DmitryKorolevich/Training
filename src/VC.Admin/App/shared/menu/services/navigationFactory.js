@@ -68,7 +68,6 @@ angular.module('app.shared.menu.services.navigationFactory', [])
                         { name: 'orderSKUAddressReport', stateName: 'index.oneCol.orderSKUAddressReport', stateLabel: 'Order SKU and Address Report', access: 3 },
                         { name: 'orderSkuCountReport', stateName: 'index.oneCol.orderSkuCountReport', stateLabel: 'Order SKU Counts', access: 3 },
                         { name: 'inventorySkusUsageReport', stateName: 'index.oneCol.inventorySkusUsageReport', stateLabel: 'Parts Usage Report', access: 3 },
-                        { name: 'inventoriesSummaryUsageReport', stateName: 'index.oneCol.inventoriesSummaryUsageReport', stateLabel: 'Product Shipment Summary', access: 3 },
                         { name: 'ordersRegionStatistic', stateName: 'index.oneCol.ordersRegionStatistic', stateLabel: 'Regional Sales Summary', access: 3 },
                         { name: 'shippedViaSummaryReport', stateName: 'index.oneCol.shippedViaSummaryReport', stateLabel: 'Shipped Via Report', access: 3 },
                         { name: 'skuBreakDownReport', stateName: 'index.oneCol.skuBreakDownReport', stateLabel: 'SKU Breakdown Report', access: 3 },
@@ -97,6 +96,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    stateLabel: 'Operations',
 				    subMenu: [
                         { name: 'orderAgentsStatistic', stateName: 'index.oneCol.orderAgentsStatistic', stateLabel: 'Agents Report', access: null },
+                        { name: 'inventoriesSummaryUsageReport', stateName: 'index.oneCol.inventoriesSummaryUsageReport', stateLabel: 'Inventory Shipment Summary', access: 3 },
                         { name: 'vitalGreen', stateName: 'index.oneCol.vitalGreen', stateLabel: 'Review VitalGreen Statistics', access: 3 },
                         { name: 'index.oneCol.serviceCodesStatistic', stateName: 'index.oneCol.serviceCodesStatistic', stateLabel: 'Service Codes Report', access: 3 },
                         //{ name: 'productQualityIssuesReport', stateName: 'index.oneCol.productQualityIssuesReport', stateLabel: 'Product Quality Issues Report', access: 3 },

@@ -11,7 +11,7 @@ namespace VitalChoice.Business.Queries.Product
     {
         public GcQuery WithId(int id)
         {
-            Add(x => x.Id.Equals(id));
+            Add(x => x.Id == id);
             return this;
         }
 

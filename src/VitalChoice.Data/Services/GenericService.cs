@@ -89,32 +89,32 @@ namespace VitalChoice.Data.Services
 
         public List<TEntity> Query()
         {
-            return Repository.Query().Select();
+            return Repository.Query().Select(false);
         }
 
         public virtual List<TEntity> Query(IQueryObject<TEntity> queryObject)
         {
-            return Repository.Query(queryObject).Select();
+            return Repository.Query(queryObject).Select(false);
         }
 
 	    public async Task<List<TEntity>> QueryAsync(IQueryObject<TEntity> queryObject)
 	    {
-			return await Repository.Query(queryObject).SelectAsync();
+			return await Repository.Query(queryObject).SelectAsync(false);
 		}
 
 	    public virtual List<TEntity> Query(Expression<Func<TEntity, bool>> query)
         {
-            return Repository.Query(query).Select();
+            return Repository.Query(query).Select(false);
         }
 
-	    public async Task<TEntity> Query(int id)
-	    {
-		    var res = await Repository.Query(x=>x.Id == id).SelectAsync();
+        public async Task<TEntity> Query(int id)
+        {
+            var res = await Repository.Query(x => x.Id == id).SelectAsync(false);
 
-		    return res.SingleOrDefault();
-	    }
+            return res.FirstOrDefault();
+        }
 
-	    public virtual async Task<bool> DeleteAsync(int id)
+        public virtual async Task<bool> DeleteAsync(int id)
         {
             return await DeleteAsync(CancellationToken.None, id);
         }

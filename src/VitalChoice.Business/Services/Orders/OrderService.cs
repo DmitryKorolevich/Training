@@ -1383,7 +1383,8 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     try
                     {
-                        var previous = await SelectAsync(x => autoShips.Select(y => y.Id).Contains(x.Id));
+                        var list = autoShips.Select(y => y.Id).Distinct().ToList();
+                        var previous = await SelectAsync(x => list.Contains(x.Id));
 
                         res.AddRange(await UpdateRangeInternalAsync(autoShips, uow));
 

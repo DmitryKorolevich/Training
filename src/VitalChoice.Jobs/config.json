@@ -66,10 +66,10 @@
       "Disabled": false
     },
     "VeraCoreSettings": {
-      "ExportFolderName": "Export",
-      "ServerHost": "127.0.0.1",
-      "UserName": "admin",
-      "Password": "admin",
+      "ExportFolderName": "TestExport",
+      "ServerHost": "ftpvc5.veracore.com",
+      "UserName": "vitalchoice2",
+      "Password": "vitalchoice!32",
       "ServerPort": "22",
       "ArchivePath": "C:\\WindowsService\\SFTPCache",
       "WAwarehouseThreshold": 609000

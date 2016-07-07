@@ -149,8 +149,10 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 
                 foreach (var subCategory in category.SubCategories)
                 {
-                    var subCategoryContent =
-                        (await _productCategoryRepository.Query(p => p.Id == subCategory.Id && p.NavIdVisible.HasValue && customerVisibility.Contains(p.NavIdVisible.Value)).SelectAsync(false)).SingleOrDefault();
+                    var subCategoryContent = await
+                        _productCategoryRepository.Query(
+                            p => p.Id == subCategory.Id && p.NavIdVisible.HasValue && customerVisibility.Contains(p.NavIdVisible.Value))
+                            .SelectFirstOrDefaultAsync(false);
                     if (subCategoryContent != null)
                     {
                         subCategoryContent.ProductCategory = subCategory;

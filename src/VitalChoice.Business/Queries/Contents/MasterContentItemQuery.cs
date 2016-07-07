@@ -10,7 +10,8 @@ namespace VitalChoice.Business.Queries.Content
         {
             if (type.HasValue)
             {
-                Add(x => x.TypeId == (int)type);
+                var typeInt = (int)type.Value;
+                Add(x => x.TypeId == typeInt);
             }
 
             return this;
@@ -34,7 +35,7 @@ namespace VitalChoice.Business.Queries.Content
         {
             if (status == RecordStatusCode.Active || status == RecordStatusCode.NotActive)
             {
-                Add(x => x.StatusCode == status);
+                Add(x => x.StatusCode == status.Value);
             }
 
             return this;

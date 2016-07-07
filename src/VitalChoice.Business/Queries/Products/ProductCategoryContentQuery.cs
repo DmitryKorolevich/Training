@@ -30,11 +30,11 @@ namespace VitalChoice.Business.Queries.Products
             {
                 if (codes != null)
                 {
-                    Add(x => x.NavIdVisible.HasValue && codes.Contains(x.NavIdVisible.Value));
+                    Add(x => x.NavIdVisible != null && codes.Contains(x.NavIdVisible.Value));
                 }
                 else
                 {
-                    Add(x => x.NavIdVisible.HasValue);
+                    Add(x => x.NavIdVisible != null);
                 }
             }
 

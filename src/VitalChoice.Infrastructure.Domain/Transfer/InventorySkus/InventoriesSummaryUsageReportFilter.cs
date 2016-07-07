@@ -10,6 +10,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.InventorySkus
 
         public DateTime To { get; set; }
 
+        public bool ShipDate { get; set; }
+
         public string Sku { get; set; }
 
         public string InvSku { get; set; }

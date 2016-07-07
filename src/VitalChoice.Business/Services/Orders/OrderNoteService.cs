@@ -4,7 +4,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Queries.Orders;
-using VitalChoice.Business.Queries.User;
 using VitalChoice.Business.Queries.Users;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
@@ -104,7 +103,7 @@ namespace VitalChoice.Business.Services.Orders
 				return new ExtendedOrderNote
 				{
 					AdminProfile =
-						(await _adminProfileRepository.Query(x => x.Id == id).SelectAsync(false)).SingleOrDefault(
+						(await _adminProfileRepository.Query(x => x.Id == id).SelectAsync(false)).FirstOrDefault(
 							x => x.Id == orderNote.IdEditedBy),
 					IdEditedBy = orderNote.IdEditedBy,
 					CustomerTypes = orderNote.CustomerTypes,
@@ -125,7 +124,7 @@ namespace VitalChoice.Business.Services.Orders
 		{
 			var condition = new OrderNoteQuery().NotDeleted().MatchByid(id);
 
-			var orderNote = (await _orderNoteRepository.Query(condition).Include(x => x.CustomerTypes).SelectAsync(false)).SingleOrDefault();
+		    var orderNote = await _orderNoteRepository.Query(condition).Include(x => x.CustomerTypes).SelectFirstOrDefaultAsync(false);
 
 			return orderNote;
 		}
@@ -197,7 +196,7 @@ namespace VitalChoice.Business.Services.Orders
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.HasAssignments]);
 			}
 
-			var orderNote = (await _orderNoteRepository.Query(new OrderNoteQuery().NotDeleted().MatchByid(id)).SelectAsync(false)).SingleOrDefault();
+		    var orderNote = await _orderNoteRepository.Query(new OrderNoteQuery().NotDeleted().MatchByid(id)).SelectFirstOrDefaultAsync(false);
 
 			if (orderNote != null)
 			{

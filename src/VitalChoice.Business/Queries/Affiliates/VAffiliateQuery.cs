@@ -13,7 +13,7 @@ namespace VitalChoice.Business.Queries.Affiliate
         {
             if (id.HasValue)
             {
-                And(x => x.Id==id);
+                And(x => x.Id == id.Value);
             }
             return this;
         }
