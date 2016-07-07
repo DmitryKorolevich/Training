@@ -29,20 +29,11 @@ namespace VitalChoice.ExportService.Services
         {
         }
 
-        public bool IsAuthenticatedClient(Guid sessionId)
-        {
-            return false;
-        }
-
         public string LocalHostName => string.Empty;
         public string ServerHostName => string.Empty;
-        public Task<bool> AuthenticateClient(Guid sessionId)
+        public Task<Guid> AuthenticateClientWithLock(Guid sessionId)
         {
-            return TaskCache<bool>.DefaultCompletedTask;
-        }
-
-        public void RemoveClient(Guid sessionId)
-        {
+            return TaskCache<Guid>.DefaultCompletedTask;
         }
     }
 }

@@ -6,7 +6,6 @@ namespace VitalChoice.Interfaces.Services
 {
     public interface IEncryptedServiceBusHostClient : IEncryptedServiceBusHost
     {
-        Task<bool> AuthenticateClient(Guid sessionId);
-        void RemoveClient(Guid sessionId);
+        Task<Guid> AuthenticateClientWithLock(Guid sessionId);
     }
 }

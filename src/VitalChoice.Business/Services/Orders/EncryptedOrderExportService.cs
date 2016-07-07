@@ -37,7 +37,7 @@ namespace VitalChoice.Business.Services.Orders
                 });
             }
             await SendCommand(
-                new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName)
+                new ServiceBusCommandBase(Guid.NewGuid(), OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName)
                 {
                     Data = new ServiceBusCommandData(exportData)
                 },
@@ -76,41 +76,54 @@ namespace VitalChoice.Business.Services.Orders
             var sentItems = new HashSet<int>(exportData.ExportInfo.Select(o => o.Id));
             var results = new List<OrderExportItemResult>();
             var doneAllEvent = new AsyncManualResetEvent(false);
-            await
-                SendCommand(
-                    new ServiceBusCommandBase(SessionId, OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName)
-                    {
-                        Data = new ServiceBusCommandData(exportData)
-                    },
-                    (command, o) =>
-                    {
-                        lock (sentItems)
+            var command = new ServiceBusCommandBase(Guid.NewGuid(), OrderExportServiceCommandConstants.ExportOrder, ServerHostName,
+                LocalHostName)
+            {
+                Data = new ServiceBusCommandData(exportData)
+            };
+            try
+            {
+                await
+                    SendCommand(command,
+                        (cmd, o) =>
                         {
-                            if (!string.IsNullOrEmpty(o.Error))
+                            lock (sentItems)
                             {
-                                sentItems.Clear();
-                                results.Add(new OrderExportItemResult
+                                if (!string.IsNullOrEmpty(o.Error))
                                 {
-                                    Error = o.Error,
-                                    Success = false
-                                });
-                                Logger.LogError(o.Error);
-                                doneAllEvent.Set();
-                            }
-                            else
-                            {
-                                var exportResult = (OrderExportItemResult) o.Data;
-                                results.Add(exportResult);
-                                sentItems.Remove(exportResult.Id);
-                                if (sentItems.Count == 0)
-                                {
+                                    EncryptionHost.UnlockSession(cmd.SessionId);
+                                    sentItems.Clear();
+                                    results.Add(new OrderExportItemResult
+                                    {
+                                        Error = o.Error,
+                                        Success = false
+                                    });
+                                    Logger.LogError(o.Error);
                                     doneAllEvent.Set();
                                 }
+                                else
+                                {
+                                    var exportResult = (OrderExportItemResult) o.Data;
+                                    results.Add(exportResult);
+                                    sentItems.Remove(exportResult.Id);
+                                    if (sentItems.Count == 0)
+                                    {
+                                        EncryptionHost.UnlockSession(cmd.SessionId);
+                                        doneAllEvent.Set();
+                                    }
+                                }
                             }
-                        }
-                    });
+                        });
+            }
+            catch (Exception)
+            {
+                EncryptionHost.UnlockSession(command.SessionId);
+                doneAllEvent.Set();
+                throw;
+            }
             if (!await doneAllEvent.WaitAsync(TimeSpan.FromSeconds(110)))
             {
+                EncryptionHost.UnlockSession(command.SessionId);
                 // ReSharper disable once InconsistentlySynchronizedField
                 Logger.LogError("Export timeout");
                 throw new ApiException("Export timeout");
@@ -127,7 +140,7 @@ namespace VitalChoice.Business.Services.Orders
             if (!ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), orderPaymentMethod.CardNumber, "CardNumber") ||
                 orderPaymentMethod.IdCustomerPaymentMethod > 0)
                 return
-                    SendCommand<bool>(new ServiceBusCommandWithResult(SessionId, OrderExportServiceCommandConstants.UpdateOrderPayment,
+                    SendCommand<bool>(new ServiceBusCommandWithResult(Guid.NewGuid(), OrderExportServiceCommandConstants.UpdateOrderPayment,
                         ServerHostName, LocalHostName)
                     {
                         Data = new ServiceBusCommandData(orderPaymentMethod)
@@ -150,7 +163,7 @@ namespace VitalChoice.Business.Services.Orders
                     return TaskCache<bool>.DefaultCompletedTask;
 
                 return
-                    SendCommand<bool>(new ServiceBusCommandWithResult(SessionId, OrderExportServiceCommandConstants.UpdateCustomerPayment,
+                    SendCommand<bool>(new ServiceBusCommandWithResult(Guid.NewGuid(), OrderExportServiceCommandConstants.UpdateCustomerPayment,
                         ServerHostName, LocalHostName)
                     {
                         Data = new ServiceBusCommandData(paymentsToUpdate)

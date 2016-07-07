@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Interfaces.Services;
@@ -10,84 +11,63 @@ namespace VitalChoice.Business.Services
 {
     public abstract class EncryptedServiceBusClient : IDisposable
     {
-        private static readonly List<SessionInfo> SessionPool = new List<SessionInfo>(20);
-
-        private static int _currentSession;
-
         protected readonly IEncryptedServiceBusHostClient EncryptedBusHost;
         protected readonly IObjectEncryptionHost EncryptionHost;
-        private bool _authenticated;
         protected readonly ILogger Logger;
 
-        public Guid SessionId => _session.SessionId;
+        private Guid _sessionId;
 
         public string ServerHostName => EncryptedBusHost.ServerHostName;
         public string LocalHostName => EncryptedBusHost.LocalHostName;
 
-        protected virtual int MaxSessions => 10;
-
-        protected virtual int ExpireTimeMinutes => 60;
-
-        protected EncryptedServiceBusClient(IEncryptedServiceBusHostClient encryptedBusHost, IObjectEncryptionHost encryptionHost, ILogger logger)
+        protected EncryptedServiceBusClient(IEncryptedServiceBusHostClient encryptedBusHost, IObjectEncryptionHost encryptionHost,
+            ILogger logger)
         {
             EncryptedBusHost = encryptedBusHost;
             EncryptionHost = encryptionHost;
             Logger = logger;
-            _session = GetSession();
+            _sessionId = EncryptionHost.GetSession();
         }
-
-        private SessionInfo _session;
 
         protected async Task<T> SendCommand<T>(ServiceBusCommandWithResult command)
         {
-            if (!await EnsureAuthenticated())
+            try
             {
-                throw new Exception("Cannot authenticate export client");
+                await EnsureAuthenticatedWithLock();
             }
-
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                EncryptionHost.UnlockSession(_sessionId);
+                throw;
+            }
+            command.SessionId = _sessionId;
             return await EncryptedBusHost.ExecuteCommand<T>(command);
         }
 
-        private async Task<bool> EnsureAuthenticated()
+        private async Task EnsureAuthenticatedWithLock()
         {
-            if (!_authenticated)
-            {
-                var sessionId = _session.SessionId;
-                while (!EncryptionHost.SessionExist(sessionId))
-                {
-                    SetInvalid(sessionId);
-                    sessionId = _session.SessionId;
-                }
-                //double auth try to refresh broken/regenerated public key
-                if (!await EncryptedBusHost.AuthenticateClient(sessionId))
-                {
-                    Logger.LogWarning("Authentication failed, retrying");
-                    SetInvalid(sessionId);
-                    sessionId = _session.SessionId;
-                    if (!await EncryptedBusHost.AuthenticateClient(sessionId))
-                    {
-                        Logger.LogError("Authentication failed");
-                        SetInvalid(sessionId);
-                        return false;
-                    }
-                }
-                _authenticated = true;
-            }
-            return true;
+            _sessionId = await EncryptedBusHost.AuthenticateClientWithLock(_sessionId);
         }
 
         protected async Task SendCommand(ServiceBusCommandBase command,
             Action<ServiceBusCommandBase, ServiceBusCommandData> requestAcqureAction)
         {
-            if (!await EnsureAuthenticated())
+            try
             {
+                await EnsureAuthenticatedWithLock();
+            }
+            catch (Exception e)
+            {
+                EncryptionHost.UnlockSession(_sessionId);
+                Logger.LogError(e.ToString());
                 requestAcqureAction?.Invoke(command, new ServiceBusCommandData
                 {
-                    Error = "Cannot authenticate export client"
+                    Error = e.ToString()
                 });
                 return;
             }
-
+            command.SessionId = _sessionId;
             EncryptedBusHost.ExecuteCommand(command, requestAcqureAction);
         }
 
@@ -97,88 +77,6 @@ namespace VitalChoice.Business.Services
             {
                 GC.SuppressFinalize(this);
             }
-        }
-
-        private SessionInfo GetSession()
-        {
-            lock (SessionPool)
-            {
-                if (_currentSession + 1 > SessionPool.Count)
-                {
-                    _currentSession = 0;
-                    if (SessionPool.Count < MaxSessions)
-                    {
-                        var newInfo = new SessionInfo
-                        {
-                            SessionId = Guid.NewGuid(),
-                            CreationTime = DateTime.Now
-                        };
-                        CreateAndRegisterSession(newInfo);
-                        SessionPool.Add(newInfo);
-                    }
-                }
-                var sessionInfo = SessionPool[_currentSession];
-                if ((DateTime.Now - sessionInfo.CreationTime).TotalMinutes > ExpireTimeMinutes)
-                {
-                    sessionInfo = new SessionInfo
-                    {
-                        SessionId = Guid.NewGuid(),
-                        CreationTime = DateTime.Now
-                    };
-                    CreateAndRegisterSession(sessionInfo);
-                    SessionPool[_currentSession] = sessionInfo;
-                }
-                _currentSession++;
-                return sessionInfo;
-            }
-        }
-
-        private void CreateAndRegisterSession(SessionInfo sessionInfo)
-        {
-            var keys = EncryptionHost.CreateSession(sessionInfo.SessionId);
-            EncryptionHost.RegisterSession(sessionInfo.SessionId, keys);
-        }
-
-        private void SetInvalid(Guid session)
-        {
-            lock (SessionPool)
-            {
-                if (SessionPool[_currentSession].SessionId == session)
-                {
-                    var sessionInfo = new SessionInfo
-                    {
-                        SessionId = Guid.NewGuid(),
-                        CreationTime = DateTime.Now
-                    };
-                    CreateAndRegisterSession(sessionInfo);
-                    SessionPool[_currentSession] = sessionInfo;
-                    _session = sessionInfo;
-                    return;
-                }
-                for (var i = 0; i < SessionPool.Count; i++)
-                {
-                    if (SessionPool[i].SessionId == session)
-                    {
-                        var sessionInfo = new SessionInfo
-                        {
-                            SessionId = Guid.NewGuid(),
-                            CreationTime = DateTime.Now
-                        };
-                        CreateAndRegisterSession(sessionInfo);
-                        SessionPool[i] = sessionInfo;
-                        _session = sessionInfo;
-                        return;
-                    }
-                }
-                _session = GetSession();
-            }
-        }
-
-        private class SessionInfo
-        {
-            public Guid SessionId { get; set; }
-
-            public DateTime CreationTime { get; set; }
         }
 
         public void Dispose()

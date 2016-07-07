@@ -143,8 +143,8 @@ namespace VitalChoice.ExportService.Services
 
         private void OnSessionRemoved(Guid session, string hostName)
         {
-            SendPlainCommand(new ServiceBusCommandBase(session, ServiceBusCommandConstants.SessionExpired, hostName, LocalHostName,
-                ttl: TimeSpan.FromMinutes(10)));
+            ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(session, ServiceBusCommandConstants.SessionExpired, hostName,
+                LocalHostName)).GetAwaiter().GetResult();
         }
 
         public override void Dispose()

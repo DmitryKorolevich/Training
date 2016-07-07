@@ -1,6 +1,7 @@
 using System;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 
 namespace VitalChoice.Infrastructure.ServiceBus.Base
@@ -30,12 +31,18 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             where T : ServiceBusCommandBase;
 
         TransportCommandData AesEncryptSign(ServiceBusCommandBase command, Guid session);
+        Guid GetSession();
         bool SessionExist(Guid session);
+        void SetAuthenticated(Guid session);
+        bool IsAuthenticated(Guid session);
+        void RemoveSession(Guid session);
         bool RegisterSession(Guid session, string hostName, KeyExchange keyCombined);
-        bool RegisterSession(Guid session, KeyExchange keyCombined);
-        KeyExchange CreateSession(Guid session);
-        KeyExchange GetSession(Guid session);
-        bool RemoveSession(Guid session);
+        KeyExchange GetSessionKeys(Guid session);
+
+        Task LockSession(Guid session);
+
+        void UnlockSession(Guid session);
+
         event SessionExpiredEventHandler OnSessionExpired;
         void Dispose();
     }
