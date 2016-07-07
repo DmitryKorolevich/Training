@@ -130,6 +130,7 @@ namespace VitalChoice.ExportService.Services
                 }
                 catch (Exception ex)
                 {
+                    Logger.LogError(ex.ToString());
                     SendCommand(new ServiceBusCommandBase(command, new OrderExportItemResult
                     {
                         Id = e.Id,
