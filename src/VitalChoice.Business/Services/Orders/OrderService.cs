@@ -1641,7 +1641,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public string GenerateOrderCode(POrderType? pOrderType, int idOrder, out TaxGetType type)
         {
-            var orderCode = !pOrderType.HasValue ? idOrder.ToString() : (pOrderType.Value == POrderType.P ? idOrder + "_p" : idOrder + "_np");
+            var orderCode = !pOrderType.HasValue ? idOrder.ToString() : (pOrderType.Value == POrderType.P ? idOrder + "-P" : idOrder + "-NP");
             type = !pOrderType.HasValue ? TaxGetType.UseBoth : (pOrderType.Value == POrderType.P ? TaxGetType.Perishable : TaxGetType.NonPerishable);
             return orderCode;
         }

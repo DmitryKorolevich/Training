@@ -307,15 +307,15 @@ namespace VitalChoice.Business.Services.VeraCore
                                 {
                                     sNumber = orderInfo.PurchaseOrderNumber.Split(new[] { '-' })[0];
                                 }
-                                if (sNumber.EndsWith("_np"))
+                                if (sNumber.EndsWith("-NP"))
                                 {
                                     pOrderType = (int)POrderType.NP;
-                                    sNumber = sNumber.Replace("_np", "");
+                                    sNumber = sNumber.Replace("-NP", "");
                                 }
-                                if (sNumber.EndsWith("_p"))
+                                if (sNumber.EndsWith("-P"))
                                 {
                                     pOrderType = (int)POrderType.P;
-                                    sNumber = sNumber.Replace("_p", "");
+                                    sNumber = sNumber.Replace("-P", "");
                                 }
 
                                 if (_numberPattern.IsMatch(sNumber))
@@ -464,15 +464,15 @@ namespace VitalChoice.Business.Services.VeraCore
                         if (cancelNotice.CanceledComplete.ToLower() == "y")
                         {
                             string sNumber = cancelNotice.OrderID;
-                            if (sNumber.EndsWith("_np"))
+                            if (sNumber.EndsWith("-NP"))
                             {
                                 pOrderType = POrderType.NP;
-                                sNumber = sNumber.Replace("_np", "");
+                                sNumber = sNumber.Replace("-NP", "");
                             }
-                            if (sNumber.EndsWith("_p"))
+                            if (sNumber.EndsWith("-P"))
                             {
                                 pOrderType = POrderType.P;
-                                sNumber = sNumber.Replace("_p", "");
+                                sNumber = sNumber.Replace("-P", "");
                             }
 
                             if (_numberPattern.IsMatch(sNumber))
