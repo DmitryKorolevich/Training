@@ -67,99 +67,84 @@ namespace VitalChoice.ExportService.Services
 
         public async Task ExportOrder(OrderDynamic order, ExportSide exportSide)
         {
-            bool needUpdate = false;
             var context = await _orderService.CalculateOrder(order, OrderStatus.Processed);
-            try
+            if (context.SplitInfo.ShouldSplit)
             {
-                if (context.SplitInfo.ShouldSplit)
+                VeraCoreExportOrder nonPerishablePart;
+                VeraCoreExportOrder perishablePart;
+                switch (exportSide)
                 {
-                    VeraCoreExportOrder nonPerishablePart;
-                    VeraCoreExportOrder perishablePart;
-                    switch (exportSide)
-                    {
-                        case ExportSide.All:
-                            if (order.POrderStatus != OrderStatus.Processed)
-                            {
-                                throw new ApiException($"Cannot export order {order.Id}. Invalid P status: {order.POrderStatus}");
-                            }
-                            if (order.NPOrderStatus != OrderStatus.Processed)
-                            {
-                                throw new ApiException($"Cannot export order {order.Id}. Invalid NP status: {order.POrderStatus}");
-                            }
+                    case ExportSide.All:
+                        if (order.POrderStatus != OrderStatus.Processed)
+                        {
+                            throw new ApiException($"Cannot export order {order.Id}. Invalid P status: {order.POrderStatus}");
+                        }
+                        if (order.NPOrderStatus != OrderStatus.Processed)
+                        {
+                            throw new ApiException($"Cannot export order {order.Id}. Invalid NP status: {order.POrderStatus}");
+                        }
 
-                            perishablePart = await CreateExportFromOrder(order, context, ExportSide.Perishable);
-                            if (_client.AddOrder(perishablePart) == null)
-                            {
-                                throw new ApiException("Export failed.");
-                            }
-                            await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.Perishable);
-                            UpdateOrderStatus(order, context, ExportSide.Perishable);
-                            needUpdate = true;
-                            nonPerishablePart = await CreateExportFromOrder(order, context, ExportSide.NonPerishable);
-                            if (_client.AddOrder(nonPerishablePart) == null)
-                            {
-                                throw new ApiException("Export failed.");
-                            }
-                            await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.NonPerishable);
-                            UpdateOrderStatus(order, context, ExportSide.NonPerishable);
-                            break;
-                        case ExportSide.Perishable:
-                            if (order.POrderStatus != OrderStatus.Processed)
-                            {
-                                throw new ApiException($"Cannot export order {order.Id}. Invalid P status: {order.POrderStatus}");
-                            }
+                        perishablePart = await CreateExportFromOrder(order, context, ExportSide.Perishable);
+                        if (_client.AddOrder(perishablePart) == null)
+                        {
+                            throw new ApiException("Export failed.");
+                        }
+                        await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.Perishable);
+                        UpdateOrderStatus(order, context, ExportSide.Perishable);
+                        nonPerishablePart = await CreateExportFromOrder(order, context, ExportSide.NonPerishable);
+                        if (_client.AddOrder(nonPerishablePart) == null)
+                        {
+                            throw new ApiException("Export failed.");
+                        }
+                        await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.NonPerishable);
+                        UpdateOrderStatus(order, context, ExportSide.NonPerishable);
+                        break;
+                    case ExportSide.Perishable:
+                        if (order.POrderStatus != OrderStatus.Processed)
+                        {
+                            throw new ApiException($"Cannot export order {order.Id}. Invalid P status: {order.POrderStatus}");
+                        }
 
-                            perishablePart = await CreateExportFromOrder(order, context, ExportSide.Perishable);
-                            if (_client.AddOrder(perishablePart) == null)
-                            {
-                                throw new ApiException("Export failed.");
-                            }
-                            await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.Perishable);
-                            UpdateOrderStatus(order, context, ExportSide.Perishable);
-                            needUpdate = true;
-                            break;
-                        case ExportSide.NonPerishable:
-                            if (order.NPOrderStatus != OrderStatus.Processed)
-                            {
-                                throw new ApiException($"Cannot export order {order.Id}. Invalid NP status: {order.POrderStatus}");
-                            }
+                        perishablePart = await CreateExportFromOrder(order, context, ExportSide.Perishable);
+                        if (_client.AddOrder(perishablePart) == null)
+                        {
+                            throw new ApiException("Export failed.");
+                        }
+                        await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.Perishable);
+                        UpdateOrderStatus(order, context, ExportSide.Perishable);
+                        break;
+                    case ExportSide.NonPerishable:
+                        if (order.NPOrderStatus != OrderStatus.Processed)
+                        {
+                            throw new ApiException($"Cannot export order {order.Id}. Invalid NP status: {order.POrderStatus}");
+                        }
 
-                            nonPerishablePart = await CreateExportFromOrder(order, context, ExportSide.NonPerishable);
-                            if (_client.AddOrder(nonPerishablePart) == null)
-                            {
-                                throw new ApiException("Export failed.");
-                            }
-                            await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.NonPerishable);
-                            UpdateOrderStatus(order, context, ExportSide.NonPerishable);
-                            needUpdate = true;
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(exportSide), exportSide, null);
-                    }
-                }
-                else
-                {
-                    if (order.OrderStatus != OrderStatus.Processed)
-                    {
-                        throw new ApiException($"Cannot export order {order.Id}. Invalid status: {order.OrderStatus}");
-                    }
-
-                    var veracoreOrder = await CreateExportFromOrder(order, context, ExportSide.All);
-                    if (_client.AddOrder(veracoreOrder) == null)
-                    {
-                        throw new ApiException("Export failed.");
-                    }
-                    await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.UseBoth);
-                    UpdateOrderStatus(order, context, ExportSide.All);
-                    needUpdate = true;
+                        nonPerishablePart = await CreateExportFromOrder(order, context, ExportSide.NonPerishable);
+                        if (_client.AddOrder(nonPerishablePart) == null)
+                        {
+                            throw new ApiException("Export failed.");
+                        }
+                        await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.NonPerishable);
+                        UpdateOrderStatus(order, context, ExportSide.NonPerishable);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(exportSide), exportSide, null);
                 }
             }
-            finally
+            else
             {
-                if (needUpdate)
+                if (order.OrderStatus != OrderStatus.Processed)
                 {
-                    await _orderService.UpdateAsync(order);
+                    throw new ApiException($"Cannot export order {order.Id}. Invalid status: {order.OrderStatus}");
                 }
+
+                var veracoreOrder = await CreateExportFromOrder(order, context, ExportSide.All);
+                if (_client.AddOrder(veracoreOrder) == null)
+                {
+                    throw new ApiException("Export failed.");
+                }
+                await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.UseBoth);
+                UpdateOrderStatus(order, context, ExportSide.All);
             }
         }
 

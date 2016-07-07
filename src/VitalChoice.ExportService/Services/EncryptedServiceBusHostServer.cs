@@ -110,35 +110,15 @@ namespace VitalChoice.ExportService.Services
                 SendCommand(new ServiceBusCommandBase(command, "Export data is empty"));
                 return false;
             }
-            Parallel.ForEach(exportData.ExportInfo, e =>
+            using (var scope = _rootScope.BeginLifetimeScope())
             {
-                try
+                var orderExportService = scope.Resolve<IOrderExportService>();
+                var results = orderExportService.ExportOrders(exportData.ExportInfo).GetAwaiter().GetResult();
+                foreach (var result in results)
                 {
-                    using (var scope = _rootScope.BeginLifetimeScope())
-                    {
-                        var orderExportService = scope.Resolve<IOrderExportService>();
-                        if (e.IsRefund)
-                        {
-                            orderExportService.ExportRefund(e.Id).GetAwaiter().GetResult();
-                        }
-                        else
-                        {
-                            orderExportService.ExportOrder(e.Id, e.OrderType).GetAwaiter().GetResult();
-                        }
-                    }
-                    SendCommand(new ServiceBusCommandBase(command, new OrderExportItemResult {Id = e.Id, Success = true}));
+                    SendCommand(new ServiceBusCommandBase(command, result));
                 }
-                catch (Exception ex)
-                {
-                    Logger.LogError(ex.ToString());
-                    SendCommand(new ServiceBusCommandBase(command, new OrderExportItemResult
-                    {
-                        Id = e.Id,
-                        Success = false,
-                        Error = ex.ToString()
-                    }));
-                }
-            });
+            }
             return true;
         }
 

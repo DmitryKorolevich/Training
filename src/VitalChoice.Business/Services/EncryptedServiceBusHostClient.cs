@@ -102,7 +102,7 @@ namespace VitalChoice.Business.Services
                         return sessionId;
                     }
                 }
-                catch (ApiException e)
+                catch (Exception e)
                 {
                     Logger.LogError(e.ToString());
                     await _publicKeyLock.WaitAsync();
