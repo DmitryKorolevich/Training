@@ -54,6 +54,8 @@ foreach{
 						cmd /c mklink /D $destinationPath "${filesLinkSource}"
 						$destinationPath = $RootDeploy + "\" + $targetName + "\wwwroot\design"
 						cmd /c mklink /D $destinationPath "${designLinkSource}"
+						$destinationPath = $RootDeploy + "\" + $targetName
+						cp libuv.dll $destinationPath -Force
 					}
 				}
 			}
