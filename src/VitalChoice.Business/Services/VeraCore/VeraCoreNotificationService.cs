@@ -356,7 +356,7 @@ namespace VitalChoice.Business.Services.VeraCore
                                         ShipMethodFreightCarrier = shipNotice.FreightCarrier,
                                         ShipMethodFreightService = shipNotice.FreightService,
                                         ShippedDate = shipNotice.ShipDate,
-                                        TrackingNumber = itemInformation.LabelInformation?.LabelTrackingNumber,
+                                        TrackingNumber = itemInformation.LabelInformation?.LabelTrackingNumber ?? string.Empty,
                                         UPSServiceCode = itemInformation.VendorProductID,
                                         IdWarehouse = resultId >= _options.Value.VeraCoreSettings.WAwarehouseThreshold
                                             ? Warehouse.WA
