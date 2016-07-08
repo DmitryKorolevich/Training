@@ -66,6 +66,7 @@ namespace VC.Public.Controllers
         private readonly IAffiliateService _affiliateService;
         private readonly INotificationService _notificationService;
         private readonly ILogger _logger;
+        private readonly ICountryNameCodeResolver _countryNameCodeResolver;
 
         public CheckoutController(IStorefrontUserService storefrontUserService,
             ICustomerService customerService,
@@ -80,7 +81,7 @@ namespace VC.Public.Controllers
             ICountryService countryService,
             BrontoService brontoService,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
-            IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager)
+            IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager, ICountryNameCodeResolver countryNameCodeResolver)
             : base(
                 customerService, infrastructureService, authorizationService, checkoutService, orderService,
                 skuMapper, productMapper, pageResultService, settingService, userManager)
@@ -93,6 +94,7 @@ namespace VC.Public.Controllers
             _countryService = countryService;
             _brontoService = brontoService;
             _transactionAccessor = transactionAccessor;
+            _countryNameCodeResolver = countryNameCodeResolver;
             _affiliateService = affiliateService;
             _notificationService = notificationService;
             _appInfrastructure = appInfrastructureService.Data();
@@ -689,14 +691,12 @@ namespace VC.Public.Controllers
         {
             await InitCartModelInternal(reviewOrderModel);
 
-            var countries = await _countryService.GetCountriesAsync();
-
             var paymentMethod = cart.Order.PaymentMethod;
-            reviewOrderModel.BillToAddress = paymentMethod.Address.PopulateBillingAddressDetails(countries, cart.Order.Customer.Email);
+            reviewOrderModel.BillToAddress = paymentMethod.Address.PopulateBillingAddressDetails(_countryNameCodeResolver, cart.Order.Customer.Email);
             reviewOrderModel.CreditCardDetails = paymentMethod.PopulateCreditCardDetails(_appInfrastructure);
 
             var shippingAddress = cart.Order.ShippingAddress;
-            reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(countries);
+            reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(_countryNameCodeResolver);
 
             reviewOrderModel.DeliveryInstructions = shippingAddress.SafeData.DeliveryInstructions;
             reviewOrderModel.GiftMessage = cart.Order.SafeData.GiftMessage;
@@ -718,14 +718,12 @@ namespace VC.Public.Controllers
             var context = await OrderService.CalculateStorefrontOrder(order, OrderStatus.Processed);
             await FillModel(reviewOrderModel, order, context);
 
-            var countries = await _countryService.GetCountriesAsync();
-
             var paymentMethod = order.PaymentMethod;
-            reviewOrderModel.BillToAddress = paymentMethod.Address.PopulateBillingAddressDetails(countries, order.Customer.Email);
+            reviewOrderModel.BillToAddress = paymentMethod.Address.PopulateBillingAddressDetails(_countryNameCodeResolver, order.Customer.Email);
             reviewOrderModel.CreditCardDetails = paymentMethod.PopulateCreditCardDetails(_appInfrastructure);
 
             var shippingAddress = order.ShippingAddress;
-            reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(countries);
+            reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(_countryNameCodeResolver);
 
             reviewOrderModel.DeliveryInstructions = shippingAddress.SafeData.DeliveryInstructions;
             reviewOrderModel.GiftMessage = order.SafeData.GiftMessage;

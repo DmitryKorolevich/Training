@@ -73,8 +73,8 @@ namespace VC.Public.Controllers
         private readonly IOrderService _orderService;
         private readonly IHelpService _helpService;
         private readonly IHealthwiseService _healthwiseService;
-        private readonly ICountryService _countryService;
         private readonly IContentCrossSellService _contentCrossSellService;
+        private readonly ICountryNameCodeResolver _countryNameCodeResolver;
         private readonly ILogger _logger;
 
         public ProfileController(IStorefrontUserService storefrontUserService,
@@ -88,9 +88,10 @@ namespace VC.Public.Controllers
             IAuthorizationService authorizationService, ICheckoutService checkoutService,
             ILoggerProviderExtended loggerProvider,
             IPageResultService pageResultService, IDynamicMapper<SkuDynamic, Sku> skuMapper,
-            IDynamicMapper<ProductDynamic, Product> productMapper, ICountryService countryService,
+            IDynamicMapper<ProductDynamic, Product> productMapper,
             IDynamicMapper<OrderDynamic, Order> orderMapper,
-            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter, ExtendedUserManager userManager, IContentCrossSellService contentCrossSellService)
+            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter, ExtendedUserManager userManager,
+            IContentCrossSellService contentCrossSellService, ICountryNameCodeResolver countryNameCodeResolver)
             : base(customerService, infrastructureService, authorizationService, checkoutService, pageResultService, userManager)
         {
             _storefrontUserService = storefrontUserService;
@@ -103,18 +104,17 @@ namespace VC.Public.Controllers
             _healthwiseService = healthwiseService;
             _skuMapper = skuMapper;
             _productMapper = productMapper;
-            _countryService = countryService;
             _orderMapper = orderMapper;
             _orderPaymentMethodConverter = orderPaymentMethodConverter;
             _userManager = userManager;
             _contentCrossSellService = contentCrossSellService;
+            _countryNameCodeResolver = countryNameCodeResolver;
             _logger = loggerProvider.CreateLogger<ProfileController>();
         }
 
         private async Task<PagedListEx<AutoShipHistoryItemModel>> PopulateAutoShipHistoryModel(OrderFilter filter)
 		{
 			var infr = InfrastructureService.Data();
-			var countries = await _countryService.GetCountriesAsync();
 
             var customer = await GetCurrentCustomerDynamic();
 
@@ -125,7 +125,7 @@ namespace VC.Public.Controllers
 
             var orders = await _orderService.GetFullAutoShipsAsync(filter);
 
-            var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, countries);
+            var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, _countryNameCodeResolver);
             var ordersModel = new PagedListEx<AutoShipHistoryItemModel>
             {
                 Items = await orders.Items.Select(async p => await helper.PopulateAutoShipItemModel(p)).ToListAsync(),

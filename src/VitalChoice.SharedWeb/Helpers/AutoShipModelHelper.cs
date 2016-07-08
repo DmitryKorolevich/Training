@@ -11,6 +11,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Interfaces.Services;
 using VitalChoice.SharedWeb.Models.Orders;
 
 namespace VitalChoice.SharedWeb.Helpers
@@ -21,18 +22,19 @@ namespace VitalChoice.SharedWeb.Helpers
 	    private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
 	    private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
 	    private readonly ReferenceData _referenceData;
-	    private readonly ICollection<Country> _countries;
+        private readonly ICountryNameCodeResolver _countryNameCodeResolver;
 
-	    public AutoShipModelHelper(IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper, IDynamicMapper<OrderDynamic, Order> orderMapper, ReferenceData referenceData, ICollection<Country> countries)
-	    {
-		    _skuMapper = skuMapper;
-		    _productMapper = productMapper;
-		    _orderMapper = orderMapper;
-		    _referenceData = referenceData;
-		    _countries = countries;
-	    }
+        public AutoShipModelHelper(IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
+            IDynamicMapper<OrderDynamic, Order> orderMapper, ReferenceData referenceData, ICountryNameCodeResolver countryNameCodeResolver)
+        {
+            _skuMapper = skuMapper;
+            _productMapper = productMapper;
+            _orderMapper = orderMapper;
+            _referenceData = referenceData;
+            _countryNameCodeResolver = countryNameCodeResolver;
+        }
 
-	    public async Task<AutoShipHistoryItemModel> PopulateAutoShipItemModel(OrderDynamic orderDynamic)
+        public async Task<AutoShipHistoryItemModel> PopulateAutoShipItemModel(OrderDynamic orderDynamic)
 	    {
 			var skuItem = orderDynamic.Skus.First();
 
@@ -44,7 +46,7 @@ namespace VitalChoice.SharedWeb.Helpers
 			result.PaymentMethodDetails = paymentMethod.PopulateCreditCardDetails(_referenceData);
 
 			var shippingAddress = orderDynamic.ShippingAddress;
-			result.ShippingDetails = shippingAddress.PopulateShippingAddressDetails(_countries);
+			result.ShippingDetails = shippingAddress.PopulateShippingAddressDetails(_countryNameCodeResolver);
 
 			var displayName = result.Name;
 			if (!string.IsNullOrWhiteSpace(result.SubTitle))
