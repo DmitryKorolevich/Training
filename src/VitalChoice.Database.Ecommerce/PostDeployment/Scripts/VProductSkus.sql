@@ -22,6 +22,8 @@ SELECT
 	ISNULL(tval.Value, topt.DefaultValue) AS TaxCode,
 	ISNULL(sval.Value, sopt.DefaultValue) AS SubTitle,
 	ISNULL(sdval.Value, sopt.DefaultValue) AS ShortDescription,
+	CAST(disval.Value as BIT) AS DisregardStock,
+	CAST(insval.Value as INT) AS Stock,
 	s.[Order] SkuOrder
 	FROM Products AS p
 	LEFT JOIN Skus AS s ON p.Id = s.IdProduct
@@ -33,5 +35,9 @@ SELECT
 	LEFT JOIN ProductOptionValues AS sval ON sval.IdProduct = p.Id AND sval.IdOptionType = sopt.Id
 	LEFT JOIN ProductOptionTypes AS sdopt ON sdopt.Name = N'ShortDescription' AND sdopt.IdObjectType = p.IdObjectType
 	LEFT JOIN ProductOptionValues AS sdval ON sdval.IdProduct = p.Id AND sdval.IdOptionType = sdopt.Id
+	LEFT JOIN SkuOptionTypes AS disopt ON disopt.Name = N'DisregardStock' AND disopt.IdObjectType = p.IdObjectType
+	LEFT JOIN SkuOptionValues AS disval ON disval.IdSku = s.Id AND disval.IdOptionType = disopt.Id
+	LEFT JOIN SkuOptionTypes AS insopt ON insopt.Name = N'Stock' AND insopt.IdObjectType = p.IdObjectType
+	LEFT JOIN SkuOptionValues AS insval ON insval.IdSku = s.Id AND insval.IdOptionType = insopt.Id
 
 GO

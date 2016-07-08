@@ -25,9 +25,7 @@
         public const string OrderProductReviewEmail = "OrderProductReviewEmail";
         public const string EGiftNotificationEmail = "EGiftNotificationEmail";
 
-        //public const int OrderProductReviewEmailDaysCount = 15;
-        //for testing
-        public const int OrderProductReviewEmailDaysCount = 1;
+        public const int OrderProductReviewEmailDaysCount = 10;
 
         public const int ProductReviewIdNewsletter = 1;
     }

@@ -1,6 +1,7 @@
 ﻿$(document).ready(function ()
 {
     var submitted = false;
+    var regex = "/^[0-9]{1,3}$/";
 
     $('.category-skus table input').change(function ()
     {
@@ -17,7 +18,7 @@
     function isValidSku(elem)
     {
         var value = elem.value;
-        if (value.trim() != "" && !value.match(/^[0-9]+$/))
+        if (value.trim() != "" && !value.match(/^[0-9]{1,3}$/))
         {
             $(elem).addClass("input-validation-error");
             $(elem).parent().find(".field-validation-error").removeClass("hide-imp");
@@ -50,7 +51,7 @@
             $.each($('.category-skus table input'), function (index, item)
             {
                 var value = item.value;
-                if (value.trim() != "" && value.match(/^[0-9]+$/) && parseInt(value)!=0)
+                if (value.trim() != "" && value.match(/^[0-9]{1,3}$/) && parseInt(value) != 0)
                 {
                     skus.push({
                         Code: $(item).data("sku-code"),

@@ -345,6 +345,8 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                     SubTitle = x.SubTitle,
                     ShortDescription = x.ShortDescription,
                     Price = wholesaleCustomer==true ? x.WholesalePrice ?? 0 : x.Price ?? 0,
+                    InStock = x.IdProductType == ProductType.EGс || x.IdProductType == ProductType.Gc ||
+                            (x.DisregardStock ?? false) || (x.Stock ?? 0) > 0
                 }).ToList(),
                 SideMenuItems = ConvertToSideMenuModelLevel(rootNavCategory?.SubItems),
                 BreadcrumbOrderedItems = breadcrumbItems

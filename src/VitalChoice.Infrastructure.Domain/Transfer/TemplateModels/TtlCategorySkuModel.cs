@@ -19,5 +19,7 @@
 		public string Thumbnail { get; set; }
 
         public decimal Price { get; set; }
+
+        public bool InStock { get; set; }
     }
 }

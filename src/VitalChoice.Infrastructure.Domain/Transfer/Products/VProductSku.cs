@@ -45,6 +45,10 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 
         public string ShortDescription { get; set; }
 
+        public bool? DisregardStock { get; set; }
+
+        public int? Stock { get; set; }
+
         public int? SkuOrder { get; set; }
     }
 }
