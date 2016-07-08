@@ -9,6 +9,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Entities.Promotions;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Help;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
@@ -681,6 +682,16 @@ namespace VitalChoice.Business.Helpers
             {
                 new LookupItem<int>() {Key= (int)Warehouse.WA, Text= "Ferndale, WA Warehouse"},
                 new LookupItem<int>(){Key = (int)Warehouse.VA, Text = "Richmond, VA Warehouse"},
+            };
+            return toReturn;
+        }
+
+        public static IList<LookupItem<int>> GetProductCategoryViewTypes()
+        {
+            IList<LookupItem<int>> toReturn = new List<LookupItem<int>>
+            {
+                new LookupItem<int>() {Key= (int)ProductCategoryViewType.Retail, Text= "Retail View"},
+                new LookupItem<int>(){Key = (int)ProductCategoryViewType.Wholesale, Text = "Wholesale View"},
             };
             return toReturn;
         }

@@ -410,6 +410,7 @@ namespace VitalChoice.Business.Services
             referenceData.ShipMethodTypes = LookupHelper.GetShipMethodTypes();
             referenceData.Carriers = LookupHelper.GetCarriers();
             referenceData.Warehouses = LookupHelper.GetWarehouses();
+            referenceData.ProductCategoryViewTypes = LookupHelper.GetProductCategoryViewTypes();
 
             //BUG: shoule be moved to the specific worker
             SetupAppSettings();

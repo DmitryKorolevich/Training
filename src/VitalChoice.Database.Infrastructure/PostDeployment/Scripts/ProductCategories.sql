@@ -100,3 +100,10 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'ProductCategories') AND Name = N'ViewType')
+BEGIN
+	ALTER TABLE ProductCategories ADD ViewType INT NOT NULL CONSTRAINT DV_ProductCategories_ViewType DEFAULT 1 WITH VALUES	
+END
+
+GO

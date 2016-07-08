@@ -125,5 +125,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer
         public IList<LookupItem<string>> Carriers { get; set; }
 
         public IList<LookupItem<int>> Warehouses { get; set; }
+
+        public IList<LookupItem<int>> ProductCategoryViewTypes { get; set; }
     }
 }

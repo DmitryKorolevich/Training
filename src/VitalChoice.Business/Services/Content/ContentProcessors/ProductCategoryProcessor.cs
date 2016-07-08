@@ -15,6 +15,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
@@ -139,11 +140,9 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 
             var customerVisibility = GetCustomerVisibility(viewContext);
 
+            var wholesaleCustomer = viewContext.User.IsInRole(IdentityConstants.WholesaleCustomer);
             if (category != null)
             {
-                var wholesaleCustomer =
-                viewContext.User.IsInRole(IdentityConstants.WholesaleCustomer);
-
                 await DenyAccessIfWholesaleRuleApplied(category, viewContext, wholesaleCustomer);
                 DenyAccessIfRetailRuleApplied(category, viewContext, wholesaleCustomer);
 
@@ -173,16 +172,17 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             if (productIds.Count > 0)
             {
                 var dbProducts =
-                    (await _productRepository.GetProductsAsync(new VProductSkuFilter() { IdProducts = productIds })).Items;
+                    (await _productRepository.GetProductsAsync(new VProductSkuFilter() { IdProducts = productIds }, false)).Items;
                 dbProducts = dbProducts.Where(x => targetStatuses.Contains(x.StatusCode)).ToList();
 
                 //order products
                 foreach (var productId in productIds)
                 {
-                    var dbProduct = dbProducts.FirstOrDefault(p => p.IdProduct == productId);
-                    if (dbProduct != null)
+                    var dbProductGroup = dbProducts.Where(p => p.IdProduct == productId).ToList();
+                    dbProductGroup = dbProductGroup.OrderBy(p => p.SkuOrder).ToList();
+                    if (dbProductGroup.Any())
                     {
-                        products.Add(dbProduct);
+                        products.AddRange(dbProductGroup);
                     }
                 }
 
@@ -198,7 +198,8 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 
             var rootNavCategory = GetFilteredByVisibilityCategories(allRootCategory, customerVisibility);
 
-            return PopulateCategoryTemplateModel(viewContext.Entity, customerVisibility, subCategoriesContent, products, productContents, rootNavCategory, allRootCategory);
+            return PopulateCategoryTemplateModel(viewContext.Entity, customerVisibility, 
+                subCategoriesContent, products, productContents, rootNavCategory, allRootCategory, wholesaleCustomer, targetStatuses);
         }
 
         private ProductNavCategoryLite GetFilteredByVisibilityCategories(ProductNavCategoryLite navCategory, IList<CustomerTypeCode> visibility)
@@ -289,12 +290,28 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
         }
 
         private TtlCategoryModel PopulateCategoryTemplateModel(ProductCategoryContent productCategoryContent, IList<CustomerTypeCode> customerVisibility,
-            IList<ProductCategoryContent> subProductCategoryContent = null, IList<VProductSku> products = null, IList<ProductContent> productContents = null,
-            ProductNavCategoryLite rootNavCategory = null, ProductNavCategoryLite rootAllCategory = null)
+            IList<ProductCategoryContent> subProductCategoryContent = null, IList<VProductSku> skuProducts = null, IList<ProductContent> productContents = null,
+            ProductNavCategoryLite rootNavCategory = null, ProductNavCategoryLite rootAllCategory = null, bool? wholesaleCustomer = null,
+            List<RecordStatusCode> targetStatuses=null)
         {
             IList<TtlBreadcrumbItemModel> breadcrumbItems = new List<TtlBreadcrumbItemModel>();
             BuildBreadcrumb(rootAllCategory, rootAllCategory, productCategoryContent.Id, breadcrumbItems);
             breadcrumbItems = breadcrumbItems.Reverse().ToList();
+
+            var products = skuProducts?.GroupBy(p => p.IdProduct).Select(g => new VProductSku()
+            {
+                IdProduct = g.Key,
+                Name = g.Min(p => p.Name),
+                SubTitle = g.Min(p => p.SubTitle),
+                Thumbnail = g.Min(p => p.Thumbnail),
+                TaxCode = g.Min(p => p.TaxCode),
+                StatusCode = g.Min(p => p.StatusCode),
+                IdVisibility = g.Min(p => p.IdVisibility),
+                DateEdited = g.Min(p => p.DateEdited),
+                IdEditedBy = g.Min(p => p.IdEditedBy),
+                IdProductType = g.Min(p => p.IdProductType)
+            }).ToList();
+            
             var toReturn = new TtlCategoryModel
             {
                 Name = productCategoryContent.ProductCategory.Name,
@@ -306,6 +323,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 HideLongDescription = productCategoryContent.HideLongDescription,
                 LongDescriptionBottom = productCategoryContent.LongDescriptionBottom,
                 HideLongDescriptionBottom = productCategoryContent.HideLongDescriptionBottom,
+                ViewType = (int)productCategoryContent.ViewType,
                 SubCategories = subProductCategoryContent?.Select(x => PopulateCategoryTemplateModel(x, customerVisibility)).ToList(),
                 Products = products?.Where(x => x.IdVisibility.HasValue && customerVisibility.Contains(x.IdVisibility.Value)).Select(x => new TtlCategoryProductModel
                 {
@@ -314,9 +332,24 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                     Thumbnail = x.Thumbnail,
                     SubTitle = x.SubTitle,
                 }).ToList(),
+                Skus = skuProducts?.Where(x => 
+                    x.IdVisibility.HasValue && customerVisibility.Contains(x.IdVisibility.Value) && x.SkuId.HasValue
+                    && !x.SkuHidden && targetStatuses.Contains((RecordStatusCode)x.SkuStatusCode)
+                    ).Select(x => new TtlCategorySkuModel
+                {
+                    IdProduct = x.IdProduct,
+                    IdSku = x.SkuId.Value,
+                    Code = x.Code,
+                    Name = x.Name,
+                    Thumbnail = x.Thumbnail,
+                    SubTitle = x.SubTitle,
+                    ShortDescription = x.ShortDescription,
+                    Price = wholesaleCustomer==true ? x.WholesalePrice ?? 0 : x.Price ?? 0,
+                }).ToList(),
                 SideMenuItems = ConvertToSideMenuModelLevel(rootNavCategory?.SubItems),
                 BreadcrumbOrderedItems = breadcrumbItems
             };
+
             if (toReturn.Products != null && productContents != null)
             {
                 foreach (var product in toReturn.Products)
@@ -328,6 +361,18 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                     }
                 }
             }
+            if (toReturn.Skus != null && productContents != null)
+            {
+                foreach (var product in toReturn.Skus)
+                {
+                    var productContent = productContents.FirstOrDefault(p => p.Id == product.IdProduct);
+                    if (productContent != null)
+                    {
+                        product.Url = productContent.Url + "?cat=" + productCategoryContent.Id;
+                    }
+                }
+            }
+
             return toReturn;
         }
 

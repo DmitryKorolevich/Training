@@ -1561,11 +1561,16 @@ BEGIN
 
 <layout> -> (ProductCategory)
 {{
+    @script(){{
+        <script src="/app/modules/product/product-category.js"></script>
+    }}
 <aside id="menuSidebar" class="category-aside">
     @menu_sidebar()
 </aside>
 <section class="category-main">
 	@category_breadcrumb()
+	@if(@model.ViewType==1)
+	{{
 	<div class="category-top">
 	    @category_top()
 	</div>
@@ -1588,6 +1593,65 @@ BEGIN
 	<article class="category-article">
 	    @category_article()
 	</article>
+	}}
+	@if(@model.ViewType==2)
+	{{
+    <div class="category-skus relative">
+        <div class="overlay hide">
+				<div class="loading">Loading…</div>
+		</div>
+        <div class="margin-bottom-small">
+            Specify a quantity for any of the products listed on this page, then click 'Add to Cart' to add them to your shopping cart.
+        </div>
+        <table class="standard-table margin-bottom-small">
+	        <thead>
+        		<tr>
+        			<th>Qty</th>
+        			<th></th>
+        			<th>SKU</th>
+        			<th>Description</th>
+        			<th>Case Price (24 ct.)</th>
+        		</tr>
+        	</thead>
+	        <tbody>
+	            @list(Skus)
+	            {{
+	            <tr>
+	                <td class="qty">
+	                    <input data-sku-code="@(Code)" class="input-control width-small">
+	                    <span class="field-validation-error hide-imp">
+	                        <span>Quantity must be whole number</span>
+	                    </span>
+	                </td>
+	                </td>
+                    <td>
+                      	<div class="thumb">
+                      	    <img src="@(Thumbnail)">
+                        </div>
+                    </td>
+	                <td>
+	                    <span>@(Code)</span>
+	                </td>
+                    <td>
+                        <span class="title">
+                            @(Name) @(SubTitle)
+                        </span>
+                        <br/>
+                        @(ShortDescription)
+                    </td>
+                    <td class="price">
+	                    <span>@money(Price)</span>
+                    </td>
+                </tr>
+                }}
+            </tbody>
+        </table>
+        <a href="javascript:void()" id="lnkAddToCart" class="ladda-button" data-style="zoom-in">
+    	    <span class="ladda-label"></span>
+    		<img src="/assets/images/addtocartorange-2015.jpg">
+    	</a>
+	</div>
+	}}
 </section>
 }}:: TtlCategoryModel 
 %>'

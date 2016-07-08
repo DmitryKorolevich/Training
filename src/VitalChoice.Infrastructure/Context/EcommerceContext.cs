@@ -147,7 +147,7 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<VProductSku>(entity =>
             {
-                entity.HasKey(p => p.IdProduct);
+                entity.HasKey(p => new { p.IdProduct, p.SkuId });
                 entity.Ignore(x => x.Id);
                 entity.Ignore(x => x.EditedByAgentId);
                 entity.ToTable("VProductSkus");
@@ -158,14 +158,6 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(p => new { p.IdProduct, p.SkuId });
                 entity.Ignore(x => x.Id);
                 entity.ToTable("VSkus");
-            });
-
-            builder.Entity<VProductSku>(entity =>
-            {
-                entity.HasKey(p => p.IdProduct);
-                entity.Ignore(x => x.Id);
-                entity.Ignore(x => x.EditedByAgentId);
-                entity.ToTable("VProductSkus");
             });
 
             builder.Entity<VProductsWithReview>(entity =>

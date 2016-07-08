@@ -158,11 +158,20 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="type" class="col-md-3 control-label">Display</label>
+                                                <label for="display" class="col-md-3 control-label">Display</label>
                                                 <div class="col-md-9">
                                                     <select class="form-control" name="NavIdVisible" data-ng-model="productCategory.NavIdVisible" ng-options="item.Key as item.Text for item in visibleOptions"></select>
                                                     <div class="error-container" ng-show="forms.form.submitted && forms.form.NavIdVisible.$invalid">
                                                         <small class="error" ng-show="forms.form.NavIdVisible.$error.server">{{serverMessages.GetMessage('NavIdVisible')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="view" class="col-md-3 control-label">View</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" name="ViewType" data-ng-model="productCategory.ViewType" ng-options="item.Key as item.Text for item in ReferenceData.ProductCategoryViewTypes" required></select>
+                                                    <div class="error-container" ng-show="forms.form.submitted && forms.form.ViewType.$invalid">
+                                                        <small class="error" ng-show="forms.form.ViewType.$error.server">{{serverMessages.GetMessage('ViewType')}}</small>
                                                     </div>
                                                 </div>
                                             </div>

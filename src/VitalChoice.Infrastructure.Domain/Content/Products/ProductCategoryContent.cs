@@ -30,6 +30,8 @@ namespace VitalChoice.Infrastructure.Domain.Content.Products
         
         public CustomerTypeCode? NavIdVisible { get; set; }
 
+        public ProductCategoryViewType ViewType { get; set; }
+
         [NotMapped]
         public ProductCategory ProductCategory { get; set; }
 

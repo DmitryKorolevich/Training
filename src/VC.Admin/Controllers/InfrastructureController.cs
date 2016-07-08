@@ -88,6 +88,7 @@ namespace VC.Admin.Controllers
                     ShipMethodTypes = referenceData.ShipMethodTypes,
                     Carriers = referenceData.Carriers,
                     Warehouses = referenceData.Warehouses,
+                    ProductCategoryViewTypes = referenceData.ProductCategoryViewTypes,
                     CartShippingOptions = referenceData.CartShippingOptions,
                     RefundRedeemOptions=referenceData.RefundRedeemOptions,
                     ProductSellers = referenceData.ProductSellers,

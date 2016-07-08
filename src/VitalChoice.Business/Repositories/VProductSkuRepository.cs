@@ -18,7 +18,7 @@ namespace VitalChoice.Business.Repositories
 		{
         }
 
-        public async Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter)
+        public async Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter, bool groupByIdProduct=true)
         {
             var query = this.DbSet.Where(x => (x.StatusCode == RecordStatusCode.Active || x.StatusCode == RecordStatusCode.NotActive));
             if(!String.IsNullOrEmpty(filter.SearchText))
@@ -64,19 +64,22 @@ namespace VitalChoice.Business.Repositories
                     break;
             }
 
-            query = query.GroupBy(p => p.IdProduct).Select(g => new VProductSku()
+            if (groupByIdProduct)
             {
-                IdProduct = g.Key,
-                Name = g.Min(p => p.Name),
-                SubTitle = g.Min(p => p.SubTitle),
-                Thumbnail = g.Min(p => p.Thumbnail),
-                TaxCode = g.Min(p => p.TaxCode),
-                StatusCode = g.Min(p => p.StatusCode),
-                IdVisibility = g.Min(p => p.IdVisibility),
-                DateEdited= g.Min(p => p.DateEdited),
-                IdEditedBy = g.Min(p => p.IdEditedBy),
-                IdProductType = g.Min(p => p.IdProductType)
-            });
+                query = query.GroupBy(p => p.IdProduct).Select(g => new VProductSku()
+                {
+                    IdProduct = g.Key,
+                    Name = g.Min(p => p.Name),
+                    SubTitle = g.Min(p => p.SubTitle),
+                    Thumbnail = g.Min(p => p.Thumbnail),
+                    TaxCode = g.Min(p => p.TaxCode),
+                    StatusCode = g.Min(p => p.StatusCode),
+                    IdVisibility = g.Min(p => p.IdVisibility),
+                    DateEdited = g.Min(p => p.DateEdited),
+                    IdEditedBy = g.Min(p => p.IdEditedBy),
+                    IdProductType = g.Min(p => p.IdProductType)
+                });
+            }
             var count = await query.CountAsync();
             query = sortable(query);
             if (filter.Paging != null)

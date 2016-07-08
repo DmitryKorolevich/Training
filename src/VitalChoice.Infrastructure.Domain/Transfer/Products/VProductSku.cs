@@ -23,6 +23,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 
         public RecordStatusCode? SkuStatusCode { get; set; }
 
+        public  bool SkuHidden { get; set; }
+
         public int IdProduct { get; set; }
 
         public DateTime DateCreated { get; set; }
@@ -40,5 +42,9 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
         public string Thumbnail { get; set; }
 
         public string TaxCode { get; set; }
+
+        public string ShortDescription { get; set; }
+
+        public int? SkuOrder { get; set; }
     }
 }

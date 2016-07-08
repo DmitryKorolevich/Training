@@ -70,5 +70,6 @@ namespace VC.Admin.Models.Infrastructure
         public IList<LookupItem<int>> GoogleCategories { get; set; }
         public IList<LookupItem<string>> Carriers { get; set; }
         public IList<LookupItem<int>> Warehouses { get; set; }
+        public IList<LookupItem<int>> ProductCategoryViewTypes { get; set; }
     }
 }

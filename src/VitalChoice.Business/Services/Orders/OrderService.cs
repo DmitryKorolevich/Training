@@ -1569,7 +1569,11 @@ namespace VitalChoice.Business.Services.Orders
                     break;
             }
 
-            var orders = await SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, conditions, includes => includes.Include(c => c.OptionValues).Include(c => c.PaymentMethod).Include(c => c.ShippingAddress).ThenInclude(c => c.OptionValues).Include(c => c.Customer).ThenInclude(p => p.ProfileAddress).ThenInclude(c => c.OptionValues).Include(c => c.OrderShippingPackages), orderBy: sortable, withDefaults: true);
+            var orders = await SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, conditions, 
+                includes => includes.Include(c => c.OptionValues).Include(c => c.PaymentMethod).
+                Include(c => c.ShippingAddress).ThenInclude(c => c.OptionValues).Include(c => c.Customer).
+                ThenInclude(p => p.ProfileAddress).ThenInclude(c => c.OptionValues).
+                Include(c => c.OrderShippingPackages), orderBy: sortable, withDefaults: true);
 
             var resultList = new List<OrderInfoItem>(orders.Items.Count);
             var shippingMethods = _appInfrastructureService.Data().OrderPreferredShipMethod;
@@ -1596,6 +1600,17 @@ namespace VitalChoice.Business.Services.Orders
                     PreferredShipMethod = item.ShippingAddress?.SafeData.PreferredShipMethod
                 };
                 await DynamicMapper.UpdateModelAsync(newItem, item);
+
+                newItem.DateShipped =
+                    item.OrderShippingPackages.FirstOrDefault(p => !p.POrderType.HasValue)?.ShippedDate ??
+                    newItem.DateShipped;
+                newItem.PDateShipped =
+                    item.OrderShippingPackages.FirstOrDefault(p => p.POrderType == (int)POrderType.P)?.ShippedDate ??
+                    newItem.PDateShipped;
+                newItem.NPDateShipped =
+                    item.OrderShippingPackages.FirstOrDefault(p => p.POrderType == (int)POrderType.NP)?.ShippedDate ??
+                    newItem.NPDateShipped;
+
                 resultList.Add(newItem);
             }
 

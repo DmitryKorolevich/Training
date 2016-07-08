@@ -61,6 +61,8 @@ namespace VC.Admin.Models.Products
 
         public CustomerTypeCode? NavIdVisible { get; set; }
 
+        public ProductCategoryViewType ViewType { get; set; }
+
         public ProductCategoryManageModel()
         {
         }
@@ -82,6 +84,7 @@ namespace VC.Admin.Models.Products
             HideLongDescriptionBottom = item.HideLongDescriptionBottom;
             NavLabel = item.NavLabel;
             NavIdVisible = item.NavIdVisible;
+            ViewType = item.ViewType;
             Description = item.ContentItem.Description;
             Template = item.ContentItem.Template;
             Title = item.ContentItem.Title;
@@ -121,6 +124,7 @@ namespace VC.Admin.Models.Products
                 HideLongDescriptionBottom = HideLongDescriptionBottom,
                 NavLabel = NavLabel,
                 NavIdVisible = NavIdVisible,
+                ViewType = ViewType,
                 ContentItem = new ContentItem
                 {
                     Description = Description ?? string.Empty,

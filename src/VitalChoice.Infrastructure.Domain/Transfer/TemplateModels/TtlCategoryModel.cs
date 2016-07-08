@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using VitalChoice.Infrastructure.Domain.Content.Products;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels
 {
@@ -9,7 +10,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels
 			SubCategories = new List<TtlCategoryModel>();
 			SideMenuItems = new List<TtlSidebarMenuItemModel>();
 			Products = new List<TtlCategoryProductModel>();
-			BreadcrumbOrderedItems = new List<TtlBreadcrumbItemModel>();
+            Skus = new List<TtlCategorySkuModel>();
+            BreadcrumbOrderedItems = new List<TtlBreadcrumbItemModel>();
         }
 
 	    public string Name { get; set; }
@@ -30,11 +32,15 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels
 
         public bool HideLongDescriptionBottom { get; set; }
 
+        public int ViewType { get; set; }
+
         public IList<TtlCategoryModel> SubCategories { get; set; }
 
 	    public IList<TtlCategoryProductModel> Products { get; set; }
 
-	    public IList<TtlSidebarMenuItemModel> SideMenuItems { get; set; }
+        public IList<TtlCategorySkuModel> Skus { get; set; }
+
+        public IList<TtlSidebarMenuItemModel> SideMenuItems { get; set; }
 
 	    public IList<TtlBreadcrumbItemModel> BreadcrumbOrderedItems { get; set; }
     }

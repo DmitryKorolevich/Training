@@ -189,6 +189,7 @@ namespace VitalChoice.Business.Services.Products
             categoryContent.HideLongDescriptionBottom = model.HideLongDescriptionBottom;
             categoryContent.NavLabel = model.NavLabel;
             categoryContent.NavIdVisible = model.NavIdVisible;
+            categoryContent.ViewType = model.ViewType;
             if (model.MasterContentItemId != 0)
             {
                 categoryContent.MasterContentItemId = model.MasterContentItemId;
