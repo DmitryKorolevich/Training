@@ -250,7 +250,9 @@ namespace VitalChoice.Business.Services.VeraCore
                 {
                     TaxGetType type;
                     var orderCode = _orderService.GenerateOrderCode(p.POrderType, order.Id, out type);
-                    _avalaraTax.CommitTax(orderCode, order.ShippingAddress?.IdState, type).Wait();
+                    _avalaraTax.CommitTax(orderCode, order.ShippingAddress?.IdState, type)
+                        .GetAwaiter()
+                        .GetResult();
                 }
             });
         }

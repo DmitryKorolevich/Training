@@ -79,16 +79,17 @@ namespace VitalChoice.Business.Services.Avatax
             {
                 CompanyCode = _companyCode,
                 DocCode = "TAX" + orderCode,
-                Commit = taxGetType.HasFlag(TaxGetType.Commit),
+                Commit = true,
                 DocType = DocType.SalesInvoice,
-                DocDate = DateTime.Now
+                DocDate = DateTime.Now,
+                DetailLevel = DetailLevel.Document
             };
 
             var postTaxResult = await _taxService.GetTax(getTaxRequest);
             if (postTaxResult.ResultCode != SeverityLevel.Success)
             {
-                _logger.LogWarning(string.Join("\n",
-                    postTaxResult.Messages.Select(m => $"[{m.Source}] {m.Summary} ({m.Details})")));
+                _logger.LogError(string.Join("\n",
+                    postTaxResult.Messages.Select(m => $"[{postTaxResult.DocCode}]({m.Source}) {m.Summary}")));
             }
             return postTaxResult.ResultCode == SeverityLevel.Success;
         }
