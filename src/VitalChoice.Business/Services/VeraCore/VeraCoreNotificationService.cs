@@ -347,19 +347,21 @@ namespace VitalChoice.Business.Services.VeraCore
                                         break;
                                     }
 
-                                    OrderShippingPackage package = new OrderShippingPackage();
-                                    package.IdOrder = orderId.Value;
-                                    package.IdSku = sku.Id;
-                                    package.POrderType = pOrderType;
-                                    package.DateCreated = now;
-                                    package.ShipMethodFreightCarrier = shipNotice.FreightCarrier;
-                                    package.ShipMethodFreightService = shipNotice.FreightService;
-                                    package.ShippedDate = shipNotice.ShipDate;
-                                    package.TrackingNumber = itemInformation.LabelInformation.LabelTrackingNumber;
-                                    package.UPSServiceCode = itemInformation.VendorProductID;
-                                    package.IdWarehouse = resultId >= _options.Value.VeraCoreSettings.WAwarehouseThreshold
-                                        ? Warehouse.WA
-                                        : Warehouse.VA;
+                                    OrderShippingPackage package = new OrderShippingPackage
+                                    {
+                                        IdOrder = orderId.Value,
+                                        IdSku = sku.Id,
+                                        POrderType = pOrderType,
+                                        DateCreated = now,
+                                        ShipMethodFreightCarrier = shipNotice.FreightCarrier,
+                                        ShipMethodFreightService = shipNotice.FreightService,
+                                        ShippedDate = shipNotice.ShipDate,
+                                        TrackingNumber = itemInformation.LabelInformation?.LabelTrackingNumber,
+                                        UPSServiceCode = itemInformation.VendorProductID,
+                                        IdWarehouse = resultId >= _options.Value.VeraCoreSettings.WAwarehouseThreshold
+                                            ? Warehouse.WA
+                                            : Warehouse.VA
+                                    };
 
                                     packages.Add(package);
                                 }
@@ -373,8 +375,9 @@ namespace VitalChoice.Business.Services.VeraCore
                             if (parsed)
                             {
                                 var order =
-                                    (await orderRepository.Query(p => p.Id == orderId && p.StatusCode != (int)RecordStatusCode.Deleted).SelectAsync(true)).FirstOrDefault
-                                        ();
+                                    await
+                                        orderRepository.Query(p => p.Id == orderId && p.StatusCode != (int) RecordStatusCode.Deleted)
+                                            .SelectFirstOrDefaultAsync(true);
                                 if (order == null ||
                                     (!pOrderType.HasValue &&
                                      (!order.OrderStatus.HasValue || (order.OrderStatus != OrderStatus.Exported &&
@@ -387,7 +390,7 @@ namespace VitalChoice.Business.Services.VeraCore
                                                                         order.NPOrderStatus != OrderStatus.Shipped))))
                                 {
                                     _logger.LogError(
-                                        $"Update notification - invalid order or shipment notification(order id - {orderId})");
+                                        $"Update notification - invalid order or shipment notification(order with id - {orderId} not found)");
                                     await IncrementAttempt(item);
                                     continue;
                                 }
