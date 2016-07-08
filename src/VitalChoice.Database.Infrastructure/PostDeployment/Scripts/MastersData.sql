@@ -1602,7 +1602,7 @@ BEGIN
 				<div class="loading">Loading…</div>
 		</div>
         <div class="margin-bottom-small">
-            Specify a quantity for any of the products listed on this page, then click 'Add to Cart' to add them to your shopping cart.
+            Specify a quantity for any of the products listed on this page, then click ''Add to Cart'' to add them to your shopping cart.
         </div>
         <table class="standard-table margin-bottom-small">
 	        <thead>
