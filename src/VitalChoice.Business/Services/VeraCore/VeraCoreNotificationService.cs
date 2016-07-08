@@ -267,10 +267,10 @@ namespace VitalChoice.Business.Services.VeraCore
                     case OrderType.DropShip:
                     case OrderType.GiftList:
                     case OrderType.AutoShipOrder:
-                        await orderTree.ExecuteAsync("TaxTotal", new OrderDataContext(OrderStatus.Exported));
+                        await orderTree.ExecuteAsync(new OrderDataContext(OrderStatus.Exported));
                         break;
                     case OrderType.Reship:
-                        await reshipTree.ExecuteAsync("TaxTotal", new OrderDataContext(OrderStatus.Exported));
+                        await reshipTree.ExecuteAsync(new OrderDataContext(OrderStatus.Exported));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
