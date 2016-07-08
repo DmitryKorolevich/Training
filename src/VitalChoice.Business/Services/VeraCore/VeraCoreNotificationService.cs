@@ -26,6 +26,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Entities.VeraCore;
 using VitalChoice.Ecommerce.Domain.Entities.VeraCore.FilesSchema;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Avatax;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -33,6 +34,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.VeraCore;
 using VitalChoice.Interfaces.Services.Avatax;
+using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Workflow.Core;
 
@@ -57,6 +59,7 @@ namespace VitalChoice.Business.Services.VeraCore
         private readonly Regex _numberPattern;
         private readonly ILogger _logger;
         private readonly IWorkflowFactory _treeFactory;
+        private readonly ICustomerService _customerService;
 
         public VeraCoreNotificationService(
             IOptions<AppOptions> options,
@@ -71,7 +74,7 @@ namespace VitalChoice.Business.Services.VeraCore
             INotificationService notificationService,
             IAvalaraTax avalaraTax,
             OrderMapper orderMapper,
-            ILoggerProviderExtended logger, IWorkflowFactory treeFactory)
+            ILoggerProviderExtended logger, IWorkflowFactory treeFactory, ICustomerService customerService)
         {
             _options = options;
             _veraCoreProcessItemRepository = veraCoreProcessItemRepository;
@@ -89,6 +92,7 @@ namespace VitalChoice.Business.Services.VeraCore
             _avalaraTax = avalaraTax;
             _orderMapper = orderMapper;
             _treeFactory = treeFactory;
+            _customerService = customerService;
             _logger = logger.CreateLogger<VeraCoreSFTPService>();
         }
 
@@ -237,7 +241,13 @@ namespace VitalChoice.Business.Services.VeraCore
             var shipmentNotificationItems = await ProcessOrderShipmentPackagesUpdate(items);
             var processingResult = shipmentNotificationItems.Count > 0;
             //BUG: refunds wont work here
-            var orders = await _orderService.SelectAsync(shipmentNotificationItems.Select(p => p.IdOrder).ToList());
+            var orders = await _orderService.SelectAsync(shipmentNotificationItems.Select(p => p.IdOrder).Distinct().ToList(), true);
+            var customers =
+                (await _customerService.SelectAsync(orders.Select(o => o.Customer.Id).Distinct().ToList(), true)).ToDictionary(c => c.Id);
+            foreach (var order in orders)
+            {
+                order.Customer = customers.GetValueOrDefault(order.Customer.Id) ?? order.Customer;
+            }
             await SendShipmentNotifications(shipmentNotificationItems, orders);
             await CommitTaxes(orders);
 
