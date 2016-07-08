@@ -19,6 +19,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.Products;
 using VitalChoice.Ecommerce.Domain.Entities.Promotions;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Identity.UserManagers;
@@ -33,7 +34,6 @@ namespace VC.Admin.Controllers
         private readonly IDynamicMapper<PromotionDynamic, Promotion> _mapper;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly ILogger _logger;
-        private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ExtendedUserManager _userManager;
 
         public PromotionController(
@@ -49,7 +49,6 @@ namespace VC.Admin.Controllers
             _userManager = userManager;
             _mapper = mapper;
             _logger = loggerProvider.CreateLogger<PromotionController>();
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
         #region Promotions
@@ -81,8 +80,8 @@ namespace VC.Admin.Controllers
                     Assigned = null, //All
                     IdObjectType = PromotionType.BuyXGetY,
                     PromotionBuyType = PromoBuyType.Any,
-                    StartDate = TimeZoneInfo.ConvertTime(now, _pstTimeZoneInfo, TimeZoneInfo.Local),
-                    ExpirationDate = TimeZoneInfo.ConvertTime(now.AddDays(30), _pstTimeZoneInfo, TimeZoneInfo.Local),
+                    StartDate = TimeZoneInfo.ConvertTime(now, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local),
+                    ExpirationDate = TimeZoneInfo.ConvertTime(now.AddDays(30), TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local),
                     CanUseWithDiscount=true,
                     PromotionsToBuySkus = new List<PromotionToBuySkuModel>(),
                     PromotionsToGetSkus = new List<PromotionToGetSkuModel>(),

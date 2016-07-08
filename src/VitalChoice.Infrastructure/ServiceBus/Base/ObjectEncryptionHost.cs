@@ -9,6 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -21,30 +22,17 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 
     public class ObjectEncryptionHost : IDisposable, IObjectEncryptionHost
     {
+        protected virtual int MaxSessions => 10;
         private readonly string _localEncryptionPath;
         private readonly ILogger _logger;
-        public X509Certificate2 RootCert { get; }
-
-        public void UpdateLocalKey(KeyExchange key)
-        {
-            File.WriteAllBytes(_localEncryptionPath, RsaEncrypt(key.ToCombined(), _signProvider));
-            _localAes.Key = key.Key;
-            _localAes.IV = key.IV;
-        }
-
-        public KeyExchange GetLocalKey()
-        {
-            return new KeyExchange(_localAes.Key, _localAes.IV);
-        }
-
-        public X509Certificate2 LocalCert { get; }
+        private readonly Random _rnd;
+        
 #if !NETSTANDARD1_5
         private readonly RSACryptoServiceProvider _signProvider;
 #else
         private readonly RSA _signProvider;
 #endif
         private readonly Aes _localAes;
-        private readonly bool _sessionExpires;
         private readonly Dictionary<Guid, SessionInfo> _sessions = new Dictionary<Guid, SessionInfo>();
         private readonly ManualResetEvent _disposeEvent;
 
@@ -53,6 +41,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         /// </summary>
         public ObjectEncryptionHost(IOptions<AppOptions> options, ILogger logger)
         {
+            _rnd = new Random();
             _localEncryptionPath = options.Value.LocalEncryptionKeyPath;
             _logger = logger;
             try
@@ -77,7 +66,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 {
                     _disposeEvent = new ManualResetEvent(false);
                     new Thread(SessionExpirationLookup).Start();
-                    _sessionExpires = true;
                 }
                 _localAes = GetLocalAes();
             }
@@ -86,6 +74,22 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 logger.LogCritical(e.Message, e);
             }
         }
+
+        public X509Certificate2 RootCert { get; }
+
+        public void UpdateLocalKey(KeyExchange key)
+        {
+            File.WriteAllBytes(_localEncryptionPath, RsaEncrypt(key.ToCombined(), _signProvider));
+            _localAes.Key = key.Key;
+            _localAes.IV = key.IV;
+        }
+
+        public KeyExchange GetLocalKey()
+        {
+            return new KeyExchange(_localAes.Key, _localAes.IV);
+        }
+
+        public X509Certificate2 LocalCert { get; }
 
         public T LocalDecrypt<T>(byte[] data)
         {
@@ -217,7 +221,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             }
             if (RsaVerifyCommandSign(data))
             {
-                encryption.Expiration = DateTime.Now.AddHours(1);
                 byte[] plainData = null;
                 try
                 {
@@ -263,7 +266,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                     return new TransportCommandData(null);
                 }
             }
-            encryption.Expiration = DateTime.Now.AddHours(1);
             try
             {
                 using (var encryptor = encryption.Aes.CreateEncryptor())
@@ -302,6 +304,31 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             }
         }
 
+        public bool IsAuthenticated(Guid session)
+        {
+            lock (_sessions)
+            {
+                SessionInfo info;
+                if (_sessions.TryGetValue(session, out info))
+                {
+                    return info.Authenticated;
+                }
+            }
+            return false;
+        }
+
+        public void SetAuthenticated(Guid session)
+        {
+            lock (_sessions)
+            {
+                SessionInfo info;
+                if (_sessions.TryGetValue(session, out info))
+                {
+                    info.Authenticated = true;
+                }
+            }
+        }
+
         public bool RegisterSession(Guid session, string hostName, KeyExchange keyExchange)
         {
             Aes aes = Aes.Create();
@@ -314,7 +341,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             SessionInfo encryption = new SessionInfo
             {
                 Aes = aes,
-                Expiration = DateTime.Now.AddHours(1),
                 HostName = hostName
             };
             lock (_sessions)
@@ -326,7 +352,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             return true;
         }
 
-        public bool RegisterSession(Guid session, KeyExchange keyCombined)
+        private void RegisterSession(Guid session, KeyExchange keyCombined)
         {
             Aes aes = Aes.Create();
             if (aes == null)
@@ -337,19 +363,22 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             aes.Padding = PaddingMode.PKCS7;
             SessionInfo encryption = new SessionInfo
             {
-                Aes = aes,
-                Expiration = DateTime.Now.AddHours(1)
+                Aes = aes
             };
             lock (_sessions)
             {
                 if (_sessions.ContainsKey(session))
-                    return false;
-                _sessions.Add(session, encryption);
+                {
+                    _sessions[session] = encryption;
+                }
+                else
+                {
+                    _sessions.Add(session, encryption);
+                }
             }
-            return true;
         }
 
-        public KeyExchange CreateSession(Guid session)
+        private KeyExchange CreateSession(Guid session)
         {
             lock (_sessions)
             {
@@ -366,32 +395,17 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             }
         }
 
-        public KeyExchange GetSession(Guid session)
+        public void RemoveSession(Guid session)
         {
             lock (_sessions)
             {
                 SessionInfo sessionInfo;
                 if (_sessions.TryGetValue(session, out sessionInfo))
                 {
-                    return new KeyExchange(sessionInfo.Aes.Key, sessionInfo.Aes.IV);
-                }
-                return null;
-            }
-        }
-
-        public bool RemoveSession(Guid session)
-        {
-            lock (_sessions)
-            {
-                SessionInfo aes;
-                if (_sessions.TryGetValue(session, out aes))
-                {
                     _sessions.Remove(session);
-                    aes.Dispose();
-                    return true;
+                    sessionInfo.Dispose();
                 }
             }
-            return false;
         }
 
         public event SessionExpiredEventHandler OnSessionExpired;
@@ -465,8 +479,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 }
                 foreach (var expiredSession in expiredSessions)
                 {
-                    RemoveSession(expiredSession.Key);
                     OnSessionExpired?.Invoke(expiredSession.Key, expiredSession.Value.HostName);
+                    RemoveSession(expiredSession.Key);
                 }
             }
         }
@@ -625,14 +639,72 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             }
         }
 
-        private struct SessionInfo : IDisposable
+        public Guid GetSession()
         {
+            lock (_sessions)
+            {
+                var chooseSession = _rnd.Next(0, MaxSessions);
+                if (_sessions.Count < chooseSession + 1)
+                {
+                    var newSession = Guid.NewGuid();
+                    var keys = CreateSession(newSession);
+                    RegisterSession(newSession, keys);
+                    return newSession;
+                }
+                return _sessions.Keys.Skip(chooseSession).FirstOrDefault();
+            }
+        }
+
+        public KeyExchange GetSessionKeys(Guid session)
+        {
+            lock (_sessions)
+            {
+                SessionInfo sessionInfo;
+                if (_sessions.TryGetValue(session, out sessionInfo))
+                {
+                    return new KeyExchange(sessionInfo.Aes.Key, sessionInfo.Aes.IV);
+                }
+                return null;
+            }
+        }
+
+        public async Task LockSession(Guid session)
+        {
+            SessionInfo sessionInfo;
+            bool getResult;
+            lock (_sessions)
+            {
+                getResult = _sessions.TryGetValue(session, out sessionInfo);
+            }
+            if (getResult)
+            {
+                await sessionInfo.SemaphoreSlim.WaitAsync();
+            }
+        }
+
+        public void UnlockSession(Guid session)
+        {
+            lock (_sessions)
+            {
+                SessionInfo sessionInfo;
+                if (_sessions.TryGetValue(session, out sessionInfo))
+                {
+                    sessionInfo.SemaphoreSlim.Release();
+                }
+            }
+        }
+
+        private class SessionInfo : IDisposable
+        {
+            public SemaphoreSlim SemaphoreSlim { get; } = new SemaphoreSlim(1);
+            public bool Authenticated { get; set; }
             public Aes Aes { get; set; }
-            public DateTime Expiration { get; set; }
+            public DateTime Expiration { get; } = DateTime.Now.AddHours(1);
             public string HostName { get; set; }
 
             public void Dispose()
             {
+                SemaphoreSlim.Dispose();
                 Aes?.Dispose();
             }
         }

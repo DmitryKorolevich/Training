@@ -134,8 +134,8 @@ namespace VitalChoice.Business.Services.Avatax
             {
                 return result.TotalTax;
             }
-            _logger.LogWarning(string.Join("\n",
-                result.Messages.Select(m => $"[{m.Source}] {m.Summary}\r\n{result.DocCode}")));
+            _logger.LogError(string.Join("\n",
+                result.Messages.Select(m => $"[{result.DocCode}]({m.Source}) {m.Summary}")));
             return 0;
         }
 
@@ -189,6 +189,10 @@ namespace VitalChoice.Business.Services.Avatax
         {
             int customerId = customer.Id;
 
+            var orderCode = taxGetType.HasFlag(TaxGetType.UseBoth)
+                ? idOrder.ToString()
+                : (taxGetType.HasFlag(TaxGetType.Perishable) ? $"{idOrder}-P" : $"{idOrder}-NP");
+
             GetTaxRequest getTaxRequest = new GetTaxRequest
             {
                 CustomerCode = customerId.ToString(CultureInfo.InvariantCulture),
@@ -200,14 +204,12 @@ namespace VitalChoice.Business.Services.Avatax
                         ? "G"
                         : null,
                 DocCode =
-                    "TAX" +
-                    (taxGetType.HasFlag(TaxGetType.Perishable) ? $"{idOrder}-P" : $"{idOrder}-NP"),
+                    "TAX" + orderCode,
                 DetailLevel = DetailLevel.Tax,
                 Commit = taxGetType.HasFlag(TaxGetType.Commit),
                 DocType =
                     taxGetType.HasFlag(TaxGetType.SavePermanent) ? DocType.SalesInvoice : DocType.SalesOrder,
-                PurchaseOrderNo =
-                    (taxGetType.HasFlag(TaxGetType.Perishable) ? $"{idOrder}-P" : $"{idOrder}-NP"),
+                PurchaseOrderNo = orderCode,
                 CurrencyCode = "USD",
                 Discount = discountTotal,
                 Addresses = new[] {originAddress, destinationAddress}

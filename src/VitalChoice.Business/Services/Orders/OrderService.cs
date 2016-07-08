@@ -96,7 +96,6 @@ namespace VitalChoice.Business.Services.Orders
         //private readonly IObjectMapper<OrderPaymentMethodDynamic> _paymentMapper;
         private readonly IEcommerceRepositoryAsync<OrderToGiftCertificate> _orderToGiftCertificateRepositoryAsync;
         private readonly ICountryService _countryService;
-        private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
         private readonly IProductService _productService;
         private readonly INotificationService _notificationService;
@@ -175,7 +174,6 @@ namespace VitalChoice.Business.Services.Orders
             _addressMapper = addressMapper;
             _productService = productService;
             _notificationService = notificationService;
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
         private async Task<Order> InsertAsyncInternal(OrderDynamic model, IUnitOfWorkAsync uow)
@@ -1656,7 +1654,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public string GenerateOrderCode(POrderType? pOrderType, int idOrder, out TaxGetType type)
         {
-            var orderCode = !pOrderType.HasValue ? idOrder.ToString() : (pOrderType.Value == POrderType.P ? idOrder + "_p" : idOrder + "_np");
+            var orderCode = !pOrderType.HasValue ? idOrder.ToString() : (pOrderType.Value == POrderType.P ? idOrder + "-P" : idOrder + "-NP");
             type = !pOrderType.HasValue ? TaxGetType.UseBoth : (pOrderType.Value == POrderType.P ? TaxGetType.Perishable : TaxGetType.NonPerishable);
             return orderCode;
         }
@@ -2058,7 +2056,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 if (DateTime.TryParse(sShipDate, CultureInfo.InvariantCulture, DateTimeStyles.None, out shipDate))
                 {
-                    toReturn = TimeZoneInfo.ConvertTime(shipDate, _pstTimeZoneInfo, TimeZoneInfo.Local);
+                    toReturn = TimeZoneInfo.ConvertTime(shipDate, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local);
                     if (toReturn < DateTime.Now)
                     {
                         messages.Add(AddErrorMessage(columnName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.MustBeFutureDateError], columnName)));

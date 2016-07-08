@@ -47,42 +47,41 @@ namespace VC.Admin.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IDynamicMapper<OrderDynamic, Order> _mapper;
-        private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
-        private readonly ICustomerService _customerService;
+        //private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
+        //private readonly ICustomerService _customerService;
         private readonly ITokenService _tokenService;
         private readonly IOptions<AppOptions> _options;
-        private readonly IAdminUserService _adminUserService;
-        private readonly ICountryService _countryService;
-        private readonly IAppInfrastructureService _appInfrastructureService;
-        private readonly TimeZoneInfo _pstTimeZoneInfo;
-        private readonly ITrackingService _trackingService;
-        private readonly ILogger logger;
+        //private readonly IAdminUserService _adminUserService;
+        //private readonly ICountryService _countryService;
+        //private readonly IAppInfrastructureService _appInfrastructureService;
+        //private readonly ITrackingService _trackingService;
+        //private readonly ILogger logger;
 
         public OrderInvoiceController(
             IOrderService orderService,
-            ILoggerProviderExtended loggerProvider,
             IDynamicMapper<OrderDynamic, Order> mapper,
-            ICustomerService customerService,
             ITokenService tokenService,
-            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
-            IOptions<AppOptions> options,
-            IAdminUserService adminUserService,
-            ICountryService countryService,
-            IAppInfrastructureService appInfrastructureService,
-            ITrackingService trackingService)
+            //ILoggerProviderExtended loggerProvider,
+            //ICustomerService customerService,
+            //IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
+            IOptions<AppOptions> options
+            //IAdminUserService adminUserService,
+            //ICountryService countryService,
+            //IAppInfrastructureService appInfrastructureService,
+            //ITrackingService trackingService*/
+            )
         {
             _orderService = orderService;
             _mapper = mapper;
-            _customerService = customerService;
-            _addressMapper = addressMapper;
+            //_customerService = customerService;
+            //_addressMapper = addressMapper;
             _tokenService = tokenService;
             _options = options;
-            _adminUserService = adminUserService;
-            _countryService = countryService;
-            _appInfrastructureService = appInfrastructureService;
-            _trackingService = trackingService;
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-            this.logger = loggerProvider.CreateLogger<OrderInvoiceController>();
+            //_adminUserService = adminUserService;
+            //_countryService = countryService;
+            //_appInfrastructureService = appInfrastructureService;
+            //_trackingService = trackingService;
+            //this.logger = loggerProvider.CreateLogger<OrderInvoiceController>();
         }
 
         [HttpGet]

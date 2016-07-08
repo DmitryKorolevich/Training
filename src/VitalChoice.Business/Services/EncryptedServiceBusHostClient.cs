@@ -58,11 +58,17 @@ namespace VitalChoice.Business.Services
             }
         }
 
-        public async Task<bool> AuthenticateClient(Guid sessionId)
+        public async Task<Guid> AuthenticateClientWithLock(Guid sessionId)
         {
             var keyExchangeProvider = await TryGetKeyProvider();
             if (keyExchangeProvider == null)
-                return false;
+                throw new ApiException("Cannot get public key from server");
+
+            await EncryptionHost.LockSession(sessionId);
+
+            if (EncryptionHost.IsAuthenticated(sessionId))
+                return sessionId;
+
             if (EncryptionHost.SessionExist(sessionId))
             {
                 try
@@ -72,20 +78,31 @@ namespace VitalChoice.Business.Services
                             ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.CheckSessionKey,
                                 ServerHostName, LocalHostName)))
                     {
-                        return true;
+                        EncryptionHost.SetAuthenticated(sessionId);
+                        return sessionId;
                     }
-                    var existingKeys = EncryptionHost.GetSession(sessionId);
-                    if (existingKeys == null)
-                        return false;
 
-                    return await
+                    var existingKeys = EncryptionHost.GetSessionKeys(sessionId);
+                    while (existingKeys == null)
+                    {
+                        EncryptionHost.UnlockSession(sessionId);
+                        sessionId = EncryptionHost.GetSession();
+                        await EncryptionHost.LockSession(sessionId);
+                        existingKeys = EncryptionHost.GetSessionKeys(sessionId);
+                    }
+
+                    if (await
                         ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.SetSessionKey,
                             ServerHostName, LocalHostName)
                         {
                             Data = new ServiceBusCommandData(EncryptionHost.RsaEncrypt(existingKeys.ToCombined(), keyExchangeProvider))
-                        });
+                        }))
+                    {
+                        EncryptionHost.SetAuthenticated(sessionId);
+                        return sessionId;
+                    }
                 }
-                catch (ApiException e)
+                catch (Exception e)
                 {
                     Logger.LogError(e.ToString());
                     await _publicKeyLock.WaitAsync();
@@ -97,10 +114,13 @@ namespace VitalChoice.Business.Services
                     {
                         _publicKeyLock.Release();
                     }
-                    return false;
+                    EncryptionHost.UnlockSession(sessionId);
+                    return await AuthenticateClientWithLock(sessionId);
                 }
+                throw new ApiException("Session keys couldn't be set on remote");
             }
-            return false;
+            EncryptionHost.UnlockSession(sessionId);
+            return await AuthenticateClientWithLock(EncryptionHost.GetSession());
         }
 
         private async Task<RSACryptoServiceProvider> TryGetKeyProvider()
@@ -121,20 +141,21 @@ namespace VitalChoice.Business.Services
             return keyExchangeProvider;
         }
 
-        public void RemoveClient(Guid sessionId)
-        {
-            EncryptionHost.RemoveSession(sessionId);
-        }
-
         protected override bool ProcessPlainCommand(ServiceBusCommandBase command)
         {
             if (command.CommandName == ServiceBusCommandConstants.SessionExpired)
             {
-                var session = command.SessionId;
-                if (EncryptionHost.RemoveSession(session))
+                EncryptionHost.LockSession(command.SessionId);
+                try
                 {
-                    return true;
+                    EncryptionHost.RemoveSession(command.SessionId);
                 }
+                finally
+                {
+                    EncryptionHost.UnlockSession(command.SessionId);
+                }
+                SendPlainCommand(new ServiceBusCommandBase(command, true));
+                return true;
             }
             return false;
         }

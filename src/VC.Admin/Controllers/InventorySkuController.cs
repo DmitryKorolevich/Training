@@ -48,6 +48,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.InventorySkus;
 using VitalChoice.Interfaces.Services.InventorySkus;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 
@@ -60,7 +61,6 @@ namespace VC.Admin.Controllers
         private readonly InventorySkuMapper _mapper;
         private readonly ISettingService _settingService;
         private readonly ICsvExportService<InventorySkuUsageReportItemForExport, InventorySkuUsageReportItemForExportCsvMap> _inventorySkuUsageReportItemForExportCSVExportService;
-        private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger _logger;
         private readonly ExtendedUserManager _userManager;
 
@@ -78,7 +78,6 @@ namespace VC.Admin.Controllers
             _settingService = settingService;
             _inventorySkuUsageReportItemForExportCSVExportService = inventorySkuUsageReportItemForExportCSVExportService;
             _userManager = userManager;
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             _logger = loggerProvider.CreateLogger<InventorySkuController>();
         }
 
@@ -256,8 +255,8 @@ namespace VC.Admin.Controllers
         public async Task<FileResult> GetInventorySkuUsageReportFile([FromQuery]string from, [FromQuery]string to,
              [FromQuery]string skuids, [FromQuery]string invskuids)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;
@@ -301,8 +300,8 @@ namespace VC.Admin.Controllers
         public async Task<FileResult> GetInventoriesSummaryUsageReportFile([FromQuery]string from, [FromQuery]string to,
              [FromQuery]string sku, [FromQuery]string invsku, [FromQuery]bool? assemble, [FromQuery]string idsinvcat)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;

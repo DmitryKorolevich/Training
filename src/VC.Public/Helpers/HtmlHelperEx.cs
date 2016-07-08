@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.ViewFeatures.Internal;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VC.Public.Helpers
 {
@@ -41,11 +42,9 @@ namespace VC.Public.Helpers
 			}
 		}
 
-        private static readonly TimeZoneInfo PstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-
         public static DateTime ConvertToPst(this DateTime date)
         {
-            return TimeZoneInfo.ConvertTime(date, TimeZoneInfo.Local, PstTimeZoneInfo);
+            return TimeZoneInfo.ConvertTime(date, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
         }
     }
 }

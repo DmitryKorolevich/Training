@@ -33,14 +33,14 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
                 if (context.Data.PromoProducts < 150)
                 {
                     context.StandardShippingCharges = (decimal) 14.95;
-                    AddSplitShipping(context, DeliveryServiceCostGroup.ThirdCost);
+                    AddSplitShipping(context, DeliveryServiceCostGroup.SecondCost);
                     return Task.FromResult(context.StandardShippingCharges);
                     //_deliveryServiceCostGroup = DeliveryServiceCostGroup.SecondCost;
                 }
                 if (context.Data.PromoProducts < 200)
                 {
                     context.StandardShippingCharges = (decimal) 19.95;
-                    AddSplitShipping(context, DeliveryServiceCostGroup.FourthCost);
+                    AddSplitShipping(context, DeliveryServiceCostGroup.SecondCost);
                     return Task.FromResult(context.StandardShippingCharges);
                     //_deliveryServiceCostGroup = DeliveryServiceCostGroup.SecondCost;
                 }

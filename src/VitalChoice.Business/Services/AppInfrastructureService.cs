@@ -27,6 +27,7 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
 
 namespace VitalChoice.Business.Services
@@ -50,7 +51,6 @@ namespace VitalChoice.Business.Services
         private readonly ISettingService settingService;
         private readonly IBackendSettingsService _backendSettingsService;
         private readonly ILocalizationService _localizationService;
-        private readonly TimeZoneInfo _pstTimeZoneInfo;
 
         public AppInfrastructureService(
             ICacheProvider cache, 
@@ -88,7 +88,6 @@ namespace VitalChoice.Business.Services
             this.settingService = settingService;
             _localizationService = localizationService;
             _backendSettingsService = backendSettingsService;
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
         private ReferenceData Populate()
@@ -426,7 +425,7 @@ namespace VitalChoice.Business.Services
             {
                 var firstDayOfCurrentMonth = DateTime.Now;
                 firstDayOfCurrentMonth = new DateTime(firstDayOfCurrentMonth.Year, firstDayOfCurrentMonth.Month, 1);
-                var date = TimeZoneInfo.ConvertTime(firstDayOfCurrentMonth, _pstTimeZoneInfo, TimeZoneInfo.Local);
+                var date = TimeZoneInfo.ConvertTime(firstDayOfCurrentMonth, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local);
                 var dbDate = DateTime.MinValue;
                 DateTime.TryParse(affiliateReportDateOption.OptionValue, out dbDate);
                 if (date != dbDate)

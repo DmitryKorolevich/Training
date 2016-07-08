@@ -74,7 +74,6 @@ namespace VC.Admin.Controllers
         private readonly ICustomerService _customerService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly IAppInfrastructureService _appInfrastructureService;
-        private readonly ICountryService _countryService;
         private readonly ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> _ordersRegionStatisticItemCSVExportService;
         private readonly ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> _ordersZipStatisticItemCSVExportService;
         private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
@@ -88,7 +87,6 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<ShippedViaReportRawOrderItem, ShippedViaItemsReportOrderItemCsvMap> _shippedViaItemsReportOrderItemCsvMapСSVExportService;
         private readonly INotificationService _notificationService;
         private readonly BrontoService _brontoService;
-        private static readonly TimeZoneInfo PstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
         private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
         private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
@@ -96,6 +94,7 @@ namespace VC.Admin.Controllers
         private readonly IAvalaraTax _avalaraTax;
         private readonly IVeraCoreNotificationService _testService;
         private readonly IEncryptedOrderExportService _exportService;
+        private readonly ICountryNameCodeResolver _countryNameCodeResolver;
 
         public OrderController(
             IOrderService orderService,
@@ -127,7 +126,7 @@ namespace VC.Admin.Controllers
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMethodMapper,
             IDynamicMapper<AddressDynamic, Address> addressMapper, ExtendedUserManager userManager,
             IAvalaraTax avalaraTax,
-            IVeraCoreNotificationService testService, IEncryptedOrderExportService exportService)
+            IVeraCoreNotificationService testService, IEncryptedOrderExportService exportService, ICountryNameCodeResolver countryNameCodeResolver)
         {
             _orderService = orderService;
             _orderRefundService = orderRefundService;
@@ -150,7 +149,6 @@ namespace VC.Admin.Controllers
             _orderReportService = orderReportService;
             _objectHistoryLogService = objectHistoryLogService;
             _appInfrastructureService = appInfrastructureService;
-            _countryService = countryService;
             _orderMapper = orderMapper;
             _productMapper = productMapper;
             _skuMapper = skuMapper;
@@ -162,6 +160,7 @@ namespace VC.Admin.Controllers
             _avalaraTax = avalaraTax;
             _testService = testService;
             _exportService = exportService;
+            _countryNameCodeResolver = countryNameCodeResolver;
         }
 
         #region BaseOrderLogic
@@ -465,7 +464,6 @@ namespace VC.Admin.Controllers
         public async Task<Result<PagedList<AutoShipHistoryItemModel>>> GetAutoShips([FromBody] OrderFilter filter)
         {
             var infr = _appInfrastructureService.Data();
-            var countries = await _countryService.GetCountriesAsync();
 
             filter.Sorting.SortOrder = VitalChoice.Infrastructure.Domain.Transfer.FilterSortOrder.Desc;
             filter.Sorting.Path = VOrderSortPath.DateCreated;
@@ -473,7 +471,7 @@ namespace VC.Admin.Controllers
 
             var orders = await _orderService.GetFullAutoShipsAsync(filter);
 
-            var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, countries);
+            var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, _countryNameCodeResolver);
             var ordersModel = new PagedList<AutoShipHistoryItemModel>
             {
                 Items = await orders.Items.Select(async p => await helper.PopulateAutoShipItemModel(p)).ToListAsync(),
@@ -985,7 +983,7 @@ namespace VC.Admin.Controllers
             var data = await _orderService.GetOrderWithRegionInfoItemsAsync(filter);
             foreach (var item in data.Items)
             {
-                item.DateCreated = TimeZoneInfo.ConvertTime(item.DateCreated, TimeZoneInfo.Local, PstTimeZoneInfo);
+                item.DateCreated = TimeZoneInfo.ConvertTime(item.DateCreated, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
             }
 
             var result = _vOrderWithRegionInfoItemCSVExportService.ExportToCsv(data.Items);
@@ -1027,8 +1025,8 @@ namespace VC.Admin.Controllers
         public async Task<FileResult> GetOrdersAgentReportFile([FromQuery]string from, [FromQuery]string to,
             [FromQuery]FrequencyType frequencytype, [FromQuery]string idadminteams = null, [FromQuery]int? idadmin = null)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(PstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(PstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;
@@ -1062,8 +1060,8 @@ namespace VC.Admin.Controllers
             }
             foreach (var item in data.Periods)
             {
-                item.From = TimeZoneInfo.ConvertTime(item.From, TimeZoneInfo.Local, PstTimeZoneInfo);
-                item.To = TimeZoneInfo.ConvertTime(item.To, TimeZoneInfo.Local, PstTimeZoneInfo);
+                item.From = TimeZoneInfo.ConvertTime(item.From, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
+                item.To = TimeZoneInfo.ConvertTime(item.To, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
             }
 
             var items = _orderReportService.ConvertOrdersAgentReportToExportItems(data, fullReport);
@@ -1102,14 +1100,14 @@ namespace VC.Admin.Controllers
             [FromQuery]string shipfirstname = null, [FromQuery]string shiplastname = null, [FromQuery]string shipidconfirm = null, [FromQuery]int? idorder = null,
             [FromQuery]string ponumber = null)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(PstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(PstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;
             }
-            DateTime? dShipFrom = !string.IsNullOrEmpty(shipfrom) ? shipfrom.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
-            DateTime? dShipTo = !string.IsNullOrEmpty(shipto) ? shipto.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
+            DateTime? dShipFrom = !string.IsNullOrEmpty(shipfrom) ? shipfrom.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
+            DateTime? dShipTo = !string.IsNullOrEmpty(shipto) ? shipto.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
 
             WholesaleDropShipReportFilter filter = new WholesaleDropShipReportFilter()
             {
@@ -1157,8 +1155,8 @@ namespace VC.Admin.Controllers
             [FromQuery]int? idcustomer = null, [FromQuery]int? idorder = null,
             [FromQuery]int? idorderstatus = null, [FromQuery]int? idordertype = null)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(PstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(PstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;
@@ -1217,16 +1215,16 @@ namespace VC.Admin.Controllers
             [FromQuery]int? idcustomer = null, [FromQuery]string keycode = null, [FromQuery]string discountcode = null, [FromQuery]bool? isaffiliate = null,
             [FromQuery]int? fromcount = null, [FromQuery]int? tocount = null)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(PstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(PstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;
             }
-            DateTime? dShipFrom = !string.IsNullOrEmpty(shipfrom) ? shipfrom.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
-            DateTime? dShipTo = !string.IsNullOrEmpty(shipto) ? shipto.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
-            DateTime? dFirstOrderFrom = !string.IsNullOrEmpty(firstorderfrom) ? shipfrom.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
-            DateTime? dFirstOrderTo = !string.IsNullOrEmpty(firstorderto) ? shipto.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
+            DateTime? dShipFrom = !string.IsNullOrEmpty(shipfrom) ? shipfrom.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
+            DateTime? dShipTo = !string.IsNullOrEmpty(shipto) ? shipto.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
+            DateTime? dFirstOrderFrom = !string.IsNullOrEmpty(firstorderfrom) ? shipfrom.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
+            DateTime? dFirstOrderTo = !string.IsNullOrEmpty(firstorderto) ? shipto.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
 
 
             OrdersSummarySalesReportFilter filter = new OrdersSummarySalesReportFilter()
@@ -1275,8 +1273,8 @@ namespace VC.Admin.Controllers
         public async Task<FileResult> GetSkuAddressReportItemsReportFile([FromQuery]string from, [FromQuery]string to,
             [FromQuery]int? idcustomertype = null, [FromQuery]string skucode = null, [FromQuery]string discountcode = null, [FromQuery]bool withoutdiscount = false)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(PstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(PstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;
@@ -1319,8 +1317,8 @@ namespace VC.Admin.Controllers
         public async Task<FileResult> GetMatchbackItemsReportFile([FromQuery]string from, [FromQuery]string to,
             [FromQuery]int? idordersource = null)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(PstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(PstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;
@@ -1363,16 +1361,16 @@ namespace VC.Admin.Controllers
             [FromQuery]int? lastfromtotal = null, [FromQuery]int? lasttototal = null, [FromQuery]bool? dnm = null, [FromQuery]bool? dnr = null,
             [FromQuery]int? idcustomerordersource = null, [FromQuery]string keycodefirst = null, [FromQuery]string discountcodefirst = null)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(PstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(PstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;
             }
-            DateTime? dFromFirst = !string.IsNullOrEmpty(fromfirst) ? fromfirst.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
-            DateTime? dToFirst = !string.IsNullOrEmpty(tofirst) ? tofirst.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
-            DateTime? dFromLast = !string.IsNullOrEmpty(fromlast) ? fromlast.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
-            DateTime? dToLast = !string.IsNullOrEmpty(tolast) ? tolast.GetDateFromQueryStringInPst(PstTimeZoneInfo) : null;
+            DateTime? dFromFirst = !string.IsNullOrEmpty(fromfirst) ? fromfirst.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
+            DateTime? dToFirst = !string.IsNullOrEmpty(tofirst) ? tofirst.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
+            DateTime? dFromLast = !string.IsNullOrEmpty(fromlast) ? fromlast.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
+            DateTime? dToLast = !string.IsNullOrEmpty(tolast) ? tolast.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
 
             MailingReportFilter filter = new MailingReportFilter()
             {
@@ -1438,8 +1436,8 @@ namespace VC.Admin.Controllers
             [FromQuery]int? idstate = null, [FromQuery]int? idservicecode = null, [FromQuery]int? idwarehouse = null,
             [FromQuery]string carrier = null, [FromQuery]int? idshipservice = null)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(PstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(PstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;

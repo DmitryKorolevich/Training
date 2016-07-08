@@ -2,25 +2,19 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Core.GlobalFilters
 {
     public class PstLocalIsoDateTimeConverter : IsoDateTimeConverter
     {
-        private readonly TimeZoneInfo _pstTimeZoneInfo;
-
-        public PstLocalIsoDateTimeConverter()
-        {
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-        }
-
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var obj = base.ReadJson(reader, objectType, existingValue, serializer);
             if (obj is DateTime)
             {
                 var dateTime = (DateTime) obj;
-                return TimeZoneInfo.ConvertTime(dateTime, _pstTimeZoneInfo, TimeZoneInfo.Local);
+                return TimeZoneInfo.ConvertTime(dateTime, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local);
             }
             return obj;
         }
@@ -30,7 +24,7 @@ namespace VitalChoice.Core.GlobalFilters
             if (value is DateTime)
             {
                 var dateTime = (DateTime)value;
-                value = TimeZoneInfo.ConvertTime(dateTime, TimeZoneInfo.Local, _pstTimeZoneInfo);
+                value = TimeZoneInfo.ConvertTime(dateTime, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
             }
             base.WriteJson(writer, value, serializer);
         }

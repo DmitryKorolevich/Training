@@ -83,18 +83,21 @@ namespace VitalChoice.ExportService.Services
                         {
                             throw new ApiException($"Cannot export order {order.Id}. Invalid NP status: {order.POrderStatus}");
                         }
+
                         perishablePart = await CreateExportFromOrder(order, context, ExportSide.Perishable);
                         if (_client.AddOrder(perishablePart) == null)
                         {
                             throw new ApiException("Export failed.");
                         }
+                        await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.Perishable);
+                        UpdateOrderStatus(order, context, ExportSide.Perishable);
                         nonPerishablePart = await CreateExportFromOrder(order, context, ExportSide.NonPerishable);
                         if (_client.AddOrder(nonPerishablePart) == null)
                         {
                             throw new ApiException("Export failed.");
                         }
-                        await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.Perishable);
                         await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.NonPerishable);
+                        UpdateOrderStatus(order, context, ExportSide.NonPerishable);
                         break;
                     case ExportSide.Perishable:
                         if (order.POrderStatus != OrderStatus.Processed)
@@ -108,6 +111,7 @@ namespace VitalChoice.ExportService.Services
                             throw new ApiException("Export failed.");
                         }
                         await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.Perishable);
+                        UpdateOrderStatus(order, context, ExportSide.Perishable);
                         break;
                     case ExportSide.NonPerishable:
                         if (order.NPOrderStatus != OrderStatus.Processed)
@@ -121,6 +125,7 @@ namespace VitalChoice.ExportService.Services
                             throw new ApiException("Export failed.");
                         }
                         await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.NonPerishable);
+                        UpdateOrderStatus(order, context, ExportSide.NonPerishable);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(exportSide), exportSide, null);
@@ -139,9 +144,8 @@ namespace VitalChoice.ExportService.Services
                     throw new ApiException("Export failed.");
                 }
                 await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.UseBoth);
+                UpdateOrderStatus(order, context, ExportSide.All);
             }
-
-            await UpdateOrderStatus(order, context, exportSide);
         }
 
         public async Task ExportRefund(OrderRefundDynamic order)
@@ -175,7 +179,7 @@ namespace VitalChoice.ExportService.Services
             }
         }
 
-        private async Task UpdateOrderStatus(OrderDynamic order, OrderDataContext context, ExportSide exportSide)
+        private void UpdateOrderStatus(OrderDynamic order, OrderDataContext context, ExportSide exportSide)
         {
             if (context.SplitInfo.ShouldSplit)
             {
@@ -203,7 +207,6 @@ namespace VitalChoice.ExportService.Services
             {
                 _paymentMapper.SecureObject(order.PaymentMethod);
             }
-            await _orderService.UpdateAsync(order);
         }
 
         private void ParseGeneralInfo(MappedObject order, VeraCoreExportOrder promailOrder, ExportSide exportSide)

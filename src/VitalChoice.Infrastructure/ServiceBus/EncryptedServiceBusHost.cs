@@ -235,12 +235,10 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         private void CommandComplete(ServiceBusCommandBase command)
         {
-            lock (_commands)
-            {
-                CommandItem commandItem = command;
-                WeakReference<ServiceBusCommandBase> reference;
-                _commands.TryRemove(commandItem, out reference);
-            }
+            EncryptionHost.UnlockSession(command.SessionId);
+            CommandItem commandItem = command;
+            WeakReference<ServiceBusCommandBase> reference;
+            _commands.TryRemove(commandItem, out reference);
         }
 
         private void ProcessEncryptedMessage(BrokeredMessage message)
@@ -259,10 +257,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 return;
             }
             WeakReference<ServiceBusCommandBase> commandReference;
-            lock (_commands)
-            {
-                _commands.TryGetValue(remoteCommand, out commandReference);
-            }
+            _commands.TryGetValue(remoteCommand, out commandReference);
             if (commandReference != null)
             {
                 ServiceBusCommandBase command;
@@ -308,11 +303,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             if (EncryptionHost.RsaVerifyWithConvert(message.GetBody<TransportCommandData>(), out remoteCommand))
             {
                 WeakReference<ServiceBusCommandBase> commandReference;
-                lock (_commands)
-                {
-                    _commands.TryGetValue(remoteCommand,
-                        out commandReference);
-                }
+                _commands.TryGetValue(remoteCommand, out commandReference);
 
                 if (commandReference != null)
                 {
@@ -384,10 +375,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         private void TrackCommand(ServiceBusCommandBase command)
         {
-            lock (_commands)
-            {
-                _commands.TryAdd(command, new WeakReference<ServiceBusCommandBase>(command));
-            }
+            _commands.TryAdd(command, new WeakReference<ServiceBusCommandBase>(command));
         }
 
         private struct CommandItem : IEquatable<CommandItem>

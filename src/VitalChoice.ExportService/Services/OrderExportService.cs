@@ -3,9 +3,13 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Antlr4.Runtime.Atn;
+using Autofac;
+using Autofac.Core.Lifetime;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using VitalChoice.Data.Extensions;
 using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -35,6 +39,7 @@ namespace VitalChoice.ExportService.Services
         private readonly ExportInfoContext _infoContext;
         private readonly IOrderRefundService _refundService;
         private readonly ICustomerService _customerService;
+        private readonly ILifetimeScope _scope;
         private static volatile bool _writeQueue;
         private static readonly AsyncManualResetEvent LockCustomersEvent = new AsyncManualResetEvent(true);
         private static readonly AsyncManualResetEvent LockOrdersEvent = new AsyncManualResetEvent(true);
@@ -43,7 +48,7 @@ namespace VitalChoice.ExportService.Services
         public OrderExportService(IOptions<ExportOptions> options, IObjectEncryptionHost encryptionHost,
             DbContextOptions<ExportInfoContext> contextOptions, ILoggerFactory loggerFactory,
             IVeraCoreExportService veraCoreExportService, IOrderService orderService, ExportInfoContext infoContext,
-            IOrderRefundService refundService, ICustomerService customerService)
+            IOrderRefundService refundService, ICustomerService customerService, ILifetimeScope scope)
         {
             _options = options;
             _encryptionHost = encryptionHost;
@@ -53,6 +58,7 @@ namespace VitalChoice.ExportService.Services
             _infoContext = infoContext;
             _refundService = refundService;
             _customerService = customerService;
+            _scope = scope;
             _logger = loggerFactory.CreateLogger<OrderExportService>();
         }
 
@@ -193,32 +199,149 @@ namespace VitalChoice.ExportService.Services
             }
         }
 
-        public async Task ExportOrder(int idOrder, ExportSide exportSide)
+        public async Task<ICollection<OrderExportItemResult>> ExportOrders(ICollection<OrderExportItem> exportItems)
         {
             if (_writeQueue)
             {
                 throw new ApiException("Orders cannot be exported while encrypted database update is in progress");
             }
-            var order = await _orderService.SelectWithCustomerAsync(idOrder, true);
-            if (order.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
-            {
-                var uow = new UnitOfWork(_infoContext);
-                {
-                    var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
-                    var orderPayment =
-                        await rep.Query(o => o.IdOrder == idOrder).SelectFirstOrDefaultAsync(false);
-                    if (orderPayment == null)
-                    {
-                        throw new ApiException("Cannot find order credit card");
-                    }
 
-                    order.PaymentMethod.Data.CardNumber = _encryptionHost.LocalDecrypt<string>(orderPayment.CreditCardNumber);
-                }
-            }
-            await _veraCoreExportService.ExportOrder(order, exportSide);
+            List<OrderExportItemResult> results = new List<OrderExportItemResult>();
+            var lockObject = new object();
+
+            await ExportOrders(exportItems, results, lockObject);
+            await ExportRefunds(exportItems, results, lockObject);
+
+            return results;
         }
 
-        public async Task ExportRefund(int idOrder)
+        private async Task ExportOrders(ICollection<OrderExportItem> exportItems, List<OrderExportItemResult> results, object lockObject)
+        {
+            var orders = exportItems.Where(i => !i.IsRefund).ToDictionary(o => o.Id);
+
+            var orderList =
+                new HashSet<OrderDynamic>(
+                    await _orderService.SelectAsync(exportItems.Where(i => !i.IsRefund).Select(o => o.Id).ToList(), true));
+            var customerList =
+                (await
+                    _customerService.SelectAsync(
+                        orderList.Select(o => o.Customer.Id).Distinct().ToList(), true))
+                    .ToDictionary(c => c.Id);
+
+            foreach (var order in orderList)
+            {
+                order.Customer = customerList.GetValueOrDefault(order.Customer.Id) ?? order.Customer;
+            }
+
+            var cardedOrders =
+                orderList.Where(o => o.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard).Select(o => o.Id).ToList();
+            var uow = new UnitOfWork(_infoContext);
+            var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
+            var orderPayments = (await rep.Query(o => cardedOrders.Contains(o.IdOrder)).SelectAsync(false)).ToDictionary(o => o.IdOrder);
+            foreach (var order in orderList.Where(o => o.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard).ToArray())
+            {
+                var payment = orderPayments.GetValueOrDefault(order.Id);
+                if (payment == null)
+                {
+                    results.Add(new OrderExportItemResult
+                    {
+                        Id = order.Id,
+                        Error = "Cannot find order credit card in encrypted store",
+                        Success = false
+                    });
+                    orderList.Remove(order);
+                }
+                else
+                {
+                    order.PaymentMethod.Data.CardNumber = _encryptionHost.LocalDecrypt<string>(payment.CreditCardNumber);
+                }
+            }
+
+            var rootScope = ((LifetimeScope) _scope).RootLifetimeScope;
+            await Task.WhenAll(orderList.Select(async order =>
+            {
+                using (var scope = rootScope.BeginLifetimeScope())
+                {
+                    var veracoreExportService = scope.Resolve<IVeraCoreExportService>();
+                    try
+                    {
+                        await veracoreExportService.ExportOrder(order, orders[order.Id].OrderType);
+                        lock (lockObject)
+                        {
+                            results.Add(new OrderExportItemResult
+                            {
+                                Id = order.Id,
+                                Success = true
+                            });
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        lock (lockObject)
+                        {
+                            results.Add(new OrderExportItemResult
+                            {
+                                Error = e.ToString(),
+                                Id = order.Id,
+                                Success = false
+                            });
+                        }
+                    }
+                }
+            })).ConfigureAwait(false);
+            
+            await _orderService.UpdateRangeAsync(orderList);
+        }
+
+        private async Task ExportRefunds(ICollection<OrderExportItem> exportItems, List<OrderExportItemResult> results, object lockObject)
+        {
+            var refundList =
+                new HashSet<OrderRefundDynamic>(
+                    await _refundService.SelectAsync(exportItems.Where(i => i.IsRefund).Select(o => o.Id).ToList(), true));
+            var refundCustomerList =
+                (await
+                    _customerService.SelectAsync(
+                        refundList.Select(o => o.Customer.Id).Distinct().ToList(), true))
+                    .ToDictionary(c => c.Id);
+
+            foreach (var refund in refundList)
+            {
+                refund.Customer = refundCustomerList.GetValueOrDefault(refund.Customer.Id) ?? refund.Customer;
+            }
+
+            await refundList.ToArray().ForEachAsync(async refund =>
+            {
+                try
+                {
+                    await _veraCoreExportService.ExportRefund(refund);
+                    lock (lockObject)
+                    {
+                        results.Add(new OrderExportItemResult
+                        {
+                            Id = refund.Id,
+                            Success = true
+                        });
+                    }
+                }
+                catch (Exception e)
+                {
+                    lock (lockObject)
+                    {
+                        refundList.Remove(refund);
+                        results.Add(new OrderExportItemResult
+                        {
+                            Error = e.ToString(),
+                            Id = refund.Id,
+                            Success = false
+                        });
+                    }
+                }
+            });
+
+            await _refundService.UpdateRangeAsync(refundList);
+        }
+
+        public async Task ExportRefunds(int idOrder)
         {
             var refund = await _refundService.SelectAsync(idOrder, true);
             refund.Customer = await _customerService.SelectAsync(refund.Customer.Id, true);

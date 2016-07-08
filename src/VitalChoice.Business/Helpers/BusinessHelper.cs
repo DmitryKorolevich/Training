@@ -11,15 +11,6 @@ namespace VitalChoice.Business.Helpers
 {
     public static class BusinessHelper
     {
-		public static string ResolveStateOrCounty(ICollection<Country> countries, AddressDynamic address)
-		{
-			var target = countries.Single(x => x.Id == address.IdCountry);
-
-			var stateOrCounty = address.IdState.HasValue ? target.States.FirstOrDefault(x => x.Id == address.IdState.Value)?.StateCode : address.County;
-
-			return stateOrCounty;
-		}
-
 		public static string GetDiscountMessage(this DiscountDynamic discount, int? IdTier = null)
 		{
 			string toReturn = null;

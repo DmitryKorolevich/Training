@@ -19,6 +19,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Interfaces.Services;
@@ -35,7 +36,6 @@ namespace VC.Admin.ModelConverters
         private readonly ICountryService _countryService;
         private readonly IAdminUserService _adminUserService;
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
-        private readonly TimeZoneInfo _pstTimeZoneInfo;
 
         public OrderInvoiceModelConverter(IAppInfrastructureService appInfrastructureService, 
             ITrackingService trackingService,
@@ -50,7 +50,6 @@ namespace VC.Admin.ModelConverters
             _countryService = countryService;
             _adminUserService = adminUserService;
             _addressMapper = addressMapper;
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
         public override async Task DynamicToModelAsync(OrderInvoiceModel model, OrderDynamic dynamic)
@@ -81,18 +80,18 @@ namespace VC.Admin.ModelConverters
             }
 
             model.IdCustomer = dynamic.Customer.Id;
-            model.DateCreated = TimeZoneInfo.ConvertTime(model.DateCreated, TimeZoneInfo.Local, _pstTimeZoneInfo);
+            model.DateCreated = TimeZoneInfo.ConvertTime(model.DateCreated, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
             if (model.ShipDelayDate.HasValue)
             {
-                model.ShipDelayDate = TimeZoneInfo.ConvertTime(model.ShipDelayDate.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+                model.ShipDelayDate = TimeZoneInfo.ConvertTime(model.ShipDelayDate.Value, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
             }
             if (model.ShipDelayDateP.HasValue)
             {
-                model.ShipDelayDateP = TimeZoneInfo.ConvertTime(model.ShipDelayDateP.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+                model.ShipDelayDateP = TimeZoneInfo.ConvertTime(model.ShipDelayDateP.Value, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
             }
             if (model.ShipDelayDateNP.HasValue)
             {
-                model.ShipDelayDateNP = TimeZoneInfo.ConvertTime(model.ShipDelayDateNP.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+                model.ShipDelayDateNP = TimeZoneInfo.ConvertTime(model.ShipDelayDateNP.Value, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
             }
             model.IdEditAgent = adminProfile == null ? "--" : adminProfile.AgentId;
             if (dynamic.IdObjectType == (int)OrderType.Refund)

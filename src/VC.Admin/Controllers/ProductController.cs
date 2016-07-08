@@ -57,7 +57,6 @@ namespace VC.Admin.Controllers
         private readonly ILogger logger;
         private readonly ExtendedUserManager _userManager;
         private readonly IAgentService _agentService;
-        private readonly TimeZoneInfo _pstTimeZoneInfo;
 
         public ProductController(IProductCategoryService productCategoryService,
             IProductService productService,
@@ -84,7 +83,6 @@ namespace VC.Admin.Controllers
             _agentService = agentService;
             _skuMapper = skuMapper;
             _mapper = mapper;
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             this.logger = loggerProvider.CreateLogger<ProductController>();
         }
 
@@ -696,8 +694,8 @@ namespace VC.Admin.Controllers
         [HttpGet]
         public async Task<FileResult> GetSkuBreakDownReportItemsReportFile([FromQuery]string from, [FromQuery]string to)
         {
-            var dFrom = from.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
-            var dTo = to.GetDateFromQueryStringInPst(_pstTimeZoneInfo);
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
             if (!dFrom.HasValue || !dTo.HasValue)
             {
                 return null;

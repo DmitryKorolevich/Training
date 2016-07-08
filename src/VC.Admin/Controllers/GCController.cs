@@ -21,6 +21,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Business.CsvExportMaps;
 using Microsoft.Net.Http.Headers;
 using VC.Admin.Models.Products;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Orders;
@@ -33,7 +34,6 @@ namespace VC.Admin.Controllers
         private readonly IOrderSchedulerService OrderSchedulerService;
         private readonly ICsvExportService<GCWithOrderListItemModel, GcWithOrderListItemModelCsvMap> _gCWithOrderListItemModelCsvMapCSVExportService;
         private readonly ExtendedUserManager _userManager;
-        private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly ILogger logger;
 
         public GCController(IGcService GCService,
@@ -45,7 +45,6 @@ namespace VC.Admin.Controllers
             this.OrderSchedulerService = OrderSchedulerService;
             _gCWithOrderListItemModelCsvMapCSVExportService = gCWithOrderListItemModelCsvMapCSVExportService;
             _userManager = userManager;
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             this.logger = loggerProvider.CreateLogger<GCController>();
         }
 
@@ -93,7 +92,7 @@ namespace VC.Admin.Controllers
             var data = await GCService.GetGiftCertificatesWithOrderInfoAsync(filter);
             foreach (var item in data.Items)
             {
-                item.Created = TimeZoneInfo.ConvertTime(item.Created, TimeZoneInfo.Local, _pstTimeZoneInfo);
+                item.Created = TimeZoneInfo.ConvertTime(item.Created, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
             }
 
             var result = _gCWithOrderListItemModelCsvMapCSVExportService.ExportToCsv(data.Items);

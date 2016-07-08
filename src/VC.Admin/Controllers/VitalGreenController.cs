@@ -9,6 +9,7 @@ using VitalChoice.Interfaces.Services;
 using System;
 using Microsoft.Net.Http.Headers;
 using VitalChoice.Business.CsvExportMaps;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
@@ -22,7 +23,6 @@ namespace VC.Admin.Controllers
         private readonly IVitalGreenService _vitalGreenService;
         private readonly ICsvExportService<VitalGreenRequest, VitalGreenRequestCsvMap> _csvExportVitalGreenRequestService;
         private readonly ILogger _logger;
-        private readonly TimeZoneInfo _pstTimeZoneInfo;
 
         public VitalGreenController(
             IVitalGreenService vitalGreenService,
@@ -32,14 +32,13 @@ namespace VC.Admin.Controllers
             _vitalGreenService = vitalGreenService;
             _csvExportVitalGreenRequestService = csvExportVitalGreenRequestService;
             this._logger = loggerProvider.CreateLogger<VitalGreenController>();
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
         [HttpPost]
         public async Task<Result<VitalGreenReportModel>> GetVitalGreenReport([FromBody]VitalGreenReportFilter filter)
         {
             DateTime utcDate = new DateTime(filter.Year,filter.Month,1);
-            utcDate = TimeZoneInfo.ConvertTime(utcDate, _pstTimeZoneInfo, TimeZoneInfo.Local);
+            utcDate = TimeZoneInfo.ConvertTime(utcDate, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local);
 
             var toReturn = await _vitalGreenService.GetVitalGreenReport(utcDate);
             toReturn.Year = filter.Year;
@@ -51,7 +50,7 @@ namespace VC.Admin.Controllers
         public async Task<FileResult> GetVitalGreenReportFile([FromQuery]string year, [FromQuery]string month)
         {
             DateTime utcDate = new DateTime(Int32.Parse(year), Int32.Parse(month), 1);
-            utcDate = TimeZoneInfo.ConvertTime(utcDate, _pstTimeZoneInfo, TimeZoneInfo.Local);
+            utcDate = TimeZoneInfo.ConvertTime(utcDate, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local);
 
             var toReturn = await _vitalGreenService.GetVitalGreenReport(utcDate);
             var requests = new List<VitalGreenRequest>();
