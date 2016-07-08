@@ -1720,9 +1720,23 @@ namespace VitalChoice.Business.Services.Orders
             {
                 throw new AppValidationException("Invalid file format");
             }
-            if (!customer.ApprovedPaymentMethods.Contains((int) PaymentMethodType.NoCharge))
+            if (orderType == OrderType.GiftList && !customer.ApprovedPaymentMethods.Contains((int) PaymentMethodType.NoCharge))
             {
                 throw new AppValidationException("Payment method \"No Charge\" should be allowed");
+            }
+            CustomerPaymentMethodDynamic oacPaymentMethod=null;
+            if (orderType == OrderType.DropShip)
+            {
+                if (!customer.ApprovedPaymentMethods.Contains((int) PaymentMethodType.Oac))
+                {
+                    throw new AppValidationException("Payment method \"On Approved Credit\" should be allowed");
+                }
+                oacPaymentMethod = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == idPaymentMethod);
+                if (oacPaymentMethod == null || oacPaymentMethod.IdObjectType != (int) PaymentMethodType.Oac ||
+                    oacPaymentMethod.Address==null)
+                {
+                    throw new AppValidationException("Payment method \"On Approved Credit\" should be configured");
+                }
             }
             if (orderType != OrderType.GiftList && orderType != OrderType.DropShip)
             {
@@ -1760,7 +1774,7 @@ namespace VitalChoice.Business.Services.Orders
                 throw new AppValidationException(messages);
             }
 
-            var map = await OrdersForImportBaseConvert(records, orderType, customer, idAddedBy);
+            var map = await OrdersForImportBaseConvert(records, orderType, customer, oacPaymentMethod, idAddedBy);
 
             await LoadSkusDynamic(map, customer);
             //not found SKU errors
@@ -1855,7 +1869,8 @@ namespace VitalChoice.Business.Services.Orders
             }
         }
 
-        private async Task<List<OrderImportItemOrderDynamic>> OrdersForImportBaseConvert(List<OrderBaseImportItem> records, OrderType orderType, CustomerDynamic customer, int idAddedBy)
+        private async Task<List<OrderImportItemOrderDynamic>> OrdersForImportBaseConvert(List<OrderBaseImportItem> records, OrderType orderType,
+            CustomerDynamic customer, CustomerPaymentMethodDynamic oacPaymentMethod, int idAddedBy)
         {
             List<OrderImportItemOrderDynamic> toReturn = new List<OrderImportItemOrderDynamic>();
             foreach (var record in records)
@@ -1864,7 +1879,7 @@ namespace VitalChoice.Business.Services.Orders
                 order.IdEditedBy = idAddedBy;
                 order.Customer = customer;
                 order.ShippingAddress = await _addressMapper.FromModelAsync(record, (int) AddressType.Shipping);
-                record.SetFields(order);
+                record.SetFields(order, oacPaymentMethod);
                 toReturn.Add(new OrderImportItemOrderDynamic
                 {
                     OrderImportItem = record, Order = order,

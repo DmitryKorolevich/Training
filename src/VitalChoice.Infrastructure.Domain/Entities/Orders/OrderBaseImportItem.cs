@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
@@ -90,14 +91,28 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
 
         public ICollection<MessageInfo> ErrorMessages { get; set; }
 
-        public virtual void SetFields(OrderDynamic order)
+        public virtual void SetFields(OrderDynamic order, CustomerPaymentMethodDynamic paymentMethod)
         {
             order.DateCreated = DateTime.Now;
             order.StatusCode = (int)RecordStatusCode.Active;
-            order.PaymentMethod = new OrderPaymentMethodDynamic()
+            if (order.IdObjectType == (int) OrderType.GiftList)
             {
-                IdObjectType = (int)PaymentMethodType.NoCharge,
-            };
+                order.PaymentMethod = new OrderPaymentMethodDynamic()
+                {
+                    IdObjectType = (int) PaymentMethodType.NoCharge,
+                };
+            }
+            if (order.IdObjectType == (int)OrderType.DropShip)
+            {
+                order.PaymentMethod = new OrderPaymentMethodDynamic()
+                {
+                    IdObjectType = (int)PaymentMethodType.Oac,
+                    Address = paymentMethod.Address
+                };
+                order.PaymentMethod.Data.Terms = paymentMethod.Data.Terms;
+                order.PaymentMethod.Data.Fob = paymentMethod.Data.Fob;
+                order.PaymentMethod.Address.Id = 0;
+            }
             order.Skus = this?.Skus.Select(p => new SkuOrdered()
             {
                 Sku = new SkuDynamic() { Code = p.SKU },

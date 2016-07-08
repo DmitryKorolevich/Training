@@ -1,7 +1,15 @@
 ﻿function addToCart(elem, sku)
 {
+    addToCartMultiple(elem, [{Code: sku, Quantity: 1}])
+
+    return false;
+}
+
+function addToCartMultiple(elem, skus)
+{
     var l = null;
-    if (elem != null) {
+    if (elem != null)
+    {
         l = Ladda.create(elem)
         l.start();
     }
@@ -9,8 +17,10 @@
     $(".overlay").show();
 
     $.ajax({
-        url: "/Cart/AddToCartView?skuCode=" + sku,
+        url: "/Cart/AddToCartView",
         dataType: "html",
+        data: JSON.stringify(skus),
+        contentType: "application/json; charset=utf-8",
         type: "POST"
     }).success(function (result)
     {
@@ -40,8 +50,10 @@
     }).error(function (result)
     {
         notifyError();
-    }).complete(function () {
-        if (l != null) {
+    }).complete(function ()
+    {
+        if (l != null)
+        {
             l.stop();
         }
 

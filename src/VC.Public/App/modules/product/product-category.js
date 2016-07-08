@@ -10,6 +10,10 @@
         }
     });
 
+    $("body").on("click", "#lnkClose", closeCartLite);
+
+    $("body").on("click", ".proposals-item-link", addCrossToCart);
+
     function isValidSku(elem)
     {
         var value = elem.value;
@@ -42,6 +46,24 @@
 
         if (valid)
         {
+            var skus = [];
+            $.each($('.category-skus table input'), function (index, item)
+            {
+                var value = item.value;
+                if (value.trim() != "" && value.match(/^[0-9]+$/) && parseInt(value)!=0)
+                {
+                    skus.push({
+                        Code: $(item).data("sku-code"),
+                        Quantity: parseInt(value),
+                    });
+                }
+            });
+
+            if(skus.length>0)
+            {
+                addToCartMultiple(e.currentTarget, skus);
+                $('.category-skus table input').val("");
+            }
         }
         else
         {

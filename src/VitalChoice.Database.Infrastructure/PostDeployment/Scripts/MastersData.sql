@@ -1562,6 +1562,7 @@ BEGIN
 <layout> -> (ProductCategory)
 {{
     @script(){{
+        <script src="/app/modules/product/addtocart.js"></script>
         <script src="/app/modules/product/product-category.js"></script>
     }}
 <aside id="menuSidebar" class="category-aside">

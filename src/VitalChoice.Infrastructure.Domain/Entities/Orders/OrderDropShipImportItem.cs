@@ -29,9 +29,9 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
         [Display(Name = "Ship Date")]
         public DateTime? ShipDelayDate { get; set; }
 
-        public override void SetFields(OrderDynamic order)
+        public override void SetFields(OrderDynamic order, CustomerPaymentMethodDynamic paymentMethod)
         {
-            base.SetFields(order);
+            base.SetFields(order, paymentMethod);
             order.Data.KeyCode = "DROPSHIP";
             order.OrderStatus = OrderStatus.Processed;
             order.Data.OrderType = (int)SourceOrderType.Web;

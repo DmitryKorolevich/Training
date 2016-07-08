@@ -1496,7 +1496,7 @@ namespace VC.Admin.Controllers
             {
                 idPaymentMethod = Int32.Parse(form["idpaymentmethod"]);
             }
-            if (orderType == OrderType.GiftList && idPaymentMethod == null)
+            if (idPaymentMethod == null)
             {
                 throw new AppValidationException("Payment method isn't specified.");
             }

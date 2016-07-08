@@ -553,6 +553,15 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			            {
 			                data.idpaymentmethod = $scope.options.UploadOrderCreditCard;
 			            }
+			            if ($scope.options.UploadOrderType == 3)//ds
+			            {
+			                if ($scope.currentCustomer.Oac == null || $scope.currentCustomer.Oac.Id == 0)
+			                {
+			                    toaster.pop('error', "Error!", "Please specify an On Approved Credit payment method and save a customer first.", null, 'trustedHtml');
+			                    return;
+			                }
+			                data.idpaymentmethod = $scope.currentCustomer.Oac.Id;
+			            }
 			            $scope.options.uploadingOrdersImport = true;
 			            var deferred = $scope.addEditTracker.createPromise();
 			            Upload.upload({
