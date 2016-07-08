@@ -19,6 +19,7 @@ using VitalChoice.Interfaces.Services.Settings;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.Products;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Identity.UserManagers;using VitalChoice.Infrastructure.Domain.Entities.Roles;
@@ -34,7 +35,6 @@ namespace VC.Admin.Controllers
         private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly ExtendedUserManager _userManager;
         private readonly ILogger _logger;
-        private readonly TimeZoneInfo _pstTimeZoneInfo;
 
         public DiscountController(
             IDiscountService discountService, 
@@ -49,7 +49,6 @@ namespace VC.Admin.Controllers
             _mapper = mapper;
             _logger = loggerProvider.CreateLogger<DiscountController>();
             _appInfrastructureService = appInfrastructureService;
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
         }
 
         #region Products
@@ -80,8 +79,8 @@ namespace VC.Admin.Controllers
                     StatusCode = RecordStatusCode.Active,
                     Assigned = null,//All
                     DiscountType=DiscountType.PercentDiscount,
-                    StartDate = TimeZoneInfo.ConvertTime(now, _pstTimeZoneInfo, TimeZoneInfo.Local),
-                    ExpirationDate= TimeZoneInfo.ConvertTime(now.AddDays(30), _pstTimeZoneInfo, TimeZoneInfo.Local),
+                    StartDate = TimeZoneInfo.ConvertTime(now, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local),
+                    ExpirationDate= TimeZoneInfo.ConvertTime(now.AddDays(30), TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local),
                     DiscountsToSelectedSkus = new List<DiscountToSelectedSku>(),
                     DiscountsToSkus = new List<DiscountToSku>(),
                     DiscountTiers = new List<DiscountTier>(),

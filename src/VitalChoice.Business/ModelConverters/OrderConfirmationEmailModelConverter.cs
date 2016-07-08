@@ -23,54 +23,49 @@ namespace VitalChoice.Business.ModelConverters
 {
     public class OrderConfirmationEmailModelConverter : BaseModelConverter<OrderConfirmationEmail, OrderDynamic>
     {
-        private readonly TimeZoneInfo _pstTimeZoneInfo;
-        private readonly ICountryService _countryService;
         private readonly ICustomerService _customerService;
         private readonly ReferenceData _referenceData;
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
         private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
         private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
         private readonly IOptions<AppOptions> _options;
+        private readonly ICountryNameCodeResolver _countryNameCodeResolver;
 
         public OrderConfirmationEmailModelConverter(
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
-            ICountryService countryService,
             ICustomerService customerService,
             IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<SkuDynamic, Sku> skuMapper,
             IDynamicMapper<ProductDynamic, Product> productMapper,
-            IOptions<AppOptions> options)
+            IOptions<AppOptions> options, ICountryNameCodeResolver countryNameCodeResolver)
         {
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-            _countryService = countryService;
             _customerService = customerService;
             _referenceData = appInfrastructureService.Data();
             _addressMapper = addressMapper;
             _skuMapper = skuMapper;
             _productMapper = productMapper;
             _options = options;
+            _countryNameCodeResolver = countryNameCodeResolver;
         }
 
         public override async Task DynamicToModelAsync(OrderConfirmationEmail model, OrderDynamic dynamic)
         {
-            var countries = await _countryService.GetCountriesAsync();
-
             dynamic.Customer = await _customerService.SelectAsync(dynamic.Customer.Id);
             model.PublicHost = _options.Value.PublicHost;
 
             //Dates in the needed timezone
-            model.DateCreated = TimeZoneInfo.ConvertTime(model.DateCreated, TimeZoneInfo.Local, _pstTimeZoneInfo);
+            model.DateCreated = TimeZoneInfo.ConvertTime(model.DateCreated, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
             if (model.ShipDelayDate.HasValue)
             {
-                model.ShipDelayDate = TimeZoneInfo.ConvertTime(model.ShipDelayDate.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+                model.ShipDelayDate = TimeZoneInfo.ConvertTime(model.ShipDelayDate.Value, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
             }
             if (model.ShipDelayDateP.HasValue)
             {
-                model.ShipDelayDateP = TimeZoneInfo.ConvertTime(model.ShipDelayDateP.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+                model.ShipDelayDateP = TimeZoneInfo.ConvertTime(model.ShipDelayDateP.Value, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
             }
             if (model.ShipDelayDateNP.HasValue)
             {
-                model.ShipDelayDateNP = TimeZoneInfo.ConvertTime(model.ShipDelayDateNP.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+                model.ShipDelayDateNP = TimeZoneInfo.ConvertTime(model.ShipDelayDateNP.Value, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
             }
 
             await model.Skus.AddRangeAsync(dynamic.Skus?.Select(async sku =>
@@ -127,21 +122,21 @@ namespace VitalChoice.Business.ModelConverters
             if (dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.NoCharge && dynamic.Customer.ProfileAddress != null)
             {
                 model.BillToAddress = await _addressMapper.ToModelAsync<AddressEmailItem>(dynamic.Customer.ProfileAddress);
-                model.BillToAddress.Country = countries.FirstOrDefault(p => p.Id == dynamic.Customer.ProfileAddress.IdCountry)?.CountryName;
-                model.BillToAddress.StateCodeOrCounty = BusinessHelper.ResolveStateOrCounty(countries, dynamic.Customer.ProfileAddress);
+                model.BillToAddress.Country = _countryNameCodeResolver.GetCountryName(dynamic.Customer.ProfileAddress);
+                model.BillToAddress.StateCodeOrCounty = _countryNameCodeResolver.GetRegionOrStateCode(dynamic.Customer.ProfileAddress);
             }
             else if (dynamic.PaymentMethod?.Address != null)
             {
                 model.BillToAddress = await _addressMapper.ToModelAsync<AddressEmailItem>(dynamic.PaymentMethod.Address);
-                model.BillToAddress.Country = countries.FirstOrDefault(p => p.Id == dynamic.PaymentMethod.Address.IdCountry)?.CountryName;
-                model.BillToAddress.StateCodeOrCounty = BusinessHelper.ResolveStateOrCounty(countries, dynamic.PaymentMethod.Address);
+                model.BillToAddress.Country = _countryNameCodeResolver.GetCountryName(dynamic.PaymentMethod.Address);
+                model.BillToAddress.StateCodeOrCounty = _countryNameCodeResolver.GetRegionOrStateCode(dynamic.PaymentMethod.Address);
             }
 
             if (dynamic.ShippingAddress != null)
             {
                 model.ShipToAddress = await _addressMapper.ToModelAsync<AddressEmailItem>(dynamic.ShippingAddress);
-                model.ShipToAddress.Country = countries.FirstOrDefault(p => p.Id == dynamic.ShippingAddress.IdCountry)?.CountryName;
-                model.ShipToAddress.StateCodeOrCounty = BusinessHelper.ResolveStateOrCounty(countries, dynamic.ShippingAddress);
+                model.ShipToAddress.Country = _countryNameCodeResolver.GetCountryName(dynamic.ShippingAddress);
+                model.ShipToAddress.StateCodeOrCounty = _countryNameCodeResolver.GetRegionOrStateCode(dynamic.ShippingAddress);
                 model.DeliveryInstructions = model.ShipToAddress.DeliveryInstructions;
             }
 

@@ -32,6 +32,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -65,7 +66,6 @@ namespace VC.Admin.Controllers
         private readonly IDynamicServiceAsync<CustomerNoteDynamic, CustomerNote> _notesService;
 
 		private readonly ILogger logger;
-        private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly ExtendedUserManager _userManager;
         private readonly INotificationService _notificationService;
@@ -99,7 +99,6 @@ namespace VC.Admin.Controllers
             _defaultCountry = appInfrastructureService.Data().DefaultCountry;
             _csvExportCustomersForAffiliatesService = csvExportCustomersForAffiliatesService;
             _csvExportWholesaleListitemService = csvExportWholesaleListitemService;
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
 	        _paymentMethodService = paymentMethodService;
             _userManager = userManager;
             _notificationService = notificationService;
@@ -441,7 +440,7 @@ namespace VC.Admin.Controllers
             {
                 if (item.FirstOrderPlaced.HasValue)
                 {
-                    item.FirstOrderPlaced=TimeZoneInfo.ConvertTime(item.FirstOrderPlaced.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+                    item.FirstOrderPlaced=TimeZoneInfo.ConvertTime(item.FirstOrderPlaced.Value, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
                 }
             }
 
@@ -656,7 +655,7 @@ namespace VC.Admin.Controllers
             {
                 lastMonthStartDay = lastMonthStartDay.AddMonths(-1);
             }
-            lastMonthStartDay = TimeZoneInfo.ConvertTime(lastMonthStartDay, _pstTimeZoneInfo, TimeZoneInfo.Local);
+            lastMonthStartDay = TimeZoneInfo.ConvertTime(lastMonthStartDay, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local);
             return (await _customerService.GetWholesaleSummaryReportMonthStatisticAsync(lastMonthStartDay, count)).ToList();
         }
 

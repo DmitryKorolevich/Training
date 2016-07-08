@@ -32,6 +32,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using Microsoft.Extensions.Options;
 using VC.Admin.Models.Affiliates;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 
@@ -49,7 +50,6 @@ namespace VC.Admin.Controllers
         private readonly IOrderService _orderService;
         private readonly ICountryService _countryService;
         private readonly ISettingService _settingService;
-        private readonly TimeZoneInfo _pstTimeZoneInfo;
         private readonly IOptions<AppOptions> _appOptions;
         private readonly ILogger logger;
 
@@ -76,7 +76,6 @@ namespace VC.Admin.Controllers
             _orderService = orderService;
             _countryService = countryService;
             _settingService = settingService;
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             _appOptions = appOptions;
             logger = loggerProvider.CreateLogger<AffiliateController>();
         }
@@ -330,7 +329,7 @@ namespace VC.Admin.Controllers
         {
             DateTime lastMonthStartDay = DateTime.Now;
             lastMonthStartDay = new DateTime(lastMonthStartDay.Year, lastMonthStartDay.Month, 1);
-            lastMonthStartDay = TimeZoneInfo.ConvertTime(lastMonthStartDay, _pstTimeZoneInfo, TimeZoneInfo.Local);
+            lastMonthStartDay = TimeZoneInfo.ConvertTime(lastMonthStartDay, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local);
             return lastMonthStartDay;
         }
 
@@ -350,7 +349,7 @@ namespace VC.Admin.Controllers
             {
                 lastMonthStartDay = lastMonthStartDay.AddMonths(-1);
             }
-            lastMonthStartDay = TimeZoneInfo.ConvertTime(lastMonthStartDay, _pstTimeZoneInfo, TimeZoneInfo.Local);
+            lastMonthStartDay = TimeZoneInfo.ConvertTime(lastMonthStartDay, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local);
             return (await _affiliateService.GetAffiliatesSummaryReportItemsForMonths(lastMonthStartDay, count)).ToList();
         }
 

@@ -27,40 +27,36 @@ namespace VC.Public.ModelConverters.Order
 {
     public class OrderViewModelConverter : BaseModelConverter<OrderViewModel, OrderDynamic>
     {
-        private readonly TimeZoneInfo _pstTimeZoneInfo;
-        private readonly ICountryService _countryService;
         private readonly ReferenceData _referenceData;
         protected readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
         protected readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
         private readonly ITrackingService _trackingService;
+        private readonly ICountryNameCodeResolver _countryNameCodeResolver;
 
         public OrderViewModelConverter(
-            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
-            ICountryService countryService,
             IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<SkuDynamic, Sku> skuMapper,
             IDynamicMapper<ProductDynamic, Product> productMapper,
-            ITrackingService trackingService)
+            ITrackingService trackingService,
+            ICountryNameCodeResolver countryNameCodeResolver)
         {
-            _pstTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-            _countryService = countryService;
             _referenceData = appInfrastructureService.Data();
             _skuMapper = skuMapper;
             _productMapper = productMapper;
             _trackingService = trackingService;
+            _countryNameCodeResolver = countryNameCodeResolver;
         }
 
         public override async Task DynamicToModelAsync(OrderViewModel model, OrderDynamic dynamic)
         {
-            var countries = await _countryService.GetCountriesAsync();
             if (dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.NoCharge && dynamic.Customer.ProfileAddress != null)
             {
-                model.BillToAddress = dynamic.Customer.ProfileAddress.PopulateBillingAddressDetails(countries,
+                model.BillToAddress = dynamic.Customer.ProfileAddress.PopulateBillingAddressDetails(_countryNameCodeResolver,
                     dynamic.Customer.Email);
             }
             else if (dynamic.PaymentMethod?.Address != null)
             {
-                model.BillToAddress = dynamic.PaymentMethod.Address.PopulateBillingAddressDetails(countries,
+                model.BillToAddress = dynamic.PaymentMethod.Address.PopulateBillingAddressDetails(_countryNameCodeResolver,
                     dynamic.Customer.Email);
             }
 
@@ -71,7 +67,7 @@ namespace VC.Public.ModelConverters.Order
 
             if (dynamic.ShippingAddress != null)
             {
-                model.ShipToAddress = dynamic.ShippingAddress.PopulateShippingAddressDetails(countries);
+                model.ShipToAddress = dynamic.ShippingAddress.PopulateShippingAddressDetails(_countryNameCodeResolver);
                 model.DeliveryInstructions = dynamic.ShippingAddress.SafeData.DeliveryInstructions;
             }
             
@@ -142,18 +138,18 @@ namespace VC.Public.ModelConverters.Order
             }).ToList() ?? new List<GCInvoiceEntity>();
 
             //Dates in the needed timezone
-            model.DateCreated = TimeZoneInfo.ConvertTime(model.DateCreated, TimeZoneInfo.Local, _pstTimeZoneInfo);
+            model.DateCreated = TimeZoneInfo.ConvertTime(model.DateCreated, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
             if (model.ShipDelayDate.HasValue)
             {
-                model.ShipDelayDate = TimeZoneInfo.ConvertTime(model.ShipDelayDate.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+                model.ShipDelayDate = TimeZoneInfo.ConvertTime(model.ShipDelayDate.Value, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
             }
             if (model.ShipDelayDateP.HasValue)
             {
-                model.ShipDelayDateP = TimeZoneInfo.ConvertTime(model.ShipDelayDateP.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+                model.ShipDelayDateP = TimeZoneInfo.ConvertTime(model.ShipDelayDateP.Value, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
             }
             if (model.ShipDelayDateNP.HasValue)
             {
-                model.ShipDelayDateNP = TimeZoneInfo.ConvertTime(model.ShipDelayDateNP.Value, TimeZoneInfo.Local, _pstTimeZoneInfo);
+                model.ShipDelayDateNP = TimeZoneInfo.ConvertTime(model.ShipDelayDateNP.Value, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
             }
 
             if (dynamic.OrderShippingPackages != null && dynamic.OrderShippingPackages.Count > 0)
