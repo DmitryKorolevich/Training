@@ -353,11 +353,11 @@ namespace VitalChoice.Business.Services.VeraCore
                                         IdSku = sku.Id,
                                         POrderType = pOrderType,
                                         DateCreated = now,
-                                        ShipMethodFreightCarrier = shipNotice.FreightCarrier,
-                                        ShipMethodFreightService = shipNotice.FreightService,
+                                        ShipMethodFreightCarrier = shipNotice.FreightCarrier ?? string.Empty,
+                                        ShipMethodFreightService = shipNotice.FreightService ?? string.Empty,
                                         ShippedDate = shipNotice.ShipDate,
                                         TrackingNumber = itemInformation.LabelInformation?.LabelTrackingNumber ?? string.Empty,
-                                        UPSServiceCode = itemInformation.VendorProductID,
+                                        UPSServiceCode = itemInformation.VendorProductID ?? string.Empty,
                                         IdWarehouse = resultId >= _options.Value.VeraCoreSettings.WAwarehouseThreshold
                                             ? Warehouse.WA
                                             : Warehouse.VA
