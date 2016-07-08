@@ -7,7 +7,8 @@ using VitalChoice.Workflow.Base;
 
 namespace VitalChoice.Workflow.Core
 {
-    public class WorkflowTreeExecutor<TContext, TResult> : IWorkflowTreeExecutor<TContext, TResult> where TContext : WorkflowDataContext<TResult>
+    public class WorkflowTreeExecutor<TContext, TResult> : IWorkflowTreeExecutor<TContext, TResult>
+        where TContext : WorkflowDataContext<TResult>
     {
         private readonly IWorkflowTree<TContext, TResult> _tree;
         private readonly ILifetimeScope _scope;
@@ -21,6 +22,11 @@ namespace VitalChoice.Workflow.Core
         public Task<TResult> ExecuteAsync(TContext context)
         {
             return _tree.ExecuteAsync(context, new TreeContext(_scope));
+        }
+
+        public Task<TResult> ExecuteAsync(string actionName, TContext result)
+        {
+            return _tree.ExecuteAsync(actionName, result, new TreeContext(_scope));
         }
     }
 }

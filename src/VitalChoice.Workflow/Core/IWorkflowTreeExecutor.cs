@@ -6,5 +6,6 @@ namespace VitalChoice.Workflow.Core
         where TContext : WorkflowDataContext<TResult>
     {
         Task<TResult> ExecuteAsync(TContext context);
+        Task<TResult> ExecuteAsync(string actionName, TContext result);
     }
 }

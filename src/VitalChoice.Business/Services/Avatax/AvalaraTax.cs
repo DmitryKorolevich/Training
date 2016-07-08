@@ -61,37 +61,9 @@ namespace VitalChoice.Business.Services.Avatax
 
             var cancelTaxResult = await _taxService.CancelTax(cancelTaxRequest);
             if (cancelTaxResult.ResultCode != SeverityLevel.Success)
-                _logger.LogWarning(string.Join("\n",
-                    cancelTaxResult.Messages.Select(m => $"[{m.Source}] {m.Summary} ({m.Details})")));
-            return cancelTaxResult.ResultCode == SeverityLevel.Success;
-        }
-
-        public async Task<bool> CommitTax(string orderCode, int? idState, TaxGetType taxGetType = TaxGetType.UseBoth)
-        {
-            if (!idState.HasValue ||
-                (!_countryNameCode.IsState(idState.Value, "us", "va") &&
-                 !_countryNameCode.IsState(idState.Value, "us", "wa")))
-                return true;
-
-            if (_turnOffCommit)
-                return true;
-            GetTaxRequest getTaxRequest = new GetTaxRequest
-            {
-                CompanyCode = _companyCode,
-                DocCode = "TAX" + orderCode,
-                Commit = true,
-                DocType = DocType.SalesInvoice,
-                DocDate = DateTime.Now,
-                DetailLevel = DetailLevel.Document
-            };
-
-            var postTaxResult = await _taxService.GetTax(getTaxRequest);
-            if (postTaxResult.ResultCode != SeverityLevel.Success)
-            {
                 _logger.LogError(string.Join("\n",
-                    postTaxResult.Messages.Select(m => $"[{postTaxResult.DocCode}]({m.Source}) {m.Summary}")));
-            }
-            return postTaxResult.ResultCode == SeverityLevel.Success;
+                    cancelTaxResult.Messages.Select(m => $"[{orderCode}]({m.Source}) {m.Summary}")));
+            return cancelTaxResult.ResultCode == SeverityLevel.Success;
         }
 
         public async Task<decimal> GetTax<T>(BaseOrderContext<T> context, TaxGetType taxGetType = TaxGetType.UseBoth)

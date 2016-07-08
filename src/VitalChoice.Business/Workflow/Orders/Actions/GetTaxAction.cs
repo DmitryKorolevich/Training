@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Avatax;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Interfaces.Services.Avatax;
@@ -19,13 +20,35 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
             var taxService = executionContext.Resolve<IAvalaraTax>();
             if (context.SplitInfo.ShouldSplit)
             {
-                context.SplitInfo.PerishableTax = await taxService.GetTax(context, TaxGetType.Perishable);
-                context.SplitInfo.NonPerishableTax = await taxService.GetTax(context, TaxGetType.NonPerishable);
+                var pGetType = TaxGetType.Perishable;
+                if (context.Order.POrderStatus.HasValue && context.Order.POrderStatus.Value == OrderStatus.Shipped)
+                {
+                    pGetType = pGetType | TaxGetType.Commit | TaxGetType.SavePermanent;
+                }
+                var npGetType = TaxGetType.NonPerishable;
+                if (context.Order.NPOrderStatus.HasValue && context.Order.NPOrderStatus.Value == OrderStatus.Shipped)
+                {
+                    npGetType = npGetType | TaxGetType.Commit | TaxGetType.SavePermanent;
+                }
+                await Task.WhenAll(Task.Run(async () =>
+                {
+                    context.SplitInfo.PerishableTax = await taxService.GetTax(context, pGetType);
+                }), Task.Run(async () =>
+                {
+                    context.SplitInfo.NonPerishableTax = await taxService.GetTax(context, npGetType);
+                }));
                 context.TaxTotal = context.SplitInfo.PerishableTax + context.SplitInfo.NonPerishableTax;
             }
             else
             {
-                context.TaxTotal = await taxService.GetTax(context);
+                if (context.Order.OrderStatus.HasValue && context.Order.OrderStatus.Value == OrderStatus.Shipped)
+                {
+                    context.TaxTotal = await taxService.GetTax(context, TaxGetType.UseBoth | TaxGetType.Commit | TaxGetType.SavePermanent);
+                }
+                else
+                {
+                    context.TaxTotal = await taxService.GetTax(context);
+                }
             }
             return context.TaxTotal;
         }

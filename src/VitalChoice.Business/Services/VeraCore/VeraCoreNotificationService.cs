@@ -29,10 +29,12 @@ using VitalChoice.Ecommerce.Domain.Entities.VeraCore.FilesSchema;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Avatax;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.VeraCore;
 using VitalChoice.Interfaces.Services.Avatax;
 using VitalChoice.Interfaces.Services.Orders;
+using VitalChoice.Workflow.Core;
 
 namespace VitalChoice.Business.Services.VeraCore
 {
@@ -54,6 +56,7 @@ namespace VitalChoice.Business.Services.VeraCore
         private readonly Regex _cancelFileNamePattern;
         private readonly Regex _numberPattern;
         private readonly ILogger _logger;
+        private readonly IWorkflowFactory _treeFactory;
 
         public VeraCoreNotificationService(
             IOptions<AppOptions> options,
@@ -68,7 +71,7 @@ namespace VitalChoice.Business.Services.VeraCore
             INotificationService notificationService,
             IAvalaraTax avalaraTax,
             OrderMapper orderMapper,
-            ILoggerProviderExtended logger)
+            ILoggerProviderExtended logger, IWorkflowFactory treeFactory)
         {
             _options = options;
             _veraCoreProcessItemRepository = veraCoreProcessItemRepository;
@@ -85,6 +88,7 @@ namespace VitalChoice.Business.Services.VeraCore
             _notificationService = notificationService;
             _avalaraTax = avalaraTax;
             _orderMapper = orderMapper;
+            _treeFactory = treeFactory;
             _logger = logger.CreateLogger<VeraCoreSFTPService>();
         }
 
@@ -230,31 +234,38 @@ namespace VitalChoice.Business.Services.VeraCore
 
         private async Task<bool> ProcessShipment(ICollection<VeraCoreProcessItem> items)
         {
-            var toReturn = false;
-
             var shipmentNotificationItems = await ProcessOrderShipmentPackagesUpdate(items);
-            toReturn = shipmentNotificationItems.Count > 0;
+            var processingResult = shipmentNotificationItems.Count > 0;
+            //BUG: refunds wont work here
             var orders = await _orderService.SelectAsync(shipmentNotificationItems.Select(p => p.IdOrder).ToList());
             await SendShipmentNotifications(shipmentNotificationItems, orders);
-            CommitTaxes(shipmentNotificationItems, orders);
+            await CommitTaxes(orders);
 
-            return toReturn;
+            return processingResult;
         }
 
-        private void CommitTaxes(ICollection<ShipmentNotificationItem> shipmentNotificationItems, List<OrderDynamic> orders)
+        private async Task CommitTaxes(IEnumerable<OrderDynamic> orders)
         {
-            shipmentNotificationItems.AsParallel().ForAll(p =>
+            var orderTree = await _treeFactory.CreateTreeAsync<OrderDataContext, decimal>("Order");
+            var reshipTree = await _treeFactory.CreateTreeAsync<OrderDataContext, decimal>("Reship");
+            foreach (var order in orders)
             {
-                var order = orders.FirstOrDefault(pp => pp.Id == p.IdOrder);
-                if (order != null)
+                switch ((OrderType) order.IdObjectType)
                 {
-                    TaxGetType type;
-                    var orderCode = _orderService.GenerateOrderCode(p.POrderType, order.Id, out type);
-                    _avalaraTax.CommitTax(orderCode, order.ShippingAddress?.IdState, type)
-                        .GetAwaiter()
-                        .GetResult();
+                    case OrderType.Normal:
+                    case OrderType.AutoShip:
+                    case OrderType.DropShip:
+                    case OrderType.GiftList:
+                    case OrderType.AutoShipOrder:
+                        await orderTree.ExecuteAsync("TaxTotal", new OrderDataContext(OrderStatus.Exported));
+                        break;
+                    case OrderType.Reship:
+                        await reshipTree.ExecuteAsync("TaxTotal", new OrderDataContext(OrderStatus.Exported));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
-            });
+            }
         }
 
         private async Task SendShipmentNotifications(ICollection<ShipmentNotificationItem> shipmentNotificationItems, ICollection<OrderDynamic> orders)
