@@ -23,7 +23,7 @@ cmd /c rmdir "${RootDeploy}\blue\wwwroot\design"
 cmd /c rmdir "${RootDeploy}\public\wwwroot\design"
 robocopy "empty\" "${RootDeploy}\" /xd "logs" "files" "design" /mir /nfl /ndl /njh > clean.log
 ni -itemtype directory -path "${RootDeploy}\logs\" -Force
-cp "${RootBuild}\src\nlog.config" "${RootDeploy}\nlog.config"
+#cp "${RootBuild}\src\nlog.config" "${RootDeploy}\nlog.config"
 Push-Location "${RootBuild}"
 echo "Working directory: ${RootBuild}"
 echo "Restoring packages..."
