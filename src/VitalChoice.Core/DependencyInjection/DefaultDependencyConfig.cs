@@ -104,6 +104,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.ObjectPool;
 using Newtonsoft.Json.Serialization;
 using NLog;
+using NLog.Config;
 using VitalChoice.Business.Services.VeraCore;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Interfaces.Services.VeraCore;
@@ -121,6 +122,15 @@ namespace VitalChoice.Core.DependencyInjection
         public Autofac.IContainer RegisterInfrastructure(IConfiguration configuration, IServiceCollection services,
             Assembly projectAssembly, IHostingEnvironment appEnv, bool enableCache = true)
         {
+            var newOptions = new AppOptions();
+            ConfigureAppOptions(configuration, newOptions);
+            var tableLogsClient = new TableLogsClient(new OptionsWrapper<AppOptions>(newOptions),
+                appEnv);
+            services.AddSingleton<ITableLogsClient>(tableLogsClient);
+
+            AzureTablesTarget.InitalizeTableClient(tableLogsClient);
+            ConfigurationItemFactory.Default.Targets.RegisterDefinition("AzureTables", typeof(AzureTablesTarget));
+
             // Add EF services to the services container.
             var scopeContainer = new CacheServiceScopeFactoryContainer();
 #if !NETSTANDARD1_5
@@ -268,7 +278,6 @@ namespace VitalChoice.Core.DependencyInjection
                     ServiceUrl = configuration.GetSection("App:PDFMyUrl:ServiceUrl").Value,
                 };
             });
-
             services.Configure<MvcJsonOptions>(o =>
             {
                 o.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;

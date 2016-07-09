@@ -35,6 +35,7 @@ using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Data.Extensions;
+using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Infrastructure.Domain.Content;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Profiling.Base;
@@ -51,6 +52,7 @@ namespace VC.Admin.Controllers
         private readonly ICatalogRequestAddressService _catalogRequestAddressService;
         private readonly ICsvExportService<CatalogRequestAddressListItemModel, CatalogRequestAddressListItemModelCsvMap> _exportCatalogRequestAddressService;
         private readonly ILogger logger;
+        private readonly ITableLogsClient _logsClient;
 
         public SettingController(
             ILogViewService logViewService,
@@ -60,7 +62,7 @@ namespace VC.Admin.Controllers
             IObjectHistoryLogService objectHistoryLogService,
             ICatalogRequestAddressService catalogRequestAddressService,
             ICsvExportService<CatalogRequestAddressListItemModel, CatalogRequestAddressListItemModelCsvMap> exportCatalogRequestAddressService,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider, ITableLogsClient logsClient)
         {
             this.logViewService = logViewService;
             this.countryService = countryService;
@@ -69,6 +71,7 @@ namespace VC.Admin.Controllers
             this.objectHistoryLogService = objectHistoryLogService;
             _catalogRequestAddressService = catalogRequestAddressService;
             _exportCatalogRequestAddressService = exportCatalogRequestAddressService;
+            _logsClient = logsClient;
             this.logger = loggerProvider.CreateLogger<SettingController>();
         }
 
@@ -217,16 +220,13 @@ namespace VC.Admin.Controllers
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Settings)]
-        public async Task<Result<PagedList<LogListItemModel>>> GetLogItems([FromBody]LogItemListFilter filter)
+        public Result<PagedList<LogListItemModel>> GetLogItems([FromBody] LogItemListFilter filter)
         {
-            var items = await _catalogRequestAddressService.GetCatalogRequestsAsync();
-
-            if (filter.To.HasValue)
-            {
-                filter.To = filter.To.Value.AddDays(1);
-            }
-            var result = await logViewService.GetCommonItemsAsync(filter.LogLevel, filter.Message, filter.Source, filter.From, filter.To?.AddDays(1),
-                filter.Paging.PageIndex, filter.Paging.PageItemCount, filter.Sorting);
+            var end = filter.To?.AddDays(1) ?? DateTime.Today.AddDays(1);
+            var start = filter.From ?? DateTime.Today.AddDays(-1);
+            var result = _logsClient.GetLogs(start, end, filter.AppName, filter.LogLevel, filter.Message, filter.Source,
+                filter.Paging.PageIndex,
+                filter.Paging.PageItemCount, filter.Sorting);
             var toReturn = new PagedList<LogListItemModel>
             {
                 Items = result.Items.Select(p => new LogListItemModel(p)).ToList(),

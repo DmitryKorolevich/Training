@@ -9,6 +9,7 @@
         self.LogLevel = null;
         var currentDate = new Date();
         currentDate.setHours(0, 0, 0, 0);
+        self.AppName = 'VC.Admin';
         self.To = currentDate.shiftDate('+1d');
         self.From = currentDate.shiftDate('-1m');
         self.Paging = { PageIndex: 1, PageItemCount: 100 };
@@ -69,6 +70,13 @@
         {
             Id: 'Debug', Name: 'Debug'
         },
+        ];
+
+        $scope.appNames = [
+            "VC.Admin",
+            "VC.Public",
+            "VitalChoice.Jobs",
+            "VitalChoice.ExportService"
         ];
         
         $scope.filter = new Filter();

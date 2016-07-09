@@ -5,6 +5,7 @@ using VitalChoice.Business.Queries.Log;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.Logs;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Interfaces.Services;
@@ -20,7 +21,7 @@ namespace VitalChoice.Business.Services
             this.commonLogItemsRepository = commonLogItemsRepository;
         }
 
-        public async Task<PagedList<CommonLogItem>> GetCommonItemsAsync(string logLevel = null, string message = null, string source = null, DateTime? @from = null, DateTime? to = null, int page = 1, int take = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT, SortFilter sorting = default(SortFilter))
+        public async Task<PagedList<CommonLogItem>> GetCommonItemsAsync(string logLevel = null, string message = null, string source = null, DateTime? @from = null, DateTime? to = null, int page = 0, int take = BaseAppConstants.DEFAULT_LIST_TAKE_COUNT, SortFilter sorting = default(SortFilter))
         {
             var query = new CommonLogQuery();
             query = query.GetItems(logLevel, message, source, from, to);

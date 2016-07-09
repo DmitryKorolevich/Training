@@ -22,14 +22,17 @@
                 </p>
             </div>
         </div>
-        <div class="row form-group">
+	    <div class="row form-group">
             <div class="col-md-3">
-                <input type="text" class="form-control" placeholder="Message" data-ng-model="filter.Message">
+                <select class="form-control" data-ng-model="filter.AppName" ng-options="name as name for name in appNames"></select>
             </div>
-            <div class="col-md-3">
-                <input type="text" class="form-control" placeholder="Source" data-ng-model="filter.Source">
-            </div>
-        </div>
+	        <div class="col-md-3">
+	            <input type="text" class="form-control" placeholder="Message" data-ng-model="filter.Message">
+	        </div>
+	        <div class="col-md-3">
+	            <input type="text" class="form-control" placeholder="Source" data-ng-model="filter.Source">
+	        </div>
+	    </div>
 		<div class="row form-group">
 			<div class="col-md-4">
                 <button class="btn btn-info" data-ng-click="filterLogs();" type="button">Filter</button>

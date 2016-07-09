@@ -11,7 +11,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Infrastructure.Domain.Options;
 using NLog;
+using NLog.Config;
+using NLog.Targets;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Interfaces.Services;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
@@ -141,7 +144,8 @@ namespace VitalChoice.Core.Services
         {
             string basePath = env.ContentRootPath;
             string logPath = env.ContentRootPath;
-            _factory = new CustomFactory(new LoggerFactory(), env);
+            _factory = new LoggerFactory();
+            //_factory = new CustomFactory(new LoggerFactory(), env);
             int backLevelCount = 0;
             var searchPath = basePath;
             while (!File.Exists(searchPath + @"\nlog.config") && backLevelCount <= 5)

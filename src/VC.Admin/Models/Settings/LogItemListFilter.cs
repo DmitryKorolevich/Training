@@ -14,5 +14,7 @@ namespace VC.Admin.Models.Setting
         public string Source { get; set; }
 
         public string Message { get; set; }
+
+        public string AppName { get; set; }
     }
 }
