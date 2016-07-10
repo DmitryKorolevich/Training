@@ -4,12 +4,13 @@
 @using VitalChoice.Interfaces.Services.Settings
 @using Microsoft.Extensions.Options
 @using VitalChoice.Infrastructure.Domain.Options
+@using VitalChoice.Infrastructure.Domain.Transfer
 @model RegisterWholesaleAccountModel
-@inject IAppInfrastructureService appInfrastructureService;
+@inject ReferenceData appInfrastructureService;
 @inject IOptions<AppOptions> appOptions;
 
 @{
-    var infrastructure = appInfrastructureService.Data();
+    var infrastructure = appInfrastructureService;
 }
 
 <dv class="content-ajax-form-wrapper">

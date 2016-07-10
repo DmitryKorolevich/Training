@@ -1,11 +1,12 @@
 ﻿@using System.Linq
 @using VitalChoice.Ecommerce.Domain.Entities.Payment
 @using VitalChoice.Interfaces.Services
+@using VitalChoice.Infrastructure.Domain.Transfer
 @model VC.Public.Models.Profile.OrderViewModel
-@inject IAppInfrastructureService appInfrastructureService;
+@inject ReferenceData appInfrastructureService;
 
 @{
-    var infrastructure = appInfrastructureService.Data();
+    var infrastructure = appInfrastructureService;
 }
 
 @section Meta {

@@ -1,10 +1,11 @@
 ﻿@using VitalChoice.Interfaces.Services
 @using VC.Public.Helpers
+@using VitalChoice.Infrastructure.Domain.Transfer
 @model VC.Public.Models.Profile.HelpTicketManageModel
-@inject IAppInfrastructureService appInfrastructureService;
+@inject ReferenceData appInfrastructureService;
 
 @{
-    var infrastructure = appInfrastructureService.Data();
+    var infrastructure = appInfrastructureService;
 }
 
 @section Meta {

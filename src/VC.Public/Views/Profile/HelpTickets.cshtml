@@ -1,15 +1,16 @@
 ﻿@using System.Globalization;
 @using System.Collections.Generic;
 @using VitalChoice.Interfaces.Services
+@using VitalChoice.Infrastructure.Domain.Transfer
 @model  ICollection<VitalChoice.SharedWeb.Models.Help.HelpTicketListItemModel>
-@inject IAppInfrastructureService appInfrastructureService;
+@inject ReferenceData appInfrastructureService;
 
 @section Meta {
     <title>Vital Choice | Help Tickets</title>
 }
 
 @{
-    var infrastructure = appInfrastructureService.Data();
+    var infrastructure = appInfrastructureService;
 }
 
 <div class="working-area-holder">

@@ -3,8 +3,9 @@
 @using VitalChoice.Infrastructure.Domain.Options
 @using VitalChoice.Infrastructure.Identity
 @using VitalChoice.Interfaces.Services
+@using VitalChoice.Infrastructure.Domain.Transfer
 @inject IOptions<AppOptions> appOptions;
-@inject IAppInfrastructureService appInfrastructureService;
+@inject ReferenceData appInfrastructureService;
 
 <!DOCTYPE html>
 <!--[if lt IE 9]>
@@ -38,7 +39,7 @@
 		</style>
 	<script>
 		@{
-			var appInfrastructure = appInfrastructureService.Data();
+			var appInfrastructure = appInfrastructureService;
 		}
 
 		var appSettings = { DefaultCountryId: @(appInfrastructure.DefaultCountry?.Id) }

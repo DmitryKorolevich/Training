@@ -1,9 +1,10 @@
 ﻿@using System.Threading.Tasks
 @using VitalChoice.Ecommerce.Domain.Entities.Addresses
 @using VitalChoice.Interfaces.Services
+@using VitalChoice.Infrastructure.Domain.Transfer
 @model VC.Public.Models.Checkout.AddUpdateShippingMethodModel
 
-@inject IAppInfrastructureService appInfrastructureService;
+@inject ReferenceData appInfrastructureService;
 
 @Html.HiddenFor(x=>x.ShipAddressIdToOverride)
 @Html.HiddenFor(x=>x.PreferredShipMethod)
@@ -116,7 +117,7 @@
 <div class="form-group">
 	@Html.LabelFor(m => m.PreferredShipMethod, new { @class = "control-label" })
 	<div class="input-group">
-		<label id="PreferredShipMethodLabel" class="form-control-static">@(Model?.PreferredShipMethod != null ? appInfrastructureService.Data().OrderPreferredShipMethod.Single(x => x.Key == (int)Model.PreferredShipMethod.Value).Text : string.Empty)</label>
+		<label id="PreferredShipMethodLabel" class="form-control-static">@(Model?.PreferredShipMethod != null ? appInfrastructureService.OrderPreferredShipMethod.Single(x => x.Key == (int)Model.PreferredShipMethod.Value).Text : string.Empty)</label>
 	</div>
 </div>
 <div class="form-group">

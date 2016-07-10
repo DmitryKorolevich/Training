@@ -1,10 +1,11 @@
 ﻿@using System.Threading.Tasks
 @using VitalChoice.Interfaces.Services
+@using VitalChoice.Infrastructure.Domain.Transfer
 @model  VitalChoice.Ecommerce.Domain.Transfer.PagedListEx<VC.Public.Models.Profile.OrderHistoryItemModel>
-@inject IAppInfrastructureService appInfrastructureService;
+@inject ReferenceData appInfrastructureService;
 
 @{
-	var infrastructure = appInfrastructureService.Data();
+	var infrastructure = appInfrastructureService;
 }
 
 <table class="standard-table">
