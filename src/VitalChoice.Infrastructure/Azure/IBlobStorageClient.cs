@@ -6,7 +6,11 @@ namespace VitalChoice.Infrastructure.Azure
 {
     public interface IBlobStorageClient
     {
-	    Task UploadBlobAsync(string containerName, string blobName, byte[] data, string contentType = null);
+        Task UploadBlobAsStringAsync(string containerName, string blobName, string data, string contentType = null);
+
+        Task<string> DownloadBlobAsStringAsync(string containerName, string blobName);
+
+        Task UploadBlobAsync(string containerName, string blobName, byte[] data, string contentType = null);
 
 	    Task<bool> BlobBlockExistsAsync(string containerName, string blobName);
 

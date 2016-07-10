@@ -8,13 +8,13 @@
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Infrastructure.Domain": "1.0.0-*",
     "VitalChoice.Ecommerce": "1.0.0-*",
-    "WindowsAzure.Storage": "7.0.1-preview"
+    "WindowsAzure.Storage": "7.1.2"
   },
 
   "frameworks": {
     "net451": {
       "dependencies": {
-        "WindowsAzure.ServiceBus": "3.2.4",
+        "WindowsAzure.ServiceBus": "3.3.1",
         "Microsoft.WindowsAzure.ConfigurationManager": "3.2.1",
         "NLog": "4.4.0-beta12"
       }

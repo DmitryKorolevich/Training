@@ -44,7 +44,7 @@
             $scope.historyFilter = {
                 IdObject: null,
                 IdObjectType: null,
-                IdBeforeObjectHistoryLogItem: null,
+                DataReferenceId: null,
                 Paging: { PageIndex: 1, PageItemCount: 20 },
             };
         }
@@ -60,7 +60,7 @@
 
         $scope.openHistoryReport = function (id)
         {
-            $scope.historyFilter.IdBeforeObjectHistoryLogItem = id;
+            $scope.historyFilter.DataReferenceId = id;
             $scope.service.getHistoryReport($scope.historyFilter, $scope.tracker)
                 .success(function (result)
                 {

@@ -15,9 +15,19 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Settings
         public ObjectHistoryOrderLogListItemModel(ObjectHistoryLogItem item) :
             base(item)
         {
-            if (!string.IsNullOrEmpty(item.OptionalData))
+            FillOptinal(item.OptionalData);
+        }
+
+        public ObjectHistoryOrderLogListItemModel(ObjectHistoryItem item) : base(item)
+        {
+            FillOptinal(item.OptionalData);
+        }
+
+        private void FillOptinal(string optinalData)
+        {
+            if (!string.IsNullOrEmpty(optinalData))
             {
-                var parts = item.OptionalData.Split(',');
+                var parts = optinalData.Split(',');
                 foreach (var part in parts)
                 {
                     if (part.StartsWith("All:"))

@@ -6,7 +6,8 @@
     "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0.*",
     "Microsoft.EntityFrameworkCore": "1.0.0.*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
-    "VitalChoice.Workflow": "1.0.0-*"
+    "VitalChoice.Workflow": "1.0.0-*",
+    "WindowsAzure.Storage": "7.1.2"
   },
   "frameworks": {
     "net451": { }

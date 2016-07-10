@@ -22,6 +22,7 @@ using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Workflow.Core;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Reflection.Metadata;
 using Newtonsoft.Json;
@@ -107,6 +108,7 @@ using NLog;
 using NLog.Config;
 using VitalChoice.Business.Services.VeraCore;
 using VitalChoice.Caching.Services.Cache.Base;
+using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services.VeraCore;
 using IContainer = Autofac.IContainer;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -365,7 +367,7 @@ namespace VitalChoice.Core.DependencyInjection
                         configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value),
                 ServerHostName = configuration.GetSection("App:ExportService:ServerHostName").Value
             };
-            options.AzureStorage = new AzureStorage()
+            options.AzureStorage = new AzureStorage
             {
                 StorageConnectionString = configuration.GetSection("App:AzureStorage:StorageConnectionString").Value,
                 CustomerContainerName = configuration.GetSection("App:AzureStorage:CustomerContainerName").Value,
@@ -377,6 +379,7 @@ namespace VitalChoice.Core.DependencyInjection
                     configuration.GetSection("App:AzureStorage:AppFilesContainerName").Value,
                 ProductGoogleFeedFileName =
                     configuration.GetSection("App:AzureStorage:ProductGoogleFeedFileName").Value,
+                ObjectHistoryContainerName = configuration.GetSection("App:AzureStorage:ObjectHistoryContainerName").Value
             };
             options.FedExOptions = new FedExOptions()
             {
@@ -554,7 +557,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<OrderRefundService>().As<IOrderRefundService>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<AffiliateService>().As<IAffiliateService>().InstancePerLifetimeScope();
             builder.RegisterType<HelpService>().As<IHelpService>().InstancePerLifetimeScope();
-            builder.RegisterType<BlobStorageClient>().As<IBlobStorageClient>().InstancePerLifetimeScope();
+            builder.RegisterType<BlobStorageClient>().As<IBlobStorageClient>().SingleInstance();
             builder.RegisterType<PromotionService>().As<IPromotionService>().InstancePerLifetimeScope();
             builder.RegisterType<ContentAreaService>().As<IContentAreaService>().InstancePerLifetimeScope();
             builder.RegisterType<FedExService>().As<IFedExService>().InstancePerLifetimeScope();
@@ -612,8 +615,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<AddressService>().As<IAddressService>().InstancePerLifetimeScope();
             builder.RegisterType<AvalaraTax>().As<IAvalaraTax>().InstancePerLifetimeScope();
             builder.RegisterType<BackendSettingsService>().As<IBackendSettingsService>().InstancePerLifetimeScope();
-            builder.RegisterType<ObjectHistoryLogService>().As<IObjectHistoryLogService>().InstancePerLifetimeScope();
-            builder.RegisterType<ObjectLogItemExternalService>().As<IObjectLogItemExternalService>().InstancePerLifetimeScope();
+            builder.RegisterType<AzureGetHistoryService>().As<IObjectHistoryLogService>().InstancePerLifetimeScope();
+            builder.RegisterType<AzureTablesObjectLogService>().As<IObjectLogItemExternalService>().SingleInstance();
             builder.RegisterType<ReCaptchaValidator>().AsSelf().SingleInstance();
             builder.RegisterType<CountryNameCodeResolver>().As<ICountryNameCodeResolver>()
                 .InstancePerLifetimeScope();

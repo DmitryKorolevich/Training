@@ -23,7 +23,7 @@
     ]
   },
   "dependencies": {
-    "WindowsAzure.ServiceBus": "3.2.4",
+    "WindowsAzure.ServiceBus": "3.3.1",
     "Microsoft.WindowsAzure.ConfigurationManager": "3.2.1",
     "VitalChoice.Infrastructure": "1.0.0-*",
     "VitalChoice.Business": "1.0.0-*",

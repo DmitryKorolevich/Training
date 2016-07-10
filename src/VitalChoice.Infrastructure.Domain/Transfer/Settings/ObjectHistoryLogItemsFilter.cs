@@ -8,6 +8,6 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Settings
 
         public ObjectType IdObjectType { get; set; }
 
-        public long? IdBeforeObjectHistoryLogItem { get; set; }
+        public string DataReferenceId { get; set; }
     }
 }

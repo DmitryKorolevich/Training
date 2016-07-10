@@ -35,6 +35,7 @@ using VC.Admin.Models.Affiliates;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Identity.UserManagers;
+using VitalChoice.Infrastructure.Services;
 
 namespace VC.Admin.Controllers
 {

@@ -38,6 +38,7 @@ using VitalChoice.Data.Extensions;
 using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Infrastructure.Domain.Content;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Services;
 using VitalChoice.Profiling.Base;
 
 namespace VC.Admin.Controllers

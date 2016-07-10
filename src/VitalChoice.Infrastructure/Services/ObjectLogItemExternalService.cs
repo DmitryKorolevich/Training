@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Interfaces.Services;
-using VitalChoice.Data.Services;
-using Newtonsoft.Json;
 using System.Reflection;
-using Newtonsoft.Json.Serialization;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.Data.Services;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -16,20 +12,18 @@ using VitalChoice.Ecommerce.Domain.Entities.History;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 
-namespace VitalChoice.Business.Services.Settings
+namespace VitalChoice.Infrastructure.Services
 {
     public class ObjectLogItemExternalService : IObjectLogItemExternalService
     {
         private readonly IEcommerceRepositoryAsync<ObjectHistoryLogItem> _objectHistoryLogItemRepository;
 
-        public ObjectLogItemExternalService(
-            IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository)
+        public ObjectLogItemExternalService(IEcommerceRepositoryAsync<ObjectHistoryLogItem> objectHistoryLogItemRepository)
         {
             _objectHistoryLogItemRepository = objectHistoryLogItemRepository;
         }
 
-        public async Task LogItems<T>(IEnumerable<T> models, bool logFullObjects = true)
-            where T: class
+        public async Task LogItems<T>(IEnumerable<T> models, bool logFullObjects = true) where T : class
         {
             if (models != null)
             {
@@ -47,14 +41,16 @@ namespace VitalChoice.Business.Services.Settings
                     if (isDynamic)
                     {
                         item = TransformForDynamic(model as MappedObject, objectType);
-                    } else if (isContentDataItem)
+                    }
+                    else if (isContentDataItem)
                     {
                         item = TransformForContentDataItem(model as ContentDataItem, objectType);
                     }
                     else if (isLogEntity)
                     {
                         item = TransformForLogEntity(model as LogEntity, objectType);
-                    } else if (isEntity)
+                    }
+                    else if (isEntity)
                     {
                         item = TransformForEntity(model as Entity, objectType);
                     }
@@ -99,19 +95,17 @@ namespace VitalChoice.Business.Services.Settings
                 IdObjectStatus = model.StatusCode,
                 IdEditedBy = model.IdEditedBy
             };
-            if(objectType == ObjectType.Order)
+            if (objectType == ObjectType.Order)
             {
                 if (model is OrderDynamic)
                 {
                     OrderDynamic order = (OrderDynamic) model;
-                    item.OptionalData =
-                        $"All:{(int?) order.OrderStatus},P:{(int?) order.POrderStatus},NP:{(int?) order.NPOrderStatus}";
+                    item.OptionalData = $"All:{(int?) order.OrderStatus},P:{(int?) order.POrderStatus},NP:{(int?) order.NPOrderStatus}";
                 }
                 if (model is OrderRefundDynamic)
                 {
-                    OrderRefundDynamic order = (OrderRefundDynamic)model;
-                    item.OptionalData =
-                        $"All:{(int?)order.OrderStatus}";
+                    OrderRefundDynamic order = (OrderRefundDynamic) model;
+                    item.OptionalData = $"All:{(int?) order.OrderStatus}";
                 }
             }
             return item;
@@ -134,10 +128,10 @@ namespace VitalChoice.Business.Services.Settings
         {
             ObjectHistoryLogItem item = new ObjectHistoryLogItem
             {
-                IdObjectType = (int)objectType,
+                IdObjectType = (int) objectType,
                 DateCreated = DateTime.Now,
                 IdObject = model.Id,
-                IdObjectStatus = (int)model.StatusCode,
+                IdObjectStatus = (int) model.StatusCode,
                 IdEditedBy = model.IdEditedBy,
             };
             //TODO - add needed fields to general implementiotn of Entity
@@ -159,7 +153,7 @@ namespace VitalChoice.Business.Services.Settings
         {
             ObjectHistoryLogItem item = new ObjectHistoryLogItem
             {
-                IdObjectType = (int)objectType,
+                IdObjectType = (int) objectType,
                 DateCreated = DateTime.Now
             };
             //TODO - add needed fields to general implementiotn of Entity

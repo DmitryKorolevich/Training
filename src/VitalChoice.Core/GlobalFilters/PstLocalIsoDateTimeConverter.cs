@@ -23,8 +23,15 @@ namespace VitalChoice.Core.GlobalFilters
         {
             if (value is DateTime)
             {
-                var dateTime = (DateTime)value;
-                value = TimeZoneInfo.ConvertTime(dateTime, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
+                var dateTime = (DateTime) value;
+                if (dateTime.Kind == DateTimeKind.Local)
+                {
+                    value = TimeZoneInfo.ConvertTime(dateTime, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
+                }
+                else if (dateTime.Kind == DateTimeKind.Utc)
+                {
+                    value = TimeZoneInfo.ConvertTime(dateTime, TimeZoneInfo.Utc, TimeZoneHelper.PstTimeZoneInfo);
+                }
             }
             base.WriteJson(writer, value, serializer);
         }

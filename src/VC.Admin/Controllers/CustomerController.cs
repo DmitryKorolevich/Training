@@ -44,6 +44,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using VitalChoice.Infrastructure.Identity.UserManagers;
+using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services.Payments;
 
 namespace VC.Admin.Controllers

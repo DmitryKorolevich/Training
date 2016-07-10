@@ -96,18 +96,18 @@ namespace VitalChoice.Business.Services
 
         public string GetCountryCode(AddressDynamic address)
         {
-            if (_stateCodes == null)
+            if (_coutryCodes == null)
             {
-                _stateCodes = _countrySource.Value.ToDictionary(c => c.Id, c => c.States.ToDictionary(s => s.Id));
+                _coutryCodes = _countrySource.Value.ToDictionary(c => c.Id);
             }
             return _coutryCodes.GetCountry(address?.IdCountry ?? 0)?.CountryCode;
         }
 
         public string GetCountryName(AddressDynamic address)
         {
-            if (_stateCodes == null)
+            if (_coutryCodes == null)
             {
-                _stateCodes = _countrySource.Value.ToDictionary(c => c.Id, c => c.States.ToDictionary(s => s.Id));
+                _coutryCodes = _countrySource.Value.ToDictionary(c => c.Id);
             }
             return _coutryCodes.GetCountry(address?.IdCountry ?? 0)?.CountryName;
         }

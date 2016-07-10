@@ -6,8 +6,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Settings
 {
     public class ObjectHistoryLogListItemModel
     {
-        public long Id { get; set; }
-
+        public string DataReferenceId { get; set; }
         public int IdObject { get; set; }
 
         public int IdObjectStatus { get; set; }
@@ -15,8 +14,6 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Settings
         public ObjectType IdObjectType { get; set; }
 
         public DateTime DateCreated { get; set; }
-
-        public int? IdEditedBy { get; set; }
 
         public string EditedBy { get; set; }
 
@@ -26,20 +23,48 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Settings
 
         public ObjectHistoryLogListItemModel(ObjectHistoryLogItem item)
         {
-            if(item!=null)
+            if (item != null)
             {
-                Id = item.IdObjectHistoryLogItem;
                 IdObject = item.IdObject;
                 IdObjectStatus = item.IdObjectStatus;
-                IdObjectType = (ObjectType)item.IdObjectType;
+                IdObjectType = (ObjectType) item.IdObjectType;
                 DateCreated = item.DateCreated;
-                IdEditedBy = item.IdEditedBy;
                 EditedBy = item.EditedBy;
                 OptionalData = item.OptionalData;
                 if (item.DataItem != null)
                 {
                     Data = item.DataItem.Data;
                 }
+                DataReferenceId = item.IdObjectHistoryLogDataItem?.ToString();
+            }
+        }
+
+        public ObjectHistoryLogListItemModel(ObjectHistoryItem item)
+        {
+            if (item != null)
+            {
+                IdObject = item.IdObject;
+                IdObjectStatus = item.IdObjectStatus;
+                IdObjectType = (ObjectType)item.IdObjectType;
+                DateCreated = item.DateCreated;
+                EditedBy = item.EditedBy;
+                OptionalData = item.OptionalData;
+                DataReferenceId = item.DataReferenceId;
+            }
+        }
+
+        public ObjectHistoryLogListItemModel(LogDataItemTableEntity item)
+        {
+            if (item != null)
+            {
+                IdObject = int.Parse(item.PartitionKey);
+                IdObjectStatus = item.IdObjectStatus;
+                IdObjectType = (ObjectType) item.IdObjectType;
+                DateCreated = item.DateCreated;
+                EditedBy = item.EditedBy;
+                OptionalData = item.OptionalData;
+                Data = item.Data;
+                DataReferenceId = item.PartitionKey + "_" + item.RowKey;
             }
         }
     }

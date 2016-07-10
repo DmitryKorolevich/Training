@@ -18,7 +18,7 @@
                     <span data-ng-if="item.IdObjectStatus == 1" class="label label-danger font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.IdObjectStatus).Text}}</span>
                 </td>
                 <td class="actions">
-                    <button data-ng-if="!$first" title="View" class="btn btn-default btn-success btn-xs" data-ng-click="openHistoryReport(item.Id);">
+                    <button data-ng-if="!$first" title="View" class="btn btn-default btn-success btn-xs" data-ng-click="openHistoryReport(item.DataReferenceId);">
                         <i class="fa fa-search"></i>
                     </button>
                 </td>

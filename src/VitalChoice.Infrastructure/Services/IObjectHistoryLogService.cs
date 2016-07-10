@@ -3,11 +3,11 @@ using VitalChoice.Ecommerce.Domain.Entities.History;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 
-namespace VitalChoice.Interfaces.Services.Settings
+namespace VitalChoice.Infrastructure.Services
 {
 	public interface IObjectHistoryLogService
     {
-        Task<PagedList<ObjectHistoryLogItem>> GetObjectHistoryLogItems(ObjectHistoryLogItemsFilter filter);
+        Task<PagedList<ObjectHistoryItem>> GetObjectHistoryLogItems(ObjectHistoryLogItemsFilter filter);
 
         Task<ObjectHistoryReportModel> GetObjectHistoryReport(ObjectHistoryLogItemsFilter filter);
     }

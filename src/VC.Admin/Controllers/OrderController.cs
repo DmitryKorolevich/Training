@@ -57,6 +57,7 @@ using Address = VitalChoice.Ecommerce.Domain.Entities.Addresses.Address;
 using AddressType = VitalChoice.Ecommerce.Domain.Entities.Addresses.AddressType;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
+using VitalChoice.Infrastructure.Services;
 
 namespace VC.Admin.Controllers
 {

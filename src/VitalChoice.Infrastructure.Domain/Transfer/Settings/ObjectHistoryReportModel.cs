@@ -5,9 +5,5 @@
         public ObjectHistoryLogListItemModel Main { get; set; }
 
         public ObjectHistoryLogListItemModel Before { get; set; }
-
-        public ObjectHistoryReportModel()
-        {
-        }
     }
 }
