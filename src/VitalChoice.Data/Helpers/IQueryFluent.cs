@@ -18,13 +18,15 @@ namespace VitalChoice.Data.Helpers
         Task<bool> SelectAnyAsync();
         Task<int> SelectCountAsync();
         Task<decimal> SelectSumAsync(Expression<Func<TEntity, decimal>> func);
-        List<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = true);
+        List<TEntity> SelectPage(int page, int pageSize, out int totalCount, bool tracking = false);
         Task<PagedList<TEntity>> SelectPageAsync(int page, int pageSize, bool tracking = false);
-        List<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector = null, bool tracking = true);
-        List<TEntity> Select(bool tracking = true);
-        Task<List<TEntity>> SelectAsync(bool tracking = true);
-        Task<List<TResult>> SelectAsync<TResult>(Expression<Func<TEntity, TResult>> selector, bool tracking = true);
-        Task<TEntity> SelectFirstOrDefaultAsync(bool tracking = true);
+        List<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector, bool tracking);
+        List<TEntity> Select(bool tracking);
+
+        TEntity SelectFirstOrDefault(bool tracking);
+        Task<List<TEntity>> SelectAsync(bool tracking);
+        Task<List<TResult>> SelectAsync<TResult>(Expression<Func<TEntity, TResult>> selector, bool tracking);
+        Task<TEntity> SelectFirstOrDefaultAsync(bool tracking);
         IQueryFluent<TEntity> Where(Expression<Func<TEntity, bool>> predicate);
         IQueryFluent<TEntity> Distinct();
     }

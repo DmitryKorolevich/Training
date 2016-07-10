@@ -58,7 +58,7 @@ namespace VitalChoice.Business.Services.Products
             }
 
             var query = new InventoryCategoryQuery().NotDeleted();
-            List<InventoryCategory> dbCategories = await inventoryCategoryEcommerceRepository.Query(query).SelectAsync();
+            List<InventoryCategory> dbCategories = await inventoryCategoryEcommerceRepository.Query(query).SelectAsync(true);
             int order = 0;
             foreach (var category in categories)
             {

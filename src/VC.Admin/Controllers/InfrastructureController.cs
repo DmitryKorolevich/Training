@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.Infrastructure;
 using VitalChoice.Core.Base;
@@ -9,25 +10,25 @@ namespace VC.Admin.Controllers
 {
     public class InfrastructureController : BaseApiController
     {
-        private readonly IAppInfrastructureService appInfrastructureService;
+        private readonly IAppInfrastructureService _appInfrastructureService;
 
         public InfrastructureController(IAppInfrastructureService appInfrastructureService)
         {
-            this.appInfrastructureService = appInfrastructureService;
+            _appInfrastructureService = appInfrastructureService;
         }
 
         [HttpGet]
-        public Result<RestrictedReferenceData> GetReferenceData()
+        public async Task<Result<RestrictedReferenceData>> GetReferenceData()
         {
-            var referenceData = this.appInfrastructureService.Data();
+            var referenceData = await _appInfrastructureService.GetDataAsync();
 
-	        RestrictedReferenceData referenceDataModel;
+            RestrictedReferenceData referenceDataModel;
 
-			if (HttpContext.User.Identity.IsAuthenticated)
-	        {
+            if (HttpContext.User.Identity.IsAuthenticated)
+            {
                 referenceDataModel = new FullReferenceDataModel()
                 {
-                    AppSettings=referenceData.AppSettings,
+                    AppSettings = referenceData.AppSettings,
                     Labels = referenceData.Labels,
                     AdminRoles = referenceData.AdminRoles,
                     CustomerRoles = referenceData.CustomerRoles,
@@ -42,7 +43,7 @@ namespace VC.Admin.Controllers
                     GCTypes = referenceData.GCTypes,
                     GCShortTypes = referenceData.GCShortTypes,
                     RecordStatuses = referenceData.RecordStatuses,
-                    PublicRecordStatuses=referenceData.PublicRecordStatuses,
+                    PublicRecordStatuses = referenceData.PublicRecordStatuses,
                     CustomerStatuses = referenceData.CustomerStatuses,
                     AffiliateStatuses = referenceData.AffiliateStatuses,
                     ProductTypes = referenceData.ProductTypes,
@@ -51,7 +52,7 @@ namespace VC.Admin.Controllers
                     AssignedCustomerTypes = referenceData.AssignedCustomerTypes,
                     ActiveFilterOptions = referenceData.ActiveFilterOptions,
                     CustomerTypes = referenceData.CustomerTypes,
-                    ShortCustomerTypes=referenceData.ShortCustomerTypes,
+                    ShortCustomerTypes = referenceData.ShortCustomerTypes,
                     OrderStatuses = referenceData.OrderStatuses,
                     PaymentMethods = referenceData.PaymentMethods,
                     ShortPaymentMethods = referenceData.ShortPaymentMethods,
@@ -59,9 +60,9 @@ namespace VC.Admin.Controllers
                     PublicOrderTypes = referenceData.PublicOrderTypes,
                     ShortOrderTypes = referenceData.ShortOrderTypes,
                     TaxExempts = referenceData.TaxExempts,
-					Tiers = referenceData.Tiers,
-					TradeClasses = referenceData.TradeClasses,
-					CustomerNotePriorities = referenceData.CustomerNotePriorities,
+                    Tiers = referenceData.Tiers,
+                    TradeClasses = referenceData.TradeClasses,
+                    CustomerNotePriorities = referenceData.CustomerNotePriorities,
                     CreditCardTypes = referenceData.CreditCardTypes,
                     OacFob = referenceData.OacFob,
                     OacTerms = referenceData.OacTerms,
@@ -84,27 +85,27 @@ namespace VC.Admin.Controllers
                     DateStatuses = referenceData.DateStatuses,
                     PromotionBuyTypes = referenceData.PromotionBuyTypes,
                     ShippingUpgrades = referenceData.ShippingUpgrades,
-                    PersonTitles=referenceData.PersonTitles,
+                    PersonTitles = referenceData.PersonTitles,
                     ShipMethodTypes = referenceData.ShipMethodTypes,
                     Carriers = referenceData.Carriers,
                     Warehouses = referenceData.Warehouses,
                     ProductCategoryViewTypes = referenceData.ProductCategoryViewTypes,
                     CartShippingOptions = referenceData.CartShippingOptions,
-                    RefundRedeemOptions=referenceData.RefundRedeemOptions,
+                    RefundRedeemOptions = referenceData.RefundRedeemOptions,
                     ProductSellers = referenceData.ProductSellers,
                     GoogleCategories = referenceData.GoogleCategories,
                 };
-	        }
-			else
-			{
-				referenceDataModel = new RestrictedReferenceData()
-				{
-					Labels = referenceData.Labels,
-					CartShippingOptions = referenceData.CartShippingOptions
-				};
-			}
+            }
+            else
+            {
+                referenceDataModel = new RestrictedReferenceData()
+                {
+                    Labels = referenceData.Labels,
+                    CartShippingOptions = referenceData.CartShippingOptions
+                };
+            }
 
-	        return referenceDataModel;
+            return referenceDataModel;
         }
     }
 }

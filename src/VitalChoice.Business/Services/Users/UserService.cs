@@ -38,7 +38,7 @@ namespace VitalChoice.Business.Services.Users
 	    private readonly ITransactionAccessor<VitalChoiceContext> _transactionAccessor;
 	    private readonly ILogger _logger;
 
-	    protected IAppInfrastructureService AppInfrastructureService { get; }
+	    protected ReferenceData ReferenceData { get; }
 
 		protected UserManager<ApplicationUser> UserManager { get; }
 
@@ -51,7 +51,7 @@ namespace VitalChoice.Business.Services.Users
 		protected IDataContextAsync Context { get; }
 
 	    protected UserService(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, VitalChoiceContext context,
-	        SignInManager<ApplicationUser> signInManager, IAppInfrastructureService appInfrastructureService,
+	        SignInManager<ApplicationUser> signInManager, ReferenceData referenceData,
 	        INotificationService notificationService, IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
 	        IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor, ILoggerProviderExtended loggerProvider)
 	    {
@@ -59,7 +59,7 @@ namespace VitalChoice.Business.Services.Users
 	        RoleManager = roleManager;
 	        Context = context;
 	        this._signInManager = signInManager;
-	        AppInfrastructureService = appInfrastructureService;
+	        ReferenceData = referenceData;
 	        NotificationService = notificationService;
 	        this._ecommerceRepositoryAsync = ecommerceRepositoryAsync;
 	        this._userValidator = userValidator;

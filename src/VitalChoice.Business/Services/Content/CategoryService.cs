@@ -94,7 +94,7 @@ namespace VitalChoice.Business.Services.Content
                 throw new ArgumentNullException(nameof(category));
 
             var query = new CategoryQuery().WithType(category.Type).NotDeleted();
-            var dbCategories = await contentCategoryRepository.Query(query).SelectAsync();
+            var dbCategories = await contentCategoryRepository.Query(query).SelectAsync(true);
             category.SetSubCategoriesOrder();
 
             foreach (var dbCategory in dbCategories)
@@ -190,8 +190,12 @@ namespace VitalChoice.Business.Services.Content
             }
             else
             {
-                dbItem = (await contentCategoryRepository.Query(p => p.Id == model.Id).Include(p => p.ContentItem).ThenInclude(p => p.ContentItemToContentProcessors).
-                    SelectAsync()).FirstOrDefault();
+                dbItem =
+                    await
+                        contentCategoryRepository.Query(p => p.Id == model.Id)
+                            .Include(p => p.ContentItem)
+                            .ThenInclude(p => p.ContentItemToContentProcessors)
+                            .SelectFirstOrDefaultAsync(true);
                 if (dbItem != null)
                 {
                     foreach (var proccesorRef in dbItem.ContentItem.ContentItemToContentProcessors)

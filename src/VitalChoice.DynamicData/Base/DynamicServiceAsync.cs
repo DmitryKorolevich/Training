@@ -234,7 +234,7 @@ namespace VitalChoice.DynamicData.Base
             query = BuildQuery(query);
             if (query != null)
             {
-                var entities = await query.SelectAsync();
+                var entities = await query.SelectAsync(true);
                 if (entities.Count == 0)
                     return new List<TEntity>();
                 var items = entities.Join(models, entity => entity.Id, model => model.Id,
@@ -267,7 +267,7 @@ namespace VitalChoice.DynamicData.Base
                     .Include(p => p.OptionValues)
                     .ThenInclude(p => p.BigValue);
             query = BuildQuery(query);
-            var entity = await query.SelectFirstOrDefaultAsync();
+            var entity = await query.SelectFirstOrDefaultAsync(true);
             if (entity == null)
                 return null;
             entity.OptionTypes = DynamicMapper.FilterByType(model.IdObjectType);
@@ -425,7 +425,7 @@ namespace VitalChoice.DynamicData.Base
             {
                 query = query.Include(e => e.OptionValues);
             }
-            var toDelete = await query.SelectFirstOrDefaultAsync();
+            var toDelete = await query.SelectFirstOrDefaultAsync(true);
             if (toDelete == null)
                 return false;
             if (!await DeleteAsync(toDelete, mainRepository, valuesRepository, physically))
@@ -446,7 +446,7 @@ namespace VitalChoice.DynamicData.Base
             {
                 query = query.Include(e => e.OptionValues);
             }
-            var toDelete = await query.SelectAsync();
+            var toDelete = await query.SelectAsync(true);
             if (toDelete.Count == 0)
                 return false;
             if (!await DeleteAllAsync(toDelete, mainRepository, valuesRepository, physically))

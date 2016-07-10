@@ -103,14 +103,13 @@ namespace VitalChoice.Business.Services.Products
             ICsvExportService<SkuGoogleItem, SkuGoogleItemExportCsvMap> skuGoogleItemCSVExportService,
             IBlobStorageClient storageClient,
             IProductCategoryService productCategoryService,
-            IAppInfrastructureService appInfrastructureService,
             IOptions<AppOptions> options,
             ILoggerProviderExtended loggerProvider,
             IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync,
             SpEcommerceRepository sPEcommerceRepository, DynamicExtensionsRewriter queryVisitor,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
             IExtendedDynamicReadServiceAsync<SkuDynamic, Sku> skuReadServiceAsync,
-            IDynamicEntityOrderingExtension<Product> orderingExtension)
+            IDynamicEntityOrderingExtension<Product> orderingExtension, ReferenceData referenceData)
             : base(
                 mapper, productRepository, productValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension
@@ -131,13 +130,13 @@ namespace VitalChoice.Business.Services.Products
             _contentTypeRepository = contentTypeRepository;
             _skuGoogleItemCSVExportService = skuGoogleItemCSVExportService;
             _productCategoryService = productCategoryService;
-            _referenceData = appInfrastructureService.Data();
             _storageClient = storageClient;
             _vCustomerFavoriteRepository = vCustomerRepositoryAsync;
             _options = options;
             _skuOptionValueRepositoryAsync = skuOptionValueRepositoryAsync;
             _sPEcommerceRepository = sPEcommerceRepository;
             _skuReadServiceAsync = skuReadServiceAsync;
+            _referenceData = referenceData;
         }
 
         public async Task<ProductContent> SelectContentForTransfer(int id)
@@ -844,7 +843,7 @@ namespace VitalChoice.Business.Services.Products
             if (toReturn.Items.Count > 0)
             {
                 var ids = toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value).Distinct().ToList();
-                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
+                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
                 foreach (var item in toReturn.Items)
                 {
                     foreach (var profile in profiles)
@@ -908,7 +907,8 @@ namespace VitalChoice.Business.Services.Products
             List<ProductCategoryOrderModel> toReturn = new List<ProductCategoryOrderModel>();
 
             var productsOnCategory = await _productToCategoryRepository.Query(p => p.IdCategory == idCategory &&
-                p.Product.StatusCode == (int)RecordStatusCode.Active && p.Product.IdVisibility.HasValue).SelectAsync();
+                                                                                   p.Product.StatusCode == (int) RecordStatusCode.Active &&
+                                                                                   p.Product.IdVisibility != null).SelectAsync(false);
             var products = await SelectAsync(productsOnCategory.Select(p => p.IdProduct).ToList());
 
             foreach (var productOnCategory in productsOnCategory.OrderBy(p => p.Order))
@@ -934,7 +934,8 @@ namespace VitalChoice.Business.Services.Products
         public async Task<bool> UpdateProductsOnCategoryOrderAsync(int idCategory, ICollection<ProductCategoryOrderModel> products)
         {
             var dbProductsOnCategory = await _productToCategoryRepository.Query(p => p.IdCategory == idCategory &&
-                p.Product.StatusCode == (int)RecordStatusCode.Active && p.Product.IdVisibility.HasValue).SelectAsync();
+                                                                                     p.Product.StatusCode == (int) RecordStatusCode.Active &&
+                                                                                     p.Product.IdVisibility.HasValue).SelectAsync(true);
 
             int order = 0;
             foreach (var productCategoryOrderModel in products)
@@ -1103,10 +1104,15 @@ namespace VitalChoice.Business.Services.Products
             while (batch.Count > 0)
             {
                 // ReSharper disable once AccessToModifiedClosure
-                pairs.AddRange(_productContentRepository.Query(p => batch.Contains(p.Id)).Select(x => new KeyValuePair<int, string>(x.Id, x.Url)));
+                pairs.AddRange(
+                    (await _productContentRepository.Query(p => batch.Contains(p.Id)).SelectAsync(false)).Select(
+                        x => new KeyValuePair<int, string>(x.Id, x.Url)));
 
                 i++;
-                batch = productIds.Skip(i * BaseAppConstants.DEFAULT_MAX_ALLOWED_PARAMS_SQL).Take(BaseAppConstants.DEFAULT_MAX_ALLOWED_PARAMS_SQL).ToList();
+                batch =
+                    productIds.Skip(i*BaseAppConstants.DEFAULT_MAX_ALLOWED_PARAMS_SQL)
+                        .Take(BaseAppConstants.DEFAULT_MAX_ALLOWED_PARAMS_SQL)
+                        .ToList();
             }
 
             var favorites = new PagedList<VCustomerFavoriteFull>();
@@ -1251,7 +1257,7 @@ namespace VitalChoice.Business.Services.Products
                         var dbProductContent = (await
                             _productContentRepository.Query(p => p.Id == model.Id && p.StatusCode != RecordStatusCode.Deleted)
                                 .Include(p => p.ContentItem)
-                                .SelectAsync()).FirstOrDefault();
+                                .SelectAsync(true)).FirstOrDefault();
                         if (dbProductContent != null)
                         {
                             await Validate(productContent);
@@ -1296,7 +1302,7 @@ namespace VitalChoice.Business.Services.Products
                     var dbProductContents = (await
                             _productContentRepository.Query(p => ids.Contains(p.Id) && p.StatusCode != RecordStatusCode.Deleted)
                                 .Include(p => p.ContentItem)
-                                .SelectAsync()).ToList();
+                                .SelectAsync(true)).ToList();
                     foreach (var dbProductContent in dbProductContents)
                     {
                         var model = models.FirstOrDefault(p => p.ProductDynamic.Id == dbProductContent.Id);
@@ -1377,7 +1383,7 @@ namespace VitalChoice.Business.Services.Products
             var result = await base.DeleteAsync(uow, id, physically);
             if (result)
             {
-                var productContent = (await _productContentRepository.Query(p => p.Id == id).SelectAsync()).FirstOrDefault();
+                var productContent = (await _productContentRepository.Query(p => p.Id == id).SelectAsync(true)).FirstOrDefault();
                 if (productContent != null && productContent.StatusCode != RecordStatusCode.Deleted)
                 {
                     productContent.StatusCode = RecordStatusCode.Deleted;
@@ -1478,7 +1484,7 @@ namespace VitalChoice.Business.Services.Products
         {
             var productQuery = new ProductQuery().WithPublicId(productId).NotDeleted();
 
-            return (await _productRepository.Query(productQuery).SelectAsync(x => x.Id)).FirstOrDefault();
+            return (await _productRepository.Query(productQuery).SelectFirstOrDefaultAsync(false))?.Id ?? 0;
         }
 
         #endregion

@@ -148,8 +148,8 @@ namespace VitalChoice.Business.Services.Content
                 dbItem.ContentItem.ContentItemToContentProcessors = new List<ContentItemToContentProcessor>();
 
                 //set predefined master
-                var contentType = (await contentTypeRepository.Query(p => p.Id == (int)ContentType.Faq).SelectAsync()).FirstOrDefault();
-                if (contentType == null || !contentType.DefaultMasterContentItemId.HasValue)
+                var contentType = await contentTypeRepository.Query(p => p.Id == (int) ContentType.Faq).SelectFirstOrDefaultAsync(false);
+                if (contentType?.DefaultMasterContentItemId == null)
                 {
                     throw new Exception("The default master template isn't confugurated. Please contact support.");
                 }
@@ -157,8 +157,12 @@ namespace VitalChoice.Business.Services.Content
             }
             else
             {
-                dbItem = (await faqRepository.Query(p => p.Id == model.Id).Include(p => p.ContentItem).ThenInclude(p=>p.ContentItemToContentProcessors).
-                    SelectAsync()).FirstOrDefault();
+                dbItem =
+                    await
+                        faqRepository.Query(p => p.Id == model.Id)
+                            .Include(p => p.ContentItem)
+                            .ThenInclude(p => p.ContentItemToContentProcessors)
+                            .SelectFirstOrDefaultAsync(true);
                 if (dbItem != null)
                 {
                     foreach (var proccesorRef in dbItem.ContentItem.ContentItemToContentProcessors)

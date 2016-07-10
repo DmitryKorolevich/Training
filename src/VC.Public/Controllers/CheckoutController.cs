@@ -59,31 +59,30 @@ namespace VC.Public.Controllers
         private readonly IProductService _productService;
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodConverter;
         private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
-        private readonly ReferenceData _appInfrastructure;
-        private readonly ICountryService _countryService;
         private readonly BrontoService _brontoService;
         private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
         private readonly IAffiliateService _affiliateService;
         private readonly INotificationService _notificationService;
         private readonly ILogger _logger;
         private readonly ICountryNameCodeResolver _countryNameCodeResolver;
+        private readonly ReferenceData _referenceData;
 
         public CheckoutController(IStorefrontUserService storefrontUserService,
             ICustomerService customerService,
             IAffiliateService affiliateService,
             INotificationService notificationService,
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> paymentMethodConverter,
-            IOrderService orderService, IProductService productService, IAppInfrastructureService infrastructureService,
+            IOrderService orderService, IProductService productService,
             IAuthorizationService authorizationService, ICheckoutService checkoutService,
-            IDynamicMapper<AddressDynamic, Address> addressConverter, IAppInfrastructureService appInfrastructureService,
+            IDynamicMapper<AddressDynamic, Address> addressConverter,
             IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter,
-            IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper, 
-            ICountryService countryService,
+            IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
             BrontoService brontoService,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
-            IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager, ICountryNameCodeResolver countryNameCodeResolver)
+            IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider,
+            ExtendedUserManager userManager, ICountryNameCodeResolver countryNameCodeResolver, ReferenceData referenceData)
             : base(
-                customerService, infrastructureService, authorizationService, checkoutService, orderService,
+                customerService, referenceData, authorizationService, checkoutService, orderService,
                 skuMapper, productMapper, pageResultService, settingService, userManager)
         {
             _storefrontUserService = storefrontUserService;
@@ -91,13 +90,12 @@ namespace VC.Public.Controllers
             _productService = productService;
             _addressConverter = addressConverter;
             _orderPaymentMethodConverter = orderPaymentMethodConverter;
-            _countryService = countryService;
             _brontoService = brontoService;
             _transactionAccessor = transactionAccessor;
             _countryNameCodeResolver = countryNameCodeResolver;
+            _referenceData = referenceData;
             _affiliateService = affiliateService;
             _notificationService = notificationService;
-            _appInfrastructure = appInfrastructureService.Data();
             _logger = loggerProvider.CreateLogger<CheckoutController>();
         }
 
@@ -693,7 +691,7 @@ namespace VC.Public.Controllers
 
             var paymentMethod = cart.Order.PaymentMethod;
             reviewOrderModel.BillToAddress = paymentMethod.Address.PopulateBillingAddressDetails(_countryNameCodeResolver, cart.Order.Customer.Email);
-            reviewOrderModel.CreditCardDetails = paymentMethod.PopulateCreditCardDetails(_appInfrastructure);
+            reviewOrderModel.CreditCardDetails = paymentMethod.PopulateCreditCardDetails(_referenceData);
 
             var shippingAddress = cart.Order.ShippingAddress;
             reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(_countryNameCodeResolver);
@@ -720,7 +718,7 @@ namespace VC.Public.Controllers
 
             var paymentMethod = order.PaymentMethod;
             reviewOrderModel.BillToAddress = paymentMethod.Address.PopulateBillingAddressDetails(_countryNameCodeResolver, order.Customer.Email);
-            reviewOrderModel.CreditCardDetails = paymentMethod.PopulateCreditCardDetails(_appInfrastructure);
+            reviewOrderModel.CreditCardDetails = paymentMethod.PopulateCreditCardDetails(_referenceData);
 
             var shippingAddress = order.ShippingAddress;
             reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(_countryNameCodeResolver);

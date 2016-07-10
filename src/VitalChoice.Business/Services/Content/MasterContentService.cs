@@ -123,8 +123,12 @@ namespace VitalChoice.Business.Services.Content
             }
             else
             {
-                dbItem = (await masterContentItemRepository.Query(p => p.Id == model.Id).Include(p=>p.MasterContentItemToContentProcessors).Include(p=>p.Type).
-                    SelectAsync()).FirstOrDefault();
+                dbItem =
+                    await
+                        masterContentItemRepository.Query(p => p.Id == model.Id)
+                            .Include(p => p.MasterContentItemToContentProcessors)
+                            .Include(p => p.Type)
+                            .SelectFirstOrDefaultAsync(true);
                 if (dbItem != null)
                 {
                     await masterContentItemToProcessorsRepository.DeleteAllAsync(dbItem.MasterContentItemToContentProcessors);
@@ -163,7 +167,7 @@ namespace VitalChoice.Business.Services.Content
 
                 if (model.Type.DefaultMasterContentItemId.HasValue)
                 {
-                    var contentType = (await contentTypeRepository.Query(p => p.Id == dbItem.TypeId).SelectAsync()).FirstOrDefault();
+                    var contentType = await contentTypeRepository.Query(p => p.Id == dbItem.TypeId).SelectFirstOrDefaultAsync(true);
                     if (contentType != null && contentType.DefaultMasterContentItemId != model.Type.DefaultMasterContentItemId)
                     {
                         contentType.DefaultMasterContentItemId = dbItem.Id;

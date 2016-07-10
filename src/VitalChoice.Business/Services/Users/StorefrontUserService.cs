@@ -22,6 +22,7 @@ using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
+using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Business.Services.Users
 {
@@ -31,12 +32,12 @@ namespace VitalChoice.Business.Services.Users
 
         public StorefrontUserService(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager,
 			VitalChoiceContext context, SignInManager<ApplicationUser> signInManager,
-			IAppInfrastructureService appInfrastructureService, INotificationService notificationService,
+			ReferenceData referenceData, INotificationService notificationService,
 			IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
             IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
             IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor, ILoggerProviderExtended loggerProvider)
 			: base(
-				userManager, roleManager, context, signInManager, appInfrastructureService, notificationService, options,
+				userManager, roleManager, context, signInManager, referenceData, notificationService, options,
 				ecommerceRepositoryAsync, userValidator, transactionAccessor, loggerProvider)
 		{
             _customerRepositoryAsync = customerRepositoryAsync;

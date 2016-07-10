@@ -148,7 +148,8 @@ namespace VitalChoice.Business.Services.Content
                 if(model.MasterContentItemId==0)
                 { 
                     //set predefined master
-                    var contentType = (await contentTypeRepository.Query(p => p.Id == (int)ContentType.ContentPage).SelectAsync()).FirstOrDefault();
+                    var contentType =
+                        await contentTypeRepository.Query(p => p.Id == (int) ContentType.ContentPage).SelectFirstOrDefaultAsync(false);
                     if (contentType == null || !contentType.DefaultMasterContentItemId.HasValue)
                     {
                         throw new Exception("The default master template isn't confugurated. Please contact support.");
@@ -158,8 +159,12 @@ namespace VitalChoice.Business.Services.Content
             }
             else
             {
-                dbItem = (await contentPageRepository.Query(p => p.Id == model.Id).Include(p => p.ContentItem).ThenInclude(p=>p.ContentItemToContentProcessors).
-                    SelectAsync()).FirstOrDefault();
+                dbItem =
+                    await
+                        contentPageRepository.Query(p => p.Id == model.Id)
+                            .Include(p => p.ContentItem)
+                            .ThenInclude(p => p.ContentItemToContentProcessors)
+                            .SelectFirstOrDefaultAsync(true);
             }
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)

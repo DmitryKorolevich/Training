@@ -53,7 +53,7 @@ namespace VitalChoice.Business.Services.Settings
         public async Task<bool> UpdateSettingsAsync(SettingDynamic settings)
         {
             var entity = _settingMapper.ConvertDefaultAsync(settings);
-            var optionTypes = await _settingOptionTypeRepository.Query().SelectAsync();
+            var optionTypes = await _settingOptionTypeRepository.Query().SelectAsync(true);
             var forUpdate = new List<SettingOptionType>();
             foreach (var settingOptionValue in entity.OptionValues)
             {
@@ -79,7 +79,7 @@ namespace VitalChoice.Business.Services.Settings
 
         public async Task<Lookup> GetLookupAsync(int id)
         {
-            var toReturn = await _lookupRepository.Query(p => p.Id==id).Include(p=>p.LookupVariants).SelectFirstOrDefaultAsync(false);
+            var toReturn = await _lookupRepository.Query(p => p.Id == id).Include(p => p.LookupVariants).SelectFirstOrDefaultAsync(false);
             toReturn.LookupVariants = toReturn.LookupVariants.OrderBy(p => p.Order).ToList();
             return toReturn;
         }
@@ -93,14 +93,15 @@ namespace VitalChoice.Business.Services.Settings
                 order++;
                 if (lookupVariant.Id == 0)
                 {
-                    lookupVariant.Id = variants.Max(p => p.Id)+1;
+                    lookupVariant.Id = variants.Max(p => p.Id) + 1;
                 }
             }
 
-            var dbLookup = (await _lookupRepository.Query(p => p.Id == id).Include(p => p.LookupVariants).SelectAsync(true)).FirstOrDefault();
+            var dbLookup =
+                (await _lookupRepository.Query(p => p.Id == id).Include(p => p.LookupVariants).SelectAsync(true)).FirstOrDefault();
             if (dbLookup != null)
             {
-                dbLookup.LookupVariants.MergeKeyed(variants, p=>p.Id, (a,b) =>
+                dbLookup.LookupVariants.MergeKeyed(variants, p => p.Id, (a, b) =>
                 {
                     a.ValueVariant = b.ValueVariant;
                     a.Order = b.Order;
@@ -115,7 +116,8 @@ namespace VitalChoice.Business.Services.Settings
                     if (e.InnerException != null && e.InnerException is SqlException &&
                         (e.InnerException as SqlException).Number == SqlConstants.ERROR_CODE_FOREIGN_KEY_CONFLICT)
                     {
-                        throw new AppValidationException(string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.DenyDeleteInUseItems],"Variants"));
+                        throw new AppValidationException(
+                            string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.DenyDeleteInUseItems], "Variants"));
                     }
                 }
             }

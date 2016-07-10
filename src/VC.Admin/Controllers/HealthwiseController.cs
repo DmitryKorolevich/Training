@@ -49,53 +49,54 @@ namespace VC.Admin.Controllers
     {
         private readonly IHealthwiseService _healthwiseService;
         private readonly IOrderService _orderService;
-        private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly INotificationService _notificationService;
         private readonly ILogger _logger;
         private readonly ExtendedUserManager _userManager;
+        private readonly ReferenceData _referenceData;
 
         public HealthwiseController(
             IHealthwiseService healthwiseService,
             IOrderService orderService,
-            IAppInfrastructureService appInfrastructureService,
             INotificationService notificationService,
             ILoggerProviderExtended loggerProvider,
-            ExtendedUserManager userManager)
+            ExtendedUserManager userManager, ReferenceData referenceData)
         {
             _healthwiseService = healthwiseService;
             _orderService = orderService;
-            _appInfrastructureService = appInfrastructureService;
             _notificationService = notificationService;
             _userManager = userManager;
+            _referenceData = referenceData;
             _logger = loggerProvider.CreateLogger<HealthwiseController>();
         }
 
         [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
-        public async Task<Result<ICollection<HealthwiseCustomerListItemModel>>> GetHealthwiseCustomersWithPeriods([FromBody]VHealthwisePeriodFilter filter)
-	    {
+        public async Task<Result<ICollection<HealthwiseCustomerListItemModel>>> GetHealthwiseCustomersWithPeriods(
+            [FromBody] VHealthwisePeriodFilter filter)
+        {
             var toReturn = new List<HealthwiseCustomerListItemModel>();
-			var items = await _healthwiseService.GetVHealthwisePeriodsAsync(filter);
+            var items = await _healthwiseService.GetVHealthwisePeriodsAsync(filter);
             var periodGroups = items.GroupBy(p => p.IdCustomer).Select(p => new
             {
                 IdCustomer = p.Key,
                 Periods = p.ToList()
             }).ToList();
-            foreach(var periodGroup in periodGroups)
+            var hwMaxPeriod = _referenceData.AppSettings.HealthwisePeriodMaxItemsCount;
+            foreach (var periodGroup in periodGroups)
             {
                 var item = new HealthwiseCustomerListItemModel(periodGroup.Periods);
-                SetAllowPaymentPeriodSetting(item);
+                SetAllowPaymentPeriodSetting(item, hwMaxPeriod);
                 toReturn.Add(item);
             }
             return toReturn;
-		}
-        
+        }
+
         [NonAction]
-        private void SetAllowPaymentPeriodSetting(HealthwiseCustomerListItemModel model)
+        private void SetAllowPaymentPeriodSetting(HealthwiseCustomerListItemModel model, int hwMaxPeriod)
         {
             foreach (var period in model.Periods)
             {
-                period.AllowPayment = !period.PaidDate.HasValue && period.OrdersCount >= _appInfrastructureService.Data().AppSettings.HealthwisePeriodMaxItemsCount;
+                period.AllowPayment = !period.PaidDate.HasValue && period.OrdersCount >= hwMaxPeriod;
             }
         }
 
@@ -107,8 +108,9 @@ namespace VC.Admin.Controllers
             HealthwiseCustomerListItemModel toReturn;
             if(item!=null)
             {
+                var hwMaxPeriod = _referenceData.AppSettings.HealthwisePeriodMaxItemsCount;
                 toReturn = new HealthwiseCustomerListItemModel(new List<VHealthwisePeriod>() { item});
-                SetAllowPaymentPeriodSetting(toReturn);
+                SetAllowPaymentPeriodSetting(toReturn, hwMaxPeriod);
             }
             else
             {

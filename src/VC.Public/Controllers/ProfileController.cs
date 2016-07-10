@@ -84,7 +84,7 @@ namespace VC.Public.Controllers
             IOrderService orderService,
             IProductService productService,
             IHelpService helpService,
-            IHealthwiseService healthwiseService, IAppInfrastructureService infrastructureService,
+            IHealthwiseService healthwiseService, ReferenceData referenceData,
             IAuthorizationService authorizationService, ICheckoutService checkoutService,
             ILoggerProviderExtended loggerProvider,
             IPageResultService pageResultService, IDynamicMapper<SkuDynamic, Sku> skuMapper,
@@ -92,7 +92,7 @@ namespace VC.Public.Controllers
             IDynamicMapper<OrderDynamic, Order> orderMapper,
             IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter, ExtendedUserManager userManager,
             IContentCrossSellService contentCrossSellService, ICountryNameCodeResolver countryNameCodeResolver)
-            : base(customerService, infrastructureService, authorizationService, checkoutService, pageResultService, userManager)
+            : base(customerService, authorizationService, checkoutService, pageResultService, userManager, referenceData)
         {
             _storefrontUserService = storefrontUserService;
             _addressConverter = addressConverter;
@@ -114,8 +114,6 @@ namespace VC.Public.Controllers
 
         private async Task<PagedListEx<AutoShipHistoryItemModel>> PopulateAutoShipHistoryModel(OrderFilter filter)
 		{
-			var infr = InfrastructureService.Data();
-
             var customer = await GetCurrentCustomerDynamic();
 
 			filter.IdCustomer = customer.Id;
@@ -125,7 +123,7 @@ namespace VC.Public.Controllers
 
             var orders = await _orderService.GetFullAutoShipsAsync(filter);
 
-            var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, _countryNameCodeResolver);
+            var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, ReferenceData, _countryNameCodeResolver);
             var ordersModel = new PagedListEx<AutoShipHistoryItemModel>
             {
                 Items = await orders.Items.Select(async p => await helper.PopulateAutoShipItemModel(p)).ToListAsync(),

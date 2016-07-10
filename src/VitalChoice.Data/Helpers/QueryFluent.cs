@@ -47,13 +47,13 @@ namespace VitalChoice.Data.Helpers
             _expression = expression;
         }
 
-        public async Task<List<TResult>> SelectAsync<TResult>(Expression<Func<TEntity, TResult>> selector, bool tracking = true)
+        public async Task<List<TResult>> SelectAsync<TResult>(Expression<Func<TEntity, TResult>> selector, bool tracking)
         {
             var query = RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy, tracking: tracking).Select(selector);
             return await query.ToListAsync();
         }
 
-        public async Task<TEntity> SelectFirstOrDefaultAsync(bool tracking = true)
+        public async Task<TEntity> SelectFirstOrDefaultAsync(bool tracking)
         {
             var query = RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy, tracking: tracking);
             return await query.FirstOrDefaultAsync();
@@ -111,25 +111,30 @@ namespace VitalChoice.Data.Helpers
         public async Task<PagedList<TEntity>> SelectPageAsync(int page, int pageSize, bool tracking = false)
         {
             var countQuery = RepositoryAsync<TEntity>.Select(Query, _expression);
-            int count;
-            count = await countQuery.CountAsync();
+            var count = await countQuery.CountAsync();
             var items = await Repository.SelectAsync(Query, _expression, _orderBy, page, pageSize, tracking);
             return new PagedList<TEntity>(items, count);
         }
 
-        public List<TEntity> Select(bool tracking = true)
+        public List<TEntity> Select(bool tracking)
         {
             var query = RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy, tracking: tracking);
             return query.ToList();
         }
 
-        public List<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector, bool tracking = true)
+        public TEntity SelectFirstOrDefault(bool tracking)
+        {
+            var query = RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy, tracking: tracking);
+            return query.FirstOrDefault();
+        }
+
+        public List<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> selector, bool tracking)
         {
             var query = RepositoryAsync<TEntity>.Select(Query, _expression, _orderBy, tracking: tracking).Select(selector);
             return query.ToList();
         }
 
-        public Task<List<TEntity>> SelectAsync(bool tracking = true)
+        public Task<List<TEntity>> SelectAsync(bool tracking)
         {
             return Repository.SelectAsync(Query, _expression, _orderBy, tracking: tracking);
         }

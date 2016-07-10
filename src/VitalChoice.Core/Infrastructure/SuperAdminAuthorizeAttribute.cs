@@ -8,6 +8,7 @@ using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Core.Infrastructure
 {
@@ -39,11 +40,10 @@ namespace VitalChoice.Core.Infrastructure
 			var result = authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile).GetAwaiter().GetResult();
 			if (result)
 			{
-				var superAdmin =
-				context.HttpContext.RequestServices.GetService<IAppInfrastructureService>()
-					.Data()
-					.AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser)
-					.Text;
+			    var superAdmin =
+			        context.HttpContext.RequestServices.GetService<ReferenceData>()
+			            .AdminRoles.Single(x => x.Key == (int) RoleType.SuperAdminUser)
+			            .Text;
 
 				if (claimUser.IsInRole(superAdmin.Normalize()))
 				{

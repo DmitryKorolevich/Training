@@ -236,7 +236,7 @@ namespace VitalChoice.Business.Services.Products
             var conditions = new GcQuery().WithId(model.Id).NotDeleted();
             var query = giftCertificateRepository.Query(conditions);
 
-            GiftCertificate dbItem = (await query.SelectAsync()).FirstOrDefault();
+            GiftCertificate dbItem = await query.SelectFirstOrDefaultAsync(true);
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
             {

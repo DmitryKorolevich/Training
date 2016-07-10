@@ -31,7 +31,7 @@ namespace VitalChoice.Business.Services.Content
 
 		public async Task<IList<ContentArea>> GetContentAreasAsync()
 		{
-			return await Repository.Query().Include(x=>x.User).ThenInclude(x=>x.Profile).SelectAsync();
+			return await Repository.Query().Include(x=>x.User).ThenInclude(x=>x.Profile).SelectAsync(false);
 		}
 
 		public async Task UpdateContentAreaAsync(ContentArea contentArea)

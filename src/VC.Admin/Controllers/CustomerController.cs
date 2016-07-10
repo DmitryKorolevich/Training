@@ -59,7 +59,6 @@ namespace VC.Admin.Controllers
         private readonly ICustomerService _customerService;
         private readonly IStorefrontUserService _storefrontUserService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
-        private readonly Country _defaultCountry;
         private readonly ICsvExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> _csvExportCustomersForAffiliatesService;
         private readonly ICsvExportService<WholesaleListitem, WholesaleListitemCsvMap> _csvExportWholesaleListitemService;
 
@@ -70,6 +69,7 @@ namespace VC.Admin.Controllers
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly ExtendedUserManager _userManager;
         private readonly INotificationService _notificationService;
+        private readonly ReferenceData _referenceData;
 
         public CustomerController(ICustomerService customerService,
             IDynamicMapper<CustomerDynamic, Customer> customerMapper,
@@ -78,13 +78,12 @@ namespace VC.Admin.Controllers
             IDynamicServiceAsync<CustomerNoteDynamic, CustomerNote> notesService,
             IDynamicMapper<CustomerNoteDynamic, CustomerNote> noteMapper, ILoggerProviderExtended loggerProvider,
             IStorefrontUserService storefrontUserService,
-            IAppInfrastructureService appInfrastructureService,
             IObjectHistoryLogService objectHistoryLogService,
             ICsvExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> csvExportCustomersForAffiliatesService,
             ICsvExportService<WholesaleListitem, WholesaleListitemCsvMap> csvExportWholesaleListitemService,
             IPaymentMethodService paymentMethodService, 
             ExtendedUserManager userManager,
-            INotificationService notificationService)
+            INotificationService notificationService, ReferenceData referenceData)
         {
             _customerService = customerService;
             _countryService = countryService;
@@ -97,12 +96,12 @@ namespace VC.Admin.Controllers
             this.logger = loggerProvider.CreateLogger<CustomerController>();
 	        _storefrontUserService = storefrontUserService;
             _objectHistoryLogService = objectHistoryLogService;
-            _defaultCountry = appInfrastructureService.Data().DefaultCountry;
             _csvExportCustomersForAffiliatesService = csvExportCustomersForAffiliatesService;
             _csvExportWholesaleListitemService = csvExportWholesaleListitemService;
 	        _paymentMethodService = paymentMethodService;
             _userManager = userManager;
             _notificationService = notificationService;
+            _referenceData = referenceData;
         }
 
         [HttpGet]
@@ -138,6 +137,7 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Customers)]
         public async Task<Result<AddUpdateCustomerModel>> CreateCustomerPrototype()
         {
+            var defaultCountry = _referenceData.DefaultCountry;
             var model = await _customerService.Mapper.CreatePrototypeForAsync<AddUpdateCustomerModel>((int)CustomerType.Retail);
             model.PublicId = Guid.NewGuid();
             model.TaxExempt = TaxExempt.YesCurrentCertificate;
@@ -146,11 +146,11 @@ namespace VC.Admin.Controllers
             model.TradeClass = 1;
             model.CustomerNotes = new List<CustomerNoteModel>();
             model.ProfileAddress = new AddressModel() { };
-            model.ProfileAddress.Country = new CountryListItemModel(_defaultCountry);
+            model.ProfileAddress.Country = new CountryListItemModel(defaultCountry);
             model.Shipping = new List<AddressModel>()
             { new AddressModel()
                 {
-                    Country = new CountryListItemModel(_defaultCountry),
+                    Country = new CountryListItemModel(defaultCountry),
                     PreferredShipMethod = PreferredShipMethod.Best,
                     ShippingAddressType = ShippingAddressType.Residential,
                 }
@@ -169,9 +169,10 @@ namespace VC.Admin.Controllers
         //[AdminAuthorize(PermissionType.Customers)]
         public Result<CreditCardModel> CreateCreditCardPrototype()
         {
+            var defaultCountry = _referenceData.DefaultCountry;
             return new CreditCardModel
             {
-                Address = new AddressModel { Country = new CountryListItemModel(_defaultCountry) },
+                Address = new AddressModel { Country = new CountryListItemModel(defaultCountry) },
                 CardType = CreditCardType.MasterCard
             };
         }
@@ -180,9 +181,10 @@ namespace VC.Admin.Controllers
         //[AdminAuthorize(PermissionType.Customers)]
         public Result<OacPaymentModel> CreateOacPrototype()
         {
+            var defaultCountry = _referenceData.DefaultCountry;
             return new OacPaymentModel
             {
-                Address = new AddressModel { Country = new CountryListItemModel(_defaultCountry) },
+                Address = new AddressModel { Country = new CountryListItemModel(defaultCountry) },
                 Fob = 1,
                 Terms = 1
             };
@@ -192,9 +194,10 @@ namespace VC.Admin.Controllers
         //[AdminAuthorize(PermissionType.Customers)]
         public Result<CheckPaymentModel> CreateCheckPrototype()
         {
+            var defaultCountry = _referenceData.DefaultCountry;
             return new CheckPaymentModel
             {
-                Address = new AddressModel {Country = new CountryListItemModel(_defaultCountry) }
+                Address = new AddressModel {Country = new CountryListItemModel(defaultCountry) }
             };
         }
 
@@ -202,9 +205,10 @@ namespace VC.Admin.Controllers
         //[AdminAuthorize(PermissionType.Customers)]
         public Result<WireTransferPaymentModel> CreateWireTransferPrototype()
         {
+            var defaultCountry = _referenceData.DefaultCountry;
             return new WireTransferPaymentModel
             {
-                Address = new AddressModel { Country = new CountryListItemModel(_defaultCountry) }
+                Address = new AddressModel { Country = new CountryListItemModel(defaultCountry) }
             };
         }
 
@@ -212,9 +216,10 @@ namespace VC.Admin.Controllers
         //[AdminAuthorize(PermissionType.Customers)]
         public Result<MarketingPaymentModel> CreateMarketingPrototype()
         {
+            var defaultCountry = _referenceData.DefaultCountry;
             return new MarketingPaymentModel
             {
-                Address = new AddressModel { Country = new CountryListItemModel(_defaultCountry) }
+                Address = new AddressModel { Country = new CountryListItemModel(defaultCountry) }
             };
         }
 
@@ -222,9 +227,10 @@ namespace VC.Admin.Controllers
         //[AdminAuthorize(PermissionType.Customers)]
         public Result<VCWellnessEmployeeProgramPaymentModel> CreateVCWellnessPrototype()
         {
+            var defaultCountry = _referenceData.DefaultCountry;
             return new VCWellnessEmployeeProgramPaymentModel
             {
-                Address = new AddressModel { Country = new CountryListItemModel(_defaultCountry) }
+                Address = new AddressModel { Country = new CountryListItemModel(defaultCountry) }
             };
         }
 
@@ -232,9 +238,10 @@ namespace VC.Admin.Controllers
         //[AdminAuthorize(PermissionType.Customers)]
         public Result<AddressModel> CreateAddressPrototype()
         {
+            var defaultCountry = _referenceData.DefaultCountry;
             return new AddressModel()
             {
-                Country = new CountryListItemModel(_defaultCountry),
+                Country = new CountryListItemModel(defaultCountry),
                 PreferredShipMethod = PreferredShipMethod.Best,
                 ShippingAddressType = ShippingAddressType.Residential,
             };

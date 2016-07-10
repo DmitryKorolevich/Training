@@ -20,6 +20,7 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Business.Services.Users
 {
@@ -31,13 +32,13 @@ namespace VitalChoice.Business.Services.Users
         public AdminUserService(UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
             VitalChoiceContext context, SignInManager<ApplicationUser> signInManager, 
-            IAppInfrastructureService appInfrastructureService, INotificationService notificationService, 
+            ReferenceData referenceData, INotificationService notificationService, 
             IOptions<AppOptions> options,
             IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IRepositoryAsync<AdminTeam> adminTeamRepository,
             IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor, ILoggerProviderExtended loggerProvider) : 
-            base(userManager, roleManager, context, signInManager, appInfrastructureService, notificationService, options, ecommerceRepositoryAsync, userValidator, transactionAccessor, loggerProvider)
+            base(userManager, roleManager, context, signInManager, referenceData, notificationService, options, ecommerceRepositoryAsync, userValidator, transactionAccessor, loggerProvider)
 		{
             _adminProfileRepository = adminProfileRepository;
             _adminTeamRepository = adminTeamRepository;
@@ -51,7 +52,7 @@ namespace VitalChoice.Business.Services.Users
 
         public async Task<bool> IsSuperAdmin(ApplicationUser user)
 		{
-			return await UserManager.IsInRoleAsync(user, AppInfrastructureService.Data()
+			return await UserManager.IsInRoleAsync(user, ReferenceData
 				.AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser)
 				.Text.Normalize());
 		}

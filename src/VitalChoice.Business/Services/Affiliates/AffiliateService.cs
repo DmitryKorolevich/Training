@@ -472,7 +472,7 @@ namespace VitalChoice.Business.Services.Affiliates
 
         public async Task<bool> DeleteAffiliateOrderPayment(int idOrder)
         {
-            var dbItem = (await _affiliateOrderPaymentRepository.Query(p => p.Id == idOrder).SelectAsync()).FirstOrDefault();
+            var dbItem = await _affiliateOrderPaymentRepository.Query(p => p.Id == idOrder).SelectFirstOrDefaultAsync(true);
             if (dbItem != null)
             {
                 if (dbItem.Status == AffiliateOrderPaymentStatus.Paid)
@@ -487,7 +487,7 @@ namespace VitalChoice.Business.Services.Affiliates
 
         public async Task<AffiliateOrderPayment> UpdateAffiliateOrderPayment(AffiliateOrderPayment item)
         {
-            var dbItem = (await _affiliateOrderPaymentRepository.Query(p => p.Id == item.Id).SelectAsync()).FirstOrDefault();
+            var dbItem = await _affiliateOrderPaymentRepository.Query(p => p.Id == item.Id).SelectFirstOrDefaultAsync(true);
             if (dbItem == null)
             {
                 dbItem = new AffiliateOrderPayment();
@@ -529,12 +529,16 @@ namespace VitalChoice.Business.Services.Affiliates
                         var affiliateOrderPaymentRepository = uow.RepositoryAsync<AffiliateOrderPayment>();
                         var affiliatePaymentRepository = uow.RepositoryAsync<AffiliatePayment>();
 
-                        var orderPayments = (await affiliateOrderPaymentRepository.Query(p => p.IdAffiliate == idAffiliate && p.Status == AffiliateOrderPaymentStatus.NotPaid &&
-                            p.Order.DateCreated < to).SelectAsync()).ToList();
+                        var orderPayments =
+                            (await
+                                affiliateOrderPaymentRepository.Query(
+                                    p => p.IdAffiliate == idAffiliate && p.Status == AffiliateOrderPaymentStatus.NotPaid &&
+                                         p.Order.DateCreated < to).SelectAsync(true)).ToList();
                         if (orderPayments.Sum(p => p.Amount) < AffiliateConstants.AffiliateMinPayCommisionsAmount)
                         {
                             throw new AppValidationException(
-                                string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AffiliateMinPayCommisionsAmountNotMatch], AffiliateConstants.AffiliateMinPayCommisionsAmount));
+                                string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AffiliateMinPayCommisionsAmountNotMatch],
+                                    AffiliateConstants.AffiliateMinPayCommisionsAmount));
                         }
 
                         AffiliatePayment payment = new AffiliatePayment();

@@ -26,6 +26,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
@@ -34,23 +35,24 @@ namespace VitalChoice.Business.Services
 {
     public class AppInfrastructureService : IAppInfrastructureService
     {
-        private readonly ICacheProvider cache;
-        private readonly int expirationTerm;
-        private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly IRepositoryAsync<ContentTypeEntity> contentTypeRepository;
-        private readonly IRepositoryAsync<ContentProcessorEntity> contentProcessorRepository;
-        private readonly IOptions<AppOptions> appOptionsAccessor;
-        private readonly IEcommerceRepositoryAsync<CustomerTypeEntity> customerTypeRepository;
-        private readonly IEcommerceRepositoryAsync<OrderStatusEntity> orderStatusRepository;
-        private readonly IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository;
-        private readonly IEcommerceRepositoryAsync<PromotionTypeEntity> promotionTypeEntityRepository;
+        private readonly ICacheProvider _cache;
+        private readonly int _expirationTerm;
+        private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly IRepositoryAsync<ContentTypeEntity> _contentTypeRepository;
+        private readonly IRepositoryAsync<ContentProcessorEntity> _contentProcessorRepository;
+        private readonly IOptions<AppOptions> _appOptionsAccessor;
+        private readonly IEcommerceRepositoryAsync<CustomerTypeEntity> _customerTypeRepository;
+        private readonly IEcommerceRepositoryAsync<OrderStatusEntity> _orderStatusRepository;
+        private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepository;
+        private readonly IEcommerceRepositoryAsync<PromotionTypeEntity> _promotionTypeEntityRepository;
         private readonly IEcommerceRepositoryAsync<LookupVariant> _lookupVariantRepository;
         private readonly IEcommerceRepositoryAsync<Lookup> _lookupRepository;
-        private readonly IEcommerceRepositoryAsync<AppOption> appOptionRepository;
-        private readonly IEcommerceRepositoryAsync<OrderTypeEntity> orderTypeEntityRepository;
-        private readonly ISettingService settingService;
+        private readonly IEcommerceRepositoryAsync<AppOption> _appOptionRepository;
+        private readonly IEcommerceRepositoryAsync<OrderTypeEntity> _orderTypeEntityRepository;
+        private readonly ISettingService _settingService;
         private readonly IBackendSettingsService _backendSettingsService;
         private readonly ILocalizationService _localizationService;
+        private static ReferenceData _cachedData;
 
         public AppInfrastructureService(
             ICacheProvider cache, 
@@ -71,85 +73,86 @@ namespace VitalChoice.Business.Services
             IBackendSettingsService backendSettingsService,
             ILocalizationService localizationService)
         {
-            this.cache = cache;
-            this.expirationTerm = appOptions.Value.DefaultCacheExpirationTermMinutes;
-            this.roleManager = roleManager;
-            this.contentProcessorRepository = contentProcessorRepository;
-            this.contentTypeRepository = contentTypeRepository;
-            this.appOptionsAccessor = appOptionsAccessor;
-            this.customerTypeRepository = customerTypeRepository;
-            this.orderStatusRepository = orderStatusRepository;
-            this.paymentMethodRepository = paymentMethodRepository;
-            this.promotionTypeEntityRepository = promotionTypeEntityRepository;
-            this._lookupVariantRepository = lookupVariantRepository;
-            this._lookupRepository = lookupRepository;
-            this.appOptionRepository = appOptionRepository;
-            this.orderTypeEntityRepository = orderTypeEntityRepository;
-            this.settingService = settingService;
+            _cache = cache;
+            _expirationTerm = appOptions.Value.DefaultCacheExpirationTermMinutes;
+            _roleManager = roleManager;
+            _contentProcessorRepository = contentProcessorRepository;
+            _contentTypeRepository = contentTypeRepository;
+            _appOptionsAccessor = appOptionsAccessor;
+            _customerTypeRepository = customerTypeRepository;
+            _orderStatusRepository = orderStatusRepository;
+            _paymentMethodRepository = paymentMethodRepository;
+            _promotionTypeEntityRepository = promotionTypeEntityRepository;
+            _lookupVariantRepository = lookupVariantRepository;
+            _lookupRepository = lookupRepository;
+            _appOptionRepository = appOptionRepository;
+            _orderTypeEntityRepository = orderTypeEntityRepository;
+            _settingService = settingService;
             _localizationService = localizationService;
             _backendSettingsService = backendSettingsService;
         }
 
-        private ReferenceData Populate()
+        private async Task<ReferenceData> Populate()
         {
-            var lookups = _lookupRepository.Query().Select(false);
-            var tradeLookup = lookups.Single(x => x.Name == LookupNames.CustomerTradeClass).Id;
-            var taxExemptLookup = lookups.Single(x => x.Name == LookupNames.CustomerTaxExempt).Id;
-            var priorityLookup = lookups.Single(x => x.Name == LookupNames.CustomerNotePriorities).Id;
-            var tierLookup = lookups.Single(x => x.Name == LookupNames.CustomerTier).Id;
-            var termsLookup = lookups.Single(x => x.Name == LookupNames.Terms).Id;
-            var fobLookup = lookups.Single(x => x.Name == LookupNames.Fob).Id;
-            var marketingPromotionTypesLookup = lookups.Single(x => x.Name == LookupNames.MarketingPromotionType).Id;
-            var orderSourcesLookup = lookups.Single(x => x.Name == LookupNames.OrderSources).Id;
-            var orderSourcesCelebrityHealthAdvocateLookup = lookups.Single(x => x.Name == LookupNames.OrderSourcesCelebrityHealthAdvocate).Id;
-            var orderPreferredShipMethod = lookups.Single(x => x.Name == LookupNames.OrderPreferredShipMethod).Id;
-            var orderSourceTypes = lookups.Single(x => x.Name == LookupNames.OrderSourceTypes).Id;
-            var pOrderTypes = lookups.Single(x => x.Name == LookupNames.POrderTypes).Id;
-            var serviceCodes = lookups.Single(x => x.Name == LookupNames.ServiceCodes).Id;
-            var affiliateProfessionalPractices = lookups.Single(x => x.Name == LookupNames.AffiliateProfessionalPractices).Id;
-            var affiliateMonthlyEmailsSentOptions = lookups.Single(x => x.Name == LookupNames.AffiliateMonthlyEmailsSentOptions).Id;
-            var affiliateTiers = lookups.Single(x => x.Name == LookupNames.AffiliateTiers).Id;
-            var promotionBuyTypes = lookups.Single(x => x.Name == LookupNames.PromotionBuyTypes).Id;
-            var shippingUpgrades = lookups.Single(x => x.Name == LookupNames.ShippingUpgrades).Id;
-            var autoshipOptions = lookups.Single(x => x.Name == LookupNames.AutoShipSchedule).Id;
-            var refundRedeemOptions = lookups.Single(x => x.Name == LookupNames.RefundRedeemOptions).Id;
-            var productSellersOptions = lookups.Single(x => x.Name == LookupNames.ProductSellers).Id;
-            var googleCategoriesOptions = lookups.Single(x => x.Name == LookupNames.GoogleCategories).Id;
+            var lookups = (await _lookupRepository.Query().SelectAsync(false)).GroupBy(l => l.Name)
+                .ToDictionary(g => g.Key, g => g.ToList());
+            var tradeLookup = lookups[LookupNames.CustomerTradeClass].Single().Id;
+            var taxExemptLookup = lookups[LookupNames.CustomerTaxExempt].Single().Id;
+            var priorityLookup = lookups[LookupNames.CustomerNotePriorities].Single().Id;
+            var tierLookup = lookups[LookupNames.CustomerTier].Single().Id;
+            var termsLookup = lookups[LookupNames.Terms].Single().Id;
+            var fobLookup = lookups[LookupNames.Fob].Single().Id;
+            var marketingPromotionTypesLookup = lookups[LookupNames.MarketingPromotionType].Single().Id;
+            var orderSourcesLookup = lookups[LookupNames.OrderSources].Single().Id;
+            var orderSourcesCelebrityHealthAdvocateLookup = lookups[LookupNames.OrderSourcesCelebrityHealthAdvocate].Single().Id;
+            var orderPreferredShipMethod = lookups[LookupNames.OrderPreferredShipMethod].Single().Id;
+            var orderSourceTypes = lookups[LookupNames.OrderSourceTypes].Single().Id;
+            var pOrderTypes = lookups[LookupNames.POrderTypes].Single().Id;
+            var serviceCodes = lookups[LookupNames.ServiceCodes].Single().Id;
+            var affiliateProfessionalPractices = lookups[LookupNames.AffiliateProfessionalPractices].Single().Id;
+            var affiliateMonthlyEmailsSentOptions = lookups[LookupNames.AffiliateMonthlyEmailsSentOptions].Single().Id;
+            var affiliateTiers = lookups[LookupNames.AffiliateTiers].Single().Id;
+            var promotionBuyTypes = lookups[LookupNames.PromotionBuyTypes].Single().Id;
+            var shippingUpgrades = lookups[LookupNames.ShippingUpgrades].Single().Id;
+            var autoshipOptions = lookups[LookupNames.AutoShipSchedule].Single().Id;
+            var refundRedeemOptions = lookups[LookupNames.RefundRedeemOptions].Single().Id;
+            var productSellersOptions = lookups[LookupNames.ProductSellers].Single().Id;
+            var googleCategoriesOptions = lookups[LookupNames.GoogleCategories].Single().Id;
 
-            var lookupVariants = _lookupVariantRepository.Query()
-                .Select(false)
+            var lookupVariants = (await _lookupVariantRepository.Query()
+                .SelectAsync(false))
                 .GroupBy(l => l.IdLookup)
                 .ToDictionary(l => l.Key, l => l.ToArray());
 
             // ReSharper disable once UseObjectOrCollectionInitializer
             var referenceData = new ReferenceData();
             referenceData.DefaultCountry = _backendSettingsService.GetDefaultCountry();
-            referenceData.AdminRoles = roleManager.Roles.Where(x => x.IdUserType == UserType.Admin).OrderBy(p=>p.Order).Select(x => new LookupItem<int>
+            referenceData.AdminRoles = await _roleManager.Roles.Where(x => x.IdUserType == UserType.Admin).OrderBy(p=>p.Order).Select(x => new LookupItem<int>
             {
                 Key = x.Id,
                 Text = x.Name
-            }).ToList();
-            referenceData.CustomerRoles = roleManager.Roles.Where(x => x.IdUserType == UserType.Customer).Select(x => new LookupItem<int>
+            }).ToListAsync();
+            referenceData.CustomerRoles = await _roleManager.Roles.Where(x => x.IdUserType == UserType.Customer).Select(x => new LookupItem<int>
             {
                 Key = x.Id,
                 Text = x.Name
-            }).ToList();
-            referenceData.AffiliateRoles = roleManager.Roles.Where(x => x.IdUserType == UserType.Affiliate).Select(x => new LookupItem<int>
+            }).ToListAsync();
+            referenceData.AffiliateRoles = await _roleManager.Roles.Where(x => x.IdUserType == UserType.Affiliate).Select(x => new LookupItem<int>
             {
                 Key = x.Id,
                 Text = x.Name
-            }).ToList();
+            }).ToListAsync();
             referenceData.UserStatuses = EnumHelper.GetItemsWithDescription<byte>(typeof(UserStatus)).Select(x => new LookupItem<byte>()
             {
                 Key = x.Key,
                 Text = x.Value
             }).ToList();
-            referenceData.ContentTypes = contentTypeRepository.Query().Select(false).ToList().Select(x => new LookupItem<int>
+            referenceData.ContentTypes = (await _contentTypeRepository.Query().SelectAsync(false)).Select(x => new LookupItem<int>
             {
                 Key = x.Id,
                 Text = x.Name
             }).ToList();
-            referenceData.ContentProcessors = contentProcessorRepository.Query().Select(false).ToList();
+            referenceData.ContentProcessors = await _contentProcessorRepository.Query().SelectAsync(false);
             referenceData.Labels = _localizationService.GetStrings();
             var months = CultureInfo.InvariantCulture.DateTimeFormat.MonthNames.Where(p => !String.IsNullOrEmpty(p)).ToList();
             referenceData.Months = new List<LookupItem<int>>();
@@ -161,8 +164,8 @@ namespace VitalChoice.Business.Services
                     Text = months[i],
                 });
             }
-            referenceData.PublicHost = !String.IsNullOrEmpty(appOptionsAccessor.Value.PublicHost)
-                ? appOptionsAccessor.Value.PublicHost
+            referenceData.PublicHost = !String.IsNullOrEmpty(_appOptionsAccessor.Value.PublicHost)
+                ? _appOptionsAccessor.Value.PublicHost
                 : "http://notdefined/";
             referenceData.VisibleOptions = LookupHelper.GetVisibleOptions();
             referenceData.ContentItemStatusNames = LookupHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>
@@ -226,18 +229,20 @@ namespace VitalChoice.Business.Services
                 Key = x.Key == -1 ? null : (int?)x.Key,
                 Text = x.Value
             }).ToList();
-            referenceData.CustomerTypes = customerTypeRepository.Query(new CustomerTypeQuery().NotDeleted())
-                .Select(x => new LookupItem<int>() { Key = x.Id, Text = x.Name })
-                .ToList();
+            referenceData.CustomerTypes = (await _customerTypeRepository.Query(new CustomerTypeQuery().NotDeleted())
+                .SelectAsync(false)).Select(x => new LookupItem<int> {Key = x.Id, Text = x.Name}).ToList();
             referenceData.ShortCustomerTypes = referenceData.CustomerTypes.Select(x => new LookupItem<int>() { Key = x.Key, Text = x.Text.Substring(0,1) }).ToList();
-            referenceData.OrderStatuses = orderStatusRepository.Query().Select(x => new LookupItem<int>() { Key = x.Id, Text = x.Name })
-                .ToList();
-            referenceData.PaymentMethods = paymentMethodRepository.Query().Select(x => new LookupItem<int>() { Key = x.Id, Text = x.Name })
-                .ToList();
-            var shortPaymentMethods = (new List<LookupItem<int>>(referenceData.PaymentMethods));
+            referenceData.OrderStatuses =
+                (await _orderStatusRepository.Query().SelectAsync(false)).Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
+                    .ToList();
+            referenceData.PaymentMethods =
+                (await _paymentMethodRepository.Query().SelectAsync(false)).Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
+                    .ToList();
+            var shortPaymentMethods = new List<LookupItem<int>>(referenceData.PaymentMethods);
             referenceData.ShortPaymentMethods = LookupHelper.GetShortPaymentMethods(shortPaymentMethods);
-            referenceData.OrderTypes = orderTypeEntityRepository.Query().Select(x => new LookupItem<int>() { Key = x.Id, Text = x.Name })
-                .ToList();
+            referenceData.OrderTypes =
+                (await _orderTypeEntityRepository.Query().SelectAsync(false)).Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
+                    .ToList();
             referenceData.PublicOrderTypes = LookupHelper.GetPublicOrderTypes(referenceData.OrderTypes);
             var shortOrderTypes = (new List<LookupItem<int>>(referenceData.OrderTypes));
             referenceData.ShortOrderTypes = LookupHelper.GetShortOrderTypes(shortOrderTypes);
@@ -356,12 +361,12 @@ namespace VitalChoice.Business.Services
                 Key = x.Key,
                 Text = x.Value
             }).ToList();
-            referenceData.PromotionTypes = promotionTypeEntityRepository.Query()
+            referenceData.PromotionTypes = _promotionTypeEntityRepository.Query()
                 .Select(x => new LookupItem<int>()
                 {
                     Key = x.Id,
                     Text = x.Name
-                }).ToList();
+                }, false);
             referenceData.ExpiredTypes = LookupHelper.GetExpiredTypes();
             referenceData.DateStatuses = LookupHelper.GetDateStatuses();
             referenceData.CartShippingOptions = LookupHelper.GetCartShippingOptions().Select(x => new LookupItem<int>
@@ -412,15 +417,17 @@ namespace VitalChoice.Business.Services
             referenceData.ProductCategoryViewTypes = LookupHelper.GetProductCategoryViewTypes();
 
             //BUG: shoule be moved to the specific worker
-            SetupAppSettings();
+            await SetupAppSettings();
 
             return referenceData;
             
         }
 
-        private void SetupAppSettings()
+        private async Task SetupAppSettings()
         {
-            var affiliateReportDateOption = appOptionRepository.Query(p => p.OptionName == AffiliateConstants.AffiliateOrderPaymentsCountToDateOptionName).Select().FirstOrDefault();
+            var affiliateReportDateOption =
+                await _appOptionRepository.Query(p => p.OptionName == AffiliateConstants.AffiliateOrderPaymentsCountToDateOptionName)
+                    .SelectFirstOrDefaultAsync(false);
             if (affiliateReportDateOption != null)
             {
                 var firstDayOfCurrentMonth = DateTime.Now;
@@ -431,14 +438,14 @@ namespace VitalChoice.Business.Services
                 if (date != dbDate)
                 {
                     affiliateReportDateOption.OptionValue = date.ToString("yyyy-MM-dd hh:mm:ss.fff");
-                    appOptionRepository.Update(affiliateReportDateOption);
+                    _appOptionRepository.Update(affiliateReportDateOption);
                 }
             }
         }
 
-        private ReferenceData SetAppSettings(ReferenceData referenceData)
+        private async Task<ReferenceData> SetAppSettings(ReferenceData referenceData)
         {
-            var settings = settingService.GetSettingsAsync().GetAwaiter().GetResult();;
+            var settings = await _settingService.GetSettingsAsync();
             referenceData.AppSettings = new AppSettings()
             {
                 CreditCardAuthorizations = settings.SafeData.CreditCardAuthorizations,
@@ -448,17 +455,19 @@ namespace VitalChoice.Business.Services
             return referenceData;
         }
 
-        public ReferenceData Data()
+        public ReferenceData CachedData => _cachedData;
+
+        public async Task<ReferenceData> GetDataAsync()
         {
-            var referenceData = cache.GetItem<ReferenceData>(CacheKeys.AppInfrastructure);
+            var referenceData = _cache.GetItem<ReferenceData>(CacheKeys.AppInfrastructure);
 
             if (referenceData == null)
             {
-                referenceData = Populate();
-                cache.SetItem(CacheKeys.AppInfrastructure, referenceData, expirationTerm);
+                referenceData = await Populate();
+                _cache.SetItem(CacheKeys.AppInfrastructure, referenceData, _expirationTerm);
             }
-            referenceData = SetAppSettings(referenceData);
-
+            referenceData = await SetAppSettings(referenceData);
+            _cachedData = referenceData;
             return referenceData;
         }
     }

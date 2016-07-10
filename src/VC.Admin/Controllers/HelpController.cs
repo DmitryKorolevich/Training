@@ -24,6 +24,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Admin.Controllers
@@ -32,16 +33,16 @@ namespace VC.Admin.Controllers
     public class HelpController : BaseApiController
     {
         private readonly IHelpService _helpService;
-        private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly ExtendedUserManager _userManager;
+        private readonly ReferenceData _referenceData;
         private readonly ILogger _logger;
 
-        public HelpController(IHelpService helpService, IAppInfrastructureService appInfrastructureService,
-            ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager)
+        public HelpController(IHelpService helpService,
+            ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager, ReferenceData referenceData)
         {
             _helpService = helpService;
-            _appInfrastructureService = appInfrastructureService;
             _userManager = userManager;
+            _referenceData = referenceData;
             _logger = loggerProvider.CreateLogger<HelpController>();
         }
 
@@ -152,7 +153,7 @@ namespace VC.Admin.Controllers
                 Count = result.Count,
             };
 
-            var superAdmin = _appInfrastructureService.Data().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
+            var superAdmin = _referenceData.AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
             var isSuperAdmin = HttpContext.User.IsInRole(superAdmin.Normalize());
             int userId = Int32.Parse(_userManager.GetUserId(User));
             foreach (var item in toReturn.Items)
@@ -185,7 +186,7 @@ namespace VC.Admin.Controllers
             var result = await _helpService.GetBugTicketAsync(id);
             var toReturn= new BugTicketManageModel(result);
 
-            var superAdmin = _appInfrastructureService.Data().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
+            var superAdmin = _referenceData.AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
             if(HttpContext.User.IsInRole(superAdmin.Normalize()) || result.IdAddedBy== Int32.Parse(_userManager.GetUserId(User)))
             {
                 toReturn.IsAllowEdit = true;
@@ -201,7 +202,7 @@ namespace VC.Admin.Controllers
                 return null;
             var item = model.Convert();
 
-            var superAdmin = _appInfrastructureService.Data().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
+            var superAdmin = _referenceData.AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
             var isSuperAdmin = HttpContext.User.IsInRole(superAdmin.Normalize());
             item = await _helpService.UpdateBugTicketAsync(item, Int32.Parse(_userManager.GetUserId(User)), isSuperAdmin);
 
@@ -211,7 +212,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<bool>> DeleteBugTicket(int id)
         {
-            var superAdmin = _appInfrastructureService.Data().AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
+            var superAdmin = _referenceData.AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
             var isSuperAdmin = HttpContext.User.IsInRole(superAdmin.Normalize());
 
             return await _helpService.DeleteBugTicketAsync(id, Int32.Parse(_userManager.GetUserId(User)), isSuperAdmin ? (int?)null : Int32.Parse(_userManager.GetUserId(User)));

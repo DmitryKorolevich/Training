@@ -34,13 +34,13 @@ namespace VitalChoice.Business.ModelConverters
         public OrderConfirmationEmailModelConverter(
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             ICustomerService customerService,
-            IAppInfrastructureService appInfrastructureService,
+            ReferenceData referenceData,
             IDynamicMapper<SkuDynamic, Sku> skuMapper,
             IDynamicMapper<ProductDynamic, Product> productMapper,
             IOptions<AppOptions> options, ICountryNameCodeResolver countryNameCodeResolver)
         {
             _customerService = customerService;
-            _referenceData = appInfrastructureService.Data();
+            _referenceData = referenceData;
             _addressMapper = addressMapper;
             _skuMapper = skuMapper;
             _productMapper = productMapper;

@@ -470,7 +470,7 @@ namespace VitalChoice.Business.Services.VeraCore
         private async Task IncrementAttempt(VeraCoreProcessItem item)
         {
             var processItem =
-                (await _veraCoreProcessItemRepository.Query(p => p.Id == item.Id).SelectAsync()).FirstOrDefault();
+                await _veraCoreProcessItemRepository.Query(p => p.Id == item.Id).SelectFirstOrDefaultAsync(true);
             if (processItem != null)
             {
                 processItem.Attempt++;

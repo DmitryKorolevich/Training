@@ -57,6 +57,7 @@ using Address = VitalChoice.Ecommerce.Domain.Entities.Addresses.Address;
 using AddressType = VitalChoice.Ecommerce.Domain.Entities.Addresses.AddressType;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Services;
 
 namespace VC.Admin.Controllers
@@ -74,7 +75,6 @@ namespace VC.Admin.Controllers
 
         private readonly ICustomerService _customerService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
-        private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> _ordersRegionStatisticItemCSVExportService;
         private readonly ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> _ordersZipStatisticItemCSVExportService;
         private readonly ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> _vOrderWithRegionInfoItemCSVExportService;
@@ -93,9 +93,9 @@ namespace VC.Admin.Controllers
         private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
         private readonly IOrderReportService _orderReportService;
         private readonly IAvalaraTax _avalaraTax;
-        private readonly IVeraCoreNotificationService _testService;
         private readonly IEncryptedOrderExportService _exportService;
         private readonly ICountryNameCodeResolver _countryNameCodeResolver;
+        private readonly ReferenceData _referenceData;
 
         public OrderController(
             IOrderService orderService,
@@ -116,18 +116,19 @@ namespace VC.Admin.Controllers
             ICsvExportService<SkuAddressReportItem, SkuAddressReportItemCsvMap> skuAddressReportItemSVExportService,
             ICsvExportService<MatchbackReportItem, MatchbackReportItemCsvMap> matchbackReportItemСSVExportService,
             ICsvExportService<MailingReportItem, MailingReportItemCsvMap> mailingReportItemСSVExportService,
-            ICsvExportService<ShippedViaReportRawOrderItem, ShippedViaItemsReportOrderItemCsvMap> shippedViaItemsReportOrderItemCsvMapСSVExportService,
+            ICsvExportService<ShippedViaReportRawOrderItem, ShippedViaItemsReportOrderItemCsvMap>
+                shippedViaItemsReportOrderItemCsvMapСSVExportService,
             INotificationService notificationService,
             BrontoService brontoService,
             IOrderReportService orderReportService,
-            IObjectHistoryLogService objectHistoryLogService, IAppInfrastructureService appInfrastructureService,
-            ICountryService countryService, IDynamicMapper<OrderDynamic, Order> orderMapper,
+            IObjectHistoryLogService objectHistoryLogService,
+            IDynamicMapper<OrderDynamic, Order> orderMapper,
             IDynamicMapper<ProductDynamic, Product> productMapper, IDynamicMapper<SkuDynamic, Sku> skuMapper,
             IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodMapper,
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMethodMapper,
             IDynamicMapper<AddressDynamic, Address> addressMapper, ExtendedUserManager userManager,
-            IAvalaraTax avalaraTax,
-            IVeraCoreNotificationService testService, IEncryptedOrderExportService exportService, ICountryNameCodeResolver countryNameCodeResolver)
+            IAvalaraTax avalaraTax, IEncryptedOrderExportService exportService, ICountryNameCodeResolver countryNameCodeResolver,
+            ReferenceData referenceData)
         {
             _orderService = orderService;
             _orderRefundService = orderRefundService;
@@ -149,7 +150,6 @@ namespace VC.Admin.Controllers
             _brontoService = brontoService;
             _orderReportService = orderReportService;
             _objectHistoryLogService = objectHistoryLogService;
-            _appInfrastructureService = appInfrastructureService;
             _orderMapper = orderMapper;
             _productMapper = productMapper;
             _skuMapper = skuMapper;
@@ -159,9 +159,9 @@ namespace VC.Admin.Controllers
             _userManager = userManager;
             loggerProvider.CreateLogger<OrderController>();
             _avalaraTax = avalaraTax;
-            _testService = testService;
             _exportService = exportService;
             _countryNameCodeResolver = countryNameCodeResolver;
+            _referenceData = referenceData;
         }
 
         #region BaseOrderLogic
@@ -464,15 +464,13 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedList<AutoShipHistoryItemModel>>> GetAutoShips([FromBody] OrderFilter filter)
         {
-            var infr = _appInfrastructureService.Data();
-
             filter.Sorting.SortOrder = VitalChoice.Infrastructure.Domain.Transfer.FilterSortOrder.Desc;
             filter.Sorting.Path = VOrderSortPath.DateCreated;
             filter.OrderType = OrderType.AutoShip;
 
             var orders = await _orderService.GetFullAutoShipsAsync(filter);
 
-            var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, infr, _countryNameCodeResolver);
+            var helper = new AutoShipModelHelper(_skuMapper, _productMapper, _orderMapper, _referenceData, _countryNameCodeResolver);
             var ordersModel = new PagedList<AutoShipHistoryItemModel>
             {
                 Items = await orders.Items.Select(async p => await helper.PopulateAutoShipItemModel(p)).ToListAsync(),
@@ -1043,8 +1041,7 @@ namespace VC.Admin.Controllers
                 IdAdmin = idadmin,
             };
 
-            var superAdmin = _appInfrastructureService
-                .Data()
+            var superAdmin = _referenceData
                 .AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser)
                 .Text;
 

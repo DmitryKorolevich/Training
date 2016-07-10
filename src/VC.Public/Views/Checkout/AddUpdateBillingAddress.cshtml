@@ -2,8 +2,9 @@
 @using Microsoft.AspNetCore.Mvc.Rendering
 @using VitalChoice.Core.Infrastructure.Helpers
 @using VitalChoice.Interfaces.Services
+@using VitalChoice.Infrastructure.Domain.Transfer
 @model VC.Public.Models.Checkout.AddUpdateBillingAddressModel
-@inject IAppInfrastructureService InfrastructureService
+@inject ReferenceData InfrastructureService
 
 @section Meta {
 	<title>Wild Seafood & Organics - Vital Choice</title>

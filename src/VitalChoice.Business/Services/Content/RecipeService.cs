@@ -215,8 +215,8 @@ namespace VitalChoice.Business.Services.Content
                 dbItem.ContentItem.ContentItemToContentProcessors = new List<ContentItemToContentProcessor>();
 
                 //set predefined master
-                var contentType = (await _contentTypeRepository.Query(p => p.Id == (int)ContentType.Recipe).SelectAsync()).FirstOrDefault();
-                if (contentType == null || !contentType.DefaultMasterContentItemId.HasValue)
+                var contentType = await _contentTypeRepository.Query(p => p.Id == (int) ContentType.Recipe).SelectFirstOrDefaultAsync(false);
+                if (contentType?.DefaultMasterContentItemId == null)
                 {
                     throw new Exception("The default master template isn't confugurated. Please contact support.");
                 }
@@ -224,8 +224,12 @@ namespace VitalChoice.Business.Services.Content
             }
             else
             {
-                dbItem = (await _recipeRepository.Query(p => p.Id == model.Id).Include(p => p.ContentItem).ThenInclude(p => p.ContentItemToContentProcessors).
-                    SelectAsync()).FirstOrDefault();
+                dbItem =
+                    await
+                        _recipeRepository.Query(p => p.Id == model.Id)
+                            .Include(p => p.ContentItem)
+                            .ThenInclude(p => p.ContentItemToContentProcessors)
+                            .SelectFirstOrDefaultAsync(true);
                 if (dbItem != null)
                 {
                     foreach (var proccesorRef in dbItem.ContentItem.ContentItemToContentProcessors)
@@ -285,7 +289,7 @@ namespace VitalChoice.Business.Services.Content
 					    else
 					    {
 							var crossSellsToUpdate = model.CrossSells.ToList();
-							var crossSells = await _crossSellRepository.Query(x => x.IdRecipe == dbItem.Id).SelectAsync();
+							var crossSells = await _crossSellRepository.Query(x => x.IdRecipe == dbItem.Id).SelectAsync(true);
 						    if (crossSells.Count > 0)
 						    {
 							    await _crossSellRepository.DeleteAllAsync(crossSells);
@@ -296,7 +300,7 @@ namespace VitalChoice.Business.Services.Content
 							}
 
 							var relatedToUpdate = model.RelatedRecipes.ToList();
-							var relatedRecipes = await _relatedRecipeRepository.Query(x => x.IdRecipe == dbItem.Id).SelectAsync();
+							var relatedRecipes = await _relatedRecipeRepository.Query(x => x.IdRecipe == dbItem.Id).SelectAsync(true);
 						    if (relatedRecipes.Count > 0)
 						    {
 							    await _relatedRecipeRepository.DeleteAllAsync(relatedRecipes);
@@ -318,7 +322,7 @@ namespace VitalChoice.Business.Services.Content
 						    item.IdRecipe = dbItem.Id;
 					    }
 
-					    var dbProducts = await _recipeToProductRepository.Query(c => c.IdRecipe == dbItem.Id).SelectAsync();
+				        var dbProducts = await _recipeToProductRepository.Query(c => c.IdRecipe == dbItem.Id).SelectAsync(true);
 					    await _recipeToProductRepository.DeleteAllAsync(dbProducts);
 					    await _recipeToProductRepository.InsertRangeAsync(recipesToProducts);
 					    dbItem.RecipesToProducts = recipesToProducts;

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Services;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services;
@@ -20,16 +21,16 @@ namespace VC.Public.Controllers
     public class LookupController : BaseMvcController
 	{
 		private readonly ICountryService _countryService;
-		private readonly IAppInfrastructureService _appInfrastructureService;
+	    private readonly ReferenceData _referenceData;
 
-		public LookupController(ICountryService countryService, IAppInfrastructureService appInfrastructureService,
-            IPageResultService pageResultService) : base(pageResultService)
-        {
-			_countryService = countryService;
-			_appInfrastructureService = appInfrastructureService;
-		}
+	    public LookupController(ICountryService countryService,
+            IPageResultService pageResultService, ReferenceData referenceData) : base(pageResultService)
+	    {
+	        _countryService = countryService;
+	        _referenceData = referenceData;
+	    }
 
-		[HttpGet]
+	    [HttpGet]
 		public async Task<Result<IList<CountryListItemModel>>> GetCountries()
 		{
 			var result = await _countryService.GetCountriesAsync(new CountryFilter() {ActiveOnly = true});
@@ -49,9 +50,7 @@ namespace VC.Public.Controllers
 		[HttpGet]
 		public Result<IList<LookupItem<int>>> GetCreditCardTypes()
 		{
-			var referenceData = _appInfrastructureService.Data();
-
-			var creditCardTypes = referenceData.CreditCardTypes;
+			var creditCardTypes = _referenceData.CreditCardTypes;
 
 			return new Result<IList<LookupItem<int>>>(true, creditCardTypes);
 		}
@@ -59,9 +58,7 @@ namespace VC.Public.Controllers
 		[HttpGet]
 		public Result<IList<LookupItem<int>>> GetCartShippingOptions()
 		{
-			var referenceData = _appInfrastructureService.Data();
-
-			var options = referenceData.CartShippingOptions;
+			var options = _referenceData.CartShippingOptions;
 
 			return new Result<IList<LookupItem<int>>>(true, options);
 		}
@@ -69,9 +66,7 @@ namespace VC.Public.Controllers
 		[HttpGet]
 		public Result<IList<LookupItem<int>>> GetShippingPreferredOptions()
 		{
-			var referenceData = _appInfrastructureService.Data();
-
-			var shipMethods = referenceData.OrderPreferredShipMethod;
+			var shipMethods = _referenceData.OrderPreferredShipMethod;
 
 			return new Result<IList<LookupItem<int>>>(true, shipMethods);
 		}

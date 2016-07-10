@@ -99,7 +99,7 @@ namespace VitalChoice.Business.Services.Products
             }
 
             var query = new ProductCategoryQuery().NotDeleted();
-            List<ProductCategory> dbCategories = await productCategoryEcommerceRepository.Query(query).SelectAsync();
+            List<ProductCategory> dbCategories = await productCategoryEcommerceRepository.Query(query).SelectAsync(true);
             SetSubCategoriesOrder(category);
 
             foreach (var dbCategory in dbCategories)

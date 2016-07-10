@@ -108,6 +108,7 @@ using NLog;
 using NLog.Config;
 using VitalChoice.Business.Services.VeraCore;
 using VitalChoice.Caching.Services.Cache.Base;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services.VeraCore;
 using IContainer = Autofac.IContainer;
@@ -441,6 +442,11 @@ namespace VitalChoice.Core.DependencyInjection
 
         public IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
         {
+            builder.Register(cc =>
+            {
+                var service = cc.Resolve<IAppInfrastructureService>();
+                return service.CachedData ?? service.GetDataAsync().GetAwaiter().GetResult();
+            }).InstancePerLifetimeScope();
             builder.RegisterType<VitalChoiceContext>()
                 .As<IDataContextAsync>()
                 .AsSelf()

@@ -39,19 +39,17 @@ namespace VC.Public.Controllers
         protected readonly IOrderService OrderService;
         protected readonly IDynamicMapper<SkuDynamic, Sku> SkuMapper;
         protected readonly IDynamicMapper<ProductDynamic, Product> ProductMapper;
-        protected readonly ReferenceData AppInfrastructure;
 
         protected CheckoutControllerBase(ICustomerService customerService,
-            IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService,
+            ReferenceData referenceData, IAuthorizationService authorizationService, ICheckoutService checkoutService,
             IOrderService orderService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
             IPageResultService pageResultService, ISettingService settingService, ExtendedUserManager userManager) : base(customerService,
-                infrastructureService, authorizationService, checkoutService, pageResultService, userManager)
+                authorizationService, checkoutService, pageResultService, userManager, referenceData)
         {
             OrderService = orderService;
             SkuMapper = skuMapper;
             ProductMapper = productMapper;
             SettingService = settingService;
-            AppInfrastructure = infrastructureService.Data();
         }
 
         protected async Task<bool> IsCartEmpty()

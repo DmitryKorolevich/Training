@@ -26,6 +26,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.ContentCrossSells;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
@@ -51,10 +52,10 @@ namespace VC.Public.Controllers
 	    public CartController(
             ICustomerService customerService,
             IOrderService orderService, IProductService productService, ICheckoutService checkoutService,
-            IAuthorizationService authorizationService, IAppInfrastructureService appInfrastructureService,
+            IAuthorizationService authorizationService, ReferenceData appReferenceData,
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
             IDiscountService discountService, IGcService gcService, IContentCrossSellService contentCrossSellService, IPageResultService pageResultService, ISettingService settingService, ExtendedUserManager userManager)
-            : base(customerService, appInfrastructureService, authorizationService, checkoutService, orderService, skuMapper,productMapper, pageResultService, settingService, userManager)
+            : base(customerService, appReferenceData, authorizationService, checkoutService, orderService, skuMapper,productMapper, pageResultService, settingService, userManager)
         {
 	        _productService = productService;
             _checkoutService = checkoutService;
@@ -331,7 +332,7 @@ namespace VC.Public.Controllers
 		{
 			var sku = await _productService.GetSkuOrderedAsync(id);
 
-			var options = AppInfrastructure.AutoShipOptions;
+			var options = ReferenceData.AutoShipOptions;
 
 			var lookup = new List<SelectListItem>();
 			if (sku.Sku.Data.AutoShipFrequency1)
@@ -371,7 +372,7 @@ namespace VC.Public.Controllers
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> AutoShip(AutoShipModel model)
 		{
-			var options = AppInfrastructure.AutoShipOptions;
+			var options = ReferenceData.AutoShipOptions;
 
 			if (options.All(x => x.Key != model.IdSchedule))
 			{

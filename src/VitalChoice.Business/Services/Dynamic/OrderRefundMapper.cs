@@ -234,7 +234,7 @@ namespace VitalChoice.Business.Services.Dynamic
                                         p.IdOrder == refundOrderToGiftCertificate.IdOrder &&
                                         p.IdGiftCertificate == refundOrderToGiftCertificate.IdGiftCertificate)
                                     .Include(p => p.GiftCertificate)
-                                    .SelectFirstOrDefaultAsync();
+                                    .SelectFirstOrDefaultAsync(true);
                         if (newItem.OrderToGiftCertificate?.GiftCertificate != null)
                         {
                             newItem.OrderToGiftCertificate.GiftCertificate.Balance += newItem.Amount;

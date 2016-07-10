@@ -21,25 +21,25 @@ using VitalChoice.Interfaces.Services.Checkout;
 using System.Linq;
 using VitalChoice.Core.Services;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Public.Controllers
 {
     public abstract class PublicControllerBase : BaseMvcController
     {
-        protected readonly IAppInfrastructureService InfrastructureService;
         protected readonly IAuthorizationService AuthorizationService;
         protected readonly ICustomerService CustomerService;
         protected readonly ICheckoutService CheckoutService;
         private readonly ExtendedUserManager _userManager;
+        protected readonly ReferenceData ReferenceData;
 
-        protected PublicControllerBase(ICustomerService customerService,
-            IAppInfrastructureService infrastructureService, IAuthorizationService authorizationService, ICheckoutService checkoutService,
-            IPageResultService pageResultService, ExtendedUserManager userManager) : base(pageResultService)
+        protected PublicControllerBase(ICustomerService customerService, IAuthorizationService authorizationService, ICheckoutService checkoutService,
+            IPageResultService pageResultService, ExtendedUserManager userManager, ReferenceData referenceData) : base(pageResultService)
         {
             CheckoutService = checkoutService;
             _userManager = userManager;
-            InfrastructureService = infrastructureService;
+            ReferenceData = referenceData;
             AuthorizationService = authorizationService;
 			CustomerService = customerService;
         }
@@ -50,7 +50,7 @@ namespace VC.Public.Controllers
             var signedIn = await AuthorizationService.AuthorizeAsync(context.User, null, IdentityConstants.IdentityBasicProfile);
             if (signedIn)
             {
-                if (InfrastructureService.IsValidCustomer(context.User))
+                if (ReferenceData.IsValidCustomer(context.User))
                 {
                     return true;
                 }
@@ -63,7 +63,7 @@ namespace VC.Public.Controllers
             if (role != RoleType.Retail && role != RoleType.Wholesale)
                 return false;
             var context = HttpContext;
-            return InfrastructureService.HasRole(context.User, role);
+            return ReferenceData.HasRole(context.User, role);
         }
 
         protected int GetInternalCustomerId()
@@ -132,7 +132,7 @@ namespace VC.Public.Controllers
 
 		    ViewBag.CreditCards = creditCards.ToDictionary(x => x.Id,
 		        y =>
-		            InfrastructureService.Data().CreditCardTypes.Single(z => z.Key == (int) y.Data.CardType).Text + ", ending in " +
+                    ReferenceData.CreditCardTypes.Single(z => z.Key == (int) y.Data.CardType).Text + ", ending in " +
 		            ((string) y.Data.CardNumber).Substring(((string) y.Data.CardNumber).Length - 4) +
 		            (y.SafeData.Default == true ? " (Default)" : ""));
 		}

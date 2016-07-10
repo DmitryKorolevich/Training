@@ -243,7 +243,7 @@ namespace VitalChoice.Business.Services.Products
             if (toReturn.Items.Count > 0)
             {
                 var ids = result.Items.Where(p => p.IdAddedBy.HasValue).Select(p => p.IdAddedBy.Value).Distinct().ToList();
-                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
+                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
                 foreach (var item in toReturn.Items)
                 {
                     foreach (var profile in profiles)

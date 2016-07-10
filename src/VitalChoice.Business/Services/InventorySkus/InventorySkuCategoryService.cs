@@ -53,7 +53,7 @@ namespace VitalChoice.Business.Services.InventorySkus
             }
 
             var query = new InventorySkuCategoryQuery().NotDeleted();
-            List<InventorySkuCategory> dbCategories = await _inventorySkuCategoryEcommerceRepository.Query(query).SelectAsync();
+            List<InventorySkuCategory> dbCategories = await _inventorySkuCategoryEcommerceRepository.Query(query).SelectAsync(true);
             int order = 0;
             foreach (var category in categories)
             {

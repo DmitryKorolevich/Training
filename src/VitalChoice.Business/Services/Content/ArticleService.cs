@@ -200,8 +200,9 @@ namespace VitalChoice.Business.Services.Content
                 dbItem.ContentItem.ContentItemToContentProcessors = new List<ContentItemToContentProcessor>();
 
                 //set predefined master
-                var contentType = (await _contentTypeRepository.Query(p => p.Id == (int)ContentType.Article).SelectAsync()).FirstOrDefault();
-                if (contentType == null || !contentType.DefaultMasterContentItemId.HasValue)
+                var contentType =
+                    await _contentTypeRepository.Query(p => p.Id == (int) ContentType.Article).SelectFirstOrDefaultAsync(false);
+                if (contentType?.DefaultMasterContentItemId == null)
                 {
                     throw new Exception("The default master template isn't confugurated. Please contact support.");
                 }
@@ -209,8 +210,12 @@ namespace VitalChoice.Business.Services.Content
             }
             else
             {
-                dbItem = (await _articleRepository.Query(p => p.Id == model.Id).Include(p => p.ContentItem).ThenInclude(p=>p.ContentItemToContentProcessors).
-                    SelectAsync()).FirstOrDefault();
+                dbItem =
+                    await
+                        _articleRepository.Query(p => p.Id == model.Id)
+                            .Include(p => p.ContentItem)
+                            .ThenInclude(p => p.ContentItemToContentProcessors)
+                            .SelectFirstOrDefaultAsync(true);
                 if (dbItem != null)
                 {
                     foreach (var proccesorRef in dbItem.ContentItem.ContentItemToContentProcessors)
@@ -266,7 +271,7 @@ namespace VitalChoice.Business.Services.Content
                     item.Id = 0;
                     item.IdArticle = dbItem.Id;
                 }
-                var dbProducts = await _articleToProductRepository.Query(c => c.IdArticle == dbItem.Id).SelectAsync();
+                var dbProducts = await _articleToProductRepository.Query(c => c.IdArticle == dbItem.Id).SelectAsync(true);
                 await _articleToProductRepository.DeleteAllAsync(dbProducts);
                 await _articleToProductRepository.InsertRangeAsync(articlesToProducts);
                 dbItem.ArticlesToProducts = articlesToProducts;

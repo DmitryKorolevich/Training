@@ -141,7 +141,7 @@ namespace VitalChoice.Business.Services.InventorySkus
             if (toReturn.Items.Count > 0)
             {
                 var ids = toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value).Distinct().ToList();
-                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
+                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
                 foreach (var item in toReturn.Items)
                 {
                     foreach (var profile in profiles)

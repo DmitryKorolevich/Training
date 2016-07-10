@@ -317,7 +317,7 @@ namespace VitalChoice.Business.Services.HelpService
                     }
 
                     var condition = new HelpTicketQuery().NotDeleted().WithId(item.IdHelpTicket);
-                    var helpTicket = (await _helpTicketRepository.Query(condition).SelectAsync()).FirstOrDefault();
+                    var helpTicket = await _helpTicketRepository.Query(condition).SelectFirstOrDefaultAsync(true);
                     if (helpTicket != null)
                     {
                         helpTicket.DateEdited = now;
@@ -365,7 +365,7 @@ namespace VitalChoice.Business.Services.HelpService
                 await _helpTicketCommentRepository.UpdateAsync(item);
 
                 var condition = new HelpTicketQuery().NotDeleted().WithId(item.IdHelpTicket);
-                var helpTicket = (await _helpTicketRepository.Query(condition).SelectAsync()).FirstOrDefault();
+                var helpTicket = await _helpTicketRepository.Query(condition).SelectFirstOrDefaultAsync(true);
                 if (helpTicket != null)
                 {
                     helpTicket.DateEdited = DateTime.Now;
@@ -681,7 +681,7 @@ namespace VitalChoice.Business.Services.HelpService
                     }
 
                     var condition = new BugTicketQuery().NotDeleted().WithId(item.IdBugTicket);
-                    bugTicket = (await _bugTicketRepository.Query(condition).SelectAsync()).FirstOrDefault();
+                    bugTicket = await _bugTicketRepository.Query(condition).SelectFirstOrDefaultAsync(true);
                     if (bugTicket != null)
                     {
                         bugTicket.DateEdited = now;
@@ -734,7 +734,7 @@ namespace VitalChoice.Business.Services.HelpService
                 await _bugTicketCommentRepository.UpdateAsync(item);
 
                 var condition = new BugTicketQuery().NotDeleted().WithId(item.IdBugTicket);
-                var bugTicket = (await _bugTicketRepository.Query(condition).SelectAsync()).FirstOrDefault();
+                var bugTicket = await _bugTicketRepository.Query(condition).SelectFirstOrDefaultAsync(true);
                 if (bugTicket != null)
                 {
                     bugTicket.DateEdited = DateTime.Now;

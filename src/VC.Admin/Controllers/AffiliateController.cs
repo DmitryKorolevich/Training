@@ -46,7 +46,7 @@ namespace VC.Admin.Controllers
         private readonly IAffiliateUserService _affiliateUserService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly ExtendedUserManager _userManager;
-        private readonly Country _defaultCountry;
+        private readonly ReferenceData _referenceData;
         private readonly ICsvExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> _csvExportAffiliateOrderListItemService;
         private readonly IOrderService _orderService;
         private readonly ICountryService _countryService;
@@ -59,20 +59,19 @@ namespace VC.Admin.Controllers
             IAffiliateUserService affiliateUserService,
             ILoggerProviderExtended loggerProvider,
             IDynamicMapper<AffiliateDynamic, Affiliate> mapper,
-            IAppInfrastructureService appInfrastructureService,
             ICsvExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> csvExportAffiliateOrderListItemService,
             IOrderService orderService,
             ICountryService countryService,
             ISettingService settingService,
             IOptions<AppOptions> appOptions,
-            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager)
+            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager, ReferenceData referenceData)
         {
             _affiliateService = affiliateService;
             _affiliateUserService = affiliateUserService;
             _mapper = mapper;
             _objectHistoryLogService = objectHistoryLogService;
             _userManager = userManager;
-            _defaultCountry = appInfrastructureService.Data().DefaultCountry;
+            _referenceData = referenceData;
             _csvExportAffiliateOrderListItemService = csvExportAffiliateOrderListItemService;
             _orderService = orderService;
             _countryService = countryService;
@@ -117,11 +116,12 @@ namespace VC.Admin.Controllers
             {
                 var now = DateTime.Now;
                 now = new DateTime(now.Year, now.Month, now.Day);
+                var defaultCountry = _referenceData.DefaultCountry;
                 return new AffiliateManageModel()
                 {
                     StatusCode = RecordStatusCode.NotActive,
-                    IdCountry = _defaultCountry != null ? _defaultCountry.Id : (int?)null,
-                    PaymentType = AffiliateConstants.DefaultPaymentType,//Credit
+                    IdCountry = defaultCountry?.Id,
+                    PaymentType = AffiliateConstants.DefaultPaymentType, //Credit
                     Tier = AffiliateConstants.DefaultTier,
                     CommissionFirst = AffiliateConstants.DefaultCommissionFirst,
                     CommissionAll = AffiliateConstants.DefaultCommissionAll,

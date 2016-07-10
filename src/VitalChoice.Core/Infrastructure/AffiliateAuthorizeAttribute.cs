@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Core.Infrastructure
 {
@@ -34,8 +35,7 @@ namespace VitalChoice.Core.Infrastructure
                     if (claimUser.HasClaim(x => x.Type == IdentityConstants.AffiliateRole))
                     {
                         var affiliateRoles =
-                            context.HttpContext.RequestServices.GetService<IAppInfrastructureService>()
-                                .Data()
+                            context.HttpContext.RequestServices.GetService<ReferenceData>()
                                 .AffiliateRoles;
 
                         if (affiliateRoles.Any(affiliateRole => claimUser.IsInRole(affiliateRole.Text.Normalize())))

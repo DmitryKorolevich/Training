@@ -21,6 +21,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
+using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Business.Services.Users
 {
@@ -33,7 +34,7 @@ namespace VitalChoice.Business.Services.Users
             RoleManager<ApplicationRole> roleManager,
             VitalChoiceContext context, 
             SignInManager<ApplicationUser> signInManager, 
-            IAppInfrastructureService appInfrastructureService,
+            ReferenceData referenceData,
             INotificationService notificationService,
             IOptions<AppOptions> options, 
             IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
@@ -44,7 +45,7 @@ namespace VitalChoice.Business.Services.Users
                 roleManager,
                 context, 
                 signInManager, 
-                appInfrastructureService,
+                referenceData,
                 notificationService, 
                 options, 
                 ecommerceRepositoryAsync,
@@ -108,23 +109,23 @@ namespace VitalChoice.Business.Services.Users
 		}
 
 
-        protected override async Task ValidateUserOnSignIn(string login)
-        {
-            var appUser = await UserManager.Users.FirstOrDefaultAsync(x => x.Email.Equals(login));
+	    protected override async Task ValidateUserOnSignIn(string login)
+	    {
+	        var appUser = await UserManager.Users.FirstOrDefaultAsync(x => x.Email.Equals(login));
 
-            if (appUser!=null)
-            {
-                var affiliate = (await _affiliateRepositoryAsync.Query(p => p.Id == appUser.Id).SelectAsync()).FirstOrDefault();
-                if(affiliate!=null && affiliate.StatusCode==(int)AffiliateStatus.Pending)
-                {
-                    throw new AffiliatePendingException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
-                }
-            }
+	        if (appUser != null)
+	        {
+	            var affiliate = await _affiliateRepositoryAsync.Query(p => p.Id == appUser.Id).SelectFirstOrDefaultAsync(false);
+	            if (affiliate != null && affiliate.StatusCode == (int) AffiliateStatus.Pending)
+	            {
+	                throw new AffiliatePendingException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
+	            }
+	        }
 
-            await base.ValidateUserOnSignIn(login);
-        }
+	        await base.ValidateUserOnSignIn(login);
+	    }
 
-        public async Task SendSuccessfulRegistration(string email, string firstName, string lastName)
+	    public async Task SendSuccessfulRegistration(string email, string firstName, string lastName)
 		{
 			await NotificationService.SendAffiliateRegistrationSuccess(email, new SuccessfulUserRegistration()
 			{

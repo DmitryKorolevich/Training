@@ -22,6 +22,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Interfaces.Services.Users;
@@ -30,26 +31,26 @@ namespace VC.Admin.ModelConverters
 {
     public class OrderInvoiceModelConverter : BaseModelConverter<OrderInvoiceModel, OrderDynamic>
     {
-        private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly ITrackingService _trackingService;
         private readonly ICustomerService _customerService;
         private readonly ICountryService _countryService;
         private readonly IAdminUserService _adminUserService;
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
+        private readonly ReferenceData _referenceData;
 
-        public OrderInvoiceModelConverter(IAppInfrastructureService appInfrastructureService, 
+        public OrderInvoiceModelConverter(
             ITrackingService trackingService,
             ICustomerService customerService,
             ICountryService countryService,
             IAdminUserService adminUserService,
-            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper)
+            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper, ReferenceData referenceData)
         {
-            _appInfrastructureService = appInfrastructureService;
             _trackingService = trackingService;
             _customerService = customerService;
             _countryService = countryService;
             _adminUserService = adminUserService;
             _addressMapper = addressMapper;
+            _referenceData = referenceData;
         }
 
         public override async Task DynamicToModelAsync(OrderInvoiceModel model, OrderDynamic dynamic)
@@ -187,7 +188,7 @@ namespace VC.Admin.ModelConverters
 
             if (dynamic.PaymentMethod != null)
             {
-                var paymentMethodInfo = _appInfrastructureService.Data().PaymentMethods.FirstOrDefault(p => p.Key == dynamic.PaymentMethod.IdObjectType);
+                var paymentMethodInfo = _referenceData.PaymentMethods.FirstOrDefault(p => p.Key == dynamic.PaymentMethod.IdObjectType);
                 model.PaymentTypeName = paymentMethodInfo?.Text;
                 switch ((PaymentMethodType)dynamic.PaymentMethod.IdObjectType)
                 {
@@ -208,15 +209,15 @@ namespace VC.Admin.ModelConverters
                         model.ShowWholesaleNormalView = true;
                         if (model.ShippingAddress.PreferredShipMethod.HasValue)
                         {
-                            model.PreferredShipMethodName = _appInfrastructureService.Data().OrderPreferredShipMethod.FirstOrDefault(p => p.Key == (int)model.ShippingAddress.PreferredShipMethod.Value)?.Text;
+                            model.PreferredShipMethodName = _referenceData.OrderPreferredShipMethod.FirstOrDefault(p => p.Key == (int)model.ShippingAddress.PreferredShipMethod.Value)?.Text;
                         }
                         if (dynamic.PaymentMethod.DictionaryData.ContainsKey("Fob") && dynamic.PaymentMethod.SafeData.Fob is int)
                         {
-                            model.OACFOB = _appInfrastructureService.Data().OacFob.FirstOrDefault(p => p.Key == (int)dynamic.PaymentMethod.SafeData.Fob)?.Text;
+                            model.OACFOB = _referenceData.OacFob.FirstOrDefault(p => p.Key == (int)dynamic.PaymentMethod.SafeData.Fob)?.Text;
                         }
                         if (dynamic.PaymentMethod.DictionaryData.ContainsKey("Terms") && dynamic.PaymentMethod.SafeData.Terms is int)
                         {
-                            model.OACTerms = _appInfrastructureService.Data().OacTerms.FirstOrDefault(p => p.Key == (int)dynamic.PaymentMethod.SafeData.Terms)?.Text;
+                            model.OACTerms = _referenceData.OacTerms.FirstOrDefault(p => p.Key == (int)dynamic.PaymentMethod.SafeData.Terms)?.Text;
                         }
                         break;
                 }

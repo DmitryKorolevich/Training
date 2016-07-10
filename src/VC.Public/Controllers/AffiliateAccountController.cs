@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Public.Controllers
@@ -33,18 +34,20 @@ namespace VC.Public.Controllers
         private readonly IAffiliateUserService _userService;
         private readonly IAffiliateService _affiliateService;
         private readonly ExtendedUserManager _userManager;
+        private readonly ReferenceData _referenceData;
         private readonly IDynamicMapper<AffiliateDynamic, Affiliate> _affiliateMapper;
 
         public AffiliateAccountController(
             IAffiliateUserService userService,
             IDynamicMapper<AffiliateDynamic, Affiliate> affiliateMapper,
             IAffiliateService affiliateService,
-            IPageResultService pageResultService, ExtendedUserManager userManager) : base(pageResultService)
+            IPageResultService pageResultService, ExtendedUserManager userManager, ReferenceData referenceData) : base(pageResultService)
         {
             _userService = userService;
             _affiliateMapper = affiliateMapper;
             _affiliateService = affiliateService;
             _userManager = userManager;
+            _referenceData = referenceData;
         }
 
         [HttpGet]
@@ -358,7 +361,7 @@ namespace VC.Public.Controllers
 
         private void InitRegisterModel(AffiliateManageModel model,bool refresh=false)
         {
-            var settings = HttpContext.RequestServices.GetService<IAppInfrastructureService>().Data();
+            var settings = _referenceData;
             model.MonthlyEmailsSentOptions = settings.AffiliateMonthlyEmailsSentOptions.Select(p => new SelectListItem()
             {
                 Value = p.Key.ToString(),

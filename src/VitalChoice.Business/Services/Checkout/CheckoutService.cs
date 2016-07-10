@@ -205,7 +205,7 @@ namespace VitalChoice.Business.Services.Checkout
                         {
                             if (cart.IdCustomer == null)
                             {
-                                var dbCart = await _cartRepository.Query(c => c.CartUid == cart.CartUid).SelectFirstOrDefaultAsync();
+                                var dbCart = await _cartRepository.Query(c => c.CartUid == cart.CartUid).SelectFirstOrDefaultAsync(true);
                                 dbCart.IdCustomer = idCustomer;
                                 await _context.SaveChangesAsync();
                             }
@@ -236,7 +236,7 @@ namespace VitalChoice.Business.Services.Checkout
                         anonymCart.Order.Customer = customer;
                         anonymCart.Order = await _orderService.InsertAsync(anonymCart.Order);
 
-                        var dbCart = await _cartRepository.Query(c => c.CartUid == cart.CartUid).SelectFirstOrDefaultAsync();
+                        var dbCart = await _cartRepository.Query(c => c.CartUid == cart.CartUid).SelectFirstOrDefaultAsync(true);
                         dbCart.IdOrder = anonymCart.Order.Id;
                         await _context.SaveChangesAsync();
 
@@ -308,7 +308,7 @@ namespace VitalChoice.Business.Services.Checkout
                             _cartRepository.Query(c => c.CartUid == cartOrder.CartUid)
                                 .Include(c => c.GiftCertificates)
                                 .Include(c => c.Skus)
-                                .SelectFirstOrDefaultAsync();
+                                .SelectFirstOrDefaultAsync(true);
 
                     if (cart == null)
                     {
@@ -396,7 +396,7 @@ namespace VitalChoice.Business.Services.Checkout
                             _cartRepository.Query(c => c.CartUid == cartOrder.CartUid)
                                 .Include(c => c.GiftCertificates)
                                 .Include(c => c.Skus)
-                                .SelectFirstOrDefaultAsync();
+                                .SelectFirstOrDefaultAsync(true);
 
                     if (cart == null)
                         return false;

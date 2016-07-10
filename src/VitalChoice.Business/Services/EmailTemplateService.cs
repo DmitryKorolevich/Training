@@ -207,7 +207,7 @@ namespace VitalChoice.Business.Services
                 dbItem.ContentItem.Created = DateTime.Now;
 
                 //set predefined master
-                var contentType = (await _contentTypeRepository.Query(p => p.Id == (int)ContentType.Email).SelectAsync()).FirstOrDefault();
+                var contentType = await _contentTypeRepository.Query(p => p.Id == (int) ContentType.Email).SelectFirstOrDefaultAsync(false);
                 if (contentType == null || !contentType.DefaultMasterContentItemId.HasValue)
                 {
                     throw new AppValidationException("The default master template isn't confugurated. Please contact support.");
@@ -216,8 +216,8 @@ namespace VitalChoice.Business.Services
             }
             else
             {
-                dbItem = (await _emailTemplateRepository.Query(p => p.Id == model.Id).Include(p => p.ContentItem).
-                    SelectAsync()).FirstOrDefault();
+                dbItem =
+                    await _emailTemplateRepository.Query(p => p.Id == model.Id).Include(p => p.ContentItem).SelectFirstOrDefaultAsync(true);
             }
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)

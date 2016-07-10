@@ -99,7 +99,7 @@ namespace VitalChoice.Business.Services.Settings
                 i++;
             }
 
-            var dbCountries = await countryRepository.Query(p=>p.StatusCode != RecordStatusCode.Deleted).SelectAsync();
+            var dbCountries = await countryRepository.Query(p=>p.StatusCode != RecordStatusCode.Deleted).SelectAsync(true);
             foreach (var dbCountry in dbCountries)
             {
                 var country = model.FirstOrDefault(p => p.Id == dbCountry.Id);
@@ -110,7 +110,7 @@ namespace VitalChoice.Business.Services.Settings
             }
             toReturn = await countryRepository.UpdateRangeAsync(dbCountries);
 
-            var dbStates = await stateRepository.Query(p => p.StatusCode != RecordStatusCode.Deleted).SelectAsync();
+            var dbStates = await stateRepository.Query(p => p.StatusCode != RecordStatusCode.Deleted).SelectAsync(true);
             foreach (var dbState in dbStates)
             {
                 var country = model.FirstOrDefault(p => p.CountryCode == dbState.CountryCode);

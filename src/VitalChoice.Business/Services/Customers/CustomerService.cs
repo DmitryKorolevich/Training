@@ -81,8 +81,8 @@ namespace VitalChoice.Business.Services.Customers
         private readonly IEncryptedOrderExportService _encryptedOrderExportService;
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly IEcommerceRepositoryAsync<VWholesaleSummaryInfo> _vWholesaleSummaryInfoRepositoryAsync;
-        private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly SpEcommerceRepository _sPEcommerceRepository;
+        private readonly ReferenceData _referenceData;
 
         private static string _customerContainerName;
 
@@ -103,9 +103,8 @@ namespace VitalChoice.Business.Services.Customers
             ICountryNameCodeResolver countryNameCode, IEncryptedOrderExportService encryptedOrderExportService,
             IPaymentMethodService paymentMethodService,
             IEcommerceRepositoryAsync<VWholesaleSummaryInfo> vWholesaleSummaryInfoRepositoryAsync,
-            IAppInfrastructureService appInfrastructureService,
             SpEcommerceRepository sPEcommerceRepository,
-            ITransactionAccessor<EcommerceContext> transactionAccessor, IDynamicEntityOrderingExtension<Customer> orderingExtension)
+            ITransactionAccessor<EcommerceContext> transactionAccessor, IDynamicEntityOrderingExtension<Customer> orderingExtension, ReferenceData referenceData)
             : base(
                 customerMapper, customerRepositoryAsync,
                 customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, 
@@ -127,8 +126,8 @@ namespace VitalChoice.Business.Services.Customers
             _encryptedOrderExportService = encryptedOrderExportService;
             _paymentMethodService = paymentMethodService;
             _vWholesaleSummaryInfoRepositoryAsync = vWholesaleSummaryInfoRepositoryAsync;
-            _appInfrastructureService = appInfrastructureService;
             _sPEcommerceRepository = sPEcommerceRepository;
+            _referenceData = referenceData;
         }
 
         protected override IQueryLite<Customer> BuildIncludes(IQueryLite<Customer> query)
@@ -823,7 +822,7 @@ namespace VitalChoice.Business.Services.Customers
         public async Task<WholesaleSummaryReport> GetWholesaleSummaryReportAsync()
         {
             WholesaleSummaryReport toReturn = new WholesaleSummaryReport();
-            toReturn.TradeClasses = _appInfrastructureService.Data().TradeClasses.Select(p => new WholesaleSummaryReportTradeClassItem()
+            toReturn.TradeClasses = _referenceData.TradeClasses.Select(p => new WholesaleSummaryReportTradeClassItem()
             {
                 Id = p.Key,
                 Name = p.Text
@@ -920,8 +919,8 @@ namespace VitalChoice.Business.Services.Customers
                     IdTradeClass = p.SafeData.TradeClass,
                     IdTier = p.SafeData.Tier,
                 };
-                item.TradeClass = item.IdTradeClass.HasValue ? _appInfrastructureService.Data().TradeClasses.FirstOrDefault(pp => item.IdTradeClass.Value == pp.Key)?.Text : null;
-                item.Tier = item.IdTier.HasValue ? _appInfrastructureService.Data().Tiers.FirstOrDefault(pp => item.IdTier.Value == pp.Key)?.Text : null;
+                item.TradeClass = item.IdTradeClass.HasValue ? _referenceData.TradeClasses.FirstOrDefault(pp => item.IdTradeClass.Value == pp.Key)?.Text : null;
+                item.Tier = item.IdTier.HasValue ? _referenceData.Tiers.FirstOrDefault(pp => item.IdTier.Value == pp.Key)?.Text : null;
 
 
                 toReturn.Items.Add(item);

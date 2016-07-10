@@ -4,7 +4,8 @@
 @using VC.Public.Models.Checkout
 @using VitalChoice.Core.Infrastructure.Helpers
 @using VitalChoice.Interfaces.Services
-@inject IAppInfrastructureService InfrastructureService
+@using VitalChoice.Infrastructure.Domain.Transfer
+@inject ReferenceData InfrastructureService
 @model  AddUpdateBillingAddressModel
 
 <input id="hdCountry" value="@Html.DisplayForEx(x => x.IdCountry)" type="hidden">

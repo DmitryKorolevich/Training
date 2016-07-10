@@ -79,21 +79,17 @@ namespace VitalChoice.Business.Services.Orders
     public class OrderService : ExtendedEcommerceDynamicService<OrderDynamic, Order, OrderOptionType, OrderOptionValue>,
         IOrderService
     {
-        //private readonly IEcommerceRepositoryAsync<VOrder> _vOrderRepository;
         private readonly IEcommerceRepositoryAsync<VOrderWithRegionInfoItem> _vOrderWithRegionInfoItemRepository;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
-        //private readonly IEcommerceRepositoryAsync<Sku> _skusRepository;
         private readonly ProductMapper _productMapper;
         private readonly SkuMapper _skuMapper;
         private readonly CustomerMapper _customerMapper;
         private readonly ICustomerService _customerService;
         private readonly IWorkflowFactory _treeFactory;
         private readonly IEcommerceRepositoryAsync<VCustomer> _vCustomerRepositoryAsync;
-        private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly IEncryptedOrderExportService _encryptedOrderExportService;
         private readonly SpEcommerceRepository _sPEcommerceRepository;
         private readonly IPaymentMethodService _paymentMethodService;
-        //private readonly IObjectMapper<OrderPaymentMethodDynamic> _paymentMapper;
         private readonly IEcommerceRepositoryAsync<OrderToGiftCertificate> _orderToGiftCertificateRepositoryAsync;
         private readonly ICountryService _countryService;
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
@@ -109,10 +105,10 @@ namespace VitalChoice.Business.Services.Orders
 	    private readonly IEcommerceRepositoryAsync<VAutoShipOrder> _vAutoShipOrderRepository;
         private readonly AffiliateOrderPaymentRepository _affiliateOrderPaymentRepository;
         private readonly ICountryNameCodeResolver _codeResolver;
+        private readonly ReferenceData _referenceData;
         private readonly OrderRepository _orderRepository;
 
         public OrderService(
-            //IEcommerceRepositoryAsync<VOrder> vOrderRepository,
             IEcommerceRepositoryAsync<VOrderWithRegionInfoItem> vOrderWithRegionInfoItemRepository,
             OrderRepository orderRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
@@ -123,14 +119,12 @@ namespace VitalChoice.Business.Services.Orders
             ProductMapper productMapper,
             CustomerMapper customerMapper,
             ICustomerService customerService, IWorkflowFactory treeFactory,
-            ILoggerProviderExtended loggerProvider, //IEcommerceRepositoryAsync<Sku> skusRepository,
+            ILoggerProviderExtended loggerProvider,
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
             DynamicExtensionsRewriter queryVisitor,
-            IAppInfrastructureService appInfrastructureService,
             IEncryptedOrderExportService encryptedOrderExportService,
             SpEcommerceRepository sPEcommerceRepository,
             IPaymentMethodService paymentMethodService,
-            //IObjectMapper<OrderPaymentMethodDynamic> paymentMapper,
             IEcommerceRepositoryAsync<OrderToGiftCertificate> orderToGiftCertificateRepositoryAsync,
             IExtendedDynamicServiceAsync
                 <OrderPaymentMethodDynamic, OrderPaymentMethod, CustomerPaymentMethodOptionType, OrderPaymentMethodOptionValue>
@@ -141,24 +135,22 @@ namespace VitalChoice.Business.Services.Orders
             ICountryService countryService, ITransactionAccessor<EcommerceContext> transactionAccessor, SkuMapper skuMapper,
             IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository, IDiscountService discountService,
             IEcommerceRepositoryAsync<VAutoShip> vAutoShipRepository, IEcommerceRepositoryAsync<VAutoShipOrder> vAutoShipOrderRepository,
-            AffiliateOrderPaymentRepository affiliateOrderPaymentRepository, ICountryNameCodeResolver codeResolver, IDynamicEntityOrderingExtension<Order> orderingExtension)
+            AffiliateOrderPaymentRepository affiliateOrderPaymentRepository, ICountryNameCodeResolver codeResolver,
+            IDynamicEntityOrderingExtension<Order> orderingExtension, ReferenceData referenceData)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
-                bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension)
+                bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension
+                )
         {
-            //_vOrderRepository = vOrderRepository;
             _vOrderWithRegionInfoItemRepository = vOrderWithRegionInfoItemRepository;
             _adminProfileRepository = adminProfileRepository;
             _productMapper = productMapper;
             _customerService = customerService;
             _treeFactory = treeFactory;
-            //_skusRepository = skusRepository;
             _vCustomerRepositoryAsync = vCustomerRepositoryAsync;
-            _appInfrastructureService = appInfrastructureService;
             _encryptedOrderExportService = encryptedOrderExportService;
             _sPEcommerceRepository = sPEcommerceRepository;
             _paymentMethodService = paymentMethodService;
-            //_paymentMapper = paymentMapper;
             _customerMapper = customerMapper;
             _orderToGiftCertificateRepositoryAsync = orderToGiftCertificateRepositoryAsync;
             _paymentGenericService = paymentGenericService;
@@ -170,6 +162,7 @@ namespace VitalChoice.Business.Services.Orders
             _vAutoShipOrderRepository = vAutoShipOrderRepository;
             _affiliateOrderPaymentRepository = affiliateOrderPaymentRepository;
             _codeResolver = codeResolver;
+            _referenceData = referenceData;
             _orderRepository = orderRepository;
             _addressMapper = addressMapper;
             _productService = productService;
@@ -419,7 +412,7 @@ namespace VitalChoice.Business.Services.Orders
         {
             var orderQuery = new OrderQuery().WithCustomerId(customerId).WithId(autoShipId).NotDeleted().WithOrderType(OrderType.AutoShip);
 
-            var autoShip = await _orderRepository.Query(orderQuery).SelectFirstOrDefaultAsync();
+            var autoShip = await _orderRepository.Query(orderQuery).SelectFirstOrDefaultAsync(true);
             if (autoShip == null)
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AutoShipNotAvailable]);
@@ -617,7 +610,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 var toLoadUp =
                     new HashSet<int>(updated.GiftCertificates.Where(g => g.GiftCertificate == null).Select(g => g.IdGiftCertificate));
-                var gcs = await gcRep.Query(g => toLoadUp.Contains(g.Id)).SelectAsync();
+                var gcs = await gcRep.Query(g => toLoadUp.Contains(g.Id)).SelectAsync(false);
                 updated.GiftCertificates.ForEach(g =>
                 {
                     if (g.GiftCertificate == null)
@@ -936,14 +929,20 @@ namespace VitalChoice.Business.Services.Orders
         {
             var currentDate = DateTime.Now;
 
-            var frequencyAvailable = _appInfrastructureService.Data().AutoShipOptions.Select(x => x.Key).ToList();
+            var frequencyAvailable = _referenceData.AutoShipOptions.Select(x => x.Key).ToList();
 
             var toProcess = new List<int>();
             foreach (var frequency in frequencyAvailable)
             {
                 var tempDate = currentDate.AddDays(-frequency); //AddMonths(-frequency);
 
-                var vAutoShips = await _vAutoShipRepository.Query(x => x.AutoShipFrequency == frequency && x.LastAutoShipDate.HasValue && x.LastAutoShipDate.Value.Day <= tempDate.Day && x.LastAutoShipDate.Value.Year <= tempDate.Year && x.LastAutoShipDate.Value.Month <= tempDate.Month).SelectAsync(x => x.Id);
+                var vAutoShips =
+                    await
+                        _vAutoShipRepository.Query(
+                            x =>
+                                x.AutoShipFrequency == frequency && x.LastAutoShipDate.HasValue &&
+                                x.LastAutoShipDate.Value.Day <= tempDate.Day && x.LastAutoShipDate.Value.Year <= tempDate.Year &&
+                                x.LastAutoShipDate.Value.Month <= tempDate.Month).SelectAsync(x => x.Id, false);
 
                 if (vAutoShips.Count > 0)
                 {
@@ -952,7 +951,7 @@ namespace VitalChoice.Business.Services.Orders
             }
 
             //skipped by some reason
-            var skippedAcidently = await _vAutoShipRepository.Query(x => !x.LastAutoShipDate.HasValue).SelectAsync(x => x.Id);
+            var skippedAcidently = await _vAutoShipRepository.Query(x => !x.LastAutoShipDate.HasValue).SelectAsync(x => x.Id, false);
 
             if (skippedAcidently.Count > 0)
             {
@@ -1027,7 +1026,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<IList<int>> SelectAutoShipOrdersAsync(int idAutoShip)
         {
-            return await _vAutoShipOrderRepository.Query(x => x.AutoShipId == idAutoShip).SelectAsync(x => x.Id);
+            return await _vAutoShipOrderRepository.Query(x => x.AutoShipId == idAutoShip).SelectAsync(x => x.Id, false);
         }
 
         public async Task<bool> CancelOrderAsync(int id, POrderType? pOrderType = null)
@@ -1046,16 +1045,19 @@ namespace VitalChoice.Business.Services.Orders
                             List<GiftCertificate> generatedGcs = new List<GiftCertificate>();
                             if (order.Skus.Any(s => (s.GcsGenerated?.Count ?? 0) > 0))
                             {
-                                generatedGcs = await giftCertificateRepository.Query(p => p.IdOrder == order.Id && p.StatusCode != RecordStatusCode.NotActive).SelectAsync();
+                                generatedGcs =
+                                    await
+                                        giftCertificateRepository.Query(
+                                            p => p.IdOrder == order.Id && p.StatusCode != RecordStatusCode.NotActive).SelectAsync(true);
                                 //cancel gc=3 with np part
                                 if (pOrderType == POrderType.NP)
                                 {
-                                    generatedGcs.Where(p => p.GCType == GCType.GC).ForEach(p => { p.StatusCode = RecordStatusCode.NotActive; });
+                                    generatedGcs.Where(p => p.GCType == GCType.GC).ForEach(p => p.StatusCode = RecordStatusCode.NotActive);
                                 }
                                 //cancel all gcs with all
                                 if (IsAllCancel(pOrderType, order))
                                 {
-                                    generatedGcs.ForEach(p => { p.StatusCode = RecordStatusCode.NotActive; });
+                                    generatedGcs.ForEach(p => p.StatusCode = RecordStatusCode.NotActive);
                                 }
                             }
 
@@ -1574,7 +1576,7 @@ namespace VitalChoice.Business.Services.Orders
                 Include(c => c.OrderShippingPackages), orderBy: sortable, withDefaults: true);
 
             var resultList = new List<OrderInfoItem>(orders.Items.Count);
-            var shippingMethods = _appInfrastructureService.Data().OrderPreferredShipMethod;
+            var shippingMethods = _referenceData.OrderPreferredShipMethod;
             foreach (var item in orders.Items)
             {
                 var newItem = new OrderInfoItem
@@ -2337,12 +2339,25 @@ namespace VitalChoice.Business.Services.Orders
                     //        throw;
                     //    }
                     //}
-                    var maxCount = _appInfrastructureService.Data().AppSettings.HealthwisePeriodMaxItemsCount;
+                    var maxCount = _referenceData.AppSettings.HealthwisePeriodMaxItemsCount;
                     var orderCreatedDate = orderDateCreated;
-                    var periods = (await healthwisePeriodRepositoryAsync.Query(p => p.IdCustomer == idCustomer && orderCreatedDate >= p.StartDate && orderCreatedDate < p.EndDate && !p.PaidDate.HasValue).Include(p => p.HealthwiseOrders).ThenInclude(p => p.Order).SelectAsync(false)).ToList();
+                    var periods =
+                        (await
+                            healthwisePeriodRepositoryAsync.Query(
+                                p =>
+                                    p.IdCustomer == idCustomer && orderCreatedDate >= p.StartDate && orderCreatedDate < p.EndDate &&
+                                    !p.PaidDate.HasValue).Include(p => p.HealthwiseOrders).ThenInclude(p => p.Order).SelectAsync(false))
+                            .ToList();
                     foreach (var healthwisePeriod in periods)
                     {
-                        healthwisePeriod.HealthwiseOrders = healthwisePeriod.HealthwiseOrders.Where(p => p.Order.OrderStatus == OrderStatus.Processed || p.Order.OrderStatus == OrderStatus.Exported || p.Order.OrderStatus == OrderStatus.Shipped || p.Order.POrderStatus == OrderStatus.Processed || p.Order.POrderStatus == OrderStatus.Exported || p.Order.POrderStatus == OrderStatus.Shipped || p.Order.NPOrderStatus == OrderStatus.Processed || p.Order.NPOrderStatus == OrderStatus.Exported || p.Order.NPOrderStatus == OrderStatus.Shipped).ToList();
+                        healthwisePeriod.HealthwiseOrders =
+                            healthwisePeriod.HealthwiseOrders.Where(
+                                p =>
+                                    p.Order.OrderStatus == OrderStatus.Processed || p.Order.OrderStatus == OrderStatus.Exported ||
+                                    p.Order.OrderStatus == OrderStatus.Shipped || p.Order.POrderStatus == OrderStatus.Processed ||
+                                    p.Order.POrderStatus == OrderStatus.Exported || p.Order.POrderStatus == OrderStatus.Shipped ||
+                                    p.Order.NPOrderStatus == OrderStatus.Processed || p.Order.NPOrderStatus == OrderStatus.Exported ||
+                                    p.Order.NPOrderStatus == OrderStatus.Shipped).ToList();
                     }
                     bool addedToPeriod = false;
                     foreach (var period in periods.OrderBy(p => p.StartDate))
@@ -2470,7 +2485,7 @@ namespace VitalChoice.Business.Services.Orders
                 }
             }
             var ids = toReturn.Where(p => p.Order.IdEditedBy.HasValue).Select(p => p.Order.IdEditedBy.Value).Distinct().ToList();
-            var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync();
+            var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
             foreach (var item in toReturn)
             {
                 foreach (var profile in profiles)

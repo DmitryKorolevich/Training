@@ -34,17 +34,16 @@ namespace VC.Public.ModelConverters.Order
         private readonly ICountryNameCodeResolver _countryNameCodeResolver;
 
         public OrderViewModelConverter(
-            IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<SkuDynamic, Sku> skuMapper,
             IDynamicMapper<ProductDynamic, Product> productMapper,
             ITrackingService trackingService,
-            ICountryNameCodeResolver countryNameCodeResolver)
+            ICountryNameCodeResolver countryNameCodeResolver, ReferenceData referenceData)
         {
-            _referenceData = appInfrastructureService.Data();
             _skuMapper = skuMapper;
             _productMapper = productMapper;
             _trackingService = trackingService;
             _countryNameCodeResolver = countryNameCodeResolver;
+            _referenceData = referenceData;
         }
 
         public override async Task DynamicToModelAsync(OrderViewModel model, OrderDynamic dynamic)
