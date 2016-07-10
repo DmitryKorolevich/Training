@@ -58,6 +58,7 @@
       "BugTicketFilesContainerName": "bug-ticket-files",
       "BugTicketCommentFilesContainerName": "bug-ticket-comment-files",
       "AppFilesContainerName": "app-files",
+      "ObjectHistoryContainerName": "object-history-data",
       "ProductGoogleFeedFileName": "datafeed.csv"
     },
     "FedExOptions": {
