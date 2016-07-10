@@ -26,7 +26,7 @@ namespace VitalChoice.Caching.Interfaces
         ICollection<EntityKey> MarkForAdd(ICollection<object> entities);
         bool TryRemove(object entity);
         bool TryRemove(EntityKey pk);
-        bool ItemExist(EntityKey pk);
+        bool ItemExistWithoutRelations(EntityKey pk);
         bool ItemExistAndNotNull(EntityKey pk);
         bool GetCacheExist(RelationInfo relationInfo);
         bool GetIsCacheFullCollection(RelationInfo relationInfo);

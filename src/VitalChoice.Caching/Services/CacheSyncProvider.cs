@@ -110,7 +110,7 @@ namespace VitalChoice.Caching.Services
                         switch (op.SyncOperation.SyncType)
                         {
                             case SyncType.Add:
-                                if (op.Cache.ItemExist(op.PrimaryKey))
+                                if (op.Cache.ItemExistWithoutRelations(op.PrimaryKey))
                                 {
                                     var entity = KeyStorage.GetEntity(op.EntityType, op.PrimaryKey, ScopeContainer.ScopeFactory);
                                     if (!op.Cache.Update(entity, (DbContext) null))
@@ -120,7 +120,7 @@ namespace VitalChoice.Caching.Services
                                 }
                                 break;
                             case SyncType.Update:
-                                if (op.Cache.ItemExist(op.PrimaryKey))
+                                if (op.Cache.ItemExistWithoutRelations(op.PrimaryKey))
                                 {
                                     var entity = KeyStorage.GetEntity(op.EntityType, op.PrimaryKey, ScopeContainer.ScopeFactory);
                                     if (!op.Cache.Update(entity, (DbContext) null))
