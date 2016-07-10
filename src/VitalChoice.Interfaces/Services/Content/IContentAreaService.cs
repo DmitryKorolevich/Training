@@ -8,7 +8,7 @@ namespace VitalChoice.Interfaces.Services.Content
     {
 	    Task<IList<ContentArea>> GetContentAreasAsync();
 
-	    Task<ContentArea> UpdateContentAreaAsync(ContentArea contentArea);
+	    Task UpdateContentAreaAsync(ContentArea contentArea);
 
 	    Task<ContentArea> GetContentAreaAsync(int id);
 

@@ -18,9 +18,9 @@ namespace VitalChoice.Business.Services.Content
 			return obj;
 		}
 
-		public async Task<CustomPublicStyle> UpdateStylesAsync(CustomPublicStyle customPublicStyle)
+		public Task UpdateStylesAsync(CustomPublicStyle customPublicStyle)
 		{
-			return await UpdateAsync(customPublicStyle);
+			return UpdateAsync(customPublicStyle);
 		}
 	}
 }

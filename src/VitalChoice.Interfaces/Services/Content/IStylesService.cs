@@ -7,6 +7,6 @@ namespace VitalChoice.Interfaces.Services.Content
 	{
 	    Task<CustomPublicStyle> GetStyles();
 
-	    Task<CustomPublicStyle> UpdateStylesAsync(CustomPublicStyle customPublicStyle);
+	    Task UpdateStylesAsync(CustomPublicStyle customPublicStyle);
     }
 }

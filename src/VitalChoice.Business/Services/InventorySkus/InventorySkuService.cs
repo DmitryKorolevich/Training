@@ -157,23 +157,24 @@ namespace VitalChoice.Business.Services.InventorySkus
             return toReturn;
         }
 
-        public async Task<Dictionary<int, List<SkuToInventorySku>>> GetAssignedInventorySkusAsync(ICollection<int> skuIds)
+        public async Task<Dictionary<int, List<SkuToInventorySku>>> GetAssignedInventorySkusAsync(IEnumerable<int> skuIds)
         {
             skuIds = skuIds.Distinct().ToList();
             var items = await _skuToInventorySkuRepository.Query(p => skuIds.Contains(p.IdSku)).SelectAsync(false);
-            var toReturn = new Dictionary<int, List<SkuToInventorySku>>();
-            foreach (var skuToInventorySku in items)
-            {
-                List<SkuToInventorySku> assignedInventories;
-                toReturn.TryGetValue(skuToInventorySku.IdSku, out assignedInventories);
-                if (assignedInventories == null)
-                {
-                    assignedInventories = new List<SkuToInventorySku>();
-                    toReturn.Add(skuToInventorySku.IdSku, assignedInventories);
-                }
-                assignedInventories.Add(skuToInventorySku);
-            }
-            return toReturn;
+            //var toReturn = new Dictionary<int, List<SkuToInventorySku>>();
+            //foreach (var skuToInventorySku in items)
+            //{
+            //    List<SkuToInventorySku> assignedInventories;
+            //    toReturn.TryGetValue(skuToInventorySku.IdSku, out assignedInventories);
+            //    if (assignedInventories == null)
+            //    {
+            //        assignedInventories = new List<SkuToInventorySku>();
+            //        toReturn.Add(skuToInventorySku.IdSku, assignedInventories);
+            //    }
+            //    assignedInventories.Add(skuToInventorySku);
+            //}
+            //return toReturn;
+            return items.GroupBy(inv => inv.IdSku).ToDictionary(inv => inv.Key, g => g.ToList());
         }
 
         public async Task<ICollection<InventorySkuUsageReportItem>> GetInventorySkuUsageReportAsync(InventorySkuUsageReportFilter filter)

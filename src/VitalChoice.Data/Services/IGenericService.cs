@@ -14,12 +14,12 @@ namespace VitalChoice.Data.Services
         Task InsertAsync(TEntity entity);
         bool InsertRange(ICollection<TEntity> entities);
 	    Task<bool> InsertRangeAsync(ICollection<TEntity> entities);
-        TEntity InsertGraph(TEntity entity);
-		Task<TEntity> InsertGraphAsync(TEntity entity);
+        void InsertGraph(TEntity entity);
+		Task InsertGraphAsync(TEntity entity);
 	    bool InsertGraphRange(params TEntity[] entities);
 	    Task<bool> InsertGraphRangeAsync(params TEntity[] entities);
-	    TEntity Update(TEntity entity);
-	    Task<TEntity> UpdateAsync(TEntity entity);
+	    void Update(TEntity entity);
+	    Task UpdateAsync(TEntity entity);
         void Delete(int id);
         void Delete(TEntity entity);
 		List<TEntity> Query();

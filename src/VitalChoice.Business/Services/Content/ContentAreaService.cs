@@ -34,13 +34,11 @@ namespace VitalChoice.Business.Services.Content
 			return await Repository.Query().Include(x=>x.User).ThenInclude(x=>x.Profile).SelectAsync();
 		}
 
-		public async Task<ContentArea> UpdateContentAreaAsync(ContentArea contentArea)
+		public async Task UpdateContentAreaAsync(ContentArea contentArea)
 		{
-			var toReturn = await UpdateAsync(contentArea);
+			await UpdateAsync(contentArea);
 
-            await _objectLogItemExternalService.LogItem(toReturn);
-
-		    return toReturn;
+            await _objectLogItemExternalService.LogItem(contentArea);
 		}
 	}
 }

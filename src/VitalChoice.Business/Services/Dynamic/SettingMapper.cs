@@ -27,34 +27,19 @@ namespace VitalChoice.Business.Services.Dynamic
         public override Expression<Func<SettingOptionValue, int>> ObjectIdSelector => a => 0;
 
         protected override Task FromEntityRangeInternalAsync(
-           ICollection<DynamicEntityPair<SettingDynamic, Setting>> items, bool withDefaults = false)
+            ICollection<DynamicEntityPair<SettingDynamic, Setting>> items, bool withDefaults = false)
         {
-            items.ForEach(item =>
-            {
-                var entity = item.Entity;
-                var dynamic = item.Dynamic;
-            });
             return TaskCache.CompletedTask;
         }
 
         protected override Task UpdateEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<SettingDynamic, Setting>> items)
         {
-            items.ForEach(item =>
-            {
-                var entity = item.Entity;
-                var dynamic = item.Dynamic;
-            });
             return TaskCache.CompletedTask;
         }
 
         protected override Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<SettingDynamic, Setting>> items)
         {
-            items.ForEach(item =>
-            {
-                var entity = item.Entity;
-                var dynamic = item.Dynamic;
-            });
             return TaskCache.CompletedTask;
         }
     }

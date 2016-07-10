@@ -33,10 +33,10 @@ namespace VitalChoice.Business.Services.Dynamic
 
         public override Expression<Func<ProductOptionValue, int>> ObjectIdSelector => p => p.IdProduct;
 
-        protected override async Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items,
+        protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items,
             bool withDefaults = false)
         {
-            await items.ForEachAsync(async pair =>
+            return items.ForEachAsync(async pair =>
             {
                 var entity = pair.Entity;
                 var dynamic = pair.Dynamic;
@@ -54,9 +54,9 @@ namespace VitalChoice.Business.Services.Dynamic
             });
         }
 
-        protected override async Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items)
+        protected override Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<ProductDynamic, Product>> items)
         {
-            await items.ForEachAsync(async pair =>
+            return items.ForEachAsync(async pair =>
             {
                 var entity = pair.Entity;
                 var dynamic = pair.Dynamic;
@@ -90,10 +90,10 @@ namespace VitalChoice.Business.Services.Dynamic
             });
         }
 
-        protected override async Task ToEntityRangeInternalAsync(
+        protected override Task ToEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<ProductDynamic, Product>> items)
         {
-            await items.ForEachAsync(async pair =>
+            return items.ForEachAsync(async pair =>
             {
                 var entity = pair.Entity;
                 var dynamic = pair.Dynamic;

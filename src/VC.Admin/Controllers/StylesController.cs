@@ -52,7 +52,7 @@ namespace VC.Admin.Controllers
 			res.Updated = DateTime.Now;
 			res.Styles = model.CSS;
 
-			res = await _stylesService.UpdateStylesAsync(res);
+		    await _stylesService.UpdateStylesAsync(res);
 			model.CSS = res.Styles;
 
 			return model;

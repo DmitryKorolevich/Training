@@ -58,10 +58,10 @@ namespace VitalChoice.Business.Services.Dynamic
 
         public override Expression<Func<OrderOptionValue, int>> ObjectIdSelector => o => o.IdOrder;
 
-        protected override async Task FromEntityRangeInternalAsync(
+        protected override Task FromEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<OrderDynamic, Order>> items, bool withDefaults = false)
         {
-            await items.ForEachAsync(async item =>
+            return items.ForEachAsync(async item =>
             {
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
@@ -179,7 +179,8 @@ namespace VitalChoice.Business.Services.Dynamic
                 }
 
                 dynamic.AffiliateOrderPayment = entity.AffiliateOrderPayment;
-                dynamic.OrderShippingPackages = entity.OrderShippingPackages?.Select(p => new OrderShippingPackageModelItem(p)).ToList() ?? new List<OrderShippingPackageModelItem>();
+                dynamic.OrderShippingPackages = entity.OrderShippingPackages?.Select(p => new OrderShippingPackageModelItem(p)).ToList() ??
+                                                new List<OrderShippingPackageModelItem>();
             });
         }
 
@@ -341,7 +342,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdDiscount = dynamic.Discount?.Id;
                 if (dynamic.PaymentMethod.Address != null && entity.PaymentMethod.BillingAddress == null)
                 {
-                    entity.PaymentMethod.BillingAddress = new OrderAddress { OptionValues = new List<OrderAddressOptionValue>() };
+                    entity.PaymentMethod.BillingAddress = new OrderAddress {OptionValues = new List<OrderAddressOptionValue>()};
                 }
                 if (dynamic.PaymentMethod.Address == null)
                 {
@@ -428,19 +429,12 @@ namespace VitalChoice.Business.Services.Dynamic
             });
         }
 
-        private async Task<Dictionary<int, List<SkuToInventorySku>>> GetInventoryMap(ICollection<DynamicEntityPair<OrderDynamic, Order>> items)
+        private async Task<Dictionary<int, List<SkuToInventorySku>>> GetInventoryMap(
+            ICollection<DynamicEntityPair<OrderDynamic, Order>> items)
         {
-            var skuIds = items.Select(p => p.Dynamic).SelectMany(p => p?.Skus).Select(p => p.Sku.Id).ToList();
-            skuIds.AddRange(items.Select(p => p.Dynamic).SelectMany(p => p?.PromoSkus).Select(p => p.Sku.Id).ToList());
-            Dictionary<int, List<SkuToInventorySku>> inventoryMap;
-            if (skuIds.Count > 0)
-            {
-                inventoryMap = await _inventorySkuService.GetAssignedInventorySkusAsync(skuIds);
-            }
-            else
-            {
-                inventoryMap = new Dictionary<int, List<SkuToInventorySku>>();
-            }
+            var skuIds = items.Select(p => p.Dynamic).SelectMany(p => p.Skus).Select(p => p.Sku.Id);
+            skuIds = skuIds.Union(items.Select(p => p.Dynamic).SelectMany(p => p.PromoSkus).Select(p => p.Sku.Id));
+            var inventoryMap = await _inventorySkuService.GetAssignedInventorySkusAsync(skuIds);
             return inventoryMap;
         }
     }

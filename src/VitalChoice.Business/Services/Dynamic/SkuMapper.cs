@@ -30,10 +30,10 @@ namespace VitalChoice.Business.Services.Dynamic
 
         public override Expression<Func<SkuOptionValue, int>> ObjectIdSelector => s => s.IdSku;
 
-        protected override async Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<SkuDynamic, Sku>> items,
+        protected override Task FromEntityRangeInternalAsync(ICollection<DynamicEntityPair<SkuDynamic, Sku>> items,
             bool withDefaults = false)
         {
-            await items.ForEachAsync(async pair =>
+            return items.ForEachAsync(async pair =>
             {
                 var entity = pair.Entity;
                 var dynamic = pair.Dynamic;

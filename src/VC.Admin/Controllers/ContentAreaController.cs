@@ -58,7 +58,7 @@ namespace VC.Admin.Controllers
 			contentArea.Updated = DateTime.Now;
 			contentArea.Template = model.Template;
 
-			contentArea = await _contentAreaService.UpdateContentAreaAsync(contentArea);
+			await _contentAreaService.UpdateContentAreaAsync(contentArea);
 
 		    return new ContentAreaReadModel(contentArea);
 		}

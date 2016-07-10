@@ -31,11 +31,11 @@ namespace VitalChoice.Business.Services.Dynamic
 
         public override Expression<Func<OrderPaymentMethodOptionValue, int>> ObjectIdSelector => p => p.IdOrderPaymentMethod;
 
-        protected override async Task FromEntityRangeInternalAsync(
+        protected override Task FromEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<OrderPaymentMethodDynamic, OrderPaymentMethod>> items,
             bool withDefaults = false)
         {
-            await items.ForEachAsync(async item =>
+            return items.ForEachAsync(async item =>
             {
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
@@ -44,10 +44,10 @@ namespace VitalChoice.Business.Services.Dynamic
             });
         }
 
-        protected override async Task UpdateEntityRangeInternalAsync(
+        protected override Task UpdateEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<OrderPaymentMethodDynamic, OrderPaymentMethod>> items)
         {
-            await
+            return
                 _orderAddressMapper.UpdateEntityRangeAsync(
                     items.Select(
                         i =>
@@ -56,10 +56,10 @@ namespace VitalChoice.Business.Services.Dynamic
                         .ToList());
         }
 
-        protected override async Task ToEntityRangeInternalAsync(
+        protected override Task ToEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<OrderPaymentMethodDynamic, OrderPaymentMethod>> items)
         {
-            await items.ForEachAsync(async pair =>
+            return items.ForEachAsync(async pair =>
             {
                 var entity = pair.Entity;
                 var dynamic = pair.Dynamic;

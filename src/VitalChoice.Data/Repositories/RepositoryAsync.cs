@@ -22,9 +22,9 @@ namespace VitalChoice.Data.Repositories
             return true;
         }
 
-        public virtual async Task<bool> InsertAsync(TEntity entity)
+        public virtual Task<bool> InsertAsync(TEntity entity)
         {
-            return await InsertAsync(CancellationToken.None, entity);
+            return InsertAsync(CancellationToken.None, entity);
         }
 
         public virtual async Task<bool> InsertAsync(CancellationToken cancellationToken, TEntity entity)
@@ -49,9 +49,9 @@ namespace VitalChoice.Data.Repositories
             return false;
         }
 
-        public virtual async Task<bool> InsertRangeAsync(IEnumerable<TEntity> entities)
+        public virtual Task<bool> InsertRangeAsync(IEnumerable<TEntity> entities)
         {
-            return await InsertRangeAsync(CancellationToken.None, entities);
+            return InsertRangeAsync(CancellationToken.None, entities);
         }
 
         public virtual async Task<bool> InsertRangeAsync(CancellationToken cancellationToken,
@@ -77,9 +77,9 @@ namespace VitalChoice.Data.Repositories
             return false;
         }
 
-        public virtual async Task<bool> InsertGraphAsync(TEntity entity)
+        public virtual Task<bool> InsertGraphAsync(TEntity entity)
         {
-            return await InsertGraphAsync(CancellationToken.None, entity);
+            return InsertGraphAsync(CancellationToken.None, entity);
         }
 
         public virtual async Task<bool> InsertGraphAsync(CancellationToken cancellationToken, TEntity entity)
@@ -103,9 +103,9 @@ namespace VitalChoice.Data.Repositories
             return true;
         }
 
-        public virtual async Task<bool> InsertGraphRangeAsync(params TEntity[] entities)
+        public virtual Task<bool> InsertGraphRangeAsync(params TEntity[] entities)
         {
-            return await InsertGraphRangeAsync(CancellationToken.None, entities);
+            return InsertGraphRangeAsync(CancellationToken.None, entities);
         }
 
         public virtual async Task<bool> InsertGraphRangeAsync(CancellationToken cancellationToken,
@@ -119,9 +119,9 @@ namespace VitalChoice.Data.Repositories
             return true;
         }
 
-        public virtual async Task<bool> InsertGraphRangeAsync(IEnumerable<TEntity> entities)
+        public virtual Task<bool> InsertGraphRangeAsync(IEnumerable<TEntity> entities)
         {
-            return await InsertGraphRangeAsync(CancellationToken.None, entities);
+            return InsertGraphRangeAsync(CancellationToken.None, entities);
         }
 
         public virtual async Task<bool> InsertGraphRangeAsync(CancellationToken cancellationToken,
@@ -146,9 +146,9 @@ namespace VitalChoice.Data.Repositories
             return false;
         }
 
-        public virtual async Task<bool> UpdateAsync(TEntity entity)
+        public virtual Task<bool> UpdateAsync(TEntity entity)
         {
-            return await UpdateAsync(CancellationToken.None, entity);
+            return UpdateAsync(CancellationToken.None, entity);
         }
 
         public virtual async Task<bool> UpdateAsync(CancellationToken cancellationToken, TEntity entity)
@@ -173,9 +173,9 @@ namespace VitalChoice.Data.Repositories
             return false;
         }
 
-        public virtual async Task<bool> UpdateRangeAsync(IEnumerable<TEntity> entities)
+        public virtual Task<bool> UpdateRangeAsync(IEnumerable<TEntity> entities)
         {
-            return await UpdateRangeAsync(CancellationToken.None, entities);
+            return UpdateRangeAsync(CancellationToken.None, entities);
         }
 
         public virtual async Task<bool> UpdateRangeAsync(CancellationToken cancellationToken,
@@ -237,9 +237,9 @@ namespace VitalChoice.Data.Repositories
             return true;
         }
 
-        public virtual async Task<bool> DeleteAsync(int id)
+        public virtual Task<bool> DeleteAsync(int id)
         {
-            return await DeleteAsync(CancellationToken.None, id);
+            return DeleteAsync(CancellationToken.None, id);
         }
 
         public virtual async Task<bool> DeleteAsync(CancellationToken cancellationToken, int id)
@@ -252,9 +252,9 @@ namespace VitalChoice.Data.Repositories
             return true;
         }
 
-        public virtual async Task<bool> DeleteAsync(TEntity entity)
+        public virtual Task<bool> DeleteAsync(TEntity entity)
         {
-            return await DeleteAsync(CancellationToken.None, entity);
+            return DeleteAsync(CancellationToken.None, entity);
         }
 
         public virtual async Task<bool> DeleteAsync(CancellationToken cancellationToken, TEntity entity)
@@ -266,9 +266,9 @@ namespace VitalChoice.Data.Repositories
             return true;
         }
 
-        public virtual async Task<bool> DeleteAllAsync(ICollection<int> ids)
+        public virtual Task<bool> DeleteAllAsync(ICollection<int> ids)
         {
-            return await DeleteAllAsync(CancellationToken.None, ids);
+            return DeleteAllAsync(CancellationToken.None, ids);
         }
 
         public virtual async Task<bool> DeleteAllAsync(CancellationToken cancellationToken, ICollection<int> ids)
@@ -284,9 +284,9 @@ namespace VitalChoice.Data.Repositories
             return true;
         }
 
-        public virtual async Task<bool> DeleteAllAsync(IEnumerable<TEntity> entitySet)
+        public virtual Task<bool> DeleteAllAsync(IEnumerable<TEntity> entitySet)
         {
-            return await DeleteAllAsync(CancellationToken.None, entitySet);
+            return DeleteAllAsync(CancellationToken.None, entitySet);
         }
 
         public virtual async Task<bool> DeleteAllAsync(CancellationToken cancellationToken,

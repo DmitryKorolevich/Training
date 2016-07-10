@@ -28,9 +28,9 @@ namespace VitalChoice.Data.Services
 			Repository.Insert(entity);
         }
 
-	    public async Task InsertAsync(TEntity entity)
+	    public Task InsertAsync(TEntity entity)
 	    {
-		    await Repository.InsertAsync(entity);
+		    return Repository.InsertAsync(entity);
 	    }
 
 	    public virtual bool InsertRange(ICollection<TEntity> entities)
@@ -38,24 +38,22 @@ namespace VitalChoice.Data.Services
 			return Repository.InsertRange(entities);
 		}
 
-	    public virtual async Task<bool> InsertRangeAsync(ICollection<TEntity> entities)
+	    public virtual Task<bool> InsertRangeAsync(ICollection<TEntity> entities)
 	    {
-			return await Repository.InsertRangeAsync(entities);
+			return Repository.InsertRangeAsync(entities);
 		}
 
-	    public virtual TEntity InsertGraph(TEntity entity)
+	    public virtual void InsertGraph(TEntity entity)
 	    {
             Repository.Insert(entity);
-            return entity; 
 		}
 
-	    public virtual async Task<TEntity> InsertGraphAsync(TEntity entity)
-	    {
-	        await Repository.InsertGraphAsync(entity);
-            return entity;
-		}
+        public virtual Task InsertGraphAsync(TEntity entity)
+        {
+            return Repository.InsertGraphAsync(entity);
+        }
 
-	    public virtual bool InsertGraphRange(params TEntity[] entities)
+        public virtual bool InsertGraphRange(params TEntity[] entities)
         {
 			return Repository.InsertGraphRange(entities);
 		}
@@ -65,16 +63,14 @@ namespace VitalChoice.Data.Services
 			return await Repository.InsertGraphRangeAsync(entities);
 		}
 
-	    public virtual TEntity Update(TEntity entity)
+	    public virtual void Update(TEntity entity)
 	    {
 	        Repository.Update(entity);
-            return entity;
 		}
 
-	    public virtual async Task<TEntity> UpdateAsync(TEntity entity)
+	    public virtual Task UpdateAsync(TEntity entity)
 	    {
-	        await Repository.UpdateAsync(entity);
-            return entity;
+	        return Repository.UpdateAsync(entity);
 	    }
 
 	    public virtual void Delete(int id)
