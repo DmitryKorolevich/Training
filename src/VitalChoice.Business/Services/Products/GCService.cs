@@ -284,7 +284,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<bool> DeleteGiftCertificateAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await giftCertificateRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await giftCertificateRepository.Query(p => p.Id == id).SelectFirstOrDefaultAsync(false));
             if (dbItem != null)
             {
                 dbItem.StatusCode = RecordStatusCode.Deleted;

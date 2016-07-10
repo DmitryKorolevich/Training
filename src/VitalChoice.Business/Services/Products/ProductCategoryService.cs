@@ -120,7 +120,7 @@ namespace VitalChoice.Business.Services.Products
         {
             ProductCategoryContent toReturn = null;
             ProductCategoryQuery query = new ProductCategoryQuery().WithId(id).NotDeleted();
-            var categoryEcommerce = (await productCategoryEcommerceRepository.Query(query).SelectAsync(false)).FirstOrDefault();
+            var categoryEcommerce = (await productCategoryEcommerceRepository.Query(query).SelectFirstOrDefaultAsync(false));
             if(categoryEcommerce!=null)
             {
                 toReturn = (await productCategoryRepository.Query(p=>p.Id== categoryEcommerce.Id).Include(p => p.ContentItem).
@@ -141,7 +141,7 @@ namespace VitalChoice.Business.Services.Products
             if(toReturn!=null)
             { 
                 ProductCategoryQuery query = new ProductCategoryQuery().WithId(toReturn.Id).NotDeleted();
-                var categoryEcommerce = (await productCategoryEcommerceRepository.Query(query).SelectAsync(false)).FirstOrDefault();
+                var categoryEcommerce = (await productCategoryEcommerceRepository.Query(query).SelectFirstOrDefaultAsync(false));
                 if (categoryEcommerce != null)
                 {
                     toReturn.ProductCategory = categoryEcommerce;
@@ -260,7 +260,7 @@ namespace VitalChoice.Business.Services.Products
                 if (model.MasterContentItemId == 0)
                 {
                     //set predefined master
-                    var contentType = (await contentTypeRepository.Query(p => p.Id == (int)ContentType.ProductCategory).SelectAsync(false)).FirstOrDefault();
+                    var contentType = (await contentTypeRepository.Query(p => p.Id == (int)ContentType.ProductCategory).SelectFirstOrDefaultAsync(false));
                     if(contentType?.DefaultMasterContentItemId != null)
                     {
                         model.MasterContentItemId = contentType.DefaultMasterContentItemId.Value;
@@ -287,7 +287,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<bool> DeleteCategoryAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await productCategoryEcommerceRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await productCategoryEcommerceRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectFirstOrDefaultAsync(false));
             if (dbItem != null)
             {
                 //Check sub categories
@@ -309,7 +309,7 @@ namespace VitalChoice.Business.Services.Products
                 dbItem.StatusCode = RecordStatusCode.Deleted;
                 await productCategoryEcommerceRepository.UpdateAsync(dbItem);
 
-                var dbContentCategoryPart = (await productCategoryRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
+                var dbContentCategoryPart = (await productCategoryRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectFirstOrDefaultAsync(false));
                 if (dbContentCategoryPart != null)
                 {
                     dbContentCategoryPart.StatusCode = RecordStatusCode.Deleted;

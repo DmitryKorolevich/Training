@@ -79,7 +79,7 @@ namespace VitalChoice.Business.Services.InventorySkus
         public async Task<InventorySkuCategory> GetCategoryAsync(int id)
         {
             InventorySkuCategoryQuery query = new InventorySkuCategoryQuery().WithId(id).NotDeleted();
-            return (await _inventorySkuCategoryEcommerceRepository.Query(query).SelectAsync(false)).FirstOrDefault();
+            return (await _inventorySkuCategoryEcommerceRepository.Query(query).SelectFirstOrDefaultAsync(false));
         }
 
         public async Task<InventorySkuCategory> UpdateCategoryAsync(InventorySkuCategory model)
@@ -147,7 +147,7 @@ namespace VitalChoice.Business.Services.InventorySkus
         public async Task<bool> DeleteCategoryAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await _inventorySkuCategoryEcommerceRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await _inventorySkuCategoryEcommerceRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectFirstOrDefaultAsync(false));
             if (dbItem != null)
             {
                 List<MessageInfo> errors = new List<MessageInfo>();

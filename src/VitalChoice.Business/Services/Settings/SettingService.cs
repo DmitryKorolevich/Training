@@ -98,7 +98,7 @@ namespace VitalChoice.Business.Services.Settings
             }
 
             var dbLookup =
-                (await _lookupRepository.Query(p => p.Id == id).Include(p => p.LookupVariants).SelectAsync(true)).FirstOrDefault();
+                (await _lookupRepository.Query(p => p.Id == id).Include(p => p.LookupVariants).SelectFirstOrDefaultAsync(true));
             if (dbLookup != null)
             {
                 dbLookup.LookupVariants.MergeKeyed(variants, p => p.Id, (a, b) =>

@@ -25,7 +25,7 @@ namespace VitalChoice.Business.Services
 
         public async Task<Token> GetTokenAsync(Guid id, TokenType idTokenType)
         {
-            return (await _tokenRepository.Query(p => p.IdToken == id && p.IdTokenType== idTokenType).SelectAsync(false)).FirstOrDefault();
+            return (await _tokenRepository.Query(p => p.IdToken == id && p.IdTokenType== idTokenType).SelectFirstOrDefaultAsync(false));
         }
 
         public async Task<Token> InsertTokenAsync(Token item)

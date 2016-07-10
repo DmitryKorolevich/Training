@@ -193,7 +193,7 @@ namespace VitalChoice.Business.Services.Content
         public async Task<Recipe> GetRecipeByIdOldAsync(int id)
         {
             RecipeQuery query = new RecipeQuery().WithIdOld(id).NotDeleted();
-            var toReturn = (await _recipeRepository.Query(query).SelectAsync(false)).FirstOrDefault();
+            var toReturn = (await _recipeRepository.Query(query).SelectFirstOrDefaultAsync(false));
 
             return toReturn;
         }
@@ -350,7 +350,7 @@ namespace VitalChoice.Business.Services.Content
             {
                 var recipeRepository = uow.RepositoryAsync<Recipe>();
                 var recipeToContentCategoryRepository = uow.RepositoryAsync<RecipeToContentCategory>();
-                var dbItem = (await recipeRepository.Query(p => p.Id == id).Include(p => p.RecipesToContentCategories).SelectAsync(false)).FirstOrDefault();
+                var dbItem = (await recipeRepository.Query(p => p.Id == id).Include(p => p.RecipesToContentCategories).SelectFirstOrDefaultAsync(false));
                 if (dbItem != null)
                 {
                     var categories = await _contentCategoryRepository.Query(p => categoryIds.Contains(p.Id) && p.Type == ContentType.RecipeCategory && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
@@ -414,7 +414,7 @@ namespace VitalChoice.Business.Services.Content
         public async Task<bool> DeleteRecipeAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await _recipeRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await _recipeRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectFirstOrDefaultAsync(false));
             if (dbItem != null)
             {
                 dbItem.StatusCode = RecordStatusCode.Deleted;

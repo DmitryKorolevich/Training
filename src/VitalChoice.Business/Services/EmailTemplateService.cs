@@ -244,7 +244,7 @@ namespace VitalChoice.Business.Services
         public async Task<bool> DeleteEmailTemplateAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await _emailTemplateRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await _emailTemplateRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectFirstOrDefaultAsync(false));
             if (dbItem != null)
             {
                 dbItem.StatusCode = RecordStatusCode.Deleted;

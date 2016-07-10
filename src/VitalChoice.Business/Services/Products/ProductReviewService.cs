@@ -154,7 +154,7 @@ namespace VitalChoice.Business.Services.Products
             var conditions = new ProductReviewQuery().WithId(id).NotDeleted();
             var query = _productReviewRepository.Query(conditions).Include(p => p.Product);
 
-            return (await query.SelectAsync(false)).FirstOrDefault();
+            return (await query.SelectFirstOrDefaultAsync(false));
         }
 
         public async Task<ProductReview> UpdateProductReviewAsync(ProductReview model)
@@ -209,7 +209,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<bool> DeleteProductReviewAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await _productReviewRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await _productReviewRepository.Query(p => p.Id == id).SelectFirstOrDefaultAsync(false));
             if (dbItem != null)
             {
                 dbItem.StatusCode = RecordStatusCode.Deleted;

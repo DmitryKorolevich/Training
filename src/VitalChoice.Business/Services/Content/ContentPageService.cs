@@ -129,7 +129,7 @@ namespace VitalChoice.Business.Services.Content
         public async Task<ContentPage> GetContentPageByIdOldAsync(int id)
         {
             ContentPageQuery query = new ContentPageQuery().WithIdOld(id).NotDeleted();
-            var toReturn = (await contentPageRepository.Query(query).SelectAsync(false)).FirstOrDefault();
+            var toReturn = (await contentPageRepository.Query(query).SelectFirstOrDefaultAsync(false));
 
             return toReturn;
         }
@@ -220,7 +220,7 @@ namespace VitalChoice.Business.Services.Content
         public async Task<bool> AttachContentPageToCategoriesAsync(int id, IEnumerable<int> categoryIds)
         {
             bool toReturn = false;
-            var dbItem = (await contentPageRepository.Query(p => p.Id == id).Include(p=>p.ContentPagesToContentCategories).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await contentPageRepository.Query(p => p.Id == id).Include(p=>p.ContentPagesToContentCategories).SelectFirstOrDefaultAsync(false));
             if (dbItem != null)
             {
                 var categories = await contentCategoryRepository.Query(p => categoryIds.Contains(p.Id) && p.Type == ContentType.ContentPageCategory && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false);
@@ -280,7 +280,7 @@ namespace VitalChoice.Business.Services.Content
         public async Task<bool> DeleteContentPageAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await contentPageRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await contentPageRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectFirstOrDefaultAsync(false));
             if (dbItem != null)
             {
                 dbItem.StatusCode = RecordStatusCode.Deleted;

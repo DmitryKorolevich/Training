@@ -104,7 +104,7 @@ namespace VitalChoice.Business.Services.Content
             var query = new MasterContentItemQuery();
             query = query.WithId(id).NotDeleted();
             var toReturn = (await masterContentItemRepository.Query(query).Include(p=>p.MasterContentItemToContentProcessors).Include(p=>p.Type).
-                Include(p => p.User).ThenInclude(p=>p.Profile).SelectAsync(false)).FirstOrDefault();
+                Include(p => p.User).ThenInclude(p=>p.Profile).SelectFirstOrDefaultAsync(false));
             return toReturn;
         }
 
@@ -182,7 +182,7 @@ namespace VitalChoice.Business.Services.Content
         public async Task<bool> DeleteMasterContentItemAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await masterContentItemRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await masterContentItemRepository.Query(p => p.Id == id).SelectFirstOrDefaultAsync(false));
             if (dbItem != null)
             {
                 bool relations = false;

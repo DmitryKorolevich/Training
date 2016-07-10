@@ -177,7 +177,7 @@ namespace VitalChoice.Business.Services.Content
                 if (model.MasterContentItemId == 0)
                 {
                     //set predefined master
-                    var contentType = (await contentTypeRepository.Query(p => p.Id == (int)model.Type).SelectAsync(false)).FirstOrDefault();
+                    var contentType = (await contentTypeRepository.Query(p => p.Id == (int)model.Type).SelectFirstOrDefaultAsync(false));
                     if (contentType?.DefaultMasterContentItemId != null)
                     {
                         model.MasterContentItemId = contentType.DefaultMasterContentItemId.Value;
@@ -251,7 +251,7 @@ namespace VitalChoice.Business.Services.Content
         public async Task<bool> DeleteCategoryAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await contentCategoryRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await contentCategoryRepository.Query(p => p.Id == id).SelectFirstOrDefaultAsync(false));
             if (dbItem != null)
             {
                 //Check sub categories

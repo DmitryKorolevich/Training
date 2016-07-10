@@ -521,7 +521,7 @@ namespace VitalChoice.Business.Services.VeraCore
                             if (parsed)
                             {
                                 var order = (await _orderRepository.Query(p => p.Id == orderId && p.StatusCode!=(int)RecordStatusCode.Deleted)
-                                    .SelectAsync(false)).FirstOrDefault();
+                                    .SelectFirstOrDefaultAsync(false));
                                 if (order == null || (!pOrderType.HasValue && order.OrderStatus!=OrderStatus.Exported) ||
                                     (pOrderType==POrderType.P && order.POrderStatus != OrderStatus.Exported) ||
                                     (pOrderType == POrderType.NP && order.NPOrderStatus != OrderStatus.Exported))

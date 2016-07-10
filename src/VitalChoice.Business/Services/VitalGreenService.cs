@@ -62,13 +62,13 @@ namespace VitalChoice.Business.Services
 
         public async Task<FedExZone> GetFedExZone(string stateCode)
         {
-            var zone = (await _fedExZoneRepository.Query(p=>p.StatesCovered.Contains(stateCode)).SelectAsync(false)).FirstOrDefault();
+            var zone = (await _fedExZoneRepository.Query(p=>p.StatesCovered.Contains(stateCode)).SelectFirstOrDefaultAsync(false));
             return zone;
         }
 
         public async Task<FedExZone> GetFedExZone(int id)
         {
-            var zone = (await _fedExZoneRepository.Query(p => p.Id== id).SelectAsync(false)).FirstOrDefault();
+            var zone = (await _fedExZoneRepository.Query(p => p.Id== id).SelectFirstOrDefaultAsync(false));
             return zone;
         }
 

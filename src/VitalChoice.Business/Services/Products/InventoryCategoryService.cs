@@ -84,7 +84,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<InventoryCategory> GetCategoryAsync(int id)
         {
             InventoryCategoryQuery query = new InventoryCategoryQuery().WithId(id).NotDeleted();
-            return (await inventoryCategoryEcommerceRepository.Query(query).SelectAsync(false)).FirstOrDefault();
+            return (await inventoryCategoryEcommerceRepository.Query(query).SelectFirstOrDefaultAsync(false));
         }
 
         public async Task<InventoryCategory> UpdateCategoryAsync(InventoryCategory model)
@@ -149,7 +149,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<bool> DeleteCategoryAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await inventoryCategoryEcommerceRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await inventoryCategoryEcommerceRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectFirstOrDefaultAsync(false));
             if (dbItem != null)
             {
                 List<MessageInfo> errors = new List<MessageInfo>();

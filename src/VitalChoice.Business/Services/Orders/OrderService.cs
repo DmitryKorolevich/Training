@@ -702,7 +702,7 @@ namespace VitalChoice.Business.Services.Orders
             //TODO - should be redone on standart reading with dynamics after fixing missing data(Skus) with sort of operations
             OrderDynamic toReturn = null;
             var orderQuery = new OrderQuery().NotDeleted().WithActualStatusOnly().WithCustomerId(customerId);
-            var order = (await _orderRepository.Query(orderQuery).OrderBy(p => p.OrderByDescending(x => x.Id)).SelectAsync(false)).FirstOrDefault();
+            var order = (await _orderRepository.Query(orderQuery).OrderBy(p => p.OrderByDescending(x => x.Id)).SelectFirstOrDefaultAsync(false));
             if (order != null)
             {
                 toReturn = await this.SelectAsync(order.Id);
@@ -865,7 +865,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<int?> GetOrderIdCustomer(int id)
         {
-            var order = (await this._orderRepository.Query(p => p.StatusCode != (int) RecordStatusCode.Deleted && p.Id == id).SelectAsync(false)).FirstOrDefault();
+            var order = (await this._orderRepository.Query(p => p.StatusCode != (int) RecordStatusCode.Deleted && p.Id == id).SelectFirstOrDefaultAsync(false));
             return order?.IdCustomer;
         }
 
@@ -1828,7 +1828,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 model.CardNumber = creditCard.SafeData.CardNumber;
             }
-            var profile = (await _adminProfileRepository.Query(p => p.Id == idAddedBy).SelectAsync(false)).FirstOrDefault();
+            var profile = (await _adminProfileRepository.Query(p => p.Id == idAddedBy).SelectFirstOrDefaultAsync(false));
             model.Agent = profile?.AgentId;
             model.ImportedOrdersCount = orders.Count;
             model.ImportedOrdersAmount = orders.Sum(p => p.Total);
@@ -2284,7 +2284,7 @@ namespace VitalChoice.Business.Services.Orders
             if (option != null)
             {
                 var customerOptionValueRepositoryAsync = uow.RepositoryAsync<CustomerOptionValue>();
-                var optionValue = (await customerOptionValueRepositoryAsync.Query(p => p.IdCustomer == idCustomer && p.IdOptionType == option.Id).SelectAsync(true)).FirstOrDefault();
+                var optionValue = (await customerOptionValueRepositoryAsync.Query(p => p.IdCustomer == idCustomer && p.IdOptionType == option.Id).SelectFirstOrDefaultAsync(true));
                 if (optionValue == null)
                 {
                     optionValue = new CustomerOptionValue()
@@ -2316,7 +2316,7 @@ namespace VitalChoice.Business.Services.Orders
             }
             else
             {
-                HealthwiseOrder healthwiseOrder = (await healthwiseOrderRepositoryAsync.Query(p => p.Id == idOrder).SelectAsync(false)).FirstOrDefault();
+                HealthwiseOrder healthwiseOrder = (await healthwiseOrderRepositoryAsync.Query(p => p.Id == idOrder).SelectFirstOrDefaultAsync(false));
                 if (healthwiseOrder == null)
                 {
                     //BUG: doesn't make any sense to delete not exists HW order

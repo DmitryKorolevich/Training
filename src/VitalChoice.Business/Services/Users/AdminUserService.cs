@@ -47,7 +47,7 @@ namespace VitalChoice.Business.Services.Users
 
         public async Task<AdminProfile> GetAdminProfileAsync(int id)
         {
-            return (await _adminProfileRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            return (await _adminProfileRepository.Query(p => p.Id == id).SelectFirstOrDefaultAsync(false));
         }
 
         public async Task<bool> IsSuperAdmin(ApplicationUser user)

@@ -109,7 +109,7 @@ namespace VitalChoice.Business.Services.Healthwise
 
         public async Task<VHealthwisePeriod> GetVHealthwisePeriodAsync(int id)
         {
-            var toReturn = (await _vHealthwisePeriodRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            var toReturn = (await _vHealthwisePeriodRepository.Query(p => p.Id == id).SelectFirstOrDefaultAsync(false));
             return toReturn;
         }
 

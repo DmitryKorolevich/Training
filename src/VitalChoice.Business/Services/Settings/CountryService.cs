@@ -72,7 +72,7 @@ namespace VitalChoice.Business.Services.Settings
 
         public async Task<Country> GetCountryAsync(int id)
         {
-            Country toReturn = (await countryRepository.Query(x=>x.Id==id).SelectAsync(false)).FirstOrDefault();
+            Country toReturn = (await countryRepository.Query(x=>x.Id==id).SelectFirstOrDefaultAsync(false));
             if (toReturn != null)
             {
                 toReturn.States = await stateRepository.Query(x=>x.CountryCode == toReturn.CountryCode).SelectAsync(false);
@@ -140,7 +140,7 @@ namespace VitalChoice.Business.Services.Settings
             }
             else
             {
-                dbItem = (await countryRepository.Query(p=>p.Id==model.Id).SelectAsync(false)).FirstOrDefault();
+                dbItem = (await countryRepository.Query(p=>p.Id==model.Id).SelectFirstOrDefaultAsync(false));
             }
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
@@ -187,7 +187,7 @@ namespace VitalChoice.Business.Services.Settings
         public async Task<bool> DeleteCountryAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await countryRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await countryRepository.Query(p => p.Id == id).SelectFirstOrDefaultAsync(false));
             if (dbItem != null)
             {
                 string message = String.Empty;
@@ -252,7 +252,7 @@ namespace VitalChoice.Business.Services.Settings
             }
             else
             {
-                dbItem = (await stateRepository.Query(p => p.Id == model.Id).SelectAsync(false)).FirstOrDefault();
+                dbItem = (await stateRepository.Query(p => p.Id == model.Id).SelectFirstOrDefaultAsync(false));
             }
 
             if (dbItem != null && dbItem.StatusCode != RecordStatusCode.Deleted)
@@ -294,7 +294,7 @@ namespace VitalChoice.Business.Services.Settings
         public async Task<bool> DeleteStateAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await stateRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await stateRepository.Query(p => p.Id == id).SelectFirstOrDefaultAsync(false));
             if (dbItem != null)
             {
                 try

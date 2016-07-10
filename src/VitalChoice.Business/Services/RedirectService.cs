@@ -52,7 +52,7 @@ namespace VitalChoice.Business.Services
 
         public async Task<Redirect> GetRedirectAsync(int id)
         {
-            return (await _redirectRepository.Query(p => p.Id == id && p.StatusCode == RecordStatusCode.Active).SelectAsync(false)).FirstOrDefault();
+            return (await _redirectRepository.Query(p => p.Id == id && p.StatusCode == RecordStatusCode.Active).SelectFirstOrDefaultAsync(false));
         }
 
         public async Task<Redirect> UpdateRedirectAsync(Redirect item)
@@ -73,7 +73,7 @@ namespace VitalChoice.Business.Services
             }
             else
             {
-                var dbItem= (await _redirectRepository.Query(p =>p.Id == item.Id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
+                var dbItem= (await _redirectRepository.Query(p =>p.Id == item.Id && p.StatusCode != RecordStatusCode.Deleted).SelectFirstOrDefaultAsync(false));
                 if(dbItem!=null)
                 {
                     dbItem.IdEditedBy = item.IdEditedBy;
@@ -88,7 +88,7 @@ namespace VitalChoice.Business.Services
 
         public async Task<bool> DeleteRedirectAsync(int id, int idUser)
         {
-            var item = (await _redirectRepository.Query(p => p.Id == id).SelectAsync(false)).FirstOrDefault();
+            var item = (await _redirectRepository.Query(p => p.Id == id).SelectFirstOrDefaultAsync(false));
 
             if (item != null)
             {

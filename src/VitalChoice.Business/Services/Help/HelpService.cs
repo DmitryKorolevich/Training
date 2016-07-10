@@ -164,14 +164,14 @@ namespace VitalChoice.Business.Services.HelpService
         public async Task<HelpTicket> GetHelpTicketAsync(int id)
         {
             var condition = new HelpTicketQuery().NotDeleted().WithId(id);
-            var item = (await _helpTicketRepository.Query(condition).Include(x => x.Order).Include(x => x.Comments).SelectAsync(false)).FirstOrDefault();
+            var item = (await _helpTicketRepository.Query(condition).Include(x => x.Order).Include(x => x.Comments).SelectFirstOrDefaultAsync(false));
 
             if (item != null)
             {
                 item.Comments = item.Comments.Where(p => p.StatusCode != RecordStatusCode.Deleted).ToList();
 
                 var vCondition = new VHelpTicketQuery().WithId(id);
-                var vItem = (await _vHelpTicketRepository.Query(vCondition).SelectAsync(false)).FirstOrDefault();
+                var vItem = (await _vHelpTicketRepository.Query(vCondition).SelectFirstOrDefaultAsync(false));
                 if (vItem != null)
                 {
                     item.Customer = vItem.Customer;
@@ -212,7 +212,7 @@ namespace VitalChoice.Business.Services.HelpService
                     }
                     else
                     {
-                        var dbItem = (await _helpTicketRepository.Query(p => p.Id == item.Id).SelectAsync(false)).FirstOrDefault();
+                        var dbItem = (await _helpTicketRepository.Query(p => p.Id == item.Id).SelectFirstOrDefaultAsync(false));
                         if (dbItem != null)
                         {
                             item.IdOrder = dbItem.IdOrder;
@@ -241,7 +241,7 @@ namespace VitalChoice.Business.Services.HelpService
 
         public async Task<bool> DeleteHelpTicketAsync(int id)
         {
-            var item = (await _helpTicketRepository.Query(new HelpTicketQuery().NotDeleted().WithId(id)).SelectAsync(false)).FirstOrDefault();
+            var item = (await _helpTicketRepository.Query(new HelpTicketQuery().NotDeleted().WithId(id)).SelectFirstOrDefaultAsync(false));
 
             if (item != null)
             {
@@ -259,13 +259,13 @@ namespace VitalChoice.Business.Services.HelpService
         public async Task<HelpTicketComment> GetHelpTicketCommentAsync(int id)
         {
             var condition = new HelpTicketCommentQuery().NotDeleted().WithId(id);
-            var item = (await _helpTicketCommentRepository.Query(condition).SelectAsync(false)).FirstOrDefault();
+            var item = (await _helpTicketCommentRepository.Query(condition).SelectFirstOrDefaultAsync(false));
 
             if (item != null)
             {
                 item.HelpTicket = await GetHelpTicketAsync(item.IdHelpTicket);
 
-                var adminProfile = (await _adminProfileRepository.Query(p => p.Id == item.IdEditedBy).SelectAsync(false)).FirstOrDefault();
+                var adminProfile = (await _adminProfileRepository.Query(p => p.Id == item.IdEditedBy).SelectFirstOrDefaultAsync(false));
                 item.EditedBy = adminProfile?.AgentId;
             }
 
@@ -298,7 +298,7 @@ namespace VitalChoice.Business.Services.HelpService
                     }
                     else
                     {
-                        var dbItem = (await _helpTicketCommentRepository.Query(p => p.Id == item.Id).SelectAsync(false)).FirstOrDefault();
+                        var dbItem = (await _helpTicketCommentRepository.Query(p => p.Id == item.Id).SelectFirstOrDefaultAsync(false));
 
                         if (dbItem != null)
                         {
@@ -336,7 +336,7 @@ namespace VitalChoice.Business.Services.HelpService
             if (item.IdEditedBy.HasValue)
             {
                 var adminProfileCondition = new AdminProfileQuery().WithId(item.IdEditedBy.Value);
-                var adminProfile = (await _adminProfileRepository.Query(adminProfileCondition).Include(p => p.User).SelectAsync(false)).FirstOrDefault();
+                var adminProfile = (await _adminProfileRepository.Query(adminProfileCondition).Include(p => p.User).SelectFirstOrDefaultAsync(false));
                 if (adminProfile != null)
                 {
                     item.EditedBy = adminProfile.AgentId;
@@ -350,7 +350,7 @@ namespace VitalChoice.Business.Services.HelpService
 
         public async Task<bool> DeleteHelpTicketCommentAsync(int id, int? adminId)
         {
-            var item = (await _helpTicketCommentRepository.Query(new HelpTicketCommentQuery().NotDeleted().WithId(id)).SelectAsync(false)).FirstOrDefault();
+            var item = (await _helpTicketCommentRepository.Query(new HelpTicketCommentQuery().NotDeleted().WithId(id)).SelectFirstOrDefaultAsync(false));
 
             if (item != null)
             {
@@ -492,7 +492,7 @@ namespace VitalChoice.Business.Services.HelpService
         public async Task<BugTicket> GetBugTicketAsync(int id)
         {
             var condition = new BugTicketQuery().NotDeleted().WithId(id);
-            var item = (await _bugTicketRepository.Query(condition).Include(x => x.Comments).ThenInclude(x => x.Files).Include(x => x.Files).SelectAsync(false)).FirstOrDefault();
+            var item = (await _bugTicketRepository.Query(condition).Include(x => x.Comments).ThenInclude(x => x.Files).Include(x => x.Files).SelectFirstOrDefaultAsync(false));
 
             if (item != null)
             {
@@ -550,7 +550,7 @@ namespace VitalChoice.Business.Services.HelpService
                         await _bugTicketRepository.InsertGraphAsync(item);
                         await _notificationService.SendBugTicketUpdaingForSuperAdminAsync(new BugTicketEmail { Id = item.Id });
 
-                        var adminProfile = (await _adminProfileRepository.Query(p => p.Id == item.IdAddedBy).Include(p => p.User).SelectAsync(false)).FirstOrDefault();
+                        var adminProfile = (await _adminProfileRepository.Query(p => p.Id == item.IdAddedBy).Include(p => p.User).SelectFirstOrDefaultAsync(false));
                         if (adminProfile != null)
                         {
                             item.AddedBy = adminProfile.User.FirstName + " " + adminProfile.User.LastName;
@@ -560,7 +560,7 @@ namespace VitalChoice.Business.Services.HelpService
                     }
                     else
                     {
-                        var dbItem = (await _bugTicketRepository.Query(p => p.Id == item.Id).SelectAsync(false)).FirstOrDefault();
+                        var dbItem = (await _bugTicketRepository.Query(p => p.Id == item.Id).SelectFirstOrDefaultAsync(false));
                         if (dbItem != null)
                         {
                             if (isSuperAdmin.HasValue && !isSuperAdmin.Value && adminId != dbItem.IdAddedBy)
@@ -599,7 +599,7 @@ namespace VitalChoice.Business.Services.HelpService
 
         public async Task<bool> DeleteBugTicketAsync(int id,int adminId , int? userId = null)
         {
-            var item = (await _bugTicketRepository.Query(new BugTicketQuery().NotDeleted().WithId(id)).SelectAsync(false)).FirstOrDefault();
+            var item = (await _bugTicketRepository.Query(new BugTicketQuery().NotDeleted().WithId(id)).SelectFirstOrDefaultAsync(false));
 
             if (item != null)
             {
@@ -623,13 +623,13 @@ namespace VitalChoice.Business.Services.HelpService
         public async Task<BugTicketComment> GetBugTicketCommentAsync(int id)
         {
             var condition = new BugTicketCommentQuery().NotDeleted().WithId(id);
-            var item = (await _bugTicketCommentRepository.Query(condition).Include(x => x.Files).SelectAsync(false)).FirstOrDefault();
+            var item = (await _bugTicketCommentRepository.Query(condition).Include(x => x.Files).SelectFirstOrDefaultAsync(false));
 
             if (item != null)
             {
                 item.BugTicket = await GetBugTicketAsync(item.IdBugTicket);
 
-                var adminProfile = (await _adminProfileRepository.Query(p => p.Id == item.IdEditedBy).SelectAsync(false)).FirstOrDefault();
+                var adminProfile = (await _adminProfileRepository.Query(p => p.Id == item.IdEditedBy).SelectFirstOrDefaultAsync(false));
 
                 if (adminProfile != null)
                 {
@@ -668,7 +668,7 @@ namespace VitalChoice.Business.Services.HelpService
                     }
                     else
                     {
-                        var dbItem = (await _bugTicketCommentRepository.Query(p => p.Id == item.Id).SelectAsync(false)).FirstOrDefault();
+                        var dbItem = (await _bugTicketCommentRepository.Query(p => p.Id == item.Id).SelectFirstOrDefaultAsync(false));
                         if (dbItem != null)
                         {
                             item.Order = dbItem.Order;
@@ -699,7 +699,7 @@ namespace VitalChoice.Business.Services.HelpService
             }
 
             var adminProfileCondition = new AdminProfileQuery().WithId(item.IdEditedBy);
-            var adminProfile = (await _adminProfileRepository.Query(adminProfileCondition).Include(p => p.User).SelectAsync(false)).FirstOrDefault();
+            var adminProfile = (await _adminProfileRepository.Query(adminProfileCondition).Include(p => p.User).SelectFirstOrDefaultAsync(false));
             if (adminProfile != null)
             {
                 item.EditedBy = adminProfile.User.FirstName + " " + adminProfile.User.LastName;
@@ -723,7 +723,7 @@ namespace VitalChoice.Business.Services.HelpService
 
         public async Task<bool> DeleteBugTicketCommentAsync(int id, int adminId)
         {
-            var item = (await _bugTicketCommentRepository.Query(new BugTicketCommentQuery().NotDeleted().WithId(id)).SelectAsync(false)).FirstOrDefault();
+            var item = (await _bugTicketCommentRepository.Query(new BugTicketCommentQuery().NotDeleted().WithId(id)).SelectFirstOrDefaultAsync(false));
 
             if (item != null)
             {

@@ -183,7 +183,7 @@ namespace VitalChoice.Business.Services.Content
         public async Task<Article> GetArticleByIdOldAsync(int id)
         {
             ArticleQuery query = new ArticleQuery().WithIdOld(id).NotDeleted();
-            var toReturn = (await _articleRepository.Query(query).SelectAsync(false)).FirstOrDefault();
+            var toReturn = (await _articleRepository.Query(query).SelectFirstOrDefaultAsync(false));
 
             return toReturn;
         }
@@ -289,7 +289,7 @@ namespace VitalChoice.Business.Services.Content
             {
                 var articleRepository = uow.RepositoryAsync<Article>();
                 var articleToContentCategoryRepository = uow.RepositoryAsync<ArticleToContentCategory>();
-                var dbItem = (await articleRepository.Query(p => p.Id == id).Include(p => p.ArticlesToContentCategories).SelectAsync(false)).FirstOrDefault();
+                var dbItem = (await articleRepository.Query(p => p.Id == id).Include(p => p.ArticlesToContentCategories).SelectFirstOrDefaultAsync(false));
                 if (dbItem != null)
                 {
                     var categories =
@@ -340,7 +340,7 @@ namespace VitalChoice.Business.Services.Content
         public async Task<bool> DeleteArticleAsync(int id)
         {
             bool toReturn = false;
-            var dbItem = (await _articleRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectAsync(false)).FirstOrDefault();
+            var dbItem = (await _articleRepository.Query(p => p.Id == id && p.StatusCode != RecordStatusCode.Deleted).SelectFirstOrDefaultAsync(false));
             if (dbItem != null)
             {
                 dbItem.StatusCode = RecordStatusCode.Deleted;

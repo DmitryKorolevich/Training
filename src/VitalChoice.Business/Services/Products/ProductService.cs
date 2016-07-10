@@ -141,7 +141,7 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<ProductContent> SelectContentForTransfer(int id)
         {
-            return (await _productContentRepository.Query(p => p.Id == id).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
+            return (await _productContentRepository.Query(p => p.Id == id).Include(p => p.ContentItem).SelectFirstOrDefaultAsync(false));
         }
 
         public async Task<ICollection<ProductContent>> SelectContentsForTransfer()
@@ -1257,7 +1257,7 @@ namespace VitalChoice.Business.Services.Products
                         var dbProductContent = (await
                             _productContentRepository.Query(p => p.Id == model.Id && p.StatusCode != RecordStatusCode.Deleted)
                                 .Include(p => p.ContentItem)
-                                .SelectAsync(true)).FirstOrDefault();
+                                .SelectFirstOrDefaultAsync(true));
                         if (dbProductContent != null)
                         {
                             await Validate(productContent);
@@ -1343,7 +1343,7 @@ namespace VitalChoice.Business.Services.Products
             if (productContent.MasterContentItemId == 0)
             {
                 //set predefined master
-                var contentType = (await _contentTypeRepository.Query(p => p.Id == (int)ContentType.Product).SelectAsync(false)).FirstOrDefault();
+                var contentType = (await _contentTypeRepository.Query(p => p.Id == (int)ContentType.Product).SelectFirstOrDefaultAsync(false));
                 if (contentType?.DefaultMasterContentItemId != null)
                 {
                     productContent.MasterContentItemId = contentType.DefaultMasterContentItemId.Value;
@@ -1383,7 +1383,7 @@ namespace VitalChoice.Business.Services.Products
             var result = await base.DeleteAsync(uow, id, physically);
             if (result)
             {
-                var productContent = (await _productContentRepository.Query(p => p.Id == id).SelectAsync(true)).FirstOrDefault();
+                var productContent = (await _productContentRepository.Query(p => p.Id == id).SelectFirstOrDefaultAsync(true));
                 if (productContent != null && productContent.StatusCode != RecordStatusCode.Deleted)
                 {
                     productContent.StatusCode = RecordStatusCode.Deleted;
@@ -1397,7 +1397,7 @@ namespace VitalChoice.Business.Services.Products
         {
             ProductContentTransferEntity toReturn = null;
 
-            var content = (await _productContentRepository.Query(p => p.IdOld == id).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
+            var content = (await _productContentRepository.Query(p => p.IdOld == id).Include(p => p.ContentItem).SelectFirstOrDefaultAsync(false));
             if (content != null)
             {
                 var ecomProduct = await this.SelectAsync(content.Id);
@@ -1468,7 +1468,7 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<ProductContentTransferEntity> SelectTransferAsync(string url, bool withDefaults = false)
         {
-            var productContent = (await _productContentRepository.Query(p => p.Url.Equals(url)).Include(p => p.ContentItem).SelectAsync(false)).FirstOrDefault();
+            var productContent = (await _productContentRepository.Query(p => p.Url.Equals(url)).Include(p => p.ContentItem).SelectFirstOrDefaultAsync(false));
 
             var toReturn = new ProductContentTransferEntity
             {

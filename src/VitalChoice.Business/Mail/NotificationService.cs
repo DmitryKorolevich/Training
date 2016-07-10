@@ -302,7 +302,7 @@ namespace VitalChoice.Business.Mail
 
         public async Task<bool> UpdateUnsubscribeEmailAsync(int idNewsletter, string email, bool unsubscribe)
         {
-            var dbItem = (await _newsletterBlockedEmailRepository.Query(p => p.IdNewsletter == idNewsletter && p.Email == email).SelectAsync(true)).FirstOrDefault();
+            var dbItem = (await _newsletterBlockedEmailRepository.Query(p => p.IdNewsletter == idNewsletter && p.Email == email).SelectFirstOrDefaultAsync(true));
             if (unsubscribe)
             {
                 if (dbItem == null)

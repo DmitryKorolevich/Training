@@ -48,7 +48,7 @@ namespace VitalChoice.Business.Services.Content
 
 	    public async Task<ContentItem> GetContentItemAsync(int id)
 	    {
-	        return (await contentItemRepository.Query(c => c.Id == id).SelectAsync(false)).FirstOrDefault();
+	        return (await contentItemRepository.Query(c => c.Id == id).SelectFirstOrDefaultAsync(false));
         }
 
 	    public virtual async Task<MasterContentItem> UpdateMasterContentItemAsync(MasterContentItem itemToUpdate)
@@ -59,7 +59,7 @@ namespace VitalChoice.Business.Services.Content
 
 	    public virtual async Task<MasterContentItem> GetMasterContentItemAsync(int id)
 	    {
-	        return (await masterContentItemRepository.Query(m => m.Id == id).SelectAsync(false)).FirstOrDefault();
+	        return (await masterContentItemRepository.Query(m => m.Id == id).SelectFirstOrDefaultAsync(false));
 	    }
 
 	    #endregion
