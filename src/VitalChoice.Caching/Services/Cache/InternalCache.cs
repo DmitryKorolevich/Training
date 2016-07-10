@@ -408,9 +408,9 @@ namespace VitalChoice.Caching.Services.Cache
             return true;
         }
 
-        public bool ItemExist(EntityKey pk)
+        public bool ItemExistWithoutRelations(EntityKey pk)
         {
-            return CacheStorage.AllCacheDatas.Any(d => d.ItemExist(pk));
+            return CacheStorage.AllCacheDatas.Any(d => d.Relations.Relations.Count == 0 && d.ItemExist(pk));
         }
 
         public bool ItemExistAndNotNull(EntityKey pk)
