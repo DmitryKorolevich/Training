@@ -129,8 +129,14 @@
 					<input type="image" src="/Assets/images/mag.jpg" />
 				</form>
 			</div>
-			@*@await Component.InvokeAsync("Menu")*@
-            @await Component.InvokeAsync("Area", new { name = "Top Menu" })
+			@if (User.Identity.IsAuthenticated && User.IsInRole(IdentityConstants.WholesaleCustomer))
+            {
+                <text>@await Component.InvokeAsync("Area", new { name = "Wholesale Top Mega Menu" })</text>
+            }
+            else
+            {
+                <text>@await Component.InvokeAsync("Area", new { name = "Retail Top Mega Menu" })</text>
+            }
             @if (ViewBag.HideMenuShadow != true)
             {
                 <div class="nav-shadow"></div>

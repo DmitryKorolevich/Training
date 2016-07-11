@@ -915,3 +915,18 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name]='Wholesale Top Mega Menu')
+BEGIN
+
+	INSERT INTO [dbo].[ContentAreas]
+	([Name], [Template], [StatusCode], [Created], [Updated])
+	SELECT N'Wholesale Top Mega Menu', [Template], 2, GETDATE(), GETDATE() FROM [dbo].[ContentAreas] WHERE [Name] = 'Top Menu'
+
+	UPDATE [dbo].[ContentAreas]
+	SET [Name] = N'Retail Top Mega Menu'
+	WHERE [Name] = 'Top Menu'
+
+END
+
+GO
