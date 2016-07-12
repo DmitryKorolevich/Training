@@ -23,7 +23,7 @@ net stop jobsService
 $RootBuild = (Get-Item -Path ".\${Src}" -Verbose).FullName
 echo "Clean deploy directory..."
 ls -Path ${RootDeploy} -Include * | remove-Item -recurse 
-cp "${RootBuild}\src\nlog.config" "${RootDeploy}\nlog.config"
+cp "${RootBuild}\src\VitalChoice.Jobs\nlog.config" "${RootDeploy}\nlog.config"
 
 Push-Location "${RootBuild}"
 echo "Working directory: ${RootBuild}"
