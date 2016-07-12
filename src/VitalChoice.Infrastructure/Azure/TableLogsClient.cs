@@ -123,7 +123,7 @@ namespace VitalChoice.Infrastructure.Azure
         static TableLogEntity()
         {
             MessageProperties =
-                typeof(TableLogEntity).GetRuntimeProperties()
+                typeof(TableLogEntity).GetTypeInfo().GetProperties(BindingFlags.Instance | BindingFlags.Public)
                     .Where(p => p.Name.StartsWith("Message"))
                     .OrderBy(p => int.Parse(p.Name.Substring("Message".Length)))
                     .Select(
