@@ -150,12 +150,11 @@ namespace VitalChoice.ExportService.Services
 
         public async Task ExportRefund(OrderRefundDynamic order)
         {
-            var context = await _refundService.CalculateRefundOrder(order);
             if (order.OrderStatus != OrderStatus.Processed)
             {
                 throw new ApiException($"Cannot export order {order.Id}. Invalid status: {order.OrderStatus}");
             }
-            var veracoreOrder = await CreateExportFromRefund(order, context);
+            var veracoreOrder = await CreateExportFromRefund(order);
             if (_client.AddOrder(veracoreOrder) == null)
             {
                 throw new ApiException("Export failed.");
@@ -512,7 +511,7 @@ namespace VitalChoice.ExportService.Services
             }
         }
 
-        private static void ParseProductInfo(OrderRefundDataContext context, VeraCoreExportOrder exportOrder)
+        private static void ParseProductInfo(OrderRefundDynamic refund, VeraCoreExportOrder exportOrder)
         {
             exportOrder.Offers = new[]
             {
@@ -524,7 +523,7 @@ namespace VitalChoice.ExportService.Services
                     },
                     LineNumber = 0,
                     Quantity = 1,
-                    UnitPrice = -context.Total,
+                    UnitPrice = -refund.Total,
                     ProductDetails = new[]
                     {
                         new OrderProductDetail
@@ -663,7 +662,7 @@ namespace VitalChoice.ExportService.Services
             };
         }
 
-        private async Task<VeraCoreExportOrder> CreateExportFromRefund(OrderRefundDynamic order, OrderRefundDataContext context)
+        private async Task<VeraCoreExportOrder> CreateExportFromRefund(OrderRefundDynamic refund)
         {
             var result = new VeraCoreExportOrder
             {
@@ -676,11 +675,11 @@ namespace VitalChoice.ExportService.Services
                     PaymentType = new PaymentType()
                 }
             };
-            ParseGeneralInfo(order, result, ExportSide.All);
-            ParsePaymentInfo(order, result);
-            await ParseBillingInfo(order.PaymentMethod, order.Customer, result);
-            await ParseShippingInfo(order, result);
-            ParseProductInfo(context, result);
+            ParseGeneralInfo(refund, result, ExportSide.All);
+            ParsePaymentInfo(refund, result);
+            await ParseBillingInfo(refund.PaymentMethod, refund.Customer, result);
+            await ParseShippingInfo(refund, result);
+            ParseProductInfo(refund, result);
 
             return result;
         }
