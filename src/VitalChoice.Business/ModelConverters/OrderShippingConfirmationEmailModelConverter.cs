@@ -1,27 +1,88 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.Extensions.Options;
-using VitalChoice.Business.Helpers;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
-using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Options;
-using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services.Customers;
 
 namespace VitalChoice.Business.ModelConverters
 {
+    public class RefundShippingConfirmationEmailModelConverter : BaseModelConverter<OrderShippingConfirmationEmail, OrderRefundDynamic>
+    {
+        private readonly ICustomerService _customerService;
+        private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
+        private readonly IOptions<AppOptions> _options;
+        private readonly ICountryNameCodeResolver _countryNameCodeResolver;
+
+        public RefundShippingConfirmationEmailModelConverter(
+            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
+            ICustomerService customerService,
+            IOptions<AppOptions> options, ICountryNameCodeResolver countryNameCodeResolver)
+        {
+            _customerService = customerService;
+            _addressMapper = addressMapper;
+            _options = options;
+            _countryNameCodeResolver = countryNameCodeResolver;
+        }
+
+        public override async Task DynamicToModelAsync(OrderShippingConfirmationEmail model, OrderRefundDynamic dynamic)
+        {
+            dynamic.Customer = await _customerService.SelectAsync(dynamic.Customer.Id);
+            model.PublicHost = _options.Value.PublicHost;
+
+            model.Email = dynamic.Customer.Email;
+
+            model.TrackingInfoItems = new List<TrackingInfoEmailItem>
+            {
+                new TrackingInfoEmailItem
+                {
+                    Number = "REFUND",
+                    ServiceUrl = string.Empty
+                }
+            };
+            model.IsPerishable = false;
+
+            //Dates in the needed timezone
+            model.DateCreated = TimeZoneInfo.ConvertTime(model.DateCreated, TimeZoneInfo.Local, TimeZoneHelper.PstTimeZoneInfo);
+
+            if (dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.NoCharge && dynamic.Customer.ProfileAddress != null)
+            {
+                model.BillToAddress = await _addressMapper.ToModelAsync<AddressEmailItem>(dynamic.Customer.ProfileAddress);
+                model.BillToAddress.Country = _countryNameCodeResolver.GetCountryName(dynamic.Customer.ProfileAddress);
+                model.BillToAddress.StateCodeOrCounty = _countryNameCodeResolver.GetRegionOrStateCode(dynamic.Customer.ProfileAddress);
+            }
+            else if (dynamic.PaymentMethod?.Address != null)
+            {
+                model.BillToAddress = await _addressMapper.ToModelAsync<AddressEmailItem>(dynamic.PaymentMethod.Address);
+                model.BillToAddress.Country = _countryNameCodeResolver.GetCountryName(dynamic.PaymentMethod.Address);
+                model.BillToAddress.StateCodeOrCounty = _countryNameCodeResolver.GetRegionOrStateCode(dynamic.PaymentMethod.Address);
+            }
+
+            if (dynamic.ShippingAddress != null)
+            {
+                model.ShipToAddress = await _addressMapper.ToModelAsync<AddressEmailItem>(dynamic.ShippingAddress);
+                model.ShipToAddress.Country = _countryNameCodeResolver.GetCountryName(dynamic.ShippingAddress);
+                model.ShipToAddress.StateCodeOrCounty = _countryNameCodeResolver.GetRegionOrStateCode(dynamic.ShippingAddress);
+            }
+        }
+
+        public override Task ModelToDynamicAsync(OrderShippingConfirmationEmail model, OrderRefundDynamic dynamic)
+        {
+            return TaskCache.CompletedTask;
+        }
+    }
+
     public class OrderShippingConfirmationEmailModelConverter : BaseModelConverter<OrderShippingConfirmationEmail, OrderDynamic>
     {
         private readonly ICustomerService _customerService;

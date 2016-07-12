@@ -54,6 +54,7 @@ namespace VitalChoice.Business.Services.VeraCore
         private readonly INotificationService _notificationService;
         private readonly IAvalaraTax _avalaraTax;
         private readonly OrderMapper _orderMapper;
+        private readonly OrderRefundMapper _refundMapper;
         private readonly Regex _shipFileNamePattern;
         private readonly Regex _cancelFileNamePattern;
         private readonly Regex _numberPattern;
@@ -74,7 +75,7 @@ namespace VitalChoice.Business.Services.VeraCore
             INotificationService notificationService,
             IAvalaraTax avalaraTax,
             OrderMapper orderMapper,
-            ILoggerProviderExtended logger, IWorkflowFactory treeFactory, ICustomerService customerService)
+            ILoggerProviderExtended logger, IWorkflowFactory treeFactory, ICustomerService customerService, OrderRefundMapper refundMapper)
         {
             _options = options;
             _veraCoreProcessItemRepository = veraCoreProcessItemRepository;
@@ -93,6 +94,7 @@ namespace VitalChoice.Business.Services.VeraCore
             _orderMapper = orderMapper;
             _treeFactory = treeFactory;
             _customerService = customerService;
+            _refundMapper = refundMapper;
             _logger = logger.CreateLogger<VeraCoreSFTPService>();
         }
 
@@ -102,7 +104,6 @@ namespace VitalChoice.Business.Services.VeraCore
             await ProcessFiles();
             await ProcessQueue();
             _veraCoreFilesCacheService.MakeBackup();
-
         }
 
         public async Task ProcessFiles()
@@ -240,8 +241,15 @@ namespace VitalChoice.Business.Services.VeraCore
         {
             var shipmentNotificationItems = await ProcessOrderShipmentPackagesUpdate(items);
             var processingResult = shipmentNotificationItems.Count > 0;
-            //BUG: refunds wont work here
-            var orders = await _orderService.SelectAsync(shipmentNotificationItems.Select(p => p.IdOrder).Distinct().ToList(), true);
+            var orderIds = shipmentNotificationItems.Select(p => p.IdOrder).Distinct().ToList();
+            var dbRefundOrders =
+                await _orderRepository.Query(o => orderIds.Contains(o.Id) && o.IdObjectType == (int) OrderType.Refund).SelectAsync(false);
+
+            var refunds = await _orderRefundService.SelectAsync(dbRefundOrders.Select(r => r.Id).ToList(), true);
+
+            await SendShipmentNotifications(shipmentNotificationItems, refunds);
+
+            var orders = await _orderService.SelectAsync(orderIds.ExceptKeyedWith(dbRefundOrders, i => i, r => r.Id).ToList(), true);
             var customers =
                 (await _customerService.SelectAsync(orders.Select(o => o.Customer.Id).Distinct().ToList(), true)).ToDictionary(c => c.Id);
             foreach (var order in orders)
@@ -278,9 +286,28 @@ namespace VitalChoice.Business.Services.VeraCore
                             Order = order
                         });
                         break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
                 }
+            }
+        }
+
+        private async Task SendShipmentNotifications(ICollection<ShipmentNotificationItem> shipmentNotificationItems,
+            ICollection<OrderRefundDynamic> orders)
+        {
+            if (shipmentNotificationItems.Count > 0)
+            {
+                var emailModels = new List<OrderShippingConfirmationEmail>();
+                foreach (var veraCoreShipmentNotificationItem in shipmentNotificationItems)
+                {
+                    var order = orders.FirstOrDefault(p => p.Id == veraCoreShipmentNotificationItem.IdOrder);
+                    if (order != null)
+                    {
+                        var emailModel = await _refundMapper.ToModelAsync<OrderShippingConfirmationEmail>(order);
+                        emailModel.ToEmail = emailModel.Email;
+                        emailModels.Add(emailModel);
+                    }
+                }
+
+                await _notificationService.SendOrderShippingConfirmationEmailsAsync(emailModels);
             }
         }
 
@@ -370,7 +397,11 @@ namespace VitalChoice.Business.Services.VeraCore
                                     var sku = skus.FirstOrDefault(pp => pp.Code == itemInformation.VendorProductID);
                                     if (sku == null)
                                     {
-                                        _logger.LogError("Update notification - missed sku code");
+                                        if (itemInformation.VendorProductID != "REFUND")
+                                        {
+                                            _logger.LogError(
+                                                $"Update notification - missed sku code {itemInformation.VendorProductID} in order {orderId.Value}");
+                                        }
                                         missedSku = true;
                                         parsed = false;
                                         break;
@@ -419,7 +450,7 @@ namespace VitalChoice.Business.Services.VeraCore
                                                                         order.NPOrderStatus != OrderStatus.Shipped))))
                                 {
                                     _logger.LogError(
-                                        $"Update notification - invalid order or shipment notification(order with id - {orderId} not found)");
+                                        $"Update notification - invalid order or shipment notification(order {orderId} not found)");
                                     await IncrementAttempt(item);
                                     continue;
                                 }
@@ -480,11 +511,10 @@ namespace VitalChoice.Business.Services.VeraCore
 
         private async Task<bool> ProcessCancel(ICollection<VeraCoreProcessItem> items)
         {
-            var toReturn = false;
+            bool updatedAtLeastOne = false;
             var serializer = new XmlSerializer(typeof(CancelAck));
             foreach (var item in items)
             {
-                var parsed = true;
                 int? orderId = null;
                 POrderType? pOrderType = null;
                 try
@@ -492,7 +522,7 @@ namespace VitalChoice.Business.Services.VeraCore
                     var data = Encoding.ASCII.GetBytes(item.Data);
                     using (MemoryStream stream = new MemoryStream(data))
                     {
-                        var cancelNotice = (CancelAck)serializer.Deserialize(stream);
+                        var cancelNotice = (CancelAck) serializer.Deserialize(stream);
                         if (cancelNotice.CanceledComplete.ToLower() == "y")
                         {
                             string sNumber = cancelNotice.OrderID;
@@ -513,45 +543,38 @@ namespace VitalChoice.Business.Services.VeraCore
                             if (!orderId.HasValue)
                             {
                                 _logger.LogError("Cancel notification - missed id order");
-                                parsed = false;
-                                break;
+                                continue;
                             }
 
                             //Parsed without exceptions
-                            if (parsed)
-                            {
-                                var order = (await _orderRepository.Query(p => p.Id == orderId && p.StatusCode!=(int)RecordStatusCode.Deleted)
+                            var order =
+                                (await _orderRepository.Query(p => p.Id == orderId && p.StatusCode != (int) RecordStatusCode.Deleted)
                                     .SelectFirstOrDefaultAsync(false));
-                                if (order == null || (!pOrderType.HasValue && order.OrderStatus!=OrderStatus.Exported) ||
-                                    (pOrderType==POrderType.P && order.POrderStatus != OrderStatus.Exported) ||
-                                    (pOrderType == POrderType.NP && order.NPOrderStatus != OrderStatus.Exported))
-                                {
-                                    _logger.LogError(
-                                        $"Update cancel - invalid order or cancel notification(order id - {orderId})");
-                                    await IncrementAttempt(item);
-                                    continue;
-                                }
-
-                                if (order.IdObjectType == (int) OrderType.Refund)
-                                {
-                                    await _orderRefundService.CancelRefundOrderAsync(order.Id);
-                                }
-                                else
-                                {
-                                    await _orderService.CancelOrderAsync(order.Id, pOrderType);
-                                }
-
-                                await _veraCoreProcessItemRepository.DeleteAsync(item.Id);
-
-                                TaxGetType type;
-                                var orderCode =_orderService.GenerateOrderCode(pOrderType, order.Id, out type);
-                                await _avalaraTax.CancelTax(orderCode);
-                            }
-
-                            if (!parsed)
+                            if (order == null || (!pOrderType.HasValue && order.OrderStatus != OrderStatus.Exported) ||
+                                (pOrderType == POrderType.P && order.POrderStatus != OrderStatus.Exported) ||
+                                (pOrderType == POrderType.NP && order.NPOrderStatus != OrderStatus.Exported))
                             {
+                                _logger.LogError(
+                                    $"Update cancel - invalid order or cancel notification(order id - {orderId})");
                                 await IncrementAttempt(item);
+                                continue;
                             }
+
+                            if (order.IdObjectType == (int) OrderType.Refund)
+                            {
+                                await _orderRefundService.CancelRefundOrderAsync(order.Id);
+                            }
+                            else
+                            {
+                                await _orderService.CancelOrderAsync(order.Id, pOrderType);
+                            }
+
+                            await _veraCoreProcessItemRepository.DeleteAsync(item.Id);
+
+                            TaxGetType type;
+                            var orderCode = _orderService.GenerateOrderCode(pOrderType, order.Id, out type);
+                            await _avalaraTax.CancelTax(orderCode);
+                            updatedAtLeastOne = true;
                         }
                     }
                 }
@@ -563,7 +586,7 @@ namespace VitalChoice.Business.Services.VeraCore
                 }
             }
 
-            return toReturn;
+            return updatedAtLeastOne;
         }
     }
 }
