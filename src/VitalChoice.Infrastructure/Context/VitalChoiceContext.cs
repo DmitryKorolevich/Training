@@ -42,7 +42,7 @@ namespace VitalChoice.Infrastructure.Context
             var connectionString = (new SqlConnectionStringBuilder
             {
                 DataSource = _options.Value.Connection.Server,
-                // TODO: Currently nested queries are run while processing the results of outer queries
+                // NOTTODO: Currently nested queries are run while processing the results of outer queries (we are ok to use the same connection)
                 // This either requires MARS or creation of a new connection for each query. Currently using
                 // MARS since cloning connections is known to be problematic.
                 MultipleActiveResultSets = true,

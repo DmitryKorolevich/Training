@@ -25,7 +25,7 @@ namespace VC.Admin.ModelConverters
 
         public override Task ModelToDynamicAsync(SkuListItemModel model, SkuDynamic dynamic)
         {
-            throw new NotImplementedException();
+            return TaskCache.CompletedTask;
         }
     }
 }

@@ -104,7 +104,7 @@ namespace Authorize.Net.Utility
 
         private void CheckForErrors(ANetApiResponse response)
         {
-            if (response.GetType() == typeof (createCustomerProfileTransactionResponse))
+            if (response.GetType() == typeof(createCustomerProfileTransactionResponse))
             {
                 //there's a directResponse we need to find...
                 var thingy = (createCustomerProfileTransactionResponse) response;
@@ -156,131 +156,123 @@ namespace Authorize.Net.Utility
 
             ANetApiResponse apiResponse = null;
 
-            try
+            var reader = new StringReader(xmldoc.DocumentElement.OuterXml);
+            // Use the root node to determine the type of response object to create
+            switch (xmldoc.DocumentElement.Name)
             {
-                var reader = new StringReader(xmldoc.DocumentElement.OuterXml);
-                // Use the root node to determine the type of response object to create
-                switch (xmldoc.DocumentElement.Name)
-                {
-                    case "getSettledBatchListResponse":
-                        serializer = new XmlSerializer(typeof (getSettledBatchListResponse));
-                        apiResponse = (getSettledBatchListResponse) serializer.Deserialize(reader);
-                        break;
-                    case "getTransactionDetailsResponse":
-                        serializer = new XmlSerializer(typeof (getTransactionDetailsResponse));
-                        apiResponse = (getTransactionDetailsResponse) serializer.Deserialize(reader);
-                        break;
-                    case "getTransactionListResponse":
-                        serializer = new XmlSerializer(typeof (getTransactionListResponse));
-                        apiResponse = (getTransactionListResponse) serializer.Deserialize(reader);
-                        break;
+                case "getSettledBatchListResponse":
+                    serializer = new XmlSerializer(typeof(getSettledBatchListResponse));
+                    apiResponse = (getSettledBatchListResponse) serializer.Deserialize(reader);
+                    break;
+                case "getTransactionDetailsResponse":
+                    serializer = new XmlSerializer(typeof(getTransactionDetailsResponse));
+                    apiResponse = (getTransactionDetailsResponse) serializer.Deserialize(reader);
+                    break;
+                case "getTransactionListResponse":
+                    serializer = new XmlSerializer(typeof(getTransactionListResponse));
+                    apiResponse = (getTransactionListResponse) serializer.Deserialize(reader);
+                    break;
 
-                    case "getUnsettledTransactionListResponse":
-                        serializer = new XmlSerializer(typeof (getUnsettledTransactionListResponse));
-                        apiResponse = (getUnsettledTransactionListResponse) serializer.Deserialize(reader);
-                        break;
+                case "getUnsettledTransactionListResponse":
+                    serializer = new XmlSerializer(typeof(getUnsettledTransactionListResponse));
+                    apiResponse = (getUnsettledTransactionListResponse) serializer.Deserialize(reader);
+                    break;
 
-                    case "getBatchStatisticsResponse":
-                        serializer = new XmlSerializer(typeof (getBatchStatisticsResponse));
-                        apiResponse = (getBatchStatisticsResponse) serializer.Deserialize(reader);
-                        break;
+                case "getBatchStatisticsResponse":
+                    serializer = new XmlSerializer(typeof(getBatchStatisticsResponse));
+                    apiResponse = (getBatchStatisticsResponse) serializer.Deserialize(reader);
+                    break;
 
-                    case "createCustomerPaymentProfileResponse":
-                        serializer = new XmlSerializer(typeof (createCustomerPaymentProfileResponse));
-                        apiResponse = (createCustomerPaymentProfileResponse) serializer.Deserialize(reader);
-                        break;
-                    case "createCustomerProfileResponse":
-                        serializer = new XmlSerializer(typeof (createCustomerProfileResponse));
-                        apiResponse = (createCustomerProfileResponse) serializer.Deserialize(reader);
-                        break;
-                    case "createCustomerProfileTransactionResponse":
-                        serializer = new XmlSerializer(typeof (createCustomerProfileTransactionResponse));
-                        apiResponse = (createCustomerProfileTransactionResponse) serializer.Deserialize(reader);
-                        break;
-                    case "createCustomerShippingAddressResponse":
-                        serializer = new XmlSerializer(typeof (createCustomerShippingAddressResponse));
-                        apiResponse = (createCustomerShippingAddressResponse) serializer.Deserialize(reader);
-                        break;
-                    case "deleteCustomerPaymentProfileResponse":
-                        serializer = new XmlSerializer(typeof (deleteCustomerPaymentProfileResponse));
-                        apiResponse = (deleteCustomerPaymentProfileResponse) serializer.Deserialize(reader);
-                        break;
-                    case "deleteCustomerProfileResponse":
-                        serializer = new XmlSerializer(typeof (deleteCustomerProfileResponse));
-                        apiResponse = (deleteCustomerProfileResponse) serializer.Deserialize(reader);
-                        break;
-                    case "deleteCustomerShippingAddressResponse":
-                        serializer = new XmlSerializer(typeof (deleteCustomerShippingAddressResponse));
-                        apiResponse = (deleteCustomerShippingAddressResponse) serializer.Deserialize(reader);
-                        break;
-                    case "getCustomerPaymentProfileResponse":
-                        serializer = new XmlSerializer(typeof (getCustomerPaymentProfileResponse));
-                        apiResponse = (getCustomerPaymentProfileResponse) serializer.Deserialize(reader);
-                        break;
-                    case "getCustomerProfileIdsResponse":
-                        serializer = new XmlSerializer(typeof (getCustomerProfileIdsResponse));
-                        apiResponse = (getCustomerProfileIdsResponse) serializer.Deserialize(reader);
-                        break;
-                    case "getCustomerProfileResponse":
-                        serializer = new XmlSerializer(typeof (getCustomerProfileResponse));
-                        apiResponse = (getCustomerProfileResponse) serializer.Deserialize(reader);
-                        break;
-                    case "getCustomerShippingAddressResponse":
-                        serializer = new XmlSerializer(typeof (getCustomerShippingAddressResponse));
-                        apiResponse = (getCustomerShippingAddressResponse) serializer.Deserialize(reader);
-                        break;
-                    case "isAliveResponse":
-                        serializer = new XmlSerializer(typeof (isAliveResponse));
-                        apiResponse = (isAliveResponse) serializer.Deserialize(reader);
-                        break;
-                    case "updateCustomerPaymentProfileResponse":
-                        serializer = new XmlSerializer(typeof (updateCustomerPaymentProfileResponse));
-                        apiResponse = (updateCustomerPaymentProfileResponse) serializer.Deserialize(reader);
-                        break;
-                    case "updateCustomerProfileResponse":
-                        serializer = new XmlSerializer(typeof (updateCustomerProfileResponse));
-                        apiResponse = (updateCustomerProfileResponse) serializer.Deserialize(reader);
-                        break;
-                    case "updateCustomerShippingAddressResponse":
-                        serializer = new XmlSerializer(typeof (updateCustomerShippingAddressResponse));
-                        apiResponse = (updateCustomerShippingAddressResponse) serializer.Deserialize(reader);
-                        break;
-                    case "validateCustomerPaymentProfileResponse":
-                        serializer = new XmlSerializer(typeof (validateCustomerPaymentProfileResponse));
-                        apiResponse = (validateCustomerPaymentProfileResponse) serializer.Deserialize(reader);
-                        break;
-                    //ARB response
-                    case "ARBCreateSubscriptionResponse":
-                        serializer = new XmlSerializer(typeof (ARBCreateSubscriptionResponse));
-                        apiResponse = (ARBCreateSubscriptionResponse) serializer.Deserialize(reader);
-                        break;
+                case "createCustomerPaymentProfileResponse":
+                    serializer = new XmlSerializer(typeof(createCustomerPaymentProfileResponse));
+                    apiResponse = (createCustomerPaymentProfileResponse) serializer.Deserialize(reader);
+                    break;
+                case "createCustomerProfileResponse":
+                    serializer = new XmlSerializer(typeof(createCustomerProfileResponse));
+                    apiResponse = (createCustomerProfileResponse) serializer.Deserialize(reader);
+                    break;
+                case "createCustomerProfileTransactionResponse":
+                    serializer = new XmlSerializer(typeof(createCustomerProfileTransactionResponse));
+                    apiResponse = (createCustomerProfileTransactionResponse) serializer.Deserialize(reader);
+                    break;
+                case "createCustomerShippingAddressResponse":
+                    serializer = new XmlSerializer(typeof(createCustomerShippingAddressResponse));
+                    apiResponse = (createCustomerShippingAddressResponse) serializer.Deserialize(reader);
+                    break;
+                case "deleteCustomerPaymentProfileResponse":
+                    serializer = new XmlSerializer(typeof(deleteCustomerPaymentProfileResponse));
+                    apiResponse = (deleteCustomerPaymentProfileResponse) serializer.Deserialize(reader);
+                    break;
+                case "deleteCustomerProfileResponse":
+                    serializer = new XmlSerializer(typeof(deleteCustomerProfileResponse));
+                    apiResponse = (deleteCustomerProfileResponse) serializer.Deserialize(reader);
+                    break;
+                case "deleteCustomerShippingAddressResponse":
+                    serializer = new XmlSerializer(typeof(deleteCustomerShippingAddressResponse));
+                    apiResponse = (deleteCustomerShippingAddressResponse) serializer.Deserialize(reader);
+                    break;
+                case "getCustomerPaymentProfileResponse":
+                    serializer = new XmlSerializer(typeof(getCustomerPaymentProfileResponse));
+                    apiResponse = (getCustomerPaymentProfileResponse) serializer.Deserialize(reader);
+                    break;
+                case "getCustomerProfileIdsResponse":
+                    serializer = new XmlSerializer(typeof(getCustomerProfileIdsResponse));
+                    apiResponse = (getCustomerProfileIdsResponse) serializer.Deserialize(reader);
+                    break;
+                case "getCustomerProfileResponse":
+                    serializer = new XmlSerializer(typeof(getCustomerProfileResponse));
+                    apiResponse = (getCustomerProfileResponse) serializer.Deserialize(reader);
+                    break;
+                case "getCustomerShippingAddressResponse":
+                    serializer = new XmlSerializer(typeof(getCustomerShippingAddressResponse));
+                    apiResponse = (getCustomerShippingAddressResponse) serializer.Deserialize(reader);
+                    break;
+                case "isAliveResponse":
+                    serializer = new XmlSerializer(typeof(isAliveResponse));
+                    apiResponse = (isAliveResponse) serializer.Deserialize(reader);
+                    break;
+                case "updateCustomerPaymentProfileResponse":
+                    serializer = new XmlSerializer(typeof(updateCustomerPaymentProfileResponse));
+                    apiResponse = (updateCustomerPaymentProfileResponse) serializer.Deserialize(reader);
+                    break;
+                case "updateCustomerProfileResponse":
+                    serializer = new XmlSerializer(typeof(updateCustomerProfileResponse));
+                    apiResponse = (updateCustomerProfileResponse) serializer.Deserialize(reader);
+                    break;
+                case "updateCustomerShippingAddressResponse":
+                    serializer = new XmlSerializer(typeof(updateCustomerShippingAddressResponse));
+                    apiResponse = (updateCustomerShippingAddressResponse) serializer.Deserialize(reader);
+                    break;
+                case "validateCustomerPaymentProfileResponse":
+                    serializer = new XmlSerializer(typeof(validateCustomerPaymentProfileResponse));
+                    apiResponse = (validateCustomerPaymentProfileResponse) serializer.Deserialize(reader);
+                    break;
+                //ARB response
+                case "ARBCreateSubscriptionResponse":
+                    serializer = new XmlSerializer(typeof(ARBCreateSubscriptionResponse));
+                    apiResponse = (ARBCreateSubscriptionResponse) serializer.Deserialize(reader);
+                    break;
 
-                    case "ARBUpdateSubscriptionResponse":
-                        serializer = new XmlSerializer(typeof (ARBUpdateSubscriptionResponse));
-                        apiResponse = (ARBUpdateSubscriptionResponse) serializer.Deserialize(reader);
-                        break;
+                case "ARBUpdateSubscriptionResponse":
+                    serializer = new XmlSerializer(typeof(ARBUpdateSubscriptionResponse));
+                    apiResponse = (ARBUpdateSubscriptionResponse) serializer.Deserialize(reader);
+                    break;
 
-                    case "ARBCancelSubscriptionResponse":
-                        serializer = new XmlSerializer(typeof (ARBCancelSubscriptionResponse));
-                        apiResponse = (ARBCancelSubscriptionResponse) serializer.Deserialize(reader);
-                        break;
+                case "ARBCancelSubscriptionResponse":
+                    serializer = new XmlSerializer(typeof(ARBCancelSubscriptionResponse));
+                    apiResponse = (ARBCancelSubscriptionResponse) serializer.Deserialize(reader);
+                    break;
 
-                    case "ARBGetSubscriptionStatusResponse":
-                        serializer = new XmlSerializer(typeof (ARBGetSubscriptionStatusResponse));
-                        apiResponse = (ARBGetSubscriptionStatusResponse) serializer.Deserialize(reader);
-                        break;
+                case "ARBGetSubscriptionStatusResponse":
+                    serializer = new XmlSerializer(typeof(ARBGetSubscriptionStatusResponse));
+                    apiResponse = (ARBGetSubscriptionStatusResponse) serializer.Deserialize(reader);
+                    break;
 
-                    case "ErrorResponse":
-                        serializer = new XmlSerializer(typeof (ANetApiResponse));
-                        apiResponse = (ANetApiResponse) serializer.Deserialize(reader);
-                        break;
-                }
+                case "ErrorResponse":
+                    serializer = new XmlSerializer(typeof(ANetApiResponse));
+                    apiResponse = (ANetApiResponse) serializer.Deserialize(reader);
+                    break;
             }
-            catch (Exception)
-            {
-                //BUG: log
-            }
-
             return apiResponse;
         }
     }

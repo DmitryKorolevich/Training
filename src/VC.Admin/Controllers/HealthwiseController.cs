@@ -1,46 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Net.Http.Headers;
-using VC.Admin.Models.Customer;
-using VC.Admin.Models.Setting;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Data.Services;
-using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Interfaces.Services.Customers;
-using VitalChoice.Interfaces.Services.Settings;
-using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using VitalChoice.Ecommerce.Domain.Entities.Addresses;
-using VitalChoice.Ecommerce.Domain.Entities.Customers;
-using VitalChoice.Ecommerce.Domain.Entities.Payment;
-using VitalChoice.Ecommerce.Domain.Exceptions;
-using VitalChoice.Ecommerce.Domain.Transfer;
-using VitalChoice.Infrastructure.Domain.Constants;
-using VitalChoice.Infrastructure.Domain.Dynamic;
-using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.Permissions;
-using VitalChoice.Infrastructure.Domain.Entities.Users;
-using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
-using VitalChoice.Infrastructure.Domain.Transfer.Customers;
-using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using VitalChoice.Interfaces.Services.Healthwise;
 using VitalChoice.Interfaces.Services.Orders;
 using VC.Admin.Models.Healthwise;
 using VitalChoice.Business.Mail;
-using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Transfer.Healthwise;
 using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
+using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VC.Admin.Controllers
@@ -53,19 +29,21 @@ namespace VC.Admin.Controllers
         private readonly ILogger _logger;
         private readonly ExtendedUserManager _userManager;
         private readonly ReferenceData _referenceData;
+        private readonly AppSettings _appSettings;
 
         public HealthwiseController(
             IHealthwiseService healthwiseService,
             IOrderService orderService,
             INotificationService notificationService,
             ILoggerProviderExtended loggerProvider,
-            ExtendedUserManager userManager, ReferenceData referenceData)
+            ExtendedUserManager userManager, ReferenceData referenceData, AppSettings appSettings)
         {
             _healthwiseService = healthwiseService;
             _orderService = orderService;
             _notificationService = notificationService;
             _userManager = userManager;
             _referenceData = referenceData;
+            _appSettings = appSettings;
             _logger = loggerProvider.CreateLogger<HealthwiseController>();
         }
 
@@ -81,7 +59,7 @@ namespace VC.Admin.Controllers
                 IdCustomer = p.Key,
                 Periods = p.ToList()
             }).ToList();
-            var hwMaxPeriod = _referenceData.AppSettings.HealthwisePeriodMaxItemsCount;
+            var hwMaxPeriod = _appSettings.HealthwisePeriodMaxItemsCount;
             foreach (var periodGroup in periodGroups)
             {
                 var item = new HealthwiseCustomerListItemModel(periodGroup.Periods);
@@ -108,7 +86,7 @@ namespace VC.Admin.Controllers
             HealthwiseCustomerListItemModel toReturn;
             if(item!=null)
             {
-                var hwMaxPeriod = _referenceData.AppSettings.HealthwisePeriodMaxItemsCount;
+                var hwMaxPeriod = _appSettings.HealthwisePeriodMaxItemsCount;
                 toReturn = new HealthwiseCustomerListItemModel(new List<VHealthwisePeriod>() { item});
                 SetAllowPaymentPeriodSetting(toReturn, hwMaxPeriod);
             }

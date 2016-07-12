@@ -365,7 +365,7 @@ namespace VitalChoice.DynamicData.Base
 
         private async Task<TDynamic> InsertAsync(IUnitOfWorkAsync uow, TDynamic model)
         {
-            //TODO: lock writing DB until we read result
+            //TODO: lock writing DB until we read result (Low, race condition for logging)
             var entity = await InsertAsync(model, uow);
             int id = entity.Id;
             entity = await SelectEntityFirstAsync(o => o.Id == id);
@@ -375,7 +375,7 @@ namespace VitalChoice.DynamicData.Base
 
         private async Task<TDynamic> UpdateAsync(IUnitOfWorkAsync uow, TDynamic model)
         {
-            //TODO: lock writing DB until we read result
+            //TODO: lock writing DB until we read result (Low, race condition for logging)
             var entity = await UpdateAsync(model, uow);
             int id = entity.Id;
             entity = await SelectEntityFirstAsync(o => o.Id == id);
@@ -385,7 +385,7 @@ namespace VitalChoice.DynamicData.Base
 
         private async Task<List<TDynamic>> InsertRangeAsync(IUnitOfWorkAsync uow, ICollection<TDynamic> models)
         {
-            //TODO: lock writing DB until we read result
+            //TODO: lock writing DB until we read result (Low, race condition for logging)
             var entityIds = (await InsertRangeAsync(models, uow)).Select(e => e.Id).ToList();
             var entities = await SelectEntitiesAsync(o => entityIds.Contains(o.Id));
             await LogItemChanges(await DynamicMapper.FromEntityRangeAsync(entities));
@@ -394,7 +394,7 @@ namespace VitalChoice.DynamicData.Base
 
         private async Task<List<TDynamic>> UpdateRangeAsync(IUnitOfWorkAsync uow, ICollection<TDynamic> models)
         {
-            //TODO: lock writing DB until we read result
+            //TODO: lock writing DB until we read result (Low, race condition for logging)
             var entities = await UpdateRangeAsync(models, uow);
             var entityIds = entities.Select(e => e.Id).ToArray();
             entities = await SelectEntitiesAsync(o => entityIds.Contains(o.Id));

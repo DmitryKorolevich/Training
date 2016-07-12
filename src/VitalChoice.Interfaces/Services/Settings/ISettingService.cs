@@ -8,6 +8,12 @@ namespace VitalChoice.Interfaces.Services.Settings
 {
     public interface ISettingService
     {
+        Task<AppSettings> GetSettingsInstanceAsync();
+
+        AppSettings GetSettingsInstance();
+
+        SettingDynamic GetSettings();
+
         Task<SettingDynamic> GetSettingsAsync();
 
         Task<bool> UpdateSettingsAsync(SettingDynamic settings);

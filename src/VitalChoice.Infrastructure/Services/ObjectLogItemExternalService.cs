@@ -134,7 +134,6 @@ namespace VitalChoice.Infrastructure.Services
                 IdObjectStatus = (int) model.StatusCode,
                 IdEditedBy = model.IdEditedBy,
             };
-            //TODO - add needed fields to general implementiotn of Entity
             return item;
         }
 
@@ -156,7 +155,6 @@ namespace VitalChoice.Infrastructure.Services
                 IdObjectType = (int) objectType,
                 DateCreated = DateTime.Now
             };
-            //TODO - add needed fields to general implementiotn of Entity
             return item;
         }
 

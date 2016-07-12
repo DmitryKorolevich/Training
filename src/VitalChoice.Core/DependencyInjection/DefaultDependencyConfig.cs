@@ -447,6 +447,7 @@ namespace VitalChoice.Core.DependencyInjection
                 var service = cc.Resolve<IAppInfrastructureService>();
                 return service.CachedData ?? service.GetDataAsync().GetAwaiter().GetResult();
             }).InstancePerLifetimeScope();
+            builder.Register(cc => cc.Resolve<ISettingService>().GetSettingsInstance()).InstancePerLifetimeScope();
             builder.RegisterType<VitalChoiceContext>()
                 .As<IDataContextAsync>()
                 .AsSelf()

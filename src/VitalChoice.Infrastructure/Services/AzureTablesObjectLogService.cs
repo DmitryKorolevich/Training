@@ -226,7 +226,6 @@ namespace VitalChoice.Infrastructure.Services
                 IdObjectStatus = (int) model.StatusCode,
                 IdEditedBy = model.IdEditedBy
             };
-            //TODO - add needed fields to general implementiotn of Entity
             return item;
         }
 
@@ -239,7 +238,6 @@ namespace VitalChoice.Infrastructure.Services
         private LogDataItemTableEntity TransformForOther(object model, ObjectType objectType)
         {
             LogDataItemTableEntity item = new LogDataItemTableEntity((int) objectType, Guid.NewGuid().ToString("N"), DateTime.Now);
-            //TODO - add needed fields to general implementiotn of Entity
             return item;
         }
 

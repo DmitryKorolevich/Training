@@ -74,7 +74,7 @@ namespace VitalChoice.Caching.Iterators
             }
             else
             {
-                //TODO: Retry with expression rewrite to skip items that was retreived already
+                //TODO: Retry with expression rewrite to skip items that was retreived already (Low)
                 retryEnumerable = _queryProvider.ExecuteBaseAsync<T>(_expression);
             }
             return Task.FromResult(retryEnumerable);

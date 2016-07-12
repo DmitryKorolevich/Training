@@ -77,11 +77,6 @@ namespace VitalChoice.DynamicData.Validation.Abstractions
             return this;
         }
 
-        public IErrorResult Errors(IEnumerable<MessageInfo> messages)
-        {
-            throw new NotImplementedException();
-        }
-
         public List<MessageInfo> Build()
         {
             if (!string.IsNullOrEmpty(CollectionName))

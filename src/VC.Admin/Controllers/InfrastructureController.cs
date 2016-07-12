@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.Infrastructure;
 using VitalChoice.Core.Base;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Controllers
@@ -11,10 +12,12 @@ namespace VC.Admin.Controllers
     public class InfrastructureController : BaseApiController
     {
         private readonly IAppInfrastructureService _appInfrastructureService;
+        private readonly ISettingService _settingService;
 
-        public InfrastructureController(IAppInfrastructureService appInfrastructureService)
+        public InfrastructureController(IAppInfrastructureService appInfrastructureService, ISettingService settingService)
         {
             _appInfrastructureService = appInfrastructureService;
+            _settingService = settingService;
         }
 
         [HttpGet]
@@ -26,9 +29,9 @@ namespace VC.Admin.Controllers
 
             if (HttpContext.User.Identity.IsAuthenticated)
             {
-                referenceDataModel = new FullReferenceDataModel()
+                referenceDataModel = new FullReferenceDataModel
                 {
-                    AppSettings = referenceData.AppSettings,
+                    AppSettings = await _settingService.GetSettingsInstanceAsync(),
                     Labels = referenceData.Labels,
                     AdminRoles = referenceData.AdminRoles,
                     CustomerRoles = referenceData.CustomerRoles,

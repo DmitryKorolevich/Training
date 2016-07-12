@@ -26,6 +26,7 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.Healthwise;
+using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Healthwise;
 using VitalChoice.Infrastructure.UnitOfWork;
@@ -41,39 +42,36 @@ namespace VitalChoice.Business.Services.Healthwise
         private readonly IEcommerceRepositoryAsync<VHealthwisePeriod> _vHealthwisePeriodRepository;
         private readonly IEcommerceRepositoryAsync<HealthwiseOrder> _healthwiseOrderRepository;
         private readonly IEcommerceRepositoryAsync<HealthwisePeriod> _healthwisePeriodRepository;
-        private readonly OrderRepository _orderRepository;
         private readonly IOrderService _orderService;
         private readonly IEcommerceRepositoryAsync<Customer> _customerRepository;
         private readonly IGcService _gcService;
         private readonly INotificationService _notificationService;
         private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
         private readonly DbContextOptions<EcommerceContext> _eccomerceContextOptions;
-        private readonly ReferenceData _referenceData;
+        private readonly AppSettings _appSettings;
         private readonly ILogger _logger;
 
         public HealthwiseService(
             IEcommerceRepositoryAsync<VHealthwisePeriod> vHealthwisePeriodRepository,
             IEcommerceRepositoryAsync<HealthwiseOrder> healthwiseOrderRepository,
             IEcommerceRepositoryAsync<HealthwisePeriod> healthwisePeriodRepository,
-            OrderRepository orderRepository,
             IOrderService orderService,
             IEcommerceRepositoryAsync<Customer> customerRepository,
             IGcService gcService,
             INotificationService notificationService,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
-            ILoggerProviderExtended loggerProvider, DbContextOptions<EcommerceContext> eccomerceContextOptions, ReferenceData referenceData)
+            ILoggerProviderExtended loggerProvider, DbContextOptions<EcommerceContext> eccomerceContextOptions, AppSettings appSettings)
         {
             _vHealthwisePeriodRepository = vHealthwisePeriodRepository;
             _healthwiseOrderRepository = healthwiseOrderRepository;
             _healthwisePeriodRepository = healthwisePeriodRepository;
-            _orderRepository = orderRepository;
             _orderService = orderService;
             _customerRepository = customerRepository;
             _gcService = gcService;
             _notificationService = notificationService;
             _transactionAccessor = transactionAccessor;
             _eccomerceContextOptions = eccomerceContextOptions;
-            _referenceData = referenceData;
+            _appSettings = appSettings;
             _logger = loggerProvider.CreateLogger<HealthwiseService>();
         }
 
@@ -100,7 +98,7 @@ namespace VitalChoice.Business.Services.Healthwise
                 .WithDateTo(filter.To)
                 .WithDateFrom(filter.From)
                 .
-                WithAllowPaymentOnly(filter.NotBilledOnly, _referenceData.AppSettings.HealthwisePeriodMaxItemsCount)
+                WithAllowPaymentOnly(filter.NotBilledOnly, _appSettings.HealthwisePeriodMaxItemsCount)
                 .WithNotPaid(filter.NotPaid);
 
             var toReturn = await _vHealthwisePeriodRepository.Query(conditions).SelectAsync(false);
@@ -141,7 +139,7 @@ namespace VitalChoice.Business.Services.Healthwise
                         var healthwise = await vHealthwisePeriodRepository.Query(p => p.Id == id).SelectFirstOrDefaultAsync(true);
 
                         if (healthwise != null && !healthwise.PaidDate.HasValue &&
-                            healthwise.OrdersCount >= _referenceData.AppSettings.HealthwisePeriodMaxItemsCount)
+                            healthwise.OrdersCount >= _appSettings.HealthwisePeriodMaxItemsCount)
                         {
                             if (payAsGC)
                             {
@@ -213,7 +211,7 @@ namespace VitalChoice.Business.Services.Healthwise
 
             if (period != null && count != 0)
             {
-                int maxCount = _referenceData.AppSettings.HealthwisePeriodMaxItemsCount;
+                int maxCount = _appSettings.HealthwisePeriodMaxItemsCount;
                 VHealthwisePeriodQuery conditions = new VHealthwisePeriodQuery().WithCustomerId(period.IdCustomer).WithNotPaid(true);
                 var items = await _vHealthwisePeriodRepository.Query(conditions).SelectAsync(false);
                 foreach (var item in items)
@@ -239,7 +237,7 @@ namespace VitalChoice.Business.Services.Healthwise
                     {
                         try
                         {
-                            int maxCount = _referenceData.AppSettings.HealthwisePeriodMaxItemsCount;
+                            int maxCount = _appSettings.HealthwisePeriodMaxItemsCount;
                             var healthwiseOrderRepository = uow.RepositoryAsync<HealthwiseOrder>();
                             var orders =
                                 await healthwiseOrderRepository.Query(p => ids.Contains(p.Id)).Include(p => p.Order).SelectAsync(true);

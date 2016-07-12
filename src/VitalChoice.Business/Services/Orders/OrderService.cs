@@ -68,6 +68,7 @@ using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Avatax;
+using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Extensions;
@@ -107,6 +108,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly ICountryNameCodeResolver _codeResolver;
         private readonly ReferenceData _referenceData;
         private readonly OrderRepository _orderRepository;
+        private readonly AppSettings _appSettings;
 
         public OrderService(
             IEcommerceRepositoryAsync<VOrderWithRegionInfoItem> vOrderWithRegionInfoItemRepository,
@@ -136,7 +138,7 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository, IDiscountService discountService,
             IEcommerceRepositoryAsync<VAutoShip> vAutoShipRepository, IEcommerceRepositoryAsync<VAutoShipOrder> vAutoShipOrderRepository,
             AffiliateOrderPaymentRepository affiliateOrderPaymentRepository, ICountryNameCodeResolver codeResolver,
-            IDynamicEntityOrderingExtension<Order> orderingExtension, ReferenceData referenceData)
+            IDynamicEntityOrderingExtension<Order> orderingExtension, ReferenceData referenceData, AppSettings appSettings)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension
@@ -163,6 +165,7 @@ namespace VitalChoice.Business.Services.Orders
             _affiliateOrderPaymentRepository = affiliateOrderPaymentRepository;
             _codeResolver = codeResolver;
             _referenceData = referenceData;
+            _appSettings = appSettings;
             _orderRepository = orderRepository;
             _addressMapper = addressMapper;
             _productService = productService;
@@ -2339,7 +2342,7 @@ namespace VitalChoice.Business.Services.Orders
                     //        throw;
                     //    }
                     //}
-                    var maxCount = _referenceData.AppSettings.HealthwisePeriodMaxItemsCount;
+                    var maxCount = _appSettings.HealthwisePeriodMaxItemsCount;
                     var orderCreatedDate = orderDateCreated;
                     var periods =
                         (await

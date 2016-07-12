@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Settings;
 
 namespace VitalChoice.Business.Services.Settings
 {
@@ -30,6 +31,12 @@ namespace VitalChoice.Business.Services.Settings
             _settingOptionTypeRepository = settingOptionTypeRepository;
             _settingMapper = settingMapper;
         }
+
+        public Task<AppSettings> GetSettingsInstanceAsync() => _settingMapper.CreatePrototypeForAsync<AppSettings>();
+
+        public AppSettings GetSettingsInstance() => _settingMapper.CreatePrototypeFor<AppSettings>();
+
+        public SettingDynamic GetSettings() => _settingMapper.CreatePrototype();
 
         public Task<SettingDynamic> GetSettingsAsync() => _settingMapper.CreatePrototypeAsync();
 

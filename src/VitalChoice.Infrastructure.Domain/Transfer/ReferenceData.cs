@@ -7,8 +7,6 @@ namespace VitalChoice.Infrastructure.Domain.Transfer
 {
     public class ReferenceData
     {
-        public AppSettings AppSettings { get; set; }
-
         public Ecommerce.Domain.Entities.Addresses.Country DefaultCountry { get; set; }
 
         public IList<LookupItem<int>> AdminRoles { get; set; }

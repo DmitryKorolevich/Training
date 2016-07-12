@@ -182,7 +182,7 @@ namespace Authorize.Net.Api.Controllers.Bases
             var merchantAuthenticationType = request.merchantAuthentication;
             //if ( null != ) throw new IllegalArgumentException(" needs to be null");
 
-            //TODO
+            //NOTTODO, BG
             /*
 		    if ( null != merchantAuthenticationType.Item.GetType().   sessionToken) throw new IllegalArgumentException("SessionToken needs to be null");
 		    if ( null != merchantAuthenticationType.getPassword()) throw new IllegalArgumentException("Password needs to be null");

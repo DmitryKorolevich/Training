@@ -443,19 +443,6 @@ namespace VitalChoice.Business.Services
             }
         }
 
-        private async Task<ReferenceData> SetAppSettings(ReferenceData referenceData)
-        {
-            var settings = await _settingService.GetSettingsAsync();
-            
-            referenceData.AppSettings = new AppSettings()
-            {
-                CreditCardAuthorizations = settings.SafeData.CreditCardAuthorizations,
-                GlobalPerishableThreshold = settings.SafeData.GlobalPerishableThreshold,
-                HealthwisePeriodMaxItemsCount = settings.SafeData.HealthwisePeriodMaxItemsCount
-            };
-            return referenceData;
-        }
-
         public ReferenceData CachedData => _cachedData;
 
         public async Task<ReferenceData> GetDataAsync()
@@ -467,7 +454,6 @@ namespace VitalChoice.Business.Services
                 referenceData = await Populate();
                 _cache.SetItem(CacheKeys.AppInfrastructure, referenceData, _expirationTerm);
             }
-            referenceData = await SetAppSettings(referenceData);
             _cachedData = referenceData;
             return referenceData;
         }
