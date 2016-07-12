@@ -63,7 +63,12 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
                 if (perishableSubtotal == 0)
                 {
                     var nonPerishableCharge = Math.Min(nonPerishableSubtotal, totalGcAmount - perishableCharge);
+                    gc.NPAmount = nonPerishableCharge;
                     nonPerishableSubtotal -= nonPerishableCharge;
+                }
+                else
+                {
+                    gc.PAmount = perishableCharge;
                 }
             }
             context.GiftCertificatesSubtotal = orderSubTotal - (decimal) context.Data.PayableTotal;
