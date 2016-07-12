@@ -159,6 +159,7 @@ namespace VitalChoice.ExportService.Services
             {
                 throw new ApiException("Export failed.");
             }
+            order.OrderStatus = OrderStatus.Exported;
         }
 
         private static string FormatCcType(CreditCardType internalCcType)
