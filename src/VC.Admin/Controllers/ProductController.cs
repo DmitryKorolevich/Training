@@ -147,7 +147,7 @@ namespace VC.Admin.Controllers
                                                        (ProductType) dynamic.Product.IdObjectType == ProductType.Gc ||
                                                        ((bool?) dynamic.SafeData.DisregardStock ?? false) ||
                                                        ((int?) dynamic.SafeData.Stock ?? 0) > 0)
-                .Select(async p => await _skuMapper.ToModelAsync<SkuWithStatisticListItemModel>(p));
+                .Select(p => _skuMapper.ToModelAsync<SkuWithStatisticListItemModel>(p));
             foreach (var skuTask in inStockItems)
             {
                 var sku = await skuTask;

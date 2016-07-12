@@ -272,7 +272,8 @@ namespace VitalChoice.Business.Services.Products
             //var items = GetProductOptionTypes(names);
             foreach (
                 var item in
-                    ((IEnumerable<OptionType>) DynamicMapper.OptionTypes).Union(_skuMapper.OptionTypes).Where(t => t.DefaultValue != null))
+                    ((IEnumerable<OptionType>) DynamicMapper.OptionTypes).Union(_skuMapper.OptionTypes)
+                        .Where(t => t.DefaultValue != null))
             {
                 if (item.IdObjectType != null)
                 {

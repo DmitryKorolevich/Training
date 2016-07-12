@@ -2502,7 +2502,19 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<ICollection<SkuOrdered>> GetGeneratedGcs(int id)
         {
-            var items = await _orderToSkusRepository.Query(s => s.IdOrder == id && (s.Sku.IdObjectType == (int) ProductType.EGс || s.Sku.IdObjectType == (int) ProductType.Gc)).Include(g => g.Sku).ThenInclude(s => s.OptionValues).Include(g => g.Sku).ThenInclude(s => s.Product).ThenInclude(p => p.OptionValues).Include(s => s.GeneratedGiftCertificates).SelectAsync(false);
+            var items =
+                await
+                    _orderToSkusRepository.Query(
+                        s =>
+                            s.IdOrder == id &&
+                            (s.Sku.Product.IdObjectType == (int) ProductType.EGс || s.Sku.Product.IdObjectType == (int) ProductType.Gc))
+                        .Include(g => g.Sku)
+                        .ThenInclude(s => s.OptionValues)
+                        .Include(g => g.Sku)
+                        .ThenInclude(s => s.Product)
+                        .ThenInclude(p => p.OptionValues)
+                        .Include(s => s.GeneratedGiftCertificates)
+                        .SelectAsync(false);
 
             return items.Select(s => new SkuOrdered
             {

@@ -446,6 +446,7 @@ namespace VitalChoice.Business.Services
         private async Task<ReferenceData> SetAppSettings(ReferenceData referenceData)
         {
             var settings = await _settingService.GetSettingsAsync();
+            
             referenceData.AppSettings = new AppSettings()
             {
                 CreditCardAuthorizations = settings.SafeData.CreditCardAuthorizations,

@@ -26,7 +26,7 @@ namespace VC.Admin.Models.Settings
                 LogLevel = logEntity.PartitionKey;
                 Source = logEntity.Source;
                 ShortMessage = logEntity.ShortMessage;
-                Message = logEntity.Message;
+                Message = logEntity.GetFullMessage();
             }
         }
 

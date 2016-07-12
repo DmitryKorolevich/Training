@@ -40,6 +40,10 @@ namespace VitalChoice.Caching.Extensions
                         : DeepCloneItem(value, relation);
                     relation.SetOrUpdateRelatedObject(dest, replacementValue);
                 }
+                else
+                {
+                    relation.SetOrUpdateRelatedObject(dest, null);
+                }
             }
         }
 

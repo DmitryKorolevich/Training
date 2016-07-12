@@ -2,15 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using System.Threading.Tasks;
-using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
-using System.Threading;
-using Microsoft.EntityFrameworkCore;
 using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
@@ -73,14 +69,18 @@ namespace VitalChoice.DynamicData.Base
             _typeConverter = typeConverter;
             _optionTypes =
                 new Lazy<ICollection<TOptionType>>(
-                    () => optionTypeRepositoryAsync.Query().Include(o => o.Lookup).ThenInclude(l => l.LookupVariants).Select(false));
+                    () =>
+                        optionTypeRepositoryAsync.Query()
+                            .Include(o => o.Lookup)
+                            .ThenInclude(l => l.LookupVariants)
+                            .Select(false));
             _optionTypesByType = new Dictionary<int, ICollection<TOptionType>>();
         }
 
         public virtual void SyncCollections(ICollection<TDynamic> dynamics, ICollection<TEntity> entities,
             ICollection<TOptionType> optionTypes = null)
         {
-            SyncCollectionsAsync(dynamics, entities, optionTypes).Wait();
+            SyncCollectionsAsync(dynamics, entities, optionTypes).GetAwaiter().GetResult();
         }
 
         public virtual async Task SyncCollectionsAsync<T>(ICollection<TDynamic> dynamics, ICollection<T> entities, Func<T, TEntity> selector,
@@ -568,23 +568,19 @@ namespace VitalChoice.DynamicData.Base
         {
             if (entity == null)
                 return null;
-            if (entity.OptionValues == null)
-            {
-                entity.OptionValues = new List<TOptionValue>();
-            }
             if (entity.OptionTypes == null)
             {
                 throw new ApiException($"FromEntityItem<{typeof(TEntity)}> have no OptionTypes, are you forgot to pass them?");
             }
             var result = new TDynamic();
             var data = result.DictionaryData;
-            if (entity.OptionValues.Count > 0)
+            if (entity.OptionValues?.Count > 0)
             {
-                var optionTypes = entity.OptionTypes.ToDictionary(o => o.Id, o => o);
-                foreach (var value in entity.OptionValues)
+                var optionValues = entity.OptionValues.ToDictionary(v => v.IdOptionType);
+                foreach (var optionType in entity.OptionTypes)
                 {
-                    TOptionType optionType;
-                    if (optionTypes.TryGetValue(value.IdOptionType, out optionType))
+                    TOptionValue value;
+                    if (optionValues.TryGetValue(optionType.Id, out value))
                     {
                         data.Add(optionType.Name,
                             MapperTypeConverter.ConvertTo<TOptionValue, TOptionType>(value,
@@ -617,8 +613,8 @@ namespace VitalChoice.DynamicData.Base
         private static void FillEntityOptions(TDynamic obj, ICollection<TOptionType> optionTypes, TEntity entity)
         {
             entity.MappedObject = obj;
-            HashSet<int> optionTypeIds = new HashSet<int>(optionTypes.Select(o => o.Id));
-            entity.OptionValues.RemoveAll(o => !optionTypeIds.Contains(o.IdOptionType));
+            var optionIdsSet = new HashSet<int>(optionTypes.Select(o => o.Id));
+            entity.OptionValues.RemoveAll(o => !optionIdsSet.Contains(o.IdOptionType));
             Dictionary<int, TOptionValue> optionValues = entity.OptionValues.ToDictionary(v => v.IdOptionType);
             foreach (var optionType in optionTypes)
             {
@@ -738,15 +734,37 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        public TDynamic CreatePrototype(int idObjectType)
+        public virtual async Task<TModel> CreatePrototypeForAsync<TModel>() where TModel : class, new()
+        {
+            return await ToModelAsync<TModel>(await CreatePrototypeAsync());
+        }
+
+        public virtual TDynamic CreatePrototype(int idObjectType)
         {
             return CreatePrototypeAsync(idObjectType).GetAwaiter().GetResult();
         }
 
-        public TModel CreatePrototypeFor<TModel>(int idObjectType)
+        public virtual TDynamic CreatePrototype()
+        {
+            return CreatePrototypeAsync().GetAwaiter().GetResult();
+        }
+
+        public virtual TModel CreatePrototypeFor<TModel>(int idObjectType)
             where TModel : class, new()
         {
             return CreatePrototypeForAsync<TModel>(idObjectType).GetAwaiter().GetResult();
+        }
+
+        public virtual TModel CreatePrototypeFor<TModel>() where TModel : class, new()
+        {
+            return CreatePrototypeForAsync<TModel>().GetAwaiter().GetResult();
+        }
+
+        public virtual async Task<TDynamic> CreatePrototypeAsync()
+        {
+            var optionTypes = FilterByType(null);
+            var entity = new TEntity {OptionTypes = optionTypes, OptionValues = new List<TOptionValue>()};
+            return await FromEntityAsync(entity, true);
         }
 
         public virtual async Task<TDynamic> CreatePrototypeAsync(int idObjectType)
@@ -760,22 +778,6 @@ namespace VitalChoice.DynamicData.Base
             where TModel : class, new()
         {
             return await ToModelAsync<TModel>(await CreatePrototypeAsync(idObjectType));
-        }
-
-        public virtual async Task<TDynamic> GetDefaultAsync(int? idObjectType)
-        {
-            var optionTypes = FilterByType(idObjectType);
-            var entity = new TEntity { OptionTypes = optionTypes, OptionValues = new List<TOptionValue>() };
-            return await FromEntityAsync(entity, true);
-        }
-
-        public virtual TEntity ConvertDefaultAsync(TDynamic dynamic)
-        {
-            var optionTypes = FilterByType(dynamic.IdObjectType);
-            var entity = new TEntity { OptionTypes = optionTypes, OptionValues = new List<TOptionValue>() };
-            FillEntityOptions(dynamic, optionTypes, entity);
-            
-            return entity;
         }
     }
 }

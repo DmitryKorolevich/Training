@@ -131,11 +131,10 @@ namespace VitalChoice.DynamicData.Base
         private static IEnumerable<TOptionType> FilterOptionTypes(IDictionary<string, object> values,
             IOptionTypeQueryProvider<TEntity, TOptionType, TOptionValue> optionTypeQuery, int? idObjectType, bool lookForObjectType)
         {
-            var valueNames = new HashSet<string>(values.Keys);
             if (lookForObjectType)
-                return optionTypeQuery.OptionsForType(idObjectType).Where(t => valueNames.Contains(t.Name));
+                return optionTypeQuery.OptionsForType(idObjectType).Where(t => values.ContainsKey(t.Name));
 
-            return optionTypeQuery.OptionTypes.Where(t => valueNames.Contains(t.Name));
+            return optionTypeQuery.OptionTypes.Where(t => values.ContainsKey(t.Name));
         }
 
         private static IEnumerable<OptionGroup<TOptionType>> BuildSearchValues(

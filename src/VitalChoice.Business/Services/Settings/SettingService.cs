@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;
-using VitalChoice.Infrastructure.Domain.Entities.Settings;
-using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
 using Microsoft.EntityFrameworkCore;
 using VitalChoice.Business.Services.Dynamic;
-using VitalChoice.Business.Services.Ecommerce;
-using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 
@@ -25,34 +17,25 @@ namespace VitalChoice.Business.Services.Settings
 {
     public class SettingService : ISettingService
     {
-        private readonly IRepositoryAsync<AppSettingItem> _appSettingRepository;
         private readonly IEcommerceRepositoryAsync<Lookup> _lookupRepository;
         private readonly IEcommerceRepositoryAsync<SettingOptionType> _settingOptionTypeRepository;
         private readonly SettingMapper _settingMapper;
-        private readonly ILogger _logger;
 
-        public SettingService(IRepositoryAsync<AppSettingItem> appSettingRepository,
+        public SettingService(
             IEcommerceRepositoryAsync<Lookup> lookupRepository,
             IEcommerceRepositoryAsync<SettingOptionType> settingOptionTypeRepository,
-            SettingMapper settingMapper,
-            ILoggerProviderExtended loggerProvider)
+            SettingMapper settingMapper)
         {
-            _appSettingRepository = appSettingRepository;
             _lookupRepository = lookupRepository;
             _settingOptionTypeRepository = settingOptionTypeRepository;
             _settingMapper = settingMapper;
-            _logger = loggerProvider.CreateLogger<SettingService>();
         }
 
-        public async Task<SettingDynamic> GetSettingsAsync()
-        {
-            var toReturn = await _settingMapper.GetDefaultAsync(null);
-            return toReturn;
-        }
+        public Task<SettingDynamic> GetSettingsAsync() => _settingMapper.CreatePrototypeAsync();
 
         public async Task<bool> UpdateSettingsAsync(SettingDynamic settings)
         {
-            var entity = _settingMapper.ConvertDefaultAsync(settings);
+            var entity = await _settingMapper.ToEntityAsync(settings);
             var optionTypes = await _settingOptionTypeRepository.Query().SelectAsync(true);
             var forUpdate = new List<SettingOptionType>();
             foreach (var settingOptionValue in entity.OptionValues)

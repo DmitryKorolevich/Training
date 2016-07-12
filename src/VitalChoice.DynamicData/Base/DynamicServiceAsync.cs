@@ -208,7 +208,6 @@ namespace VitalChoice.DynamicData.Base
             var entity = await DynamicMapper.ToEntityAsync(model, optionTypes);
             if (entity == null)
                 return null;
-            entity.OptionTypes = new List<TOptionType>();
             var productRepository = uow.RepositoryAsync<TEntity>();
             await productRepository.InsertGraphAsync(entity);
             await uow.SaveChangesAsync(CancellationToken.None);

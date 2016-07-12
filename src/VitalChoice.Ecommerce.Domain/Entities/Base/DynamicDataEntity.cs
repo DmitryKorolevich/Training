@@ -38,6 +38,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Base
         where TOptionValue: OptionValue<TOptionType>
         where TOptionType : OptionType
     {
+        [NotMapped]
         public virtual ICollection<TOptionType> OptionTypes { get; set; }
 
         //public IEnumerable<TOptionValue> ExceptOptionsIn(

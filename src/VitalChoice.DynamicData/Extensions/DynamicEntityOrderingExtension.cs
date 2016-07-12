@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Autofac;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -32,7 +31,7 @@ namespace VitalChoice.DynamicData.Extensions
         {
             var typeProvider = _currentScope.Resolve<IOptionTypeQueryProvider<T, TType, TValue>>();
 
-            var optionTypes = typeProvider.FilterByType(idObjectType).Where(t => t.Name == fieldName);
+            var optionTypes = typeProvider.OptionsForType(idObjectType).Where(t => t.Name == fieldName);
 
             return CreateOrderBy<T, TType, TValue>(entity, objectSelector, fieldName, optionTypes);
         }
@@ -45,7 +44,7 @@ namespace VitalChoice.DynamicData.Extensions
         {
             var typeProvider = _currentScope.Resolve<IOptionTypeQueryProvider<T, TType, TValue>>();
 
-            var optionTypes = typeProvider.FilterByType(idObjectType).Where(t => t.Name == fieldName);
+            var optionTypes = typeProvider.OptionsForType(idObjectType).Where(t => t.Name == fieldName);
 
             return CreateOrderByDescending<T, TType, TValue>(entity, objectSelector, fieldName, optionTypes);
         }
@@ -81,7 +80,7 @@ namespace VitalChoice.DynamicData.Extensions
         {
             var typeProvider = _currentScope.Resolve<IOptionTypeQueryProvider<TEntity, TOptionType, TOptionValue>>();
 
-            var optionTypes = typeProvider.FilterByType(idObjectType).Where(t => t.Name == fieldName);
+            var optionTypes = typeProvider.OptionsForType(idObjectType).Where(t => t.Name == fieldName);
 
             return CreateOrderBy(entity, typeProvider, fieldName, optionTypes);
         }
@@ -91,7 +90,7 @@ namespace VitalChoice.DynamicData.Extensions
         {
             var typeProvider = _currentScope.Resolve<IOptionTypeQueryProvider<TEntity, TOptionType, TOptionValue>>();
 
-            var optionTypes = typeProvider.FilterByType(idObjectType).Where(t => t.Name == fieldName);
+            var optionTypes = typeProvider.OptionsForType(idObjectType).Where(t => t.Name == fieldName);
 
             return CreateOrderByDescending(entity, fieldName, optionTypes);
         }

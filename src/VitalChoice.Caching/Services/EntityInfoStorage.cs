@@ -98,7 +98,7 @@ namespace VitalChoice.Caching.Services
                     }
                     else
                     {
-                        Logger.LogError($"{entityType.ClrType.FullName} was already exist in different context");
+                        Logger.LogWarning($"{entityType.ClrType.FullName} was already exist in different context");
                         return;
                     }
                 }
