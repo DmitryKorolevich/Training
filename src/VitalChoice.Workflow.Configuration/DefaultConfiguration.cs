@@ -172,9 +172,7 @@ namespace VitalChoice.Workflow.Configuration
                     action.Dependency<ProductsWithPromoAction>();
                 });
 
-                order.Action<ShippingUpgradesUsCaAction>("ShippingUpgradeUsCa", action =>
-                {
-                });
+                order.Action<ShippingUpgradesUsCaAction>("ShippingUpgradeUsCa");
 
                 order.ActionResolver<ShippingUpgradesActionResolver>("ShippingUpgrade", action =>
                 {

@@ -60,11 +60,6 @@ namespace VitalChoice.ExportService.Services
             };
         }
 
-        //public OrderInqRecord Test(string testOrderNumber)
-        //{
-        //    return _client.GetOrderInfo(testOrderNumber);
-        //}
-
         public async Task ExportOrder(OrderDynamic order, ExportSide exportSide)
         {
             var context = await _orderService.CalculateOrder(order, OrderStatus.Processed);
@@ -552,7 +547,7 @@ namespace VitalChoice.ExportService.Services
             {
                 case ExportSide.All:
                     offers.AddRange(context.ItemsOrdered.Select(product => CreateProductOffer(product, ref lineIndex)));
-                    if (context.GiftCertificatesSubtotal > 0)
+                    if (context.GiftCertificatesSubtotal < 0)
                     {
                         offers.Add(CreateGcOffer(context.GiftCertificatesSubtotal, ref lineIndex));
                     }
@@ -560,7 +555,7 @@ namespace VitalChoice.ExportService.Services
                 case ExportSide.Perishable:
                     offers.AddRange(
                         context.SplitInfo.GetPerishablePartProducts().Select(product => CreateProductOffer(product, ref lineIndex)));
-                    if (context.SplitInfo.PerishableGiftCertificateAmount > 0)
+                    if (context.SplitInfo.PerishableGiftCertificateAmount < 0)
                     {
                         offers.Add(CreateGcOffer(context.SplitInfo.PerishableGiftCertificateAmount, ref lineIndex));
                     }
@@ -568,7 +563,7 @@ namespace VitalChoice.ExportService.Services
                 case ExportSide.NonPerishable:
                     offers.AddRange(
                         context.SplitInfo.GetNonPerishablePartProducts().Select(product => CreateProductOffer(product, ref lineIndex)));
-                    if (context.SplitInfo.NonPerishableGiftCertificateAmount > 0)
+                    if (context.SplitInfo.NonPerishableGiftCertificateAmount < 0)
                     {
                         offers.Add(CreateGcOffer(context.SplitInfo.NonPerishableGiftCertificateAmount, ref lineIndex));
                     }

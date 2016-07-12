@@ -72,12 +72,12 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
                     if (upgradeNp == ShippingUpgradeOption.Overnight)
                     {
                         result += upgradeNonPerishableO;
-                        context.SplitInfo.NonPerishableSurchargeOverriden += upgradeNonPerishableO;
+                        context.SplitInfo.NonPerishableShippingOverriden += upgradeNonPerishableO;
                     }
                     else if (upgradeNp == ShippingUpgradeOption.SecondDay)
                     {
                         result += upgradeNonPerishable2D;
-                        context.SplitInfo.NonPerishableSurchargeOverriden += upgradeNonPerishable2D;
+                        context.SplitInfo.NonPerishableShippingOverriden += upgradeNonPerishable2D;
                     }
                     return Task.FromResult(result);
                 }
