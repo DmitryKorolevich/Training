@@ -225,26 +225,41 @@ namespace VitalChoice.Business.Services.Avatax
             return taxGetType;
         }
 
-        private static IEnumerable<Line> UnionTaxShipping<T>(IEnumerable<Line> lines, BaseOrderContext<T> order, TaxGetType taxGetType)
+        private IEnumerable<Line> UnionTaxShipping<T>(IEnumerable<Line> lines, BaseOrderContext<T> context, TaxGetType taxGetType)
             where T:ItemOrdered
         {
             decimal shippingTotal;
-            if (order.BaseSplitInfo.ShouldSplit)
+            if (context.BaseSplitInfo.ShouldSplit)
             {
                 if (taxGetType.HasFlag(TaxGetType.Perishable))
                 {
-                    shippingTotal = order.BaseSplitInfo.PerishableShippingOveridden + order.BaseSplitInfo.PerishableSurchargeOverriden;
+                    shippingTotal = context.BaseSplitInfo.PerishableShippingOveridden + context.BaseSplitInfo.PerishableSurchargeOverriden;
+                    if (shippingTotal < 0)
+                    {
+                        _logger.LogWarning(
+                            $"Invalid shipping amount. Standard part: {context.BaseSplitInfo.PerishableShippingOveridden:C}, Special handling: {context.BaseSplitInfo.PerishableSurchargeOverriden:C}");
+                    }
                 }
                 else
                 {
-                    shippingTotal = order.BaseSplitInfo.NonPerishableShippingOverriden + order.BaseSplitInfo.NonPerishableSurchargeOverriden;
+                    shippingTotal = context.BaseSplitInfo.NonPerishableShippingOverriden +
+                                    context.BaseSplitInfo.NonPerishableSurchargeOverriden;
+                    if (shippingTotal < 0)
+                    {
+                        _logger.LogWarning(
+                            $"Invalid shipping amount. Standard part: {context.BaseSplitInfo.NonPerishableShippingOverriden:C}, Special handling: {context.BaseSplitInfo.NonPerishableSurchargeOverriden:C}");
+                    }
                 }
             }
             else
             {
-                shippingTotal = order.ShippingTotal;
+                shippingTotal = context.ShippingTotal;
+                if (shippingTotal < 0)
+                {
+                    _logger.LogWarning(
+                        $"Invalid shipping amount. Standard part: {((decimal?) context.SafeData.StandardShipping ?? 0) - ((decimal?) context.SafeData.ShippingOverride ?? 0):C}, Special handling: {((decimal?) context.SafeData.ShippingSurcharge ?? 0) - ((decimal?) context.SafeData.SurchargeOverride ?? 0):C}");
+                }
             }
-
             return lines.Union(Enumerable.Repeat(
                 new Line
                 {
@@ -257,8 +272,8 @@ namespace VitalChoice.Business.Services.Avatax
                     ItemCode = "SHIPPING",
                     LineNo = "01-SHIP",
                     CustomerUsageType =
-                        order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
-                        order.Order.Customer.SafeData.TaxExempt == 1 //Yes, Current Certificate
+                        context.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
+                        context.Order.Customer.SafeData.TaxExempt == 1 //Yes, Current Certificate
                             ? "G"
                             : null
                 }, 1));
