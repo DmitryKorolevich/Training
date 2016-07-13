@@ -640,7 +640,7 @@ namespace VitalChoice.ExportService.Services
                 },
                 LineNumber = lineIndex++,
                 Quantity = 1,
-                UnitPrice = -amount,
+                UnitPrice = amount,
                 ProductDetails = new[]
                 {
                     new OrderProductDetail
