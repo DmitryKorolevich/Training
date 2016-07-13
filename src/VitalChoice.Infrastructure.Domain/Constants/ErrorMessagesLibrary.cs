@@ -62,6 +62,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
 		    public const string AccessDenied = "AccessDenied";
 		    public const string AutoShipAlreadyStarted = "AutoShipAlreadyStarted";
 		    public const string AutoShipAlreadyPaused = "AutoShipAlreadyPaused";
+		    public const string AutoShipOrderShouldContainAutoShip = "AutoShipOrderShouldContainAutoShip";
 		}
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -121,7 +122,8 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             {Keys.AutoShipNotAvailable,  "Requested Auto-Ship either not available or not found"},
             {Keys.AccessDenied,  "Access denied"},
             {Keys.AutoShipAlreadyStarted,  "Auto-Ship has been started already. Please refresh page to check changes"},
-            {Keys.AutoShipAlreadyPaused,  "Auto-Ship has been paused already. Please refresh page to check changes"}
+            {Keys.AutoShipAlreadyPaused,  "Auto-Ship has been paused already. Please refresh page to check changes"},
+            {Keys.AutoShipOrderShouldContainAutoShip,  "Your Auto-Ship order should contain Auto-Ship product"}
         };
     }
 }

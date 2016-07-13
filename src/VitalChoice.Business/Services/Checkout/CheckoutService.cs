@@ -384,6 +384,11 @@ namespace VitalChoice.Business.Services.Checkout
             if (cartOrder?.Order == null)
                 return false;
 
+            if (cartOrder.Order.IdObjectType == (int)OrderType.AutoShip && !cartOrder.Order.Skus.Any(x=>x.Sku.Data.AutoShipProduct))
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AutoShipOrderShouldContainAutoShip]);
+            }
+
             cartOrder.Order = (await _orderService.CalculateStorefrontOrder(cartOrder.Order, OrderStatus.Processed)).Order;
             //set needed key code for orders from storefront
             cartOrder.Order.Data.KeyCode = "WEB ORDER";
