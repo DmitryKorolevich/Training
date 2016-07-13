@@ -7,15 +7,16 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Settings
     {
         public LogDataItemTableEntity()
         {
-            
+
         }
 
-        public LogDataItemTableEntity(int idObjectType, object idObject, DateTime dateCreated)
+        public LogDataItemTableEntity(int idObjectType, object idObject)
         {
+            var createdDate = UniqueDateGenerator.GetUniqueDate();
             PartitionKey = idObject.ToString();
-            RowKey = $"{idObjectType}{dateCreated.ToBinary().ToString("x16")}";
+            RowKey = $"{idObjectType}{createdDate.ToBinary().ToString("x16")}";
             IdObjectType = idObjectType;
-            DateCreated = dateCreated;
+            DateCreated = createdDate;
         }
 
         public int IdObjectType { get; set; }

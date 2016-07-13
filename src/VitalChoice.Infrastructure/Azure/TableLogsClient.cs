@@ -20,6 +20,8 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using LogLevel = Microsoft.WindowsAzure.Storage.LogLevel;
 using VitalChoice.Ecommerce.Domain.Entities.Logs;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain;
+using VitalChoice.Infrastructure.Services;
 
 namespace VitalChoice.Infrastructure.Azure
 {
@@ -44,7 +46,7 @@ namespace VitalChoice.Infrastructure.Azure
         public TableLogEntity(NLog.LogLevel logLevel)
         {
             PartitionKey = logLevel.ToString();
-            RowKey = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffffff");
+            RowKey = UniqueDateGenerator.GetUniqueDate().ToString("yyyy-MM-ddTHH:mm:ss.fffffff");
         }
 
         public TableLogEntity()

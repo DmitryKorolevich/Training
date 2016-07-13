@@ -188,7 +188,7 @@ namespace VitalChoice.Infrastructure.Services
 
         private LogDataItemTableEntity TransformForDynamic(MappedObject model, ObjectType objectType)
         {
-            LogDataItemTableEntity item = new LogDataItemTableEntity((int) objectType, model.Id, DateTime.Now)
+            LogDataItemTableEntity item = new LogDataItemTableEntity((int) objectType, model.Id)
             {
                 IdObjectStatus = model.StatusCode,
                 IdEditedBy = model.IdEditedBy
@@ -211,7 +211,7 @@ namespace VitalChoice.Infrastructure.Services
 
         private LogDataItemTableEntity TransformForContentDataItem(ContentDataItem model, ObjectType objectType)
         {
-            LogDataItemTableEntity item = new LogDataItemTableEntity((int) objectType, model.Id, DateTime.Now)
+            LogDataItemTableEntity item = new LogDataItemTableEntity((int) objectType, model.Id)
             {
                 IdObjectStatus = (int) model.StatusCode,
                 IdEditedBy = model.UserId
@@ -221,7 +221,7 @@ namespace VitalChoice.Infrastructure.Services
 
         private LogDataItemTableEntity TransformForLogEntity(LogEntity model, ObjectType objectType)
         {
-            LogDataItemTableEntity item = new LogDataItemTableEntity((int) objectType, model.Id, DateTime.Now)
+            LogDataItemTableEntity item = new LogDataItemTableEntity((int) objectType, model.Id)
             {
                 IdObjectStatus = (int) model.StatusCode,
                 IdEditedBy = model.IdEditedBy
@@ -231,13 +231,13 @@ namespace VitalChoice.Infrastructure.Services
 
         private LogDataItemTableEntity TransformForEntity(Entity model, ObjectType objectType)
         {
-            LogDataItemTableEntity item = new LogDataItemTableEntity((int) objectType, model.Id, DateTime.Now);
+            LogDataItemTableEntity item = new LogDataItemTableEntity((int) objectType, model.Id);
             return item;
         }
 
         private LogDataItemTableEntity TransformForOther(object model, ObjectType objectType)
         {
-            LogDataItemTableEntity item = new LogDataItemTableEntity((int) objectType, Guid.NewGuid().ToString("N"), DateTime.Now);
+            LogDataItemTableEntity item = new LogDataItemTableEntity((int) objectType, Guid.NewGuid().ToString("N"));
             return item;
         }
 

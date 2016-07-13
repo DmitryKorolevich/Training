@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Authorize.Net.Api.Contracts.V1;
 using Authorize.Net.Api.Controllers;
@@ -14,7 +12,6 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Transaction;
 using VitalChoice.DynamicData.Base;
-using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -366,4 +363,3 @@ namespace VitalChoice.Business.Services.Payment
 	    }
 	}
 }
-
