@@ -590,7 +590,9 @@ namespace VitalChoice.DynamicData.Base
             }
             if (withDefaults)
             {
-                foreach (var optionType in entity.OptionTypes.Where(optionType => !data.ContainsKey(optionType.Name)))
+                foreach (
+                    var optionType in
+                        entity.OptionTypes.Where(optionType => optionType.DefaultValue != null && !data.ContainsKey(optionType.Name)))
                 {
                     data.Add(optionType.Name,
                         MapperTypeConverter.ConvertTo(optionType.DefaultValue, (FieldType) optionType.IdFieldType));
