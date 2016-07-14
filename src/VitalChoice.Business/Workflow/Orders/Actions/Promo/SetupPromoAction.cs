@@ -19,7 +19,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Promo
             var promoService = executionContext.Resolve<IPromotionService>();
             context.Promotions =
                 await
-                    promoService.GetActivePromotions((CustomerType) context.Order.Customer.IdObjectType);
+                    promoService.GetActivePromotions((CustomerType?) context.Order.Customer?.IdObjectType ?? CustomerType.Retail);
             return 0;
         }
     }
