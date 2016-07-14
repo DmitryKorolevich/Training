@@ -139,7 +139,7 @@ namespace VitalChoice.Business.Services.Orders
                 return Task.FromResult(true);
             }
             if (!ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), orderPaymentMethod.CardNumber, "CardNumber") ||
-                orderPaymentMethod.IdCustomerPaymentMethod > 0)
+                orderPaymentMethod.IdCustomerPaymentMethod > 0 || orderPaymentMethod.IdOrderSource > 0)
                 return
                     SendCommand<bool>(new ServiceBusCommandWithResult(Guid.NewGuid(), OrderExportServiceCommandConstants.UpdateOrderPayment,
                         ServerHostName, LocalHostName)
