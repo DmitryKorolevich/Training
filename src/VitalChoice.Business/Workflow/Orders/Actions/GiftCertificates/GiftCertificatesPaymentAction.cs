@@ -67,7 +67,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
             }
             context.GiftCertificatesSubtotal = orderSubTotal - (decimal) context.Data.PayableTotal;
             context.SplitInfo.PerishableGiftCertificateAmount = perishableSubtotal - context.SplitInfo.PerishableSubtotal;
-            context.SplitInfo.NonPerishableSurchargeOverriden = nonPerishableSubtotal - context.SplitInfo.NonPerishableSubtotal;
+            context.SplitInfo.NonPerishableGiftCertificateAmount = nonPerishableSubtotal - context.SplitInfo.NonPerishableSubtotal;
             return Task.FromResult(context.GiftCertificatesSubtotal);
         }
     }
