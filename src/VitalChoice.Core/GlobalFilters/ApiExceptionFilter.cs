@@ -62,6 +62,9 @@ namespace VitalChoice.Core.GlobalFilters
             }
             else
             {
+                var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
+                var logger = loggerFactory.CreateLogger<ApiExceptionFilterAttribute>();
+                logger.LogError(context.Exception.ToString());
                 var exception = context.Exception as AccessDeniedException;
                 if (exception != null)
                 {
@@ -79,12 +82,6 @@ namespace VitalChoice.Core.GlobalFilters
                         {
                             StatusCode = (int)apiException.Status
                         };
-                    }
-                    var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
-                    var logger = loggerFactory.CreateLogger<ApiExceptionFilterAttribute>();
-                    if (context.Exception.InnerException != null)
-                    {
-                        logger.LogError(0, context.Exception.ToString());
                     }
                 }
             }

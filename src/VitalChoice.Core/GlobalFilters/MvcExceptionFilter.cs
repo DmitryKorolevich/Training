@@ -119,7 +119,9 @@ namespace VitalChoice.Core.GlobalFilters
 				}
 				else
 				{
-				    //var pageService = context.HttpContext.RequestServices.GetService<IPageResultService>();
+                    var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
+                    var logger = loggerFactory.CreateLogger<MvcExceptionFilter>();
+                    logger.LogError(context.Exception.ToString());
 
                     if (apiException.Status == HttpStatusCode.NotFound)
 					{
@@ -135,10 +137,6 @@ namespace VitalChoice.Core.GlobalFilters
 
 					result.ViewName = viewName;
 					result.StatusCode = (int)apiException.Status;
-
-				    var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
-				    var logger = loggerFactory.CreateLogger<MvcExceptionFilter>();
-                    logger.LogError(0, context.Exception.ToString());
                 }
 				context.Result = result;
 			}
