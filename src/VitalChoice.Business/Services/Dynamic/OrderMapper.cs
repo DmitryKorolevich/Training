@@ -10,6 +10,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Checkout;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
@@ -57,6 +58,26 @@ namespace VitalChoice.Business.Services.Dynamic
         }
 
         public override Expression<Func<OrderOptionValue, int>> ObjectIdSelector => o => o.IdOrder;
+
+        public override OrderDynamic CreatePrototype(int idObjectType)
+        {
+            var order = base.CreatePrototype(idObjectType);
+            if (order.Customer == null)
+            {
+                order.Customer = _customerMapper.CreatePrototype((int) CustomerType.Retail);
+            }
+            return order;
+        }
+
+        public override OrderDynamic CreatePrototype()
+        {
+            var order = base.CreatePrototype();
+            if (order.Customer == null)
+            {
+                order.Customer = _customerMapper.CreatePrototype((int)CustomerType.Retail);
+            }
+            return order;
+        }
 
         protected override Task FromEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<OrderDynamic, Order>> items, bool withDefaults = false)
