@@ -126,7 +126,28 @@ namespace VitalChoice.ExportService.Services
         {
             var uow = new UnitOfWork(context);
             {
-                if (paymentMethod.IdCustomerPaymentMethod > 0 &&
+                if (paymentMethod.IdOrderSource > 0 &&
+                         ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), paymentMethod.CardNumber, "CardNumber"))
+                {
+                    var orderRep = uow.RepositoryAsync<OrderPaymentMethodExport>();
+                    var orderPayment =
+                        await orderRep.Query(o => o.IdOrder == paymentMethod.IdOrderSource.Value).SelectFirstOrDefaultAsync(false);
+                    if (orderPayment != null)
+                    {
+                        paymentMethod.CardNumber = _encryptionHost.LocalDecrypt<string>(orderPayment.CreditCardNumber);
+
+                        await UpdateOrderPayment(paymentMethod, uow);
+                        await uow.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        // ReSharper disable once PossibleInvalidOperationException
+                        var error = $"Cannot find source order for payment {paymentMethod.IdOrderSource.Value}";
+                        _logger.LogWarning(error);
+                        throw new ApiException(error);
+                    }
+                }
+                else if (paymentMethod.IdCustomerPaymentMethod > 0 &&
                     ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), paymentMethod.CardNumber, "CardNumber"))
                 {
                     var customerRep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
@@ -145,27 +166,6 @@ namespace VitalChoice.ExportService.Services
                     {
                         // ReSharper disable once PossibleInvalidOperationException
                         var error = $"Cannot find source customer payment method {paymentMethod.IdCustomerPaymentMethod.Value}";
-                        _logger.LogWarning(error);
-                        throw new ApiException(error);
-                    }
-                }
-                else if (paymentMethod.IdOrderSource > 0 &&
-                         ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), paymentMethod.CardNumber, "CardNumber"))
-                {
-                    var orderRep = uow.RepositoryAsync<OrderPaymentMethodExport>();
-                    var orderPayment =
-                        await orderRep.Query(o => o.IdOrder == paymentMethod.IdOrderSource.Value).SelectFirstOrDefaultAsync(false);
-                    if (orderPayment != null)
-                    {
-                        paymentMethod.CardNumber = _encryptionHost.LocalDecrypt<string>(orderPayment.CreditCardNumber);
-
-                        await UpdateOrderPayment(paymentMethod, uow);
-                        await uow.SaveChangesAsync();
-                    }
-                    else
-                    {
-                        // ReSharper disable once PossibleInvalidOperationException
-                        var error = $"Cannot find source order for payment {paymentMethod.IdOrderSource.Value}";
                         _logger.LogWarning(error);
                         throw new ApiException(error);
                     }

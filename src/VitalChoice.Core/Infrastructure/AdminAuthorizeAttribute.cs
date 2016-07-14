@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
-using System.Web.Http;
 using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Infrastructure.Domain.Transfer;
 

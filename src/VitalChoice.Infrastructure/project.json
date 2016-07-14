@@ -16,7 +16,7 @@
       "dependencies": {
         "WindowsAzure.ServiceBus": "3.3.1",
         "Microsoft.WindowsAzure.ConfigurationManager": "3.2.1",
-        "NLog": "4.4.0-beta12"
+        "NLog": "4.3.5"
       }
     }
   }
