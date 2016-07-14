@@ -743,7 +743,7 @@ namespace VitalChoice.DynamicData.Base
 
         public virtual TDynamic CreatePrototype(int idObjectType)
         {
-            var result = new TDynamic();
+            var result = new TDynamic {IdObjectType = idObjectType};
             var optionTypes = FilterByType(idObjectType);
             var data = result.DictionaryData;
             foreach (var optionType in optionTypes.Where(optionType => optionType.DefaultValue != null))
