@@ -15,5 +15,8 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
         [DataMember]
         public int? IdCustomerPaymentMethod { get; set; }
+
+        [DataMember]
+        public int? IdOrderSource { get; set; }
     }
 }

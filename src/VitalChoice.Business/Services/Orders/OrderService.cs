@@ -186,7 +186,8 @@ namespace VitalChoice.Business.Services.Orders
                     var paymentCopy = new OrderCardData
                     {
                         CardNumber = model.PaymentMethod.SafeData.CardNumber,
-                        IdCustomerPaymentMethod = model.PaymentMethod.IdCustomerPaymentMethod
+                        IdCustomerPaymentMethod = model.PaymentMethod.IdCustomerPaymentMethod,
+                        IdOrderSource = model.PaymentMethod.IdOrderSource
                     };
                     (await authTask).Raise();
                     entity = await base.InsertAsync(model, uow);
@@ -239,7 +240,8 @@ namespace VitalChoice.Business.Services.Orders
                         PaymentMethod = new OrderCardData
                         {
                             CardNumber = p.PaymentMethod.SafeData.CardNumber,
-                            IdCustomerPaymentMethod = p.PaymentMethod.IdCustomerPaymentMethod
+                            IdCustomerPaymentMethod = p.PaymentMethod.IdCustomerPaymentMethod,
+                            IdOrderSource = p.PaymentMethod.IdOrderSource
                         }
                     }).ToArray();
                     entities = await base.InsertRangeAsync(models, uow);
@@ -291,7 +293,8 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         CardNumber = model.PaymentMethod.SafeData.CardNumber,
                         IdOrder = model.Id,
-                        IdCustomerPaymentMethod = model.PaymentMethod.IdCustomerPaymentMethod
+                        IdCustomerPaymentMethod = model.PaymentMethod.IdCustomerPaymentMethod,
+                        IdOrderSource = model.PaymentMethod.IdOrderSource
                     };
                     var initial = await SelectEntityFirstAsync(o => o.Id == model.Id, query => query);
                     entity = await base.UpdateAsync(model, uow);
@@ -371,6 +374,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         CardNumber = p.PaymentMethod.SafeData.CardNumber,
                         IdCustomerPaymentMethod = p.PaymentMethod.IdCustomerPaymentMethod,
+                        IdOrderSource = p.PaymentMethod.IdOrderSource,
                         IdOrder = p.Id
                     }).ToArray();
                     var initialList = await SelectEntitiesAsync(o => ids.Contains(o.Id), query => query);
@@ -979,11 +983,16 @@ namespace VitalChoice.Business.Services.Orders
                             await UpdateInternalAsync(autoShip, uow);
 
                             standardOrder = autoShip;
+                            standardOrder.PaymentMethod.IdOrderSource = autoShip.Id;
                             standardOrder.IdObjectType = (int) OrderType.AutoShipOrder;
                             standardOrder.Data.AutoShipFrequency = null;
                             standardOrder.Data.LastAutoShipDate = null;
                             standardOrder.Id = 0;
                             standardOrder.PaymentMethod.Id = 0;
+                            if (standardOrder.PaymentMethod.Address != null)
+                            {
+                                standardOrder.PaymentMethod.Address.Id = 0;
+                            }
                             standardOrder.ShippingAddress.Id = 0;
                             standardOrder.Data.AutoShipId = autoShip.Id;
 
@@ -1179,11 +1188,17 @@ namespace VitalChoice.Business.Services.Orders
 
                         if (anyNotIncomplete)
                         {
+                            model.PaymentMethod.IdOrderSource = res.Id;
                             model.IdObjectType = (int) OrderType.AutoShipOrder;
                             model.Data.AutoShipFrequency = null;
                             model.Data.LastAutoShipDate = null;
                             model.Data.AutoShipId = res.Id;
                             model.Id = 0;
+                            model.PaymentMethod.Id = 0;
+                            if (model.PaymentMethod.Address != null)
+                            {
+                                model.PaymentMethod.Address.Id = 0;
+                            }
                             model.ShippingAddress.Id = 0;
 
                             idAutoShipOrder = (await InsertAsyncInternal(model, uow)).Id;
@@ -1283,12 +1298,18 @@ namespace VitalChoice.Business.Services.Orders
                         {
                             foreach (var model in completed)
                             {
-                                model.IdObjectType = (int) OrderType.AutoShipOrder;
+                                model.PaymentMethod.IdOrderSource = model.Id;
+                                model.IdObjectType = (int)OrderType.AutoShipOrder;
                                 model.Data.AutoShipFrequency = null;
                                 model.Data.LastAutoShipDate = null;
                                 model.Data.AutoShipId = model.Id;
-                                model.ShippingAddress.Id = 0;
                                 model.Id = 0;
+                                model.PaymentMethod.Id = 0;
+                                if (model.PaymentMethod.Address != null)
+                                {
+                                    model.PaymentMethod.Address.Id = 0;
+                                }
+                                model.ShippingAddress.Id = 0;
                             }
 
                             autoShipOrderIds = (await InsertRangeInternalAsync(completed, uow)).Select(p => p.Id).ToList();
@@ -1338,12 +1359,17 @@ namespace VitalChoice.Business.Services.Orders
                             model.Data.LastAutoShipDate = DateTime.Now;
                             await UpdateInternalAsync(model, uow);
 
-                            model.IdObjectType = (int) OrderType.AutoShipOrder;
+                            model.PaymentMethod.IdOrderSource = res.Id;
+                            model.IdObjectType = (int)OrderType.AutoShipOrder;
                             model.Data.AutoShipFrequency = null;
                             model.Data.LastAutoShipDate = null;
                             model.Data.AutoShipId = res.Id;
                             model.Id = 0;
                             model.PaymentMethod.Id = 0;
+                            if (model.PaymentMethod.Address != null)
+                            {
+                                model.PaymentMethod.Address.Id = 0;
+                            }
                             model.ShippingAddress.Id = 0;
 
                             idAutoShipOrder = (await InsertAsyncInternal(model, uow)).Id;
@@ -1402,12 +1428,17 @@ namespace VitalChoice.Business.Services.Orders
                                     model.Data.LastAutoShipDate = DateTime.Now;
                                     await UpdateInternalAsync(model, uow);
 
-                                    model.IdObjectType = (int) OrderType.AutoShipOrder;
+                                    model.PaymentMethod.IdOrderSource = model.Id;
+                                    model.IdObjectType = (int)OrderType.AutoShipOrder;
                                     model.Data.AutoShipFrequency = null;
                                     model.Data.LastAutoShipDate = null;
                                     model.Data.AutoShipId = model.Id;
                                     model.Id = 0;
                                     model.PaymentMethod.Id = 0;
+                                    if (model.PaymentMethod.Address != null)
+                                    {
+                                        model.PaymentMethod.Address.Id = 0;
+                                    }
                                     model.ShippingAddress.Id = 0;
 
                                     toInsert.Add(model);
