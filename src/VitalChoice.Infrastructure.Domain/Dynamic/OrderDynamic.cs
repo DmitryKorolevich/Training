@@ -17,6 +17,7 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
             Skus = new List<SkuOrdered>();
             PromoSkus = new List<PromoOrdered>();
             GiftCertificates = new List<GiftCertificateInOrder>();
+            Customer = new CustomerDynamic();
         }
 
         public int? IdAddedBy { get; set; }
@@ -27,7 +28,6 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
         public OrderStatus? NPOrderStatus { get; set; }
 
-        //[NotLoggedInfo]
         public CustomerDynamic Customer { get; set; }
 
         public ICollection<SkuOrdered> Skus { get; set; }
