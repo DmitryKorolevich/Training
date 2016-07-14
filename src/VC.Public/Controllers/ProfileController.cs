@@ -595,7 +595,7 @@ namespace VC.Public.Controllers
                                 ProductUrl = ProductBaseUrl + skuOrdered.Sku.Product.Url,
                                 IconLink = skuOrdered.Sku.Product.SafeData.Thumbnail,
                                 ProductName = skuOrdered.Sku.Product.Name,
-                                PortionsCount = skuOrdered.Sku.Data.QTY,
+                                PortionsCount = (int?)skuOrdered.Sku.SafeData.QTY ?? 0,
                                 Quantity = skuOrdered.Quantity,
                                 SkuCode = skuOrdered.Sku.Code,
                                 ProductSubTitle = skuInDB.Product.SafeData.SubTitle,

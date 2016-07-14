@@ -16,7 +16,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions
 
         public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, ITreeContext executionContext)
         {
-            context.ManualRefundOverride = context.RefundOrder.Data.ManualRefundOverride;
+            context.ManualRefundOverride = (decimal?) context.RefundOrder.SafeData.ManualRefundOverride ?? 0;
             return Task.FromResult(context.ManualRefundOverride);
         }
     }

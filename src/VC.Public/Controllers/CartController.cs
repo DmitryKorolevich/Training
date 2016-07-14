@@ -365,7 +365,7 @@ namespace VC.Public.Controllers
 			return View("AutoShip", new AutoShipModel()
 			{
 				SkuCode = sku.Sku.Code,
-				DisplayName = $"{sku.Sku.Product.Name} {sku.Sku.Product.Data.SubTitle} ({sku.Sku.Data.QTY})",
+				DisplayName = $"{sku.Sku.Product.Name} {sku.Sku.Product.SafeData.SubTitle} ({sku.Sku.SafeData.QTY})",
 				IdSchedule = lookup.FirstOrDefault() != null ? Convert.ToInt32(lookup.First().Value):0,
 				ProductUrl = sku.Sku.Product.Url
 			});

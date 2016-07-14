@@ -53,7 +53,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.DiscountTiers = entity.DiscountTiers?.ToList();
                 if (dynamic.IdObjectType == (int)DiscountType.Threshold && withDefaults)
                 {
-                    dynamic.Data.ThresholdSku = await _productService.GetSkuOrderedAsync((string) dynamic.Data.ProductSKU);
+                    dynamic.Data.ThresholdSku = await _productService.GetSkuOrderedAsync((string) dynamic.SafeData.ProductSKU);
                 }
             });
         }

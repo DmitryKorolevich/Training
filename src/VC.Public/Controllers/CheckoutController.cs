@@ -508,16 +508,16 @@ namespace VC.Public.Controllers
                     {
                         if (customerAddressIdToUpdate.HasValue)
                         {
-                            var customerAddresses = cart.Order.Customer.ShippingAddresses.ToList();
+                            var shippingAddresses = cart.Order.Customer.ShippingAddresses.ToList();
 
-                            var index = customerAddresses.IndexOf(customerAddresses.Single(x => x.Id == customerAddressIdToUpdate.Value));
-                            var originalId = customerAddresses[index].Id;
-                            var defaultAddr = customerAddresses[index].Data.Default;
+                            var index = shippingAddresses.IndexOf(shippingAddresses.Single(x => x.Id == customerAddressIdToUpdate.Value));
+                            var originalId = shippingAddresses[index].Id;
+                            var defaultAddr = shippingAddresses[index].Data.Default;
                             cart.Order.ShippingAddress.Id = originalId;
                             cart.Order.ShippingAddress.Data.Default = defaultAddr;
-                            customerAddresses[index] = cart.Order.ShippingAddress;
+                            shippingAddresses[index] = cart.Order.ShippingAddress;
 
-                            cart.Order.Customer.ShippingAddresses = customerAddresses;
+                            cart.Order.Customer.ShippingAddresses = shippingAddresses;
 
                             cart.Order.Customer = await CustomerService.UpdateAsync(cart.Order.Customer);
                         }

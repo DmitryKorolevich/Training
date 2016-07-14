@@ -39,7 +39,7 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
 
             if (dataContext.Order.Discount.DictionaryData.ContainsKey("RequireMinimumPerishable") &&
                 dataContext.Order.Discount.Data.RequireMinimumPerishable &&
-                dataContext.Data.PerishableSubtotal < dataContext.Order.Discount.Data.RequireMinimumPerishableAmount)
+                dataContext.Data.PerishableSubtotal < dataContext.Order.Discount.SafeData.RequireMinimumPerishableAmount)
             {
                 dataContext.Messages.Add(new MessageInfo
                 {
@@ -121,7 +121,7 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
                             {
                                 dataContext.Order.IsFirstHealthwise = false;
                             }
-                            else if ((bool?) dataContext.Order.Data.IsHealthwise ?? false)
+                            else if ((bool?) dataContext.Order.SafeData.IsHealthwise ?? false)
                             {
                                 dataContext.Order.IsFirstHealthwise = true;
                             }

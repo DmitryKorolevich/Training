@@ -48,9 +48,9 @@ namespace VC.Public.Controllers
 	    {
 			var productTransfer = await _productService.SelectTransferAsync(id, true);
 
-			ViewBag.Image = productTransfer.ProductDynamic.Data.Thumbnail;
+			ViewBag.Image = productTransfer.ProductDynamic.SafeData.Thumbnail;
 			ViewBag.Name = productTransfer.ProductDynamic.Name;
-			ViewBag.SubTitle = productTransfer.ProductDynamic.Data.SubTitle;
+			ViewBag.SubTitle = productTransfer.ProductDynamic.SafeData.SubTitle;
 		}
 
 	    private async Task<PagedListEx<ReviewListItemModel>> GetReviewsModel(ProductReviewFilter filter)
@@ -250,7 +250,7 @@ namespace VC.Public.Controllers
 		    {
 				ProductPublicId = transfer.ProductDynamic.PublicId,
 				ProductTitle = transfer.ProductDynamic.Name,
-				ProductSubTitle = transfer.ProductDynamic.Data.SubTitle,
+				ProductSubTitle = transfer.ProductDynamic.SafeData.SubTitle,
 				ProductUrl = transfer.ProductContent.Url,
 				Reviews = reviewsModel,
 				AverageRatings = await _productReviewService.GetApprovedAverageRatingsAsync(transfer.ProductDynamic.Id)

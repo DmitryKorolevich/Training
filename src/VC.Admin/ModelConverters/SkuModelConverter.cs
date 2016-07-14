@@ -48,7 +48,7 @@ namespace VC.Admin.ModelConverters
         {
             dynamic.StatusCode = model.Active ? (int)RecordStatusCode.Active : (int)RecordStatusCode.NotActive;
             dynamic.Code = dynamic.Code.Trim();
-            if (!dynamic.Data.AutoShipProduct)
+            if (!((bool?) dynamic.SafeData.AutoShipProduct ?? false))
             {
                 dynamic.DictionaryData.Remove("AutoShipFrequency1");
                 dynamic.DictionaryData.Remove("AutoShipFrequency2");

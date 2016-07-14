@@ -57,7 +57,7 @@ namespace VitalChoice.SharedWeb.Helpers
 
 			result.DisplayName = displayName;
 			result.Active = orderDynamic.StatusCode == (int)RecordStatusCode.Active;
-	        if (orderDynamic.Data.LastAutoShipDate != null)
+	        if (orderDynamic.SafeData.LastAutoShipDate != null)
 	        {
 	            result.NextDate = orderDynamic.Data.LastAutoShipDate.AddMonths(result.Frequency);
 	        }

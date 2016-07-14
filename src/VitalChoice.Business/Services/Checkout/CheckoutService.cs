@@ -384,7 +384,8 @@ namespace VitalChoice.Business.Services.Checkout
             if (cartOrder?.Order == null)
                 return false;
 
-            if (cartOrder.Order.IdObjectType == (int)OrderType.AutoShip && !cartOrder.Order.Skus.Any(x=>x.Sku.Data.AutoShipProduct))
+            if (cartOrder.Order.IdObjectType == (int) OrderType.AutoShip &&
+                !cartOrder.Order.Skus.Any(x => (bool?) x.Sku.SafeData.AutoShipProduct ?? false))
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AutoShipOrderShouldContainAutoShip]);
             }
