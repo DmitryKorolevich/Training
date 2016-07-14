@@ -14,8 +14,6 @@ namespace VitalChoice.Interfaces.Services.Settings
 
         SettingDynamic GetSettings();
 
-        Task<SettingDynamic> GetSettingsAsync();
-
         Task<bool> UpdateSettingsAsync(SettingDynamic settings);
         
         Task<IList<Lookup>> GetLookupsAsync(ICollection<string> names);

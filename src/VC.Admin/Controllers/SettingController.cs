@@ -37,6 +37,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Infrastructure.Domain.Content;
+using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Services;
 using VitalChoice.Profiling.Base;
@@ -54,6 +55,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<CatalogRequestAddressListItemModel, CatalogRequestAddressListItemModelCsvMap> _exportCatalogRequestAddressService;
         private readonly ILogger logger;
         private readonly ITableLogsClient _logsClient;
+        private readonly AppSettings _appSettings;
 
         public SettingController(
             ILogViewService logViewService,
@@ -63,7 +65,7 @@ namespace VC.Admin.Controllers
             IObjectHistoryLogService objectHistoryLogService,
             ICatalogRequestAddressService catalogRequestAddressService,
             ICsvExportService<CatalogRequestAddressListItemModel, CatalogRequestAddressListItemModelCsvMap> exportCatalogRequestAddressService,
-            ILoggerProviderExtended loggerProvider, ITableLogsClient logsClient)
+            ILoggerProviderExtended loggerProvider, ITableLogsClient logsClient, AppSettings appSettings)
         {
             this.logViewService = logViewService;
             this.countryService = countryService;
@@ -73,6 +75,7 @@ namespace VC.Admin.Controllers
             _catalogRequestAddressService = catalogRequestAddressService;
             _exportCatalogRequestAddressService = exportCatalogRequestAddressService;
             _logsClient = logsClient;
+            _appSettings = appSettings;
             this.logger = loggerProvider.CreateLogger<SettingController>();
         }
 
@@ -190,25 +193,23 @@ namespace VC.Admin.Controllers
 
         [HttpGet]
         [AdminAuthorize(PermissionType.Settings)]
-        public async Task<Result<GlobalSettingsManageModel>> GetGlobalSettings()
+        public Result<GlobalSettingsManageModel> GetGlobalSettings()
         {
-            var settings = await settingService.GetSettingsAsync();
-
             return new GlobalSettingsManageModel()
             {
-                GlobalPerishableThreshold = settings.SafeData.GlobalPerishableThreshold,
-                CreditCardAuthorizations = settings.SafeData.CreditCardAuthorizations,
+                GlobalPerishableThreshold = _appSettings.GlobalPerishableThreshold,
+                CreditCardAuthorizations = _appSettings.CreditCardAuthorizations,
             };
         }
 
         [HttpPost]
         [AdminAuthorize(PermissionType.Settings)]
-        public async Task<Result<bool>> UpdateGlobalSettings([FromBody]GlobalSettingsManageModel model)
+        public async Task<Result<bool>> UpdateGlobalSettings([FromBody] GlobalSettingsManageModel model)
         {
             if (!Validate(model))
                 return false;
 
-            var settings = await settingService.GetSettingsAsync();
+            var settings = settingService.GetSettings();
             settings.Data.GlobalPerishableThreshold = model.GlobalPerishableThreshold;
             settings.Data.CreditCardAuthorizations = model.CreditCardAuthorizations;
 

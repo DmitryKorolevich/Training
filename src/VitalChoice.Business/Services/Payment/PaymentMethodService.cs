@@ -17,6 +17,7 @@ using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer.PaymentMethod;
@@ -35,11 +36,13 @@ namespace VitalChoice.Business.Services.Payment
 	    private readonly ICountryNameCodeResolver _countryNameCode;
 	    private readonly ILogger _logger;
 	    private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
-	    private readonly ISettingService _settingService;
+	    private readonly AppSettings _appSettings;
 
-	    public PaymentMethodService(IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository, IRepositoryAsync<AdminProfile> adminProfileRepository,
+	    public PaymentMethodService(IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
+	        IRepositoryAsync<AdminProfile> adminProfileRepository,
 	        IEcommerceRepositoryAsync<PaymentMethodToCustomerType> paymentMethodToCustomerTypeRepository,
-	        ILoggerProviderExtended loggerProvider, IOptions<AppOptions> options, ICountryNameCodeResolver countryNameCode, ITransactionAccessor<EcommerceContext> transactionAccessor, ISettingService settingService)
+	        ILoggerProviderExtended loggerProvider, IOptions<AppOptions> options, ICountryNameCodeResolver countryNameCode,
+	        ITransactionAccessor<EcommerceContext> transactionAccessor, AppSettings appSettings)
 	    {
 	        _paymentMethodRepository = paymentMethodRepository;
 	        _adminProfileRepository = adminProfileRepository;
@@ -47,7 +50,7 @@ namespace VitalChoice.Business.Services.Payment
 	        _options = options;
 	        _countryNameCode = countryNameCode;
 	        _transactionAccessor = transactionAccessor;
-	        _settingService = settingService;
+	        _appSettings = appSettings;
 	        _logger = loggerProvider.CreateLogger<PaymentMethodService>();
 	    }
 
@@ -192,7 +195,8 @@ namespace VitalChoice.Business.Services.Payment
                 return errors;
             }
 
-            if (_options.Value.AuthorizeNet.TestEnv || paymentMethod.IdObjectType != (int)PaymentMethodType.CreditCard || !(await _settingService.GetSettingsAsync()).SafeData.CreditCardAuthorizations)
+            if (_options.Value.AuthorizeNet.TestEnv || paymentMethod.IdObjectType != (int) PaymentMethodType.CreditCard ||
+                !_appSettings.CreditCardAuthorizations)
                 return errors;
 
             creditCardType creditCard;

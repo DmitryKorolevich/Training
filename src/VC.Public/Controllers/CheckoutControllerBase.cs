@@ -21,6 +21,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
@@ -39,17 +40,19 @@ namespace VC.Public.Controllers
         protected readonly IOrderService OrderService;
         protected readonly IDynamicMapper<SkuDynamic, Sku> SkuMapper;
         protected readonly IDynamicMapper<ProductDynamic, Product> ProductMapper;
+        protected readonly AppSettings AppSettings;
 
         protected CheckoutControllerBase(ICustomerService customerService,
             ReferenceData referenceData, IAuthorizationService authorizationService, ICheckoutService checkoutService,
             IOrderService orderService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
-            IPageResultService pageResultService, ISettingService settingService, ExtendedUserManager userManager) : base(customerService,
+            IPageResultService pageResultService, ISettingService settingService, ExtendedUserManager userManager, AppSettings appSettings) : base(customerService,
                 authorizationService, checkoutService, pageResultService, userManager, referenceData)
         {
             OrderService = orderService;
             SkuMapper = skuMapper;
             ProductMapper = productMapper;
             SettingService = settingService;
+            AppSettings = appSettings;
         }
 
         protected async Task<bool> IsCartEmpty()
@@ -85,7 +88,7 @@ namespace VC.Public.Controllers
             }
             else
             {
-                decimal? globalThreshold = (await SettingService.GetSettingsAsync()).SafeData.GlobalPerishableThreshold;
+                decimal? globalThreshold = AppSettings.GlobalPerishableThreshold;
                 cartModel.TopGlobalMessage = globalThreshold.HasValue && globalThreshold.Value > 0
                     ? $"Frozen products must total {globalThreshold.Value.ToString("c")}, to prevent thawing during shipping. Please add frozen items until they total {globalThreshold.Value.ToString("c")}."
                     : null;

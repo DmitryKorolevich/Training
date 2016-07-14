@@ -139,7 +139,7 @@ namespace VitalChoice.Business.Services.Checkout
 
         private async Task<CustomerCartOrder> InitCartOrder(CartExtended cart)
         {
-            var newOrder = await _orderService.Mapper.CreatePrototypeAsync((int) OrderType.Normal);
+            var newOrder = _orderService.Mapper.CreatePrototype((int) OrderType.Normal);
             newOrder.Data.OrderType = (int) SourceOrderType.Web;
             if (newOrder.Customer != null)
             {
@@ -171,7 +171,7 @@ namespace VitalChoice.Business.Services.Checkout
                     Quantity = s.Quantity
                 };
             }).ToList() ?? new List<SkuOrdered>();
-            newOrder.ShippingAddress = await _addressService.Mapper.CreatePrototypeAsync((int) AddressType.Shipping);
+            newOrder.ShippingAddress = _addressService.Mapper.CreatePrototype((int) AddressType.Shipping);
             newOrder.ShippingAddress.IdCountry = (await _countryService.GetCountriesAsync(new CountryFilter
             {
                 CountryCode = "US"

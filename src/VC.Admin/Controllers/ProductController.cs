@@ -38,6 +38,7 @@ using VitalChoice.Interfaces.Services.InventorySkus;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Services;
 
 namespace VC.Admin.Controllers
@@ -52,6 +53,7 @@ namespace VC.Admin.Controllers
         private readonly ISettingService settingService;
         private readonly IDynamicMapper<ProductDynamic, Product> _mapper;
         private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
+        private readonly AppSettings _appSettings;
         private readonly ICsvExportService<ProductCategoryStatisticTreeItemModel, ProductCategoryStatisticTreeItemCsvMap> productCategoryStatisticTreeItemCSVExportService;
         private readonly ICsvExportService<SkuBreakDownReportItem, SkuBreakDownReportItemCsvMap> _skuBreakDownReportItemCSVExportService;
         private readonly IObjectHistoryLogService objectHistoryLogService;
@@ -69,7 +71,7 @@ namespace VC.Admin.Controllers
             IDynamicMapper<ProductDynamic, Product> mapper,
             ICsvExportService<ProductCategoryStatisticTreeItemModel, ProductCategoryStatisticTreeItemCsvMap> productCategoryStatisticTreeItemCSVExportService,
             ICsvExportService<SkuBreakDownReportItem, SkuBreakDownReportItemCsvMap> skuBreakDownReportItemCSVExportService,
-            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager, IAgentService agentService, IDynamicMapper<SkuDynamic, Sku> skuMapper)
+            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager, IAgentService agentService, IDynamicMapper<SkuDynamic, Sku> skuMapper, AppSettings appSettings)
         {
             this.productCategoryService = productCategoryService;
             this.inventoryCategoryService = inventoryCategoryService;
@@ -83,6 +85,7 @@ namespace VC.Admin.Controllers
             _userManager = userManager;
             _agentService = agentService;
             _skuMapper = skuMapper;
+            _appSettings = appSettings;
             _mapper = mapper;
             this.logger = loggerProvider.CreateLogger<ProductController>();
         }
@@ -617,14 +620,13 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<string>> GetProductOutOfStockRequestsMessageFormat()
+        public Result<string> GetProductOutOfStockRequestsMessageFormat()
         {
-            var settings = await settingService.GetSettingsAsync();
-            if (settings == null || settings.SafeData.ProductOutOfStockEmailTemplate==null)
+            if (_appSettings.ProductOutOfStockEmailTemplate == null)
             {
                 throw new NotSupportedException($"{SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE} not configurated.");
             }
-            return settings.SafeData.ProductOutOfStockEmailTemplate;
+            return _appSettings.ProductOutOfStockEmailTemplate;
         }
 
         [HttpPost]

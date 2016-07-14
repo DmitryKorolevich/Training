@@ -20,9 +20,6 @@ namespace VitalChoice.DynamicData.Interfaces
         Task UpdateObjectAsync<TModel>(TModel model, TDynamic obj, int idObjectType, bool loadDefaults = true)
             where TModel : class, new();
 
-        Task<TDynamic> CreatePrototypeAsync();
-        Task<TDynamic> CreatePrototypeAsync(int idObjectType);
-
         Task<TModel> CreatePrototypeForAsync<TModel>(int idObjectType)
             where TModel : class, new();
 

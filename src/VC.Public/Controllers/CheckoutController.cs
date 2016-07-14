@@ -40,6 +40,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
@@ -65,7 +66,6 @@ namespace VC.Public.Controllers
         private readonly INotificationService _notificationService;
         private readonly ILogger _logger;
         private readonly ICountryNameCodeResolver _countryNameCodeResolver;
-        private readonly ReferenceData _referenceData;
 
         public CheckoutController(IStorefrontUserService storefrontUserService,
             ICustomerService customerService,
@@ -80,10 +80,11 @@ namespace VC.Public.Controllers
             BrontoService brontoService,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
             IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider,
-            ExtendedUserManager userManager, ICountryNameCodeResolver countryNameCodeResolver, ReferenceData referenceData)
+            ExtendedUserManager userManager, ICountryNameCodeResolver countryNameCodeResolver, ReferenceData referenceData,
+            AppSettings appSettings)
             : base(
                 customerService, referenceData, authorizationService, checkoutService, orderService,
-                skuMapper, productMapper, pageResultService, settingService, userManager)
+                skuMapper, productMapper, pageResultService, settingService, userManager, appSettings)
         {
             _storefrontUserService = storefrontUserService;
             _paymentMethodConverter = paymentMethodConverter;
@@ -93,7 +94,6 @@ namespace VC.Public.Controllers
             _brontoService = brontoService;
             _transactionAccessor = transactionAccessor;
             _countryNameCodeResolver = countryNameCodeResolver;
-            _referenceData = referenceData;
             _affiliateService = affiliateService;
             _notificationService = notificationService;
             _logger = loggerProvider.CreateLogger<CheckoutController>();
@@ -691,7 +691,7 @@ namespace VC.Public.Controllers
 
             var paymentMethod = cart.Order.PaymentMethod;
             reviewOrderModel.BillToAddress = paymentMethod.Address.PopulateBillingAddressDetails(_countryNameCodeResolver, cart.Order.Customer.Email);
-            reviewOrderModel.CreditCardDetails = paymentMethod.PopulateCreditCardDetails(_referenceData);
+            reviewOrderModel.CreditCardDetails = paymentMethod.PopulateCreditCardDetails(ReferenceData);
 
             var shippingAddress = cart.Order.ShippingAddress;
             reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(_countryNameCodeResolver);
@@ -718,7 +718,7 @@ namespace VC.Public.Controllers
 
             var paymentMethod = order.PaymentMethod;
             reviewOrderModel.BillToAddress = paymentMethod.Address.PopulateBillingAddressDetails(_countryNameCodeResolver, order.Customer.Email);
-            reviewOrderModel.CreditCardDetails = paymentMethod.PopulateCreditCardDetails(_referenceData);
+            reviewOrderModel.CreditCardDetails = paymentMethod.PopulateCreditCardDetails(ReferenceData);
 
             var shippingAddress = order.ShippingAddress;
             reviewOrderModel.ShipToAddress = shippingAddress.PopulateShippingAddressDetails(_countryNameCodeResolver);
@@ -858,7 +858,7 @@ namespace VC.Public.Controllers
             var shipping = existingCustomer.ShippingAddresses.FirstOrDefault();
             if (shipping == null)
             {
-                shipping = await _addressConverter.CreatePrototypeAsync((int) AddressType.Shipping);
+                shipping = _addressConverter.CreatePrototype((int) AddressType.Shipping);
                 existingCustomer.ShippingAddresses.Add(shipping);
             }
             await _addressConverter.UpdateObjectAsync(model, shipping, (int) AddressType.Shipping);
@@ -886,7 +886,7 @@ namespace VC.Public.Controllers
 
         private async Task<CustomerDynamic> CreateAccount(AddUpdateBillingAddressModel model)
         {
-            var newCustomer = await CustomerService.Mapper.CreatePrototypeAsync((int) CustomerType.Retail);
+            var newCustomer = CustomerService.Mapper.CreatePrototype((int) CustomerType.Retail);
             newCustomer.PublicId = Guid.NewGuid();
             UpdateAccount(model, newCustomer);
             newCustomer.ProfileAddress = await _addressConverter.FromModelAsync(model, (int) AddressType.Profile);

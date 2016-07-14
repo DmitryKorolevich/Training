@@ -38,8 +38,6 @@ namespace VitalChoice.Business.Services.Settings
 
         public SettingDynamic GetSettings() => _settingMapper.CreatePrototype();
 
-        public Task<SettingDynamic> GetSettingsAsync() => _settingMapper.CreatePrototypeAsync();
-
         public async Task<bool> UpdateSettingsAsync(SettingDynamic settings)
         {
             var entity = await _settingMapper.ToEntityAsync(settings);

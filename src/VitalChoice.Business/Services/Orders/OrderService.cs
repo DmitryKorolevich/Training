@@ -181,7 +181,7 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     SetExtendedOptions(Enumerable.Repeat(model, 1));
                     await SetSkusBornDate(new[] {model}, uow);
-                    await EnsurePaymentMethod(model);
+                    EnsurePaymentMethod(model);
                     var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
                     var paymentCopy = new OrderCardData
                     {
@@ -285,15 +285,14 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     SetExtendedOptions(Enumerable.Repeat(model, 1));
                     await SetSkusBornDate(new[] {model}, uow);
-                    await EnsurePaymentMethod(model);
-                    var authTask = _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod);
+                    EnsurePaymentMethod(model);
+                    (await _paymentMethodService.AuthorizeCreditCard(model.PaymentMethod)).Raise();
                     var paymentCopy = new OrderCardData
                     {
                         CardNumber = model.PaymentMethod.SafeData.CardNumber,
                         IdOrder = model.Id,
                         IdCustomerPaymentMethod = model.PaymentMethod.IdCustomerPaymentMethod
                     };
-                    (await authTask).Raise();
                     var initial = await SelectEntityFirstAsync(o => o.Id == model.Id, query => query);
                     entity = await base.UpdateAsync(model, uow);
 
@@ -1224,7 +1223,7 @@ namespace VitalChoice.Business.Services.Orders
             }
         }
 
-        private async Task EnsurePaymentMethod(OrderDynamic model)
+        private void EnsurePaymentMethod(OrderDynamic model)
         {
             if (model.PaymentMethod == null)
             {
@@ -1232,22 +1231,22 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     case OrderType.Normal:
                     case OrderType.AutoShipOrder:
-                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int) PaymentMethodType.CreditCard);
+                        model.PaymentMethod = _paymentGenericService.Mapper.CreatePrototype((int) PaymentMethodType.CreditCard);
                         break;
                     case OrderType.AutoShip:
-                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int) PaymentMethodType.CreditCard);
+                        model.PaymentMethod = _paymentGenericService.Mapper.CreatePrototype((int) PaymentMethodType.CreditCard);
                         break;
                     case OrderType.DropShip:
-                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int) PaymentMethodType.NoCharge);
+                        model.PaymentMethod = _paymentGenericService.Mapper.CreatePrototype((int) PaymentMethodType.NoCharge);
                         break;
                     case OrderType.GiftList:
-                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int) PaymentMethodType.NoCharge);
+                        model.PaymentMethod = _paymentGenericService.Mapper.CreatePrototype((int) PaymentMethodType.NoCharge);
                         break;
                     case OrderType.Reship:
-                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int) PaymentMethodType.CreditCard);
+                        model.PaymentMethod = _paymentGenericService.Mapper.CreatePrototype((int) PaymentMethodType.CreditCard);
                         break;
                     case OrderType.Refund:
-                        model.PaymentMethod = await _paymentGenericService.Mapper.CreatePrototypeAsync((int) PaymentMethodType.CreditCard);
+                        model.PaymentMethod = _paymentGenericService.Mapper.CreatePrototype((int) PaymentMethodType.CreditCard);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -1641,9 +1640,9 @@ namespace VitalChoice.Business.Services.Orders
             return toReturn;
         }
 
-        public async Task<OrderDynamic> CreateNewNormalOrder(OrderStatus status)
+        public OrderDynamic CreateNewNormalOrder(OrderStatus status)
         {
-            var toReturn = await Mapper.CreatePrototypeAsync((int) OrderType.Normal);
+            var toReturn = Mapper.CreatePrototype((int) OrderType.Normal);
 
             toReturn.StatusCode = (int) RecordStatusCode.Active;
             if (status != OrderStatus.Processed && status != OrderStatus.Incomplete)

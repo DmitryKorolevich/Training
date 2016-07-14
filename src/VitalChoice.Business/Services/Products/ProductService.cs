@@ -44,6 +44,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Reports;
+using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
@@ -70,13 +71,13 @@ namespace VitalChoice.Business.Services.Products
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly OrderSkusRepository _orderSkusRepositoryRepository;
         private readonly IEcommerceRepositoryAsync<ProductOutOfStockRequest> _productOutOfStockRequestRepository;
-        private readonly ISettingService _settingService;
         private readonly INotificationService _notificationService;
         private readonly IRepositoryAsync<ProductContent> _productContentRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> _contentTypeRepository;
         private readonly IOptions<AppOptions> _options;
         private readonly IEcommerceRepositoryAsync<SkuOptionValue> _skuOptionValueRepositoryAsync;
         private readonly ReferenceData _referenceData;
+        private readonly AppSettings _appSettings;
         private readonly IProductCategoryService _productCategoryService;
         private readonly ICsvExportService<SkuGoogleItem, SkuGoogleItemExportCsvMap> _skuGoogleItemCSVExportService;
         private readonly IBlobStorageClient _storageClient;
@@ -96,7 +97,6 @@ namespace VitalChoice.Business.Services.Products
             OrderSkusRepository orderSkusRepositoryRepository,
             SkuMapper skuMapper,
             IEcommerceRepositoryAsync<ProductOutOfStockRequest> productOutOfStockRequestRepository,
-            ISettingService settingService,
             INotificationService notificationService,
             IRepositoryAsync<ProductContent> productContentRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
@@ -109,7 +109,7 @@ namespace VitalChoice.Business.Services.Products
             SpEcommerceRepository sPEcommerceRepository, DynamicExtensionsRewriter queryVisitor,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
             IExtendedDynamicReadServiceAsync<SkuDynamic, Sku> skuReadServiceAsync,
-            IDynamicEntityOrderingExtension<Product> orderingExtension, ReferenceData referenceData)
+            IDynamicEntityOrderingExtension<Product> orderingExtension, ReferenceData referenceData, AppSettings appSettings)
             : base(
                 mapper, productRepository, productValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension
@@ -124,7 +124,6 @@ namespace VitalChoice.Business.Services.Products
             _orderSkusRepositoryRepository = orderSkusRepositoryRepository;
             _skuMapper = skuMapper;
             _productOutOfStockRequestRepository = productOutOfStockRequestRepository;
-            _settingService = settingService;
             _notificationService = notificationService;
             _productContentRepository = productContentRepository;
             _contentTypeRepository = contentTypeRepository;
@@ -137,6 +136,7 @@ namespace VitalChoice.Business.Services.Products
             _sPEcommerceRepository = sPEcommerceRepository;
             _skuReadServiceAsync = skuReadServiceAsync;
             _referenceData = referenceData;
+            _appSettings = appSettings;
         }
 
         public async Task<ProductContent> SelectContentForTransfer(int id)
@@ -1042,12 +1042,11 @@ namespace VitalChoice.Business.Services.Products
             {
                 if (messageFormat == null)
                 {
-                    var settings = await _settingService.GetSettingsAsync();
-                    if (settings == null || settings.SafeData.ProductOutOfStockEmailTemplate == null)
+                    if (_appSettings.ProductOutOfStockEmailTemplate == null)
                     {
                         throw new NotSupportedException($"{SettingConstants.PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE} not configurated.");
                     }
-                    messageFormat = settings.SafeData.ProductOutOfStockEmailTemplate;
+                    messageFormat = _appSettings.ProductOutOfStockEmailTemplate;
                 }
 
                 var items = await _productOutOfStockRequestRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);

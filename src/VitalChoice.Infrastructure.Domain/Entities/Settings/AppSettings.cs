@@ -12,5 +12,11 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Settings
 
         [Map]
         public int HealthwisePeriodMaxItemsCount { get; set; }
+
+        [Map]
+        public string ProductOutOfStockEmailTemplate { get; set; }
+
+        [Map]
+        public string AffiliateEmailTemplate { get; set; }
     }
 }

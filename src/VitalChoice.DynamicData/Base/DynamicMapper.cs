@@ -700,7 +700,7 @@ namespace VitalChoice.DynamicData.Base
 
         public virtual async Task<TDynamic> FromModelAsync<TModel>(TModel model, int idObjectType)
         {
-            var result = await CreatePrototypeAsync(idObjectType);
+            var result = CreatePrototype(idObjectType);
             await UpdateObjectAsync(model, result);
             return result;
         }
@@ -714,14 +714,14 @@ namespace VitalChoice.DynamicData.Base
 
             if (loadDefaults)
             {
-                await UpdateObjectWithDefaults(obj, idObjectType);
+                UpdateObjectWithDefaults(obj, idObjectType);
             }
             await UpdateObjectAsync(model, obj);
         }
 
-        private async Task UpdateObjectWithDefaults(TDynamic obj, int idObjectType)
+        private void UpdateObjectWithDefaults(TDynamic obj, int idObjectType)
         {
-            var defaultObject = await CreatePrototypeAsync(idObjectType);
+            var defaultObject = CreatePrototype(idObjectType);
             var objData = obj.DictionaryData;
             foreach (var value in defaultObject.DictionaryData)
             {
@@ -738,17 +738,33 @@ namespace VitalChoice.DynamicData.Base
 
         public virtual async Task<TModel> CreatePrototypeForAsync<TModel>() where TModel : class, new()
         {
-            return await ToModelAsync<TModel>(await CreatePrototypeAsync());
+            return await ToModelAsync<TModel>(CreatePrototype());
         }
 
         public virtual TDynamic CreatePrototype(int idObjectType)
         {
-            return CreatePrototypeAsync(idObjectType).GetAwaiter().GetResult();
+            var result = new TDynamic();
+            var optionTypes = FilterByType(idObjectType);
+            var data = result.DictionaryData;
+            foreach (var optionType in optionTypes.Where(optionType => optionType.DefaultValue != null))
+            {
+                data.Add(optionType.Name,
+                    MapperTypeConverter.ConvertTo(optionType.DefaultValue, (FieldType) optionType.IdFieldType));
+            }
+            return result;
         }
 
         public virtual TDynamic CreatePrototype()
         {
-            return CreatePrototypeAsync().GetAwaiter().GetResult();
+            var result = new TDynamic();
+            var optionTypes = FilterByType(null);
+            var data = result.DictionaryData;
+            foreach (var optionType in optionTypes.Where(optionType => optionType.DefaultValue != null))
+            {
+                data.Add(optionType.Name,
+                    MapperTypeConverter.ConvertTo(optionType.DefaultValue, (FieldType)optionType.IdFieldType));
+            }
+            return result;
         }
 
         public virtual TModel CreatePrototypeFor<TModel>(int idObjectType)
@@ -762,24 +778,10 @@ namespace VitalChoice.DynamicData.Base
             return CreatePrototypeForAsync<TModel>().GetAwaiter().GetResult();
         }
 
-        public virtual async Task<TDynamic> CreatePrototypeAsync()
-        {
-            var optionTypes = FilterByType(null);
-            var entity = new TEntity {OptionTypes = optionTypes, OptionValues = new List<TOptionValue>()};
-            return await FromEntityAsync(entity, true);
-        }
-
-        public virtual async Task<TDynamic> CreatePrototypeAsync(int idObjectType)
-        {
-            var optionTypes = FilterByType(idObjectType);
-            var entity = new TEntity {OptionTypes = optionTypes, IdObjectType = idObjectType, OptionValues = new List<TOptionValue>()};
-            return await FromEntityAsync(entity, true);
-        }
-
         public virtual async Task<TModel> CreatePrototypeForAsync<TModel>(int idObjectType)
             where TModel : class, new()
         {
-            return await ToModelAsync<TModel>(await CreatePrototypeAsync(idObjectType));
+            return await ToModelAsync<TModel>(CreatePrototype(idObjectType));
         }
     }
 }

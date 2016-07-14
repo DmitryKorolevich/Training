@@ -266,7 +266,7 @@ namespace VC.Admin.Controllers
         {
             if (id == 0)
             {
-                var order = await _orderService.CreateNewNormalOrder(OrderStatus.Processed);
+                var order = _orderService.CreateNewNormalOrder(OrderStatus.Processed);
                 if (idcustomer.HasValue)
                 {
                     order.Data.OrderNotes = await _customerService.GetNewOrderNotesBasedOnCustomer(idcustomer.Value);

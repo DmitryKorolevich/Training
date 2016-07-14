@@ -25,6 +25,7 @@ using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.ContentCrossSells;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
+using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
@@ -49,19 +50,22 @@ namespace VC.Public.Controllers
 	    private readonly IContentCrossSellService _contentCrossSellService;
 
 
-	    public CartController(
+        public CartController(
             ICustomerService customerService,
             IOrderService orderService, IProductService productService, ICheckoutService checkoutService,
             IAuthorizationService authorizationService, ReferenceData appReferenceData,
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
-            IDiscountService discountService, IGcService gcService, IContentCrossSellService contentCrossSellService, IPageResultService pageResultService, ISettingService settingService, ExtendedUserManager userManager)
-            : base(customerService, appReferenceData, authorizationService, checkoutService, orderService, skuMapper,productMapper, pageResultService, settingService, userManager)
+            IDiscountService discountService, IGcService gcService, IContentCrossSellService contentCrossSellService,
+            IPageResultService pageResultService, ISettingService settingService, ExtendedUserManager userManager, AppSettings appSettings)
+            : base(
+                customerService, appReferenceData, authorizationService, checkoutService, orderService, skuMapper, productMapper,
+                pageResultService, settingService, userManager, appSettings)
         {
-	        _productService = productService;
+            _productService = productService;
             _checkoutService = checkoutService;
             _discountService = discountService;
             _gcService = gcService;
-		    _contentCrossSellService = contentCrossSellService;
+            _contentCrossSellService = contentCrossSellService;
         }
 
         private async Task<Tuple<OrderDataContext, CustomerCartOrder>> AddToCartInternal(ICollection<CartSkuModel> skuModels, int? autoshipFrequency = null)

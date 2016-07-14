@@ -33,6 +33,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using Microsoft.Extensions.Options;
 using VC.Admin.Models.Affiliates;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Infrastructure.Services;
@@ -47,6 +48,7 @@ namespace VC.Admin.Controllers
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly ExtendedUserManager _userManager;
         private readonly ReferenceData _referenceData;
+        private readonly AppSettings _appSettings;
         private readonly ICsvExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> _csvExportAffiliateOrderListItemService;
         private readonly IOrderService _orderService;
         private readonly ICountryService _countryService;
@@ -64,7 +66,7 @@ namespace VC.Admin.Controllers
             ICountryService countryService,
             ISettingService settingService,
             IOptions<AppOptions> appOptions,
-            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager, ReferenceData referenceData)
+            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager, ReferenceData referenceData, AppSettings appSettings)
         {
             _affiliateService = affiliateService;
             _affiliateUserService = affiliateUserService;
@@ -72,6 +74,7 @@ namespace VC.Admin.Controllers
             _objectHistoryLogService = objectHistoryLogService;
             _userManager = userManager;
             _referenceData = referenceData;
+            _appSettings = appSettings;
             _csvExportAffiliateOrderListItemService = csvExportAffiliateOrderListItemService;
             _orderService = orderService;
             _countryService = countryService;
@@ -193,20 +196,21 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Affiliates)]
         [HttpGet]
-        public async Task<Result<AffiliateEmailModel>> GetAffiliateEmail(int id)
+        public Result<AffiliateEmailModel> GetAffiliateEmail(int id)
         {
-            AffiliateEmailModel toReturn = new AffiliateEmailModel();
-            toReturn.FromName = "Vital Choice";
-            toReturn.FromEmail = "affiliatesupport@vitalchoice.com";
-            toReturn.Subject = "Your Vital Choice affiliate account is ready.";
+            AffiliateEmailModel toReturn = new AffiliateEmailModel
+            {
+                FromName = "Vital Choice",
+                FromEmail = "affiliatesupport@vitalchoice.com",
+                Subject = "Your Vital Choice affiliate account is ready."
+            };
             if (id == 2)//email
             {
-                var settings = await _settingService.GetSettingsAsync();
-                if (settings == null || settings.SafeData.AffiliateEmailTemplate==null)
+                if (_appSettings.AffiliateEmailTemplate == null)
                 {
                     throw new NotSupportedException($"{SettingConstants.AFFILIATE_EMAIL_TEMPLATE} not configurated.");
                 }
-                string template = settings.SafeData.AffiliateEmailTemplate;
+                string template = _appSettings.AffiliateEmailTemplate;
                 template = template.Replace(SettingConstants.AFFILIATE_EMAIL_TEMPLATE_NAME_HOLDER, "{1}")
                     .Replace(SettingConstants.AFFILIATE_EMAIL_TEMPLATE_ID_HOLDER, "{0}")
                     .Replace(SettingConstants.TEMPLATE_PUBLIC_URL_HOLDER, $"https://{_appOptions.Value.PublicHost}/");
