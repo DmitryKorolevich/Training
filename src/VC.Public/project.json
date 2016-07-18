@@ -22,7 +22,8 @@
       ]
     },
     "preserveCompilationContext": true,
-    "emitEntryPoint": true
+    "emitEntryPoint": true,
+    "optimize": true
   },
   "runtimeOptions": {
     "gcServer": false,

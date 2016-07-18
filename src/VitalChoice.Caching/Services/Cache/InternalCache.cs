@@ -1,18 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Linq.Expressions;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
-using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Caching.Services.Cache
 {
@@ -32,10 +27,9 @@ namespace VitalChoice.Caching.Services.Cache
         public InternalCache(EntityInfo entityInfo, IEntityInfoStorage infoStorage, IInternalEntityCacheFactory cacheFactory)
         {
             EntityInfo = entityInfo;
-            //KeyStorage = keyStorage;
             _infoStorage = infoStorage;
             CacheFactory = cacheFactory;
-            CacheStorage = new CacheStorage<T>(entityInfo, infoStorage, cacheFactory);
+            CacheStorage = new CacheStorage<T>(entityInfo, cacheFactory);
         }
 
         public CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations)

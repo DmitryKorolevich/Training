@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Metadata;
 using VitalChoice.Caching.Expressions;
+using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Base;
 
@@ -28,6 +29,7 @@ namespace VitalChoice.Caching.Relational
 
     public class RelationInfo : IEquatable<RelationInfo>, IRelationAccessor
     {
+        public EntityInfo EntityInfo { get; }
         public EntityPrimaryKeyInfo ItemKeyInfo { get; }
         public Type PropertyType { get; }
         public bool IsCollection { get; }
@@ -42,9 +44,10 @@ namespace VitalChoice.Caching.Relational
 
         internal RelationInfo(string name, Type relatedType, Type elementType, bool isCollection, Type ownedType, IEntityType entityType,
             IRelationAccessor relationAccessor,
-            EntityPrimaryKeyInfo keyInfo, IEnumerable<RelationInfo> subRelations = null)
+            EntityPrimaryKeyInfo keyInfo, EntityInfo entityInfo, IEnumerable<RelationInfo> subRelations = null)
         {
             ItemKeyInfo = keyInfo;
+            EntityInfo = entityInfo;
             EntityType = entityType;
             if (entityType.ClrType != elementType)
             {
@@ -61,7 +64,7 @@ namespace VitalChoice.Caching.Relational
                             new Dictionary<string, RelationInfo>();
         }
 
-        public RelationInfo(string name, Type relatedType, Type ownedType, IEntityType entityType, EntityPrimaryKeyInfo keyInfo,
+        public RelationInfo(string name, Type relatedType, Type ownedType, IEntityType entityType, EntityPrimaryKeyInfo keyInfo, 
             LambdaExpression relationExpression = null,
             IEnumerable<RelationInfo> subRelations = null)
         {

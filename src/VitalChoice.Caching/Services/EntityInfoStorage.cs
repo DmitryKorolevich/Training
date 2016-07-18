@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading;
-using Autofac;
-using Autofac.Core.Lifetime;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -22,7 +16,6 @@ using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache.Base;
-using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -77,6 +70,8 @@ namespace VitalChoice.Caching.Services
                         parsed.Add(entityType.ClrType);
                         entityInfos.AddOrUpdate(entityType.ClrType, () => new EntityInfo
                         {
+                            EntityType = entityType.ClrType,
+                            EfPrimaryKey = entityType.FindPrimaryKey(),
                             NonUniqueIndexes = nonUniqueIndexes,
                             PrimaryKey = primaryKey,
                             CacheableIndex = uniqueIndex,
@@ -85,6 +80,8 @@ namespace VitalChoice.Caching.Services
                             CacheCondition = cacheCondition
                         }, info =>
                         {
+                            info.EntityType = entityType.ClrType;
+                            info.EfPrimaryKey = entityType.FindPrimaryKey();
                             if (info.ForeignKeys == null)
                                 info.ForeignKeys = new HashSet<EntityForeignKeyInfo>();
                             info.NonUniqueIndexes = nonUniqueIndexes;

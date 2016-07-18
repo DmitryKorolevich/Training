@@ -20,7 +20,7 @@ namespace VitalChoice.Caching.Services.Cache
             _cacheFactory = cacheFactory;
         }
 
-        public IQueryParser<T> GetQueryCache<T>()
+        public IQueryParser<T> GetQueryParser<T>()
         {
             return (IQueryParser<T>) _queryCaches.GetOrAdd(typeof (T), key => new QueryParser<T>(_entityInfo, _cacheFactory.GetCache<T>()));
         }

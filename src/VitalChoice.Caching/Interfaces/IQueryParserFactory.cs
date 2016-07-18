@@ -8,6 +8,6 @@ namespace VitalChoice.Caching.Interfaces
 {
     public interface IQueryParserFactory
     {
-        IQueryParser<T> GetQueryCache<T>();
+        IQueryParser<T> GetQueryParser<T>();
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -9,9 +8,8 @@ using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Ordering;
-using VitalChoice.Caching.Services;
 using VitalChoice.Caching.Services.Cache;
-using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Expressions.Visitors
 {

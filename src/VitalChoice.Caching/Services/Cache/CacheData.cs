@@ -3,10 +3,8 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
@@ -22,7 +20,6 @@ namespace VitalChoice.Caching.Services.Cache
     {
         private readonly IInternalEntityCacheFactory _cacheFactory;
         private readonly EntityInfo _entityInfo;
-        private readonly IEntityInfoStorage _infoStorage;
         private readonly RelationInfo _relationInfo;
 
         private readonly CacheCluster<EntityKey, T> _mainCluster;
@@ -36,13 +33,12 @@ namespace VitalChoice.Caching.Services.Cache
 
         private volatile bool _needUpdate;
 
-        public CacheData(IInternalEntityCacheFactory cacheFactory, EntityInfo entityInfo, IEntityInfoStorage infoStorage, RelationInfo relationInfo)
+        public CacheData(IInternalEntityCacheFactory cacheFactory, EntityInfo entityInfo, RelationInfo relationInfo)
         {
             _mainCluster = new CacheCluster<EntityKey, T>();
             _indexedCluster = new CacheCluster<EntityIndex, T>();
             _cacheFactory = cacheFactory;
             _entityInfo = entityInfo;
-            _infoStorage = infoStorage;
             _relationInfo = relationInfo;
             _conditionalIndexedDictionary = new Dictionary<EntityConditionalIndexInfo, CacheCluster<EntityIndex, T>>();
             foreach (var conditionalIndex in entityInfo.ConditionalIndexes)
@@ -273,16 +269,12 @@ namespace VitalChoice.Caching.Services.Cache
             //        relationsToClone.Add(relation);
             //    }
             //}
-            return GetIsNormalized(entity, _relationInfo.RelationType, trackedEntities, relationsToClone, _entityInfo);
+            return GetIsNormalized(entity, trackedEntities, relationsToClone, _entityInfo);
         }
 
-        private bool GetIsNormalized(object entity, Type relationType, IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities,
-            ICollection<RelationInfo> relationsToClone, EntityInfo entityInfo = null)
+        private bool GetIsNormalized(object entity, IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities,
+            ICollection<RelationInfo> relationsToClone, EntityInfo entityInfo)
         {
-            if (entityInfo == null && !_infoStorage.GetEntityInfo(relationType, out entityInfo))
-            {
-                return false;
-            }
             foreach (var relation in relationsToClone)
             {
                 var newRelated = relation.GetRelatedObject(entity);
@@ -295,7 +287,7 @@ namespace VitalChoice.Caching.Services.Cache
                     {
                         return false;
                     }
-                    var pkInfo = _infoStorage.GetPrimaryKeyInfo(relation.RelationType);
+                    var pkInfo = relation.EntityInfo.PrimaryKey;
                     var newItems = newRelated as IEnumerable<object>;
                     if (pkInfo == null)
                     {
@@ -320,7 +312,7 @@ namespace VitalChoice.Caching.Services.Cache
                                 return false;
                             }
                         }
-                        if (!GetIsNormalized(newItem, relation.RelationType, trackedEntities, relation.Relations))
+                        if (!GetIsNormalized(newItem, trackedEntities, relation.Relations, relation.EntityInfo))
                         {
                             return false;
                         }
@@ -371,7 +363,7 @@ namespace VitalChoice.Caching.Services.Cache
                                 return false;
                             }
                         }
-                        if (!GetIsNormalized(newRelated, relation.RelationType, trackedEntities, relation.Relations))
+                        if (!GetIsNormalized(newRelated, trackedEntities, relation.Relations, relation.EntityInfo))
                         {
                             return false;
                         }

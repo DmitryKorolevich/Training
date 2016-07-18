@@ -1,39 +1,25 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
-using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Iterators;
 using VitalChoice.Caching.Relational;
-using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Extensions;
-using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.ObjectMapping.Base;
-using VitalChoice.ObjectMapping.Extensions;
 
 namespace VitalChoice.Caching.Services.Cache
 {
     public class RelationalCache<T> : IRelationalCache<T> where T : class
     {
         private readonly IInternalCache<T> _internalCache;
-        private readonly IStateManager _stateManager;
-        private readonly IChangeDetector _changeDetector;
+        private readonly ICacheStateManager _stateManager;
         private readonly ILogger _logger;
 
-        public RelationalCache(IInternalCache<T> internalCache, IStateManager stateManager, IChangeDetector changeDetector, ILogger logger)
+        public RelationalCache(IInternalCache<T> internalCache, ICacheStateManager stateManager, ILogger logger)
         {
             _stateManager = stateManager;
-            _changeDetector = changeDetector;
             _logger = logger;
             _internalCache = internalCache;
         }
@@ -267,11 +253,12 @@ namespace VitalChoice.Caching.Services.Cache
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
             var orderedResult = Order(cacheIterator, queryData);
             entity = orderedResult.FirstOrDefault();
-            if (queryData.Tracked)
+            var result = CreateGetResult(cacheIterator);
+            if (queryData.Tracked && result == CacheGetResult.Found)
             {
-                AttachNotTracked(entity, queryData.RelationInfo);
+                entity = AttachNotTracked(entity, queryData.RelationInfo);
             }
-            return CreateGetResult(cacheIterator);
+            return result;
         }
 
         private CacheGetResult ConvertResult(IEnumerable<CacheResult<T>> results, QueryData<T> queryData, out List<T> entities)
@@ -280,11 +267,12 @@ namespace VitalChoice.Caching.Services.Cache
             CacheIterator<T> cacheIterator = new CacheIterator<T>(results, compiled);
             var orderedResult = Order(cacheIterator, queryData);
             entities = orderedResult.ToList();
-            if (queryData.Tracked)
+            var result = CreateGetResult(cacheIterator);
+            if (queryData.Tracked && result == CacheGetResult.Found)
             {
-                AttachNotTracked(entities, queryData.RelationInfo);
+                entities = AttachNotTracked(entities, queryData.RelationInfo).ToList();
             }
-            return CreateGetResult(cacheIterator);
+            return result;
         }
 
         private CacheGetResult CreateGetResult(CacheIterator<T> cacheIterator)
@@ -300,41 +288,78 @@ namespace VitalChoice.Caching.Services.Cache
             return _internalCache.CanAddUpCache() ? CacheGetResult.Update : CacheGetResult.NotFound;
         }
 
-        private void AttachNotTracked(T item, RelationInfo relationInfo)
+        private T AttachNotTracked(T item, RelationInfo relationInfo)
         {
-            AttachGraph(item, relationInfo);
-            //item.UpdateRelationsAfterTrack(relationInfo.Relations);
+            return (T)AttachGraph(item, relationInfo);
         }
 
-        private void AttachNotTracked(ICollection<T> items, RelationInfo relationInfo)
+        private IEnumerable<T> AttachNotTracked(IEnumerable<T> items, RelationInfo relationInfo)
         {
-            items.ForEach(item =>
+            return AttachCollectionGraph(items, relationInfo).Cast<T>();
+        }
+
+        private IEnumerable<object> AttachCollectionGraph(IEnumerable<object> items, RelationInfo relationInfo)
+        {
+            if (items == null)
+                yield break;
+            foreach (var item in _stateManager.GetTrackedOrTrackEntity(relationInfo.EntityInfo, items))
             {
-                AttachGraph(item, relationInfo);
-                //item.UpdateRelationsAfterTrack(relationInfo.Relations);
-            });
+                _stateManager.StartTrackingFromCache(relationInfo.EntityType, item);
+                foreach (var relation in relationInfo.Relations)
+                {
+                    var value = relation.GetRelatedObject(item);
+                    if (value != null)
+                    {
+                        object newValue;
+                        if (relation.IsCollection)
+                        {
+                            newValue =
+                                typeof(List<>).CreateGenericCollection(relation.RelationType,
+                                    AttachCollectionGraph((IEnumerable<object>) value, relation)).CollectionObject;
+                        }
+                        else
+                        {
+                            newValue = AttachGraph(value, relation);
+                        }
+                        if (newValue != value)
+                        {
+                            relation.SetOrUpdateRelatedObject(item, newValue);
+                        }
+                    }
+                }
+                yield return item;
+            }
         }
 
-        private void AttachGraph(object item, RelationInfo relationInfo)
+        private object AttachGraph(object entity, RelationInfo relationInfo)
         {
-            if (item == null)
-                return;
+            if (entity == null)
+                return null;
+            var item = _stateManager.GetTrackedOrTrackEntity(relationInfo.EntityInfo, entity);
             _stateManager.StartTrackingFromCache(relationInfo.EntityType, item);
             foreach (var relation in relationInfo.Relations)
             {
                 var value = relation.GetRelatedObject(item);
                 if (value != null)
                 {
+                    object newValue;
                     if (relation.IsCollection)
                     {
-                        ((IEnumerable<object>) value).ForEach(singleValue => AttachGraph(singleValue, relation));
+                        newValue =
+                            typeof(List<>).CreateGenericCollection(relation.RelationType,
+                                AttachCollectionGraph((IEnumerable<object>)value, relation)).CollectionObject;
                     }
                     else
                     {
-                        AttachGraph(value, relation);
+                        newValue = AttachGraph(value, relation);
+                    }
+                    if (newValue != value)
+                    {
+                        relation.SetOrUpdateRelatedObject(item, newValue);
                     }
                 }
             }
+            return item;
         }
     }
 }

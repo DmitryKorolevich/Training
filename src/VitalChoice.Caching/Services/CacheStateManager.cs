@@ -13,18 +13,21 @@ using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Base;
+using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Context;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Services
 {
-    public class CacheStateManager : StateManager
+    public class CacheStateManager : StateManager, ICacheStateManager
     {
         protected readonly IInternalEntityCacheFactory CacheFactory;
         protected readonly ICacheSyncProvider CacheSyncProvider;
         protected readonly IDataContext DataContext;
         protected readonly ILogger Logger;
+
+        protected Dictionary<TrackedEntityKey, object> ContextualCacheDatas;
 
         public CacheStateManager(IInternalEntityEntryFactory factory, IInternalEntityEntrySubscriber subscriber,
             IInternalEntityEntryNotifier notifier, IValueGenerationManager valueGeneration, IModel model, IDatabase database,
@@ -38,22 +41,48 @@ namespace VitalChoice.Caching.Services
             Logger = loggerFactory.CreateLogger<CacheStateManager>();
         }
 
-        private List<ImmutableEntryState> GetEntriesToSave()
+        public object GetTrackedOrTrackEntity(EntityInfo info, object entity)
         {
-            return (List<ImmutableEntryState>) DataContext.Tag;
+            if (ContextualCacheDatas == null)
+            {
+                ContextualCacheDatas = new Dictionary<TrackedEntityKey, object>();
+            }
+            var pk = info.PrimaryKey.GetPrimaryKeyValue(entity);
+            var key = new TrackedEntityKey(info.EntityType, pk);
+            object result;
+            if (ContextualCacheDatas.TryGetValue(key, out result))
+            {
+                return result;
+            }
+
+            var newEntry = TryGetEntry(info.EfPrimaryKey, entity)?.Entity ?? entity;
+            ContextualCacheDatas.Add(key, newEntry);
+            return newEntry;
         }
 
-        protected override Task<int> SaveChangesAsync(IReadOnlyList<InternalEntityEntry> entriesToSave,
-            CancellationToken cancellationToken = new CancellationToken())
+        public IEnumerable<object> GetTrackedOrTrackEntity(EntityInfo info, IEnumerable<object> entities)
         {
-            DataContext.Tag = new List<ImmutableEntryState>(entriesToSave.Select(e => new ImmutableEntryState(e)));
-            return base.SaveChangesAsync(entriesToSave, cancellationToken);
-        }
-
-        protected override int SaveChanges(IReadOnlyList<InternalEntityEntry> entriesToSave)
-        {
-            DataContext.Tag = new List<ImmutableEntryState>(entriesToSave.Select(e => new ImmutableEntryState(e)));
-            return base.SaveChanges(entriesToSave);
+            if (ContextualCacheDatas == null)
+            {
+                ContextualCacheDatas = new Dictionary<TrackedEntityKey, object>();
+            }
+            var pkInfo = info.PrimaryKey;
+            foreach (var entity in entities)
+            {
+                var pk = pkInfo.GetPrimaryKeyValue(entity);
+                var key = new TrackedEntityKey(info.EntityType, pk);
+                object result;
+                if (ContextualCacheDatas.TryGetValue(key, out result))
+                {
+                    yield return result;
+                }
+                else
+                {
+                    var newEntry = TryGetEntry(info.EfPrimaryKey, entity)?.Entity ?? entity;
+                    ContextualCacheDatas.Add(key, newEntry);
+                    yield return newEntry;
+                }
+            }
         }
 
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
@@ -111,6 +140,24 @@ namespace VitalChoice.Caching.Services
                 Logger.LogError(e.ToString());
             }
             return result;
+        }
+
+        protected override Task<int> SaveChangesAsync(IReadOnlyList<InternalEntityEntry> entriesToSave,
+            CancellationToken cancellationToken = new CancellationToken())
+        {
+            DataContext.Tag = new List<ImmutableEntryState>(entriesToSave.Select(e => new ImmutableEntryState(e)));
+            return base.SaveChangesAsync(entriesToSave, cancellationToken);
+        }
+
+        protected override int SaveChanges(IReadOnlyList<InternalEntityEntry> entriesToSave)
+        {
+            DataContext.Tag = new List<ImmutableEntryState>(entriesToSave.Select(e => new ImmutableEntryState(e)));
+            return base.SaveChanges(entriesToSave);
+        }
+
+        private List<ImmutableEntryState> GetEntriesToSave()
+        {
+            return (List<ImmutableEntryState>)DataContext.Tag;
         }
 
         private void UpdateRollback(ICollection<ImmutableEntryState> entriesToSave)

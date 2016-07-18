@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using VitalChoice.Caching.Relational;
@@ -7,6 +8,8 @@ namespace VitalChoice.Caching.Services.Cache.Base
 {
     public class EntityInfo
     {
+        public Type EntityType;
+        public IKey EfPrimaryKey;
         public IDictionary<string, EntityRelationalReferenceInfo> RelationReferences;
         public HashSet<string> ImplicitUpdateMarkedEntities;
         public Type ContextType;
