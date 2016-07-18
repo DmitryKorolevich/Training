@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.ObjectMapping.Extensions;
 
 namespace VitalChoice.Caching.Services.Cache.Base
 {

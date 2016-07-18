@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Autofac;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Caching.Relational;

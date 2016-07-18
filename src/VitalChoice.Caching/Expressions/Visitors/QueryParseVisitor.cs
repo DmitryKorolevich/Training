@@ -9,7 +9,6 @@ using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Ordering;
 using VitalChoice.Caching.Services.Cache;
-using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Expressions.Visitors
 {

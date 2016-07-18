@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +13,6 @@ using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Iterators;
 using VitalChoice.Caching.Services.Cache;
 using VitalChoice.Caching.Services.Cache.Base;
-using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Services
