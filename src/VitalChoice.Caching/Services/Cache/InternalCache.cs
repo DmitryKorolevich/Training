@@ -32,18 +32,18 @@ namespace VitalChoice.Caching.Services.Cache
             CacheStorage = new CacheStorage<T>(entityInfo, cacheFactory);
         }
 
-        public CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations)
+        public CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations, ICacheStateManager stateManager, bool tracked)
         {
             var data = CacheStorage.GetCacheData(relations);
             var cached = data.Get(key);
             if (cached != null)
             {
-                return new CacheResult<T>(cached);
+                return new CacheResult<T>(cached, stateManager, tracked);
             }
             return CacheGetResult.Update;
         }
 
-        public IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityKey> primaryKeys, RelationInfo relations)
+        public IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityKey> primaryKeys, RelationInfo relations, ICacheStateManager stateManager, bool tracked)
         {
             var data = CacheStorage.GetCacheData(relations);
             foreach (var key in primaryKeys)
@@ -62,22 +62,22 @@ namespace VitalChoice.Caching.Services.Cache
                     yield return CacheGetResult.Update;
                     yield break;
                 }
-                yield return new CacheResult<T>(cached);
+                yield return new CacheResult<T>(cached, stateManager, tracked);
             }
         }
 
-        public CacheResult<T> TryGetEntity(EntityIndex key, RelationInfo relationInfo)
+        public CacheResult<T> TryGetEntity(EntityIndex key, RelationInfo relationInfo, ICacheStateManager stateManager, bool tracked)
         {
             var data = CacheStorage.GetCacheData(relationInfo);
             var cached = data.Get(key);
             if (cached != null)
             {
-                return new CacheResult<T>(cached);
+                return new CacheResult<T>(cached, stateManager, tracked);
             }
             return CacheGetResult.Update;
         }
 
-        public IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes, RelationInfo relations)
+        public IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes, RelationInfo relations, ICacheStateManager stateManager, bool tracked)
         {
             var data = CacheStorage.GetCacheData(relations);
             foreach (var index in indexes)
@@ -92,7 +92,7 @@ namespace VitalChoice.Caching.Services.Cache
                             yield return CacheGetResult.Update;
                             yield break;
                         }
-                        yield return new CacheResult<T>(cached);
+                        yield return new CacheResult<T>(cached, stateManager, tracked);
                     }
                 }
                 else
@@ -103,19 +103,19 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        public CacheResult<T> TryGetEntity(EntityIndex key, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations)
+        public CacheResult<T> TryGetEntity(EntityIndex key, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations, ICacheStateManager stateManager, bool tracked)
         {
             var data = CacheStorage.GetCacheData(relations);
             var cached = data.Get(conditionalInfo, key);
             if (cached != null)
             {
-                return new CacheResult<T>(cached);
+                return new CacheResult<T>(cached, stateManager, tracked);
             }
             return CacheGetResult.Update;
         }
 
         public IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes, EntityConditionalIndexInfo conditionalInfo,
-            RelationInfo relations)
+            RelationInfo relations, ICacheStateManager stateManager, bool tracked)
         {
             var data = CacheStorage.GetCacheData(relations);
             foreach (var index in indexes)
@@ -130,7 +130,7 @@ namespace VitalChoice.Caching.Services.Cache
                             yield return CacheGetResult.Update;
                             yield break;
                         }
-                        yield return new CacheResult<T>(cached);
+                        yield return new CacheResult<T>(cached, stateManager, tracked);
                     }
                 }
                 else
@@ -141,7 +141,7 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        public IEnumerable<CacheResult<T>> GetWhere(RelationInfo relations, Func<T, bool> whereFunc)
+        public IEnumerable<CacheResult<T>> GetWhere(RelationInfo relations, Func<T, bool> whereFunc, ICacheStateManager stateManager, bool tracked)
         {
             var data = CacheStorage.GetCacheData(relations);
             if (!data.FullCollection)
@@ -158,7 +158,7 @@ namespace VitalChoice.Caching.Services.Cache
             }
             foreach (var cached in allItems.Where(cached => whereFunc(cached)))
             {
-                yield return new CacheResult<T>(cached);
+                yield return new CacheResult<T>(cached, stateManager, tracked);
             }
         }
 
@@ -167,7 +167,7 @@ namespace VitalChoice.Caching.Services.Cache
             return CacheStorage.GetCacheData(relations).FullCollection;
         }
 
-        public IEnumerable<CacheResult<T>> GetAll(RelationInfo relations)
+        public IEnumerable<CacheResult<T>> GetAll(RelationInfo relations, ICacheStateManager stateManager, bool tracked)
         {
             var data = CacheStorage.GetCacheData(relations);
             if (!data.FullCollection)
@@ -183,11 +183,11 @@ namespace VitalChoice.Caching.Services.Cache
             }
             foreach (var cached in allItems)
             {
-                yield return new CacheResult<T>(cached);
+                yield return new CacheResult<T>(cached, stateManager, tracked);
             }
         }
 
-        public IEnumerable<CacheResult<T>> TryRemoveWithResult(T entity)
+        public IEnumerable<CacheResult<T>> TryRemoveWithResult(T entity, ICacheStateManager stateManager, bool tracked)
         {
             var pk = EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
             var datas = CacheStorage.AllCacheDatas;
@@ -198,7 +198,7 @@ namespace VitalChoice.Caching.Services.Cache
                 {
                     yield return CacheGetResult.NotFound;
                 }
-                yield return new CacheResult<T>(removed);
+                yield return new CacheResult<T>(removed, stateManager, tracked);
             }
         }
 

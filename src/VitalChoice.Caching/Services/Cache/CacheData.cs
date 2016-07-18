@@ -180,7 +180,7 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (entity == null)
                 return null;
-            return UpdateUnsafe(CacheResult<T>.DeepCloneItem(entity, _relationInfo));
+            return UpdateUnsafe((T) entity.DeepCloneItem(_relationInfo));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -252,23 +252,6 @@ namespace VitalChoice.Caching.Services.Cache
         {
 
             relationsToClone = _relationInfo.Relations.Where(r => cached.NeedUpdateRelated.Contains(r.Name)).ToArray();
-            //foreach (var relation in relationCandidates)
-            //{
-            //    EntityRelationalReferenceInfo reference;
-            //    if (_entityInfo.RelationReferences.TryGetValue(relation.Name, out reference))
-            //    {
-            //var newpk = reference.GetPrimaryKeyValue(entity);
-            //        var oldpk = reference.GetPrimaryKeyValue(cached.Entity);
-            //        if (newpk != oldpk)
-            //        {
-            //            relationsToClone.Add(relation);
-            //        }
-            //    }
-            //    else
-            //    {
-            //        relationsToClone.Add(relation);
-            //    }
-            //}
             return GetIsNormalized(entity, trackedEntities, relationsToClone, _entityInfo);
         }
 
@@ -375,14 +358,14 @@ namespace VitalChoice.Caching.Services.Cache
 
         public bool Update(IEnumerable<T> entities)
         {
-                foreach (var entity in CacheResult<T>.DeepCloneList(entities, _relationInfo))
+            foreach (var entity in entities.Select(e => (T) e.DeepCloneItem(_relationInfo)))
+            {
+                if (entity != null && UpdateUnsafe(entity) == null)
                 {
-                    if (entity != null && UpdateUnsafe(entity) == null)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
-                return true;
+            }
+            return true;
         }
 
         public bool UpdateExist(IEnumerable<T> entities)
@@ -438,6 +421,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         public bool Empty => _mainCluster.IsEmpty;
         public RelationInfo Relations => _relationInfo;
+        public EntityInfo EntityInfo => _entityInfo;
 
         #region Helper Methods
 

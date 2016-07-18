@@ -38,33 +38,49 @@ namespace VitalChoice.Caching.Interfaces
 
     public interface IInternalCache<T> : IInternalEntityCache
     {
-        CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations);
+        CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations, ICacheStateManager stateManager, bool tracked);
 
-        IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityKey> primaryKeys, RelationInfo relations);
+        IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityKey> primaryKeys, RelationInfo relations,
+            ICacheStateManager stateManager, bool tracked);
 
-        CacheResult<T> TryGetEntity(EntityIndex index, RelationInfo relations);
+        CacheResult<T> TryGetEntity(EntityIndex index, RelationInfo relations, ICacheStateManager stateManager, bool tracked);
 
-        IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes, RelationInfo relations);
+        IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes, RelationInfo relations, ICacheStateManager stateManager,
+            bool tracked);
 
-        CacheResult<T> TryGetEntity(EntityIndex key, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations);
+        CacheResult<T> TryGetEntity(EntityIndex key, EntityConditionalIndexInfo conditionalInfo, RelationInfo relations,
+            ICacheStateManager stateManager, bool tracked);
 
         IEnumerable<CacheResult<T>> TryGetEntities(ICollection<EntityIndex> indexes,
             EntityConditionalIndexInfo conditionalInfo,
-            RelationInfo relations);
+            RelationInfo relations, ICacheStateManager stateManager, bool tracked);
 
-        IEnumerable<CacheResult<T>> GetWhere(RelationInfo relations, Func<T, bool> whereFunc);
-        IEnumerable<CacheResult<T>> GetAll(RelationInfo relations);
+        IEnumerable<CacheResult<T>> GetWhere(RelationInfo relations, Func<T, bool> whereFunc, ICacheStateManager stateManager, bool tracked);
+
+        IEnumerable<CacheResult<T>> GetAll(RelationInfo relations, ICacheStateManager stateManager, bool tracked);
+
         bool TryRemove(T entity);
-        IEnumerable<CacheResult<T>> TryRemoveWithResult(T entity);
+
+        IEnumerable<CacheResult<T>> TryRemoveWithResult(T entity, ICacheStateManager stateManager, bool tracked);
+
         bool Update(IEnumerable<T> entities, RelationInfo relationInfo);
+
         bool Update(T entity, RelationInfo relationInfo);
+
         bool Update(T entity, DbContext context);
+
         CachedEntity<T> Update(RelationInfo relations, T entity);
+
         IEnumerable<CachedEntity<T>> Update(RelationInfo relations, IEnumerable<T> entities);
+
         bool UpdateAll(IEnumerable<T> entities, RelationInfo relationInfo);
+
         EntityKey MarkForUpdate(T entity);
+
         ICollection<EntityKey> MarkForUpdate(IEnumerable<T> entities);
+
         EntityKey MarkForAdd(T entity);
+
         ICollection<EntityKey> MarkForAdd(ICollection<T> entities);
     }
 }

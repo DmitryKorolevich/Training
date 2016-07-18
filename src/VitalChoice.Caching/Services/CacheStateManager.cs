@@ -17,6 +17,7 @@ using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Data.Context;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.ObjectMapping.Extensions;
 
 namespace VitalChoice.Caching.Services
 {
@@ -27,7 +28,10 @@ namespace VitalChoice.Caching.Services
         protected readonly IDataContext DataContext;
         protected readonly ILogger Logger;
 
-        protected Dictionary<TrackedEntityKey, object> ContextualCacheDatas;
+        protected Lazy<Dictionary<TrackedEntityKey, object>> ContextualCacheDatas =
+            new Lazy<Dictionary<TrackedEntityKey, object>>(() => new Dictionary<TrackedEntityKey, object>());
+
+        protected Dictionary<TrackedEntityKey, object> TemporaryContextualCacheDatas;
 
         public CacheStateManager(IInternalEntityEntryFactory factory, IInternalEntityEntrySubscriber subscriber,
             IInternalEntityEntryNotifier notifier, IValueGenerationManager valueGeneration, IModel model, IDatabase database,
@@ -41,45 +45,43 @@ namespace VitalChoice.Caching.Services
             Logger = loggerFactory.CreateLogger<CacheStateManager>();
         }
 
-        public object GetTrackedOrTrackEntity(EntityInfo info, object entity)
+        public void AcceptTrackData() => ContextualCacheDatas.Value.AddRange(TemporaryContextualCacheDatas);
+
+        public void RejectTrackData() => TemporaryContextualCacheDatas = null;
+
+        public object GetOrAddTracked(EntityInfo info, object entity)
         {
-            if (ContextualCacheDatas == null)
-            {
-                ContextualCacheDatas = new Dictionary<TrackedEntityKey, object>();
-            }
+            var tempData = GetTempData();
             var pk = info.PrimaryKey.GetPrimaryKeyValue(entity);
             var key = new TrackedEntityKey(info.EntityType, pk);
             object result;
-            if (ContextualCacheDatas.TryGetValue(key, out result))
+            if (tempData.TryGetValue(key, out result))
             {
                 return result;
             }
 
-            var newEntry = TryGetEntry(info.EfPrimaryKey, entity)?.Entity ?? entity;
-            ContextualCacheDatas.Add(key, newEntry);
+            var newEntry = TryGetEntry(info.EfPrimaryKey, entity)?.Entity ?? entity.Clone(info.EntityType);
+            tempData.Add(key, newEntry);
             return newEntry;
         }
 
-        public IEnumerable<object> GetTrackedOrTrackEntity(EntityInfo info, IEnumerable<object> entities)
+        public IEnumerable<object> GetOrAddTracked(EntityInfo info, IEnumerable<object> entities)
         {
-            if (ContextualCacheDatas == null)
-            {
-                ContextualCacheDatas = new Dictionary<TrackedEntityKey, object>();
-            }
+            var tempData = GetTempData();
             var pkInfo = info.PrimaryKey;
             foreach (var entity in entities)
             {
                 var pk = pkInfo.GetPrimaryKeyValue(entity);
                 var key = new TrackedEntityKey(info.EntityType, pk);
                 object result;
-                if (ContextualCacheDatas.TryGetValue(key, out result))
+                if (tempData.TryGetValue(key, out result))
                 {
                     yield return result;
                 }
                 else
                 {
-                    var newEntry = TryGetEntry(info.EfPrimaryKey, entity)?.Entity ?? entity;
-                    ContextualCacheDatas.Add(key, newEntry);
+                    var newEntry = TryGetEntry(info.EfPrimaryKey, entity)?.Entity ?? entity.Clone(info.EntityType);
+                    tempData.Add(key, newEntry);
                     yield return newEntry;
                 }
             }
@@ -153,6 +155,15 @@ namespace VitalChoice.Caching.Services
         {
             DataContext.Tag = new List<ImmutableEntryState>(entriesToSave.Select(e => new ImmutableEntryState(e)));
             return base.SaveChanges(entriesToSave);
+        }
+
+        private Dictionary<TrackedEntityKey, object> GetTempData()
+        {
+            return TemporaryContextualCacheDatas ??
+                   (TemporaryContextualCacheDatas =
+                       ContextualCacheDatas.Value.Count > 0
+                           ? new Dictionary<TrackedEntityKey, object>(ContextualCacheDatas.Value)
+                           : new Dictionary<TrackedEntityKey, object>());
         }
 
         private List<ImmutableEntryState> GetEntriesToSave()

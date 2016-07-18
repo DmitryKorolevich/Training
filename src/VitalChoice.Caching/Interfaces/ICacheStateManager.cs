@@ -9,7 +9,9 @@ namespace VitalChoice.Caching.Interfaces
 {
     public interface ICacheStateManager : IStateManager
     {
-        object GetTrackedOrTrackEntity(EntityInfo info, object entity);
-        IEnumerable<object> GetTrackedOrTrackEntity(EntityInfo info, IEnumerable<object> entities);
+        void AcceptTrackData();
+        void RejectTrackData();
+        object GetOrAddTracked(EntityInfo info, object entity);
+        IEnumerable<object> GetOrAddTracked(EntityInfo info, IEnumerable<object> entities);
     }
 }

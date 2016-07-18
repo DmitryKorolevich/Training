@@ -26,6 +26,7 @@ namespace VitalChoice.Caching.Interfaces
         bool NeedUpdate { get; set; }
         bool Empty { get; }
         RelationInfo Relations { get; }
+        EntityInfo EntityInfo { get; }
     }
 
     public interface ICacheData<T> : ICacheData

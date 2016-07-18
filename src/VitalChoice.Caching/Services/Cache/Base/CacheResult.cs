@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using VitalChoice.Caching.Extensions;
+using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.ObjectMapping.Extensions;
 
 namespace VitalChoice.Caching.Services.Cache.Base
@@ -14,7 +16,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
             Result = result;
         }
 
-        public CacheResult(CachedEntity<T> cached)
+        public CacheResult(CachedEntity<T> cached, ICacheStateManager stateManager, bool attach)
         {
             using (cached.Lock())
             {
@@ -27,7 +29,14 @@ namespace VitalChoice.Caching.Services.Cache.Base
                 else
                 {
                     Result = CacheGetResult.Found;
-                    Entity = DeepCloneItem(cached.Entity, cached.Cache.Relations);
+                    if (attach)
+                    {
+                        Entity = (T) AttachGraph(cached.Entity, cached.Cache.Relations, cached.Cache.EntityInfo, stateManager);
+                    }
+                    else
+                    {
+                        Entity = (T) cached.Entity.DeepCloneItem(cached.Cache.Relations);
+                    }
                 }
             }
         }
@@ -46,19 +55,70 @@ namespace VitalChoice.Caching.Services.Cache.Base
             return new CacheResult<T>(default(T), result);
         }
 
-        public static implicit operator CacheResult<T>(CachedEntity<T> cached)
+        private static IEnumerable<object> AttachCollectionGraph(IEnumerable<object> entities, RelationInfo relationInfo, EntityInfo entityInfo,
+            ICacheStateManager stateManager)
         {
-            return new CacheResult<T>(cached);
+            if (entities == null)
+                yield break;
+            foreach (var entity in entities)
+            {
+                var toTrack = stateManager.GetOrAddTracked(entityInfo, entity);
+                foreach (var relation in relationInfo.Relations)
+                {
+                    var value = relation.GetRelatedObject(entity);
+                    if (value != null)
+                    {
+                        object newValue;
+                        if (relation.IsCollection)
+                        {
+                            newValue =
+                                typeof(List<>).CreateGenericCollection(relation.RelationType,
+                                    AttachCollectionGraph((IEnumerable<object>) value, relation, relation.EntityInfo, stateManager))
+                                    .CollectionObject;
+                        }
+                        else
+                        {
+                            newValue = AttachGraph(value, relation, relation.EntityInfo, stateManager);
+                        }
+                        if (newValue != value)
+                        {
+                            relation.SetOrUpdateRelatedObject(entity, toTrack);
+                        }
+                    }
+                }
+                yield return entity;
+            }
         }
 
-        internal static T DeepCloneItem(T item, RelationInfo relations)
+        private static object AttachGraph(object entity, RelationInfo relationInfo, EntityInfo entityInfo, ICacheStateManager stateManager)
         {
-            return (T) item.DeepCloneItem(relations);
-        }
-
-        internal static IEnumerable<T> DeepCloneList(IEnumerable<T> entities, RelationInfo relations)
-        {
-            return entities.Select(item => (T) item.DeepCloneItem(relations));
+            if (entity == null)
+                return null;
+            var item = stateManager.GetOrAddTracked(entityInfo, entity);
+            foreach (var relation in relationInfo.Relations)
+            {
+                var value = relation.GetRelatedObject(entity);
+                if (value != null)
+                {
+                    object newValue;
+                    if (relation.IsCollection)
+                    {
+                        newValue =
+                            typeof(List<>).CreateGenericCollection(relation.RelationType,
+                                AttachCollectionGraph((IEnumerable<object>) value, relation, relation.EntityInfo, stateManager))
+                                .CollectionObject;
+                    }
+                    else
+                    {
+                        newValue = AttachGraph(value, relation, relation.EntityInfo, stateManager);
+                    }
+                    if (newValue != value)
+                    {
+                        relation.SetOrUpdateRelatedObject(item, newValue);
+                    }
+                }
+            }
+            return item;
         }
     }
 }
