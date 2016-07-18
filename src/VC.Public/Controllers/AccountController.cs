@@ -89,7 +89,7 @@ namespace VC.Public.Controllers
 			ViewBag.ReturnUrl = returnUrl;
 			if (!ModelState.IsValid)
 		    {
-				return View(model);
+				return View("Login", model);
 			}
 
             ApplicationUser user = null;
@@ -104,12 +104,12 @@ namespace VC.Public.Controllers
 		    catch (AppValidationException e)
 		    {
 				ModelState.AddModelError(string.Empty, e.Messages.First().Message);
-				return View(model);
+				return View("Login", model);
 			}
 		    if (user == null)
 			{
 				ModelState.AddModelError(string.Empty,ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
-				return View(model);
+				return View("Login", model);
 			}
 
 		    if (!string.IsNullOrWhiteSpace(returnUrl))
