@@ -11,7 +11,7 @@ namespace VitalChoice.Caching.Interfaces
     {
         void AcceptTrackData();
         void RejectTrackData();
-        object GetOrAddTracked(EntityInfo info, object entity);
+        object GetOrAddTracked(EntityInfo info, object entity, out bool cloned);
         IEnumerable<object> GetOrAddTracked(EntityInfo info, IEnumerable<object> entities);
     }
 }

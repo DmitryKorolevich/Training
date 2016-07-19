@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.ObjectMapping.Extensions;
 
 namespace VitalChoice.Caching.Services.Cache.Base
 {
@@ -60,7 +62,8 @@ namespace VitalChoice.Caching.Services.Cache.Base
                 yield break;
             foreach (var entity in entities)
             {
-                var toTrack = stateManager.GetOrAddTracked(entityInfo, entity);
+                bool cloned;
+                var toTrack = stateManager.GetOrAddTracked(entityInfo, entity, out cloned);
                 foreach (var relation in relationInfo.Relations)
                 {
                     var value = relation.GetRelatedObject(entity);
@@ -69,22 +72,39 @@ namespace VitalChoice.Caching.Services.Cache.Base
                         object newValue;
                         if (relation.IsCollection)
                         {
-                            newValue =
-                                typeof(List<>).CreateGenericCollection(relation.RelationType,
-                                    AttachCollectionGraph((IEnumerable<object>) value, relation, relation.EntityInfo, stateManager))
-                                    .CollectionObject;
+                            if (cloned)
+                            {
+                                newValue =
+                                    typeof(List<>).CreateGenericCollection(relation.RelationType,
+                                        AttachCollectionGraph((IEnumerable<object>)value, relation, relation.EntityInfo, stateManager))
+                                        .CollectionObject;
+                                relation.SetOrUpdateRelatedObject(toTrack, newValue);
+                            }
+                            else
+                            {
+                                HashSet<object> itemList = new HashSet<object>((IEnumerable<object>)relation.GetRelatedObject(toTrack));
+                                foreach (
+                                    var newItemToTrack in
+                                        AttachCollectionGraph((IEnumerable<object>)value, relation, relation.EntityInfo, stateManager))
+                                {
+                                    if (!itemList.Contains(newItemToTrack))
+                                    {
+                                        relation.AddItemToCollection(toTrack, newItemToTrack);
+                                    }
+                                }
+                            }
                         }
                         else
                         {
                             newValue = AttachGraph(value, relation, relation.EntityInfo, stateManager);
-                        }
-                        if (newValue != value)
-                        {
-                            relation.SetOrUpdateRelatedObject(entity, toTrack);
+                            if (newValue != value)
+                            {
+                                relation.SetOrUpdateRelatedObject(toTrack, newValue);
+                            }
                         }
                     }
                 }
-                yield return entity;
+                yield return toTrack;
             }
         }
 
@@ -92,7 +112,8 @@ namespace VitalChoice.Caching.Services.Cache.Base
         {
             if (entity == null)
                 return null;
-            var item = stateManager.GetOrAddTracked(entityInfo, entity);
+            bool cloned;
+            var toTrack = stateManager.GetOrAddTracked(entityInfo, entity, out cloned);
             foreach (var relation in relationInfo.Relations)
             {
                 var value = relation.GetRelatedObject(entity);
@@ -101,22 +122,39 @@ namespace VitalChoice.Caching.Services.Cache.Base
                     object newValue;
                     if (relation.IsCollection)
                     {
-                        newValue =
-                            typeof(List<>).CreateGenericCollection(relation.RelationType,
-                                AttachCollectionGraph((IEnumerable<object>) value, relation, relation.EntityInfo, stateManager))
-                                .CollectionObject;
+                        if (cloned)
+                        {
+                            newValue =
+                                typeof(List<>).CreateGenericCollection(relation.RelationType,
+                                    AttachCollectionGraph((IEnumerable<object>) value, relation, relation.EntityInfo, stateManager))
+                                    .CollectionObject;
+                            relation.SetOrUpdateRelatedObject(toTrack, newValue);
+                        }
+                        else
+                        {
+                            HashSet<object> itemList = new HashSet<object>((IEnumerable<object>) relation.GetRelatedObject(toTrack));
+                            foreach (
+                                var newItemToTrack in
+                                    AttachCollectionGraph((IEnumerable<object>) value, relation, relation.EntityInfo, stateManager))
+                            {
+                                if (!itemList.Contains(newItemToTrack))
+                                {
+                                    relation.AddItemToCollection(toTrack, newItemToTrack);
+                                }
+                            }
+                        }
                     }
                     else
                     {
                         newValue = AttachGraph(value, relation, relation.EntityInfo, stateManager);
-                    }
-                    if (newValue != value)
-                    {
-                        relation.SetOrUpdateRelatedObject(item, newValue);
+                        if (newValue != value)
+                        {
+                            relation.SetOrUpdateRelatedObject(toTrack, newValue);
+                        }
                     }
                 }
             }
-            return item;
+            return toTrack;
         }
     }
 }

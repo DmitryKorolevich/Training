@@ -49,7 +49,7 @@ namespace VitalChoice.Caching.Services
 
         public void RejectTrackData() => TemporaryContextualCacheDatas = null;
 
-        public object GetOrAddTracked(EntityInfo info, object entity)
+        public object GetOrAddTracked(EntityInfo info, object entity, out bool cloned)
         {
             var tempData = GetTempData();
             var pk = info.PrimaryKey.GetPrimaryKeyValue(entity);
@@ -57,10 +57,20 @@ namespace VitalChoice.Caching.Services
             object result;
             if (tempData.TryGetValue(key, out result))
             {
+                cloned = false;
                 return result;
             }
 
-            var newEntry = TryGetEntry(info.EfPrimaryKey, entity)?.Entity ?? entity.Clone(info.EntityType);
+            var newEntry = TryGetEntry(info.EfPrimaryKey, entity)?.Entity;
+            if (newEntry == null)
+            {
+                cloned = true;
+                newEntry = entity.Clone(info.EntityType);
+            }
+            else
+            {
+                cloned = false;
+            }
             tempData.Add(key, newEntry);
             return newEntry;
         }

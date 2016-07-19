@@ -318,7 +318,7 @@ namespace VitalChoice.Caching.Services.Cache
                 {
                     if (relation.IsCollection)
                     {
-                        ((IEnumerable<object>) value).ForEach(i => AttachGraph(i, relationInfo));
+                        ((IEnumerable<object>) value).ForEach(i => AttachGraph(i, relation));
                     }
                     else
                     {

@@ -22,6 +22,8 @@ namespace VitalChoice.Caching.Relational
 
         void AddToCollection(object entity, object relatedCollection);
 
+        void AddItemToCollection(object entity, object item);
+
         void UpdateRelatedObject(object entity, object relatedObject);
 
         bool CanSet { get; }
@@ -192,6 +194,11 @@ namespace VitalChoice.Caching.Relational
             _relationAccessor.AddToCollection(entity, relatedCollection);
         }
 
+        public void AddItemToCollection(object entity, object item)
+        {
+            _relationAccessor.AddItemToCollection(entity, item);
+        }
+
         public void UpdateRelatedObject(object entity, object relatedObject)
         {
             _relationAccessor.UpdateRelatedObject(entity, relatedObject);
@@ -284,6 +291,19 @@ namespace VitalChoice.Caching.Relational
                 }
             }
 
+            public void AddItemToCollection(object entity, object item)
+            {
+                if (_genericCollectionType == null || item == null)
+                    return;
+
+                var reference = _getFunc((TEntity) entity);
+                if (reference != null)
+                {
+                    var collection = (IGenericCollection) Activator.CreateInstance(_genericCollectionType, reference);
+                    collection.Add(item);
+                }
+            }
+
             public void UpdateRelatedObject(object entity, object relatedObject)
             {
                 if (_genericCollectionType != null)
@@ -311,6 +331,10 @@ namespace VitalChoice.Caching.Relational
             }
 
             public void AddToCollection(object entity, object relatedCollection)
+            {
+            }
+
+            public void AddItemToCollection(object entity, object item)
             {
             }
 
