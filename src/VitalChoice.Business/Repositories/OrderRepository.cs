@@ -8,7 +8,9 @@ using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
+using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Context;
@@ -56,30 +58,35 @@ namespace VitalChoice.Business.Repositories
             return toReturn;
         }
 
-        public async Task<ICollection<OrderForAgentReport>> GetOrdersForAgentReportAsync(DateTime from, DateTime to, List<int> specififcAgentIds)
+        public async Task<ICollection<OrderForAgentReport>> GetOrdersForAgentReportAsync(DateTime from, DateTime to,
+            List<int> specififcAgentIds)
         {
             OrderQuery conditions = new OrderQuery().NotDeleted().WithActualStatusOnly().WithFromDate(from).WithToDate(to).
                 WithCreatedByAgentsOrWithout(specififcAgentIds);
 
-            var orderTypeOption = _orderMapper.OptionTypes.FirstOrDefault(p => p.Name == "OrderType");
+            var orderTypeOption = _orderMapper.OptionTypes.First(p => p.Name == "OrderType");
 
-            var orderQuery = this.DbSet.Where(conditions.Query());
+            var orders = await this.DbSet.Include(o => o.OptionValues).AsNoTracking().Where(conditions.Query()).ToListAsync();
             // ReSharper disable once PossibleNullReferenceException
-            var orderOptionValueQuery = (this.Context as DbContext).Set<OrderOptionValue>().Where(p => p.IdOptionType == orderTypeOption.Id);
+            //var orderOptionValueQuery = (this.Context as DbContext).Set<OrderOptionValue>().Where(p => p.IdOptionType == orderTypeOption.Id);
 
-            var result = await (from o in orderQuery
-                         join v in orderOptionValueQuery on o.Id equals v.IdOrder into grouping
-                         from d in grouping.DefaultIfEmpty()
-                         select new
-                         {
-                             Order = o,
-                             OrderType =d
-                         }).ToListAsync();
+            //var result = await (from o in orderQuery
+            //             join v in orderOptionValueQuery on o.Id equals v.IdOrder into grouping
+            //             from d in grouping
+            //             select new
+            //             {
+            //                 Order = o,
+            //                 OrderType =d
+            //             }).ToListAsync();
 
-            return result.Select(p => new OrderForAgentReport()
+            return orders.Select(p => new OrderForAgentReport
             {
-                Order = p.Order,
-                OrderType = p.OrderType?.Value !=null ? (SourceOrderType?)Int32.Parse(p.OrderType.Value) : (SourceOrderType?)null
+                Order = p,
+                OrderType =
+                    (SourceOrderType?) (int?)
+                        MapperTypeConverter.ConvertTo<OrderOptionValue, OrderOptionType>(
+                            p.OptionValues.FirstOrDefault(v => v.IdOptionType == orderTypeOption.Id),
+                            (FieldType) orderTypeOption.IdFieldType)
             }).ToList();
         }
     }

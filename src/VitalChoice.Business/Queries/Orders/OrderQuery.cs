@@ -306,9 +306,10 @@ namespace VitalChoice.Business.Queries.Orders
 
         public OrderQuery WithCreatedByAgentsOrWithout(ICollection<int> agentIds)
         {
-            if (agentIds != null)
+            if (agentIds != null && agentIds.Count > 0)
             {
-                Add(x => x.IdAddedBy == null || agentIds.Contains(x.IdAddedBy.Value));
+                ICollection<int?> searchList = agentIds.Cast<int?>().ToList();
+                Add(x => x.IdAddedBy == null || searchList.Contains(x.IdAddedBy));
             }
             return this;
         }
