@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.ContentProcessing.Interfaces;
@@ -12,6 +13,7 @@ using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
@@ -30,8 +32,9 @@ namespace VitalChoice.Business.Services.Content
 
         public ProductViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
             IContentProcessorService processorService, IRepositoryAsync<ProductContent> contentRepository,
-            IObjectMapper<ProductViewForCustomerModel> mapper, IObjectMapperFactory mapperFactory, IProductService productService)
-            : base(templatesCache, loggerProvider.CreateLogger<ProductViewService>(), processorService, contentRepository, mapper, mapperFactory)
+            IObjectMapper<ProductViewForCustomerModel> mapper, IObjectMapperFactory mapperFactory, IProductService productService,
+            IOptions<AppOptions> appOptions)
+            : base(templatesCache, loggerProvider.CreateLogger<ProductViewService>(), processorService, contentRepository, mapper, mapperFactory, appOptions)
         {
             _productService = productService;
         }

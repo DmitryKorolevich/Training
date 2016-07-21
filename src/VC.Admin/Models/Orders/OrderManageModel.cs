@@ -204,6 +204,10 @@ namespace VC.Admin.Models.Orders
         [DirectLocalized("VC Wellness Employee Program")]
         public VCWellnessEmployeeProgramPaymentModel VCWellness { get; set; }
 
+        //Only for edit
+        [DirectLocalized("No Charge")]
+        public NCPaymentModel NC { get; set; }
+
         [DirectLocalized("Payment Method")]
         public int? IdPaymentMethodType { get; set; }
 

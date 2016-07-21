@@ -168,6 +168,13 @@ namespace VC.Admin.ModelConverters
                     case (int) PaymentMethodType.VCWellnessEmployeeProgram:
                         model.VCWellness = await _paymentMethodMapper.ToModelAsync<VCWellnessEmployeeProgramPaymentModel>(dynamic.PaymentMethod);
                         break;
+                    case (int)PaymentMethodType.NoCharge:
+                        model.NC = await _paymentMethodMapper.ToModelAsync<NCPaymentModel>(dynamic.PaymentMethod);
+                        if (model.NC.Address == null)
+                        {
+                            model.NC.Address=new AddressModel();
+                        }
+                        break;
                 }
             }
 
@@ -348,7 +355,7 @@ namespace VC.Admin.ModelConverters
                                 dbCustomer.CustomerPaymentMethods.Add(method);
                             }
                         }
-                        if (model.UpdateCheckForCustomer && dynamic.PaymentMethod != null)
+                        if (model.UpdateWireTransferForCustomer && dynamic.PaymentMethod != null)
                         {
                             RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType,
                                 PaymentMethodType.WireTransfer);
@@ -364,7 +371,7 @@ namespace VC.Admin.ModelConverters
                                 dbCustomer.CustomerPaymentMethods.Add(method);
                             }
                         }
-                        if (model.UpdateCheckForCustomer && dynamic.PaymentMethod != null)
+                        if (model.UpdateMarketingForCustomer && dynamic.PaymentMethod != null)
                         {
                             RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType,
                                 PaymentMethodType.Marketing);
@@ -384,7 +391,7 @@ namespace VC.Admin.ModelConverters
                                 dbCustomer.CustomerPaymentMethods.Add(method);
                             }
                         }
-                        if (model.UpdateCheckForCustomer && dynamic.PaymentMethod != null)
+                        if (model.UpdateVCWellnessForCustomer && dynamic.PaymentMethod != null)
                         {
                             RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType,
                                 PaymentMethodType.VCWellnessEmployeeProgram);
@@ -433,6 +440,9 @@ namespace VC.Admin.ModelConverters
                         case (int)PaymentMethodType.VCWellnessEmployeeProgram:
                             dynamic.PaymentMethod = await _paymentMethodMapper.FromModelAsync(model.VCWellness, model.IdPaymentMethodType.Value);
                             break;
+                        case (int)PaymentMethodType.NoCharge:
+                            dynamic.PaymentMethod = await _paymentMethodMapper.FromModelAsync(model.NC, model.IdPaymentMethodType.Value);
+                            break;
                         default:
                             dynamic.PaymentMethod = new OrderPaymentMethodDynamic() {IdObjectType = model.IdPaymentMethodType.Value };
                             break;
@@ -471,6 +481,10 @@ namespace VC.Admin.ModelConverters
                         case (int)PaymentMethodType.VCWellnessEmployeeProgram:
                             if (model.Customer != null)
                                 dynamic.PaymentMethod = await _paymentMethodMapper.FromModelAsync(model.Customer.VCWellness, model.IdPaymentMethodType.Value);
+                            break;
+                        case (int)PaymentMethodType.NoCharge:
+                            if (model.Customer != null)
+                                dynamic.PaymentMethod = await _paymentMethodMapper.FromModelAsync(model.Customer.NC, model.IdPaymentMethodType.Value);
                             break;
                         default:
                             dynamic.PaymentMethod = new OrderPaymentMethodDynamic() { IdObjectType = model.IdPaymentMethodType.Value };

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.ContentProcessing.Interfaces;
@@ -13,6 +14,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Products;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Products;
@@ -28,8 +30,9 @@ namespace VitalChoice.Business.Services.Content
         public CategoryViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
             IContentProcessorService processorService, IRepositoryAsync<ProductCategoryContent> contentRepository,
             IObjectMapper<ProductViewForCustomerModel> mapper, IObjectMapperFactory mapperFactory,
-            IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository)
-            : base(templatesCache, loggerProvider.CreateLogger<CategoryViewService>(), processorService, contentRepository, mapper, mapperFactory)
+            IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository,
+            IOptions<AppOptions> appOptions)
+            : base(templatesCache, loggerProvider.CreateLogger<CategoryViewService>(), processorService, contentRepository, mapper, mapperFactory, appOptions)
         {
             _productCategoryEcommerceRepository = productCategoryEcommerceRepository;
         }

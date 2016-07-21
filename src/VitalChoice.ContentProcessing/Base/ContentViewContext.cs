@@ -15,6 +15,7 @@ namespace VitalChoice.ContentProcessing.Base
     {
         private readonly ExpandoObject _parameters;
         private readonly ExStringBuilder _scriptStringBuilder = new ExStringBuilder();
+        private readonly ExStringBuilder _socialMetaStringBuilder = new ExStringBuilder();
 
         public ContentViewContext(IDictionary<string, object> parameters, ContentDataItem entity, ClaimsPrincipal user,
             ActionContext actionContext)
@@ -45,6 +46,13 @@ namespace VitalChoice.ContentProcessing.Base
         public void AppendScript(string scripts)
         {
             _scriptStringBuilder.Append(scripts);
+        }
+
+        public string SocialMeta => _socialMetaStringBuilder.ToString();
+
+        public void AppendSocialMeta(string meta)
+        {
+            _socialMetaStringBuilder.Append(meta);
         }
     }
 

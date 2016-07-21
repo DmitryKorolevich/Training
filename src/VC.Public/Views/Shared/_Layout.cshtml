@@ -17,7 +17,9 @@
 <!--[if !IE]><!-->
 	<html class="no-js" lang="en">
 <!--<![endif]-->
-
+	@{
+        var appInfrastructure = appInfrastructureService;
+    }
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -29,6 +31,16 @@
 	{
 		<title>Wild Salmon | Omega-3 | Wild Seafood | Organic Foods | Vital Choice</title>
 	}
+    @if (IsSectionDefined("SocialMeta"))
+    {
+        @await RenderSectionAsync("SocialMeta", false)
+    }
+    else
+    {
+        <meta property="og:image" content="https://@(appOptions.Value.PublicHost)/files/catalog/fbdefault2.jpg">
+        <meta itemprop="image" content="https://@(appOptions.Value.PublicHost)/files/catalog/googleplus.jpg" />
+        <link rel="image_src" href="https://@(appOptions.Value.PublicHost)/files/catalog/googleplus.jpg" />
+    }
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="msvalidate.01" content="4A9D524947EE62F01A1A9607511248C4" />
     <link href="//fonts.googleapis.com/css?family=Francois+One" rel="stylesheet" type="text/css">
@@ -39,17 +51,61 @@
 		@await Component.InvokeAsync("CustomStyles")
 	</style>
     <script>
-        @{
-            var appInfrastructure = appInfrastructureService;
-        }
-
         var appSettings = { DefaultCountryId: @(appInfrastructure.DefaultCountry?.Id) }
     </script>
+
+    <!-- mobile redirect -->
+    <script src='https://cloud.moovweb.net/api/public/js_redirection/vital-choice/vital-choice-prod.js'></script>
+    <!-- mobile redirect -->
+    <meta name='og:latitude' content='48.892917'>
+    <meta name='og:longitude' content='-122.614900'>
+    <meta name='og:street-address' content='2460 Salashan Loop Road'>
+    <meta name='og:locality' content='Ferndale'>
+    <meta name='og:region' content='WA'>
+    <meta name='og:postal-code' content='98248'>
+    <meta name='og:country-name' content='USA'>
+    <!-- crazyegg Code -->
+    <script type="text/javascript">
+        setTimeout(function(){var a=document.createElement("script");
+        var b=document.getElementsByTagName("script")[0];
+        a.src=document.location.protocol+"//script.crazyegg.com/pages/scripts/0011/3310.js?"+Math.floor(new Date().getTime()/3600000);
+        a.async=true;a.type="text/javascript";b.parentNode.insertBefore(a,b)}, 1);
+    </script>
+    <!-- crazyegg Code -->
+    <!-- Facebook Pixel Code -->
+    <script>
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+        n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+        document,'script','https://connect.facebook.net/en_US/fbevents.js');
+
+        fbq('init', '1008041505923184');
+        fbq('track', "PageView");
+    </script>
+    <noscript>
+        <img height="1" width="1" style="display:none"
+             src="https://www.facebook.com/tr?id=1008041505923184&ev=PageView&noscript=1" />
+    </noscript>
+    <!-- End Facebook Pixel Code -->
 </head>
 <body>
 	<!--[if lt IE 8]>
 		<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 	<![endif]-->
+    <!-- Google Tag Manager -->
+    <noscript>
+        <iframe src="//www.googletagmanager.com/ns.html?id=GTM-MM5ZMR"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <script>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-MM5ZMR');
+    </script>
+    <!-- End Google Tag Manager -->
 	<div class="separator-top"></div>
 	<div class="main">
 		<header>
@@ -255,5 +311,71 @@
 	@await Component.InvokeAsync("Assets", new { assetType = "scripts" })
 	@await RenderSectionAsync("PageScripts", false)
     @await RenderSectionAsync("EndPageStyles", false)
+
+    <!-- Google Code for Remarketing tag -->
+    <!-- Remarketing tags may not be associated with personally identifiable information or placed on pages related to sensitive categories. For instructions on adding this tag and more information on the above requirements, read the setup guide: google.com/ads/remarketingsetup -->
+    <script type="text/javascript">
+    /* <![CDATA[ */
+    var google_conversion_id = 1044813415;
+    var google_conversion_label = "RSLcCO3XigUQ56ya8gM";
+    var google_custom_params = window.google_tag_params;
+    var google_remarketing_only = true;
+    /* ]]> */
+    </script>
+    <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+    </script>
+    <noscript>
+        <div style="display:inline;">
+            <img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/1044813415/?value=0&amp;label=RSLcCO3XigUQ56ya8gM&amp;guid=ON&amp;script=0" />
+        </div>
+    </noscript>
+    <script type="text/javascript">
+        adroll_adv_id = "XVSDDJYFF5DU7F7F6CZF5U";
+        adroll_pix_id = "ODBEBPSLBVDCZKZQXNEJ4A";
+        (function () {
+            var oldonload = window.onload;
+            window.onload = function () {
+                __adroll_loaded = true;
+                var scr = document.createElement("script");
+                var host = (("https:" == document.location.protocol) ? "https://s.adroll.com" : "http://a.adroll.com");
+                scr.setAttribute('async', 'true');
+                scr.type = "text/javascript";
+                scr.src = host + "/j/roundtrip.js";
+                ((document.getElementsByTagName('head') || [null])[0] ||
+        document.getElementsByTagName('script')[0].parentNode).appendChild(scr);
+                if (oldonload) { oldonload() }
+            };
+        } ());
+    </script>
+    <!-- Bronto Popup -->
+    <script bronto-popup-id="352a8dc5-61a2-4f0b-92b7-06dfd854c5a3" src="https://cdn.bronto.com/popup/delivery.js"></script>
+    <!-- Bronto Popup -->
+    <!-- MyBuys -->
+    <script>
+        (function(d,c,x,s,e) {
+        s = d.createElement(x);
+        s.src = '//t.p.mybuys.com/clients/' + c + '/js/mybuys_qs.js';
+        s.async = true;
+        s.type = 'text/javascript';
+        e = d.getElementsByTagName(x)[0];
+        e.parentNode.insertBefore(s, e);
+        })(document,'VITALCHOICE','script');
+    </script>
+    <!-- MyBuys -->
+    <!-- Navistone -->
+    <script src="//code.murdoog.com/onetag/C15B7CDC77A275.js"></script>
+    <!-- Navistone -->
+    <!-- Hotjar Tracking Code for http://www.vitalchoice.com -->
+    <script>
+        (function(h,o,t,j,a,r){
+            h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+            h._hjSettings={hjid:223273,hjsv:5};
+            a=o.getElementsByTagName('head')[0];
+            r=o.createElement('script');r.async=1;
+            r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+            a.appendChild(r);
+        })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
+    </script>
+    <!-- Hotjar Tracking Code for http://www.vitalchoice.com -->
 </body>
 </html>

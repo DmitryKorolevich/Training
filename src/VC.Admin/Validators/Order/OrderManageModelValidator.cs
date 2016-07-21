@@ -25,6 +25,7 @@ namespace VC.Admin.Validators.Order
             var wireTransferPaymentModelValidator = ValidatorsFactory.GetValidator<WireTransferModelRules>();
             var marketingPaymentModelValidator = ValidatorsFactory.GetValidator<MarketingModelRules>();
             var VCWellnessPaymentModelValidator = ValidatorsFactory.GetValidator<VCWellnessModelRules>();
+            var NCPaymentModelValidator = ValidatorsFactory.GetValidator<NCPaymentModelRules>();
             ParseResults(ValidatorsFactory.GetValidator<OrderModelValidator>().Validate(value, ruleSet: "Main"));
             if (value.UseShippingAndBillingFromCustomer)
             {
@@ -79,10 +80,15 @@ namespace VC.Admin.Validators.Order
                         ParseResults(addressValidator.Validate(value.Customer.Marketing.Address), "marketing");
                     }
                     if (value.IdPaymentMethodType.Value == 8 && value.Customer.VCWellness != null &&
-                        (value.UpdateWireTransferForCustomer || value.OrderStatus != OrderStatus.OnHold))//vcwellness
+                        (value.UpdateVCWellnessForCustomer || value.OrderStatus != OrderStatus.OnHold))//vcwellness
                     {
                         ParseResults(VCWellnessPaymentModelValidator.Validate(value.Customer.VCWellness), "vcwellness");
                         ParseResults(addressValidator.Validate(value.Customer.VCWellness.Address), "vcwellness");
+                    }
+                    if (value.IdPaymentMethodType.Value == 4 && value.Customer.NC != null && value.OrderStatus != OrderStatus.OnHold)//nc 
+                    {
+                        ParseResults(NCPaymentModelValidator.Validate(value.Customer.NC), "nc");
+                        ParseResults(addressValidator.Validate(value.Customer.NC.Address), "nc");
                     }
                 }
             }
@@ -121,6 +127,11 @@ namespace VC.Admin.Validators.Order
                     {
                         ParseResults(VCWellnessPaymentModelValidator.Validate(value.VCWellness), "vcwellness");
                         ParseResults(addressValidator.Validate(value.VCWellness.Address), "vcwellness");
+                    }
+                    if (value.IdPaymentMethodType.Value == 4 && value.NC != null)//nc
+                    {
+                        ParseResults(NCPaymentModelValidator.Validate(value.NC), "nc");
+                        ParseResults(addressValidator.Validate(value.NC.Address), "nc");
                     }
                 }
             }

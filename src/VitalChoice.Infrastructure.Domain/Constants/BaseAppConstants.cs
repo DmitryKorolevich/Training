@@ -7,6 +7,7 @@
         public const int DEFAULT_LIST_TAKE_COUNT = 100;
         public const int DEFAULT_AUTO_COMPLETE_TAKE_COUNT = 20;
         public const int DEFAULT_TEXT_FIELD_MAX_SIZE = 100;
+        public const int ZIP_MAX_SIZE = 10;
         public const int DEFAULT_TEXTAREA_FIELD_MAX_SIZE = 250;
         public const int DELIVERY_INSTRUCTIONS_MAX_SIZE = 60;
         public const int DEFAULT_BIG_TEXT_FIELD_MAX_SIZE = 1000;

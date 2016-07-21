@@ -1,8 +1,14 @@
 ﻿@model VC.Public.Models.ContentPageViewModel
 
 @section Meta {
-        <title>@Html.Raw(Model.Title)</title>
-        <meta name="description" content="@Html.Raw(Model.MetaDescription)">
+    <title>@Html.Raw(Model.Title)</title>
+    <meta name="description" content="@Html.Raw(Model.MetaDescription)">
+}
+@if (!string.IsNullOrEmpty(Model.SocialMeta))
+{
+    @section SocialMeta {
+        @Html.Raw(Model.SocialMeta)
+    }
 }
 
 @section PageScripts {

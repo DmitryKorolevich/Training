@@ -78,7 +78,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         };
         $scope.paymentInfoTab = {
             index: 3,
-            formNames: ['card', 'oac', 'check', 'wiretransfer', 'marketing', 'vcwellness'],
+            formNames: ['card', 'oac', 'check', 'wiretransfer', 'marketing', 'vcwellness', 'nc'],
             AddressEditModels: {}
         };
         $scope.options.activeTabIndex = $scope.mainTab.index;
@@ -320,6 +320,13 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                             billingErrorMessages += "VC Wellness Employee Program is required. ";
                         }
                     }
+                    if ($scope.order.IdPaymentMethodType == 4)
+                    {
+                        if ($scope.order.NC == null)
+                        {
+                            billingErrorMessages += "No Charge is required. ";
+                        }
+                    }
                 }
 
                 if (billingErrorMessages)
@@ -358,6 +365,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.forms.submitted['wiretransfer'] = true;
                 $scope.forms.submitted['marketing'] = true;
                 $scope.forms.submitted['vcwellness'] = true;
+                $scope.forms.submitted['nc'] = true;
                 toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
                 deferredRecalculate.reject();
             }

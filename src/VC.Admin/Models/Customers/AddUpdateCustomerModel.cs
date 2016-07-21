@@ -117,6 +117,9 @@ namespace VC.Admin.Models.Customer
         [DirectLocalized("VC Wellness Employee Program")]
         public VCWellnessEmployeeProgramPaymentModel VCWellness { get; set; }
 
+        [DirectLocalized("No Charge")]
+        public NCPaymentModel NC { get; set; }
+
         public IList<CustomerFileModel> Files { get; set; }
 	}
 }

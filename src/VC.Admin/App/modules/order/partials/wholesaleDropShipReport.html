@@ -215,10 +215,32 @@
                             <td>{{::item.Zip}}</td>
                             <td>{{::item.Country}}</td>
                             <td>{{::item.Phone}}</td>
-                            <td>{{::item.ShipDate | date:"MM/dd/yy"}}<br />{{::item.ShipDate | date:"h:mm a"}}</td>
-                            <td>{{::item.ShippingCarrier}}</td>
                             <td>
-                                <a href="#">{{::item.ShippingIdConfirmation}}</a>
+                                <span data-ng-if="::item.ShipDate">{{::item.ShipDate | date:"MM/dd/yy"}}</span>
+                                <div data-ng-if="::!(item.ShipDate && (item.PShipDate || item.NPShipDate))">
+                                    <span data-ng-if="::item.PShipDate">{{::item.PShipDate | date:"MM/dd/yy"}} - P</span><br />
+                                    <span data-ng-if="::item.NPShipDate">{{::item.NPShipDate | date:"MM/dd/yy"}} - NP</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span data-ng-if="::item.ShippingCarrier">{{::item.ShippingCarrier}}</span>
+                                <div data-ng-if="::!(item.ShippingCarrier && (item.PShippingCarrier || item.NPShippingCarrier))">
+                                    <span data-ng-if="::item.PShippingCarrier">{{::item.PShippingCarrier}} - P</span><br />
+                                    <span data-ng-if="::item.NPShippingCarrier">{{::item.NPShippingCarrier}} - NP</span>
+                                </div>
+                            </td>
+                            <td>
+                                <a data-ng-if="::item.ShippingIdConfirmation" target="_blank" data-ng-href="{{::item.ShippingIdConfirmationUrl}}">{{::item.ShippingIdConfirmation}}</a>
+                                <div data-ng-if="::!(item.ShippingIdConfirmation && (item.PShippingIdConfirmation || item.NPShippingIdConfirmation))">
+                                    <span data-ng-if="::item.PShippingIdConfirmation">
+                                        <a target="_blank" data-ng-href="{{::item.PShippingIdConfirmationUrl}}">{{::item.PShippingIdConfirmation}}</a>
+                                         - P
+                                    </span><br />
+                                    <span data-ng-if="::item.NPShippingIdConfirmation">
+                                        <a target="_blank" data-ng-href="{{::item.NPShippingIdConfirmationUrl}}">{{::item.NPShippingIdConfirmation}}</a>
+                                         - NP
+                                    </span>
+                                </div>
                             </td>
                             <td>
                                 <span data-ng-repeat="sku in item.Skus">

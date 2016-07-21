@@ -100,7 +100,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         };
         $scope.paymentInfoTab = {
             index: 4,
-            formNames: ['card', 'oac', 'check', 'wiretransfer', 'marketing', 'vcwellness'],
+            formNames: ['card', 'oac', 'check', 'wiretransfer', 'marketing', 'vcwellness', 'nc'],
             AddressEditModels: {}
         };
         $scope.customerNotesTab = {
@@ -448,6 +448,12 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                                 billingErrorMessages += "VC Wellness Employee Program is required. ";
                             }
                         }
+                        if ($scope.order.IdPaymentMethodType == 4)
+                        {
+                            if ($scope.currentCustomer.NC == null) {
+                                billingErrorMessages += "No Charge is required. ";
+                            }
+                        }
                     }
                     else {
                         if ($scope.order.IdPaymentMethodType == 1)//card
@@ -481,6 +487,13 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                         if ($scope.order.IdPaymentMethodType == 8) {
                             if ($scope.order.VCWellness == null) {
                                 billingErrorMessages += "VC Wellness Employee Program is required. ";
+                            }
+                        }
+                        if ($scope.order.IdPaymentMethodType == 4)
+                        {
+                            if ($scope.order.NC == null)
+                            {
+                                billingErrorMessages += "No Charge is required. ";
                             }
                         }
                     }
@@ -518,6 +531,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.forms.submitted['wiretransfer'] = true;
                 $scope.forms.submitted['marketing'] = true;
                 $scope.forms.submitted['vcwellness'] = true;
+                $scope.forms.submitted['nc'] = true;
                 toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
                 deferredRecalculate.reject();
             }

@@ -100,7 +100,10 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
                 order.PaymentMethod = new OrderPaymentMethodDynamic()
                 {
                     IdObjectType = (int) PaymentMethodType.NoCharge,
+                    Address = paymentMethod.Address
                 };
+                order.PaymentMethod.Data.PaymentComment = "Gift List Upload";
+                order.PaymentMethod.Address.Id = 0;
             }
             if (order.IdObjectType == (int)OrderType.DropShip)
             {

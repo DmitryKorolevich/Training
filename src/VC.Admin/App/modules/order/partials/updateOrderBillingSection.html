@@ -125,6 +125,11 @@
                 </label>
             </div>
         </div>
+        <div class="col-md-6">
+            <div data-ng-if="paymentInfoTab.PaymentMethodType == 4 && currentCustomer.ApprovedPaymentMethods.length > 0 && !order.NC">
+                <button class="btn btn-info" data-ng-click="setNewNC();">Add New NC</button>
+            </div>
+        </div>
     </div>
     <hr />
     <form class="form-horizontal" name="forms.card" data-ng-class="{submitted: forms.submitted['card']}" novalidate unsaved-warning-form>
@@ -262,7 +267,7 @@
                         <div class="error-container" ng-show="forms.submitted['wiretransfer'] && forms.wiretransfer.PaymentComment.$invalid">
                             <small class="error" ng-show="forms.wiretransfer.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
                             <small class="error" ng-show="forms.wiretransfer.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
-                            <small class="error" ng-show="forms.wiretransfer.PaymentComment.$error.server">{{serverMessages.GetMessage('PaymentComment')}}</small>
+                            <small class="error" ng-show="forms.wiretransfer.PaymentComment.$error.server">{{serverMessages.GetMessage('PaymentComment', undefined, undefined, "wiretransfer")}}</small>
                         </div>
                     </div>
                 </div>
@@ -282,7 +287,7 @@
                         </select>
                         <div class="error-container" ng-show="forms.submitted['marketing'] && forms.marketing.MarketingPromotionType.$invalid">
                             <small class="error" ng-show="forms.marketing.MarketingPromotionType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Type")}}</small>
-                            <small class="error" ng-show="forms.marketing.MarketingPromotionType.$error.server">{{serverMessages.GetMessage('MarketingPromotionType')}}</small>
+                            <small class="error" ng-show="forms.marketing.MarketingPromotionType.$error.server">{{serverMessages.GetMessage('MarketingPromotionType', undefined, undefined, "marketing")}}</small>
                         </div>
                     </div>
                 </div>
@@ -293,7 +298,7 @@
                         <div class="error-container" ng-show="forms.submitted['marketing'] && forms.marketing.PaymentComment.$invalid">
                             <small class="error" ng-show="forms.marketing.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
                             <small class="error" ng-show="forms.marketing.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
-                            <small class="error" ng-show="forms.marketing.PaymentComment.$error.server">{{serverMessages.GetMessage('PaymentComment')}}</small>
+                            <small class="error" ng-show="forms.marketing.PaymentComment.$error.server">{{serverMessages.GetMessage('PaymentComment', undefined, undefined, "marketing")}}</small>
                         </div>
                     </div>
                 </div>
@@ -312,12 +317,31 @@
                         <div class="error-container" ng-show="forms.submitted['vcwellness'] && forms.vcwellness.PaymentComment.$invalid">
                             <small class="error" ng-show="forms.vcwellness.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
                             <small class="error" ng-show="forms.vcwellness.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
-                            <small class="error" ng-show="forms.vcwellness.PaymentComment.$error.server">{{serverMessages.GetMessage('PaymentComment')}}</small>
+                            <small class="error" ng-show="forms.vcwellness.PaymentComment.$error.server">{{serverMessages.GetMessage('PaymentComment', undefined, undefined, "vcwellness")}}</small>
                         </div>
                     </div>
                 </div>
                 <span class="legend">Billing Address</span>
                 <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(order.VCWellness, order.OnHold)]"></div>
+            </div>
+        </fieldset>
+    </form>
+    <form class="form-horizontal" name="forms.nc" data-ng-class="{submitted: forms.submitted['nc']}" novalidate unsaved-warning-form>
+        <fieldset>
+            <div data-ng-if="paymentInfoTab.PaymentMethodType == 4 && currentCustomer.ApprovedPaymentMethods.length > 0 && order.NC">
+                <div class="form-group">
+                    <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
+                    <div class="col-md-9">
+                        <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="order.NC.PaymentComment" placeholder="Payment Comment" rows="3" data-ng-required="!order.OnHold" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
+                        <div class="error-container" ng-show="forms.submitted['nc'] && forms.nc.PaymentComment.$invalid">
+                            <small class="error" ng-show="forms.nc.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
+                            <small class="error" ng-show="forms.nc.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
+                            <small class="error" ng-show="forms.nc.PaymentComment.$error.server">{{serverMessages.GetMessage('PaymentComment', undefined, undefined, "nc")}}</small>
+                        </div>
+                    </div>
+                </div>
+                <span class="legend">Billing Address</span>
+                <div data-ng-include="'app/modules/customer/partials/address.html'" data-ng-repeat="model in [buildOrderPaymentPartial(order.NC, order.OnHold)]"></div>
             </div>
         </fieldset>
     </form>

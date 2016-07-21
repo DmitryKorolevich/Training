@@ -352,6 +352,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.forms.submitted['wiretransfer'] = true;
                 $scope.forms.submitted['marketing'] = true;
                 $scope.forms.submitted['vcwellness'] = true;
+                $scope.forms.submitted['nc'] = true;
                 toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
                 deferredRecalculate.reject();
             }                               

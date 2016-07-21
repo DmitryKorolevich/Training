@@ -34,6 +34,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels
 
         public int ViewType { get; set; }
 
+        public string PublicHost { get; set; }
+
         public IList<TtlCategoryModel> SubCategories { get; set; }
 
 	    public IList<TtlCategoryProductModel> Products { get; set; }

@@ -58,7 +58,9 @@ namespace VC.Admin.ModelConverters
                 dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int)PaymentMethodType.Marketing);
             var vcWellnessType =
                 dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int)PaymentMethodType.VCWellnessEmployeeProgram);
-	        model.Oac = await _paymentMethodMapper.ToModelAsync<OacPaymentModel>(oacPaymentType);
+            var ncType =
+                dynamic.CustomerPaymentMethods.SingleOrDefault(p => p.IdObjectType == (int)PaymentMethodType.NoCharge);
+            model.Oac = await _paymentMethodMapper.ToModelAsync<OacPaymentModel>(oacPaymentType);
 	        model.Check = await _paymentMethodMapper.ToModelAsync<CheckPaymentModel>(checkType);
 	        foreach (var creditCard in dynamic.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard))
 	        {
@@ -67,6 +69,7 @@ namespace VC.Admin.ModelConverters
             model.WireTransfer = await _paymentMethodMapper.ToModelAsync<WireTransferPaymentModel>(wireTransferType);
             model.Marketing = await _paymentMethodMapper.ToModelAsync<MarketingPaymentModel>(marketingType);
             model.VCWellness = await _paymentMethodMapper.ToModelAsync<VCWellnessEmployeeProgramPaymentModel>(vcWellnessType);
+            model.NC = await _paymentMethodMapper.ToModelAsync<NCPaymentModel>(ncType);
 
             if (dynamic.Files!=null && dynamic.Files.Count > 0)
 			{

@@ -152,4 +152,24 @@ namespace VC.Admin.Models.Customers
         [Map]
         public string PaymentComment { get; set; }
     }
+
+    public class NCPaymentModel : BaseModel
+    {
+        public NCPaymentModel()
+        {
+            PaymentMethodType = PaymentMethodType.NoCharge;
+        }
+
+        [Map]
+        public int Id { get; set; }
+
+        [Map]
+        public AddressModel Address { get; set; }
+
+        [Map("IdObjectType")]
+        public PaymentMethodType PaymentMethodType { get; set; }
+
+        [Map]
+        public string PaymentComment { get; set; }
+    }
 }

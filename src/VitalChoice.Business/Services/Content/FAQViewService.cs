@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.Data.Repositories;
@@ -18,6 +19,7 @@ using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.Faq;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Business.Services.Content
@@ -29,8 +31,9 @@ namespace VitalChoice.Business.Services.Content
             IContentProcessorService processorService,
             IRepositoryAsync<FAQ> contentRepository,
             IObjectMapper<ContentParametersModel> mapper,
-            IObjectMapperFactory mapperFactory)
-            : base(templatesCache, loggerProvider.CreateLogger<FAQViewService>(), processorService, contentRepository, mapper, mapperFactory)
+            IObjectMapperFactory mapperFactory,
+            IOptions<AppOptions> appOptions)
+            : base(templatesCache, loggerProvider.CreateLogger<FAQViewService>(), processorService, contentRepository, mapper, mapperFactory, appOptions)
         {
         }
     }

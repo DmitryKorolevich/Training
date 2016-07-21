@@ -41,10 +41,16 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
             Map(m => m.Zip).Name("Postal Code").Index(16);
             Map(m => m.Country).Name("Country").Index(17);
             Map(m => m.Phone).Name("Phone").Index(18);
-            Map(m => m.ShipDate).Name("Ship Date").Index(19);
+            Map(m => m.ShipDate).Name("Ship Date").Index(19).TypeConverterOption(CultureInfo.InvariantCulture).TypeConverterOption("MM/dd/yyyy");
             Map(m => m.ShippingCarrier).Name("Shipping Carrier").Index(20);
             Map(m => m.ShippingIdConfirmation).Name("Shipping Confirmation #").Index(21);
-            Map(m => m.Skus).Name("Products").Index(22).TypeConverter<SkusConverter>();
+            Map(m => m.PShipDate).Name("P Ship Date").Index(22).TypeConverterOption(CultureInfo.InvariantCulture).TypeConverterOption("MM/dd/yyyy");
+            Map(m => m.PShippingCarrier).Name("P Shipping Carrier").Index(23);
+            Map(m => m.PShippingIdConfirmation).Name("P Shipping Confirmation #").Index(24);
+            Map(m => m.NPShipDate).Name("NP Ship Date").Index(25).TypeConverterOption(CultureInfo.InvariantCulture).TypeConverterOption("MM/dd/yyyy");
+            Map(m => m.NPShippingCarrier).Name("NP Shipping Carrier").Index(26);
+            Map(m => m.NPShippingIdConfirmation).Name("NP Shipping Confirmation #").Index(27);
+            Map(m => m.Skus).Name("Products").Index(28).TypeConverter<SkusConverter>();
         }
 
         private class SkusConverter : DefaultTypeConverter

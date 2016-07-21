@@ -19,6 +19,8 @@ using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Constants;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Options;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.ContentProcessing.Base
@@ -32,11 +34,13 @@ namespace VitalChoice.ContentProcessing.Base
         protected readonly IRepositoryAsync<TEntity> ContentRepository;
         private readonly IObjectMapper<TParametersModel> _mapper;
         private readonly IObjectMapperFactory _mapperFactory;
+        private readonly AppOptions _appOptions;
         protected readonly ILogger Logger;
 
         protected ContentViewService(
             ITtlGlobalCache templatesCache, ILogger logger, IContentProcessorService processorService,
-            IRepositoryAsync<TEntity> contentRepository, IObjectMapper<TParametersModel> mapper, IObjectMapperFactory mapperFactory)
+            IRepositoryAsync<TEntity> contentRepository, IObjectMapper<TParametersModel> mapper, IObjectMapperFactory mapperFactory,
+            IOptions<AppOptions> appOptions)
         {
             _templatesCache = templatesCache;
             _processorService = processorService;
@@ -44,9 +48,11 @@ namespace VitalChoice.ContentProcessing.Base
             _mapper = mapper;
             Logger = logger;
             _mapperFactory = mapperFactory;
+            _appOptions = appOptions.Value;
         }
 
         public virtual string ViewContextName => "ViewContext";
+        public virtual string AppOptionsName => "AppOptions";
         public virtual string DefaultModelName => "Model";
 
         public async Task<ContentViewModel> GetContentAsync(ControllerContext context, ClaimsPrincipal user,
@@ -92,7 +98,8 @@ namespace VitalChoice.ContentProcessing.Base
             Dictionary<string, object> model = new Dictionary<string, object>
             {
                 {DefaultModelName, contentEntity},
-                {ViewContextName, viewContext}
+                {ViewContextName, viewContext},
+                {AppOptionsName, _appOptions},
             };
             foreach (var p in contentEntity.MasterContentItem.MasterContentItemToContentProcessors)
             {
@@ -164,7 +171,8 @@ namespace VitalChoice.ContentProcessing.Base
                     String.Format(ContentConstants.CONTENT_PAGE_TITLE_GENERAL_FORMAT, entity.Name),
                 MetaDescription = entity.ContentItem.MetaDescription,
                 MetaKeywords = entity.ContentItem.MetaKeywords,
-                Scripts = viewContext.Scripts
+                Scripts = viewContext.Scripts,
+                SocialMeta = viewContext.SocialMeta
             };
         }
 
