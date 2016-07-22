@@ -153,6 +153,19 @@ angular.module('app.modules.customer.services.customerEditService', [])
                 }
             }
         };
+
+        uiScope.filterCountries = function ()
+        {
+            if (uiScope.allCountries && uiScope.currentCustomer)
+            {
+                var countries = $.grep(uiScope.allCountries, function (item, i)
+                {
+                    return (uiScope.currentCustomer.CustomerType == 1 && (item.IdVisibility == 1 || item.IdVisibility == 3))
+                        || (uiScope.currentCustomer.CustomerType == 2 && (item.IdVisibility == 1 || item.IdVisibility == 2));
+                });
+                uiScope.countries = countries;
+            }
+        };
     };
 
     var initCustomerEdit = function (uiScope)

@@ -94,6 +94,7 @@
                 value.CountryCode=country.CountryCode;
                 value.CountryName=country.CountryName;
                 value.StatusCode = country.StatusCode;
+                value.IdVisibility = country.IdVisibility;
                 country.type = "country";
                 if(value.States)
                 {

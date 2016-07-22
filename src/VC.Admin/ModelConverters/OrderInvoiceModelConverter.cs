@@ -69,12 +69,7 @@ namespace VC.Admin.ModelConverters
                 await FillAdditionalAddressFields(model.ShippingAddress, _countryService);
                 model.DeliveryInstructions = model.ShippingAddress.DeliveryInstructions;
             }
-            if (dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.NoCharge && dynamic.Customer.ProfileAddress != null)
-            {
-                model.BillingAddress = await _addressMapper.ToModelAsync<AddressModel>(dynamic.Customer.ProfileAddress);
-                await FillAdditionalAddressFields(model.BillingAddress, _countryService);
-            }
-            else if (dynamic.PaymentMethod?.Address != null)
+            if (dynamic.PaymentMethod?.Address != null)
             {
                 model.BillingAddress = await _addressMapper.ToModelAsync<AddressModel>(dynamic.PaymentMethod.Address);
                 await FillAdditionalAddressFields(model.BillingAddress, _countryService);

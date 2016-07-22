@@ -30,7 +30,9 @@
                                             <div class="ya-treeview-content clearfix">
                                                 <div class="line">
                                                     <label><span class="text-break-message">{{country.CountryName}} -&nbsp;</span><strong>{{country.CountryCode}}</strong></label>
-                                                    <span data-ng-if="country.StatusCode == 1" class="label label-warning category-status">Hidden</span>
+                                                    <span data-ng-if="country.IdVisibility==1" class="label label-info font-default category-status">{{getReferenceItem(ReferenceData.AssignedCustomerTypes, country.IdVisibility).Text}}</span>
+                                                    <span data-ng-if="country.IdVisibility==2" class="label label-wholesale font-default category-status">{{getReferenceItem(ReferenceData.AssignedCustomerTypes, country.IdVisibility).Text}}</span>
+                                                    <span data-ng-if="country.IdVisibility==3" class="label label-retail font-default category-status">{{getReferenceItem(ReferenceData.AssignedCustomerTypes, country.IdVisibility).Text}}</span>
                                                 </div>
                                                 <div class="ya-treview-buttons" data-nodrag>
                                                     <a class="btn btn-success btn-xs" title="Add" nodrag data-ng-click="addState(country.CountryCode, country.Id)">

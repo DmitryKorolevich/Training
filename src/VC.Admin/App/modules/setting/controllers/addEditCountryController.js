@@ -31,6 +31,11 @@
 
 	function initialize() {
 
+	    $scope.customerTypes = [
+            { Key: 1, Text: 'All' },
+            { Key: 2, Text: 'Wholesale Only'}
+	    ];
+
 	    $scope.forms = {};
 
 	    if (!data.country) {
@@ -39,7 +44,8 @@
                 Id: 0,
                 CountryCode: '',
                 CountryName: '',
-                StatusCode: 2,//Active
+                StatusCode: 2,//Active,
+                IdVisibility: 1,//all
             };
 	    }
 	    else

@@ -31,7 +31,7 @@
 
 function refreshStates()
 {
-    getCountries(function (result)
+    getCountries(1, function (result)
     {
         var selectedCountry = $.grep(result.Data, function (country, countryIndex)
         {

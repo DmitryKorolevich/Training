@@ -25,11 +25,9 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-3 control-label">Hide within storefront</label>
+                <label class="col-md-3 control-label">Visibility</label>
                 <div class="col-md-9">
-                    <div class="checkbox">
-                        <label><input type="checkbox" name="StatusCode" placeholder="Hide within storefront" data-ng-model="country.StatusCode" data-ng-true-value="1" data-ng-false-value="2"/></label>
-                    </div>
+                    <select class="form-control" name="IdVisibility" data-ng-model="country.IdVisibility" ng-options="item.Key as item.Text for item in customerTypes"></select>
                 </div>
             </div>
 		</fieldset>

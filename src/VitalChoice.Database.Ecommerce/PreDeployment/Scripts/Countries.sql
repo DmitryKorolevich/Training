@@ -51,3 +51,15 @@ VALUES
 ('US','USA',2,1)
 
 END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = 'IdVisibility' AND [object_id] = OBJECT_ID('Countries'))
+BEGIN
+
+	ALTER TABLE Countries
+	Add IdVisibility INT CONSTRAINT DF_Countries_IdVisibility DEFAULT 1 NOT NULL
+
+END
+
+GO

@@ -56,7 +56,7 @@
                                                 <div class="form-group">
                                                     <div class="col-md-3"></div>
                                                     <div class="col-md-9">
-                                                        <select class="form-control" id="customerType" data-ng-model="currentCustomer.CustomerType" data-ng-options="customerType.Key as customerType.Text for customerType in ReferenceData.CustomerTypes"></select>
+                                                        <select class="form-control" id="customerType" data-ng-model="currentCustomer.CustomerType" data-ng-change="filterCountries();" data-ng-options="customerType.Key as customerType.Text for customerType in ReferenceData.CustomerTypes"></select>
                                                     </div>
                                                 </div>
                                                 <div data-ng-if="currentCustomer.CustomerType == 2">

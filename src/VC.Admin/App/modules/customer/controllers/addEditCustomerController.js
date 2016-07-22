@@ -31,6 +31,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			{
 			    if (result.Success) {
 			        $scope.currentCustomer = result.Data;
+			        $scope.filterCountries();
 			        if ($scope.currentCustomer.InceptionDate)
 			        {
 			            $scope.currentCustomer.InceptionDate = Date.parseDateTime($scope.currentCustomer.InceptionDate);
@@ -167,14 +168,17 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				$scope.forms.submitted = [];
 
 				$q.all({ countriesCall: customerService.getCountries($scope.addEditTracker) }).then(function(result) {
-					if (result.countriesCall.data.Success) {
-						$scope.countries = result.countriesCall.data.Data;
+				    if (result.countriesCall.data.Success)
+				    {
+				        $scope.allCountries = result.countriesCall.data.Data;
+				        $scope.countries = result.countriesCall.data.Data;
 
 						if (!$scope.editMode) {
 							customerService.createCustomerPrototype($scope.addEditTracker)
 								.success(function(result) {
 									if (result.Success) {
 									    $scope.currentCustomer = result.Data;
+									    $scope.filterCountries();
 									    if ($scope.currentCustomer.InceptionDate)
 									    {
 									        $scope.currentCustomer.InceptionDate = Date.parseDateTime($scope.currentCustomer.InceptionDate);

@@ -124,9 +124,11 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             if (result.countriesCall.data.Success && result.customerGetCall.data.Success)
             {
                 $scope.refreshOrderHistory();
+                $scope.allCountries = result.countriesCall.data.Data;
                 $scope.countries = result.countriesCall.data.Data;
-
                 $scope.currentCustomer = result.customerGetCall.data.Data;
+                $scope.filterCountries();
+
                 if ($scope.currentCustomer.InceptionDate)
                 {
                     $scope.currentCustomer.InceptionDate = Date.parseDateTime($scope.currentCustomer.InceptionDate);
