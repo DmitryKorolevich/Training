@@ -71,7 +71,7 @@ DELETE FROM HelpTickets
 GO
 TRUNCATE TABLE OrderOptionValues
 GO
-DELETE FROM OrderShippingPackages
+TRUNCATE TABLE OrderShippingPackages
 GO
 DELETE FROM OrderToGiftCertificates
 GO
@@ -764,7 +764,7 @@ SELECT
 	CONVERT(NVARCHAR(250), CAST(cc.expiration AS DATETIME2), 126) AS ExpDate
 FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON oo.Id = o.idOrder
-INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = oo.Id
+INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = o.IdOrder
 INNER JOIN OrderPaymentMethods AS a ON a.IdOrder = oo.Id AND a.IdObjectType = 1) p
 UNPIVOT (Value FOR Name IN 
 	(NameOnCard, CardNumber, CardType, ExpDate)
@@ -796,7 +796,7 @@ SELECT
 FROM [vitalchoice2.0].dbo.autoshipOrders AS aso
 INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = aso.idOrder
 INNER JOIN Orders AS oo ON oo.IdAutoShipOrder = aso.idAutoShipOrder
-INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = oo.Id
+INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = o.IdOrder
 INNER JOIN OrderPaymentMethods AS a ON a.IdOrder = oo.Id AND a.IdObjectType = 1) p
 UNPIVOT (Value FOR Name IN 
 	(NameOnCard, CardNumber, CardType, ExpDate)
@@ -891,7 +891,7 @@ SELECT
 	AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS PaidInFull
 FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON oo.Id = o.idOrder
-INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = oo.Id
+INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = o.IdOrder
 INNER JOIN OrderPaymentMethods AS a ON a.IdOrder = oo.Id AND a.IdObjectType = 3) p
 UNPIVOT (Value FOR Name IN 
 	(CheckNumber, PaidInFull)
@@ -918,7 +918,7 @@ SELECT
 FROM [vitalchoice2.0].dbo.autoshipOrders AS aso
 INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = aso.idOrder
 INNER JOIN Orders AS oo ON oo.IdAutoShipOrder = aso.idAutoShipOrder
-INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = oo.Id
+INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = o.IdOrder
 INNER JOIN OrderPaymentMethods AS a ON a.IdOrder = oo.Id AND a.IdObjectType = 3) p
 UNPIVOT (Value FOR Name IN 
 	(CheckNumber, PaidInFull)
@@ -940,7 +940,7 @@ SELECT
 	CAST(cc.FOB AS NVARCHAR(250)) AS Fob
 FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON oo.Id = o.idOrder
-INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = oo.Id
+INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = o.IdOrder
 INNER JOIN OrderPaymentMethods AS a ON a.IdOrder = oo.Id AND a.IdObjectType = 2) p
 UNPIVOT (Value FOR Name IN 
 	(Terms, Fob)
@@ -962,7 +962,7 @@ SELECT
 FROM [vitalchoice2.0].dbo.autoshipOrders AS aso
 INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = aso.idOrder
 INNER JOIN Orders AS oo ON oo.IdAutoShipOrder = aso.idAutoShipOrder
-INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = oo.Id
+INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = o.IdOrder
 INNER JOIN OrderPaymentMethods AS a ON a.IdOrder = oo.Id AND a.IdObjectType = 2) p
 UNPIVOT (Value FOR Name IN 
 	(Terms, Fob)
@@ -1351,8 +1351,8 @@ SELECT
 	MAX(pki.pcPackageInfo_ShippedDate), 
 	CASE WHEN MAX(pki.Warehouse) = 'VA' THEN 2 ELSE 1 END, 
 	NULL, 
-	(SELECT TOP 1 k.Item FROM [vitalchoice2.0].[dbo].[DelimitedSplit8K](MAX(pki.pcPackageInfo_ShipMethod), ' - ') AS k ORDER BY k.ItemNumber ASC), 
-	(SELECT TOP 1 k.Item FROM [vitalchoice2.0].[dbo].[DelimitedSplit8K](MAX(pki.pcPackageInfo_ShipMethod), ' - ') AS k ORDER BY k.ItemNumber DESC),
+	(SELECT TOP 1 RTRIM(k.Item) FROM [vitalchoice2.0].[dbo].[DelimitedSplit8K](MAX(pki.pcPackageInfo_ShipMethod), '-') AS k ORDER BY k.ItemNumber ASC), 
+	(SELECT TOP 1 LTRIM(k.Item) FROM [vitalchoice2.0].[dbo].[DelimitedSplit8K](MAX(pki.pcPackageInfo_ShipMethod), '-') AS k ORDER BY k.ItemNumber DESC),
 	MAX(pki.pcPackageInfo_ShippedDate), 
 	MAX(pki.pcPackageInfo_TrackingNumber),
 	MAX(pki.pcPackageInfo_UPSServiceCode)
