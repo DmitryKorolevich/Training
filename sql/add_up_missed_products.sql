@@ -1,6 +1,10 @@
 USE [VitalChoice.Ecommerce]
 GO
 
+DELETE FROM CartToGiftCertificates
+DELETE FROM RefundOrderToGiftCertificates
+DELETE FROM OrderToGiftCertificates
+DELETE FROM GiftCertificates
 DELETE FROM PromotionsToBuySkus
 DELETE FROM PromotionsToGetSkus
 DELETE FROM PromotionsToSelectedCategories
