@@ -1344,7 +1344,7 @@ WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM OrderOptionValues 
 GO
 
 INSERT INTO OrderShippingPackages
-(IdOrder, IdSku, DateCreated, IdWarehouse, POrderType, ShipMethodFreightCarrier, ShipMethodFreightService, ShippedDate, TrackingNumber)
+(IdOrder, IdSku, DateCreated, IdWarehouse, POrderType, ShipMethodFreightCarrier, ShipMethodFreightService, ShippedDate, TrackingNumber, UPSServiceCode)
 SELECT 
 	pki.idOrder, 
 	s.Id, 
@@ -1354,7 +1354,8 @@ SELECT
 	(SELECT TOP 1 k.Item FROM [vitalchoice2.0].[dbo].[DelimitedSplit8K](MAX(pki.pcPackageInfo_ShipMethod), ' - ') AS k ORDER BY k.ItemNumber ASC), 
 	(SELECT TOP 1 k.Item FROM [vitalchoice2.0].[dbo].[DelimitedSplit8K](MAX(pki.pcPackageInfo_ShipMethod), ' - ') AS k ORDER BY k.ItemNumber DESC),
 	MAX(pki.pcPackageInfo_ShippedDate), 
-	MAX(pki.pcPackageInfo_TrackingNumber)
+	MAX(pki.pcPackageInfo_TrackingNumber),
+	MAX(pki.pcPackageInfo_UPSServiceCode)
 FROM [vitalchoice2.0].dbo.pcPackageInfo AS pki
 INNER JOIN [vitalchoice2.0].dbo.ProductsOrdered AS po ON po.idOrder = pki.idOrder
 INNER JOIN [vitalchoice2.0].dbo.products AS p ON p.idProduct = po.idProduct AND p.sku = pki.pcPackageInfo_UPSServiceCode
