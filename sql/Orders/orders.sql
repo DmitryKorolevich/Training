@@ -44,6 +44,8 @@ GO
 USE [VitalChoice.Ecommerce]
 GO
 
+PRINT '====Wipe out all data'
+
 DELETE FROM AffiliateOrderPayments
 GO
 DELETE FROM AffiliatePayments
@@ -97,6 +99,8 @@ DELETE FROM OrderPaymentMethods
 GO
 DELETE FROM OrderAddresses
 
+PRINT '====Wipe out all data === END'
+
 GO
 
 DBCC CHECKIDENT('Orders', RESEED, 1)
@@ -148,6 +152,8 @@ LEFT JOIN [vitalchoice2.0].dbo.admins AS a ON a.idadmin = o.agentId
 LEFT JOIN [VitalChoice.Infrastructure].dbo.AdminProfiles AS p ON p.AgentId = a.AgentID COLLATE Cyrillic_General_CI_AS
 INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS c ON c.Id = o.idCustomer
 WHERE o.orderDate IS NOT NULL AND o.idCustomer IS NOT NULL AND EXISTS(SELECT * FROM [vitalchoice2.0].dbo.ProductsOrdered AS po WHERE po.idOrder = o.idOrder)
+
+PRINT '====Insert auto-ship templates'
 
 GO
 
@@ -211,6 +217,8 @@ WHERE o.orderDate IS NOT NULL AND o.idCustomer IS NOT NULL AND EXISTS(SELECT * F
 
 SET IDENTITY_INSERT Orders OFF;
 
+PRINT '====Insert orders'
+
 GO
 
 UPDATE Orders
@@ -238,9 +246,9 @@ SET ShippingTotal = ISNULL(TRY_CONVERT(MONEY,[vitalchoice2.0].dbo.RegexReplace('
 FROM Orders AS oo
 INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = oo.Id
 
-GO
+PRINT '====Set up discounts and missing totals'
 
---fields (Normal order)
+GO
 
 INSERT INTO OrderOptionValues
 (IdOrder, IdOptionType, Value)
@@ -298,9 +306,9 @@ UNPIVOT (
 ) AS unpvt
 INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 1)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====fields (Normal order)'
 
 GO
---fields (Drop-Ship order)
 
 INSERT INTO OrderOptionValues
 (IdOrder, IdOptionType, Value)
@@ -336,9 +344,9 @@ UNPIVOT (
 ) AS unpvt
 INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 3)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====fields (Drop-Ship order)'
 
 GO
---fields (Gift-List order)
 
 INSERT INTO OrderOptionValues
 (IdOrder, IdOptionType, Value)
@@ -397,9 +405,9 @@ UNPIVOT (
 INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 4)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 
-GO
+PRINT '====fields (Gift-List order)'
 
---add up missed service codes
+GO
 
 DELETE FROM LookupVariants
 WHERE IdLookup = (SELECT Id FROM Lookups WHERE Name = 'ServiceCodes')
@@ -414,10 +422,9 @@ UNION ALL
 SELECT serviceCode FROM [vitalchoice2.0].dbo.refund
 ) f
 ) ff
+PRINT '====add up missed service codes'
 
 GO
-
---fields (Reship order)
 
 INSERT INTO OrderOptionValues
 (IdOrder, IdOptionType, Value)
@@ -468,9 +475,9 @@ UNPIVOT (
 ) AS unpvt
 INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 5)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====fields (Reship order)'
 
 GO
---fields (Refund order)
 
 INSERT INTO OrderOptionValues
 (IdOrder, IdOptionType, Value)
@@ -511,9 +518,9 @@ UNPIVOT (
 ) AS unpvt
 INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 6)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====fields (Refund order)'
 
 GO
---fields (Source Order for Auto-Ship)
 
 INSERT INTO OrderOptionValues
 (IdOrder, IdOptionType, Value)
@@ -566,9 +573,9 @@ UNPIVOT (
 ) AS unpvt
 INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 2)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====fields (Source Order for Auto-Ship)'
 
 GO
---fields (Auto-Ship order)
 
 INSERT INTO OrderOptionValues
 (IdOrder, IdOptionType, Value)
@@ -596,7 +603,7 @@ SELECT
 	CAST(aso.schedule AS NVARCHAR(250)) AS AutoShipFrequency
 FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON oo.Id = o.idOrder AND oo.IdObjectType = 7
-INNER JOIN Orders AS autoo ON autoo.IdOrderSource = o.idAutoShipOrder
+INNER JOIN Orders AS autoo ON autoo.idAutoShipOrder = o.idAutoShipOrder
 LEFT JOIN [vitalchoice2.0].dbo.autoShipOrders AS aso ON aso.idAutoShipOrder = o.idAutoShipOrder
 LEFT JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = o.IdOrder
 ) p
@@ -631,6 +638,7 @@ UNPIVOT (
 ) AS unpvt
 INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 7)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====fields (Auto-Ship order)'
 
 -- billing
 
@@ -656,9 +664,10 @@ SELECT
 	o.idOrder
 FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON o.idOrder = oo.Id
+PRINT '====Billing addresses'
 
 GO
---auto-ship template
+
 
 INSERT INTO OrderAddresses
 (DateCreated, DateEdited, IdCountry, IdState, StatusCode, IdObjectType, County, IdOrder)
@@ -677,6 +686,7 @@ SELECT
 FROM [vitalchoice2.0].dbo.autoshipOrders AS aso
 INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = aso.idOrder
 INNER JOIN Orders AS oo ON oo.IdAutoShipOrder = aso.idAutoShipOrder
+PRINT '====Billing addresses (Auto-Ship)'
 
 GO
 
@@ -706,9 +716,10 @@ SELECT
 FROM Orders AS o
 INNER JOIN [vitalchoice2.0].dbo.orders AS oo ON oo.idOrder = o.Id
 INNER JOIN OrderAddresses AS a ON a.IdOrder = o.Id
+PRINT '====Payment methods'
 
 GO
---auto-ship template
+
 
 INSERT INTO OrderPaymentMethods
 (DateCreated, DateEdited, IdAddress, IdEditedBy, IdObjectType, StatusCode, IdOrder)
@@ -732,17 +743,18 @@ FROM [vitalchoice2.0].dbo.autoshipOrders AS aso
 INNER JOIN [vitalchoice2.0].dbo.orders AS oo ON oo.idOrder = aso.idOrder
 INNER JOIN Orders AS o ON o.IdAutoShipOrder = aso.idAutoShipOrder
 INNER JOIN OrderAddresses AS a ON a.IdOrder = o.Id
+PRINT '====Payment methods (Auto-Ship)'
 
 GO
+
 
 UPDATE Orders 
 SET IdPaymentMethod = p.Id
 FROM Orders AS o
 INNER JOIN OrderPaymentMethods AS p ON p.IdOrder = o.Id
+PRINT '====Set up payment ids'
 
 GO
-
---credit cards
 
 INSERT INTO OrderPaymentMethodOptionValues
 (IdOrderPaymentMethod, IdOptionType, Value)
@@ -771,9 +783,9 @@ UNPIVOT (Value FOR Name IN
 )AS unpvt
 INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 1)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====credit cards'
 
 GO
---auto-ship template
 
 INSERT INTO OrderPaymentMethodOptionValues
 (IdOrderPaymentMethod, IdOptionType, Value)
@@ -803,11 +815,9 @@ UNPIVOT (Value FOR Name IN
 )AS unpvt
 INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 1)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====credit cards(auto-ship)'
 
 GO
-
-
---credit cards (old auth.net)
 
 INSERT INTO OrderPaymentMethodOptionValues
 (IdOrderPaymentMethod, IdOptionType, Value)
@@ -838,9 +848,9 @@ UNPIVOT (Value FOR Name IN
 )AS unpvt
 INNER JOIN CustomerPaymentMethodOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 1)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====credit cards (old auth.net)'
 
 GO
---auto-ship template
 
 INSERT INTO OrderPaymentMethodOptionValues
 (IdOrderPaymentMethod, IdOptionType, Value)
@@ -872,9 +882,9 @@ UNPIVOT (Value FOR Name IN
 )AS unpvt
 INNER JOIN CustomerPaymentMethodOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 1)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====credit cards (old auth.net) (auto-ship)'
 
 GO
---check
 
 INSERT INTO OrderPaymentMethodOptionValues
 (IdOrderPaymentMethod, IdOptionType, Value)
@@ -898,9 +908,9 @@ UNPIVOT (Value FOR Name IN
 )AS unpvt
 INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====check'
 
 GO
---auto-ship template
 
 INSERT INTO OrderPaymentMethodOptionValues
 (IdOrderPaymentMethod, IdOptionType, Value)
@@ -925,10 +935,9 @@ UNPIVOT (Value FOR Name IN
 )AS unpvt
 INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====check(auto-ship)'
+
 GO
-
-
---OAC
 
 INSERT INTO OrderPaymentMethodOptionValues
 (IdOrderPaymentMethod, IdOptionType, Value)
@@ -947,9 +956,9 @@ UNPIVOT (Value FOR Name IN
 )AS unpvt
 INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====OAC'
 
 GO
---auto-ship template
 
 INSERT INTO OrderPaymentMethodOptionValues
 (IdOrderPaymentMethod, IdOptionType, Value)
@@ -969,6 +978,7 @@ UNPIVOT (Value FOR Name IN
 )AS unpvt
 INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====OAC(auto-ship)'
 
 GO
 
@@ -1003,9 +1013,9 @@ UNPIVOT (Value FOR Name IN
 )AS unpvt
 INNER JOIN AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====address options'
 
 GO
---auto-ship template
 
 INSERT INTO OrderAddressOptionValues
 (IdOrderAddress, IdOptionType, Value)
@@ -1031,6 +1041,7 @@ UNPIVOT (Value FOR Name IN
 )AS unpvt
 INNER JOIN AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====address options(auto-ship)'
 
 GO
 
@@ -1041,8 +1052,6 @@ ALTER TABLE OrderAddresses
 DROP COLUMN IdOrder
 
 GO
---shipping address
-
 ALTER TABLE OrderAddresses
 ADD IdOrder INT NULL
 
@@ -1066,10 +1075,9 @@ SELECT
 	o.idOrder
 FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON o.idOrder = oo.Id
+PRINT '====shipping addresses'
 
 GO
-
---auto-ship template address
 
 INSERT INTO OrderAddresses
 (DateCreated, DateEdited, IdCountry, IdState, StatusCode, IdObjectType, County, IdOrder)
@@ -1088,13 +1096,16 @@ SELECT
 FROM [vitalchoice2.0].dbo.autoshipOrders AS aso
 INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = aso.idOrder
 INNER JOIN Orders AS oo ON oo.IdAutoShipOrder = aso.idAutoShipOrder
+PRINT '====shipping addresses(auto-ship)'
 
 GO
+
 
 UPDATE Orders
 SET IdShippingAddress = a.Id
 FROM Orders AS o
 INNER JOIN OrderAddresses AS a ON a.IdOrder = o.Id
+PRINT '====shipping addresses set up ids'
 
 GO
 
@@ -1122,9 +1133,9 @@ UNPIVOT (Value FOR Name IN
 )AS unpvt
 INNER JOIN AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====shipping addresses options'
 
 GO
---auto-ship template address
 
 INSERT INTO OrderAddressOptionValues
 (IdOrderAddress, IdOptionType, Value)
@@ -1151,6 +1162,7 @@ UNPIVOT (Value FOR Name IN
 )AS unpvt
 INNER JOIN AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====shipping addresses options(auto-ship)'
 
 GO
 
@@ -1167,6 +1179,7 @@ SELECT o.Id, (SELECT TOP 1 g.Id FROM GiftCertificates AS g WHERE g.Code = [vital
 INNER JOIN [vitalchoice2.0].dbo.orders AS oo ON oo.idOrder = o.Id
 CROSS APPLY [vitalchoice2.0].[dbo].[DelimitedSplit8K](oo.pcOrd_GCDetails, '|g|') AS gc
 WHERE oo.pcOrd_GCDetails IS NOT NULL AND oo.pcOrd_GCDetails <> '' AND gc.Item IS NOT NULL AND gc.Item <> N'' AND (SELECT TOP 1 g.Id FROM GiftCertificates AS g WHERE g.Code = [vitalchoice2.0].dbo.RegexReplace('(?<code>[^\|]+)(\|[sS]\|)(?<description>[^\|]*)(\|[sS]\|)(?<amount>[0-9]+(\.[0-9]*)?)', gc.Item, '${code}') COLLATE Cyrillic_General_CI_AS) IS NOT NULL
+PRINT '====gift certificates used in order'
 
 GO
 
@@ -1177,6 +1190,7 @@ INNER JOIN Orders AS o ON po.idOrder = o.Id
 INNER JOIN Skus AS s ON s.Id = po.IdProduct
 WHERE po.quantity > 0
 GROUP BY po.IdOrder, po.IdProduct
+PRINT '====products ordered'
 
 GO
 
@@ -1188,6 +1202,7 @@ INNER JOIN [vitalchoice2.0].dbo.products AS p ON p.IdProduct = po.idProduct
 INNER JOIN Skus AS s ON s.StatusCode <> 3 AND s.Code = p.sku COLLATE Cyrillic_General_CI_AS
 WHERE po.quantity > 0 AND po.IdProduct NOT IN (SELECT Id FROM SKus)
 GROUP BY po.IdOrder, s.Id
+PRINT '====products ordered (missed sku ids)'
 
 GO
 
@@ -1201,6 +1216,7 @@ INNER JOIN [vitalchoice2.0].[dbo].ProductsOrdered AS po ON po.IdOrder = oo.IdOrd
 INNER JOIN Skus AS s ON s.Id = po.IdProduct
 WHERE po.quantity > 0
 GROUP BY o.Id, po.IdProduct
+PRINT '====products ordered (auto-ship)'
 
 GO
 
@@ -1215,6 +1231,7 @@ INNER JOIN [vitalchoice2.0].dbo.products AS p ON p.IdProduct = po.idProduct
 INNER JOIN Skus AS s ON s.StatusCode <> 3 AND s.Code = p.sku COLLATE Cyrillic_General_CI_AS
 WHERE po.quantity > 0 AND po.IdProduct NOT IN (SELECT Id FROM SKus)
 GROUP BY o.Id, s.Id
+PRINT '====products ordered (auto-ship) (missed skus)'
 
 GO
 
@@ -1232,6 +1249,7 @@ INNER JOIN [vitalchoice2.0].dbo.refund AS r ON r.idOrder = o.Id
 INNER JOIN [vitalchoice2.0].dbo.RefundItems AS ri ON ri.ItemType = 1 AND ri.IdRefundOrder = o.Id
 INNER JOIN Skus AS s ON s.Id = ri.IdItem
 WHERE o.IdObjectType = 6
+PRINT '====refund skus'
 
 GO
 
@@ -1243,6 +1261,7 @@ INNER JOIN [vitalchoice2.0].dbo.RefundItems AS ri ON ri.ItemType = 1 AND ri.IdRe
 INNER JOIN [vitalchoice2.0].dbo.products AS p ON p.IdProduct = ri.IdItem
 INNER JOIN Skus AS s ON s.StatusCode <> 3 AND s.Code = p.sku COLLATE Cyrillic_General_CI_AS
 WHERE o.IdObjectType = 6 AND ri.IdItem NOT IN (SELECT Id FROM SKus)
+PRINT '====refund skus(missed skus)'
 
 GO
 
@@ -1262,12 +1281,14 @@ INNER JOIN Customers AS c ON c.Id = hw.customerId
 WHERE hw.date IS NOT NULL
 
 SET IDENTITY_INSERT HealthwisePeriods OFF;
+PRINT '====healthwise periods'
 
 INSERT INTO HealthwiseOrders
 (Id, IdHealthwisePeriod)
 SELECT o.Id, hw.Id FROM Orders AS o
 INNER JOIN [vitalchoice2.0].dbo.orders AS oo ON oo.idOrder = o.Id
 INNER JOIN HealthwisePeriods AS hw ON hw.Id = oo.healthwiseId
+PRINT '====healthwise orders'
 
 GO
 
@@ -1284,6 +1305,7 @@ FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON oo.Id = o.IdOrder
 INNER JOIN Affiliates AS a ON a.Id = o.idAffiliate
 WHERE o.affiliatePayReport > o.affiliatePay
+PRINT '====affiliate payments'
 
 GO
 
@@ -1309,6 +1331,7 @@ FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON oo.Id = o.IdOrder
 INNER JOIN Affiliates AS a ON a.Id = o.idAffiliate
 LEFT JOIN AffiliatePayments AS ap ON ap.IdOrder = oo.Id
+PRINT '====affiliate order payments'
 
 GO
 
@@ -1325,6 +1348,7 @@ SET IdOrder = o.Id
 FROM GiftCertificates AS g
 INNER JOIN [vitalchoice2.0].dbo.pcGCOrdered AS gc ON gc.pcGO_GcCode COLLATE Cyrillic_General_CI_AS = g.Code
 INNER JOIN Orders AS o ON o.Id = gc.pcGO_IDOrder
+PRINT '====set up created gift certificates order ids'
 
 GO
 
@@ -1332,6 +1356,7 @@ DELETE v
 FROM OrderOptionValues AS v
 INNER JOIN OrderOptionTypes AS t ON t.Id = v.IdOptionType
 WHERE t.DefaultValue = v.Value
+PRINT '====default values fixup (remove)'
 
 GO
 
@@ -1340,6 +1365,7 @@ INSERT INTO OrderOptionValues
 SELECT c.Id, t.Id, t.DefaultValue FROM Orders AS c
 INNER JOIN OrderOptionTypes AS t ON t.IdObjectType = c.IdObjectType OR t.IdObjectType IS NULL
 WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM OrderOptionValues AS v WHERE v.IdOrder = c.Id AND v.IdOptionType = t.Id)
+PRINT '====default values fixup (insert)'
 
 GO
 
@@ -1362,3 +1388,4 @@ INNER JOIN [vitalchoice2.0].dbo.products AS p ON p.idProduct = po.idProduct AND 
 INNER JOIN Skus AS s ON s.Id = p.idProduct
 WHERE pki.pcPackageInfo_ShippedDate IS NOT NULL
 GROUP BY pki.idOrder, s.Id
+PRINT '====shipping packages'
