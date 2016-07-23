@@ -726,6 +726,8 @@ BEGIN
 	DROP INDEX [IX_Email_Customers] ON [dbo].[Customers]
 END
 
+GO
+
 IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'IX_UQ_NameTypeCustomerOption')
 BEGIN
 	CREATE UNIQUE NONCLUSTERED INDEX IX_UQ_NameTypeCustomerOption ON [dbo].[CustomerOptionTypes]

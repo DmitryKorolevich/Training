@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -28,6 +29,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Reports;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Interfaces.Services.Products;
@@ -47,6 +49,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IDiscountService _discountService;
         private readonly IDynamicMapper<AddressDynamic, Address> _addresMapper;
         private readonly ReferenceData _referenceData;
+        private readonly ITrackingService _trackingService;
         private readonly ILogger _logger;
 
         public OrderReportService(
@@ -59,7 +62,9 @@ namespace VitalChoice.Business.Services.Orders
             IProductService productService,
             IDiscountService discountService,
             IDynamicMapper<AddressDynamic, Address> addresMapper,
-            ILoggerProviderExtended loggerProvider, ReferenceData referenceData)
+            ITrackingService trackingService,
+            ILoggerProviderExtended loggerProvider,
+            ReferenceData referenceData)
         {
             _orderService = orderService;
             _orderRepository = orderRepository;
@@ -71,6 +76,7 @@ namespace VitalChoice.Business.Services.Orders
             _discountService = discountService;
             _addresMapper = addresMapper;
             _referenceData = referenceData;
+            _trackingService = trackingService;
             _logger = loggerProvider.CreateLogger<OrderReportService>();
         }
 
@@ -529,7 +535,8 @@ namespace VitalChoice.Business.Services.Orders
                 .Include(o => o.PromoSkus)
                 .ThenInclude(p => p.Sku)
                 .Include(o => o.ShippingAddress)
-                .ThenInclude(s => s.OptionValues));
+                .ThenInclude(s => s.OptionValues)
+                .Include(p=>p.OrderShippingPackages));
 
             orders.ForEach(p =>
             {
@@ -547,7 +554,7 @@ namespace VitalChoice.Business.Services.Orders
                 item.ShippingFirstName = p.ShippingAddress?.SafeData.FirstName;
                 item.ShippingLastName = p.ShippingAddress?.SafeData.LastName;
                 item.ShippingAddress1 = p.ShippingAddress?.SafeData.Address1;
-                item.ShippingAddress1 = p.ShippingAddress?.SafeData.Address2;
+                item.ShippingAddress2 = p.ShippingAddress?.SafeData.Address2;
                 item.Zip = p.ShippingAddress?.SafeData.Zip;
                 item.City = p.ShippingAddress?.SafeData.City;
                 item.Country = countries.FirstOrDefault(x => x.Id == p.ShippingAddress?.IdCountry)?.CountryCode;
@@ -570,10 +577,55 @@ namespace VitalChoice.Business.Services.Orders
                     Quantity = x.Quantity,
                 }));
 
+                var package = p.OrderShippingPackages.FirstOrDefault(pp => !pp.POrderType.HasValue);
+                if (package != null)
+                {
+                    item.ShipDate = package.ShippedDate;
+                    var shipMethodType = GetShipMethodTypeForFreightService(package.ShipMethodFreightService);
+                    var shipMethodTypeName = _referenceData.ShipMethodTypes.FirstOrDefault(pp => pp.Key == (int) shipMethodType)?.Text;
+                    item.ShippingCarrier = $"{package.ShipMethodFreightCarrier} - {shipMethodTypeName}";
+                    item.ShippingIdConfirmation = package.TrackingNumber;
+                    item.ShippingIdConfirmationUrl = _trackingService.GetServiceUrl(package.ShipMethodFreightCarrier,
+                        package.TrackingNumber);
+                }
+                package = p.OrderShippingPackages.FirstOrDefault(pp => pp.POrderType==(int)POrderType.P);
+                if (package != null)
+                {
+                    item.PShipDate = package.ShippedDate;
+                    var shipMethodType = GetShipMethodTypeForFreightService(package.ShipMethodFreightService);
+                    var shipMethodTypeName = _referenceData.ShipMethodTypes.FirstOrDefault(pp => pp.Key == (int)shipMethodType)?.Text;
+                    item.PShippingCarrier = $"{package.ShipMethodFreightCarrier} - {shipMethodTypeName}";
+                    item.PShippingIdConfirmation = package.TrackingNumber;
+                    item.PShippingIdConfirmationUrl = _trackingService.GetServiceUrl(package.ShipMethodFreightCarrier,
+                        package.TrackingNumber);
+                }
+                package = p.OrderShippingPackages.FirstOrDefault(pp => pp.POrderType == (int)POrderType.NP);
+                if (package != null)
+                {
+                    item.NPShipDate = package.ShippedDate;
+                    var shipMethodType = GetShipMethodTypeForFreightService(package.ShipMethodFreightService);
+                    var shipMethodTypeName = _referenceData.ShipMethodTypes.FirstOrDefault(pp => pp.Key == (int)shipMethodType)?.Text;
+                    item.NPShippingCarrier = $"{package.ShipMethodFreightCarrier} - {shipMethodTypeName}";
+                    item.NPShippingIdConfirmation = package.TrackingNumber;
+                    item.NPShippingIdConfirmationUrl = _trackingService.GetServiceUrl(package.ShipMethodFreightCarrier,
+                        package.TrackingNumber);
+                }
+
                 toReturn.Items.Add(item);
             });
 
             return toReturn;
+        }
+
+        private ShipMethodType GetShipMethodTypeForFreightService(string name)
+        {
+            return name.StartsWith(ShippingConstants.SHIP_METHOD_TYPE_NEXT_DAY_AIR_NAME,
+                false, CultureInfo.CurrentCulture) ?
+                ShipMethodType.NextDayAir :
+                name.StartsWith(ShippingConstants.SHIP_METHOD_TYPE_SECOND_DAY_AIR_NAME,
+                false, CultureInfo.CurrentCulture) ?
+                ShipMethodType.SecondDayAir :
+                ShipMethodType.Standard;
         }
 
         public async Task<PagedList<TransactionAndRefundReportItem>> GetTransactionAndRefundReportItemsAsync(

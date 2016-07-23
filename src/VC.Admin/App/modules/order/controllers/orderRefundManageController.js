@@ -124,9 +124,11 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             if (result.countriesCall.data.Success && result.customerGetCall.data.Success)
             {
                 $scope.refreshOrderHistory();
+                $scope.allCountries = result.countriesCall.data.Data;
                 $scope.countries = result.countriesCall.data.Data;
-
                 $scope.currentCustomer = result.customerGetCall.data.Data;
+                $scope.filterCountries();
+
                 if ($scope.currentCustomer.InceptionDate)
                 {
                     $scope.currentCustomer.InceptionDate = Date.parseDateTime($scope.currentCustomer.InceptionDate);
@@ -352,6 +354,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 $scope.forms.submitted['wiretransfer'] = true;
                 $scope.forms.submitted['marketing'] = true;
                 $scope.forms.submitted['vcwellness'] = true;
+                $scope.forms.submitted['nc'] = true;
                 toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
                 deferredRecalculate.reject();
             }                               

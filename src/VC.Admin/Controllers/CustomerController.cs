@@ -235,6 +235,16 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        public Result<NCPaymentModel> CreateNCPrototype()
+        {
+            var defaultCountry = _referenceData.DefaultCountry;
+            return new NCPaymentModel
+            {
+                Address = new AddressModel { Country = new CountryListItemModel(defaultCountry) }
+            };
+        }
+
+        [HttpPost]
         //[AdminAuthorize(PermissionType.Customers)]
         public Result<AddressModel> CreateAddressPrototype()
         {

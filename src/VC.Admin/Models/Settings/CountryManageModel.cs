@@ -22,6 +22,8 @@ namespace VC.Admin.Models.Setting
 
         public bool Add { get; set; }
 
+        public CustomerTypeCode IdVisibility { get; set; }
+
         public CountryManageModel()
         {
         }
@@ -32,6 +34,7 @@ namespace VC.Admin.Models.Setting
             CountryCode = item.CountryCode;
             CountryName = item.CountryName;
             StatusCode = item.StatusCode;
+            IdVisibility = item.IdVisibility;
         }
 
         public Country Convert()
@@ -42,6 +45,7 @@ namespace VC.Admin.Models.Setting
             toReturn.CountryCode = CountryCode?.Trim();
             toReturn.CountryName = CountryName?.Trim();
             toReturn.StatusCode = StatusCode;
+            toReturn.IdVisibility = IdVisibility;
 
             return toReturn;
         }

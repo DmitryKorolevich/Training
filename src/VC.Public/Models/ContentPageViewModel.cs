@@ -14,6 +14,8 @@ namespace VC.Public.Models
 
         public string Scripts { get; set; }
 
+        public string SocialMeta { get; set; }
+
         public ContentPageViewModel(ContentViewModel data)
         {
             HTML = data.Body;
@@ -21,6 +23,7 @@ namespace VC.Public.Models
             MetaKeywords = data.MetaKeywords;
             MetaDescription = data.MetaDescription;
             Scripts = data.Scripts;
+            SocialMeta = data.SocialMeta;
         }
     }
 }

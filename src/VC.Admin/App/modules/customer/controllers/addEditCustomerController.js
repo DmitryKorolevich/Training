@@ -31,6 +31,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			{
 			    if (result.Success) {
 			        $scope.currentCustomer = result.Data;
+			        $scope.filterCountries();
 			        if ($scope.currentCustomer.InceptionDate)
 			        {
 			            $scope.currentCustomer.InceptionDate = Date.parseDateTime($scope.currentCustomer.InceptionDate);
@@ -91,6 +92,11 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			            $scope.currentCustomer.VCWellness.formName = 'vcwellness';
 			            customerEditService.syncCountry($scope, $scope.currentCustomer.VCWellness.Address);
 			        }
+			        if ($scope.currentCustomer.NC)
+			        {
+			            $scope.currentCustomer.NC.formName = 'nc';
+			            customerEditService.syncCountry($scope, $scope.currentCustomer.NC.Address);
+			        }
 
 			        customerEditService.syncDefaultPaymentMethod($scope);
 			        customerEditService.showHighPriNotes($scope);
@@ -132,7 +138,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				};
 				$scope.paymentInfoTab = {
 				    index: 4,
-					formNames: ['card', 'oac', 'check', 'wiretransfer', 'marketing', 'vcwellness'],
+					formNames: ['card', 'oac', 'check', 'wiretransfer', 'marketing', 'vcwellness', 'nc'],
 					AddressEditModels: {}
 				};
 				$scope.customerFilesTab = {
@@ -162,14 +168,17 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				$scope.forms.submitted = [];
 
 				$q.all({ countriesCall: customerService.getCountries($scope.addEditTracker) }).then(function(result) {
-					if (result.countriesCall.data.Success) {
-						$scope.countries = result.countriesCall.data.Data;
+				    if (result.countriesCall.data.Success)
+				    {
+				        $scope.allCountries = result.countriesCall.data.Data;
+				        $scope.countries = result.countriesCall.data.Data;
 
 						if (!$scope.editMode) {
 							customerService.createCustomerPrototype($scope.addEditTracker)
 								.success(function(result) {
 									if (result.Success) {
 									    $scope.currentCustomer = result.Data;
+									    $scope.filterCountries();
 									    if ($scope.currentCustomer.InceptionDate)
 									    {
 									        $scope.currentCustomer.InceptionDate = Date.parseDateTime($scope.currentCustomer.InceptionDate);
@@ -304,6 +313,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 						$scope.forms.submitted['wiretransfer'] = true;
 						$scope.forms.submitted['marketing'] = true;
 						$scope.forms.submitted['vcwellness'] = true;
+						$scope.forms.submitted['nc'] = true;
 						$scope.serverMessages = new ServerMessages(result.Messages);
 						var formForShowing = null;
 						var form;
@@ -469,6 +479,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 					$scope.forms.submitted['wiretransfer'] = true;
 					$scope.forms.submitted['marketing'] = true;
 					$scope.forms.submitted['vcwellness'] = true;
+					$scope.forms.submitted['nc'] = true;
 					toaster.pop('error', "Error!", baseValidationMessage, null, 'trustedHtml');
 				}
 			};

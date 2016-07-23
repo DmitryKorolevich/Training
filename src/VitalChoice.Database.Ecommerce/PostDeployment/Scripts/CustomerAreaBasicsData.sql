@@ -568,3 +568,14 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[CustomerPaymentMethodOptionTypes] WHERE [IdObjectType]=4 AND Name='PaymentComment')
+BEGIN
+	INSERT INTO [dbo].[CustomerPaymentMethodOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'PaymentComment', 4, NULL, 4, NULL)
+
+END
+
+GO

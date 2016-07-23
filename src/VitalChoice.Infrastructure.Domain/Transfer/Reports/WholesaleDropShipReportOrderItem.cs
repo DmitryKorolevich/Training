@@ -56,7 +56,25 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
 
         public string ShippingIdConfirmation { get; set; }
 
+        public string ShippingIdConfirmationUrl { get; set; }
+
         public string ShippingCarrier { get; set; }
+
+        public DateTime? PShipDate { get; set; }
+
+        public string PShippingIdConfirmation { get; set; }
+
+        public string PShippingIdConfirmationUrl { get; set; }
+
+        public string PShippingCarrier { get; set; }
+
+        public DateTime? NPShipDate { get; set; }
+
+        public string NPShippingIdConfirmation { get; set; }
+
+        public string NPShippingIdConfirmationUrl { get; set; }
+
+        public string NPShippingCarrier { get; set; }
 
         public ICollection<WholesaleDropShipReportSkuItem> Skus { get; set; }
     }

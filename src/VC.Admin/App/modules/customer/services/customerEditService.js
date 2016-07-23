@@ -113,6 +113,12 @@ angular.module('app.modules.customer.services.customerEditService', [])
                         address = uiScope.currentCustomer.Check.Address;
                     }
                     break;
+                case "4":
+                    if (uiScope.currentCustomer.NC)
+                    {
+                        address = uiScope.currentCustomer.NC.Address;
+                    }
+                    break;
                 case "6":
                     if (uiScope.currentCustomer.WireTransfer)
                     {
@@ -145,6 +151,19 @@ angular.module('app.modules.customer.services.customerEditService', [])
                     address.AddressType = 2;
                     address.Id = 0;
                 }
+            }
+        };
+
+        uiScope.filterCountries = function ()
+        {
+            if (uiScope.allCountries && uiScope.currentCustomer)
+            {
+                var countries = $.grep(uiScope.allCountries, function (item, i)
+                {
+                    return (uiScope.currentCustomer.CustomerType == 1 && (item.IdVisibility == 1 || item.IdVisibility == 3))
+                        || (uiScope.currentCustomer.CustomerType == 2 && (item.IdVisibility == 1 || item.IdVisibility == 2));
+                });
+                uiScope.countries = countries;
             }
         };
     };
@@ -349,6 +368,12 @@ angular.module('app.modules.customer.services.customerEditService', [])
                     if (uiScope.currentCustomer.Check)
                     {
                         address = uiScope.currentCustomer.Check.Address;
+                    }
+                    break;
+                case "4":
+                    if (uiScope.currentCustomer.NC)
+                    {
+                        address = uiScope.currentCustomer.NC.Address;
                     }
                     break;
                 case "6":
@@ -684,7 +709,42 @@ angular.module('app.modules.customer.services.customerEditService', [])
                     })
                     .then(function ()
                     {
-                        uiScope.forms.submitted['vcwellness'] = false;
+                        uiScope.forms.submitted['nc'] = false;
+                    });
+            }
+            else
+            {
+                uiScope.forms.submitted['vcwellness'] = true;
+            }
+            return false;
+        };
+
+        uiScope.setNewNC = function (callback)
+        {
+            if (uiScope.forms.nc.$valid)
+            {
+                customerService.createNCPrototype(uiScope.addEditTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            syncCountry(uiScope, result.Data.Address);
+                            uiScope.currentCustomer.NC = result.Data;
+                            uiScope.currentCustomer.NC.formName = 'nc';
+                            if (callback)
+                                callback(result.Data);
+                        } else
+                        {
+                            successHandler(result);
+                        }
+                    }).
+                    error(function (result)
+                    {
+                        errorHandler(result);
+                    })
+                    .then(function ()
+                    {
+                        uiScope.forms.submitted['nc'] = false;
                     });
             }
             else
@@ -912,6 +972,41 @@ angular.module('app.modules.customer.services.customerEditService', [])
             else
             {
                 uiScope.forms.submitted['vcwellness'] = true;
+            }
+            return false;
+        };
+
+        uiScope.setNewNC = function (callback)
+        {
+            if (uiScope.forms.nc.$valid)
+            {
+                customerService.createNCPrototype(uiScope.addEditTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            uiScope.order.NC = result.Data;
+                            syncCountry(uiScope, result.Data.Address);
+                            uiScope.order.NC.formName = 'nc';
+                            if (callback)
+                                callback(result.Data);
+                        } else
+                        {
+                            successHandler(result);
+                        }
+                    }).
+                    error(function (result)
+                    {
+                        errorHandler(result);
+                    })
+                    .then(function ()
+                    {
+                        uiScope.forms.submitted['nc'] = false;
+                    });
+            }
+            else
+            {
+                uiScope.forms.submitted['nc'] = true;
             }
             return false;
         };

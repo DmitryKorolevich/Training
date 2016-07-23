@@ -11,5 +11,7 @@
         public string MetaDescription { get; set; }
 
         public string Scripts { get; set; }
+
+        public string SocialMeta { get; set; }
     }
 }

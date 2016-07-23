@@ -18,7 +18,9 @@ namespace VC.Admin.Models.Setting
 
         public ICollection<StateListItemModel> States { get; set; }
 
-	    public CountryListItemModel()
+        public CustomerTypeCode IdVisibility { get; set; }
+
+        public CountryListItemModel()
 	    {
 		    States = new List<StateListItemModel>();
 	    }
@@ -31,6 +33,7 @@ namespace VC.Admin.Models.Setting
                 CountryCode = item.CountryCode;
                 CountryName = item.CountryName;
                 StatusCode = item.StatusCode;
+                IdVisibility = item.IdVisibility;
 
                 States = item.States.Select(p => new StateListItemModel(p)).ToList();
             }
@@ -43,6 +46,7 @@ namespace VC.Admin.Models.Setting
             country.CountryCode = CountryCode;
             country.CountryName = CountryName;
             country.StatusCode = StatusCode;
+            country.IdVisibility = IdVisibility;
             country.States = new List<State>();
             if(States!=null)
             {

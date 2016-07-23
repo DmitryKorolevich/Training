@@ -166,10 +166,8 @@ namespace VitalChoice.Business.Services.Settings
                     dbItem.CountryCode = dbItem.CountryCode.Substring(0, CODE_MAX_SYMBOLS_COUNT);
                 }
                 dbItem.CountryName = model.CountryName;
-                if (model.StatusCode != RecordStatusCode.Deleted)
-                {
-                    dbItem.StatusCode = model.StatusCode;
-                }
+                dbItem.StatusCode = RecordStatusCode.Active;
+                dbItem.IdVisibility = model.IdVisibility;
 
                 if (model.Id == 0)
                 {

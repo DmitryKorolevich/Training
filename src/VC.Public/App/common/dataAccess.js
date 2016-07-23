@@ -1,6 +1,12 @@
-﻿function getCountries(successCallback, errorCallback) {
+﻿function getCountries(idVisibility, successCallback, errorCallback)
+{
+    var url = "/Lookup/GetCountries";
+    if (idVisibility)
+    {
+        url += "/" + idVisibility;
+    }
 	$.ajax({
-		url: "/Lookup/GetCountries",
+	    url: url,
 		dataType: "json"
 	}).success(function(result) {
 		if (successCallback) {

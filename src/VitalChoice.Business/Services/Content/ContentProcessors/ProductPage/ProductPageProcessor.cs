@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using VitalChoice.Business.Services.Bronto;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.DynamicData.Interfaces;
@@ -15,6 +16,7 @@ using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
@@ -49,14 +51,19 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
         private readonly IProductCategoryService _productCategoryService;
         private readonly IProductReviewService _productReviewService;
         private readonly IRecipeService _recipeService;
+        private readonly IOptions<AppOptions> _appOptions;
 
-        public ProductPageProcessor(IObjectMapper<ProductPageParameters> mapper, IProductCategoryService productCategoryService,
-            IProductReviewService productReviewService, IRecipeService recipeService)
+        public ProductPageProcessor(IObjectMapper<ProductPageParameters> mapper,
+            IProductCategoryService productCategoryService,
+            IProductReviewService productReviewService,
+            IRecipeService recipeService,
+            IOptions<AppOptions> appOptions)
             : base(mapper)
         {
             _productCategoryService = productCategoryService;
             _productReviewService = productReviewService;
             _recipeService = recipeService;
+            _appOptions = appOptions;
         }
 
         private IList<CustomerTypeCode> GetCustomerVisibility(ProcessorViewContext viewContext)
@@ -127,10 +134,11 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             var reviewsCount = await _productReviewService.GetApprovedCountAsync(eProduct.Id);
             var ratingsAverage = await _productReviewService.GetApprovedAverageRatingsAsync(eProduct.Id);
 
-            return
+            var toReturn =
                 await
                     PopulateProductPageTemplateModel(viewContext, rootAllCategory, lastProductReviews, reviewsCount, ratingsAverage, targetStatuses, 
                     viewContext.Parameters.cat);
+            return toReturn;
         }
 
         private void BuildBreadcrumb(ProductNavCategoryLite rootCategory, ProductNavCategoryLite currentCategory, int categoryId,

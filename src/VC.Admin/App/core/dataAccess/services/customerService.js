@@ -61,6 +61,10 @@ angular.module('app.core.dataAccess.services.customerService', [])
 		{
 		    return $http.post(baseUrl + 'CreateVCWellnessPrototype', getConfig(tracker));
 		},
+		createNCPrototype: function (tracker)
+		{
+		    return $http.post(baseUrl + 'CreateNCPrototype', getConfig(tracker));
+		},
 		resendActivation: function (publicId, tracker) {
 			return $http.post(baseUrl + 'ResendActivation/' + publicId, null, getConfig(tracker));
 		},

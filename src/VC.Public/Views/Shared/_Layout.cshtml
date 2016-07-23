@@ -17,7 +17,9 @@
 <!--[if !IE]><!-->
 	<html class="no-js" lang="en">
 <!--<![endif]-->
-
+	@{
+        var appInfrastructure = appInfrastructureService;
+    }
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -29,6 +31,16 @@
 	{
 		<title>Wild Salmon | Omega-3 | Wild Seafood | Organic Foods | Vital Choice</title>
 	}
+    @if (IsSectionDefined("SocialMeta"))
+    {
+        @await RenderSectionAsync("SocialMeta", false)
+    }
+    else
+    {
+        <meta property="og:image" content="https://@(appOptions.Value.PublicHost)/files/catalog/fbdefault2.jpg">
+        <meta itemprop="image" content="https://@(appOptions.Value.PublicHost)/files/catalog/googleplus.jpg" />
+        <link rel="image_src" href="https://@(appOptions.Value.PublicHost)/files/catalog/googleplus.jpg" />
+    }
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="msvalidate.01" content="4A9D524947EE62F01A1A9607511248C4" />
     <link href="//fonts.googleapis.com/css?family=Francois+One" rel="stylesheet" type="text/css">
@@ -39,17 +51,15 @@
 		@await Component.InvokeAsync("CustomStyles")
 	</style>
     <script>
-        @{
-            var appInfrastructure = appInfrastructureService;
-        }
-
         var appSettings = { DefaultCountryId: @(appInfrastructure.DefaultCountry?.Id) }
     </script>
+    @Html.Partial("_HeadTrackScripts")
 </head>
 <body>
 	<!--[if lt IE 8]>
 		<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 	<![endif]-->
+    @Html.Partial("_BodyBeginTrackScripts")
 	<div class="separator-top"></div>
 	<div class="main">
 		<header>
@@ -255,5 +265,6 @@
 	@await Component.InvokeAsync("Assets", new { assetType = "scripts" })
 	@await RenderSectionAsync("PageScripts", false)
     @await RenderSectionAsync("EndPageStyles", false)
+    @Html.Partial("_BodyEndTrackScripts")
 </body>
 </html>

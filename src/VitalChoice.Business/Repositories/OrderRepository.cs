@@ -65,7 +65,7 @@ namespace VitalChoice.Business.Repositories
                 WithCreatedByAgentsOrWithout(specififcAgentIds);
             var orderTypeOption = _orderMapper.OptionTypes.First(p => p.Name == "OrderType");
 
-            var orders = await this.DbSet.Include(o => o.OptionValues).AsNoTracking().Where(conditions.Query()).ToListAsync();
+            var orders = await this.DbSet.Include(o => o.OptionValues).Where(conditions.Query()).AsNoTracking().ToListAsync();
             // ReSharper disable once PossibleNullReferenceException
             //var orderOptionValueQuery = (this.Context as DbContext).Set<OrderOptionValue>().Where(p => p.IdOptionType == orderTypeOption.Id);
 

@@ -64,6 +64,7 @@ angular.module('app.modules.order.services.orderEditService', [])
                 uiScope.forms.submitted['wiretransfer'] = true;
                 uiScope.forms.submitted['marketing'] = true;
                 uiScope.forms.submitted['vcwellness'] = true;
+                uiScope.forms.submitted['nc'] = true;
                 uiScope.serverMessages = new ServerMessages(result.Messages);
                 uiScope.calculateServerMessages = new ServerMessages(result.Messages);
                 var formForShowing = null;
@@ -698,6 +699,9 @@ angular.module('app.modules.order.services.orderEditService', [])
                 case "3":
                     address = uiScope.order.Check.Address;
                     break;
+                case "4":
+                    address = uiScope.order.NC.Address;
+                    break;
                 case "6":
                     address = uiScope.order.WireTransfer.Address;
                     break;
@@ -1159,6 +1163,11 @@ angular.module('app.modules.order.services.orderEditService', [])
             uiScope.currentCustomer.VCWellness.formName = "vcwellness";
             customerEditService.syncCountry(uiScope, uiScope.currentCustomer.VCWellness.Address);
         }
+        if (uiScope.currentCustomer.NC)
+        {
+            uiScope.currentCustomer.NC.formName = "nc";
+            customerEditService.syncCountry(uiScope, uiScope.currentCustomer.NC.Address);
+        }
 
         if (uiScope.order.CreditCard)
         {
@@ -1189,6 +1198,11 @@ angular.module('app.modules.order.services.orderEditService', [])
         {
             uiScope.order.VCWellness.formName = "vcwellness";
             customerEditService.syncCountry(uiScope, uiScope.order.VCWellness.Address);
+        }
+        if (uiScope.order.NC)
+        {
+            uiScope.order.NC.formName = "nc";
+            customerEditService.syncCountry(uiScope, uiScope.order.NC.Address);
         }
     };
 
@@ -1253,6 +1267,10 @@ angular.module('app.modules.order.services.orderEditService', [])
         if (!uiScope.order.VCWellness)
         {
             uiScope.order.VCWellness = uiScope.currentCustomer.VCWellness;
+        }
+        if (!uiScope.order.NC)
+        {
+            uiScope.order.NC = uiScope.currentCustomer.NC;
         }
 
         if (uiScope.paymentInfoTab.PaymentMethodType == 1)

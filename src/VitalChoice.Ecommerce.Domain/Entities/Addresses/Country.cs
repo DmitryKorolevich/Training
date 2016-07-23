@@ -13,5 +13,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Addresses
         public int Order { get; set; }
 
         public ICollection<State> States { get; set; }
+
+	    public CustomerTypeCode IdVisibility { get; set; }
     }
 }

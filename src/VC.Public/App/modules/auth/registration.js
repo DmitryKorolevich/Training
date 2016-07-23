@@ -1,11 +1,12 @@
 ﻿$(function ()
 {
-    refreshCountries();
+    var idVisibility = $("#ddCountry").eq(0).data('country-type');
+    refreshCountries(idVisibility);
 });
 
-function refreshCountries()
+function refreshCountries(idVisibility)
 {
-    getCountries(function (result)
+    getCountries(idVisibility, function (result)
     {
         $.each(result.Data, function (countryIndex, country)
         {

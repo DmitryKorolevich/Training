@@ -66,6 +66,11 @@ namespace VC.Admin.Validators.Customer
             {
                 ParseResults(addressValidator.Validate(value.VCWellness.Address), "vcwellness");
             }
+
+            if (value.NC != null)
+            {
+                ParseResults(addressValidator.Validate(value.NC.Address), "nc");
+            }
         }
 
 	    public class CustomerModelRules : AbstractValidator<AddUpdateCustomerModel>

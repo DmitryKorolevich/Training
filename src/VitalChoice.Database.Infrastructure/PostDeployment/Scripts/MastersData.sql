@@ -576,7 +576,7 @@ BEGIN
 	UPDATE [dbo].[MasterContentItems]
 	SET 
 	[Updated]=GETDATE(),
-	[Template] = N'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Articles}}
+	[Template] = N'@@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Articles}}
 @using() {{System.Collections.Generic}}
 @model() {{dynamic}}
 
@@ -631,36 +631,36 @@ BEGIN
             <strong>@(@model.Model.SubTitle)</strong>
             <br/>
             <br/>
-            <span class="date">@date(@model.Model.PublishedDate) {{MM''/''dd''/''yyyy}}</span>
+            <span class="date">@date(@model.Model.PublishedDate) {{MM'/'dd'/'yyyy}}</span>
             <span class="author">@(@model.Model.Author)</span>
             <div class="icons-bar not-printable">
-    	        <a target="_blank" href="http://www.facebook.com/sharer.php?u=@(@model.Request.AbsoluteUrl)&t=@(@model.Model.Name)" class="margin-right-medium small-window-open-link">
+        	    <a target="_blank" href="http://www.facebook.com/sharer.php?u=@(@model.ViewContext.AbsoluteUrl)&t=@(@model.Model.Name)" class="margin-right-medium small-window-open-link">
                     <img src="/assets/images/icons/fb.png">
                     <span>FACEBOOK</span>
                 </a>
-                <a target="_blank" href="http://twitter.com/share?text=@(@model.Model.Name)&url=@(@model.Request.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
-                    <img src="/assets/images/icons/fb.png">
+                <a target="_blank" href="http://twitter.com/share?text=@(@model.Model.Name)&url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
+                    <img src="/assets/images/icons/tw.png">
                     <span>TWITTER</span>
                 </a>
-                <a target="_blank" href="https://plus.google.com/share?url=@(@model.Request.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
-                    <img src="/assets/images/icons/fb.png">
+                <a target="_blank" href="https://plus.google.com/share?url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
+                    <img src="/assets/images/icons/g.png">
                     <span>GOOGLE+</span>
                 </a>
-                <a href="#" data-content-type="1" data-content-name="@(@model.Model.Name)" data-absolute-url="@(@model.Request.AbsoluteUrl)" class="margin-right-medium email-button">
-                    <img src="/assets/images/icons/fb.png">
+                <a href="#" data-content-type="1" data-title="Email Article" data-content-name="@(@model.Model.Name)" data-absolute-url="@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium email-button">
+                    <i class="fa fa-envelope"></i>
                     <span>E-MAIL</span>
                 </a>
                 <a target="_blank" href="http://www.addthis.com/bookmark.php?v=300&pubid=xa-509854151b0dec32" class="margin-right-medium small-window-open-link">
-                    <img src="/assets/images/icons/fb.png">
+                    <img src="/assets/images/icons/ad.png">
                     <span>SHARE</span>
                 </a>
                 <a href="#" class="print-button">
-                    <img src="/assets/images/icons/fb.png">
+                    <i class="fa fa-print"></i>
                     <span>PRINT</span>
                 </a>
             </div>
-            <div class="body">
-			    @if(@!string.IsNullOrEmpty(model.Model.FileUrl))
+            <div class="body">   
+                @if(@!string.IsNullOrEmpty(model.Model.FileUrl))
                 {{
                 <img class="main-img" src="@(@model.Model.FileUrl)"/>
                 }}
@@ -694,7 +694,7 @@ BEGIN
                         </div>
                     </form>
             </div>
-            <a href="#">View a recent issue</a>
+            <a href="http://hosting-source.bm23.com/26468/public/PAGES/VC-NEWS-2-4-13-A.html" target="_blank">View a recent issue</a>
         </div>
     </div>
 	@if(ArticleBonusLink){{
@@ -749,6 +749,13 @@ BEGIN
     @script(){{
         <script src="https://www.google.com/recaptcha/api.js" async defer></script>
         <script src="/app/modules/help/sendContentUrlNotification.js"></script>
+    }}
+    @if(@model.Model.FileUrl!=null){{
+        @socialmeta(){{
+            <meta property="og:image" content="https://@(@root.AppOptions.PublicHost)@(@model.Model.FileUrl)">
+            <meta itemprop="image" content="https://@(@root.AppOptions.PublicHost)@(@model.Model.FileUrl)" />
+            <link rel="image_src" href="https://@(@root.AppOptions.PublicHost)@(@model.Model.FileUrl)" />
+        }}
     }}
     <div class="working-area-holder content-page article-page">
         <div class="header-block">
@@ -1021,7 +1028,7 @@ SET	[Updated] = GETDATE(),
 <left_bottom>
 {{
     <div>
-        <a href="#">
+        <a href="/content/newsletter-sign-up">
             <img src="/assets/images/newsletter-recipes-spot-4-2-14-214px-b.png">
         </a>
 	</div>
@@ -1073,40 +1080,40 @@ SET	[Updated] = GETDATE(),
         <span class="sub-title-italic">@(@model.Model.Subtitle)</span>
         <br/>
         <br/>
-        <div class="icons-bar not-printable">
-    	    <a target="_blank" href="http://www.facebook.com/sharer.php?u=@(@model.ViewContext.AbsoluteUrl)&t=@(@model.Model.Name)" class="margin-right-medium small-window-open-link">
-                <img src="/assets/images/icons/fb.png">
-                <span>FACEBOOK</span>
-            </a>
-            <a target="_blank" href="http://twitter.com/share?text=@(@model.Model.Name)&url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
-                <img src="/assets/images/icons/fb.png">
-                <span>TWITTER</span>
-            </a>
-            <a target="_blank" href="https://plus.google.com/share?url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
-                <img src="/assets/images/icons/fb.png">
-                <span>GOOGLE+</span>
-            </a>
-            <a href="#" data-content-type="1" data-content-name="@(@model.Model.Name)" data-absolute-url="@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium email-button">
-                <img src="/assets/images/icons/fb.png">
-                <span>E-MAIL</span>
-            </a>
-            <a target="_blank" href="http://www.addthis.com/bookmark.php?v=300&pubid=xa-509854151b0dec32" class="margin-right-medium small-window-open-link">
-                <img src="/assets/images/icons/fb.png">
-                <span>SHARE</span>
-            </a>
-            <a href="#" class="print-button">
-                <img src="/assets/images/icons/fb.png">
-                <span>PRINT</span>
-            </a>
-        </div>
+            <div class="icons-bar not-printable">
+        	    <a target="_blank" href="http://www.facebook.com/sharer.php?u=@(@model.ViewContext.AbsoluteUrl)&t=@(@model.Model.Name)" class="margin-right-medium small-window-open-link">
+                    <img src="/assets/images/icons/fb.png">
+                    <span>FACEBOOK</span>
+                </a>
+                <a target="_blank" href="http://twitter.com/share?text=@(@model.Model.Name)&url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
+                    <img src="/assets/images/icons/tw.png">
+                    <span>TWITTER</span>
+                </a>
+                <a target="_blank" href="https://plus.google.com/share?url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
+                    <img src="/assets/images/icons/g.png">
+                    <span>GOOGLE+</span>
+                </a>
+                <a href="#" data-content-type="2" data-title="Email Recipe" data-content-name="@(@model.Model.Name)" data-absolute-url="@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium email-button">
+                    <i class="fa fa-envelope"></i>
+                    <span>E-MAIL</span>
+                </a>
+                <a target="_blank" href="http://www.addthis.com/bookmark.php?v=300&pubid=xa-509854151b0dec32" class="margin-right-medium small-window-open-link">
+                    <img src="/assets/images/icons/ad.png">
+                    <span>SHARE</span>
+                </a>
+                <a href="#" class="print-button">
+                    <i class="fa fa-print"></i>
+                    <span>PRINT</span>
+                </a>
+            </div>
         <div class="body">
             <div class="margin-bottom-medium">
-			    @if(@!string.IsNullOrEmpty(model.Model.YoutubeVideo))
+                @if(@!string.IsNullOrEmpty(model.Model.YoutubeVideo))
                 {{
                 <div class="video margin-right-small not-printable">
                 <iframe width="470" height="265" src="https://www.youtube.com/embed/@(@model.Model.YoutubeVideo)?rel=0&amp;enablejsapi=1" frameborder="0"></iframe>
                 </div>
-				}}
+                }}
                 @if(@!string.IsNullOrEmpty(model.Model.AboutChef))
                 {{
                 <div class="panel panel-border chef">
@@ -1114,7 +1121,7 @@ SET	[Updated] = GETDATE(),
                 </div>
                 }}
             </div>
-            <div class="description"> 
+            <div class="description">
                 @(@model.Model.ContentItem.Description)
             </div>
             @if(@!string.IsNullOrEmpty(model.Model.Ingredients))
@@ -1142,10 +1149,10 @@ SET	[Updated] = GETDATE(),
             	            </a>
         	            </div>
         	            <div class="right-part">
-							<a href="@(Url)">
-        						<span class="cross-sell-title">@(Title)</span><br/>
-        						<span class="cross-sell-sub-title">@(Subtitle)</span>
-							</a>
+            	            <a href="@(Url)">
+            	                <strong class="cross-sell-title">@(Title)</strong><br/>
+            	                <span class="cross-sell-sub-title">@(Subtitle)</span>
+            	            </a>
         	            </div>
     	            </div>
     	            }}
@@ -1204,6 +1211,17 @@ SET	[Updated] = GETDATE(),
 
 <default> -> ()
 {{
+    @script(){{
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        <script src="/app/modules/help/sendContentUrlNotification.js"></script>
+    }}
+    @if(@model.Model.FileUrl!=null){{
+        @socialmeta(){{
+            <meta property="og:image" content="https://@(@root.AppOptions.PublicHost)@(@model.Model.FileUrl)">
+            <meta itemprop="image" content="https://@(@root.AppOptions.PublicHost)@(@model.Model.FileUrl)" />
+            <link rel="image_src" href="https://@(@root.AppOptions.PublicHost)@(@model.Model.FileUrl)" />
+        }}
+    }}
     <div class="working-area-holder content-page recipe-page">
         <div class="header-block">
             <img src="/assets/images/itk-header-2015.jpg" />
@@ -1565,6 +1583,13 @@ BEGIN
         <script src="/app/modules/product/addtocart.js"></script>
         <script src="/app/modules/product/product-category.js"></script>
     }}
+    @if(@model.FileImageLargeUrl!=null){{
+        @socialmeta(){{
+            <meta property="og:image" content="https://@(@root.AppOptions.PublicHost)@(FileImageLargeUrl)">
+            <meta itemprop="image" content="https://@(@root.AppOptions.PublicHost)@(FileImageLargeUrl)" />
+            <link rel="image_src" href="https://@(@root.AppOptions.PublicHost)@(FileImageLargeUrl)" />
+        }}
+    }}
 <aside id="menuSidebar" class="category-aside">
     @menu_sidebar()
 </aside>
@@ -1611,7 +1636,7 @@ BEGIN
         			<th></th>
         			<th>SKU</th>
         			<th>Description</th>
-        			<th>Case Price (24 ct.)</th>
+        			<th>Case Price</th>
         		</tr>
         	</thead>
 	        <tbody>
@@ -1619,10 +1644,13 @@ BEGIN
 	            {{
 	            <tr>
 	                <td class="qty">
+	                    @if(InStock)
+	                    {{
 	                    <input data-sku-code="@(Code)" class="input-control width-small">
 	                    <span class="field-validation-error hide-imp">
-	                        <span>Quantity must be whole number</span>
+	                        <span>Quantity must be whole number. 3 digits max.</span>
 	                    </span>
+	                    }}
 	                </td>
 	                </td>
                     <td>
@@ -1639,6 +1667,12 @@ BEGIN
                         </span>
                         <br/>
                         @(ShortDescription)
+	                    @ifnot(InStock)
+	                    {{
+	                    <span class="field-validation-error">
+	                        <span>Currently out of stock.</span>
+	                    </span>
+	                    }}
                     </td>
                     <td class="price">
 	                    <span>@money(Price)</span>
@@ -3479,6 +3513,13 @@ BEGIN
 	
 <layout> -> (ProductPage)
 {{
+    @if(@model.Image!=null){{
+        @socialmeta(){{
+            <meta property="og:image" content="https://@(@root.AppOptions.PublicHost)@(Image)">
+            <meta itemprop="image" content="https://@(@root.AppOptions.PublicHost)@(Image)" />
+            <link rel="image_src" href="https://@(@root.AppOptions.PublicHost)@(Image)" />
+        }}
+    }}
     <div class="product-main relative">
         <div class="overlay hide">
 				<div class="loading">Loading…</div>

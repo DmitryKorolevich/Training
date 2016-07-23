@@ -441,12 +441,12 @@ $(function () {
 	                        header.find(".bronto-form").hide();
 	                        header.find(".bronto-form-success").show();
 
-	                        setTimeout(function ()
-	                        {
-	                            header.find(".bronto-form-success").slideUp(400, function() {
-	                                header.find(".bronto-subscribe-top-wrapper").hide();
-	                            });
-	                        }, 5000);
+	                        //setTimeout(function ()
+	                        //{
+	                        //    header.find(".bronto-form-success").slideUp(400, function() {
+	                        //        header.find(".bronto-subscribe-top-wrapper").hide();
+	                        //    });
+	                        //}, 5000);
 	                        Cookies.set("bronto-signup", "hidden", { expires: 1 });
 	                    }
 	                });

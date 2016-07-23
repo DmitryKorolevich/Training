@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Interfaces;
 using VitalChoice.Data.Repositories;
@@ -14,6 +15,7 @@ using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content.Articles;
 using VitalChoice.ContentProcessing.Cache;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Business.Services.Content
@@ -25,8 +27,9 @@ namespace VitalChoice.Business.Services.Content
             IContentProcessorService processorService,
             IRepositoryAsync<Article> contentRepository,
             IObjectMapper<ContentParametersModel> mapper,
-            IObjectMapperFactory mapperFactory)
-            : base(templatesCache, loggerProvider.CreateLogger<ArticleViewService>(), processorService, contentRepository, mapper, mapperFactory)
+            IObjectMapperFactory mapperFactory,
+            IOptions<AppOptions> appOptions)
+            : base(templatesCache, loggerProvider.CreateLogger<ArticleViewService>(), processorService, contentRepository, mapper, mapperFactory, appOptions)
         {
         }
 	}

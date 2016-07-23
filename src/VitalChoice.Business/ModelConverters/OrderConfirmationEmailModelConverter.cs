@@ -119,13 +119,7 @@ namespace VitalChoice.Business.ModelConverters
                 model.AutoShipFrequencyProductName = model.Skus.First().DisplayName;
             }
 
-            if (dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.NoCharge && dynamic.Customer.ProfileAddress != null)
-            {
-                model.BillToAddress = await _addressMapper.ToModelAsync<AddressEmailItem>(dynamic.Customer.ProfileAddress);
-                model.BillToAddress.Country = _countryNameCodeResolver.GetCountryName(dynamic.Customer.ProfileAddress);
-                model.BillToAddress.StateCodeOrCounty = _countryNameCodeResolver.GetRegionOrStateCode(dynamic.Customer.ProfileAddress);
-            }
-            else if (dynamic.PaymentMethod?.Address != null)
+            if (dynamic.PaymentMethod?.Address != null)
             {
                 model.BillToAddress = await _addressMapper.ToModelAsync<AddressEmailItem>(dynamic.PaymentMethod.Address);
                 model.BillToAddress.Country = _countryNameCodeResolver.GetCountryName(dynamic.PaymentMethod.Address);
