@@ -35,6 +35,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         private readonly Aes _localAes;
         private readonly Dictionary<Guid, SessionInfo> _sessions = new Dictionary<Guid, SessionInfo>();
         private readonly ManualResetEvent _disposeEvent;
+        private readonly Thread _sessionExpiration;
 
         /// <summary>
         /// Server Mode
@@ -65,7 +66,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 if (options.Value.ExportService.EncryptionHostSessionExpire)
                 {
                     _disposeEvent = new ManualResetEvent(false);
-                    new Thread(SessionExpirationLookup).Start();
+                    _sessionExpiration = new Thread(SessionExpirationLookup);
+                    _sessionExpiration.Start();
                 }
                 _localAes = GetLocalAes();
             }
@@ -412,6 +414,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 
         public void Dispose()
         {
+            _disposeEvent?.Set();
+            _sessionExpiration?.Abort();
             _disposeEvent?.Dispose();
             _signProvider?.Dispose();
             lock (_sessions)

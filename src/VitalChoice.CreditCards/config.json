@@ -1,0 +1,105 @@
+﻿{
+  "App": {
+    "LocalEncryptionKeyPath": "C:\\ProgramData\\ExportService\\key.pk",
+    "DefaultCacheExpirationTermMinutes": 1440,
+    "ActivationTokenExpirationTermDays": 3,
+    "DefaultCultureId": "en-US",
+    "PublicHost": "staging.g2-dg.com",
+    "AdminHost": "admin.staging.g2-dg.com",
+    "CustomerServiceToEmail": "gary@g2designgroup.com",
+    "CustomerFeedbackToEmail": "gary@g2designgroup.com",
+    "MainSuperAdminEmail": "gary@g2designgroup.com",
+    "ScheduleDayTimeHour": 2,
+
+    "Connection": {
+      "UserName": "dev_vcdb_login",
+      "Password": "CCQLaskw3pMFU9XqE6CHp28m",
+      "Server": "localhost"
+    },
+    "ExportConnection": {
+      "UserName": "dev_expdb_login",
+      "Password": "1230123",
+      "Server": "localhost",
+      "AdminUserName": "",
+      "AdminPassword": "",
+      "Encrypt": false
+    },
+    "ExportService": {
+      "PlainConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=PlainRights;SharedAccessKey=WiTkXyGW0OpnpSqJ9TMMrVx0wAH+eRm0MVyE1YEmOtw=",
+      "EncryptedConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=EncryptedRights;SharedAccessKey=A2tJQGyhAhf02hb9/W2W2WYVH8ulzDZPQjW8pWEtj8U=",
+      "PlainQueueName": "plain_export",
+      "EncryptedQueueName": "encrypted_export",
+      "CertThumbprint": "505BDC22499CF0F4692CF18D69CDC32F0F285545",
+      "RootThumbprint": "89735BE3169BE34AB67B65C7D9EFFD2C230A9D98",
+      "EncryptionHostSessionExpire": true,
+      "ServerHostName": "export-server"
+    },
+    "VeraCore": {
+      "UserName": "g2dev",
+      "Password": "G2dev2016#"
+    },
+    "AuthorizeNet": {
+      "ApiLogin": "36qq5ECXB",
+      "ApiKey": "4r5Zv38R56BY6tLW",
+      "TestEnv": false
+    },
+    "Email": {
+      "From": "admin.staging@g2designgroup.com",
+      "Host": "smtp.1and1.com",
+      "Port": 587,
+      "Secured": true,
+      "Username": "admin.staging@g2designgroup.com",
+      "Password": "vcstaging123",
+      "Disabled": false
+    },
+    "AzureStorage": {
+      "StorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=stagingvcfiles;AccountKey=RxGv/t6KyB7aFPKaKIljivC0YtoYv/FR+0f5uGcORdie1h5WGigJKazfMiYL/gNJz+fGUWsUhEvGjdfwfZAq6A==;BlobEndpoint=https://stagingvcfiles.blob.core.windows.net/;TableEndpoint=https://stagingvcfiles.table.core.windows.net/;QueueEndpoint=https://stagingvcfiles.queue.core.windows.net/;FileEndpoint=https://stagingvcfiles.file.core.windows.net/",
+      "CustomerContainerName": "customer-files",
+      "BugTicketFilesContainerName": "bug-ticket-files",
+      "BugTicketCommentFilesContainerName": "bug-ticket-comment-files",
+      "AppFilesContainerName": "app-files",
+      "ObjectHistoryContainerName": "object-history-data",
+      "ProductGoogleFeedFileName": "datafeed.csv"
+    },
+    "FedExOptions": {
+      "AccountNumber": "304955066",
+      "MeterNumber": "104067734",
+      "MerchantPhoneNumber": "8664825887",
+      "Key": "7Ux69IBvsRj0Ep7X",
+      "Password": "m0Zybyteel4RMp5j904aa1HpB",
+      "PayAccountNumber": "304955066",
+      "ShipServiceUrl": "https://gateway.fedex.com/web-services/ship",
+      "LocatorServiceUrl": "https://gateway.fedex.com/web-services"
+    },
+    "Avatax": {
+      "AccountNumber": "1100142393",
+      "LicenseKey": "FE7FB6CFF1D5ECD2",
+      "ServiceUrl": "https://development.avalara.net/",
+      "AccountName": "Vital Choice Seafood Inc",
+      "ProfileName": "Vital Choice",
+      "CompanyCode": "VC001",
+      "TurnOffCommit": false
+    },
+    "PDFMyUrl": {
+      "LicenseKey": "sZ0ZaPUmBkt8&",
+      "ServiceUrl": "http://pdfmyurl.com/api"
+    },
+    "CacheSettings": {
+      "MaxProcessHeapsSizeBytes": 1572864000, //1500 Mb, entire application
+      "CacheTimeToLeaveSeconds": 1800, //30 minutes
+      "CacheScanPeriodSeconds": 900 //15 minutes
+    },
+    "CacheSyncOptions": {
+      "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=hemZgxBH/foCscmtPdhF8wvbWfh8aF9GR4ShqfnCPnY=",
+      "ServiceBusQueueName": "caching",
+      "Enabled": false
+    },
+    "Bronto": {
+      "ApiKey": "BCCC606B-8D04-4BBA-80D2-8FF8832F7D2F",
+      "ApiUrl": "https://api.bronto.com/v4",
+      "PublicFormUrl": "http://news.vitalchoice.com/public/webform/process/",
+      "PublicFormSendData": "fid=hmgt3y8oy6qmzpv2rh4j51zg5l7tu&sid=09dcaffa5c9971f4be87813780496171&delid=&subid=&36429%5B338758%5D=true&36423=",
+      "PublicFormSubscribeData": "fid=0tfbcxet2mwy7gfrsgmrq6hlovv9n&sid=09dcaffa5c9971f4be87813780496171&delid=&subid=&73567%5B18487127%5D=true&73323="
+    }
+  }
+}

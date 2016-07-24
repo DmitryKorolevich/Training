@@ -1,0 +1,19 @@
+﻿{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+    "Microsoft.Extensions.Configuration.FileExtensions": "1.0.0-*",
+    "VitalChoice.Business": "1.0.0-*",
+    "VitalChoice.Core": "1.0.0-*",
+    "Microsoft.AspNetCore.Hosting": "1.0.0"
+  },
+
+  "frameworks": {
+    "net451": {
+      
+    }
+  }
+}

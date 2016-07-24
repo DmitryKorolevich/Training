@@ -1276,6 +1276,7 @@ UNPIVOT (Value FOR Name IN
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax, Email)
 )AS unpvt
 INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
+WHERE unpvt.Value IS NULL OR unpvt.Value = ''
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerPaymentMethods
 (DateCreated, DateEdited, IdAddress, IdCustomer, IdObjectType, StatusCode)
@@ -1312,6 +1313,18 @@ UNPIVOT (Value FOR Name IN
 	(NameOnCard, CardNumber, CardType, ExpDate, [Default])
 )AS unpvt
 INNER JOIN [VitalChoice.Ecommerce].dbo.CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 1)
+WHERE unpvt.Value IS NULL OR unpvt.Value = ''
+
+GO
+
+INSERT INTO [VitalChoice.ExportInfo].dbo.CustomerPaymentMethods
+(IdCustomer, IdPaymentMethod, CreditCardNumber)
+SELECT c.idCustomer, cp.Id, CAST([vitalchoice2.0].dbo.RC4Encode(c.CCNumber) AS VARBINARY)
+FROM [vitalchoice2.0].dbo.customerCreditCards AS c
+INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS cc ON cc.Id = c.idcustomer
+INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.idcustomer AND a.IdCreditCard = c.custCreditCardId
+INNER JOIN [VitalChoice.Ecommerce].dbo.CustomerPaymentMethods AS cp ON cp.IdCustomer = c.idCustomer AND cp.IdAddress = a.Id
+WHERE ISDATE(dbo.RC4Encode([Expiration])) = 1
 
 GO
 

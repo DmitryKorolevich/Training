@@ -124,18 +124,8 @@ SELECT
 		ELSE 2
 	END,
 	CASE o.orderStatus
-		WHEN 1 THEN 1
-		WHEN 3 THEN 2
-		WHEN 4 THEN 3
 		WHEN 5 THEN 4
-		WHEN 95 THEN 5
-		WHEN 98 THEN 6
-		WHEN 99 THEN 7
-		WHEN 96 THEN 2
-		WHEN 97 THEN 2
-		WHEN 100 THEN 4
-		WHEN 6 THEN 2
-		ELSE 1
+		ELSE 2
 	END,
 	o.idCustomer,
 	NULL,
@@ -1389,3 +1379,67 @@ INNER JOIN Skus AS s ON s.Id = p.idProduct
 WHERE pki.pcPackageInfo_ShippedDate IS NOT NULL
 GROUP BY pki.idOrder, s.Id
 PRINT '====shipping packages'
+
+GO
+
+TRUNCATE TABLE [VitalChoice.ExportInfo].dbo.CustomerPaymentMethods
+TRUNCATE TABLE [VitalChoice.ExportInfo].dbo.OrderPaymentMethods
+
+INSERT INTO [VitalChoice.ExportInfo].dbo.OrderPaymentMethods
+(IdOrder, CreditCardNumber)
+SELECT 
+	oo.Id, 
+	CAST([vitalchoice2.0].dbo.RC4Encode(cc.cardnumber) AS VARBINARY)
+FROM [vitalchoice2.0].dbo.orders AS o
+INNER JOIN Orders AS oo ON oo.Id = o.idOrder
+INNER JOIN OrderPaymentMethods AS a ON a.Id = oo.IdPaymentMethod AND a.IdObjectType = 1
+INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = o.IdOrder
+WHERE cc.cardnumber IS NOT NULL
+PRINT '====credit cards (export)'
+
+GO
+
+INSERT INTO [VitalChoice.ExportInfo].dbo.OrderPaymentMethods
+(IdOrder, CreditCardNumber)
+SELECT 
+	oo.Id, 
+	CAST([vitalchoice2.0].dbo.RC4Encode(cc.cardnumber) AS VARBINARY)
+FROM [vitalchoice2.0].dbo.autoshipOrders AS aso
+INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = aso.idOrder
+INNER JOIN Orders AS os ON os.Id = o.idOrder
+INNER JOIN Orders AS oo ON oo.Id = os.IdOrderSource
+INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = o.IdOrder
+INNER JOIN OrderPaymentMethods AS a ON a.Id = oo.IdPaymentMethod AND a.IdObjectType = 1
+WHERE cc.cardnumber IS NOT NULL
+PRINT '====credit cards(auto-ship) (export)'
+GO
+
+INSERT INTO [VitalChoice.ExportInfo].dbo.OrderPaymentMethods
+(IdOrder, CreditCardNumber)
+SELECT 
+	oo.Id, 
+	CAST([vitalchoice2.0].dbo.RC4Encode(cc.ccnum) AS VARBINARY)
+FROM [vitalchoice2.0].dbo.orders AS o
+INNER JOIN Orders AS oo ON oo.Id = o.idOrder
+INNER JOIN OrderPaymentMethods AS a ON a.Id = oo.IdPaymentMethod AND a.IdObjectType = 1
+INNER JOIN [vitalchoice2.0].dbo.authorders AS cc ON cc.idauthorder = (SELECT TOP 1 idauthorder FROM [vitalchoice2.0].dbo.authorders AS ac WHERE ac.idOrder = o.idOrder ORDER BY idauthorder DESC)
+LEFT JOIN [vitalchoice2.0].dbo.creditCards AS oc ON oc.idOrder = o.idOrder
+WHERE oc.idOrder IS NULL AND cc.ccnum IS NOT NULL
+PRINT '====credit cards (export)'
+
+GO
+
+INSERT INTO [VitalChoice.ExportInfo].dbo.OrderPaymentMethods
+(IdOrder, CreditCardNumber)
+SELECT 
+	oo.Id, 
+	CAST([vitalchoice2.0].dbo.RC4Encode(cc.ccnum) AS VARBINARY)
+FROM [vitalchoice2.0].dbo.autoshipOrders AS aso
+INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = aso.idOrder
+INNER JOIN Orders AS os ON os.Id = o.idOrder
+INNER JOIN Orders AS oo ON oo.Id = os.IdOrderSource
+INNER JOIN OrderPaymentMethods AS a ON a.Id = oo.IdPaymentMethod AND a.IdObjectType = 1
+INNER JOIN [vitalchoice2.0].dbo.authorders AS cc ON cc.idauthorder = (SELECT TOP 1 idauthorder FROM [vitalchoice2.0].dbo.authorders AS ac WHERE ac.idOrder = o.idOrder ORDER BY idauthorder DESC)
+LEFT JOIN [vitalchoice2.0].dbo.creditCards AS oc ON oc.idOrder = o.idOrder
+WHERE oc.idOrder IS NULL AND cc.ccnum IS NOT NULL
+PRINT '====credit cards(auto-ship) (export)'
