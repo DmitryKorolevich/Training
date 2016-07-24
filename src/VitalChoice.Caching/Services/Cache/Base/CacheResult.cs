@@ -31,7 +31,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
                     Result = CacheGetResult.Found;
                     if (attach)
                     {
-                        Entity = (T) AttachGraph(cached.Entity, cached.Cache.Relations, cached.Cache.EntityInfo, stateManager);
+                        Entity = (T) GetAttachedOrClone(cached.Entity, cached.Cache.Relations, cached.Cache.EntityInfo, stateManager);
                     }
                     else
                     {
@@ -55,7 +55,8 @@ namespace VitalChoice.Caching.Services.Cache.Base
             return new CacheResult<T>(default(T), result);
         }
 
-        private static IEnumerable<object> AttachCollectionGraph(IEnumerable<object> entities, RelationInfo relationInfo, EntityInfo entityInfo,
+        private static IEnumerable<object> GetAttachedOrCloneCollection(IEnumerable<object> entities, RelationInfo relationInfo,
+            EntityInfo entityInfo,
             ICacheStateManager stateManager)
         {
             if (entities == null)
@@ -76,16 +77,18 @@ namespace VitalChoice.Caching.Services.Cache.Base
                             {
                                 newValue =
                                     typeof(List<>).CreateGenericCollection(relation.RelationType,
-                                        AttachCollectionGraph((IEnumerable<object>)value, relation, relation.EntityInfo, stateManager))
+                                        GetAttachedOrCloneCollection((IEnumerable<object>) value, relation, relation.EntityInfo,
+                                            stateManager))
                                         .CollectionObject;
                                 relation.SetOrUpdateRelatedObject(toTrack, newValue);
                             }
                             else
                             {
-                                HashSet<object> itemList = new HashSet<object>((IEnumerable<object>)relation.GetRelatedObject(toTrack));
+                                HashSet<object> itemList = new HashSet<object>((IEnumerable<object>) relation.GetRelatedObject(toTrack));
                                 foreach (
                                     var newItemToTrack in
-                                        AttachCollectionGraph((IEnumerable<object>)value, relation, relation.EntityInfo, stateManager))
+                                        GetAttachedOrCloneCollection((IEnumerable<object>) value, relation, relation.EntityInfo,
+                                            stateManager))
                                 {
                                     if (!itemList.Contains(newItemToTrack))
                                     {
@@ -96,8 +99,8 @@ namespace VitalChoice.Caching.Services.Cache.Base
                         }
                         else
                         {
-                            newValue = AttachGraph(value, relation, relation.EntityInfo, stateManager);
-                            if (newValue != value)
+                            newValue = GetAttachedOrClone(value, relation, relation.EntityInfo, stateManager);
+                            if (newValue != relation.GetRelatedObject(toTrack))
                             {
                                 relation.SetOrUpdateRelatedObject(toTrack, newValue);
                             }
@@ -108,7 +111,8 @@ namespace VitalChoice.Caching.Services.Cache.Base
             }
         }
 
-        private static object AttachGraph(object entity, RelationInfo relationInfo, EntityInfo entityInfo, ICacheStateManager stateManager)
+        private static object GetAttachedOrClone(object entity, RelationInfo relationInfo, EntityInfo entityInfo,
+            ICacheStateManager stateManager)
         {
             if (entity == null)
                 return null;
@@ -126,7 +130,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
                         {
                             newValue =
                                 typeof(List<>).CreateGenericCollection(relation.RelationType,
-                                    AttachCollectionGraph((IEnumerable<object>) value, relation, relation.EntityInfo, stateManager))
+                                    GetAttachedOrCloneCollection((IEnumerable<object>) value, relation, relation.EntityInfo, stateManager))
                                     .CollectionObject;
                             relation.SetOrUpdateRelatedObject(toTrack, newValue);
                         }
@@ -135,7 +139,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
                             HashSet<object> itemList = new HashSet<object>((IEnumerable<object>) relation.GetRelatedObject(toTrack));
                             foreach (
                                 var newItemToTrack in
-                                    AttachCollectionGraph((IEnumerable<object>) value, relation, relation.EntityInfo, stateManager))
+                                    GetAttachedOrCloneCollection((IEnumerable<object>) value, relation, relation.EntityInfo, stateManager))
                             {
                                 if (!itemList.Contains(newItemToTrack))
                                 {
@@ -146,8 +150,8 @@ namespace VitalChoice.Caching.Services.Cache.Base
                     }
                     else
                     {
-                        newValue = AttachGraph(value, relation, relation.EntityInfo, stateManager);
-                        if (newValue != value)
+                        newValue = GetAttachedOrClone(value, relation, relation.EntityInfo, stateManager);
+                        if (newValue != relation.GetRelatedObject(toTrack))
                         {
                             relation.SetOrUpdateRelatedObject(toTrack, newValue);
                         }

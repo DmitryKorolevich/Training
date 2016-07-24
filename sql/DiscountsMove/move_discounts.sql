@@ -60,45 +60,6 @@ SET IdDiscount = NULL
 UPDATE Carts
 SET DiscountCode = NULL
 DELETE FROM Discounts
-
-DECLARE @toDelete TABLE(Id BIGINT NULL)
-
-DELETE FROM [VitalChoice.Ecommerce].[dbo].[ObjectHistoryLogItems]
-OUTPUT deleted.IdObjectHistoryLogDataItem INTO @toDelete
-WHERE IdObjectType = 2 /*Order*/ AND (IdObject NOT IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.Orders) OR DateCreated < '2016-05-13')
-
-DELETE FROM [VitalChoice.Ecommerce].[dbo].[ObjectHistoryLogItems]
-OUTPUT deleted.IdObjectHistoryLogDataItem INTO @toDelete
-WHERE IdObjectType = 3 /*Product*/ AND (IdObject NOT IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.Products) OR DateCreated < '2016-05-13')
-
-DELETE FROM [VitalChoice.Ecommerce].[dbo].[ObjectHistoryLogItems]
-OUTPUT deleted.IdObjectHistoryLogDataItem INTO @toDelete
-WHERE IdObjectType = 4 /*Discount*/
-
-DELETE FROM [VitalChoice.Ecommerce].[dbo].[ObjectHistoryLogItems]
-OUTPUT deleted.IdObjectHistoryLogDataItem INTO @toDelete
-WHERE IdObjectType = 8 /*Article*/ AND IdObject NOT IN (SELECT Id FROM [VitalChoice.Infrastructure].dbo.Articles)
-
-DELETE FROM [VitalChoice.Ecommerce].[dbo].[ObjectHistoryLogItems]
-OUTPUT deleted.IdObjectHistoryLogDataItem INTO @toDelete
-WHERE IdObjectType = 10 /*Recipe*/ AND IdObject NOT IN (SELECT Id FROM [VitalChoice.Infrastructure].dbo.Recipes)
-
-DELETE FROM [VitalChoice.Ecommerce].[dbo].[ObjectHistoryLogItems]
-OUTPUT deleted.IdObjectHistoryLogDataItem INTO @toDelete
-WHERE IdObjectType = 11 /*Content Page*/ AND IdObject NOT IN (SELECT Id FROM [VitalChoice.Infrastructure].dbo.ContentPages)
-
-DELETE FROM [VitalChoice.Ecommerce].[dbo].[ObjectHistoryLogItems]
-OUTPUT deleted.IdObjectHistoryLogDataItem INTO @toDelete
-WHERE IdObjectType = 14 /*Product Category*/ AND IdObject NOT IN (SELECT Id FROM [VitalChoice.Infrastructure].dbo.ProductCategories)
-
-DELETE FROM [VitalChoice.Ecommerce].[dbo].[ObjectHistoryLogItems]
-OUTPUT deleted.IdObjectHistoryLogDataItem INTO @toDelete
-WHERE IdObjectType = 12 /*Content Category*/ AND IdObject NOT IN (SELECT Id FROM [VitalChoice.Infrastructure].dbo.ContentCategories)
-
-DELETE FROM [VitalChoice.Ecommerce].dbo.ObjectHistoryLogDataItems
-WHERE IdObjectHistoryLogDataItem IN (SELECT Id FROM @toDelete)
-
-GO
 --=========== Import ==============
 
 USE [vitalchoice2.0]
@@ -207,3 +168,24 @@ WHERE d.tiered <> 0 AND d.tier2thresholdEnd > 0 AND d.tier1thresholdEnd > 0 AND 
 
 GO
 
+DELETE v
+FROM [VitalChoice.Ecommerce].dbo.DiscountOptionValues AS v
+INNER JOIN [VitalChoice.Ecommerce].dbo.DiscountOptionTypes AS t ON t.Id = v.IdOptionType
+WHERE t.DefaultValue = v.Value
+
+GO
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.DiscountOptionValues
+(IdDiscount, IdOptionType, Value)
+SELECT c.Id, t.Id, t.DefaultValue FROM [VitalChoice.Ecommerce].dbo.Discounts AS c
+INNER JOIN [VitalChoice.Ecommerce].dbo.DiscountOptionTypes AS t ON t.IdObjectType = c.IdObjectType OR t.IdObjectType IS NULL
+WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM [VitalChoice.Ecommerce].dbo.DiscountOptionValues AS v WHERE v.IdDiscount = c.Id AND v.IdOptionType = t.Id)
+
+GO
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.OneTimeDiscountToCustomerUsages
+(IdCustomer, IdDiscount, UsageCount)
+SELECT DISTINCT ud.idcustomer, dd.Id, 1 FROM [vitalchoice2.0].dbo.used_discounts AS ud
+INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS c ON c.Id = ud.idcustomer
+INNER JOIN [vitalchoice2.0].dbo.discounts AS d ON d.iddiscount = ud.iddiscount
+INNER JOIN [VitalChoice.Ecommerce].dbo.Discounts AS dd ON dd.Code = d.discountcode COLLATE Cyrillic_General_CI_AS

@@ -63,7 +63,6 @@ namespace VitalChoice.Business.Repositories
         {
             OrderQuery conditions = new OrderQuery().NotDeleted().WithActualStatusOnly().WithFromDate(from).WithToDate(to).
                 WithCreatedByAgentsOrWithout(specififcAgentIds);
-
             var orderTypeOption = _orderMapper.OptionTypes.First(p => p.Name == "OrderType");
 
             var orders = await this.DbSet.Include(o => o.OptionValues).Where(conditions.Query()).AsNoTracking().ToListAsync();

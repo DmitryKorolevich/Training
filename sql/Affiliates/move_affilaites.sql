@@ -1,8 +1,24 @@
+USE [master] 
+GO
+ALTER DATABASE [VitalChoice.Infrastructure] SET RECOVERY SIMPLE WITH NO_WAIT
+USE [VitalChoice.Infrastructure]
+GO
+DBCC SHRINKFILE([VitalChoice.Infrastructure_Log], 1)
+GO
+
+USE [master] 
+GO
+ALTER DATABASE [VitalChoice.Ecommerce] SET RECOVERY SIMPLE WITH NO_WAIT
+USE [VitalChoice.Ecommerce]
+GO
+DBCC SHRINKFILE([VitalChoice.Ecommerce_Log], 1)
+GO
+
 USE [VitalChoice.Ecommerce]
 
 --============================ Wipe Customers ====================================
 DELETE FROM AffiliateOrderPayments
-DELETE FROM CartToSkus
+TRUNCATE TABLE CartToSkus
 DELETE FROM Carts
 DELETE FROM OrderToSkus
 DELETE FROM RefundOrderToGiftCertificates
@@ -10,35 +26,38 @@ DELETE FROM CartToGiftCertificates
 DELETE FROM OrderToGiftCertificates
 UPDATE GiftCertificates
 SET IdOrder = NULL
+WHERE IdOrder IS NOT NULL
 DELETE FROM HealthwiseOrders
 DELETE FROM HelpTicketComments
 DELETE FROM HelpTickets
 DELETE FROM RefundSkus
 DELETE FROM ReshipProblemSkus
 DELETE FROM OrderToPromos
-DELETE FROM OrderOptionValues
+TRUNCATE TABLE OrderOptionValues
+DELETE FROM OrderShippingPackages
 DELETE FROM Orders
-DELETE FROM OrderPaymentMethodOptionValues
+TRUNCATE TABLE OrderPaymentMethodOptionValues
 DELETE FROM OrderPaymentMethods
-DELETE FROM OrderAddressOptionValues
+TRUNCATE TABLE OrderAddressOptionValues
 DELETE FROM OrderAddresses
 DELETE FROM CustomerToShippingAddresses
 DELETE FROM CustomersToPaymentMethods
 DELETE FROM CustomersToOrderNotes
-DELETE FROM CustomerPaymentMethodValues
+TRUNCATE TABLE CustomerPaymentMethodValues
 DELETE FROM CustomerPaymentMethods
-DELETE FROM CustomerNoteOptionValues
+TRUNCATE TABLE CustomerNoteOptionValues
 DELETE FROM CustomerNotes
 DELETE FROM OneTimeDiscountToCustomerUsages
 DELETE FROM HealthwisePeriods
 DELETE FROM BigStringValues
 WHERE IdBigString IN (SELECT cv.IdBigString FROM CustomerOptionValues AS cv WHERE cv.IdBigString IS NOT NULL)
-DELETE FROM CustomerOptionValues
+TRUNCATE TABLE CustomerOptionValues
 DELETE FROM CustomerFiles
 DELETE FROM Customers
-DELETE FROM AddressOptionValues
+TRUNCATE TABLE AddressOptionValues
 DELETE FROM Addresses
 DELETE FROM Users WHERE Id IN (SELECT id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE IdUserType = 2)
+DELETE FROM Users WHERE Id NOT IN (SELECT id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE IdUserType = 1)
 GO
 USE [VitalChoice.Infrastructure]
 GO
@@ -59,8 +78,6 @@ GO
 
 USE [VitalChoice.Ecommerce]
 GO
-
-DELETE FROM [VitalChoice.Ecommerce].dbo.Users WHERE Id > 1500
 
 DELETE FROM Users WHERE Id IN (SELECT id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE IdUserType = 3)
 
@@ -90,15 +107,9 @@ DELETE FROM [VitalChoice.Ecommerce].dbo.AffiliateOrderPayments
 
 UPDATE [VitalChoice.Ecommerce].dbo.Customers
 SET IdAffiliate = NULL
+WHERE IdAffiliate IS NOT NULL
 
 DELETE FROM [VitalChoice.Ecommerce].dbo.Affiliates
-
-GO
-
-DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUserRoles WHERE UserId < 1000
-DELETE FROM [VitalChoice.Infrastructure].dbo.AdminProfiles WHERE Id < 1000
-DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE Id < 1000
-DELETE FROM [VitalChoice.Ecommerce].dbo.Users WHERE Id < 1000
 
 GO
 
@@ -133,9 +144,13 @@ WHERE c.pcCountryCode NOT IN (SELECT s.pcCountryCode FROM [vitalchoice2.0].dbo.s
 
 GO
 
+DECLARE @adminsLowerSpace INT
+
+SET @adminsLowerSpace = (SELECT MAX(Id) + 1 FROM  [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE Id < 1000)
+
 --============================ Move all admin users to lower id space (from 1) ====================================
 DECLARE @aspnetUsers TABLE (
-	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	[Id] [int] NOT NULL PRIMARY KEY,
 	[IdOld] INT NOT NULL,
 	[PublicId] [uniqueidentifier] NOT NULL,
 	[AccessFailedCount] [int] NOT NULL,
@@ -171,6 +186,7 @@ DECLARE @aspnetuserroles TABLE (
 
 INSERT INTO @aspnetUsers
 (
+	Id,
 	IdOld, 
 	PublicId, 
 	[AccessFailedCount], 
@@ -199,8 +215,8 @@ INSERT INTO @aspnetUsers
 	[IsConfirmed],
 	[IdUserType]
 )
-SELECT * FROM [VitalChoice.Infrastructure].dbo.AspNetUsers
-WHERE IdUserType = 1
+SELECT ROW_NUMBER() OVER (ORDER BY u.Id) + @adminsLowerSpace, u.* FROM [VitalChoice.Infrastructure].dbo.AspNetUsers AS u
+WHERE IdUserType = 1 AND Id > 1000
 
 INSERT INTO @aspnetuserroles
 (RoleId, UserId)
@@ -456,17 +472,14 @@ INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
 DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUserRoles
 WHERE UserId IN (
 	SELECT Id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers
-	WHERE IdUserType = 1 AND Id NOT IN (SELECT Id FROM @aspnetUsers)
-)
-
-DELETE FROM [VitalChoice.Ecommerce].dbo.Users
-WHERE Id IN (
-	SELECT Id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers
-	WHERE IdUserType = 1 AND Id NOT IN (SELECT Id FROM @aspnetUsers)
+	WHERE IdUserType = 1 AND Id > 1000
 )
 
 DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUsers
-WHERE IdUserType = 1 AND Id NOT IN (SELECT Id FROM @aspnetUsers)
+WHERE IdUserType = 1 AND Id > 1000
+
+DELETE FROM [VitalChoice.Ecommerce].dbo.Users
+WHERE Id > 1000
 
 GO
 
@@ -664,13 +677,14 @@ SELECT
 	LOWER(CAST(NEWID() AS NVARCHAR(250))),
 	LOWER(CAST(NEWID() AS NVARCHAR(250)))
 FROM [vitalchoice2.0].dbo.affiliates AS aff
+OPTION (RECOMPILE, QUERYTRACEON 8649)
 
 SET IDENTITY_INSERT [VitalChoice.Infrastructure].dbo.AspNetUsers OFF
 
 GO
 
-ALTER TABLE [VitalChoice.Ecommerce].dbo.Affiliates
-DROP COLUMN IdOld
+--ALTER TABLE [VitalChoice.Ecommerce].dbo.Affiliates
+--DROP COLUMN IdOld
 
 GO
 
@@ -1510,129 +1524,96 @@ FROM customers
 
 GO
 
-USE [VitalChoice.Infrastructure]
-GO
+--USE [VitalChoice.Infrastructure]
+--GO
 
-/****** Object:  Index [IX_NormalizedEmailUserTypeDeletedDate]    Script Date: 6/2/2016 9:27:49 PM ******/
-CREATE NONCLUSTERED INDEX [IX_NormalizedEmailUserTypeDeletedDate] ON [dbo].[AspNetUsers]
-(
-	[NormalizedEmail] ASC,
-	[IdUserType] ASC,
-	[DeletedDate] ASC
-)
-INCLUDE ( 	[Id],
-	[AccessFailedCount],
-	[ConcurrencyStamp],
-	[Email],
-	[EmailConfirmed],
-	[FirstName],
-	[CreateDate],
-	[ConfirmationToken],
-	[PublicId],
-	[UserName],
-	[LastName],
-	[Status],
-	[LockoutEnabled],
-	[LockoutEnd],
-	[NormalizedUserName],
-	[PasswordHash],
-	[PhoneNumber],
-	[PhoneNumberConfirmed],
-	[LastLoginDate],
-	[UpdatedDate],
-	[SecurityStamp],
-	[TwoFactorEnabled],
-	[TokenExpirationDate],
-	[IsConfirmed]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
-GO
+--/****** Object:  Index [IX_NormalizedEmailUserTypeDeletedDate]    Script Date: 6/2/2016 9:27:49 PM ******/
+--CREATE NONCLUSTERED INDEX [IX_NormalizedEmailUserTypeDeletedDate] ON [dbo].[AspNetUsers]
+--(
+--	[NormalizedEmail] ASC,
+--	[IdUserType] ASC,
+--	[DeletedDate] ASC
+--)
+--INCLUDE ( 	[Id],
+--	[AccessFailedCount],
+--	[ConcurrencyStamp],
+--	[Email],
+--	[EmailConfirmed],
+--	[FirstName],
+--	[CreateDate],
+--	[ConfirmationToken],
+--	[PublicId],
+--	[UserName],
+--	[LastName],
+--	[Status],
+--	[LockoutEnabled],
+--	[LockoutEnd],
+--	[NormalizedUserName],
+--	[PasswordHash],
+--	[PhoneNumber],
+--	[PhoneNumberConfirmed],
+--	[LastLoginDate],
+--	[UpdatedDate],
+--	[SecurityStamp],
+--	[TwoFactorEnabled],
+--	[TokenExpirationDate],
+--	[IsConfirmed]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+--GO
 
 
-USE [VitalChoice.Infrastructure]
-GO
+--USE [VitalChoice.Infrastructure]
+--GO
 
-/****** Object:  Index [IX_RoleName]    Script Date: 6/2/2016 9:27:59 PM ******/
-CREATE NONCLUSTERED INDEX [IX_RoleName] ON [dbo].[AspNetRoles]
-(
-	[NormalizedName] ASC
-)
-INCLUDE ( 	[Id],
-	[ConcurrencyStamp],
-	[Name],
-	[IdUserType],
-	[Order]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+--/****** Object:  Index [IX_RoleName]    Script Date: 6/2/2016 9:27:59 PM ******/
+--CREATE NONCLUSTERED INDEX [IX_RoleName] ON [dbo].[AspNetRoles]
+--(
+--	[NormalizedName] ASC
+--)
+--INCLUDE ( 	[Id],
+--	[ConcurrencyStamp],
+--	[Name],
+--	[IdUserType],
+--	[Order]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+--GO
+
+--USE [VitalChoice.Ecommerce]
+--GO
+
+--/****** Object:  Index [IX_Email]    Script Date: 6/2/2016 9:29:01 PM ******/
+--CREATE NONCLUSTERED INDEX [IX_Email] ON [dbo].[Customers]
+--(
+--	[Email] ASC
+--)
+--INCLUDE ( 	[Id],
+--	[IdObjectType],
+--	[DateCreated],
+--	[DateEdited],
+--	[IdEditedBy],
+--	[IdDefaultPaymentMethod],
+--	[StatusCode],
+--	[PublicId],
+--	[IdAffiliate],
+--	[IdProfileAddress]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+--GO
+
 GO
 
 USE [VitalChoice.Ecommerce]
+
 GO
 
-/****** Object:  Index [IX_Email]    Script Date: 6/2/2016 9:29:01 PM ******/
-CREATE NONCLUSTERED INDEX [IX_Email] ON [dbo].[Customers]
-(
-	[Email] ASC
-)
-INCLUDE ( 	[Id],
-	[IdObjectType],
-	[DateCreated],
-	[DateEdited],
-	[IdEditedBy],
-	[IdDefaultPaymentMethod],
-	[StatusCode],
-	[PublicId],
-	[IdAffiliate],
-	[IdProfileAddress]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
-GO
-
-USE [vitalchoice2.0]
-GO
-
-DROP FUNCTION [dbo].[DelimitedSplit8K]
-GO
+DELETE v
+FROM CustomerOptionValues AS v
+INNER JOIN CustomerOptionTypes AS t ON t.Id = v.IdOptionType
+WHERE t.DefaultValue = v.Value
 
 GO
 
 INSERT INTO CustomerOptionValues
 (IdCustomer, IdOptionType, Value)
 SELECT c.Id, t.Id, t.DefaultValue FROM Customers AS c
-CROSS JOIN CustomerOptionTypes AS t
+INNER JOIN CustomerOptionTypes AS t ON t.IdObjectType = c.IdObjectType OR t.IdObjectType IS NULL
 WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM CustomerOptionValues AS v WHERE v.IdCustomer = c.Id AND v.IdOptionType = t.Id)
-
-GO
-
-INSERT INTO ProductOptionValues
-(IdProduct, IdOptionType, Value)
-SELECT c.Id, t.Id, t.DefaultValue FROM Products AS c
-CROSS JOIN ProductOptionTypes AS t
-WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM ProductOptionValues AS v WHERE v.IdProduct = c.Id AND v.IdOptionType = t.Id)
-
-GO
-
-DELETE p 
-FROM ProductOptionValues AS p
-INNER JOIN ProductOptionTypes AS t ON t.Id = p.IdOptionType AND t.Name LIKE 'Cross%'
-WHERE p.Value = t.DefaultValue
-
-GO
-
-DELETE p 
-FROM ProductOptionValues AS p
-INNER JOIN ProductOptionTypes AS t ON t.Id = p.IdOptionType AND t.Name LIKE 'Youtube%'
-WHERE p.Value = t.DefaultValue
-
-GO
-
-INSERT INTO SkuOptionValues
-(IdSku, IdOptionType, Value)
-SELECT c.Id, t.Id, t.DefaultValue FROM Skus AS c
-CROSS JOIN ProductOptionTypes AS t
-WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM SkuOptionValues AS v WHERE v.IdSku = c.Id AND v.IdOptionType = t.Id)
-
-GO
-
-INSERT INTO DiscountOptionValues
-(IdDiscount, IdOptionType, Value)
-SELECT c.Id, t.Id, t.DefaultValue FROM Discounts AS c
-CROSS JOIN DiscountOptionTypes AS t
-WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM DiscountOptionValues AS v WHERE v.IdDiscount = c.Id AND v.IdOptionType = t.Id)
 
 GO
 

@@ -1,3 +1,194 @@
+USE [VitalChoice.Ecommerce]
+GO
+
+DELETE FROM CartToGiftCertificates
+DELETE FROM RefundOrderToGiftCertificates
+DELETE FROM OrderToGiftCertificates
+DELETE FROM GiftCertificates
+DELETE FROM PromotionsToBuySkus
+DELETE FROM PromotionsToGetSkus
+DELETE FROM PromotionsToSelectedCategories
+DELETE FROM PromotionOptionValues
+DELETE FROM Promotions
+
+DELETE FROM SkuOptionValues
+WHERE IdSku IN (
+2455,
+2456,
+2457,
+2458,
+2459,
+2460,
+2461,
+2462,
+2463,
+2464,
+2465,
+2466,
+2467,
+2468,
+2469,
+2470,
+2471,
+2472,
+2473,
+2474,
+2475,
+2476,
+2477,
+2478,
+2479,
+2480,
+2481,
+2482,
+2483,
+2484,
+2485,
+2486,
+2487,
+2488,
+2489,
+2490,
+2491,
+2492,
+2493,
+2494,
+2495,
+2496,
+2497,
+2498
+)
+
+DELETE FROM Skus
+WHERE Id IN (
+2455,
+2456,
+2457,
+2458,
+2459,
+2460,
+2461,
+2462,
+2463,
+2464,
+2465,
+2466,
+2467,
+2468,
+2469,
+2470,
+2471,
+2472,
+2473,
+2474,
+2475,
+2476,
+2477,
+2478,
+2479,
+2480,
+2481,
+2482,
+2483,
+2484,
+2485,
+2486,
+2487,
+2488,
+2489,
+2490,
+2491,
+2492,
+2493,
+2494,
+2495,
+2496,
+2497,
+2498
+)
+
+DELETE FROM BigStringValues
+WHERE IdBigString IN (
+SELECT IdBigString FROM ProductOptionValues
+WHERE IdBigString IS NOT NULL AND IdProduct IN (
+2454,
+2455,
+2456,
+2457,
+2458,
+2459,
+2460,
+2461
+)
+)
+
+DELETE FROM ProductOptionValues
+WHERE IdProduct IN (
+2454,
+2455,
+2456,
+2457,
+2458,
+2459,
+2460,
+2461
+)
+
+DELETE FROM ProductReviews
+WHERE IdProduct IN (
+2454,
+2455,
+2456,
+2457,
+2458,
+2459,
+2460,
+2461
+)
+
+DELETE FROM ProductsToCategories
+WHERE IdProduct IN (
+2454,
+2455,
+2456,
+2457,
+2458,
+2459,
+2460,
+2461
+)
+
+DELETE FROM Products
+WHERE Id IN (
+2454,
+2455,
+2456,
+2457,
+2458,
+2459,
+2460,
+2461
+)
+GO
+
+USE [VitalChoice.Infrastructure]
+GO
+
+DECLARE @contentItemsToDelete TABLE(Id INT)
+
+INSERT INTO @contentItemsToDelete
+(Id)
+SELECT ContentItemId FROM Products
+WHERE IdOld IS NULL
+
+DELETE FROM Products
+WHERE IdOld IS NULL
+
+DELETE FROM ContentItems
+WHERE Id IN (SELECT Id FROM @contentItemsToDelete)
+
+GO
+
 USE [vitalchoice2.0]
 GO
 
@@ -21,7 +212,7 @@ BEGIN
 	DECLARE src CURSOR FOR
 	SELECT a.'+@sourceColumnName+N', idProduct, p.IdObjectType FROM products AS a
 	INNER JOIN [VitalChoice.Ecommerce].dbo.Products AS p ON p.Id = a.idProduct
-	WHERE ('+@sourceCondition+N') AND a.'+@sourceColumnName+N' IS NOT NULL AND a.'+@sourceColumnName+N' <> N''''
+	WHERE a.idProduct IN (SELECT Id FROM TempProductsToMove) AND ('+@sourceCondition+N') AND a.'+@sourceColumnName+N' IS NOT NULL AND a.'+@sourceColumnName+N' <> N''''
 
 	OPEN src
 
@@ -67,7 +258,7 @@ BEGIN
 	DECLARE src CURSOR FOR
 	SELECT a.'+@sourceColumnName+N', idProduct, p.IdObjectType FROM products AS a
 	INNER JOIN [VitalChoice.Ecommerce].dbo.Products AS p ON p.Id = a.idProduct
-	WHERE a.'+@sourceColumnName+N' IS NOT NULL AND a.'+@sourceColumnName+N' <> N''''
+	WHERE a.idProduct IN (SELECT Id FROM TempProductsToMove) AND a.'+@sourceColumnName+N' IS NOT NULL AND a.'+@sourceColumnName+N' <> N''''
 
 	OPEN src
 
@@ -126,7 +317,7 @@ BEGIN TRY
 		SELECT t.Id, p.Id, a.'+@sourceFieldName+' FROM [VitalChoice.Ecommerce].dbo.Products AS p
 		INNER JOIN [vitalchoice2.0].dbo.products AS a ON a.idProduct = p.Id
 		INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON (t.IdObjectType = p.IdObjectType OR t.IdObjectType IS NULL) AND t.Name = N'''+@destFieldName+'''
-		WHERE a.'+@sourceFieldName+' IS NOT NULL AND ('+ISNULL(@sourceConditions, '1=1')+')';
+		WHERE p.Id IN (SELECT Id FROM TempProductsToMove) AND a.'+@sourceFieldName+' IS NOT NULL AND ('+ISNULL(@sourceConditions, '1=1')+')';
 
 	ELSE
 		
@@ -135,7 +326,7 @@ BEGIN TRY
 		SELECT t.Id, p.Id, '+@fieldOperation+' FROM [VitalChoice.Ecommerce].dbo.Products AS p
 		INNER JOIN [vitalchoice2.0].dbo.products AS a ON a.idProduct = p.Id
 		INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON (t.IdObjectType = p.IdObjectType OR t.IdObjectType IS NULL) AND t.Name = N'''+@destFieldName+'''
-		WHERE a.'+@sourceFieldName+' IS NOT NULL AND ('+ISNULL(@sourceConditions, '1=1')+')';
+		WHERE p.Id IN (SELECT Id FROM TempProductsToMove) AND a.'+@sourceFieldName+' IS NOT NULL AND ('+ISNULL(@sourceConditions, '1=1')+')';
 
 	EXEC(@sql)
 END TRY
@@ -167,8 +358,8 @@ BEGIN TRY
 		SELECT t.Id, s.Id, a.'+@sourceFieldName+' FROM [VitalChoice.Ecommerce].dbo.Skus AS s
 		INNER JOIN [VitalChoice.Ecommerce].dbo.Products AS p ON p.Id = s.IdProduct
 		INNER JOIN [vitalchoice2.0].dbo.products AS a ON a.idProduct = s.Id
-		INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON (t.IdObjectType = p.IdObjectType OR t.IdObjectType IS NULL) AND t.Name = N'''+@destFieldName+'''
-		WHERE a.'+@sourceFieldName+' IS NOT NULL AND ('+ISNULL(@sourceConditions, '1=1')+')';
+		INNER JOIN [VitalChoice.Ecommerce].dbo.SkuOptionTypes AS t ON (t.IdObjectType = p.IdObjectType OR t.IdObjectType IS NULL) AND t.Name = N'''+@destFieldName+'''
+		WHERE p.Id IN (SELECT Id FROM TempProductsToMove) AND a.'+@sourceFieldName+' IS NOT NULL AND ('+ISNULL(@sourceConditions, '1=1')+')';
 
 	ELSE
 		
@@ -177,8 +368,8 @@ BEGIN TRY
 		SELECT t.Id, s.Id, '+@conversion+' FROM [VitalChoice.Ecommerce].dbo.Skus AS s
 		INNER JOIN [VitalChoice.Ecommerce].dbo.Products AS p ON p.Id = s.IdProduct
 		INNER JOIN [vitalchoice2.0].dbo.products AS a ON a.idProduct = s.Id
-		INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON (t.IdObjectType = p.IdObjectType OR t.IdObjectType IS NULL) AND t.Name = N'''+@destFieldName+'''
-		WHERE a.'+@sourceFieldName+' IS NOT NULL AND ('+ISNULL(@sourceConditions, '1=1')+')';
+		INNER JOIN [VitalChoice.Ecommerce].dbo.SkuOptionTypes AS t ON (t.IdObjectType = p.IdObjectType OR t.IdObjectType IS NULL) AND t.Name = N'''+@destFieldName+'''
+		WHERE p.Id IN (SELECT Id FROM TempProductsToMove) AND a.'+@sourceFieldName+' IS NOT NULL AND ('+ISNULL(@sourceConditions, '1=1')+')';
 
 	EXEC(@sql)
 END TRY
@@ -193,84 +384,28 @@ END
 GO
 
 ALTER TABLE [VitalChoice.Infrastructure].dbo.ContentItems
+	DROP COLUMN TempId, COLUMN TempCategoryId
+
+GO
+
+ALTER TABLE [VitalChoice.Infrastructure].dbo.ContentItems
 	ADD TempId INT NULL,
 		TempCategoryId INT NULL
 
 GO
 
-USE [VitalChoice.Ecommerce]
+USE [vitalchoice2.0]
 GO
 
---BEGIN TRANSACTION
---BEGIN TRY
+IF OBJECT_ID('dbo.TempProductsToMove') IS NOT NULL
+	DROP TABLE dbo.TempProductsToMove
 
---=========== Wipe everything ==============
+GO
 
-	DELETE FROM BigStringValues
-	WHERE IdBigString IN (SELECT v.IdBigString FROM ProductOptionValues AS v WHERE v.IdBigString IS NOT NULL)
+CREATE TABLE TempProductsToMove
+(Id INT PRIMARY KEY)
 
-	DELETE FROM BigStringValues
-	WHERE IdBigString NOT IN (SELECT v.IdBigString FROM CustomerOptionValues AS v WHERE v.IdBigString IS NOT NULL UNION SELECT v.IdBigString FROM AffiliateOptionValues AS v WHERE v.IdBigString IS NOT NULL)
-
-	DELETE FROM SkusToInventorySkus
-	DELETE FROM SkuOptionValues
-	DELETE FROM ReshipProblemSkus
-	DELETE FROM RefundSkus
-	DELETE FROM PromotionsToGetSkus
-	DELETE FROM PromotionsToBuySkus
-	DELETE FROM OrderToSkusToInventorySkus
-	DELETE FROM OrderToSkus
-	DELETE FROM OrderToPromosToInventorySkus
-	DELETE FROM OrderToPromos
-	DELETE FROM RefundOrderToGiftCertificates
-	DELETE FROM OrderToGiftCertificates
-	DELETE FROM CartToGiftCertificates
-	DELETE FROM GiftCertificates
-	DELETE FROM DiscountsToSkus
-	DELETE FROM DiscountsToSelectedSkus
-	DELETE FROM CartToSkus
-	DELETE FROM Skus
-	DELETE FROM ProductsToCategories
-	DELETE FROM ProductReviews
-	DELETE FROM ProductOutOfStockRequests
-	DELETE FROM ProductOptionValues
-	DELETE FROM Products
-	DELETE FROM Carts
-	DELETE FROM AffiliateOrderPayments
-	DELETE FROM HealthwiseOrders
-	DELETE FROM HelpTicketComments
-	DELETE FROM HelpTickets
-	DELETE FROM OrderOptionValues
-	DELETE FROM Orders
-	DELETE FROM PromotionsToSelectedCategories
-	DELETE FROM DiscountToSelectedCategories
-	DELETE FROM DiscountsToCategories
-	DELETE FROM ProductCategories
-	WHERE Id <> 1
-
-	USE [VitalChoice.Infrastructure]
-
-	DECLARE @contentRemoved TABLE(Id INT)
-
-	INSERT INTO @contentRemoved
-	SELECT ContentItemId FROM Products
-
-	INSERT INTO @contentRemoved
-	SELECT ContentItemId FROM ProductCategories
-	WHERE Id <> 1
-
-	DELETE FROM Products
-	DELETE FROM ProductCategories
-	WHERE Id <> 1
-
-	DELETE FROM ContentItems
-	WHERE Id IN (SELECT Id FROM @contentRemoved)
-
-
---=========== Import ==============
-
-	USE [vitalchoice2.0]
-
+GO
 
 	DECLARE @contentType INT, @oldContentType INT, @masterName NVARCHAR(50), @categoryMasterName NVARCHAR(50)
 	SET @contentType = 9
@@ -278,26 +413,19 @@ GO
 	SET @masterName = N'Product page'
 	SET @categoryMasterName = N'Product sub categories'
 
-
-	DECLARE @contentItemsToDelete TABLE(Id INT)
-
-	INSERT INTO @contentItemsToDelete
-	(Id)
-	SELECT ContentItemId FROM [VitalChoice.Infrastructure].dbo.Products
-	DELETE FROM [VitalChoice.Infrastructure].dbo.Products
-
-	DELETE FROM [VitalChoice.Infrastructure].dbo.ContentItems
-	WHERE Id IN (SELECT Id FROM @contentItemsToDelete)
-
 	DECLARE @articleMasterId INT
 	SELECT @articleMasterId = Id FROM [VitalChoice.Infrastructure].dbo.MasterContentItems WHERE Name = @masterName
+
+	INSERT INTO TempProductsToMove
+	(Id)
+	SELECT idProduct FROM products WHERE idProduct NOT IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.Products) AND pcprod_ParentPrd = 0
 
 	INSERT [VitalChoice.Infrastructure].dbo.ContentItems
 	(Created, Description, MetaDescription, MetaKeywords, Title, Updated, TempId, Template)
 	--OUTPUT inserted.Id, inserted.TempId INTO @insertedArticles
 	SELECT ISNULL(a.pcProd_EditedDate, GETDATE()), ISNULL(a.details, N''), LEFT(a.pcProd_MetaDesc, 250), a.pcProd_MetaKeywords, a.pcProd_MetaTitle, ISNULL(a.pcProd_EditedDate, GETDATE()), a.idProduct, N''
 	FROM [vitalchoice2.0].[dbo].Products AS a
-	WHERE a.pcprod_ParentPrd = 0
+	WHERE a.pcprod_ParentPrd = 0 AND a.idProduct IN (SELECT Id FROM TempProductsToMove)
 	ORDER BY a.idProduct
 
 	INSERT INTO [VitalChoice.Infrastructure].dbo.Products
@@ -305,31 +433,7 @@ GO
 	SELECT a.idProduct, i.Id, @articleMasterId, CASE WHEN ISNULL(a.removed, 0) <> 0 THEN 3 ELSE CASE WHEN ISNULL(a.active, 0) <> 0 THEN 2/*Active*/ ELSE 1 /*Not Active*/ END END, REPLACE(RTRIM(LTRIM(LOWER([vitalchoice2.0].[dbo].RegexReplace('[^a-zA-Z0-9]+', a.description, ' ')))) COLLATE SQL_Latin1_General_CP1_CI_AS,' ','-'), a.idProduct
 	FROM [vitalchoice2.0].[dbo].Products AS a
 	INNER JOIN [VitalChoice.Infrastructure].dbo.ContentItems AS i ON i.TempId = a.idProduct
-	WHERE a.pcprod_ParentPrd = 0
-
-	DECLARE @articleSubMaster INT
-	SELECT @articleSubMaster = Id FROM [VitalChoice.Infrastructure].dbo.MasterContentItems WHERE Name = @categoryMasterName
-
-	--DECLARE @insertedArticleCategories TABLE (Id INT NOT NULL PRIMARY KEY, TempCategoryId INT NOT NULL)
-	
-	INSERT [VitalChoice.Infrastructure].dbo.ContentItems
-	(Created, Description, MetaDescription, MetaKeywords, Title, Updated, TempCategoryId, Template)
-	--OUTPUT inserted.Id, inserted.TempCategoryId INTO @insertedArticleCategories
-	SELECT ISNULL(ca.pcCats_EditedDate, GETDATE()), N'', LEFT(CAST(ca.pcCats_MetaDesc AS NVARCHAR(MAX)), 250), ca.pcCats_MetaKeywords, ca.pcCats_MetaTitle, GETDATE(), ca.idCategory, N''
-	FROM [vitalchoice2.0].dbo.categories AS ca 
-	WHERE ca.type=@oldContentType AND ca.idCategory <> 1
-	ORDER BY ca.idParentCategory
-
-	INSERT [VitalChoice.Infrastructure].dbo.ProductCategories
-	(Id, ContentItemId, MasterContentItemId, IdOld, NavLabel, StatusCode, Url, NavIdVisible, FileImageLargeUrl, FileImageSmallUrl, HideLongDescription, HideLongDescriptionBottom, LongDescription, LongDescriptionBottom)
-	SELECT ca.idCategory, c.Id, @articleSubMaster, ca.idCategory, REPLACE(ca.categoryDesc, '&amp;', '&'),  
-		2/*Active*/, REPLACE(RTRIM(LTRIM(LOWER([vitalchoice2.0].[dbo].RegexReplace('[^a-zA-Z0-9]+', ca.categoryDesc, ' ')))) COLLATE SQL_Latin1_General_CP1_CI_AS,' ','-'),
-		CASE WHEN ISNULL(ca.iBTOhide, 0) <> 0 THEN NULL ELSE CASE WHEN ISNULL(ca.pcCats_RetailHide, 0) <> 0 THEN 2 ELSE 1 END END,
-		REPLACE(N'/files/catalog/' + ca.largeimage, '//', '/'), REPLACE(N'/files/catalog/' + ca.image, '//', '/'), CASE WHEN ISNULL(ca.HideDesc, 0) <> 0 THEN 1 ELSE 0 END, CASE WHEN ISNULL(ca.HideDesc, 0) <> 0 THEN 1 ELSE 0 END, ca.LDesc, ca.LDesc2
-	FROM [vitalchoice2.0].dbo.categories AS ca
-	INNER JOIN [VitalChoice.Infrastructure].dbo.ContentItems AS c ON c.TempCategoryId = ca.idCategory
-	WHERE ca.type=@oldContentType AND ca.idCategory <> 1
-	ORDER BY ca.idParentCategory
+	WHERE a.pcprod_ParentPrd = 0 AND a.idProduct IN (SELECT Id FROM TempProductsToMove)
 
 	SET IDENTITY_INSERT [VitalChoice.Ecommerce].dbo.Products ON;
 	
@@ -340,7 +444,7 @@ GO
 	SELECT 
 	a.idProduct, ISNULL(a.pcProd_EditedDate, GETDATE()), ISNULL(a.pcProd_EditedDate, GETDATE()), a.hidden, 1, a.description, NEWID(), CASE WHEN ISNULL(a.removed, 0) <> 0 THEN 3 ELSE CASE WHEN ISNULL(a.active, 0) <> 0 THEN 2/*Active*/ ELSE 1 /*Not Active*/ END END
 	FROM [vitalchoice2.0].[dbo].Products AS a
-	WHERE a.pcprod_ParentPrd = 0 AND ISNULL(a.pcprod_GC, 0) = 0 AND ISNULL(a.perishable, 0) = 0
+	WHERE a.pcprod_ParentPrd = 0 AND ISNULL(a.pcprod_GC, 0) = 0 AND ISNULL(a.perishable, 0) = 0 AND a.idProduct IN (SELECT Id FROM TempProductsToMove)
 
 	--================== Perishable =========================
 
@@ -349,7 +453,7 @@ GO
 	SELECT 
 	a.idProduct, ISNULL(a.pcProd_EditedDate, GETDATE()), ISNULL(a.pcProd_EditedDate, GETDATE()), a.hidden, 2, a.description, NEWID(), CASE WHEN ISNULL(a.removed, 0) <> 0 THEN 3 ELSE CASE WHEN ISNULL(a.active, 0) <> 0 THEN 2/*Active*/ ELSE 1 /*Not Active*/ END END
 	FROM [vitalchoice2.0].[dbo].Products AS a
-	WHERE a.pcprod_ParentPrd = 0 AND ISNULL(a.pcprod_GC, 0) = 0 AND ISNULL(a.perishable, 0) = -1
+	WHERE a.pcprod_ParentPrd = 0 AND ISNULL(a.pcprod_GC, 0) = 0 AND ISNULL(a.perishable, 0) = -1 AND a.idProduct IN (SELECT Id FROM TempProductsToMove)
 
 	--================== Gift Certificates =========================
 
@@ -358,41 +462,16 @@ GO
 	SELECT 
 	a.idProduct, ISNULL(a.pcProd_EditedDate, GETDATE()), ISNULL(a.pcProd_EditedDate, GETDATE()), a.hidden, 3, a.description, NEWID(), CASE WHEN ISNULL(a.removed, 0) <> 0 THEN 3 ELSE CASE WHEN ISNULL(a.active, 0) <> 0 THEN 2/*Active*/ ELSE 1 /*Not Active*/ END END
 	FROM [vitalchoice2.0].[dbo].Products AS a
-	WHERE a.pcprod_ParentPrd = 0 AND ISNULL(a.pcprod_GC, 0) = 1 AND a.sku LIKE 'EGIFT%'
+	WHERE a.pcprod_ParentPrd = 0 AND ISNULL(a.pcprod_GC, 0) = 1 AND a.sku LIKE 'EGIFT%' AND a.idProduct IN (SELECT Id FROM TempProductsToMove)
 
 	INSERT INTO [VitalChoice.Ecommerce].dbo.Products
 	(Id, DateCreated, DateEdited, Hidden, IdObjectType, Name, PublicId, StatusCode)
 	SELECT 
 	a.idProduct, ISNULL(a.pcProd_EditedDate, GETDATE()), ISNULL(a.pcProd_EditedDate, GETDATE()), a.hidden, 4, a.description, NEWID(), CASE WHEN ISNULL(a.removed, 0) <> 0 THEN 3 ELSE CASE WHEN ISNULL(a.active, 0) <> 0 THEN 2/*Active*/ ELSE 1 /*Not Active*/ END END
 	FROM [vitalchoice2.0].[dbo].Products AS a
-	WHERE a.pcprod_ParentPrd = 0 AND ISNULL(a.pcprod_GC, 0) = 1 AND a.sku NOT LIKE 'EGIFT%'
+	WHERE a.pcprod_ParentPrd = 0 AND ISNULL(a.pcprod_GC, 0) = 1 AND a.sku NOT LIKE 'EGIFT%' AND a.idProduct IN (SELECT Id FROM TempProductsToMove)
 
 	SET IDENTITY_INSERT [VitalChoice.Ecommerce].dbo.Products OFF;
-
-	SET IDENTITY_INSERT [VitalChoice.Ecommerce].dbo.ProductCategories ON;
-
-	INSERT [VitalChoice.Ecommerce].dbo.ProductCategories
-	(Id, Name, StatusCode, [Order])
-	SELECT ca.idCategory, REPLACE(ca.categoryDesc, '&amp;', '&'), 2/*Active*/, ISNULL(ca.[priority], 0)
-	FROM [vitalchoice2.0].dbo.categories AS ca
-	WHERE ca.type=@oldContentType AND ca.idCategory <> 1
-	ORDER BY ca.idParentCategory
-
-	SET IDENTITY_INSERT [VitalChoice.Ecommerce].dbo.ProductCategories OFF;
-
-	UPDATE [VitalChoice.Ecommerce].dbo.ProductCategories
-	SET ParentId = ca.idParentCategory
-	FROM [VitalChoice.Ecommerce].dbo.ProductCategories AS c
-	INNER JOIN [vitalchoice2.0].dbo.categories AS ca ON ca.idCategory = c.Id AND ca.idCategory <> 1
-	WHERE ca.type=@oldContentType AND ca.idParentCategory IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.ProductCategories)
-
-	UPDATE [VitalChoice.Infrastructure].dbo.ProductCategories
-	SET NavIdVisible = NULL
-	WHERE Id IN (SELECT c.Id FROM [VitalChoice.Ecommerce].dbo.ProductCategories AS c WHERE c.ParentId IS NULL AND c.Id <> 1)
-
-	UPDATE [VitalChoice.Ecommerce].dbo.ProductCategories
-	SET ParentId = 1
-	WHERE ParentId IS NULL AND Id <> 1
 
 -- Move fields
 
@@ -439,11 +518,11 @@ GO
 			d.Item, 
 			p.idProduct 
 		FROM products AS p
-		CROSS APPLY [dbo].[DelimitedSplit8K](p.nutritionInfo, '|~|', p.idProduct) AS d
-		WHERE d.JoinKey = p.idProduct AND p.removed = 0 AND p.pcprod_ParentPrd = 0 AND p.nutritionInfo IS NOT NULL AND p.nutritionInfo <> ''
+		CROSS APPLY [dbo].[DelimitedSplit8K](p.nutritionInfo, '|~|') AS d
+		WHERE p.removed = 0 AND p.pcprod_ParentPrd = 0 AND p.nutritionInfo IS NOT NULL AND p.nutritionInfo <> ''
 	) AS data ON data.idProduct = p.Id
 	INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON t.Name = data.FieldName AND (t.IdObjectType = p.IdObjectType OR t.IdObjectType IS NULL)
-	WHERE LEN(data.Item) <= 250
+	WHERE p.Id IN (SELECT Id FROM TempProductsToMove) AND LEN(data.Item) <= 250
 
 --======================== Additional Long Notes (Nutrition) =================================
 
@@ -462,11 +541,11 @@ GO
 			d.Item, 
 			p.idProduct 
 		FROM products AS p
-		CROSS APPLY [dbo].[DelimitedSplit8K](p.nutritionInfo, '|~|', p.idProduct) AS d
-		WHERE d.JoinKey = p.idProduct AND p.removed = 0 AND p.pcprod_ParentPrd = 0 AND p.nutritionInfo IS NOT NULL AND p.nutritionInfo <> ''
+		CROSS APPLY [dbo].[DelimitedSplit8K](p.nutritionInfo, '|~|') AS d
+		WHERE p.removed = 0 AND p.pcprod_ParentPrd = 0 AND p.nutritionInfo IS NOT NULL AND p.nutritionInfo <> ''
 	) AS data ON data.idProduct = p.Id
 	INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON t.Name = data.FieldName AND (t.IdObjectType = p.IdObjectType OR t.IdObjectType IS NULL)
-	WHERE LEN(data.Item) > 250 AND data.FieldName = N'AdditionalNotes'
+	WHERE p.Id IN (SELECT Id FROM TempProductsToMove) AND LEN(data.Item) > 250 AND data.FieldName = N'AdditionalNotes'
 
 	OPEN src
 
@@ -503,24 +582,20 @@ GO
 
 	SELECT TOP 1 @googleCategoriesLookup = Id FROM [VitalChoice.Ecommerce].dbo.Lookups AS l WHERE l.Name = 'GoogleCategories'
 
-	DELETE FROM [VitalChoice.Ecommerce].dbo.LookupVariants WHERE IdLookup = @googleCategoriesLookup
-
-	INSERT INTO [VitalChoice.Ecommerce].dbo.LookupVariants
-	(Id, IdLookup, [Order], ValueVariant)
-	SELECT c.id, @googleCategoriesLookup, ROW_NUMBER() OVER (ORDER BY c.id), c.google_category_name FROM [vitalchoice2.0].dbo.google_categories AS c
-
 	INSERT INTO [VitalChoice.Ecommerce].dbo.ProductOptionValues
 	(IdOptionType, IdProduct, Value)
 	SELECT t.Id, p.Id, CAST(l.Id AS NVARCHAR(20)) FROM [VitalChoice.Ecommerce].dbo.Products AS p
 	INNER JOIN [vitalchoice2.0].dbo.products AS a ON a.idProduct = p.Id
 	INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON (t.IdObjectType = p.IdObjectType OR t.IdObjectType IS NULL) AND t.Name = N'GoogleCategory'
 	INNER JOIN [VitalChoice.Ecommerce].dbo.LookupVariants AS l ON l.IdLookup = t.IdLookup AND l.ValueVariant COLLATE SQL_Latin1_General_CP1_CI_AS = a.google_category
+	WHERE p.Id IN (SELECT Id FROM TempProductsToMove)
 
 	INSERT [VitalChoice.Ecommerce].dbo.ProductsToCategories
 	(IdProduct, IdCategory)
 	SELECT a.Id, c.Id FROM [VitalChoice.Infrastructure].dbo.Products AS a
 	INNER JOIN [vitalchoice2.0].dbo.categories_products AS ca ON ca.idProduct = a.Id AND ca.idCategory <> 1
 	INNER JOIN [VitalChoice.Infrastructure].dbo.ProductCategories AS c ON c.IdOld = ca.idCategory
+	WHERE a.Id IN (SELECT Id FROM TempProductsToMove)
 	
 	UPDATE [VitalChoice.Infrastructure].dbo.Products
 	SET Url = r.Url + N'-' + CAST(j.Number AS NVARCHAR(10))
@@ -588,6 +663,20 @@ GO
 	DELETE FROM [VitalChoice.Ecommerce].dbo.ProductOptionValues
 	WHERE (Value IS NULL OR Value = N'') AND IdBigString IS NULL
 
+	DECLARE @additionalSkusToImport TABLE (Id INT NOT NULL PRIMARY KEY)
+
+	INSERT INTO @additionalSkusToImport
+	(Id)
+	SELECT DISTINCT IdProduct FROM (
+	SELECT IdProduct FROM products AS a
+	INNER JOIN [VitalChoice.Ecommerce].dbo.Products AS p ON p.Id = a.pcprod_ParentPrd
+	WHERE idProduct NOT IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.Skus)
+	UNION ALL
+	SELECT IdProduct FROM products AS a
+	INNER JOIN [VitalChoice.Ecommerce].dbo.Products AS p ON p.Id = a.idProduct AND ISNULL(a.pcprod_Apparel, 0) = 0 AND a.pcprod_ParentPrd = 0
+	WHERE idProduct NOT IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.Skus)
+	) f
+
 	SET IDENTITY_INSERT [VitalChoice.Ecommerce].dbo.Skus ON;
 
 	INSERT INTO [VitalChoice.Ecommerce].dbo.Skus
@@ -605,6 +694,7 @@ GO
 		CASE WHEN ISNULL(a.removed, 0) <> 0 THEN 3 ELSE CASE WHEN ISNULL(a.pcProd_SPInActive, 0) = 0 THEN 2 ELSE 1 END END
 	FROM [vitalchoice2.0].dbo.products AS a
 	INNER JOIN [VitalChoice.Ecommerce].dbo.Products AS p ON p.Id = a.pcprod_ParentPrd
+	WHERE p.Id IN (SELECT Id FROM TempProductsToMove) OR a.idProduct IN (SELECT Id FROM @additionalSkusToImport)
 
 	INSERT INTO [VitalChoice.Ecommerce].dbo.Skus
 	(Id, Code, DateCreated, DateEdited, Hidden, IdProduct, [Order], Price, WholesalePrice, StatusCode)
@@ -620,7 +710,8 @@ GO
 		a.bToBPrice,
 		p.StatusCode
 	FROM [vitalchoice2.0].dbo.products AS a
-	INNER JOIN [VitalChoice.Ecommerce].dbo.Products AS p ON p.Id = a.idProduct AND ISNULL(a.pcprod_Apparel, 0) = 0
+	INNER JOIN [VitalChoice.Ecommerce].dbo.Products AS p ON p.Id = a.idProduct AND ISNULL(a.pcprod_Apparel, 0) = 0 AND a.pcprod_ParentPrd = 0
+	WHERE p.Id IN (SELECT Id FROM TempProductsToMove) OR a.idProduct IN (SELECT Id FROM @additionalSkusToImport)
 
 	SET IDENTITY_INSERT [VitalChoice.Ecommerce].dbo.Skus OFF;
 
@@ -640,7 +731,10 @@ GO
 	INNER JOIN options AS o ON o.idOption = og.idOption
 	INNER JOIN products AS pp ON (pp.pcProd_Relationship like '%[_]'+ CAST(og.idoptoptgrp AS NVARCHAR(10)) OR (pp.pcProd_Relationship like '%[_]'+CAST(og.idoptoptgrp AS NVARCHAR(10))+'[_]%'))
 	INNER JOIN [VitalChoice.Ecommerce].dbo.Products AS ep ON ep.Id = p.idProduct
-	INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON (t.IdObjectType = ep.IdObjectType OR t.IdObjectType IS NULL) AND t.Name = N'QTY'
+	INNER JOIN [VitalChoice.Ecommerce].dbo.SkuOptionTypes AS t ON (t.IdObjectType = ep.IdObjectType OR t.IdObjectType IS NULL) AND t.Name = N'QTY'
+	WHERE ep.Id IN (SELECT Id FROM TempProductsToMove) OR pp.idProduct IN (SELECT Id FROM @additionalSkusToImport)
+
+	SELECT * FROM @additionalSkusToImport
 
 	EXEC dbo.MoveSkuField @destFieldName = N'DisregardStock', @sourceFieldName = N'nostock', @conversion = N'CASE WHEN ISNULL(a.nostock, 0) <> 0 THEN ''True'' ELSE ''False'' END'
 	EXEC dbo.MoveSkuField @destFieldName = N'Stock', @sourceFieldName = N'stock', @conversion = N'CAST(ISNULL(a.stock, 0) AS NVARCHAR(250))'
@@ -665,138 +759,38 @@ GO
 	SELECT rp.idProduct, r.Id FROM [vitalchoice2.0].dbo.recipes_products AS rp
 	INNER JOIN [VitalChoice.Infrastructure].dbo.Recipes AS r ON r.IdOld = rp.idRecipe
 	INNER JOIN [VitalChoice.Infrastructure].dbo.Products AS p ON p.Id = rp.idProduct
---	COMMIT
---END TRY
---BEGIN CATCH
---	ROLLBACK
---	SELECT 
---        ERROR_NUMBER() AS ErrorNumber,
---        ERROR_MESSAGE() AS ErrorMessage,
---		ERROR_LINE() AS Line
---END CATCH
-
-ALTER TABLE [VitalChoice.Infrastructure].dbo.ContentItems
-	DROP COLUMN TempId, COLUMN TempCategoryId
-
-ALTER TABLE [VitalChoice.Ecommerce].dbo.BigStringValues
-ADD IdProduct INT
-
-GO
-
-DECLARE @fieldType INT, @textId BIGINT
-DECLARE @textData NVARCHAR(MAX), @IdProduct INT, @idObjectType INT
-DECLARE @bigId TABLE(Id BIGINT NOT NULL, IdProduct INT NOT NULL)
-
-SET @textData = N'Frozen foods are packed with dry ice<br />
-and ship Monday through Wednesday (except holidays).<br />
- <br />
-Frozen foods ship via 2nd Day Air service or 1-3 Day Express Ground service, depending on shipping date and destination.<br />
-<a href="/shop/pc/viewContent.asp?idpage=16"><img src="/files/catalog/image001.jpg" border="0" style="margin-top:3px;"/></a>
-<br />
-<u>Standard Shipping Fees</u>
-<ul>
-<li>Up to $49.99 = $4.95 shipping</li>
-<li>$50 - $98.99 = $9.95 shipping</li>
-<li>$99 and over = FREE shipping</li>
-</ul>
-Overnight shipping and other premium services cost extra; for more information, see our <a href="/shop/pc/viewContent.asp?idpage=16">Shipping page</a>. (Live shellfish ship overnight at no extra cost.)
-<ul> 
-<li>We cannot ship perishable goods to PO boxes.</li>
-<li>Free standard shipping applies to all orders of $99 or more sent to any U.S. street address.</li>
-<li>Perishable shipments to Alaska and Hawaii are subject to surcharges; please see our <a href="/shop/pc/viewContent.asp?idpage=16">Shipping page</a>.</li>
-</ul> 
-<u>When will my frozen foods arrive?</u>
-<ul>
-<li>Orders placed Saturday, Sunday, Monday, or before 10 AM Tuesday will ship on Tuesday* to arrive 1-3 days later.</li>
-<li>Orders placed between 10 AM Tuesday and 10 AM Wednesday will ship on Wednesday* to arrive 1-2 days later.</li>
-<li>Orders placed after 10 AM on Wednesday through 12:00 midnight Friday will ship on Monday* to arrive 1-3 days later.</li>
-</ul> 
-*Except when a holiday falls on the designated shipping day.<br />
- <br />
-For more information, see our <a href="/shop/pc/viewContent.asp?idpage=16">Shipping page</a>.'
-
-SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.ProductOptionTypes WHERE Name = N'Shipping' AND IdObjectType = 2
-
-DELETE FROM [VitalChoice.Ecommerce].dbo.BigStringValues
-WHERE IdBigString IN (SELECT v.IdBigString FROM [VitalChoice.Ecommerce].dbo.ProductOptionValues AS v WHERE IdOptionType = @fieldType)
-
-DELETE FROM [VitalChoice.Ecommerce].dbo.ProductOptionValues
-WHERE IdOptionType = @fieldType
-
-INSERT INTO [VitalChoice.Ecommerce].dbo.BigStringValues
-(Value, IdProduct)
-OUTPUT inserted.IdBigString, inserted.IdProduct INTO @bigId
-SELECT @textData, Id FROM [VitalChoice.Ecommerce].dbo.Products
-WHERE IdObjectType = 2
-
-INSERT INTO [VitalChoice.Ecommerce].dbo.ProductOptionValues
-(IdProduct, IdOptionType, IdBigString)
-SELECT IdProduct, @fieldType, Id FROM @bigId
-
-DELETE FROM @bigId
-
-SET @textData = N'Non-perishable goods ship via Ground service Monday - Friday (except
-holidays) and normally arrive in 3-7 days, depending upon destination.<br />
- <br />
-Non-perishable shipments to Washington State, Oregon, Idaho, and<br />
-Northern California may arrive faster, in 1 or 2 days.<br />
-<a href="/shop/pc/viewContent.asp?idpage=16"><img src="/files/catalog/image001.jpg" border="0" /></a>
-<br />
-Standard Shipping Fees
-<ul>
-<li>Up to $49.99 = $4.95 shipping</li>
-<li>$50 - $98.99 = $9.95 shipping</li>
-<li>$99 and over = FREE shipping</li>
-</ul>
-Free standard shipping applies to orders of $99 or more per U.S.<br />
-address, including non-perishables sent to Alaska and Hawaii.<br />
- <br />
-Overnight shipping and other premium services cost more; for<br />
-more information on this and all shipping topics, see our <a href="/shop/pc/viewContent.asp?idpage=16">Shipping page</a>.'
-
-SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.ProductOptionTypes WHERE Name = N'Shipping' AND IdObjectType = 1
-
-DELETE FROM [VitalChoice.Ecommerce].dbo.BigStringValues
-WHERE IdBigString IN (SELECT v.IdBigString FROM [VitalChoice.Ecommerce].dbo.ProductOptionValues AS v WHERE IdOptionType = @fieldType)
-
-DELETE FROM [VitalChoice.Ecommerce].dbo.ProductOptionValues
-WHERE IdOptionType = @fieldType
-
-INSERT INTO [VitalChoice.Ecommerce].dbo.BigStringValues
-(Value, IdProduct)
-OUTPUT inserted.IdBigString, inserted.IdProduct INTO @bigId
-SELECT @textData, Id FROM [VitalChoice.Ecommerce].dbo.Products
-WHERE IdObjectType = 1
-
-INSERT INTO [VitalChoice.Ecommerce].dbo.ProductOptionValues
-(IdProduct, IdOptionType, IdBigString)
-SELECT IdProduct, @fieldType, Id FROM @bigId
-
-GO
-
-ALTER TABLE [VitalChoice.Ecommerce].dbo.BigStringValues
-DROP COLUMN IdProduct
-
-GO
+	WHERE p.Id IN (SELECT Id FROM TempProductsToMove)
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.ProductOptionValues
 (IdOptionType, IdProduct, Value)
 SELECT t.Id, p.Id, pp.GoogleFeedTitle FROM [VitalChoice.Ecommerce].dbo.Products AS p
 INNER JOIN [vitalchoice2.0].dbo.products AS pp ON pp.idProduct = p.Id
-INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON t.IdObjectType = p.IdObjectType AND t.Name = 'GoogleFeedTitle' 
+INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON t.IdObjectType = p.IdObjectType AND t.Name = 'GoogleFeedTitle'
+WHERE p.Id IN (SELECT Id FROM TempProductsToMove)
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.ProductOptionValues
 (IdOptionType, IdProduct, Value)
 SELECT t.Id, p.Id, LEFT(pp.GoogleFeedDescription, 250) FROM [VitalChoice.Ecommerce].dbo.Products AS p
 INNER JOIN [vitalchoice2.0].dbo.products AS pp ON pp.idProduct = p.Id
 INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON t.IdObjectType = p.IdObjectType AND t.Name = 'GoogleFeedDescription' 
+WHERE p.Id IN (SELECT Id FROM TempProductsToMove)
+
+GO
 
 ALTER TABLE [vitalchoice2.0].[dbo].pcReviewsData
 ALTER COLUMN pcRD_Comment NVARCHAR(4000) NULL
 
-DELETE FROM [VitalChoice.Ecommerce].dbo.ProductReviews
+GO
 
-INSERT INTO AZUREEC.[VitalChoice.Ecommerce].dbo.ProductReviews
+ALTER TABLE [VitalChoice.Infrastructure].dbo.ContentItems
+	DROP COLUMN TempId, COLUMN TempCategoryId
+
+ALTER TABLE [VitalChoice.Ecommerce].dbo.ProductReviews
+ADD IdOld INT NULL
+
+GO 
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.ProductReviews
 (IdProduct, CustomerName, Description, Email, DateCreated, DateEdited, Rating, StatusCode, Title, IdOld)
 SELECT r.pcRev_IDProduct, d.Name, d.Comment, ISNULL(d.Email, N''), r.pcRev_Date, r.pcRev_Date, 0, CASE WHEN r.pcRev_Active = 1 THEN 2 ELSE 1 END, d.Title, r.pcRev_IDReview
   FROM [vitalchoice2.0].[dbo].[pcReviews] AS r
@@ -809,30 +803,41 @@ SELECT r.pcRev_IDProduct, d.Name, d.Comment, ISNULL(d.Email, N''), r.pcRev_Date,
 			MIN(s.pcRD_Comment) FOR s.pcRD_IDField IN ([1], [2], [3], [4], [5])
 		) AS pvt
   ) d ON d.pcRD_IDReview = r.pcRev_IDReview
-  INNER JOIN AZUREEC.[VitalChoice.Ecommerce].dbo.Products AS p ON p.Id = r.pcRev_IDProduct
-  WHERE d.Name IS NOT NULL AND d.Name <> N''
+  INNER JOIN [VitalChoice.Ecommerce].dbo.Products AS p ON p.Id = r.pcRev_IDProduct
+  WHERE p.Id IN (SELECT Id FROM TempProductsToMove) AND d.Name IS NOT NULL AND d.Name <> N''
 
-UPDATE AZUREEC.[VitalChoice.Ecommerce].dbo.ProductReviews
+UPDATE [VitalChoice.Ecommerce].dbo.ProductReviews
 SET Rating = d.pcRD_Rate
-FROM AZUREEC.[VitalChoice.Ecommerce].dbo.ProductReviews AS r
+FROM [VitalChoice.Ecommerce].dbo.ProductReviews AS r
 INNER JOIN [vitalchoice2.0].[dbo].[pcReviews] AS rr ON rr.pcRev_IDReview = r.IdOld
 INNER JOIN [vitalchoice2.0].dbo.pcReviewsData AS d ON d.pcRD_IDReview = rr.pcRev_IDReview
-WHERE d.pcRD_Rate > 0;
+WHERE r.IdProduct IN (SELECT Id FROM TempProductsToMove) AND d.pcRD_Rate > 0
 
 UPDATE [VitalChoice.Ecommerce].dbo.Skus
 SET WholesalePrice=Price
+WHERE IdProduct IN (SELECT Id FROM TempProductsToMove)
 
-UPDATE [VitalChoice.Infrastructure].dbo.ProductCategories
-SET FileImageLargeUrl=NULL
-WHERE FileImageLargeUrl='/files/catalog/no_image.gif'
+GO
+
+ALTER TABLE [VitalChoice.Ecommerce].dbo.ProductReviews
+DROP COLUMN IdOld
+
+GO
 
 USE [VitalChoice.Ecommerce]
+GO
+
+DELETE v
+FROM ProductOptionValues AS v
+INNER JOIN ProductOptionTypes AS t ON t.Id = v.IdOptionType
+WHERE t.DefaultValue = v.Value
+
 GO
 
 INSERT INTO ProductOptionValues
 (IdProduct, IdOptionType, Value)
 SELECT c.Id, t.Id, t.DefaultValue FROM Products AS c
-CROSS JOIN ProductOptionTypes AS t
+INNER JOIN ProductOptionTypes AS t ON t.IdObjectType = c.IdObjectType OR t.IdObjectType IS NULL
 WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM ProductOptionValues AS v WHERE v.IdProduct = c.Id AND v.IdOptionType = t.Id)
 
 GO
@@ -851,10 +856,65 @@ WHERE p.Value = t.DefaultValue
 
 GO
 
+DELETE v
+FROM SkuOptionValues AS v
+INNER JOIN SkuOptionTypes AS t ON t.Id = v.IdOptionType
+WHERE t.DefaultValue = v.Value
+
+GO
+
 INSERT INTO SkuOptionValues
 (IdSku, IdOptionType, Value)
 SELECT c.Id, t.Id, t.DefaultValue FROM Skus AS c
-CROSS JOIN ProductOptionTypes AS t
+INNER JOIN Products AS p ON p.Id = c.IdProduct
+INNER JOIN SkuOptionTypes AS t ON t.IdObjectType = p.IdObjectType OR t.IdObjectType IS NULL
 WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM SkuOptionValues AS v WHERE v.IdSku = c.Id AND v.IdOptionType = t.Id)
 
 GO
+
+
+UPDATE [VitalChoice.Infrastructure].dbo.ContentItems
+SET Description = [vitalchoice2.0].dbo.RegexReplace('<table.*?>.*?<tr>\s*<td.*?>(.*?)</td>\s*</tr>.*?</table>',c.Description,'$1')
+FROM [VitalChoice.Infrastructure].dbo.ContentItems AS c
+INNER JOIN [VitalChoice.Infrastructure].dbo.Products AS p ON c.Id = p.ContentItemId
+WHERE p.Id IN (SELECT Id FROM [vitalchoice2.0].dbo.TempProductsToMove)
+
+UPDATE [VitalChoice.Infrastructure].dbo.ContentItems
+SET Description = [vitalchoice2.0].dbo.RegexReplace('<table.*?>.*?<tr>\s*<td.*?>(.*?)</td>\s*</tr>.*?</table>',c.Description,'$1')
+FROM [VitalChoice.Infrastructure].dbo.ContentItems AS c
+INNER JOIN [VitalChoice.Infrastructure].dbo.Products AS p ON c.Id = p.ContentItemId
+WHERE p.Id IN (SELECT Id FROM [vitalchoice2.0].dbo.TempProductsToMove)
+
+UPDATE [VitalChoice.Infrastructure].dbo.ContentItems
+SET Description = [vitalchoice2.0].dbo.RegexReplace('\s*style="FONT-WEIGHT:\s*normal"',c.Description,'')
+FROM [VitalChoice.Infrastructure].dbo.ContentItems AS c
+INNER JOIN [VitalChoice.Infrastructure].dbo.Products AS p ON c.Id = p.ContentItemId
+WHERE p.Id IN (SELECT Id FROM [vitalchoice2.0].dbo.TempProductsToMove)
+
+
+UPDATE [VitalChoice.Ecommerce].dbo.BigStringValues
+SET Value = [vitalchoice2.0].dbo.RegexReplace('<table.*?>.*?<tr>\s*<td.*?>(.*?)</td>\s*</tr>.*?</table>',b.Value,'$1')
+FROM [VitalChoice.Ecommerce].dbo.BigStringValues AS b
+INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionValues AS v ON b.IdBigString = v.IdBigString
+INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON t.Name = 'Description' AND t.Id = v.IdOptionType
+WHERE v.IdProduct IN (SELECT Id FROM [vitalchoice2.0].dbo.TempProductsToMove)
+
+UPDATE [VitalChoice.Ecommerce].dbo.BigStringValues
+SET Value = [vitalchoice2.0].dbo.RegexReplace('<table.*?>.*?<tr>\s*<td.*?>(.*?)</td>\s*</tr>.*?</table>',b.Value,'$1')
+FROM [VitalChoice.Ecommerce].dbo.BigStringValues AS b
+INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionValues AS v ON b.IdBigString = v.IdBigString
+INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON t.Name = 'Description' AND t.Id = v.IdOptionType
+WHERE v.IdProduct IN (SELECT Id FROM [vitalchoice2.0].dbo.TempProductsToMove)
+
+UPDATE [VitalChoice.Ecommerce].dbo.BigStringValues
+SET Value = [vitalchoice2.0].dbo.RegexReplace('\s*style="FONT-WEIGHT:\s*normal"',b.Value,'')
+FROM [VitalChoice.Ecommerce].dbo.BigStringValues AS b
+INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionValues AS v ON b.IdBigString = v.IdBigString
+INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON t.Name = 'Description' AND t.Id = v.IdOptionType
+WHERE v.IdProduct IN (SELECT Id FROM [vitalchoice2.0].dbo.TempProductsToMove)
+
+SELECT * FROM [vitalchoice2.0].dbo.TempProductsToMove
+
+GO
+
+DROP TABLE [vitalchoice2.0].dbo.TempProductsToMove
