@@ -10,3 +10,15 @@ BEGIN
 END
 
 GO
+
+IF EXISTS(SELECT * FROM States WHERE StatusCode=1)
+BEGIN
+
+	UPDATE States
+	SET 
+		StatusCode=2
+	WHERE StatusCode=1
+
+END
+
+GO

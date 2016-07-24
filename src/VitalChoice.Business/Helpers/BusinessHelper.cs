@@ -58,6 +58,10 @@ namespace VitalChoice.Business.Helpers
 							}
 						}
 					}
+					else
+					{
+					    toReturn = "Tiered Discount";
+					}
 					break;
 			}
 			return toReturn;

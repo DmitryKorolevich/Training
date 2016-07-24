@@ -11,7 +11,7 @@ namespace VC.Public.Components
     [ViewComponent(Name = "Area")]
     public class AreaViewComponent : ViewComponent
     {
-        private static readonly Regex TemplateReplaceExpression = new Regex("\\{\\{([a-z_@][a-z0-9_\\.]*)\\}\\}",
+        private static readonly Regex TemplateReplaceExpression = new Regex("\\{([a-z_@][a-z0-9_\\.]*)\\}",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private readonly IContentAreaService _contentAreaService;
 

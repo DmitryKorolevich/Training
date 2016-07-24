@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
@@ -83,7 +84,7 @@ namespace VitalChoice.Ecommerce.Domain.Dynamic
 
         private SafeDynamicObject _safeData;
         private UnsafeDynamicObject _unsafeData;
-
+        
         public UnsafeDynamicObject UnsafeData
         {
             get { return _unsafeData; }

@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using Newtonsoft.Json;
 
 namespace VitalChoice.Ecommerce.Domain.Dynamic
 {
+    [JsonObject(MemberSerialization.OptOut)]
     public class UnsafeDynamicObject : DynamicObject
     {
-        public Dictionary<string, object> Dictionary { get; }
+        public Dictionary<string, object> Dictionary { get; set; }
 
         public UnsafeDynamicObject()
         {

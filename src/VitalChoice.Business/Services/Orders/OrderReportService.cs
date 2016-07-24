@@ -987,9 +987,8 @@ namespace VitalChoice.Business.Services.Orders
                 .WithIdSku(idSku)
                 .WithOrderTypes(new[] {OrderType.AutoShipOrder, OrderType.DropShip, OrderType.GiftList, OrderType.Normal})
                 .WithOrderStatuses(new[] {OrderStatus.Processed, OrderStatus.Exported, OrderStatus.Shipped});
-            var orders = await _orderService.SelectAsync(conditions,
-                p => p.Include(x => x.Skus).ThenInclude(x => x.Sku).ThenInclude(x => x.Product).
-                    Include(x => x.PromoSkus).ThenInclude(x => x.Sku).ThenInclude(x => x.Product));
+            var orders = await _orderRepository.Query(conditions).Include(x => x.Skus).ThenInclude(x => x.Sku).ThenInclude(x => x.Product).
+                    Include(x => x.PromoSkus).ThenInclude(x => x.Sku).ThenInclude(x => x.Product).SelectAsync(false);
 
 
             foreach (var order in orders)
@@ -1001,7 +1000,7 @@ namespace VitalChoice.Business.Services.Orders
                     var items =
                         order.Skus.Where(p => p.Sku.Product.IdObjectType == (int) ProductType.Perishable).Select(p => p.Sku.Id).ToList();
                     items.AddRange(
-                        order.PromoSkus.Where(p => !p.Enabled && p.Sku.Product.IdObjectType == (int) ProductType.Perishable)
+                        order.PromoSkus.Where(p => !p.Disabled && p.Sku.Product.IdObjectType == (int) ProductType.Perishable)
                             .Select(p => p.Sku.Id));
                     perishableCount = items.Distinct().Count();
                 }
@@ -1009,7 +1008,7 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     perishableCount =
                         order.Skus.Where(p => p.Sku.Product.IdObjectType == (int) ProductType.Perishable).Sum(p => p.Quantity) +
-                        order.PromoSkus.Where(p => !p.Sku.Hidden && p.Sku.Product.IdObjectType == (int) ProductType.Perishable).
+                        order.PromoSkus.Where(p => !p.Disabled && p.Sku.Product.IdObjectType == (int) ProductType.Perishable).
                             Sum(p => p.Quantity);
                 }
                 if (perishableCount > 0)
@@ -1044,7 +1043,7 @@ namespace VitalChoice.Business.Services.Orders
                     var items =
                         order.Skus.Where(p => p.Sku.Product.IdObjectType != (int) ProductType.Perishable).Select(p => p.Sku.Id).ToList();
                     items.AddRange(
-                        order.PromoSkus.Where(p => !p.Enabled && p.Sku.Product.IdObjectType != (int) ProductType.Perishable)
+                        order.PromoSkus.Where(p => !p.Disabled && p.Sku.Product.IdObjectType != (int) ProductType.Perishable)
                             .Select(p => p.Sku.Id));
                     nonPerishableCount = items.Distinct().Count();
                 }
@@ -1052,7 +1051,7 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     nonPerishableCount =
                         order.Skus.Where(p => p.Sku.Product.IdObjectType != (int) ProductType.Perishable).Sum(p => p.Quantity) +
-                        order.PromoSkus.Where(p => !p.Enabled && p.Sku.Product.IdObjectType != (int) ProductType.Perishable).
+                        order.PromoSkus.Where(p => !p.Disabled && p.Sku.Product.IdObjectType != (int) ProductType.Perishable).
                             Sum(p => p.Quantity);
                 }
                 if (nonPerishableCount > 0)
@@ -1082,7 +1081,10 @@ namespace VitalChoice.Business.Services.Orders
 
                 //skus
                 var skus = order.Skus;
-                skus.AddRange(order.PromoSkus.Where(p => p.Enabled));
+                skus.AddRange(order.PromoSkus.Where(p => !p.Disabled).Select(p=> new OrderToSku()
+                {
+                    Sku = p.Sku,
+                }));
                 foreach (var skuOrdered in skus)
                 {
                     var skuModel = toReturn.Skus.FirstOrDefault(p => p.IdSku == skuOrdered.Sku.Id);
