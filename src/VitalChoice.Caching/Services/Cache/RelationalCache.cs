@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Iterators;
@@ -310,7 +311,6 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (entity == null)
                 return;
-            _stateManager.StartTrackingFromCache(relationInfo.EntityType, entity);
             foreach (var relation in relationInfo.Relations)
             {
                 var value = relation.GetRelatedObject(entity);
@@ -326,6 +326,7 @@ namespace VitalChoice.Caching.Services.Cache
                     }
                 }
             }
+            _stateManager.StartTrackingFromQuery(relationInfo.EntityType, entity, ValueBuffer.Empty);
         }
     }
 }

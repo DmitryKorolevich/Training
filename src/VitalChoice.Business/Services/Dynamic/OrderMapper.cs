@@ -356,7 +356,8 @@ namespace VitalChoice.Business.Services.Dynamic
                             {
                                 g.GiftCertificate.Balance = dg.GiftCertificate.Balance;
                             }
-                        });
+                        },
+                        removed => removed.ForEach(gc => gc.GiftCertificate.Balance += gc.Amount));
                 }
                 entity.IdDiscount = dynamic.Discount?.Id;
                 if (dynamic.PaymentMethod.Address != null && entity.PaymentMethod.BillingAddress == null)

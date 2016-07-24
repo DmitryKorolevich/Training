@@ -609,14 +609,14 @@ namespace VitalChoice.Business.Services.Orders
 
         protected override async Task AfterEntityChangesAsync(OrderDynamic model, Order updated, IUnitOfWorkAsync uow)
         {
-            //We need to manually remove generated but unlinked gift certificates
+            //TODO: We need to manually remove generated but unlinked gift certificates
             var gcRep = uow.RepositoryAsync<GiftCertificate>();
             if ((model.OrderStatus == null || model.OrderStatus.Value != OrderStatus.Incomplete) &&
                 (model.POrderStatus != OrderStatus.Incomplete || model.NPOrderStatus != OrderStatus.Incomplete))
             {
                 var toLoadUp =
                     new HashSet<int>(updated.GiftCertificates.Where(g => g.GiftCertificate == null).Select(g => g.IdGiftCertificate));
-                var gcs = await gcRep.Query(g => toLoadUp.Contains(g.Id)).SelectAsync(false);
+                var gcs = await gcRep.Query(g => toLoadUp.Contains(g.Id)).SelectAsync(true);
                 updated.GiftCertificates.ForEach(g =>
                 {
                     if (g.GiftCertificate == null)
