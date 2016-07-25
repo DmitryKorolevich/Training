@@ -53,7 +53,19 @@ BEGIN
 		(o.OrderStatus IS NULL AND o.POrderStatus !=1 AND o.POrderStatus !=4 AND o.POrderStatus !=6 AND 
 		o.NPOrderStatus !=1 AND o.NPOrderStatus !=4 AND o.NPOrderStatus !=6)) AND
 		(@idcustomer IS NULL OR o.IdCustomer = @idcustomer) AND	
-		(@idcustomertype IS NULL OR c.IdObjectType = @idcustomertype)
+		(@idcustomertype IS NULL OR c.IdObjectType = @idcustomertype) AND
+		(@shipfrom IS NULL OR EXISTS
+		(SELECT
+			TOP 1 s.IdOrder
+		FROM OrderShippingPackages s
+		WHERE s.IdOrder=o.Id AND s.ShippedDate>=@shipfrom
+		)) AND
+		(@shipto IS NULL OR EXISTS
+		(SELECT
+			TOP 1 s.IdOrder
+		FROM OrderShippingPackages s
+		WHERE s.IdOrder=o.Id AND s.ShippedDate<=@shipto
+		))
 
 		;WITH tempOrders(
 			Id, IdObjectType, IdCustomer, CustomerIdObjectType, IdDiscount, CustomerDateCreated,
@@ -162,7 +174,20 @@ BEGIN
 					(o.OrderStatus IS NULL AND o.POrderStatus !=1 AND o.POrderStatus !=4 AND o.POrderStatus !=6 AND 
 					o.NPOrderStatus !=1 AND o.NPOrderStatus !=4 AND o.NPOrderStatus !=6)) AND
 					(@idcustomer IS NULL OR o.IdCustomer = @idcustomer) AND	
-					(@idcustomertype IS NULL OR c.IdObjectType = @idcustomertype)) temp	
+					(@idcustomertype IS NULL OR c.IdObjectType = @idcustomertype) AND
+					(@shipfrom IS NULL OR EXISTS
+					(SELECT
+						TOP 1 s.IdOrder
+					FROM OrderShippingPackages s
+					WHERE s.IdOrder=o.Id AND s.ShippedDate>=@shipfrom
+					 )) AND
+					(@shipto IS NULL OR EXISTS
+					(SELECT
+						TOP 1 s.IdOrder
+					FROM OrderShippingPackages s
+					WHERE s.IdOrder=o.Id AND s.ShippedDate<=@shipto
+					 ))
+				) temp	
 			LEFT JOIN OrderOptionTypes AS kcopt WITH(NOLOCK) ON kcopt.Name = N'KeyCode' AND kcopt.IdObjectType = temp.IdObjectType
 			LEFT JOIN OrderOptionValues AS kcval WITH(NOLOCK) ON kcval.IdOrder = temp.Id AND kcval.IdOptionType = kcopt.Id
 			JOIN OrderOptionTypes AS otopt WITH(NOLOCK) ON otopt.Name = N'OrderType'
