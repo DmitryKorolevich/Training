@@ -6,7 +6,7 @@ using VitalChoice.Infrastructure.Domain.ServiceBus;
 
 namespace VitalChoice.Infrastructure.ServiceBus.Base
 {
-    public interface IObjectEncryptionHost
+    public interface IObjectEncryptionHost : IDisposable
     {
         void UpdateLocalKey(KeyExchange key);
         KeyExchange GetLocalKey();

@@ -20,7 +20,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 {
     public delegate void SessionExpiredEventHandler(Guid session, string hostName);
 
-    public class ObjectEncryptionHost : IDisposable, IObjectEncryptionHost
+    public class ObjectEncryptionHost : IObjectEncryptionHost
     {
         protected virtual int MaxSessions => 10;
         private readonly string _localEncryptionPath;

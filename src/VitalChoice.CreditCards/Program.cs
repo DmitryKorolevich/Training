@@ -28,15 +28,17 @@ namespace VitalChoice.CreditCards
 
             Host.Start();
 
-            var encryptionHost = Host.Services.GetRequiredService<IObjectEncryptionHost>();
+            using (var encryptionHost = Host.Services.GetRequiredService<IObjectEncryptionHost>())
+            {
 
-            Console.WriteLine("Starting customer CCs Move");
-            RecryptCustomers(encryptionHost);
-            Console.WriteLine("Starting orders CCs Move");
-            RecryptOrders(encryptionHost);
+                Console.WriteLine("Starting customer CCs Move");
+                RecryptCustomers(encryptionHost);
+                Console.WriteLine("Starting orders CCs Move");
+                RecryptOrders(encryptionHost);
 
-            Console.WriteLine("Done!");
+                Console.WriteLine("Done!");
 
+            }
             Host.Dispose();
         }
 
