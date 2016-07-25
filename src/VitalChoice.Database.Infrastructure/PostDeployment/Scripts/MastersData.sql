@@ -631,7 +631,7 @@ BEGIN
             <strong>@(@model.Model.SubTitle)</strong>
             <br/>
             <br/>
-            <span class="date">@date(@model.Model.PublishedDate) {{MM'/'dd'/'yyyy}}</span>
+            <span class="date">@date(@model.Model.PublishedDate) {{MM''/''dd''/''yyyy}}</span>
             <span class="author">@(@model.Model.Author)</span>
             <div class="icons-bar not-printable">
         	    <a target="_blank" href="http://www.facebook.com/sharer.php?u=@(@model.ViewContext.AbsoluteUrl)&t=@(@model.Model.Name)" class="margin-right-medium small-window-open-link">

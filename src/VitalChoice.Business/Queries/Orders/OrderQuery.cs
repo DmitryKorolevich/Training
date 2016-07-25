@@ -189,19 +189,19 @@ namespace VitalChoice.Business.Queries.Orders
                 Add(c => c.WhenValues(new
                 {
                     ShippingUpgradeP = 1
-                }, ValuesFilterType.And, CompareBehaviour.Equals) ||
+                }, ValuesFilterType.Or, CompareBehaviour.Equals) ||
                          c.WhenValues(new
                          {
                              ShippingUpgradeP = 2
-                         }, ValuesFilterType.And, CompareBehaviour.Equals) ||
+                         }, ValuesFilterType.Or, CompareBehaviour.Equals) ||
                          c.WhenValues(new
                          {
                              ShippingUpgradeNP = 1
-                         }, ValuesFilterType.And, CompareBehaviour.Equals) ||
+                         }, ValuesFilterType.Or, CompareBehaviour.Equals) ||
                          c.WhenValues(new
                          {
                              ShippingUpgradeNP = 2
-                         }, ValuesFilterType.And, CompareBehaviour.Equals));
+                         }, ValuesFilterType.Or, CompareBehaviour.Equals));
             }
             return this;
         }
