@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -34,78 +35,99 @@ namespace VitalChoice.CreditCards
             Console.WriteLine("Starting orders CCs Move");
             RecryptOrders(encryptionHost);
 
+            Console.WriteLine("Done!");
+
             Host.Dispose();
-        }
-
-        private static void RecryptOrders(IObjectEncryptionHost encryptionHost)
-        {
-            bool any = true;
-            var seed = 0;
-            var size = 5000;
-            Regex numberCheck = new Regex("^[0-9]+$", RegexOptions.Compiled);
-            while (any)
-            {
-                using (var context = Host.Services.GetRequiredService<ExportInfoContext>())
-                {
-                    Console.WriteLine($"Moving page: {seed}--{seed + size}");
-                    any = false;
-                    Parallel.ForEach(context.Set<OrderPaymentMethodExport>().Skip(seed).Take(size), paymentMethod =>
-                    {
-                        Interlocked.Increment(ref seed);
-                        any = true;
-                        if (numberCheck.IsMatch(Encoding.Unicode.GetString(paymentMethod.CreditCardNumber)))
-                        {
-                            paymentMethod.CreditCardNumber = encryptionHost.LocalEncrypt(paymentMethod.CreditCardNumber);
-                        }
-                        else
-                        {
-                            // ReSharper disable once AccessToDisposedClosure
-                            lock (context)
-                            {
-                                // ReSharper disable once AccessToDisposedClosure
-                                context.SetState(paymentMethod, EntityState.Deleted);
-                            }
-                        }
-                    });
-
-                    context.SaveChanges();
-                }
-            }
         }
 
         private static void RecryptCustomers(IObjectEncryptionHost encryptionHost)
         {
-            bool any = true;
             var seed = 0;
-            var size = 5000;
+            var size = 20000;
             Regex numberCheck = new Regex("^[0-9]+$", RegexOptions.Compiled);
+
+            List<Task> tasks = new List<Task>();
+            bool any = true;
             while (any)
             {
-                using (var context = Host.Services.GetRequiredService<ExportInfoContext>())
+                Console.WriteLine($"Moving page: {seed}--{seed + size}");
+
+                Task task;
+                seed = ProcessNextCustomersBatch(encryptionHost, seed, size, numberCheck, out any, out task);
+                tasks.Add(task);
+            }
+            Task.WhenAll(tasks).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        private static void RecryptOrders(IObjectEncryptionHost encryptionHost)
+        {
+            var seed = 0;
+            var size = 20000;
+            Regex numberCheck = new Regex("^[0-9]+$", RegexOptions.Compiled);
+
+            List<Task> tasks = new List<Task>();
+            bool any = true;
+            while (any)
+            {
+                Console.WriteLine($"Moving page: {seed}--{seed + size}");
+
+                Task task;
+                seed = ProcessNextOrdersBatch(encryptionHost, seed, size, numberCheck, out any, out task);
+                tasks.Add(task);
+            }
+            Task.WhenAll(tasks).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        private static int ProcessNextOrdersBatch(IObjectEncryptionHost encryptionHost, int seed, int size, Regex numberCheck,
+            out bool hasNext, out Task awaiter)
+        {
+            var context = Host.Services.GetRequiredService<ExportInfoContext>();
+            var items = context.Set<OrderPaymentMethodExport>().Skip(seed).Take(size).ToList();
+            seed += items.Count;
+            hasNext = items.Count == size;
+            awaiter = Task.Run(() => ProcessPayments(encryptionHost, numberCheck, items, context));
+            return seed;
+        }
+
+        private static int ProcessNextCustomersBatch(IObjectEncryptionHost encryptionHost, int seed, int size, Regex numberCheck,
+            out bool hasNext, out Task awaiter)
+        {
+            var context = Host.Services.GetRequiredService<ExportInfoContext>();
+            var items = context.Set<CustomerPaymentMethodExport>().Skip(seed).Take(size).ToList();
+            seed += items.Count;
+            hasNext = items.Count == size;
+            awaiter = Task.Run(() => ProcessPayments(encryptionHost, numberCheck, items, context));
+            return seed;
+        }
+
+        private static void ProcessPayments(IObjectEncryptionHost encryptionHost, Regex numberCheck, IEnumerable<PaymentMethodExport> items,
+            ExportInfoContext context)
+        {
+            try
+            {
+                foreach (var paymentMethod in items)
                 {
-                    Console.WriteLine($"Moving page: {seed}--{seed + size}");
-                    any = false;
-                    Parallel.ForEach(context.Set<CustomerPaymentMethodExport>().Skip(seed).Take(size), paymentMethod =>
+                    var ccNumber = Encoding.Unicode.GetString(paymentMethod.CreditCardNumber);
+                    if (numberCheck.IsMatch(ccNumber))
                     {
-                        Interlocked.Increment(ref seed);
-                        any = true;
-                        if (numberCheck.IsMatch(Encoding.Unicode.GetString(paymentMethod.CreditCardNumber)))
-                        {
-                            paymentMethod.CreditCardNumber = encryptionHost.LocalEncrypt(paymentMethod.CreditCardNumber);
-                        }
-                        else
+                        paymentMethod.CreditCardNumber = encryptionHost.LocalEncrypt(ccNumber);
+                    }
+                    else
+                    {
+                        // ReSharper disable once AccessToDisposedClosure
+                        lock (context)
                         {
                             // ReSharper disable once AccessToDisposedClosure
-                            lock (context)
-                            {
-                                // ReSharper disable once AccessToDisposedClosure
-                                context.SetState(paymentMethod, EntityState.Deleted);
-                            }
+                            context.SetState(paymentMethod, EntityState.Deleted);
                         }
-                    });
-
-                    context.SaveChanges();
+                    }
                 }
+
+                context.SaveChanges();
+            }
+            finally
+            {
+                context.Dispose();
             }
         }
     }
