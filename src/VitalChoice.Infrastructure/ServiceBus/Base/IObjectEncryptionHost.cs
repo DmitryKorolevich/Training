@@ -44,6 +44,5 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         void UnlockSession(Guid session);
 
         event SessionExpiredEventHandler OnSessionExpired;
-        void Dispose();
     }
 }
