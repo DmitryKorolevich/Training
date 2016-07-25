@@ -10,15 +10,7 @@ Post-Deployment Script Template
 --------------------------------------------------------------------------------------
 */
 
-:r .\Scripts\ProductOptionTypes.sql
-:r .\Scripts\DiscountOptionTypes.sql
-:r .\Scripts\CustomerAreaBasicsData.sql
-:r .\Scripts\OrderLookups.sql
 :r .\Scripts\VProductSkus.sql
-:r .\Scripts\OrdersData.sql
-:r .\Scripts\AffiliatesData.sql
-:r .\Scripts\PromotionData.sql
-:r .\Scripts\CustomerAddressStructureModeData.sql
 :r .\Scripts\VCustomers.sql
 :r .\Scripts\VOrders.sql
 :r .\Scripts\VHelpTickets.sql
@@ -33,15 +25,12 @@ Post-Deployment Script Template
 :r .\Scripts\SPGetOrdersRegionStatistic.sql
 :r .\Scripts\SPGetOrdersZipStatistic.sql
 :r .\Scripts\VCustomerFavorites.sql
-:r .\Scripts\InventorySkuData.sql
 :r .\Scripts\VTopProducts.sql
-:r .\Scripts\AutoShip.sql
 :r .\Scripts\VAutoShips.sql
 :r .\Scripts\TFGetTableIdsByString.sql
 :r .\Scripts\SPGetInventorySkusUsageReport.sql
 :r .\Scripts\SPGetInventoriesSummaryUsageReport.sql
 :r .\Scripts\SPsForWholesaleDropShipReport.sql
-:r .\Scripts\NewslettersData.sql
 :r .\Scripts\SPGetTransactionAndRefundReport.sql
 :r .\Scripts\VOrderCountOnCustomers.sql
 :r .\Scripts\VFirstOrderOnCustomers.sql
@@ -52,10 +41,7 @@ Post-Deployment Script Template
 :r .\Scripts\SPGetSkuBreakDownReport.sql
 :r .\Scripts\SPGetSkuPOrderTypeBreakDownReport.sql
 :r .\Scripts\SPGetSkuPOrderTypeFutureBreakDownReport.sql
-:r .\Scripts\AddressOptionsUpdate.sql
-
-:r .\Scripts\Skus.sql
 :r .\Scripts\SPGetMailingListReport.sql
 :r .\Scripts\SPsForShippedViaReport.sql
-:r .\Scripts\SettingsData.sql
-:r .\Scripts\CountriesData.sql
+:r .\Scripts\VAffiliates.sql
+:r .\Scripts\VProductsWithReviews.sql
