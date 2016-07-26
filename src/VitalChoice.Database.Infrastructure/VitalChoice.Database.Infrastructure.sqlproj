@@ -70,29 +70,14 @@
     <Folder Include="PreDeployment\Scripts" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\LocalizationItems.sql" />
-    <None Include="PostDeployment\Scripts\ContentTestDataInsert.sql" />
-    <None Include="PostDeployment\Scripts\ContentTestDataDelete.sql" />
-    <None Include="PostDeployment\Scripts\ContentItems.sql" />
-    <None Include="PostDeployment\Scripts\FAQs.sql" />
-    <None Include="PostDeployment\Scripts\Articles.sql" />
-    <None Include="PostDeployment\Scripts\ContentPages.sql" />
-    <None Include="PostDeployment\Scripts\StartInit.sql" />
-    <None Include="PostDeployment\Scripts\UpdateIdentity.sql" />
     <None Include="Azure.publish.xml" />
-    <None Include="PostDeployment\Scripts\ContentAreas.sql" />
-    <None Include="PreDeployment\Scripts\IdentityIndexes.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />
-    <None Include="PostDeployment\Scripts\RecordStatusCodes.sql" />
-    <None Include="PostDeployment\Scripts\ContentProcessors.sql" />
     <None Include="deploy\deploy.ps1" />
     <None Include="VitalChoice.Database.Infrastructure.publish.xml">
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
     </None>
-    <None Include="PostDeployment\Scripts\ContentTypes.sql" />
-    <None Include="PostDeployment\Scripts\SetupIdentity.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="PostDeployment\Script.PostDeployment.sql" />
@@ -102,24 +87,6 @@
     <RefactorLog Include="VitalChoice.Database.Infrastructure.refactorlog" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\ProductCategories.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\Countries.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\AppSettings.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\CURs.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\FilesPermissions.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\MarketingPermissions.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\VitalChoice.Database.Ecommerce\VitalChoice.Database.Ecommerce.sqlproj">
       <Name>VitalChoice.Database.Ecommerce</Name>
       <Project>{3b44a066-17a4-46d2-b7d1-7e67ba6aa8d0}</Project>
@@ -127,77 +94,5 @@
       <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
       <DatabaseVariableLiteralValue>VitalChoice.Ecommerce</DatabaseVariableLiteralValue>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\EcommerceMigration.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\RecipesToProducts.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\ArticlesToProducts.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\RecipeUpdate.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\BugTickets.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\CustomPublicStyles.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\ProductsOutOfStockData.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\MastersData.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\FedEx.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\UpdateIdentityWithStorefront.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\Products.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\ContentPagesData.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\ContentIndexes.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\Redirects.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\EmailTemplates.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\EmailTemplatesData.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\Tokens.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\ContentCrossSellsDefaultData.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\ContentCrossSells.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\CategoriesHistoryLogUpdate.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\AdminTeams.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\AdminTeams.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\ContentOldIds.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\ArticleBonusLinks.sql" />
   </ItemGroup>
 </Project>

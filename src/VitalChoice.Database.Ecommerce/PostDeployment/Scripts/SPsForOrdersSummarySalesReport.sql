@@ -30,14 +30,15 @@ BEGIN
 
 	SET NOCOUNT ON
 
-	DECLARE @orders AS TABLE
+	CREATE TABLE #orders
     (
-        Id INT NOT NULL, IdObjectType INT NOT NULL, IdCustomer INT NOT NULL, CustomerIdObjectType INT NOT NULL, 
+        Id INT NOT NULL PRIMARY KEY,
+		IdObjectType INT NOT NULL, IdCustomer INT NOT NULL, CustomerIdObjectType INT NOT NULL, 
 		IdDiscount INT NULL, CustomerDateCreated DATETIME2 NOT NULL, IdProfileAddress INT NOT NULL, OrderStatus INT NULL,
 		POrderStatus INT NULL, NPOrderStatus INT NULL, DateCreated DATETIME2 NOT NULL, ProductsSubtotal MONEY NOT NULL, Total MONEY NOT NULL
     );
 
-	INSERT INTO @orders
+	INSERT INTO #orders
 	(Id, IdObjectType, IdCustomer, CustomerIdObjectType,
 	IdDiscount, CustomerDateCreated, IdProfileAddress, OrderStatus,
 	POrderStatus, NPOrderStatus, DateCreated, ProductsSubtotal, Total)
@@ -52,7 +53,19 @@ BEGIN
 		(o.OrderStatus IS NULL AND o.POrderStatus !=1 AND o.POrderStatus !=4 AND o.POrderStatus !=6 AND 
 		o.NPOrderStatus !=1 AND o.NPOrderStatus !=4 AND o.NPOrderStatus !=6)) AND
 		(@idcustomer IS NULL OR o.IdCustomer = @idcustomer) AND	
-		(@idcustomertype IS NULL OR c.IdObjectType = @idcustomertype)
+		(@idcustomertype IS NULL OR c.IdObjectType = @idcustomertype) AND
+		(@shipfrom IS NULL OR EXISTS
+		(SELECT
+			TOP 1 s.IdOrder
+		FROM OrderShippingPackages s
+		WHERE s.IdOrder=o.Id AND s.ShippedDate>=@shipfrom
+		)) AND
+		(@shipto IS NULL OR EXISTS
+		(SELECT
+			TOP 1 s.IdOrder
+		FROM OrderShippingPackages s
+		WHERE s.IdOrder=o.Id AND s.ShippedDate<=@shipto
+		))
 
 		;WITH tempOrders(
 			Id, IdObjectType, IdCustomer, CustomerIdObjectType, IdDiscount, CustomerDateCreated,
@@ -69,7 +82,7 @@ BEGIN
 				d.Code as DiscountCode, aop.IdAffiliate, kcval.Value as KeyCode, CAST(sval.Value as int) as Source,
 				sdval.Value as SourceDetails, occ.Count as OrdersCount, ISNULL(foc.DateCreated, temp.CustomerDateCreated) as FirstOrderDate
 				FROM
-				@orders as temp	
+				#orders as temp	
 			LEFT JOIN OrderOptionTypes AS kcopt WITH(NOLOCK) ON kcopt.Name = N'KeyCode' AND kcopt.IdObjectType = temp.IdObjectType
 			LEFT JOIN OrderOptionValues AS kcval WITH(NOLOCK) ON kcval.IdOrder = temp.Id AND kcval.IdOptionType = kcopt.Id
 			LEFT JOIN CustomerOptionTypes AS sopt WITH(NOLOCK) ON sopt.Name = N'Source'
@@ -80,12 +93,12 @@ BEGIN
 			LEFT JOIN VFirstOrderOnCustomers As foc WITH(NOLOCK) ON foc.IdCustomer = temp.IdCustomer
 			LEFT JOIN Discounts As d WITH(NOLOCK) ON d.Id = temp.IdDiscount
 			LEFT JOIN AffiliateOrderPayments As aop WITH(NOLOCK) ON aop.Id = temp.Id
-			LEFT JOIN AddressOptionTypes AS cadfopt WITH(NOLOCK) ON cadfopt.Name = N'FirstName'
-			LEFT JOIN AddressOptionValues AS cadfval WITH(NOLOCK) ON cadfval.IdAddress = temp.IdProfileAddress AND cadfval.IdOptionType = cadfopt.Id
-			LEFT JOIN AddressOptionTypes AS cadlopt WITH(NOLOCK) ON cadlopt.Name = N'LastName'
-			LEFT JOIN AddressOptionValues AS cadlval WITH(NOLOCK) ON cadlval.IdAddress = temp.IdProfileAddress AND cadlval.IdOptionType = cadlopt.Id
-			LEFT JOIN AddressOptionTypes AS cadcopt WITH(NOLOCK) ON cadcopt.Name = N'Company'
-			LEFT JOIN AddressOptionValues AS cadcval WITH(NOLOCK) ON cadcval.IdAddress = temp.IdProfileAddress AND cadcval.IdOptionType = cadcopt.Id
+			INNER JOIN AddressOptionTypes AS cadfopt WITH(NOLOCK) ON cadfopt.Name = N'FirstName'
+			INNER JOIN AddressOptionValues AS cadfval WITH(NOLOCK) ON cadfval.IdAddress = temp.IdProfileAddress AND cadfval.IdOptionType = cadfopt.Id
+			INNER JOIN AddressOptionTypes AS cadlopt WITH(NOLOCK) ON cadlopt.Name = N'LastName'
+			INNER JOIN AddressOptionValues AS cadlval WITH(NOLOCK) ON cadlval.IdAddress = temp.IdProfileAddress AND cadlval.IdOptionType = cadlopt.Id
+			INNER JOIN AddressOptionTypes AS cadcopt WITH(NOLOCK) ON cadcopt.Name = N'Company'
+			INNER JOIN AddressOptionValues AS cadcval WITH(NOLOCK) ON cadcval.IdAddress = temp.IdProfileAddress AND cadcval.IdOptionType = cadcopt.Id
 			WHERE 
 				(@keycode IS NULL OR kcval.Value = @keycode) AND 
 				(@idcustomersource IS NULL OR sval.Value = @idcustomersource) AND
@@ -161,7 +174,20 @@ BEGIN
 					(o.OrderStatus IS NULL AND o.POrderStatus !=1 AND o.POrderStatus !=4 AND o.POrderStatus !=6 AND 
 					o.NPOrderStatus !=1 AND o.NPOrderStatus !=4 AND o.NPOrderStatus !=6)) AND
 					(@idcustomer IS NULL OR o.IdCustomer = @idcustomer) AND	
-					(@idcustomertype IS NULL OR c.IdObjectType = @idcustomertype)) temp	
+					(@idcustomertype IS NULL OR c.IdObjectType = @idcustomertype) AND
+					(@shipfrom IS NULL OR EXISTS
+					(SELECT
+						TOP 1 s.IdOrder
+					FROM OrderShippingPackages s
+					WHERE s.IdOrder=o.Id AND s.ShippedDate>=@shipfrom
+					 )) AND
+					(@shipto IS NULL OR EXISTS
+					(SELECT
+						TOP 1 s.IdOrder
+					FROM OrderShippingPackages s
+					WHERE s.IdOrder=o.Id AND s.ShippedDate<=@shipto
+					 ))
+				) temp	
 			LEFT JOIN OrderOptionTypes AS kcopt WITH(NOLOCK) ON kcopt.Name = N'KeyCode' AND kcopt.IdObjectType = temp.IdObjectType
 			LEFT JOIN OrderOptionValues AS kcval WITH(NOLOCK) ON kcval.IdOrder = temp.Id AND kcval.IdOptionType = kcopt.Id
 			JOIN OrderOptionTypes AS otopt WITH(NOLOCK) ON otopt.Name = N'OrderType'

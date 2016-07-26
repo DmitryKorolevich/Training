@@ -78,124 +78,20 @@
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
     </None>
     <None Include="Azure.publish.xml" />
-    <None Include="PostDeployment\Scripts\DiscountOptionTypes.sql" />
-    <None Include="PreDeployment\Scripts\Orders.sql" />
-    <None Include="PostDeployment\Scripts\OrdersData.sql" />
-    <None Include="PreDeployment\Scripts\CustomerAddressStructureUpdate.sql" />
-    <None Include="PostDeployment\Scripts\CustomerAddressStructureModeData.sql" />
-    <None Include="PreDeployment\Scripts\AllValueTablesStructureOptimize.sql" />
-    <None Include="PreDeployment\Scripts\Checkout.sql" />
-    <None Include="PreDeployment\Scripts\PromoUpdate.sql" />
     <None Include="PostDeployment\Scripts\VTopProducts.sql" />
-    <None Include="PreDeployment\Scripts\DiscountsUsed.sql" />
     <None Include="VitalChoice_1.Database.Ecommerce.publish.xml" />
-    <None Include="PreDeployment\Scripts\Skus.sql" />
-    <None Include="PostDeployment\Scripts\Skus.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="VitalChoice.Database.Ecommerce.refactorlog" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\ProductOptionTypes.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\CustomerAreaBasicsData.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <PreDeploy Include="PreDeployment\Script.PreDeployment.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\CustomerAreaBasics.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\Discounts.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\Products.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\BigStringValues.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\Countries.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\FieldTypes.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\GiftCertificates.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\GiftCetfificatesUpdate.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\Lookups.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\LookupVariants.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\ProductCategories.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\ProductsToCategories.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\ReferencesToUsers.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\Workflow.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\RecordStatusCodes.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\ProductTypes.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\InventoryCategories.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\ProductReviews.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\VProductsWithReviews.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\OrderLookups.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VProductSkus.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PreDeployment\Scripts\AppOptions.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\VAffiliates.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\AffiliatesData.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\HelpTickets.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="PostDeployment\Scripts\VHelpTickets.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\Promotions.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\PromotionData.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\ProductsOutOfStock.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\ObjectHistoryLogItems.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\DiscountUpdates.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VCustomers.sql" />
@@ -213,16 +109,7 @@
     <None Include="PostDeployment\Scripts\VSkus.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PreDeployment\Scripts\Affiliates.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="PostDeployment\Scripts\VAffiliateNotPaidCommissions.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\Healthwise.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\CatalogRequests.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VHealthwisePeriods.sql" />
@@ -246,18 +133,6 @@
     <None Include="PostDeployment\Scripts\VCustomerFavorites.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PreDeployment\Scripts\InventorySkus.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\InventorySkuData.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\GiftCetfificatesUpdateSku.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\AutoShip.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="PostDeployment\Scripts\VAutoShips.sql" />
   </ItemGroup>
   <ItemGroup>
@@ -271,12 +146,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPsForWholesaleDropShipReport.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PreDeployment\Scripts\Newsletters.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\NewslettersData.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPGetTransactionAndRefundReport.sql" />
@@ -309,24 +178,15 @@
     <None Include="PostDeployment\Scripts\SPGetSkuPOrderTypeFutureBreakDownReport.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PreDeployment\Scripts\VeraCore.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\AddressOptionsUpdate.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="PostDeployment\Scripts\SPGetMailingListReport.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPsForShippedViaReport.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PreDeployment\Scripts\Settings.sql" />
+    <None Include="PostDeployment\Scripts\VAffiliates.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PostDeployment\Scripts\SettingsData.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\CountriesData.sql" />
+    <None Include="PostDeployment\Scripts\VProductsWithReviews.sql" />
   </ItemGroup>
 </Project>
