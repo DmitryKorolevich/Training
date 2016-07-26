@@ -121,7 +121,10 @@ SELECT
 	p.Id,
 	CASE o.orderStatus
 		WHEN 100 THEN 3
-		ELSE 2
+		ELSE CASE aso.active 
+			WHEN 0 THEN 1 
+			ELSE 2
+		END
 	END,
 	CASE o.orderStatus
 		WHEN 5 THEN 4
