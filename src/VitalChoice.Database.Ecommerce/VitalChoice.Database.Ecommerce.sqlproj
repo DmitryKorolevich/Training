@@ -189,4 +189,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VProductsWithReviews.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPsForProductQualityReport.sql" />
+  </ItemGroup>
 </Project>

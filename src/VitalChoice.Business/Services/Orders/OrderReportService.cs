@@ -990,6 +990,9 @@ namespace VitalChoice.Business.Services.Orders
             var orders = await _orderRepository.Query(conditions).Include(x => x.Skus).ThenInclude(x => x.Sku).ThenInclude(x => x.Product).
                     Include(x => x.PromoSkus).ThenInclude(x => x.Sku).ThenInclude(x => x.Product).SelectAsync(false);
 
+            Dictionary<int,OrderSkuCountReportSkuItem> map =new Dictionary<int, OrderSkuCountReportSkuItem>();
+            OrderSkuCountReportSkuItem skuModel;
+            OrderSkuCountReportOrderItem orderModel;
 
             foreach (var order in orders)
             {
@@ -1087,21 +1090,23 @@ namespace VitalChoice.Business.Services.Orders
                 }));
                 foreach (var skuOrdered in skus)
                 {
-                    var skuModel = toReturn.Skus.FirstOrDefault(p => p.IdSku == skuOrdered.Sku.Id);
+                    map.TryGetValue(skuOrdered.Sku.Id, out skuModel);
                     if (skuModel == null)
                     {
                         skuModel = new OrderSkuCountReportSkuItem();
                         skuModel.IdSku = skuOrdered.Sku.Id;
                         skuModel.Code = skuOrdered.Sku.Code;
                         toReturn.Skus.Add(skuModel);
+                        map.Add(skuModel.IdSku, skuModel);
                     }
 
-                    var orderModel = skuModel.Orders.FirstOrDefault(p => p.IdOrder == order.Id);
+                    skuModel.Map.TryGetValue(order.Id, out orderModel);
                     if (orderModel == null)
                     {
                         orderModel = new OrderSkuCountReportOrderItem();
                         orderModel.IdOrder = order.Id;
                         skuModel.Orders.Add(orderModel);
+                        skuModel.Map.Add(orderModel.IdOrder, orderModel);
 
                         var count = perishableCount + nonPerishableCount;
                         orderModel.SkuCount = count;

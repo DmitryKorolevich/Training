@@ -21,8 +21,14 @@ BEGIN
 	INNER JOIN ProductsToCategories ptc WITH(NOLOCK) ON s.IdProduct=ptc.IdProduct aND ptc.IdCategory=@idcategory
 	INNER JOIN ProductCategories pc WITH(NOLOCK) ON ptc.IdCategory=pc.Id
 	LEFT JOIN ProductCategories rpc WITH(NOLOCK) ON pc.ParentId=rpc.Id
-	WHERE o.StatusCode!=3 AND o.OrderStatus IN (2,3,5) AND o.IdObjectType NOT IN (5,6)  AND 
-	o.DateCreated>=@from AND o.DateCreated<@to
+	WHERE 
+		o.StatusCode!=3 AND 
+		(
+			(o.OrderStatus IS NOT NULL AND o.OrderStatus IN (2,3,5)) OR
+			(o.OrderStatus IS NULL AND (o.POrderStatus IN (2,3,5) OR o.NPOrderStatus IN (2,3,5)))
+		) AND
+		o.IdObjectType NOT IN (2, 5,6)  AND 
+		o.DateCreated>=@from AND o.DateCreated<@to
 	GROUP BY s.Code
 
 END

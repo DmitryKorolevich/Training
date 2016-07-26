@@ -80,7 +80,7 @@ angular.module('app.modules.affiliate.controllers.affiliatePayCommissionsControl
 	$scope.pay = function()
 	{
 	    confirmUtil.confirm(function () {
-	        affiliateService.payForAffiliateOrders($scope.options.Id, $scope.deleteTracker)
+	        affiliateService.payForAffiliateOrders($scope.options.Id, $scope.refreshTracker)
                 .success(function (result) {
                     if (result.Success) {
                         successHandler(result);

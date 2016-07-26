@@ -208,10 +208,12 @@ namespace VitalChoice.Business.Repositories
             var toReturn = await _context.Set<OrdersSummarySalesOrderTypeStatisticItem>().FromSql
                 ("[dbo].[SPGetOrderStatisticByTypeForOrdersSummarySalesReport] @from={0}, @to={1}," +
                 " @idcustomersource={2}, @customersourcedetails={3}, @fromcount={4}, @tocount={5}, @keycode={6}," +
-                " @idcustomer={7}, @firstorderfrom={8}, @firstorderto={9}, @idcustomertype={10}, @discountcode={11}, @isaffiliate={12}",
+                " @idcustomer={7}, @firstorderfrom={8}, @firstorderto={9}, @idcustomertype={10}, @discountcode={11}, @isaffiliate={12}," +
+                " @shipfrom={13}, @shipto={14}",
                 filter.From, filter.To,
                 filter.IdCustomerSource, filter.CustomerSourceDetails, filter.FromCount, filter.ToCount, filter.KeyCode,
-                filter.IdCustomer, filter.FirstOrderFrom, filter.FirstOrderTo, filter.IdCustomerType, filter.DiscountCode, filter.IsAffiliate).ToListAsync();
+                filter.IdCustomer, filter.FirstOrderFrom, filter.FirstOrderTo, filter.IdCustomerType, filter.DiscountCode, filter.IsAffiliate,
+                filter.ShipFrom, filter.ShipTo).ToListAsync();
             return toReturn;
         }
 
@@ -228,10 +230,12 @@ namespace VitalChoice.Business.Repositories
                 ("[dbo].[SPGetOrdersForOrdersSummarySalesReport] @from={0}, @to={1}," +
                 " @idcustomersource={2}, @customersourcedetails={3}, @fromcount={4}, @tocount={5}, @keycode={6}," +
                 " @idcustomer={7}, @firstorderfrom={8}, @firstorderto={9}, @idcustomertype={10}, @discountcode={11}, @isaffiliate={12}," +
-                " @pageindex={13}, @pagesize={14}",
+                " @shipfrom={13}, @shipto={14}," +
+                " @pageindex={15}, @pagesize={16}",
                 filter.From, filter.To,
                 filter.IdCustomerSource, filter.CustomerSourceDetails, filter.FromCount, filter.ToCount, filter.KeyCode,
                 filter.IdCustomer, filter.FirstOrderFrom, filter.FirstOrderTo, filter.IdCustomerType, filter.DiscountCode, filter.IsAffiliate,
+                filter.ShipFrom, filter.ShipTo,
                 filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
             return toReturn;
         }
