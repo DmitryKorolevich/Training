@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Google.Apis.Analytics.v3;
+using Google.Apis.Services;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Interfaces.Services;

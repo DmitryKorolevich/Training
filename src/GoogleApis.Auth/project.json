@@ -1,0 +1,16 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "GoogleApis.Auth",
+  "authors": [],
+  "dependencies": {
+    "GoogleApis.Core": "1.0.0-*",
+    "BouncyCastle": "1.8.1"
+  },
+  "frameworks": {
+    "net451": {
+      "frameworkAssemblies": {
+        "System.Xml": ""
+      }
+    }
+  }
+}
