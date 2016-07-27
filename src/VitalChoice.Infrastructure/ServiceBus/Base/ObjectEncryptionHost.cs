@@ -556,6 +556,10 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 _logger.LogWarning("Incoming signature is invalid");
                 return false;
             }
+            if (commandData.Sign == null && (commandData.Data?.Length ?? 0) == 0)
+            {
+                return true;
+            }
 #if !NETSTANDARD1_5
             var rsa = new RSACryptoServiceProvider();
             rsa.ImportParameters(((RSACryptoServiceProvider)commandData.Certificate.PublicKey.Key).ExportParameters(false));
