@@ -189,7 +189,7 @@ BEGIN
  )  
 
 		SELECT 
-			CONVERT(int, otval.Value) as Id, COUNT(*), SUM(o.Total)
+			CONVERT(int, otval.Value) as Id, COUNT(*) [Count], SUM(o.Total)
 		FROM Orders o WITH(NOLOCK)
 			INNER JOIN Customers c WITH(NOLOCK) ON o.IdCustomer=c.Id  
 			LEFT JOIN OrderOptionValues AS kcval WITH(NOLOCK) ON kcval.IdOrder = o.Id AND kcval.IdOptionType IN (SELECT Id FROM @KeyCodeIds)
@@ -212,7 +212,7 @@ BEGIN
 				OR 
 				(
 					o.POrderStatus IN(2,3,5,7) 
-					AND 
+					OR 
 					o.NPOrderStatus IN(2,3,5,7)
 				)
 			) 
