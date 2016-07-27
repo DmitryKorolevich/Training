@@ -270,6 +270,18 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
             modalUtil.open('app/modules/affiliate/partials/affiliateSendEmail.html', 'affiliateSendEmailController', data);
         };
 
+        $scope.emailDrSears = function ()
+        {
+            var data =
+                {
+                    Type: 4,//emailDrSears
+                    ToId: $scope.affiliate.Id,
+                    ToName: $scope.affiliate.Name,
+                    ToEmail: $scope.affiliate.Email,
+                };
+            modalUtil.open('app/modules/affiliate/partials/affiliateSendEmail.html', 'affiliateSendEmailController', data);
+        };        
+
         $scope.toggleSuspended = function ()
         {
             $scope.affiliate.StatusCode = $scope.affiliate.StatusCode == 4 ? ($scope.affiliate.IsConfirmed ? 2 : 1) : 4;

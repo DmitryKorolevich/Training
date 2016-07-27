@@ -217,6 +217,20 @@ namespace VC.Admin.Controllers
 
                 toReturn.Message = template;
             }
+            if (id == 4)//emailDrSears
+            {
+                if (_appSettings.AffiliateEmailTemplate == null)
+                {
+                    throw new NotSupportedException($"{SettingConstants.AFFILIATE_EMAIL_TEMPLATE_DR_SEARS} not configurated.");
+                }
+                string template = _appSettings.AffiliateEmailTemplateDrSears;
+                template = template.Replace(SettingConstants.AFFILIATE_EMAIL_TEMPLATE_NAME_HOLDER, "{1}")
+                    .Replace(SettingConstants.AFFILIATE_EMAIL_TEMPLATE_ID_HOLDER, "{0}")
+                    .Replace(SettingConstants.AFFILIATE_EMAIL_TEMPLATE_EMAIL_HOLDER, "{2}")
+                    .Replace(SettingConstants.TEMPLATE_PUBLIC_URL_HOLDER, $"https://{_appOptions.Value.PublicHost}/");
+
+                toReturn.Message = template;
+            }
 
             return toReturn;
         }

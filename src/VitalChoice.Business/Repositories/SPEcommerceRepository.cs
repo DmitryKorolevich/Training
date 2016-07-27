@@ -208,10 +208,12 @@ namespace VitalChoice.Business.Repositories
             var toReturn = await _context.Set<OrdersSummarySalesOrderTypeStatisticItem>().FromSql
                 ("[dbo].[SPGetOrderStatisticByTypeForOrdersSummarySalesReport] @from={0}, @to={1}," +
                 " @idcustomersource={2}, @customersourcedetails={3}, @fromcount={4}, @tocount={5}, @keycode={6}," +
-                " @idcustomer={7}, @firstorderfrom={8}, @firstorderto={9}, @idcustomertype={10}, @discountcode={11}, @isaffiliate={12}",
+                " @idcustomer={7}, @firstorderfrom={8}, @firstorderto={9}, @idcustomertype={10}, @discountcode={11}, @isaffiliate={12}," +
+                " @shipfrom={13}, @shipto={14}",
                 filter.From, filter.To,
                 filter.IdCustomerSource, filter.CustomerSourceDetails, filter.FromCount, filter.ToCount, filter.KeyCode,
-                filter.IdCustomer, filter.FirstOrderFrom, filter.FirstOrderTo, filter.IdCustomerType, filter.DiscountCode, filter.IsAffiliate).ToListAsync();
+                filter.IdCustomer, filter.FirstOrderFrom, filter.FirstOrderTo, filter.IdCustomerType, filter.DiscountCode, filter.IsAffiliate,
+                filter.ShipFrom, filter.ShipTo).ToListAsync();
             return toReturn;
         }
 
@@ -228,10 +230,12 @@ namespace VitalChoice.Business.Repositories
                 ("[dbo].[SPGetOrdersForOrdersSummarySalesReport] @from={0}, @to={1}," +
                 " @idcustomersource={2}, @customersourcedetails={3}, @fromcount={4}, @tocount={5}, @keycode={6}," +
                 " @idcustomer={7}, @firstorderfrom={8}, @firstorderto={9}, @idcustomertype={10}, @discountcode={11}, @isaffiliate={12}," +
-                " @pageindex={13}, @pagesize={14}",
+                " @shipfrom={13}, @shipto={14}," +
+                " @pageindex={15}, @pagesize={16}",
                 filter.From, filter.To,
                 filter.IdCustomerSource, filter.CustomerSourceDetails, filter.FromCount, filter.ToCount, filter.KeyCode,
                 filter.IdCustomer, filter.FirstOrderFrom, filter.FirstOrderTo, filter.IdCustomerType, filter.DiscountCode, filter.IsAffiliate,
+                filter.ShipFrom, filter.ShipTo,
                 filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
             return toReturn;
         }
@@ -344,6 +348,26 @@ namespace VitalChoice.Business.Repositories
                 filter.From, filter.To,
                 filter.IdState, filter.IdServiceCode, filter.IdWarehouse, filter.Carrier, filter.IdShipService,
                 filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
+            return toReturn;
+        }
+
+        public async Task<ICollection<ProductQualitySalesReportItem>> GetProductQualitySalesReportRawItemsAsync(ProductQualitySalesReportFilter filter)
+        {
+            var toReturn = await _context.Set<ProductQualitySalesReportItem>().FromSql
+                ("[dbo].[SPGetProductQualitySaleIssuesReport] @from={0}, @to={1}",
+                filter.From, filter.To).ToListAsync();
+            toReturn.ForEach(p =>
+            {
+                p.SalesPerIssue = Math.Round((decimal)p.Sales/p.Issues, 2);
+            });
+            return toReturn;
+        }
+
+        public async Task<ICollection<ProductQualitySkusReportItem>> GetProductQualitySkusReportRawItemsAsync(ProductQualitySkusReportFilter filter)
+        {
+            var toReturn = await _context.Set<ProductQualitySkusReportItem>().FromSql
+                ("[dbo].[SPGetProductQualitySkuIssuesReport] @from={0}, @to={1}, @idsku={2}",
+                filter.From, filter.To, filter.IdSku).ToListAsync();
             return toReturn;
         }
     }

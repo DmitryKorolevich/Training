@@ -46,5 +46,9 @@ namespace VitalChoice.Interfaces.Services.Orders
 	    Task<ShippedViaSummaryReport> GetShippedViaSummaryReportAsync(ShippedViaReportFilter filter);
 
         Task<PagedList<ShippedViaReportRawOrderItem>> GetShippedViaItemsReportOrderItemsAsync(ShippedViaReportFilter filter);
+
+	    Task<ICollection<ProductQualitySalesReportItem>> GetProductQualitySalesReportItemsAsync(ProductQualitySalesReportFilter filter);
+
+	    Task<ICollection<ProductQualitySkusReportItem>> GetProductQualitySkusReportItemsAsync(ProductQualitySkusReportFilter filter);
 	}
 }

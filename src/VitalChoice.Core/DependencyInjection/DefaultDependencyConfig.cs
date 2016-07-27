@@ -588,6 +588,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<VeraCoreFilesCacheService>().As<IVeraCoreFilesCacheService>().InstancePerLifetimeScope();
             builder.RegisterType<VeraCoreNotificationService>().As<IVeraCoreNotificationService>().InstancePerLifetimeScope();
             builder.RegisterType<AgentService>().As<IAgentService>().InstancePerLifetimeScope();
+            builder.RegisterType<GoogleService>().As<IGoogleService>().InstancePerLifetimeScope();
 
             builder.RegisterMappers(typeof(ProductService).GetTypeInfo().Assembly, (type, registration) =>
             {

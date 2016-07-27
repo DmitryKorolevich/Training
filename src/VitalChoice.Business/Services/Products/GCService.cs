@@ -116,29 +116,16 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<GCStatisticModel> GetGiftCertificatesWithOrderInfoAsync(GCFilter filter)
         {
+            GcQuery conditions = new GcQuery().NotDeleted().WithFrom(filter.From).WithTo(filter.To).WithType(filter.Type).
+                WidthStatus(filter.StatusCode);
+
             //Get all GCs from cache
-            var data = await giftCertificateRepository.Query(p=>p.StatusCode!=RecordStatusCode.Deleted).
+            var data = await giftCertificateRepository.Query(conditions).
+                Include(p => p.Order).ThenInclude(p => p.PaymentMethod).ThenInclude(p => p.BillingAddress).ThenInclude(p => p.OptionValues).
                 Include(p=>p.Order).ThenInclude(p=>p.ShippingAddress).ThenInclude(p=>p.OptionValues).
-                Include(p=>p.Order).ThenInclude(p=>p.PaymentMethod).ThenInclude(p=>p.BillingAddress).ThenInclude(p=>p.OptionValues).
                 SelectAsync(false);
 
             var query = data.Select(p => new GCWithOrderListItemModel(p, orderAddressMapper.OptionTypes));
-            if(filter.From.HasValue)
-            {
-                query = query.Where(p => p.Created >= filter.From.Value);
-            }
-            if (filter.To.HasValue)
-            {
-                query = query.Where(p => p.Created <= filter.To.Value);
-            }
-            if (filter.Type.HasValue)
-            {
-                query = query.Where(p => p.GCType==filter.Type.Value);
-            }
-            if (filter.StatusCode.HasValue)
-            {
-                query = query.Where(p => p.StatusCode == filter.StatusCode.Value);
-            }
             if (filter.ShippingAddress!=null && !String.IsNullOrEmpty(filter.ShippingAddress.LastName))
             {
                 query = query.Where(p => !String.IsNullOrEmpty(p.ShippingLastName) && p.ShippingLastName.IndexOf(filter.ShippingAddress.LastName, StringComparison.OrdinalIgnoreCase)>=0);

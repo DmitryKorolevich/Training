@@ -56,6 +56,8 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using FluentValidation.Validators;
 using System.Text.RegularExpressions;
+using Google.Apis.Analytics.v3;
+using Google.Apis.Services;
 using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.CodeAnalysis.CSharp;
 using Renci.SshNet;
@@ -74,6 +76,8 @@ using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Extensions;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using AddressType = VitalChoice.Ecommerce.Domain.Entities.Addresses.AddressType;
+using System.Security.Cryptography.X509Certificates;
+using Google.Apis.Auth.OAuth2;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -109,6 +113,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly ReferenceData _referenceData;
         private readonly OrderRepository _orderRepository;
         private readonly AppSettings _appSettings;
+        private readonly IGoogleService _googleService;
 
         public OrderService(
             IEcommerceRepositoryAsync<VOrderWithRegionInfoItem> vOrderWithRegionInfoItemRepository,
@@ -138,7 +143,8 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository, IDiscountService discountService,
             IEcommerceRepositoryAsync<VAutoShip> vAutoShipRepository, IEcommerceRepositoryAsync<VAutoShipOrder> vAutoShipOrderRepository,
             AffiliateOrderPaymentRepository affiliateOrderPaymentRepository, ICountryNameCodeResolver codeResolver,
-            IDynamicEntityOrderingExtension<Order> orderingExtension, ReferenceData referenceData, AppSettings appSettings)
+            IDynamicEntityOrderingExtension<Order> orderingExtension, ReferenceData referenceData, AppSettings appSettings,
+            IGoogleService googleService)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension
@@ -170,6 +176,7 @@ namespace VitalChoice.Business.Services.Orders
             _addressMapper = addressMapper;
             _productService = productService;
             _notificationService = notificationService;
+            _googleService = googleService;
         }
 
         private async Task<Order> InsertAsyncInternal(OrderDynamic model, IUnitOfWorkAsync uow)
@@ -940,7 +947,7 @@ namespace VitalChoice.Business.Services.Orders
             var toProcess = new List<int>();
             foreach (var frequency in frequencyAvailable)
             {
-                var tempDate = currentDate.AddDays(-frequency); //AddMonths(-frequency);
+                var tempDate = currentDate.AddMonths(-frequency);
 
                 var vAutoShips =
                     await
@@ -1531,6 +1538,8 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<PagedList<OrderInfoItem>> GetOrdersAsync(VOrderFilter filter)
         {
+            //_googleService.Test();
+
             var conditions = new OrderQuery();
             conditions = conditions.WithCustomerId(filter.IdCustomer).NotDeleted();
 

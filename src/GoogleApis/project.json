@@ -1,0 +1,16 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "GoogleApis",
+  "authors": [],
+  "dependencies": {
+    "GoogleApis.Core": "1.0.0-*",
+    "System.IO.Compression": "4.0.0"
+  },
+  "frameworks": {
+    "net451": {
+      "frameworkAssemblies": {
+        "System.Xml": ""
+      }
+    }
+  }
+}

@@ -45,3 +45,6 @@ Post-Deployment Script Template
 :r .\Scripts\SPsForShippedViaReport.sql
 :r .\Scripts\VAffiliates.sql
 :r .\Scripts\VProductsWithReviews.sql
+:r .\Scripts\SPsForProductQualityReport.sql
+:r .\Scripts\OrderIndexes.sql
+:r .\Scripts\SettingOptionTypesData.sql

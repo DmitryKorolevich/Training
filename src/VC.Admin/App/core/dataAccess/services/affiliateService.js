@@ -73,7 +73,7 @@ angular.module('app.core.dataAccess.services.affiliateService', [])
 	    },
 	    payForAffiliateOrders: function (id, tracker)
 	    {
-	        return $http.post(baseUrl + 'PayForAffiliateOrders/' + id, getConfig(tracker));
+	        return $http.post(baseUrl + 'PayForAffiliateOrders/' + id, null, getConfig(tracker));
 	    },
 	    getUnpaidOrdersForLastPeriod: function (id, tracker)
 	    {

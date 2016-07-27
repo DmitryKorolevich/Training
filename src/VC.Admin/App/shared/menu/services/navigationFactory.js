@@ -99,7 +99,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
                         { name: 'inventoriesSummaryUsageReport', stateName: 'index.oneCol.inventoriesSummaryUsageReport', stateLabel: 'Inventory Shipment Summary', access: 3 },
                         { name: 'vitalGreen', stateName: 'index.oneCol.vitalGreen', stateLabel: 'Review VitalGreen Statistics', access: 3 },
                         { name: 'index.oneCol.serviceCodesStatistic', stateName: 'index.oneCol.serviceCodesStatistic', stateLabel: 'Service Codes Report', access: 3 },
-                        //{ name: 'productQualityIssuesReport', stateName: 'index.oneCol.productQualityIssuesReport', stateLabel: 'Product Quality Issues Report', access: 3 },
+                        { name: 'productQualitySalesReport', stateName: 'index.oneCol.productQualitySalesReport', stateLabel: 'Product Quality Issues Report', access: 3 },
                         //{ name: 'kPIReport', stateName: 'index.oneCol.kPIReport', stateLabel: 'KPI Report (APIs)', access: 3 },
 				    ]
 				},

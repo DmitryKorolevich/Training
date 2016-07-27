@@ -37,12 +37,6 @@ namespace VC.Admin.Validators.Affiliate
                     .WithMessage(model => model.Subject, ValidationMessages.FieldRequired)
                     .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
                     .WithMessage(model => model.Subject, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
-
-                RuleFor(model => model.Message)
-                    .NotEmpty()
-                    .WithMessage(model => model.Message, ValidationMessages.FieldRequired)
-                    .Length(0, BaseAppConstants.DEFAULT_EMAIL_FIELD_MAX_SIZE)
-                    .WithMessage(model => model.Message, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_EMAIL_FIELD_MAX_SIZE);
             }
         }
     }

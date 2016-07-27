@@ -120,7 +120,7 @@ namespace VitalChoice.Business.Services.Orders
             if (filter.FrequencyType == FrequencyType.Weekly)
             {
                 //start of next week
-                current = current.AddDays(-(int) current.DayOfWeek);
+                current = current.AddDays(-(int)current.DayOfWeek);
                 current = current.AddDays(7);
             }
             if (filter.FrequencyType == FrequencyType.Daily)
@@ -181,11 +181,11 @@ namespace VitalChoice.Business.Services.Orders
                                     .FirstOrDefault(p => p.IdAdmin == orderForAgentReport.Order.IdAddedBy.Value);
                             if (agent != null)
                             {
-                                if (orderForAgentReport.Order.IdObjectType == (int) OrderType.Refund)
+                                if (orderForAgentReport.Order.IdObjectType == (int)OrderType.Refund)
                                 {
                                     agent.RefundsCount++;
                                 }
-                                else if (orderForAgentReport.Order.IdObjectType == (int) OrderType.Reship)
+                                else if (orderForAgentReport.Order.IdObjectType == (int)OrderType.Reship)
                                 {
                                     agent.ReshipsCount++;
                                 }
@@ -207,11 +207,11 @@ namespace VitalChoice.Business.Services.Orders
                         }
 
                         //phone orders for period
-                        if (orderForAgentReport.Order.IdObjectType == (int) OrderType.Refund)
+                        if (orderForAgentReport.Order.IdObjectType == (int)OrderType.Refund)
                         {
                             period.RefundsCount++;
                         }
-                        else if (orderForAgentReport.Order.IdObjectType == (int) OrderType.Reship)
+                        else if (orderForAgentReport.Order.IdObjectType == (int)OrderType.Reship)
                         {
                             period.ReshipsCount++;
                         }
@@ -232,11 +232,11 @@ namespace VitalChoice.Business.Services.Orders
                     }
 
                     //all orders
-                    if (orderForAgentReport.Order.IdObjectType == (int) OrderType.Refund)
+                    if (orderForAgentReport.Order.IdObjectType == (int)OrderType.Refund)
                     {
                         period.AllRefundsCount++;
                     }
-                    else if (orderForAgentReport.Order.IdObjectType == (int) OrderType.Reship)
+                    else if (orderForAgentReport.Order.IdObjectType == (int)OrderType.Reship)
                     {
                         period.AllReshipsCount++;
                     }
@@ -261,13 +261,13 @@ namespace VitalChoice.Business.Services.Orders
             foreach (var ordersAgentReportPeriodItem in toReturn.Periods)
             {
                 ordersAgentReportPeriodItem.AverageOrdersAmount = ordersAgentReportPeriodItem.OrdersCount != 0
-                    ? ordersAgentReportPeriodItem.TotalOrdersAmount/ordersAgentReportPeriodItem.OrdersCount
+                    ? ordersAgentReportPeriodItem.TotalOrdersAmount / ordersAgentReportPeriodItem.OrdersCount
                     : 0;
                 ordersAgentReportPeriodItem.AllAverageOrdersAmount = ordersAgentReportPeriodItem.AllOrdersCount != 0
-                    ? ordersAgentReportPeriodItem.AllTotalOrdersAmount/ordersAgentReportPeriodItem.AllOrdersCount
+                    ? ordersAgentReportPeriodItem.AllTotalOrdersAmount / ordersAgentReportPeriodItem.AllOrdersCount
                     : 0;
                 ordersAgentReportPeriodItem.AgentOrdersPercent = ordersAgentReportPeriodItem.TotalOrdersAmount != 0
-                    ? Math.Round(ordersAgentReportPeriodItem.TotalOrdersAmount*100/ordersAgentReportPeriodItem.AllTotalOrdersAmount, 2)
+                    ? Math.Round(ordersAgentReportPeriodItem.TotalOrdersAmount * 100 / ordersAgentReportPeriodItem.AllTotalOrdersAmount, 2)
                     : 0;
                 ordersAgentReportPeriodItem.AverageOrdersAmountDifference = ordersAgentReportPeriodItem.AverageOrdersAmount -
                                                                             ordersAgentReportPeriodItem.AllAverageOrdersAmount;
@@ -277,7 +277,7 @@ namespace VitalChoice.Business.Services.Orders
                     foreach (var ordersAgentReportAgentItem in ordersAgentReportTeamItem.Agents)
                     {
                         ordersAgentReportAgentItem.AverageOrdersAmount = ordersAgentReportAgentItem.OrdersCount != 0
-                            ? ordersAgentReportAgentItem.TotalOrdersAmount/ordersAgentReportAgentItem.OrdersCount
+                            ? ordersAgentReportAgentItem.TotalOrdersAmount / ordersAgentReportAgentItem.OrdersCount
                             : 0;
 
                         ordersAgentReportTeamItem.OrdersCount += ordersAgentReportAgentItem.OrdersCount;
@@ -298,11 +298,11 @@ namespace VitalChoice.Business.Services.Orders
                     }
 
                     ordersAgentReportTeamItem.AverageOrdersAmount = ordersAgentReportTeamItem.OrdersCount != 0
-                        ? ordersAgentReportTeamItem.TotalOrdersAmount/ordersAgentReportTeamItem.OrdersCount
+                        ? ordersAgentReportTeamItem.TotalOrdersAmount / ordersAgentReportTeamItem.OrdersCount
                         : 0;
 
                     ordersAgentReportTeamItem.AgentOrdersPercent = ordersAgentReportTeamItem.TotalOrdersAmount != 0
-                        ? Math.Round(ordersAgentReportTeamItem.TotalOrdersAmount*100/ordersAgentReportPeriodItem.TotalOrdersAmount, 2)
+                        ? Math.Round(ordersAgentReportTeamItem.TotalOrdersAmount * 100 / ordersAgentReportPeriodItem.TotalOrdersAmount, 2)
                         : 0;
                     ordersAgentReportTeamItem.AverageOrdersAmountDifference = ordersAgentReportTeamItem.AverageOrdersAmount -
                                                                               ordersAgentReportPeriodItem.AverageOrdersAmount;
@@ -387,7 +387,7 @@ namespace VitalChoice.Business.Services.Orders
 
                     if (fullReport)
                     {
-                        team.AgentOrdersPercent = team.AgentOrdersPercent != 0 ? team.AgentOrdersPercent/100 : 0;
+                        team.AgentOrdersPercent = team.AgentOrdersPercent != 0 ? team.AgentOrdersPercent / 100 : 0;
                         toReturn.Add(new OrdersAgentReportExportItem()
                         {
                             Agent = "% of total phone orders",
@@ -412,7 +412,7 @@ namespace VitalChoice.Business.Services.Orders
                         RefundsCount = period.RefundsCount.ToString(),
                         ReshipsCount = period.ReshipsCount.ToString(),
                     });
-                    period.AgentOrdersPercent = period.AgentOrdersPercent != 0 ? period.AgentOrdersPercent/100 : 0;
+                    period.AgentOrdersPercent = period.AgentOrdersPercent != 0 ? period.AgentOrdersPercent / 100 : 0;
                     toReturn.Add(new OrdersAgentReportExportItem()
                     {
                         Agent = "% of total orders",
@@ -536,7 +536,7 @@ namespace VitalChoice.Business.Services.Orders
                 .ThenInclude(p => p.Sku)
                 .Include(o => o.ShippingAddress)
                 .ThenInclude(s => s.OptionValues)
-                .Include(p=>p.OrderShippingPackages));
+                .Include(p => p.OrderShippingPackages));
 
             orders.ForEach(p =>
             {
@@ -582,13 +582,13 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     item.ShipDate = package.ShippedDate;
                     var shipMethodType = GetShipMethodTypeForFreightService(package.ShipMethodFreightService);
-                    var shipMethodTypeName = _referenceData.ShipMethodTypes.FirstOrDefault(pp => pp.Key == (int) shipMethodType)?.Text;
+                    var shipMethodTypeName = _referenceData.ShipMethodTypes.FirstOrDefault(pp => pp.Key == (int)shipMethodType)?.Text;
                     item.ShippingCarrier = $"{package.ShipMethodFreightCarrier} - {shipMethodTypeName}";
                     item.ShippingIdConfirmation = package.TrackingNumber;
                     item.ShippingIdConfirmationUrl = _trackingService.GetServiceUrl(package.ShipMethodFreightCarrier,
                         package.TrackingNumber);
                 }
-                package = p.OrderShippingPackages.FirstOrDefault(pp => pp.POrderType==(int)POrderType.P);
+                package = p.OrderShippingPackages.FirstOrDefault(pp => pp.POrderType == (int)POrderType.P);
                 if (package != null)
                 {
                     item.PShipDate = package.ShippedDate;
@@ -641,10 +641,10 @@ namespace VitalChoice.Business.Services.Orders
                 item.IdOrder = p.IdOrder;
                 item.IdOrderSource = p.IdOrderSource;
                 item.Rank = p.Rank;
-                item.IdObjectType = (OrderType) p.IdObjectType;
-                item.OrderStatus = (OrderStatus?) p.OrderStatus;
-                item.POrderStatus = (OrderStatus?) p.POrderStatus;
-                item.NPOrderStatus = (OrderStatus?) p.NPOrderStatus;
+                item.IdObjectType = (OrderType)p.IdObjectType;
+                item.OrderStatus = (OrderStatus?)p.OrderStatus;
+                item.POrderStatus = (OrderStatus?)p.POrderStatus;
+                item.NPOrderStatus = (OrderStatus?)p.NPOrderStatus;
                 item.ServiceCode = p.ServiceCode;
                 item.ServiceCodeName = p.ServiceCode.HasValue
                     ? _referenceData.ServiceCodes.FirstOrDefault(pp => p.ServiceCode.Value == pp.Key)?.Text
@@ -652,18 +652,18 @@ namespace VitalChoice.Business.Services.Orders
                 item.IdCustomer = p.IdCustomer;
                 item.CustomerFirstName = p.CustomerFirstName;
                 item.CustomerLastName = p.CustomerLastName;
-                item.CustomerIdObjectType = (CustomerType) p.CustomerIdObjectType;
+                item.CustomerIdObjectType = (CustomerType)p.CustomerIdObjectType;
                 item.ProductsSubtotal = p.ProductsSubtotal;
                 item.DiscountTotal = p.DiscountTotal;
-                item.DiscountedSubtotal = p.IdObjectType == (int) OrderType.Refund
+                item.DiscountedSubtotal = p.IdObjectType == (int)OrderType.Refund
                     ? -(p.ProductsSubtotal - p.DiscountTotal)
                     : p.ProductsSubtotal - p.DiscountTotal;
                 item.ShippingTotal = p.ShippingTotal;
                 item.TaxTotal = p.TaxTotal;
-                item.Total = p.IdObjectType == (int) OrderType.Refund ? -p.Total : p.Total;
+                item.Total = p.IdObjectType == (int)OrderType.Refund ? -p.Total : p.Total;
                 item.ReturnAssociated = p.ReturnAssociated;
-                item.PaymentMethodIdObjectType = (PaymentMethodType?) p.PaymentMethodIdObjectType;
-                item.DiscountIdObjectType = (DiscountType?) p.DiscountIdObjectType;
+                item.PaymentMethodIdObjectType = (PaymentMethodType?)p.PaymentMethodIdObjectType;
+                item.DiscountIdObjectType = (DiscountType?)p.DiscountIdObjectType;
                 item.DiscountPercent = p.DiscountPercent;
                 item.IdSku = p.IdSku;
                 item.IdProduct = p.IdProduct;
@@ -675,9 +675,9 @@ namespace VitalChoice.Business.Services.Orders
                 }
                 item.DisplayName += $" ({p.SkuQTY})";
                 item.OrderQuantity = p.OrderQuantity;
-                item.ProductIdObjectType = (ProductType?) p.ProductIdObjectType;
-                item.Price = p.IdObjectType == (int) OrderType.Refund ? -p.Price : p.Price;
-                item.RefundIdRedeemType = (RedeemType?) p.RefundIdRedeemType;
+                item.ProductIdObjectType = (ProductType?)p.ProductIdObjectType;
+                item.Price = p.IdObjectType == (int)OrderType.Refund ? -p.Price : p.Price;
+                item.RefundIdRedeemType = (RedeemType?)p.RefundIdRedeemType;
                 item.RefundProductPercent = p.RefundProductPercent;
                 item.Override = "no";
 
@@ -698,11 +698,11 @@ namespace VitalChoice.Business.Services.Orders
             toReturn.ForEach(p =>
             {
                 p.Name = _referenceData.OrderSourceTypes.FirstOrDefault(pp => p.Id == pp.Key)?.Text;
-                p.Average = p.Count != 0 ? p.Total/p.Count : 0;
+                p.Average = p.Count != 0 ? p.Total / p.Count : 0;
                 total.Count += p.Count;
                 total.Total += p.Total;
             });
-            total.Average = total.Count != 0 ? total.Total/total.Count : 0;
+            total.Average = total.Count != 0 ? total.Total / total.Count : 0;
             toReturn.Add(total);
 
             return toReturn;
@@ -747,7 +747,7 @@ namespace VitalChoice.Business.Services.Orders
             }
 
             OrderQuery conditions = new OrderQuery().NotDeleted().WithCreatedDate(filter.From, filter.To).WithActualStatusOnly().
-                WithOrderTypes(new[] {OrderType.AutoShipOrder, OrderType.DropShip, OrderType.GiftList, OrderType.Normal}).
+                WithOrderTypes(new[] { OrderType.AutoShipOrder, OrderType.DropShip, OrderType.GiftList, OrderType.Normal }).
                 WithCustomerType(filter.IdCustomerType).WithIdSku(idSku).WithIdDiscount(idDiscount, filter.WithoutDiscount);
 
             Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderByDescending(y => y.Id);
@@ -819,7 +819,7 @@ namespace VitalChoice.Business.Services.Orders
             item.DiscountCode = order.Discount?.Code;
             item.Quantity = skuOrdered.Quantity;
             item.Price = skuOrdered.Amount;
-            item.Amount = skuOrdered.Quantity*skuOrdered.Amount;
+            item.Amount = skuOrdered.Quantity * skuOrdered.Amount;
 
             item.Source = _referenceData.OrderSources.FirstOrDefault(p => (order.Customer.SafeData.Source ?? 0) == p.Key)?.Text;
             item.DoNotMail = order.Customer.SafeData.DoNotMail ?? false;
@@ -871,7 +871,7 @@ namespace VitalChoice.Business.Services.Orders
             var toReturn = new PagedList<MatchbackReportItem>();
 
             OrderQuery conditions = new OrderQuery().NotDeleted().WithCreatedDate(filter.From, filter.To).WithActualStatusOnly().
-                WithOrderTypes(new[] {OrderType.AutoShipOrder, OrderType.DropShip, OrderType.GiftList, OrderType.Normal}).
+                WithOrderTypes(new[] { OrderType.AutoShipOrder, OrderType.DropShip, OrderType.GiftList, OrderType.Normal }).
                 WithOrderDynamicValues(filter.IdOrderSource, null, null);
 
             Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderByDescending(y => y.Id);
@@ -985,11 +985,14 @@ namespace VitalChoice.Business.Services.Orders
 
             OrderQuery conditions = new OrderQuery().NotDeleted().WithFromDate(filter.From).WithToDate(filter.To)
                 .WithIdSku(idSku)
-                .WithOrderTypes(new[] {OrderType.AutoShipOrder, OrderType.DropShip, OrderType.GiftList, OrderType.Normal})
-                .WithOrderStatuses(new[] {OrderStatus.Processed, OrderStatus.Exported, OrderStatus.Shipped});
+                .WithOrderTypes(new[] { OrderType.AutoShipOrder, OrderType.DropShip, OrderType.GiftList, OrderType.Normal })
+                .WithOrderStatuses(new[] { OrderStatus.Processed, OrderStatus.Exported, OrderStatus.Shipped });
             var orders = await _orderRepository.Query(conditions).Include(x => x.Skus).ThenInclude(x => x.Sku).ThenInclude(x => x.Product).
                     Include(x => x.PromoSkus).ThenInclude(x => x.Sku).ThenInclude(x => x.Product).SelectAsync(false);
 
+            Dictionary<int, OrderSkuCountReportSkuItem> map = new Dictionary<int, OrderSkuCountReportSkuItem>();
+            OrderSkuCountReportSkuItem skuModel;
+            OrderSkuCountReportOrderItem orderModel;
 
             foreach (var order in orders)
             {
@@ -998,17 +1001,17 @@ namespace VitalChoice.Business.Services.Orders
                 if (filter.Unique)
                 {
                     var items =
-                        order.Skus.Where(p => p.Sku.Product.IdObjectType == (int) ProductType.Perishable).Select(p => p.Sku.Id).ToList();
+                        order.Skus.Where(p => p.Sku.Product.IdObjectType == (int)ProductType.Perishable).Select(p => p.Sku.Id).ToList();
                     items.AddRange(
-                        order.PromoSkus.Where(p => !p.Disabled && p.Sku.Product.IdObjectType == (int) ProductType.Perishable)
+                        order.PromoSkus.Where(p => !p.Disabled && p.Sku.Product.IdObjectType == (int)ProductType.Perishable)
                             .Select(p => p.Sku.Id));
                     perishableCount = items.Distinct().Count();
                 }
                 else
                 {
                     perishableCount =
-                        order.Skus.Where(p => p.Sku.Product.IdObjectType == (int) ProductType.Perishable).Sum(p => p.Quantity) +
-                        order.PromoSkus.Where(p => !p.Disabled && p.Sku.Product.IdObjectType == (int) ProductType.Perishable).
+                        order.Skus.Where(p => p.Sku.Product.IdObjectType == (int)ProductType.Perishable).Sum(p => p.Quantity) +
+                        order.PromoSkus.Where(p => !p.Disabled && p.Sku.Product.IdObjectType == (int)ProductType.Perishable).
                             Sum(p => p.Quantity);
                 }
                 if (perishableCount > 0)
@@ -1041,17 +1044,17 @@ namespace VitalChoice.Business.Services.Orders
                 if (filter.Unique)
                 {
                     var items =
-                        order.Skus.Where(p => p.Sku.Product.IdObjectType != (int) ProductType.Perishable).Select(p => p.Sku.Id).ToList();
+                        order.Skus.Where(p => p.Sku.Product.IdObjectType != (int)ProductType.Perishable).Select(p => p.Sku.Id).ToList();
                     items.AddRange(
-                        order.PromoSkus.Where(p => !p.Disabled && p.Sku.Product.IdObjectType != (int) ProductType.Perishable)
+                        order.PromoSkus.Where(p => !p.Disabled && p.Sku.Product.IdObjectType != (int)ProductType.Perishable)
                             .Select(p => p.Sku.Id));
                     nonPerishableCount = items.Distinct().Count();
                 }
                 else
                 {
                     nonPerishableCount =
-                        order.Skus.Where(p => p.Sku.Product.IdObjectType != (int) ProductType.Perishable).Sum(p => p.Quantity) +
-                        order.PromoSkus.Where(p => !p.Disabled && p.Sku.Product.IdObjectType != (int) ProductType.Perishable).
+                        order.Skus.Where(p => p.Sku.Product.IdObjectType != (int)ProductType.Perishable).Sum(p => p.Quantity) +
+                        order.PromoSkus.Where(p => !p.Disabled && p.Sku.Product.IdObjectType != (int)ProductType.Perishable).
                             Sum(p => p.Quantity);
                 }
                 if (nonPerishableCount > 0)
@@ -1081,27 +1084,29 @@ namespace VitalChoice.Business.Services.Orders
 
                 //skus
                 var skus = order.Skus;
-                skus.AddRange(order.PromoSkus.Where(p => !p.Disabled).Select(p=> new OrderToSku()
+                skus.AddRange(order.PromoSkus.Where(p => !p.Disabled).Select(p => new OrderToSku()
                 {
                     Sku = p.Sku,
                 }));
                 foreach (var skuOrdered in skus)
                 {
-                    var skuModel = toReturn.Skus.FirstOrDefault(p => p.IdSku == skuOrdered.Sku.Id);
+                    map.TryGetValue(skuOrdered.Sku.Id, out skuModel);
                     if (skuModel == null)
                     {
                         skuModel = new OrderSkuCountReportSkuItem();
                         skuModel.IdSku = skuOrdered.Sku.Id;
                         skuModel.Code = skuOrdered.Sku.Code;
                         toReturn.Skus.Add(skuModel);
+                        map.Add(skuModel.IdSku, skuModel);
                     }
 
-                    var orderModel = skuModel.Orders.FirstOrDefault(p => p.IdOrder == order.Id);
+                    skuModel.Map.TryGetValue(order.Id, out orderModel);
                     if (orderModel == null)
                     {
                         orderModel = new OrderSkuCountReportOrderItem();
                         orderModel.IdOrder = order.Id;
                         skuModel.Orders.Add(orderModel);
+                        skuModel.Map.Add(orderModel.IdOrder, orderModel);
 
                         var count = perishableCount + nonPerishableCount;
                         orderModel.SkuCount = count;
@@ -1134,7 +1139,7 @@ namespace VitalChoice.Business.Services.Orders
 
                     if (filter.Unique)
                     {
-                        orderModel.CountOfGivenSku ++;
+                        orderModel.CountOfGivenSku++;
                     }
                     else
                     {
@@ -1144,60 +1149,60 @@ namespace VitalChoice.Business.Services.Orders
             }
 
             toReturn.PerishableSku1OrderPercent = toReturn.PerishableTotalOrders != 0
-                ? Math.Round(((decimal) toReturn.PerishableSku1Orders*100)/toReturn.PerishableTotalOrders, 2)
-                : (decimal) 0;
+                ? Math.Round(((decimal)toReturn.PerishableSku1Orders * 100) / toReturn.PerishableTotalOrders, 2)
+                : (decimal)0;
             toReturn.PerishableSku2OrderPercent = toReturn.PerishableTotalOrders != 0
-                ? Math.Round(((decimal) toReturn.PerishableSku2Orders*100)/toReturn.PerishableTotalOrders, 2)
-                : (decimal) 0;
+                ? Math.Round(((decimal)toReturn.PerishableSku2Orders * 100) / toReturn.PerishableTotalOrders, 2)
+                : (decimal)0;
             toReturn.PerishableSku3OrderPercent = toReturn.PerishableTotalOrders != 0
-                ? Math.Round(((decimal) toReturn.PerishableSku3Orders*100)/toReturn.PerishableTotalOrders, 2)
-                : (decimal) 0;
+                ? Math.Round(((decimal)toReturn.PerishableSku3Orders * 100) / toReturn.PerishableTotalOrders, 2)
+                : (decimal)0;
             toReturn.PerishableSku4OrderPercent = toReturn.PerishableTotalOrders != 0
-                ? Math.Round(((decimal) toReturn.PerishableSku4Orders*100)/toReturn.PerishableTotalOrders, 2)
-                : (decimal) 0;
+                ? Math.Round(((decimal)toReturn.PerishableSku4Orders * 100) / toReturn.PerishableTotalOrders, 2)
+                : (decimal)0;
             toReturn.PerishableSku5OrderPercent = toReturn.PerishableTotalOrders != 0
-                ? Math.Round(((decimal) toReturn.PerishableSku5Orders*100)/toReturn.PerishableTotalOrders, 2)
-                : (decimal) 0;
+                ? Math.Round(((decimal)toReturn.PerishableSku5Orders * 100) / toReturn.PerishableTotalOrders, 2)
+                : (decimal)0;
 
             toReturn.NonPerishableSku1OrderPercent = toReturn.NonPerishableTotalOrders != 0
-                ? Math.Round(((decimal) toReturn.NonPerishableSku1Orders*100)/toReturn.NonPerishableTotalOrders, 2)
-                : (decimal) 0;
+                ? Math.Round(((decimal)toReturn.NonPerishableSku1Orders * 100) / toReturn.NonPerishableTotalOrders, 2)
+                : (decimal)0;
             toReturn.NonPerishableSku2OrderPercent = toReturn.NonPerishableTotalOrders != 0
-                ? Math.Round(((decimal) toReturn.NonPerishableSku2Orders*100)/toReturn.NonPerishableTotalOrders, 2)
-                : (decimal) 0;
+                ? Math.Round(((decimal)toReturn.NonPerishableSku2Orders * 100) / toReturn.NonPerishableTotalOrders, 2)
+                : (decimal)0;
             toReturn.NonPerishableSku3OrderPercent = toReturn.NonPerishableTotalOrders != 0
-                ? Math.Round(((decimal) toReturn.NonPerishableSku3Orders*100)/toReturn.NonPerishableTotalOrders, 2)
-                : (decimal) 0;
+                ? Math.Round(((decimal)toReturn.NonPerishableSku3Orders * 100) / toReturn.NonPerishableTotalOrders, 2)
+                : (decimal)0;
             toReturn.NonPerishableSku4OrderPercent = toReturn.NonPerishableTotalOrders != 0
-                ? Math.Round(((decimal) toReturn.NonPerishableSku4Orders*100)/toReturn.NonPerishableTotalOrders, 2)
-                : (decimal) 0;
+                ? Math.Round(((decimal)toReturn.NonPerishableSku4Orders * 100) / toReturn.NonPerishableTotalOrders, 2)
+                : (decimal)0;
             toReturn.NonPerishableSku5OrderPercent = toReturn.NonPerishableTotalOrders != 0
-                ? Math.Round(((decimal) toReturn.NonPerishableSku5Orders*100)/toReturn.NonPerishableTotalOrders, 2)
-                : (decimal) 0;
+                ? Math.Round(((decimal)toReturn.NonPerishableSku5Orders * 100) / toReturn.NonPerishableTotalOrders, 2)
+                : (decimal)0;
 
             foreach (var orderSkuCountReportSkuItem in toReturn.Skus)
             {
                 orderSkuCountReportSkuItem.Sku1OrderPercent = orderSkuCountReportSkuItem.TotalOrders != 0
-                    ? Math.Round(((decimal) orderSkuCountReportSkuItem.Sku1Orders*100)/orderSkuCountReportSkuItem.TotalOrders, 2)
-                    : (decimal) 0;
+                    ? Math.Round(((decimal)orderSkuCountReportSkuItem.Sku1Orders * 100) / orderSkuCountReportSkuItem.TotalOrders, 2)
+                    : (decimal)0;
                 orderSkuCountReportSkuItem.Sku2OrderPercent = orderSkuCountReportSkuItem.TotalOrders != 0
-                    ? Math.Round(((decimal) orderSkuCountReportSkuItem.Sku2Orders*100)/orderSkuCountReportSkuItem.TotalOrders, 2)
-                    : (decimal) 0;
+                    ? Math.Round(((decimal)orderSkuCountReportSkuItem.Sku2Orders * 100) / orderSkuCountReportSkuItem.TotalOrders, 2)
+                    : (decimal)0;
                 orderSkuCountReportSkuItem.Sku3OrderPercent = orderSkuCountReportSkuItem.TotalOrders != 0
-                    ? Math.Round(((decimal) orderSkuCountReportSkuItem.Sku3Orders*100)/orderSkuCountReportSkuItem.TotalOrders, 2)
-                    : (decimal) 0;
+                    ? Math.Round(((decimal)orderSkuCountReportSkuItem.Sku3Orders * 100) / orderSkuCountReportSkuItem.TotalOrders, 2)
+                    : (decimal)0;
                 orderSkuCountReportSkuItem.Sku4OrderPercent = orderSkuCountReportSkuItem.TotalOrders != 0
-                    ? Math.Round(((decimal) orderSkuCountReportSkuItem.Sku4Orders*100)/orderSkuCountReportSkuItem.TotalOrders, 2)
-                    : (decimal) 0;
+                    ? Math.Round(((decimal)orderSkuCountReportSkuItem.Sku4Orders * 100) / orderSkuCountReportSkuItem.TotalOrders, 2)
+                    : (decimal)0;
                 orderSkuCountReportSkuItem.Sku5OrderPercent = orderSkuCountReportSkuItem.TotalOrders != 0
-                    ? Math.Round(((decimal) orderSkuCountReportSkuItem.Sku5Orders*100)/orderSkuCountReportSkuItem.TotalOrders, 2)
-                    : (decimal) 0;
+                    ? Math.Round(((decimal)orderSkuCountReportSkuItem.Sku5Orders * 100) / orderSkuCountReportSkuItem.TotalOrders, 2)
+                    : (decimal)0;
 
                 var allGivenSkus = orderSkuCountReportSkuItem.Orders.Sum(p => p.CountOfGivenSku);
                 foreach (var orderSkuCountReportOrderItem in orderSkuCountReportSkuItem.Orders)
                 {
                     orderSkuCountReportOrderItem.PercentOfTotal = allGivenSkus != 0
-                        ? Math.Round(((decimal) orderSkuCountReportOrderItem.CountOfGivenSku*100)/allGivenSkus, 2)
+                        ? Math.Round(((decimal)orderSkuCountReportOrderItem.CountOfGivenSku * 100) / allGivenSkus, 2)
                         : 0;
                 }
             }
@@ -1212,19 +1217,19 @@ namespace VitalChoice.Business.Services.Orders
 
             var warehouse = new ShippedViaSummaryReportWarehouseItem();
             warehouse.Warehouse = Warehouse.WA;
-            warehouse.WarehouseName = _referenceData.Warehouses.FirstOrDefault(p => p.Key == (int) Warehouse.WA)?.Text;
+            warehouse.WarehouseName = _referenceData.Warehouses.FirstOrDefault(p => p.Key == (int)Warehouse.WA)?.Text;
             CreateShipMethodTypes(warehouse);
             report.Warehouses.Add(warehouse);
 
             warehouse = new ShippedViaSummaryReportWarehouseItem();
             warehouse.Warehouse = Warehouse.VA;
-            warehouse.WarehouseName = _referenceData.Warehouses.FirstOrDefault(p => p.Key == (int) Warehouse.VA)?.Text;
+            warehouse.WarehouseName = _referenceData.Warehouses.FirstOrDefault(p => p.Key == (int)Warehouse.VA)?.Text;
             CreateShipMethodTypes(warehouse);
             report.Warehouses.Add(warehouse);
 
             foreach (var item in items)
             {
-                warehouse = report.Warehouses.FirstOrDefault(p => (int) p.Warehouse == item.IdWarehouse);
+                warehouse = report.Warehouses.FirstOrDefault(p => (int)p.Warehouse == item.IdWarehouse);
                 if (warehouse != null)
                 {
                     foreach (var shipMethodItem in warehouse.ShipMethods)
@@ -1240,7 +1245,7 @@ namespace VitalChoice.Business.Services.Orders
                         }
                     }
 
-                    var shipMethod = warehouse.ShipMethods.FirstOrDefault(p => (int) p.ShipMethodType == item.IdShipMethodFreightService);
+                    var shipMethod = warehouse.ShipMethods.FirstOrDefault(p => (int)p.ShipMethodType == item.IdShipMethodFreightService);
                     var carrierItem = shipMethod?.Carriers.FirstOrDefault(p => p.Carrier == item.ShipMethodFreightCarrier);
                     if (carrierItem != null)
                     {
@@ -1259,7 +1264,7 @@ namespace VitalChoice.Business.Services.Orders
                 ShipMethodType = ShipMethodType.Standard,
                 ShipMethodTypeName =
                     _referenceData
-                        .ShipMethodTypes.FirstOrDefault(p => p.Key == (int) ShipMethodType.Standard)?
+                        .ShipMethodTypes.FirstOrDefault(p => p.Key == (int)ShipMethodType.Standard)?
                         .Text,
             });
             warehouse.ShipMethods.Add(new ShippedViaSummaryReportShipMethodItem()
@@ -1267,7 +1272,7 @@ namespace VitalChoice.Business.Services.Orders
                 ShipMethodType = ShipMethodType.SecondDayAir,
                 ShipMethodTypeName =
                     _referenceData
-                        .ShipMethodTypes.FirstOrDefault(p => p.Key == (int) ShipMethodType.SecondDayAir)?
+                        .ShipMethodTypes.FirstOrDefault(p => p.Key == (int)ShipMethodType.SecondDayAir)?
                         .Text,
             });
             warehouse.ShipMethods.Add(new ShippedViaSummaryReportShipMethodItem()
@@ -1275,7 +1280,7 @@ namespace VitalChoice.Business.Services.Orders
                 ShipMethodType = ShipMethodType.NextDayAir,
                 ShipMethodTypeName =
                     _referenceData
-                        .ShipMethodTypes.FirstOrDefault(p => p.Key == (int) ShipMethodType.NextDayAir)?
+                        .ShipMethodTypes.FirstOrDefault(p => p.Key == (int)ShipMethodType.NextDayAir)?
                         .Text,
             });
         }
@@ -1305,6 +1310,49 @@ namespace VitalChoice.Business.Services.Orders
                 : 0;
 
             return toReturn;
+        }
+
+        public async Task<ICollection<ProductQualitySalesReportItem>> GetProductQualitySalesReportItemsAsync(ProductQualitySalesReportFilter filter)
+        {
+            var toReturn = await _sPEcommerceRepository.GetProductQualitySalesReportRawItemsAsync(filter);
+            var sortOrder = filter.Sorting.SortOrder;
+            switch (filter.Sorting.Path)
+            {
+                case ProductQualitySalesReportItemSortPath.Issues:
+                    toReturn = sortOrder == FilterSortOrder.Asc
+                                ? toReturn.OrderBy(y => y.Issues).ToList()
+                                : toReturn.OrderByDescending(y => y.Issues).ToList();
+                    break;
+                case ProductQualitySalesReportItemSortPath.Sales:
+                    toReturn = sortOrder == FilterSortOrder.Asc
+                                ? toReturn.OrderBy(y => y.Sales).ToList()
+                                : toReturn.OrderByDescending(y => y.Sales).ToList();
+                    break;
+                case ProductQualitySalesReportItemSortPath.SalesPerIssue:
+                    toReturn = sortOrder == FilterSortOrder.Asc
+                                ? toReturn.OrderBy(y => y.SalesPerIssue).ToList()
+                                : toReturn.OrderByDescending(y => y.SalesPerIssue).ToList();
+                    break;
+            }
+            return toReturn;
+        }
+
+        public async Task<ICollection<ProductQualitySkusReportItem>> GetProductQualitySkusReportItemsAsync(ProductQualitySkusReportFilter filter)
+        {
+            ICollection<ProductQualitySkusReportItem> toReturn = new List<ProductQualitySkusReportItem>();
+            int? idSku = null;
+            if (string.IsNullOrEmpty(filter.SkuCode))
+            {
+                return toReturn;
+            }
+            idSku = (await _productService.GetSkuAsync(filter.SkuCode))?.Id;
+            if (!idSku.HasValue)
+            {
+                return toReturn;
+            }
+            filter.IdSku = idSku.Value;
+
+            return await _sPEcommerceRepository.GetProductQualitySkusReportRawItemsAsync(filter);
         }
     }
 }

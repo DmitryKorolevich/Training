@@ -13,8 +13,10 @@
         public const string PRODUCT_OUT_OF_STOCK_EMAIL_TEMPLATE_PRODUCT_URL_HOLDER = "{PRODUCT_URL}";
 
         public const string AFFILIATE_EMAIL_TEMPLATE = "AffiliateEmailTemplate";
+        public const string AFFILIATE_EMAIL_TEMPLATE_DR_SEARS = "AffiliateEmailTemplateDrSears";
         public const string AFFILIATE_EMAIL_TEMPLATE_NAME_HOLDER = "{AFFILIATE_NAME}";
         public const string AFFILIATE_EMAIL_TEMPLATE_ID_HOLDER = "{AFFILIATE_ID}";
+        public const string AFFILIATE_EMAIL_TEMPLATE_EMAIL_HOLDER = "{AFFILIATE_EMAIL}";
 
         public const string SETTINGS_LOOKUP_NAMES = "ServiceCodes,InventorySkuChannels,InventorySkuProductSources,InventorySkuUnitOfMeasures,InventorySkuPurchaseUnitOfMeasures";
         public const string INVENTORY_SKU_LOOKUP_CHANNEL_NAME = "InventorySkuChannels";

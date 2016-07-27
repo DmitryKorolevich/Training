@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -12,6 +14,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
         public OrderSkuCountReportSkuItem()
         {
             Orders = new List<OrderSkuCountReportOrderItem>();
+            Map = new Dictionary<int, OrderSkuCountReportOrderItem>();
         }
 
         public int IdSku { get; set; }
@@ -41,5 +44,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
         public decimal Sku5OrderPercent { get; set; }
 
         public ICollection<OrderSkuCountReportOrderItem> Orders { get; set; }
+
+        [JsonIgnore]
+        public IDictionary<int,OrderSkuCountReportOrderItem> Map { get; set; }
     }
 }

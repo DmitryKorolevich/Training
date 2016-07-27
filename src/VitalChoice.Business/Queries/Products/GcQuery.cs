@@ -99,7 +99,7 @@ namespace VitalChoice.Business.Queries.Product
         {
             if (to.HasValue)
             {
-                Add(x => x.Created<=to.Value);
+                Add(x => x.Created<to.Value);
             }
             return this;
         }

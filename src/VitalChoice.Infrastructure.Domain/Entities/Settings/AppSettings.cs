@@ -18,5 +18,8 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Settings
 
         [Map]
         public string AffiliateEmailTemplate { get; set; }
+
+        [Map]
+        public string AffiliateEmailTemplateDrSears { get; set; }
     }
 }
