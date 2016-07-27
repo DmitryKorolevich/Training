@@ -1,11 +1,10 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using System.Security.Cryptography.X509Certificates;
 
 namespace VitalChoice.Infrastructure.Domain.ServiceBus
 {
-#if !NETSTANDARD1_5
-    [Serializable]
-#endif
+    [DataContract]
     public class TransportCommandData
     {
         public TransportCommandData(byte[] data)
@@ -13,16 +12,17 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
             Data = data;
         }
 
+        [DataMember]
         public X509Certificate2 Certificate { get; set; }
 
+        [DataMember]
         public byte[] Data { get; set; }
 
+        [DataMember]
         public byte[] Sign { get; set; }
     }
 
-#if !NETSTANDARD1_5
-    [Serializable]
-#endif
+    [DataContract]
     public class KeyExchange
     {
         public KeyExchange()
@@ -45,9 +45,11 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
             Array.Copy(keyCombined, 16, Key, 0, 32);
         }
 
-        public byte[] Key { get; }
+        [DataMember]
+        public byte[] Key { get; set; }
 
-        public byte[] IV { get; }
+        [DataMember]
+        public byte[] IV { get; set; }
 
         public byte[] ToCombined()
         {
