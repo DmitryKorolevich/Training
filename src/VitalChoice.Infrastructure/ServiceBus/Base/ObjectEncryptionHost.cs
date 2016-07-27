@@ -195,7 +195,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 return false;
             }
             result = default(T);
-            return false;
+            return true;
         }
 
         public TransportCommandData RsaSignWithConvert(ServiceBusCommandBase command)

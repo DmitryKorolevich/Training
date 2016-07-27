@@ -351,8 +351,11 @@ namespace VitalChoice.Infrastructure.ServiceBus
             }
             else
             {
-                SendPlainCommand(new ServiceBusCommandBase(remoteCommand, false));
-                Logger.LogWarning($"Invalid Sign. Message: {message.MessageId}");
+                if (remoteCommand != null)
+                {
+                    SendPlainCommand(new ServiceBusCommandBase(remoteCommand, false));
+                    Logger.LogWarning($"Invalid Sign. Command: {remoteCommand.CommandName} Data: {remoteCommand.Data?.Data:X2}");
+                }
             }
         }
 

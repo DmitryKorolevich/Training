@@ -16,7 +16,10 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
 
         public ServiceBusCommandData()
         {
-
+            Random rnd = new Random();
+            byte[] elements = new byte[32];
+            rnd.NextBytes(elements);
+            Data = elements;
         }
 
         public ServiceBusCommandData(object data)
