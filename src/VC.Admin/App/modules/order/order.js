@@ -26,7 +26,9 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.orderSkuCountReportController',
 	'app.modules.order.controllers.shippedViaSummaryReportController',
 	'app.modules.order.controllers.shippedViaDetailsReportController',
-	'app.modules.order.controllers.exportResultController'
+	'app.modules.order.controllers.exportResultController',
+	'app.modules.order.controllers.productQualitySalesReportController',
+	'app.modules.order.controllers.productQualitySkusReportController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -142,6 +144,16 @@ angular.module('app.modules.order', [
 				    url: '/report/shipped-via-details?{from:string}{to:string}{idstate:int}{idservicecode:int}{warehouse:int}{shipmethodtype:int}{carrier:string}',
 				    templateUrl: 'app/modules/order/partials/shippedViaDetailsReport.html',
 				    controller: 'shippedViaDetailsReportController'
+				})
+				.state('index.oneCol.productQualitySalesReport', {
+				    url: '/report/product-quality',
+				    templateUrl: 'app/modules/order/partials/productQualitySalesReport.html',
+				    controller: 'productQualitySalesReportController'
+				})
+				.state('index.oneCol.productQualitySkusReport', {
+				    url: '/report/sku-issue?{from:string}{to:string}{skucode:string}',
+				    templateUrl: 'app/modules/order/partials/productQualitySkusReport.html',
+				    controller: 'productQualitySkusReportController'
 				});
 		}
 ]);

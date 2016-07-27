@@ -137,6 +137,17 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(f => f.StateCode);
             });
 
+            builder.Entity<ProductQualitySalesReportItem>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+                entity.Ignore(f => f.SalesPerIssue);
+            });
+
+            builder.Entity<ProductQualitySkusReportItem>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+            });
+
             #endregion
 
             builder.Entity<VCustomerFavorite>(entity =>

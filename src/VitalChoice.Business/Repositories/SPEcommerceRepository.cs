@@ -350,5 +350,25 @@ namespace VitalChoice.Business.Repositories
                 filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
             return toReturn;
         }
+
+        public async Task<ICollection<ProductQualitySalesReportItem>> GetProductQualitySalesReportRawItemsAsync(ProductQualitySalesReportFilter filter)
+        {
+            var toReturn = await _context.Set<ProductQualitySalesReportItem>().FromSql
+                ("[dbo].[SPGetProductQualitySaleIssuesReport] @from={0}, @to={1}",
+                filter.From, filter.To).ToListAsync();
+            toReturn.ForEach(p =>
+            {
+                p.SalesPerIssue = Math.Round((decimal)p.Sales/p.Issues, 2);
+            });
+            return toReturn;
+        }
+
+        public async Task<ICollection<ProductQualitySkusReportItem>> GetProductQualitySkusReportRawItemsAsync(ProductQualitySkusReportFilter filter)
+        {
+            var toReturn = await _context.Set<ProductQualitySkusReportItem>().FromSql
+                ("[dbo].[SPGetProductQualitySkuIssuesReport] @from={0}, @to={1}, @idsku={2}",
+                filter.From, filter.To, filter.IdSku).ToListAsync();
+            return toReturn;
+        }
     }
 }

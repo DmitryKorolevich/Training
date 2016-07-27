@@ -25,6 +25,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Orders;
+using VitalChoice.Business.Helpers;
 
 namespace VC.Admin.Controllers
 {
@@ -66,6 +67,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<GCStatisticModel>> GetGiftCertificatesWithOrderInfo([FromBody]GCFilter filter)
         {
+            filter.To = filter.To?.AddDays(1) ?? filter.To;
             GCStatisticModel toReturn = await GCService.GetGiftCertificatesWithOrderInfoAsync(filter);
 
             return toReturn;
@@ -73,13 +75,16 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
-        public async Task<FileResult> GetGiftCertificatesWithOrderInfoReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
+        public async Task<FileResult> GetGiftCertificatesWithOrderInfoReportFile([FromQuery]string from, [FromQuery]string to,
             [FromQuery]int? type = null, [FromQuery]int? status = null, [FromQuery]string billinglastname = null, [FromQuery]string shippinglastname = null)
         {
+            DateTime? dFrom = !string.IsNullOrEmpty(from) ? from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
+            DateTime? dTo = !string.IsNullOrEmpty(to) ? to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
+
             GCFilter filter = new GCFilter()
             {
-                From = from,
-                To = to,
+                From = dFrom,
+                To = dTo?.AddDays(1) ?? dTo,
                 Type = type.HasValue ? (GCType?)type.Value : null,
                 StatusCode = status.HasValue ? (RecordStatusCode?)status.Value : null,
                 BillingAddress = !String.IsNullOrEmpty(billinglastname) ? new CustomerAddressFilter() { LastName= billinglastname }:

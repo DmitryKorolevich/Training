@@ -890,19 +890,27 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<ICollection<OrdersRegionStatisticItem>>> GetOrdersRegionStatistic([FromBody]OrderRegionFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
             var toReturn = await _orderService.GetOrdersRegionStatisticAsync(filter);
             return toReturn.ToList();
         }
 
         [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
-        public async Task<FileResult> GetOrdersRegionStatisticReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
+        public async Task<FileResult> GetOrdersRegionStatisticReportFile([FromQuery]string from, [FromQuery]string to,
             [FromQuery]int? idcustomertype = null, [FromQuery]int? idordertype = null)
         {
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+
             OrderRegionFilter filter = new OrderRegionFilter()
             {
-                From = from,
-                To = to,
+                From = dFrom.Value,
+                To = dTo.Value.AddDays(1),
                 IdCustomerType = idcustomertype,
                 IdOrderType = idordertype,
             };
@@ -924,19 +932,27 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<ICollection<OrdersZipStatisticItem>>> GetOrdersZipStatistic([FromBody]OrderRegionFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
             var toReturn = await _orderService.GetOrdersZipStatisticAsync(filter);
             return toReturn.ToList();
         }
 
         [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
-        public async Task<FileResult> GetOrdersZipStatisticReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
+        public async Task<FileResult> GetOrdersZipStatisticReportFile([FromQuery]string from, [FromQuery]string to,
             [FromQuery]int? idcustomertype = null, [FromQuery]int? idordertype = null)
         {
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+
             OrderRegionFilter filter = new OrderRegionFilter()
             {
-                From = from,
-                To = to,
+                From = dFrom.Value,
+                To = dTo.Value.AddDays(1),
                 IdCustomerType = idcustomertype,
                 IdOrderType = idordertype,
             };
@@ -959,19 +975,27 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedList<VOrderWithRegionInfoItem>>> GetOrderWithRegionInfoItems([FromBody]OrderRegionFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
             var toReturn = await _orderService.GetOrderWithRegionInfoItemsAsync(filter);
             return toReturn;
         }
 
         [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
-        public async Task<FileResult> GetOrderWithRegionInfoItemsReportFile([FromQuery]DateTime from, [FromQuery]DateTime to,
+        public async Task<FileResult> GetOrderWithRegionInfoItemsReportFile([FromQuery]string from, [FromQuery]string to,
             [FromQuery]int? idcustomertype = null, [FromQuery]int? idordertype = null, [FromQuery]string region = null, [FromQuery]string zip = null)
         {
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+
             OrderRegionFilter filter = new OrderRegionFilter()
             {
-                From = from,
-                To = to,
+                From = dFrom.Value,
+                To = dTo.Value.AddDays(1),
                 IdCustomerType = idcustomertype,
                 IdOrderType = idordertype,
                 Region = region,
@@ -1464,6 +1488,22 @@ namespace VC.Admin.Controllers
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
             return File(result, "text/csv");
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<ICollection<ProductQualitySalesReportItem>>> GetProductQualitySalesReportItems([FromBody]ProductQualitySalesReportFilter filter)
+        {
+            var toReturn = await _orderReportService.GetProductQualitySalesReportItemsAsync(filter);
+            return toReturn.ToList();
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<ICollection<ProductQualitySkusReportItem>>> GetProductQualitySkusReportItems([FromBody]ProductQualitySkusReportFilter filter)
+        {
+            var toReturn = await _orderReportService.GetProductQualitySkusReportItemsAsync(filter);
+            return toReturn.ToList();
         }
 
         #endregion

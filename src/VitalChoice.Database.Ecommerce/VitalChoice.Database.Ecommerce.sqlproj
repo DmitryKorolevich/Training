@@ -192,4 +192,10 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPsForProductQualityReport.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\OrderIndexes.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SettingOptionTypesData.sql" />
+  </ItemGroup>
 </Project>

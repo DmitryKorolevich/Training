@@ -275,5 +275,13 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	        return baseUrl + ('GetShippedViaItemsReportOrderItemsReportFile?{0}buildNumber={1}')
                 .format(generateQueryParamsBasedOnFilter(filter), buildNumber);
 	    },
+	    getProductQualitySalesReportItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetProductQualitySalesReportItems', filter, getConfig(tracker));
+	    },
+	    getProductQualitySkusReportItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetProductQualitySkusReportItems', filter, getConfig(tracker));
+	    },
 	};
 }]);

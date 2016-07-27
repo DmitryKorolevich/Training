@@ -1,5 +1,5 @@
-﻿IF OBJECT_ID(N'[dbo].[SPProductQualitySaleIssuesReport]', N'P') IS NOT NULL
-	DROP PROCEDURE [dbo].[SPProductQualitySaleIssuesReport]
+﻿IF OBJECT_ID(N'[dbo].[SPGetProductQualitySaleIssuesReport]', N'P') IS NOT NULL
+	DROP PROCEDURE [dbo].[SPGetProductQualitySaleIssuesReport]
 
 GO
 
@@ -7,7 +7,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [dbo].[SPProductQualitySaleIssuesReport]
+CREATE PROCEDURE [dbo].[SPGetProductQualitySaleIssuesReport]
 	@from datetime2,
 	@to datetime2
 AS
@@ -76,9 +76,9 @@ BEGIN
 
 	SELECT
 		sales.IdSku ID,
-		(SELECT i.Code FROM @issues i WHERE i.Id=sales.IdSku) Code,
+		(SELECT TOP 1 i.Code FROM @issues i WHERE i.Id=sales.IdSku) Code,
 		sales.Count Sales,
-		(SELECT i.Issues FROM @issues i WHERE i.Id=sales.IdSku) Issues
+		(SELECT TOP 1 i.Issues FROM @issues i WHERE i.Id=sales.IdSku) Issues
 	FROM
 	(
 		SELECT 
@@ -115,8 +115,8 @@ END
 
 GO
 
-IF OBJECT_ID(N'[dbo].[SPProductQualitySkuIssuesReport]', N'P') IS NOT NULL
-	DROP PROCEDURE [dbo].[SPProductQualitySkuIssuesReport]
+IF OBJECT_ID(N'[dbo].[SPGetProductQualitySkuIssuesReport]', N'P') IS NOT NULL
+	DROP PROCEDURE [dbo].[SPGetProductQualitySkuIssuesReport]
 
 GO
 
@@ -124,7 +124,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [dbo].[SPProductQualitySkuIssuesReport]
+CREATE PROCEDURE [dbo].[SPGetProductQualitySkuIssuesReport]
 	@from datetime2,
 	@to datetime2,
 	@idsku int
@@ -141,7 +141,9 @@ BEGIN
 	
 	SELECT 
 		temp.Id,
+		temp.IdObjectType,
 		temp.IdOrderSource IdOrderSource,
+		os.IdObjectType OrderSourceIdObjectType,
 		os.DateCreated DateCreated,
 		cadlval.Value LastName,
 		sval.Value OrderNotes
