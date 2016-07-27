@@ -940,7 +940,7 @@ namespace VitalChoice.Business.Services.Orders
             var toProcess = new List<int>();
             foreach (var frequency in frequencyAvailable)
             {
-                var tempDate = currentDate.AddDays(-frequency); //AddMonths(-frequency);
+                var tempDate = currentDate.AddMonths(-frequency);
 
                 var vAutoShips =
                     await
