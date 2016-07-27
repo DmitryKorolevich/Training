@@ -1,3 +1,6 @@
+:r disable_indexes.sql
+GO
+
 USE [master] 
 GO
 ALTER DATABASE [VitalChoice.Infrastructure] SET RECOVERY SIMPLE WITH NO_WAIT
@@ -121,6 +124,12 @@ DELETE FROM CatalogRequestAddressOptionValues
 DELETE FROM CatalogRequestAddresses
 DELETE FROM States
 DELETE FROM Countries
+
+GO
+:r enable_indexes.sql
+GO
+
+USE [VitalChoice.Ecommerce]
 
 INSERT INTO Countries
 (CountryCode, CountryName, [Order], StatusCode)

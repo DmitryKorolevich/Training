@@ -1,7 +1,21 @@
 ﻿{
   "version": "1.0.0-*",
   "buildOptions": {
-    "emitEntryPoint": true
+    "copyToOutput": {
+      "include": [
+        "config.json",
+        "config.local.json",
+        "nlog.config"
+      ]
+    },
+    "emitEntryPoint": true,
+    "optimize": true
+  },
+  "publishOptions": {
+    "include": [
+      "config.json",
+      "nlog.config"
+    ]
   },
 
   "dependencies": {
@@ -13,7 +27,7 @@
 
   "frameworks": {
     "net451": {
-      
+
     }
   }
 }

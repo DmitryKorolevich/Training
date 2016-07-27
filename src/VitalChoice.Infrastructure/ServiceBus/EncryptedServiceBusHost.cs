@@ -157,7 +157,12 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 {
                     throw new ApiException(command.Result.Error);
                 }
-                return (T) command.Result.Data;
+                if (command.Result.Data is T)
+                {
+                    return (T) command.Result.Data;
+                }
+                Logger.LogWarning($"Cannot cast {command.Result.Data?.GetType()} to {typeof(T)}");
+                return default(T);
             }
             return default(T);
         }
@@ -188,7 +193,12 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 {
                     throw new ApiException(command.Result.Error);
                 }
-                return (T) command.Result.Data;
+                if (command.Result.Data is T)
+                {
+                    return (T) command.Result.Data;
+                }
+                Logger.LogWarning($"Cannot cast {command.Result.Data?.GetType()} to {typeof(T)}");
+                return default(T);
             }
             return default(T);
         }

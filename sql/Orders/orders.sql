@@ -1,46 +1,3 @@
-USE [vitalchoice2.0]
-GO
-
-IF OBJECT_ID('[dbo].[DelimitedSplit8K]') IS NOT NULL
-	DROP FUNCTION [dbo].[DelimitedSplit8K]
-
-GO
-
-CREATE FUNCTION [dbo].[DelimitedSplit8K]
---===== Define I/O parameters
-        (@pString VARCHAR(8000), @pDelimiter NVARCHAR(4))
---WARNING!!! DO NOT USE MAX DATA-TYPES HERE!  IT WILL KILL PERFORMANCE!
-RETURNS TABLE WITH SCHEMABINDING AS
- RETURN
---===== "Inline" CTE Driven "Tally Table" produces values from 1 up to 10,000...
-     -- enough to cover VARCHAR(8000)
-  WITH E1(N) AS (
-                 SELECT 1 UNION ALL SELECT 1 UNION ALL SELECT 1 UNION ALL
-                 SELECT 1 UNION ALL SELECT 1 UNION ALL SELECT 1 UNION ALL
-                 SELECT 1 UNION ALL SELECT 1 UNION ALL SELECT 1 UNION ALL SELECT 1
-                ),                          --10E+1 or 10 rows
-       E2(N) AS (SELECT 1 FROM E1 a, E1 b), --10E+2 or 100 rows
-       E4(N) AS (SELECT 1 FROM E2 a, E2 b), --10E+4 or 10,000 rows max
- cteTally(N) AS (--==== This provides the "base" CTE and limits the number of rows right up front
-                     -- for both a performance gain and prevention of accidental "overruns"
-                 SELECT TOP (ISNULL(DATALENGTH(@pString),0)) ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) FROM E4
-                ),
-cteStart(N1) AS (--==== This returns N+1 (starting position of each "element" just once for each delimiter)
-                 SELECT 1 UNION ALL
-                 SELECT t.N+1 FROM cteTally t WHERE SUBSTRING(@pString,t.N,1) = @pDelimiter
-                ),
-cteLen(N1,L1) AS(--==== Return start and length (for use in substring)
-                 SELECT s.N1,
-                        ISNULL(NULLIF(CHARINDEX(@pDelimiter,@pString,s.N1),0)-s.N1,8000)
-                   FROM cteStart s
-                )
---===== Do the actual split. The ISNULL/NULLIF combo handles the length for the final element when no delimiter is found.
- SELECT ItemNumber = ROW_NUMBER() OVER(ORDER BY l.N1),
-        Item       = SUBSTRING(@pString, l.N1, l.L1)
-   FROM cteLen l
-;
-GO
-
 USE [VitalChoice.Ecommerce]
 GO
 
@@ -101,6 +58,49 @@ DELETE FROM OrderAddresses
 
 PRINT '====Wipe out all data === END'
 
+USE [vitalchoice2.0]
+GO
+
+IF OBJECT_ID('[dbo].[DelimitedSplit8K]') IS NOT NULL
+	DROP FUNCTION [dbo].[DelimitedSplit8K]
+
+GO
+
+CREATE FUNCTION [dbo].[DelimitedSplit8K]
+--===== Define I/O parameters
+        (@pString VARCHAR(8000), @pDelimiter NVARCHAR(4))
+--WARNING!!! DO NOT USE MAX DATA-TYPES HERE!  IT WILL KILL PERFORMANCE!
+RETURNS TABLE WITH SCHEMABINDING AS
+ RETURN
+--===== "Inline" CTE Driven "Tally Table" produces values from 1 up to 10,000...
+     -- enough to cover VARCHAR(8000)
+  WITH E1(N) AS (
+                 SELECT 1 UNION ALL SELECT 1 UNION ALL SELECT 1 UNION ALL
+                 SELECT 1 UNION ALL SELECT 1 UNION ALL SELECT 1 UNION ALL
+                 SELECT 1 UNION ALL SELECT 1 UNION ALL SELECT 1 UNION ALL SELECT 1
+                ),                          --10E+1 or 10 rows
+       E2(N) AS (SELECT 1 FROM E1 a, E1 b), --10E+2 or 100 rows
+       E4(N) AS (SELECT 1 FROM E2 a, E2 b), --10E+4 or 10,000 rows max
+ cteTally(N) AS (--==== This provides the "base" CTE and limits the number of rows right up front
+                     -- for both a performance gain and prevention of accidental "overruns"
+                 SELECT TOP (ISNULL(DATALENGTH(@pString),0)) ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) FROM E4
+                ),
+cteStart(N1) AS (--==== This returns N+1 (starting position of each "element" just once for each delimiter)
+                 SELECT 1 UNION ALL
+                 SELECT t.N+1 FROM cteTally t WHERE SUBSTRING(@pString,t.N,1) = @pDelimiter
+                ),
+cteLen(N1,L1) AS(--==== Return start and length (for use in substring)
+                 SELECT s.N1,
+                        ISNULL(NULLIF(CHARINDEX(@pDelimiter,@pString,s.N1),0)-s.N1,8000)
+                   FROM cteStart s
+                )
+--===== Do the actual split. The ISNULL/NULLIF combo handles the length for the final element when no delimiter is found.
+ SELECT ItemNumber = ROW_NUMBER() OVER(ORDER BY l.N1),
+        Item       = SUBSTRING(@pString, l.N1, l.L1)
+   FROM cteLen l
+;
+GO
+
 GO
 
 DBCC CHECKIDENT('Orders', RESEED, 1)
@@ -153,7 +153,7 @@ GO
 SET IDENTITY_INSERT Orders ON;
 
 INSERT INTO Orders
-(Id, IdObjectType, DateCreated, DateEdited, IdEditedBy, StatusCode, OrderStatus, IdCustomer, IdDiscount, Total, ProductsSubtotal, TaxTotal, ShippingTotal, DiscountTotal, IdAddedBy, IdOrderSource)
+(Id, IdObjectType, DateCreated, DateEdited, IdEditedBy, StatusCode, OrderStatus, IdCustomer, IdDiscount, Total, ProductsSubtotal, TaxTotal, ShippingTotal, DiscountTotal, IdAddedBy)
 SELECT 
 	o.idOrder, 
 	CASE 
@@ -200,12 +200,9 @@ SELECT
 		SELECT TOP 1 p.Id FROM [vitalchoice2.0].dbo.admins AS a 
 		LEFT JOIN [VitalChoice.Infrastructure].dbo.AdminProfiles AS p ON p.AgentId = a.AgentID COLLATE Cyrillic_General_CI_AS
 		WHERE a.idadmin = o.agentId
-	),
-	oo.Id
+	)
 FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS c ON c.Id = o.idCustomer
-LEFT JOIN [vitalchoice2.0].dbo.autoshipOrders AS aso ON aso.IdOrder = o.IdOrder
-LEFT JOIN Orders AS oo ON oo.IdAutoshipOrder = aso.IdAutoshipOrder
 WHERE o.orderDate IS NOT NULL AND o.idCustomer IS NOT NULL AND EXISTS(SELECT * FROM [vitalchoice2.0].dbo.ProductsOrdered AS po WHERE po.idOrder = o.idOrder)
 
 SET IDENTITY_INSERT Orders OFF;
@@ -238,8 +235,26 @@ SET ShippingTotal = ISNULL(TRY_CONVERT(MONEY,[vitalchoice2.0].dbo.RegexReplace('
 	)
 FROM Orders AS oo
 INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = oo.Id
-
 PRINT '====Set up discounts and missing totals'
+GO
+
+UPDATE Orders
+SET IdOrderSource = ro.Id
+FROM Orders AS oo
+INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = oo.Id
+INNER JOIN [vitalchoice2.0].dbo.reship AS r ON r.idOrder = o.IdOrder
+INNER JOIN Orders AS ro ON ro.Id = r.idOrderOriginal
+PRINT '====Set up IdOrderSource (reships)'
+
+GO
+
+UPDATE Orders
+SET IdOrderSource = ro.Id
+FROM Orders AS oo
+INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = oo.Id
+INNER JOIN [vitalchoice2.0].dbo.refund AS r ON r.idOrder = o.IdOrder
+INNER JOIN Orders AS ro ON ro.Id = r.idOrderOriginal
+PRINT '====Set up IdOrderSource (refunds)'
 
 GO
 
@@ -1228,6 +1243,54 @@ PRINT '====products ordered (auto-ship) (missed skus)'
 
 GO
 
+DECLARE @poOrderTypeId INT
+
+SELECT @poOrderTypeId = t.Id FROM OrderOptionTypes AS t
+WHERE t.Name = 'POrderType'
+
+DELETE FROM OrderOptionValues
+WHERE IdOptionType = @poOrderTypeId;
+PRINT '====POrderType values clean up'
+
+WITH productTypes AS
+(
+	SELECT p.IdObjectType, so.IdOrder FROM OrderToSkus AS so
+	INNER JOIN Skus AS s ON s.Id = so.IdSku
+	INNER JOIN Products AS p ON p.Id = s.IdProduct
+)
+INSERT INTO OrderOptionValues
+(IdOrder, IdOptionType, Value)
+SELECT 
+	o.Id, 
+	@poOrderTypeId,  
+	CAST(
+		CASE 
+			WHEN (
+					1 = ANY(SELECT IdObjectType FROM productTypes AS so
+							WHERE IdOrder = o.Id)
+					OR
+					4 = ANY(SELECT IdObjectType FROM productTypes AS so
+							WHERE IdOrder = o.Id)
+					OR
+					3 = ANY(SELECT IdObjectType FROM productTypes AS so
+							WHERE IdOrder = o.Id)
+				)
+				AND 
+				2 = ANY(SELECT IdObjectType FROM productTypes AS so
+						WHERE IdOrder = o.Id)
+				THEN 3
+			WHEN 2 = ANY(SELECT IdObjectType FROM productTypes AS so
+						WHERE IdOrder = o.Id) 
+				THEN 1
+			ELSE 2
+		END 
+		AS NVARCHAR(250)
+	)
+FROM Orders AS o
+PRINT '====POrderType value'
+
+GO
+
 DROP INDEX IX_OrdersIdAutoShipOrder ON Orders
 
 ALTER TABLE Orders
@@ -1258,6 +1321,39 @@ PRINT '====refund skus(missed skus)'
 
 GO
 
+INSERT INTO ReshipProblemSkus
+(IdOrder, IdSku)
+SELECT o.Id, so.IdSku FROM Orders AS o
+INNER JOIN [vitalchoice2.0].dbo.reship AS r ON r.idOrder = o.Id
+INNER JOIN OrderToSkus AS so ON so.IdOrder = o.Id
+WHERE r.problemSku = 'All'
+PRINT '====reship problem skus'
+
+GO
+
+INSERT INTO ReshipProblemSkus
+(IdOrder, IdSku)
+SELECT o.Id, s.Id FROM Orders AS o
+INNER JOIN [vitalchoice2.0].dbo.reship AS r ON r.idOrder = o.Id
+INNER JOIN [vitalchoice2.0].dbo.Orders AS oo ON oo.idOrder = o.Id
+INNER JOIN [vitalchoice2.0].dbo.ProductsOrdered AS po ON po.IdOrder = r.idOrderOriginal
+INNER JOIN [vitalchoice2.0].dbo.Products AS p ON p.idProduct = po.idProduct
+INNER JOIN Skus AS s ON s.Id = p.idProduct
+WHERE r.problemSku <> 'All' AND p.sku = r.problemSku AND s.Id NOT IN (SELECT IdSku FROM ReshipProblemSkus)
+PRINT '====reship problem skus (individual)'
+
+GO
+
+INSERT INTO ReshipProblemSkus
+(IdOrder, IdSku)
+SELECT o.Id, s.Id FROM Orders AS o
+INNER JOIN [vitalchoice2.0].dbo.reship AS r ON r.idOrder = o.Id
+INNER JOIN Skus AS s ON s.Code = r.problemSku COLLATE Cyrillic_General_CI_AS AND s.StatusCode <> 3
+WHERE r.problemSku <> 'All' AND s.Id NOT IN (SELECT IdSku FROM ReshipProblemSkus)
+PRINT '====reship problem skus (individual)'
+
+GO
+
 SET IDENTITY_INSERT HealthwisePeriods ON;
 
 INSERT INTO HealthwisePeriods
@@ -1285,6 +1381,10 @@ PRINT '====healthwise orders'
 
 GO
 
+DELETE FROM AffiliateOrderPayments
+DELETE FROM AffiliatePayments
+GO
+
 ALTER TABLE AffiliatePayments
 ADD IdOrder INT NOT NULL 
 CONSTRAINT UQ_AffiliatePaymentsOrder UNIQUE (IdOrder)
@@ -1297,7 +1397,7 @@ SELECT a.Id, o.affiliatePayReport, o.orderDate, oo.Id
 FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON oo.Id = o.IdOrder
 INNER JOIN Affiliates AS a ON a.Id = o.idAffiliate
-WHERE o.affiliatePayReport > o.affiliatePay
+WHERE o.affiliatePayReport > 0 AND o.affiliatePayReport > ISNULL(o.affiliatePay, 0)
 PRINT '====affiliate payments'
 
 GO
@@ -1308,7 +1408,7 @@ SELECT
 	oo.Id, 
 	a.Id, 
 	ap.Id, 
-	ISNULL(o.affiliatePay, o.affiliatePayReport), 
+	CASE WHEN o.affiliatePayReport = 0 THEN ISNULL(o.affiliatePay, 0) ELSE o.affiliatePayReport END, 
 	(SELECT CASE WHEN o.idOrder <=
 	ALL(
 		SELECT idOrder 
@@ -1324,6 +1424,7 @@ FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON oo.Id = o.IdOrder
 INNER JOIN Affiliates AS a ON a.Id = o.idAffiliate
 LEFT JOIN AffiliatePayments AS ap ON ap.IdOrder = oo.Id
+WHERE CASE WHEN o.affiliatePayReport = 0 THEN ISNULL(o.affiliatePay, 0) ELSE o.affiliatePayReport END > 0
 PRINT '====affiliate order payments'
 
 GO
