@@ -548,9 +548,9 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 throw new ArgumentNullException(nameof(commandData));
 
 #if !NETSTANDARD1_5
-            if (commandData.Certificate?.PublicKey.Key == null || commandData.Sign == null)
+            if (commandData.Certificate?.PublicKey.Key == null || (commandData.Sign == null && commandData.Data?.Length > 0))
 #else
-            if (commandData.Certificate == null || commandData.Sign == null)
+            if (commandData.Certificate == null || (commandData.Sign == null && commandData.Data?.Length > 0))
 #endif
             {
                 _logger.LogWarning("Incoming signature is invalid");
