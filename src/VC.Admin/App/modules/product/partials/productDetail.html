@@ -673,7 +673,7 @@
                                                                                         <label for="lblDate{{subSku.Id}}" class="col-md-3 control-label">Born Date</label>
                                                                                         <div class="col-md-1 margin-right-15px">
                                                                                             <p class="input-group">
-                                                                                                <input type="text" id="lblDate{{subSku.Id}}" name="BornDate" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="subSku.BornDate" is-open="subSku.DateOpened" />
+                                                                                                <input type="text" id="lblDate{{subSku.Id}}" name="BornDate" class="form-control" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="subSku.BornDate" is-open="subSku.DateOpened" />
                                                                                                 <span class="input-group-btn">
                                                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); subSku.DateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                                                 </span>

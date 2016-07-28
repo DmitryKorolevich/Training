@@ -299,6 +299,30 @@ namespace VC.Admin.ModelConverters
                     {
                         dbCustomer.Data.SourceDetails = dynamic.Customer.Data.SourceDetails;
                     }
+                    if (dynamic.Customer.DictionaryData.ContainsKey("TaxExempt"))
+                    {
+                        dbCustomer.Data.TaxExempt = dynamic.Customer.Data.TaxExempt;
+                    }
+                    if (dynamic.Customer.DictionaryData.ContainsKey("Website"))
+                    {
+                        dbCustomer.Data.Website = dynamic.Customer.Data.Website;
+                    }
+                    if (dynamic.Customer.DictionaryData.ContainsKey("PromotingWebsites"))
+                    {
+                        dbCustomer.Data.PromotingWebsites = dynamic.Customer.Data.PromotingWebsites;
+                    }
+                    if (dynamic.Customer.DictionaryData.ContainsKey("Tier"))
+                    {
+                        dbCustomer.Data.Tier = dynamic.Customer.Data.Tier;
+                    }
+                    if (dynamic.Customer.DictionaryData.ContainsKey("TradeClass"))
+                    {
+                        dbCustomer.Data.TradeClass = dynamic.Customer.Data.TradeClass;
+                    }
+                    if (dynamic.Customer.DictionaryData.ContainsKey("InceptionDate"))
+                    {
+                        dbCustomer.Data.InceptionDate = dynamic.Customer.Data.InceptionDate;
+                    }
                     if (model.Id == 0)
                     {
                         dbCustomer.ApprovedPaymentMethods = dynamic.Customer.ApprovedPaymentMethods;

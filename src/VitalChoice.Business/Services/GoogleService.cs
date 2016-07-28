@@ -56,6 +56,12 @@ namespace VitalChoice.Business.Services
 
         public void Test()
         {
+            //var accounts = Client.Management.AccountSummaries.List().Execute();
+            //foreach (var account in accounts.Items)
+            //{
+            //    var profileId = account.WebProperties[0].Profiles[0].Id;
+            //}
+
             var startDate = DateTime.Now.AddMonths(-2);
             var endDate = DateTime.Now.AddMonths(-1);
             var results = Client.Data.Ga.Get("ga:652942", startDate.ToString("yyyy-MM-dd"),
