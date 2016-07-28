@@ -538,7 +538,7 @@
                                 <div class="row form-group" data-ng-if="affiliate.Id">
                                     <div class="col-md-3">
                                         <p class="input-group">
-                                            <input type="text" name="test" class="form-control" placeholder="From" uib-datepicker-popup="dd-MMM-yyyy" ng-model="orderFilter.From" is-open="fromOpened" />
+                                            <input type="text" name="test" class="form-control" placeholder="From" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="orderFilter.From" is-open="fromOpened" />
                                             <span class="input-group-btn">
                                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                             </span>
@@ -546,7 +546,7 @@
                                     </div>
                                     <div class="col-md-3">
                                         <p class="input-group">
-                                            <input type="text" name="test" class="form-control" placeholder="To" uib-datepicker-popup="dd-MMM-yyyy" ng-model="orderFilter.To" is-open="toOpened" />
+                                            <input type="text" name="test" class="form-control" placeholder="To" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="orderFilter.To" is-open="toOpened" />
                                             <span class="input-group-btn">
                                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                             </span>

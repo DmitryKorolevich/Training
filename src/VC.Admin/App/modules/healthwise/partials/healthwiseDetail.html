@@ -56,7 +56,7 @@
                                         <label for="date" class="col-md-3 control-label">Date</label>
                                         <div class="col-md-9">
                                             <p class="input-group">
-                                                <input type="text" name="Date" class="form-control" placeholder="Date" uib-datepicker-popup="dd-MMM-yyyy" ng-model="payment.Date" is-open="dateOpened" required />
+                                                <input type="text" name="Date" class="form-control" placeholder="Date" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="payment.Date" is-open="dateOpened" required />
                                                 <span class="input-group-btn">
                                                     <button type="button" class="btn btn-default" ng-click="stopPropagation($event); dateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                 </span>

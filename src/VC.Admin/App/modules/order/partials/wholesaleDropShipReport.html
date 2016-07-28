@@ -11,7 +11,7 @@
                 <div class="row form-group">
                     <div class="col-md-3">
                         <p class="input-group">
-                            <input type="text" class="form-control" name="From" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                            <input type="text" class="form-control" name="From" data-ng-change="filterChanged();" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
@@ -22,7 +22,7 @@
                     </div>
                     <div class="col-md-3">
                         <p class="input-group">
-                            <input type="text" class="form-control" name="To" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                            <input type="text" class="form-control" name="To" data-ng-change="filterChanged();" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.To" is-open="toOpened" ng-required="true" />
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
@@ -40,7 +40,7 @@
                 <div class="row form-group">
                     <div class="col-md-3">
                         <p class="input-group">
-                            <input type="text" class="form-control" name="ShipFrom" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.ShipFrom" is-open="shipFromOpened" />
+                            <input type="text" class="form-control" name="ShipFrom" data-ng-change="filterChanged();" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.ShipFrom" is-open="shipFromOpened" />
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-click="stopPropagation($event); shipFromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
@@ -48,7 +48,7 @@
                     </div>
                     <div class="col-md-3">
                         <p class="input-group">
-                            <input type="text" class="form-control" name="ShipTo" data-ng-change="filterChanged();" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.ShipTo" is-open="shipToOpened" />
+                            <input type="text" class="form-control" name="ShipTo" data-ng-change="filterChanged();" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.ShipTo" is-open="shipToOpened" />
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-click="stopPropagation($event); shipToOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>

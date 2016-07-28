@@ -18,7 +18,7 @@
         <div class="row form-group">
             <div class="col-md-3">
                 <p class="input-group">
-                    <input type="text" name="test" class="form-control" placeholder="Valid From" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.ValidFrom" is-open="fromOpened" />
+                    <input type="text" name="test" class="form-control" placeholder="Valid From" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.ValidFrom" is-open="fromOpened" />
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
@@ -26,7 +26,7 @@
             </div>
             <div class="col-md-3">
                 <p class="input-group">
-                    <input type="text" name="test" class="form-control" placeholder="Valid To" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.ValidTo" is-open="toOpened" />
+                    <input type="text" name="test" class="form-control" placeholder="Valid To" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.ValidTo" is-open="toOpened" />
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>

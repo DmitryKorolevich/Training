@@ -239,7 +239,7 @@
                                                         <label for="date" class="col-md-6 control-label">Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDate" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDate" is-open="shipDelayDateOpened" required data-ng-disabled="orderEditDisabled" />
+                                                                <input type="text" name="ShipDelayDate" class="form-control" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="order.ShipDelayDate" is-open="shipDelayDateOpened" required data-ng-disabled="orderEditDisabled" />
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -254,7 +254,7 @@
                                                         <label for="date" class="col-md-6 control-label">Perishable Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDateP" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateP" is-open="shipDelayDatePOpened" data-ng-disabled="orderEditDisabled" />
+                                                                <input type="text" name="ShipDelayDateP" class="form-control" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="order.ShipDelayDateP" is-open="shipDelayDatePOpened" data-ng-disabled="orderEditDisabled" />
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDatePOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>
@@ -269,7 +269,7 @@
                                                         <label for="date" class="col-md-6 control-label">Non-Perishable Ship Date</label>
                                                         <div class="col-md-6">
                                                             <p class="input-group">
-                                                                <input type="text" name="ShipDelayDateNP" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened" data-ng-disabled="orderEditDisabled" />
+                                                                <input type="text" name="ShipDelayDateNP" class="form-control" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="order.ShipDelayDateNP" is-open="shipDelayDateNPOpened" data-ng-disabled="orderEditDisabled" />
                                                                 <span class="input-group-btn">
                                                                     <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); shipDelayDateNPOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                                 </span>

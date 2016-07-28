@@ -139,7 +139,7 @@
 												<label for="website" class="col-md-3 control-label">Inception Date</label>
 												<div class="col-md-9">
 													<p class="input-group">
-														<input type="text" name="test" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="date.InceptionDate" is-open="date.opened" datepicker-options="dateOptions" ng-required="true" />
+														<input type="text" name="test" class="form-control" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="date.InceptionDate" is-open="date.opened" datepicker-options="dateOptions" ng-required="true" />
 														<span class="input-group-btn">
 															<button type="button" class="btn btn-default" ng-disabled="false" ng-click="openDate($event)"><i class="glyphicon glyphicon-calendar"></i></button>
 														</span>

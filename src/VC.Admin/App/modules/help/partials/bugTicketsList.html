@@ -6,7 +6,7 @@
                 <div class="row form-group">
                     <div class="col-md-2">
                         <p class="input-group">
-                            <input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.From" is-open="fromOpened"/>
+                            <input type="text" class="form-control" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.From" is-open="fromOpened"/>
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
@@ -14,7 +14,7 @@
                     </div>
                     <div class="col-md-2">
                         <p class="input-group">
-                            <input type="text" class="form-control" uib-datepicker-popup="dd-MMM-yyyy" ng-model="filter.To" is-open="toOpened"/>
+                            <input type="text" class="form-control" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.To" is-open="toOpened"/>
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                             </span>
