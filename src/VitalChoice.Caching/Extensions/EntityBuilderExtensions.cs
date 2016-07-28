@@ -9,27 +9,34 @@ namespace VitalChoice.Caching.Extensions
 {
     public static class EntityBuilderExtensions
     {
-        public const string UniqueIndexAnnotationName = "IndexUniquenessCondition";
-        public const string FullCollectionAnnotationName = "FullCollectionCondition";
+        public const string UniqueIndexAnnotationName = "CacheUniqueIndexAnnotation";
+        public const string ConditionallyUniqueIndexAnnotationName = "CacheIndexUniquenessCondition";
+        public const string FullCollectionAnnotationName = "CacheFullCollectionCondition";
 
         public static IndexBuilder CacheIndexWhen<T>(this EntityTypeBuilder<T> typeBuilder, Expression<Func<T, bool>> condition,
             Expression<Func<T, object>> index)
             where T : class
         {
-            return typeBuilder.HasIndex(index).HasAnnotation(UniqueIndexAnnotationName, condition);
+            return typeBuilder.HasIndex(index).HasAnnotation(ConditionallyUniqueIndexAnnotationName, condition);
         }
 
         public static IndexBuilder CacheIndexWhen<T>(this EntityTypeBuilder<T> typeBuilder, Expression<Func<T, bool>> condition,
             params string[] properties)
             where T : class
         {
-            return typeBuilder.HasIndex(properties).HasAnnotation(UniqueIndexAnnotationName, condition);
+            return typeBuilder.HasIndex(properties).HasAnnotation(ConditionallyUniqueIndexAnnotationName, condition);
         }
 
-        public static EntityTypeBuilder<T> CacheWhen<T>(this EntityTypeBuilder<T> typeBuilder, Expression<Func<T, bool>> condition)
+        public static EntityTypeBuilder<T> CacheListWhen<T>(this EntityTypeBuilder<T> typeBuilder, Expression<Func<T, bool>> condition)
             where T : class
         {
             return typeBuilder.HasAnnotation(FullCollectionAnnotationName, condition);
+        }
+
+        public static IndexBuilder CacheUniqueIndex<T>(this EntityTypeBuilder<T> typeBuilder, Expression<Func<T, object>> index)
+            where T : class
+        {
+            return typeBuilder.HasIndex(index).IsUnique(true).HasAnnotation(UniqueIndexAnnotationName, typeof(T));
         }
     }
 }

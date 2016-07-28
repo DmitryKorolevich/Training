@@ -144,7 +144,11 @@ namespace VitalChoice.Caching.Services
 
         private static EntityCacheableIndexInfo GetFirstUniqueIndex(IEntityType entityType)
         {
-            var indexes = entityType.GetIndexes().Where(index => index.IsUnique);
+            var indexes =
+                entityType.GetIndexes()
+                    .Where(
+                        index =>
+                            index.IsUnique && index.GetAnnotations().Any(a => a.Name == EntityBuilderExtensions.UniqueIndexAnnotationName));
 
             var uniqueIndex =
                 indexes.Select(
@@ -295,7 +299,7 @@ namespace VitalChoice.Caching.Services
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var index in entityType.GetIndexes())
             {
-                var conditionAnnotation = index.FindAnnotation(EntityBuilderExtensions.UniqueIndexAnnotationName);
+                var conditionAnnotation = index.FindAnnotation(EntityBuilderExtensions.ConditionallyUniqueIndexAnnotationName);
                 if (conditionAnnotation != null)
                 {
                     conditionalList.Add(new EntityConditionalIndexInfo(CreateValueInfos(index.Properties),

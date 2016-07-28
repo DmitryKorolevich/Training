@@ -3770,12 +3770,17 @@ SELECT unpvt.Id, o.Id, unpvt.Value FROM
 (
 SELECT 
 	a.Id, 
-	CAST(cc.Terms AS NVARCHAR(250)) AS Terms, 
-	CAST(cc.FOB AS NVARCHAR(250)) AS Fob
+	CAST(ISNULL(termslv.Id, 1) AS NVARCHAR(250)) AS Terms, 
+	CAST(ISNULL(foblv.Id, 1) AS NVARCHAR(250)) AS Fob
 FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON oo.Id = o.idOrder
 INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = o.IdOrder
-INNER JOIN OrderPaymentMethods AS a ON a.IdOrder = oo.Id AND a.IdObjectType = 2) p
+INNER JOIN OrderPaymentMethods AS a ON a.IdOrder = oo.Id AND a.IdObjectType = 2
+INNER JOIN Lookups AS termsl ON termsl.Name = 'Terms'
+LEFT JOIN LookupVariants AS termslv ON termslv.IdLookup = termsl.Id AND termslv.ValueVariant = cc.Terms COLLATE Cyrillic_General_CI_AS
+INNER JOIN Lookups AS fobl ON fobl.Name = 'Fob'
+LEFT JOIN LookupVariants AS foblv ON foblv.IdLookup = fobl.Id AND foblv.ValueVariant = cc.FOB COLLATE Cyrillic_General_CI_AS
+) p
 UNPIVOT (Value FOR Name IN 
 	(Terms, Fob)
 )AS unpvt
@@ -3791,13 +3796,18 @@ SELECT unpvt.Id, o.Id, unpvt.Value FROM
 (
 SELECT 
 	a.Id, 
-	CAST(cc.Terms AS NVARCHAR(250)) AS Terms, 
-	CAST(cc.FOB AS NVARCHAR(250)) AS Fob
+	CAST(ISNULL(termslv.Id, 1) AS NVARCHAR(250)) AS Terms, 
+	CAST(ISNULL(foblv.Id, 1) AS NVARCHAR(250)) AS Fob
 FROM [vitalchoice2.0].dbo.autoshipOrders AS aso
 INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = aso.idOrder
 INNER JOIN Orders AS oo ON oo.IdAutoShipOrder = aso.idAutoShipOrder
 INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = o.IdOrder
-INNER JOIN OrderPaymentMethods AS a ON a.IdOrder = oo.Id AND a.IdObjectType = 2) p
+INNER JOIN OrderPaymentMethods AS a ON a.IdOrder = oo.Id AND a.IdObjectType = 2
+INNER JOIN Lookups AS termsl ON termsl.Name = 'Terms'
+LEFT JOIN LookupVariants AS termslv ON termslv.IdLookup = termsl.Id AND termslv.ValueVariant = cc.Terms COLLATE Cyrillic_General_CI_AS
+INNER JOIN Lookups AS fobl ON fobl.Name = 'Fob'
+LEFT JOIN LookupVariants AS foblv ON foblv.IdLookup = fobl.Id AND foblv.ValueVariant = cc.FOB COLLATE Cyrillic_General_CI_AS
+) p
 UNPIVOT (Value FOR Name IN 
 	(Terms, Fob)
 )AS unpvt
