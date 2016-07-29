@@ -39,9 +39,9 @@
             }
             if (data.FirstOrderTo)
             {
-                data.FirstOrderTo = data.ShipTo.FirstOrderTo();
+                data.FirstOrderTo = data.FirstOrderTo.toServerDateTime();
             }
-            if (data.CustomerSourceDetails = 'All')
+            if (data.CustomerSourceDetails == 'All')
             {
                 data.CustomerSourceDetails = null;
             }
@@ -148,7 +148,7 @@
 
         $scope.idCustomerSourceChanged = function ()
         {
-            if ($scope.filter.IdCustomerSource != 4)
+            if ($scope.filter.IdCustomerSource == 4)
             {
                 $scope.filter.CustomerSourceDetails = 'All';
             }

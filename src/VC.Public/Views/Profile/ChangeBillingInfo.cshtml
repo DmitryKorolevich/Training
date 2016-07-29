@@ -23,7 +23,7 @@
 	<div class="left-pane clean-border">
 		@await Component.InvokeAsync("ProfileSidebar")
 	</div>
-    <div class="right-pane clean-indent">
+    <div class="right-pane clean-indent relative">
         @using (Html.BeginForm("ChangeBillingInfo", "Profile", null, FormMethod.Post, null, new {@class = "form-regular medium-small border-form-left", role = "form"}))
         {
             @Html.HiddenFor(m => m.Default, new { @id = "hdDefault" })
@@ -52,5 +52,9 @@
                 <input class="yellow" type="submit" value="Save"/>
             </div>
         }
+        <div class="clear"></div>
+        <div class="overlay hide">
+            <div class="loading">Loading…</div>
+        </div>
     </div>
 </div>

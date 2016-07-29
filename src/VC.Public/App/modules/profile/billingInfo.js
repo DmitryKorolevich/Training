@@ -116,6 +116,15 @@ $(function () {
 			});
 		});
 	});
+
+	$("body .right-pane form").data("validator").settings.submitHandler = function (form)
+	{
+	    $("body .right-pane .overlay").show();
+	    setTimeout(function ()
+	    {
+	        form.submit();
+	    }, 100);
+	};
 });
 
 function populateCreditCardsSelection(creditCards, setDefault) {
@@ -171,16 +180,22 @@ function changeSaveButtonLabel(id) {
 	}
 }
 
-function deleteCreditCard(idCreditCard, successCallback, errorCallback) {
+function deleteCreditCard(idCreditCard, successCallback, errorCallback)
+{
+    $("body .right-pane .overlay").show();
 	$.ajax({
 		type: "POST",
 		url: "/Profile/DeleteBillingInfo/" + idCreditCard,
 		dataType: "json"
-	}).success(function (result) {
+	}).success(function (result)
+	{
+	    $("body .right-pane .overlay").hide();
 		if (successCallback) {
 			successCallback(result);
 		}
-	}).error(function (result) {
+	}).error(function (result)
+	{
+	    $("body .right-pane .overlay").hide();
 		if (errorCallback) {
 			errorCallback(result);
 		}
@@ -221,16 +236,22 @@ function setChangedData(selectedCreditCard) {
 	$.validator.unobtrusive.parse("form");
 }
 
-function setDefaultCreditCard(idAddress, successCallback, errorCallback) {
+function setDefaultCreditCard(idAddress, successCallback, errorCallback)
+{
+    $("body .right-pane .overlay").show();
 	$.ajax({
 		type: "POST",
 		url: "/Profile/SetDefaultCreditCard/" + idAddress,
 		dataType: "json"
-	}).success(function (result) {
+	}).success(function (result)
+	{
+	    $("body .right-pane .overlay").hide();
 		if (successCallback) {
 			successCallback(result);
 		}
-	}).error(function (result) {
+	}).error(function (result)
+	{
+	    $("body .right-pane .overlay").hide();
 		if (errorCallback) {
 			errorCallback(result);
 		}

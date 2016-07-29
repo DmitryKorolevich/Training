@@ -34,7 +34,7 @@ namespace VC.Admin.Models.Affiliate
                 FromEmail = FromEmail,
                 Subject = Subject,
                 Body = Message,
-                IsHTML=false,
+                IsHTML=true,
             };
 
             return toReturn;

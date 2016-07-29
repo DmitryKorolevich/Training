@@ -182,7 +182,7 @@ angular.module('app.core.utils.appBootstrap', [])
                 $rootScope.validatePermissionMenuItem = validatePermissionMenuItem;
                 $rootScope.stopPropagation = stopPropagation;
                 $rootScope.UIOptions = {};
-                $rootScope.UIOptions.DatepickerFormat = 'dd/MM/yyyy';
+                $rootScope.UIOptions.DatepickerFormat = 'MM/dd/yyyy';
             }
 
             function bindRootScope() {

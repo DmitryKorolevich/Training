@@ -32,7 +32,7 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
             Map(m => m.CustomerCompany).Name("Company").Index(6);
             Map(m => m.DateCreated).Name("Order Date").Index(7).TypeConverterOption(CultureInfo.InvariantCulture).TypeConverterOption("MM/dd/yyyy");
             Map(m => m.ProductsSubtotal).Name("Product Total").Index(8).TypeConverterOption("c");
-            Map(m => m.Total).Name("Total").Index(9).TypeConverterOption("c");
+            Map(m => m.Total).Name("Gross Total").Index(9).TypeConverterOption("c");
             Map(m => m.DiscountCode).Name("Discount Code").Index(10);
             Map(m => m.IdAffiliate).Name("Affiliate Id").Index(11);
             Map(m => m.KeyCode).Name("Key Code").Index(12);

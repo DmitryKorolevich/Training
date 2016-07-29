@@ -82,7 +82,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                 throw new ApiException("Invalid product");
             }
 
-            var targetStatuses = new List<RecordStatusCode>() {RecordStatusCode.Active};
+            var targetStatuses = new List<RecordStatusCode>() { RecordStatusCode.Active };
             if (viewContext.Entity.StatusCode == RecordStatusCode.NotActive)
             {
                 if (!viewContext.Parameters.Preview)
@@ -95,9 +95,9 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             var customerVisibility = GetCustomerVisibility(viewContext);
 
             var eProduct = viewContext.Parameters.Product;
-            if (!eProduct.IdVisibility.HasValue || 
-                !customerVisibility.Contains(eProduct.IdVisibility.Value) || 
-                targetStatuses.All(x => x != (RecordStatusCode) eProduct.StatusCode))
+            if (!eProduct.IdVisibility.HasValue ||
+                !customerVisibility.Contains(eProduct.IdVisibility.Value) ||
+                targetStatuses.All(x => x != (RecordStatusCode)eProduct.StatusCode))
             {
                 if (!viewContext.Parameters.Preview)
                 {
@@ -136,7 +136,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
             var toReturn =
                 await
-                    PopulateProductPageTemplateModel(viewContext, rootAllCategory, lastProductReviews, reviewsCount, ratingsAverage, targetStatuses, 
+                    PopulateProductPageTemplateModel(viewContext, rootAllCategory, lastProductReviews, reviewsCount, ratingsAverage, targetStatuses,
                     viewContext.Parameters.cat);
             return toReturn;
         }
@@ -211,7 +211,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             toReturn.SubProductGroupName = eProduct.SafeData.SubProductGroupName;
             toReturn.BreadcrumbOrderedItems = breadcrumbItems;
             toReturn.Skus =
-                eProduct.Skus.Where(x => !x.Hidden && targetStatusCodes.Contains((RecordStatusCode) x.StatusCode))
+                eProduct.Skus.Where(x => !x.Hidden && targetStatusCodes.Contains((RecordStatusCode)x.StatusCode))
                     .OrderBy(x => x.Order)
                     .Select(x => new TtlProductPageSkuModel()
                     {
@@ -221,7 +221,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                         PortionsCount = (int?)x.SafeData.QTY ?? 0,
                         InStock =
                             (x.SafeData.DisregardStock != null && x.SafeData.DisregardStock == true) || x.SafeData.DisregardStock == null
-                            || ((int?) x.SafeData.Stock ?? 0) > 0,
+                            || ((int?)x.SafeData.Stock ?? 0) > 0,
                         AutoShip = x.SafeData.AutoShipProduct != null ? x.Data.AutoShipProduct : false,
                     }).ToList();
             toReturn.YoutubeVideos = new List<TtlRelatedYoutubeVideoModel>()
@@ -298,82 +298,70 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                 }).ToList()
             };
 
-            if (eProduct.DictionaryData.ContainsKey("IngredientsTitleOverride"))
+            toReturn.IngredientsTab = new TtlProductIngredientsTabModel()
             {
-                toReturn.IngredientsTab = new TtlProductIngredientsTabModel()
-                {
-                    TitleOverride = eProduct.SafeData.IngredientsTitleOverride,
-                    Content = eProduct.SafeData.Ingredients,
-                    Hidden = eProduct.SafeData.IngredientsHide,
-                    NutritionalTitle = eProduct.SafeData.NutritionalTitle,
-                    IngredientsTitle = eProduct.SafeData.IngredientsTitle,
-                    ServingSize = eProduct.SafeData.ServingSize,
-                    Servings = eProduct.SafeData.Servings,
-                    Calories = eProduct.SafeData.Calories,
-                    CaloriesFromFat = eProduct.SafeData.CaloriesFromFat,
-                    TotalFat = eProduct.SafeData.TotalFat,
-                    TotalFatPercent = eProduct.SafeData.TotalFatPercent,
-                    SaturatedFat = eProduct.SafeData.SaturatedFat,
-                    SaturatedFatPercent = eProduct.SafeData.SaturatedFatPercent,
-                    TransFat = eProduct.SafeData.TransFat,
-                    TransFatPercent = eProduct.SafeData.TransFatPercent,
-                    Cholesterol = eProduct.SafeData.Cholesterol,
-                    CholesterolPercent = eProduct.SafeData.CholesterolPercent,
-                    Sodium = eProduct.SafeData.Sodium,
-                    SodiumPercent = eProduct.SafeData.SodiumPercent,
-                    TotalCarbohydrate = eProduct.SafeData.TotalCarbohydrate,
-                    TotalCarbohydratePercent = eProduct.SafeData.TotalCarbohydratePercent,
-                    DietaryFiber = eProduct.SafeData.DietaryFiber,
-                    DietaryFiberPercent = eProduct.SafeData.DietaryFiberPercent,
-                    Sugars = eProduct.SafeData.Sugars,
-                    SugarsPercent = eProduct.SafeData.SugarsPercent,
-                    Protein = eProduct.SafeData.Protein,
-                    ProteinPercent = eProduct.SafeData.ProteinPercent,
-                    AdditionalNotes = eProduct.SafeData.AdditionalNotes?.Replace("\n", "<br/>")
-                };
-            }
+                TitleOverride = eProduct.SafeData.IngredientsTitleOverride,
+                Content = eProduct.SafeData.Ingredients,
+                Hidden = eProduct.SafeData.IngredientsHide,
+                NutritionalTitle = eProduct.SafeData.NutritionalTitle,
+                IngredientsTitle = eProduct.SafeData.IngredientsTitle,
+                ServingSize = eProduct.SafeData.ServingSize,
+                Servings = eProduct.SafeData.Servings,
+                Calories = eProduct.SafeData.Calories,
+                CaloriesFromFat = eProduct.SafeData.CaloriesFromFat,
+                TotalFat = eProduct.SafeData.TotalFat,
+                TotalFatPercent = eProduct.SafeData.TotalFatPercent,
+                SaturatedFat = eProduct.SafeData.SaturatedFat,
+                SaturatedFatPercent = eProduct.SafeData.SaturatedFatPercent,
+                TransFat = eProduct.SafeData.TransFat,
+                TransFatPercent = eProduct.SafeData.TransFatPercent,
+                Cholesterol = eProduct.SafeData.Cholesterol,
+                CholesterolPercent = eProduct.SafeData.CholesterolPercent,
+                Sodium = eProduct.SafeData.Sodium,
+                SodiumPercent = eProduct.SafeData.SodiumPercent,
+                TotalCarbohydrate = eProduct.SafeData.TotalCarbohydrate,
+                TotalCarbohydratePercent = eProduct.SafeData.TotalCarbohydratePercent,
+                DietaryFiber = eProduct.SafeData.DietaryFiber,
+                DietaryFiberPercent = eProduct.SafeData.DietaryFiberPercent,
+                Sugars = eProduct.SafeData.Sugars,
+                SugarsPercent = eProduct.SafeData.SugarsPercent,
+                Protein = eProduct.SafeData.Protein,
+                ProteinPercent = eProduct.SafeData.ProteinPercent,
+                AdditionalNotes = eProduct.SafeData.AdditionalNotes?.Replace("\n", "<br/>")
+            };
 
-            if (eProduct.DictionaryData.ContainsKey("RecipesTitleOverride"))
+            var recipes = await _recipeService.GetRecipesAsync(new RecipeListFilter() { ProductId = eProduct.Id });
+
+            toReturn.RecipesTab = new TtlProductRecipesTabModel()
             {
-                var recipes = await _recipeService.GetRecipesAsync(new RecipeListFilter() {ProductId = eProduct.Id});
-
-                toReturn.RecipesTab = new TtlProductRecipesTabModel()
+                TitleOverride = eProduct.SafeData.RecipesTitleOverride,
+                Content = eProduct.SafeData.Recipes,
+                Hidden = eProduct.Data.RecipesHide,
+                Recipes = recipes.Items.Select(x => new TtlProductRecipeModel()
                 {
-                    TitleOverride = eProduct.SafeData.RecipesTitleOverride,
-                    Content = eProduct.SafeData.Recipes,
-                    Hidden = eProduct.Data.RecipesHide,
-                    Recipes = recipes.Items.Select(x => new TtlProductRecipeModel()
-                    {
-                        Name = x.Name,
-                        Url = ProductPageParameters.RecipeBaseUrl + x.Url
-                    }).ToList(),
-                };
-            }
+                    Name = x.Name,
+                    Url = ProductPageParameters.RecipeBaseUrl + x.Url
+                }).ToList(),
+            };
 
-            if (eProduct.DictionaryData.ContainsKey("ServingTitleOverride"))
+            toReturn.ServingTab = new TtlProductPageTabModel()
             {
-                toReturn.ServingTab = new TtlProductPageTabModel()
-                {
-                    TitleOverride = eProduct.SafeData.ServingTitleOverride,
-                    Content = eProduct.SafeData.Serving,
-                    Hidden = eProduct.Data.ServingHide
-                };
-            }
+                TitleOverride = eProduct.SafeData.ServingTitleOverride,
+                Content = eProduct.SafeData.Serving,
+                Hidden = eProduct.Data.ServingHide
+            };
 
-            if (eProduct.DictionaryData.ContainsKey("ShippingTitleOverride"))
+            toReturn.ShippingTab = new TtlProductPageTabModel()
             {
-                toReturn.ShippingTab = new TtlProductPageTabModel()
-                {
-                    TitleOverride = eProduct.SafeData.ShippingTitleOverride,
-                    Content = eProduct.SafeData.Shipping,
-                    Hidden = eProduct.Data.ShippingHide
-                };
-            }
+                TitleOverride = eProduct.SafeData.ShippingTitleOverride,
+                Content = eProduct.SafeData.Shipping,
+                Hidden = eProduct.Data.ShippingHide
+            };
 
             var bestValuedSku =
                 toReturn.Skus.Where(z => z.PortionsCount != 0)
                     .FirstOrDefault(
-                        x => x.Price/x.PortionsCount == toReturn.Skus.Where(z => z.PortionsCount != 0).Max(y => y.Price/x.PortionsCount));
+                        x => x.Price / x.PortionsCount == toReturn.Skus.Where(z => z.PortionsCount != 0).Max(y => y.Price / x.PortionsCount));
             if (bestValuedSku != null)
             {
                 bestValuedSku.BestValue = true;

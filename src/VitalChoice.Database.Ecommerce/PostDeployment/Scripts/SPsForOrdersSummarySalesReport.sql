@@ -29,6 +29,36 @@ AS
 BEGIN
 
 	SET NOCOUNT ON;
+	
+	DECLARE @KeyCodeIds TABLE(Id INT NOT NULL PRIMARY KEY)
+	DECLARE @SourceId INT, @SourceDetailId INT
+
+ INSERT @KeyCodeIds
+ (
+  Id
+ )
+ (
+  SELECT 
+   Id
+  FROM OrderOptionTypes
+  WHERE Name='KeyCode'
+ );
+
+ SET @SourceId =
+ (
+  SELECT 
+   TOP 1 Id
+  FROM CustomerOptionTypes
+  WHERE Name='Source'
+ );
+
+ SET @SourceDetailId =
+ (
+  SELECT 
+   TOP 1 Id
+  FROM CustomerOptionTypes
+  WHERE Name='SourceDetails'
+ );
 
 	WITH 
 	orders_rep
@@ -50,6 +80,7 @@ BEGIN
 		(@idcustomertype IS NULL OR c.IdObjectType = @idcustomertype) AND
 		(@idcustomer IS NULL OR o.IdCustomer = @idcustomer)
 	),
+
 	tempOrders(
 		Id, IdObjectType, IdCustomer, CustomerIdObjectType, IdDiscount, CustomerDateCreated,
 		OrderStatus, POrderStatus, NPOrderStatus, DateCreated, ProductsSubtotal, Total,
@@ -66,12 +97,9 @@ BEGIN
 			sdval.Value as SourceDetails, occ.Count as OrdersCount, ISNULL(foc.DateCreated, temp.CustomerDateCreated) as FirstOrderDate
 			FROM
 			orders_rep as temp	
-		LEFT JOIN OrderOptionTypes AS kcopt WITH(NOLOCK) ON kcopt.Name = N'KeyCode' AND kcopt.IdObjectType = temp.IdObjectType
-		LEFT JOIN OrderOptionValues AS kcval WITH(NOLOCK) ON kcval.IdOrder = temp.Id AND kcval.IdOptionType = kcopt.Id
-		LEFT JOIN CustomerOptionTypes AS sopt WITH(NOLOCK) ON sopt.Name = N'Source'
-		LEFT JOIN CustomerOptionValues AS sval WITH(NOLOCK) ON sval.IdCustomer = temp.IdCustomer AND sval.IdOptionType = sopt.Id
-		LEFT JOIN CustomerOptionTypes AS sdopt WITH(NOLOCK) ON sdopt.Name = N'SourceDetails'
-		LEFT JOIN CustomerOptionValues AS sdval WITH(NOLOCK) ON sdval.IdCustomer = temp.IdCustomer AND sdval.IdOptionType = sdopt.Id
+		LEFT JOIN OrderOptionValues AS kcval WITH(NOLOCK) ON kcval.IdOrder = temp.Id AND kcval.IdOptionType IN (SELECT Id FROM @KeyCodeIds)
+		LEFT JOIN CustomerOptionValues AS sval WITH(NOLOCK) ON sval.IdCustomer = temp.IdCustomer AND sval.IdOptionType = @SourceId
+		LEFT JOIN CustomerOptionValues AS sdval WITH(NOLOCK) ON sdval.IdCustomer = temp.IdCustomer AND sdval.IdOptionType = @SourceDetailId
 		LEFT JOIN VOrderCountOnCustomers As occ WITH(NOLOCK) ON occ.IdCustomer = temp.IdCustomer
 		LEFT JOIN VFirstOrderOnCustomers As foc WITH(NOLOCK) ON foc.IdCustomer = temp.IdCustomer
 		LEFT JOIN Discounts As d WITH(NOLOCK) ON d.Id = temp.IdDiscount
@@ -140,9 +168,7 @@ BEGIN
  SET NOCOUNT ON
 
  DECLARE @KeyCodeIds TABLE(Id INT NOT NULL PRIMARY KEY)
- DECLARE @OrderTypeIds TABLE(Id INT NOT NULL PRIMARY KEY)
- DECLARE @SourceIds TABLE(Id INT NOT NULL PRIMARY KEY)
- DECLARE @SourceDetailIds TABLE(Id INT NOT NULL PRIMARY KEY)
+ DECLARE @OrderTypeId INT, @SourceId INT, @SourceDetailId INT
 
  INSERT @KeyCodeIds
  (
@@ -155,36 +181,27 @@ BEGIN
   WHERE Name='KeyCode'
  )
 
- INSERT @OrderTypeIds
- (
-  Id
- )
+ SET @OrderTypeId =
  (
   SELECT 
-   Id
+   TOP 1 Id
   FROM OrderOptionTypes
   WHERE Name='OrderType'
  )
 
- INSERT @SourceIds
- (
-  Id
- )
+ SET @SourceId =
  (
   SELECT 
-   Id
-  FROM OrderOptionTypes
+   TOP 1 Id
+  FROM CustomerOptionTypes
   WHERE Name='Source'
  )
 
- INSERT @SourceDetailIds
- (
-  Id
- )
+ SET @SourceDetailId =
  (
   SELECT 
-   Id
-  FROM OrderOptionTypes
+   TOP 1 Id
+  FROM CustomerOptionTypes
   WHERE Name='SourceDetails'
  )  
 
@@ -193,9 +210,9 @@ BEGIN
 		FROM Orders o WITH(NOLOCK)
 			INNER JOIN Customers c WITH(NOLOCK) ON o.IdCustomer=c.Id  
 			LEFT JOIN OrderOptionValues AS kcval WITH(NOLOCK) ON kcval.IdOrder = o.Id AND kcval.IdOptionType IN (SELECT Id FROM @KeyCodeIds)
-			INNER JOIN OrderOptionValues AS otval WITH(NOLOCK) ON otval.IdOrder = o.Id AND otval.IdOptionType IN (SELECT Id FROM @OrderTypeIds)
-			LEFT JOIN CustomerOptionValues AS sval WITH(NOLOCK) ON sval.IdCustomer = o.IdCustomer AND sval.IdOptionType IN (SELECT Id FROM @SourceIds)
-			LEFT JOIN CustomerOptionValues AS sdval WITH(NOLOCK) ON sdval.IdCustomer = o.IdCustomer AND sdval.IdOptionType IN (SELECT Id FROM @SourceDetailIds)
+			INNER JOIN OrderOptionValues AS otval WITH(NOLOCK) ON otval.IdOrder = o.Id AND otval.IdOptionType=@OrderTypeId
+			LEFT JOIN CustomerOptionValues AS sval WITH(NOLOCK) ON sval.IdCustomer = o.IdCustomer AND sval.IdOptionType=@SourceId
+			LEFT JOIN CustomerOptionValues AS sdval WITH(NOLOCK) ON sdval.IdCustomer = o.IdCustomer AND sdval.IdOptionType=@SourceDetailId
 			LEFT JOIN VOrderCountOnCustomers As occ WITH(NOLOCK) ON occ.IdCustomer = o.IdCustomer
 			LEFT JOIN VFirstOrderOnCustomers As foc WITH(NOLOCK) ON foc.IdCustomer = o.IdCustomer
 			LEFT JOIN Discounts As d WITH(NOLOCK) ON d.Id = o.IdDiscount

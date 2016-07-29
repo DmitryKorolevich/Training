@@ -15,17 +15,22 @@ function changeSelection(selId) {
 		paymentId = selId;
 	}
 
+	$("body .right-pane .overlay").show();
 	$.ajax({
 		url: "/Profile/GetBillingAddress?orderId=" + orderId + "&paymentId=" + paymentId,
 		dataType: "html"
-	}).success(function (result) {
+	}).success(function (result)
+	{
+	    $("body .right-pane .overlay").hide();
 		$("#dynamicArea").html(result);
 
 		refreshCountries();
 		populateCardTypes();
 
 		reparseElementValidators("form");
-	}).error(function (result) {
+	}).error(function (result)
+	{
+	    $("body .right-pane .overlay").hide();
 		notifyError();
 	});
 }

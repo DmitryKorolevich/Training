@@ -117,6 +117,15 @@ $(function () {
 			});
 		});
 	});
+
+	$("body .right-pane form").data("validator").settings.submitHandler = function (form)
+	{
+	    $("body .right-pane .overlay").show();
+	    setTimeout(function ()
+	    {
+	        form.submit();
+	    }, 100);
+	};
 });
 
 function populateAddressesSelection(shippingAddresses, setDefault) {
@@ -222,32 +231,44 @@ function setChangedData(selectedShippingAddress) {
 	processCharcount({ target: $("textarea[name=DeliveryInstructions]") });
 }
 
-function deleteShippingAddress(idAddress, successCallback, errorCallback) {
+function deleteShippingAddress(idAddress, successCallback, errorCallback)
+{
+    $("body .right-pane .overlay").show();
 	$.ajax({
 		type: "POST",
 		url: "/Profile/DeleteShippingInfo/" + idAddress,
 		dataType: "json"
-	}).success(function (result) {
+	}).success(function (result)
+	{
+	    $("body .right-pane .overlay").hide();
 		if (successCallback) {
 			successCallback(result, shippingAddresses);
 		}
-	}).error(function (result) {
+	}).error(function (result)
+	{
+	    $("body .right-pane .overlay").hide();
 		if (errorCallback) {
 			errorCallback(result, shippingAddresses);
 		}
 	});
 }
 
-function setDefaultShippingAddress(idAddress, successCallback, errorCallback) {
+function setDefaultShippingAddress(idAddress, successCallback, errorCallback)
+{
+    $("body .right-pane .overlay").show();
 	$.ajax({
 		type: "POST",
 		url: "/Profile/SetDefaultShippingInfo/" + idAddress,
 		dataType: "json"
-	}).success(function (result) {
+	}).success(function (result)
+	{
+	    $("body .right-pane .overlay").hide();
 		if (successCallback) {
 			successCallback(result);
 		}
-	}).error(function (result) {
+	}).error(function (result)
+	{
+	    $("body .right-pane .overlay").hide();
 		if (errorCallback) {
 			errorCallback(result);
 		}
