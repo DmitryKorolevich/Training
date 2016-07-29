@@ -118,7 +118,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
-                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
+                entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
             });
 
             builder.Entity<PromotionOptionValue>(entity =>
@@ -225,7 +225,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
-                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
+                entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
             });
 
 
@@ -287,7 +287,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
-                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
+                entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
             });
 
             builder.Entity<SkuOptionValue>(entity =>
@@ -407,8 +407,8 @@ namespace VitalChoice.Ecommerce.Context
                 entity.HasKey(p => p.Id);
                 entity.ToTable("Countries");
                 entity.Ignore(p => p.States);
-                entity.CacheWhen(c => c.StatusCode != RecordStatusCode.Deleted);
-                entity.HasIndex(c => c.CountryCode).IsUnique();
+                entity.CacheListWhen(c => c.StatusCode != RecordStatusCode.Deleted);
+                entity.CacheUniqueIndex(c => c.CountryCode);
             });
 
 
@@ -416,8 +416,8 @@ namespace VitalChoice.Ecommerce.Context
             {
                 entity.HasKey(p => p.Id);
                 entity.ToTable("States");
-                entity.CacheWhen(c => c.StatusCode != RecordStatusCode.Deleted);
-                entity.HasIndex(c => new {c.StateCode, c.CountryCode}).IsUnique();
+                entity.CacheListWhen(c => c.StatusCode != RecordStatusCode.Deleted);
+                entity.CacheUniqueIndex(c => new {c.StateCode, c.CountryCode});
             });
 
 
@@ -541,7 +541,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
-                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
+                entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
             });
 
 
@@ -609,7 +609,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
-                entity.HasIndex(e => e.Name).IsUnique(true);
+                entity.CacheUniqueIndex(e => e.Name);
             });
 
             builder.Entity<CustomerNoteOptionValue>(entity =>
@@ -711,7 +711,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
-                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
+                entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
             });
 
 
@@ -852,7 +852,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
-                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
+                entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
             });
 
             builder.Entity<CustomerPaymentMethodOptionValue>(entity =>
@@ -968,7 +968,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey<OrderOptionType>(t => t.IdLookup)
                     .HasPrincipalKey<Lookup>(l => l.Id)
                     .IsRequired(false);
-                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
+                entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
             });
 
             builder.Entity<OrderToPromoToInventorySku>(entity =>
@@ -1198,7 +1198,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
-                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
+                entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
             });
 
             #endregion
@@ -1232,7 +1232,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
-                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
+                entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
             });
 
             builder.Entity<Affiliate>(entity =>
@@ -1392,7 +1392,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
-                entity.HasIndex(e => new { e.Name, e.IdObjectType }).IsUnique(true);
+                entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
             });
         }
 
@@ -1479,7 +1479,7 @@ namespace VitalChoice.Ecommerce.Context
             {
                 entity.ToTable("Carts");
                 entity.HasKey(c => c.Id);
-                entity.HasIndex(c => c.CartUid).IsUnique();
+                entity.CacheUniqueIndex(c => c.CartUid);
                 entity.HasMany(c => c.GiftCertificates).WithOne().HasForeignKey(g => g.IdCart).HasPrincipalKey(c => c.Id);
                 entity.HasMany(c => c.Skus).WithOne().HasForeignKey(s => s.IdCart).HasPrincipalKey(c => c.Id);
             });
@@ -1615,7 +1615,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
-                entity.HasIndex(e => new {e.Name, e.IdObjectType}).IsUnique(true);
+                entity.CacheUniqueIndex(e => new {e.Name, e.IdObjectType});
             });
         }
 

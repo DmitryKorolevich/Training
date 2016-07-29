@@ -12,6 +12,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Avatax;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
@@ -173,7 +174,7 @@ namespace VitalChoice.Business.Services.Avatax
                 CompanyCode = _companyCode,
                 CustomerUsageType =
                     customer.IdObjectType == (int) CustomerType.Wholesale &&
-                    customer.SafeData.TaxExempt == 1 //Yes, Current Certificate
+                    (TaxExempt?)customer.SafeData.TaxExempt == TaxExempt.YesCurrentCertificate //Yes, Current Certificate
                         ? "G"
                         : null,
                 DocCode =
@@ -273,7 +274,7 @@ namespace VitalChoice.Business.Services.Avatax
                     LineNo = "01-SHIP",
                     CustomerUsageType =
                         context.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
-                        context.Order.Customer.SafeData.TaxExempt == 1 //Yes, Current Certificate
+                        (TaxExempt?)context.Order.Customer.SafeData.TaxExempt == TaxExempt.YesCurrentCertificate //Yes, Current Certificate
                             ? "G"
                             : null
                 }, 1));
@@ -354,7 +355,7 @@ namespace VitalChoice.Business.Services.Avatax
                     Ref1 = p.Sku.Id.ToString(CultureInfo.InvariantCulture),
                     CustomerUsageType =
                         order.Order.Customer.IdObjectType == (int) CustomerType.Wholesale &&
-                        order.Order.Customer.SafeData.TaxExempt == 1 //Yes, Current Certificate
+                        (TaxExempt?) order.Order.Customer.SafeData.TaxExempt == TaxExempt.YesCurrentCertificate //Yes, Current Certificate
                             ? "G"
                             : null
                 });

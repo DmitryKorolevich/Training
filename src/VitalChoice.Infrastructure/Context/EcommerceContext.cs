@@ -40,7 +40,7 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.ToTable("Carts");
                 entity.HasKey(c => c.Id);
-                entity.HasIndex(c => c.CartUid).IsUnique();
+                entity.CacheUniqueIndex(c => c.CartUid);
                 entity.HasMany(c => c.GiftCertificates).WithOne().HasForeignKey(g => g.IdCart).HasPrincipalKey(c => c.Id);
                 entity.HasMany(c => c.Skus).WithOne().HasForeignKey(s => s.IdCart).HasPrincipalKey(c => c.Id);
             });
