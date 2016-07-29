@@ -692,6 +692,7 @@ namespace VitalChoice.Business.Services.Orders
             OrdersSummarySalesReportFilter filter)
         {
             var toReturn = await _sPEcommerceRepository.GetOrdersSummarySalesOrderTypeStatisticItemsAsync(filter);
+            toReturn = toReturn.OrderBy(p => p.Id).ToList();
 
             var total = new OrdersSummarySalesOrderTypeStatisticItem();
             total.Name = "Total";
