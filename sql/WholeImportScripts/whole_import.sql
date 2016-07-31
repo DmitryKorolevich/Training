@@ -319,25 +319,25 @@ GO
 
 USE [VitalChoice.Ecommerce]
 
-INSERT INTO Countries
-(CountryCode, CountryName, [Order], StatusCode)
-SELECT c.countryCode, c.countryName, ROW_NUMBER() OVER(ORDER BY c.countryCode), 2 FROM [vitalchoice2.0].dbo.countries AS c
+--INSERT INTO Countries
+--(CountryCode, CountryName, [Order], StatusCode, IdVisibility)
+--SELECT c.countryCode, c.countryName, ROW_NUMBER() OVER(ORDER BY c.countryCode), 2, NULL FROM [vitalchoice2.0].dbo.countries AS c
 
-INSERT INTO States
-(CountryCode, StateCode, StateName, StatusCode, [Order])
-SELECT c.pcCountryCode, c.stateCode, c.stateName, 2, ROW_NUMBER() OVER(ORDER BY c.stateCode) FROM [vitalchoice2.0].dbo.states AS c
-INNER JOIN Countries AS cc ON cc.CountryCode = c.pcCountryCode COLLATE Cyrillic_General_CI_AS
+--INSERT INTO States
+--(CountryCode, StateCode, StateName, StatusCode, [Order])
+--SELECT c.pcCountryCode, c.stateCode, c.stateName, 2, ROW_NUMBER() OVER(ORDER BY c.stateCode) FROM [vitalchoice2.0].dbo.states AS c
+--INNER JOIN Countries AS cc ON cc.CountryCode = c.pcCountryCode COLLATE Cyrillic_General_CI_AS
 
-INSERT INTO Countries
-(CountryCode, CountryName, [Order], StatusCode)
-SELECT CASE WHEN c.countryName = 'Taiwan' THEN 'TW' ELSE c.countryCode END, c.countryName, ROW_NUMBER() OVER(ORDER BY c.countryCode), 1 FROM [vitalchoice2.0].dbo.countriesCSPortal AS c
-WHERE c.countryCode NOT IN (SELECT cc.countryCode FROM [vitalchoice2.0].dbo.countries AS cc)
+--INSERT INTO Countries
+--(CountryCode, CountryName, [Order], StatusCode, IdVisibility)
+--SELECT CASE WHEN c.countryName = 'Taiwan' THEN 'TW' ELSE c.countryCode END, c.countryName, ROW_NUMBER() OVER(ORDER BY c.countryCode), 2, 2 FROM [vitalchoice2.0].dbo.countriesCSPortal AS c
+--WHERE c.countryCode NOT IN (SELECT cc.countryCode FROM [vitalchoice2.0].dbo.countries AS cc)
 
-INSERT INTO States
-(CountryCode, StateCode, StateName, StatusCode, [Order])
-SELECT c.pcCountryCode, c.stateCode, c.stateName, 1, ROW_NUMBER() OVER(ORDER BY c.stateCode) FROM [vitalchoice2.0].dbo.statesCSPortal AS c
-INNER JOIN Countries AS cc ON cc.CountryCode = c.pcCountryCode COLLATE Cyrillic_General_CI_AS
-WHERE c.pcCountryCode NOT IN (SELECT s.pcCountryCode FROM [vitalchoice2.0].dbo.states AS s)
+--INSERT INTO States
+--(CountryCode, StateCode, StateName, StatusCode, [Order])
+--SELECT c.pcCountryCode, c.stateCode, c.stateName, 2, ROW_NUMBER() OVER(ORDER BY c.stateCode) FROM [vitalchoice2.0].dbo.statesCSPortal AS c
+--INNER JOIN Countries AS cc ON cc.CountryCode = c.pcCountryCode COLLATE Cyrillic_General_CI_AS
+--WHERE c.pcCountryCode NOT IN (SELECT s.pcCountryCode FROM [vitalchoice2.0].dbo.states AS s)
 
 GO
 

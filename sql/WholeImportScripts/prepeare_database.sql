@@ -182,8 +182,6 @@ USE [VitalChoice.Ecommerce]
 
 DELETE FROM CatalogRequestAddressOptionValues
 DELETE FROM CatalogRequestAddresses
-DELETE FROM States
-DELETE FROM Countries
 DELETE FROM CartToGiftCertificates
 DELETE FROM RefundOrderToGiftCertificates
 DELETE FROM OrderToGiftCertificates
