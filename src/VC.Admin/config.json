@@ -81,7 +81,7 @@
       "ServiceUrl": "http://pdfmyurl.com/api"
     },
     "CacheSettings": {
-      "MaxProcessHeapsSizeBytes": 1572864000, //1500 Mb, entire application
+      "MaxProcessHeapsSizeBytes": 4294967296, //4 Gb, entire application
       "CacheTimeToLeaveSeconds": 1800, //30 minutes
       "CacheScanPeriodSeconds": 900 //15 minutes
     },
