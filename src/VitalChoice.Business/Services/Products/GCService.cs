@@ -119,7 +119,7 @@ namespace VitalChoice.Business.Services.Products
             GcQuery conditions = new GcQuery().NotDeleted().WithFrom(filter.From).WithTo(filter.To).WithType(filter.Type).
                 WidthStatus(filter.StatusCode);
 
-            //Get all GCs from cache
+            //BUG: TODO: please use Skip/Take functionality with ordering below because cache won't hit on conditional queries like this
             var data = await giftCertificateRepository.Query(conditions).
                 Include(p => p.Order).ThenInclude(p => p.PaymentMethod).ThenInclude(p => p.BillingAddress).ThenInclude(p => p.OptionValues).
                 Include(p=>p.Order).ThenInclude(p=>p.ShippingAddress).ThenInclude(p=>p.OptionValues).
