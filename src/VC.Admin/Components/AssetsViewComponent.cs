@@ -85,6 +85,23 @@ namespace VC.Admin.Components
                     }
                 }
             }
+            else if (assetType.Equals("styles-report", StringComparison.OrdinalIgnoreCase))
+            {
+                viewName = "Styles";
+                var assetInfo = _frontEndAssetManager.GetReportStyles();
+                if (appOptions.EnableBundlingAndMinification)
+                {
+                    filePaths.Add(urlHelper.Content(
+                        $"~/{assetInfo.MinifiedFileName}.min.css{versionQueryString}"));
+                }
+                else
+                {
+                    foreach (var assetFileInfo in assetInfo.Files)
+                    {
+                        filePaths.Add(urlHelper.Content($"~/{assetFileInfo}{versionQueryString}"));
+                    }
+                }
+            }
             else
 			{
 				throw new InvalidOperationException($"Asset type '{assetType}' is not recognized.");

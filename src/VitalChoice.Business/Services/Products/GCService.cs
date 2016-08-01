@@ -24,6 +24,8 @@ using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services.Bronto;
 using Microsoft.EntityFrameworkCore;
+using VitalChoice.DynamicData.Helpers;
+using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 
 namespace VitalChoice.Business.Services.Products
 {
@@ -39,17 +41,20 @@ namespace VitalChoice.Business.Services.Products
         private readonly INotificationService notificationService;
         private readonly OrderAddressMapper orderAddressMapper;
         private readonly ILogger logger;
+        private readonly DynamicExtensionsRewriter queryVisitor;
 
         public GCService(IEcommerceRepositoryAsync<GiftCertificate> giftCertificateRepository,
             UserManager<ApplicationUser> userManager, 
             INotificationService notificationService,
             OrderAddressMapper orderAddressMapper,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerProviderExtended loggerProvider,
+            DynamicExtensionsRewriter queryVisitor)
         {
             this.giftCertificateRepository = giftCertificateRepository;
             this.userManager = userManager;
             this.notificationService = notificationService;
             this.orderAddressMapper = orderAddressMapper;
+            this.queryVisitor = queryVisitor;
             logger = loggerProvider.CreateLogger<GCService>();
         }
 
@@ -118,81 +123,89 @@ namespace VitalChoice.Business.Services.Products
         {
             GcQuery conditions = new GcQuery().NotDeleted().WithFrom(filter.From).WithTo(filter.To).WithType(filter.Type).
                 WidthStatus(filter.StatusCode);
-
-            //BUG: TODO: please use Skip/Take functionality with ordering below because cache won't hit on conditional queries like this
-            var data = await giftCertificateRepository.Query(conditions).
-                Include(p => p.Order).ThenInclude(p => p.PaymentMethod).ThenInclude(p => p.BillingAddress).ThenInclude(p => p.OptionValues).
-                Include(p=>p.Order).ThenInclude(p=>p.ShippingAddress).ThenInclude(p=>p.OptionValues).
-                SelectAsync(false);
-
-            var query = data.Select(p => new GCWithOrderListItemModel(p, orderAddressMapper.OptionTypes));
-            if (filter.ShippingAddress!=null && !String.IsNullOrEmpty(filter.ShippingAddress.LastName))
+            if (filter.ShippingAddress != null && !String.IsNullOrEmpty(filter.ShippingAddress.LastName))
             {
-                query = query.Where(p => !String.IsNullOrEmpty(p.ShippingLastName) && p.ShippingLastName.IndexOf(filter.ShippingAddress.LastName, StringComparison.OrdinalIgnoreCase)>=0);
+                conditions = conditions.WithShippingAddress(filter.ShippingAddress);
             }
             if (filter.BillingAddress != null && !String.IsNullOrEmpty(filter.BillingAddress.LastName))
             {
-                query = query.Where(p => !String.IsNullOrEmpty(p.BillingLastName) && p.BillingLastName.IndexOf(filter.BillingAddress.LastName, StringComparison.OrdinalIgnoreCase) >= 0);
+                conditions = conditions.WithBillingAddress(filter.BillingAddress);
             }
+            var q = (Expression<Func<GiftCertificate, bool>>)queryVisitor.Visit(conditions.Query());
 
-            Func<IQueryable<GCWithOrderListItemModel>, IOrderedQueryable<GCWithOrderListItemModel>> sortable = x => x.OrderByDescending(y => y.Created);
+            Func<IQueryable<GiftCertificate>, IOrderedQueryable<GiftCertificate>> sortable = x => x.OrderByDescending(y => y.Created);
             var sortOrder = filter.Sorting.SortOrder;
-            if(String.IsNullOrEmpty(filter.Sorting.Path))
-            {
-                filter.Sorting.Path = GiftCertificatesWithOrderSortPath.Created;
-            }
             switch (filter.Sorting.Path)
             {
                 case GiftCertificatesWithOrderSortPath.Code:
-                    query = sortOrder == FilterSortOrder.Asc
-                                ? query.OrderBy(y => y.Code)
-                                : query.OrderByDescending(y => y.Code);
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.Code)
+                                : x.OrderByDescending(y => y.Code);
                     break;
                 case GiftCertificatesWithOrderSortPath.Created:
-                    query = sortOrder == FilterSortOrder.Asc
-                                ? query.OrderBy(y => y.Created)
-                                : query.OrderByDescending(y => y.Created);
-                    break;
-                case GiftCertificatesWithOrderSortPath.BillingLastName:
-                    query = sortOrder == FilterSortOrder.Asc
-                                ? query.OrderBy(y => y.BillingLastName)
-                                : query.OrderByDescending(y => y.BillingLastName);
-                    break;
-                case GiftCertificatesWithOrderSortPath.ShippingLastName:
-                    query = sortOrder == FilterSortOrder.Asc
-                                ? query.OrderBy(y => y.ShippingLastName)
-                                : query.OrderByDescending(y => y.ShippingLastName);
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.Created)
+                                : x.OrderByDescending(y => y.Created);
                     break;
                 case GiftCertificatesWithOrderSortPath.Type:
-                    query = sortOrder == FilterSortOrder.Asc
-                                ? query.OrderBy(y => y.GCType)
-                                : query.OrderByDescending(y => y.GCType);
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.GCType)
+                                : x.OrderByDescending(y => y.GCType);
                     break;
                 case GiftCertificatesWithOrderSortPath.Status:
-                    query = sortOrder == FilterSortOrder.Asc
-                                ? query.OrderBy(y => y.StatusCode)
-                                : query.OrderByDescending(y => y.StatusCode);
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.StatusCode)
+                                : x.OrderByDescending(y => y.StatusCode);
                     break;
                 case GiftCertificatesWithOrderSortPath.Balance:
-                    query = sortOrder == FilterSortOrder.Asc
-                                ? query.OrderBy(y => y.Balance)
-                                : query.OrderByDescending(y => y.Balance);
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.Balance)
+                                : x.OrderByDescending(y => y.Balance);
                     break;
             }
 
-            var items = query.ToList();
+            var query = giftCertificateRepository.Query(q).
+                Include(p => p.Order).ThenInclude(p => p.PaymentMethod).ThenInclude(p => p.BillingAddress).ThenInclude(p => p.OptionValues).
+                Include(p=>p.Order).ThenInclude(p=>p.ShippingAddress).ThenInclude(p=>p.OptionValues).OrderBy(sortable);
+            
             GCStatisticModel toReturn = new GCStatisticModel();
-            toReturn.Count = items.Count;
-            toReturn.Total = items.Where(p=>p.StatusCode==RecordStatusCode.Active).Sum(p => p.Balance);
             if (filter.Paging != null)
             {
-                toReturn.Items = items.Skip((filter.Paging.PageIndex-1)* filter.Paging.PageItemCount).Take(filter.Paging.PageItemCount).ToList();
+                var data = await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+                toReturn.Items = data.Items.Select(p => new GCWithOrderListItemModel(p, orderAddressMapper.OptionTypes)).ToList();
+                toReturn.Count = data.Count;
+                
+                var balanceConditions  =  new GcQuery().NotDeleted().WithFrom(filter.From).WithTo(filter.To).WithType(filter.Type).
+                    WidthStatus(RecordStatusCode.Active);
+                if (filter.ShippingAddress != null && !String.IsNullOrEmpty(filter.ShippingAddress.LastName))
+                {
+                    balanceConditions = conditions.WithShippingAddress(filter.ShippingAddress);
+                }
+                if (filter.BillingAddress != null && !String.IsNullOrEmpty(filter.BillingAddress.LastName))
+                {
+                    balanceConditions = conditions.WithBillingAddress(filter.BillingAddress);
+                }
+                var q = (Expression<Func<GiftCertificate, bool>>)queryVisitor.Visit(conditions.Query());
+                toReturn.Total = await giftCertificateRepository.Query(q).SelectSumAsync(p => p.Balance);
             }
             else
             {
-                toReturn.Items = items;
+                var data = await query.SelectAsync(false);
+                toReturn.Items = data.Select(p=> new GCWithOrderListItemModel(p, orderAddressMapper.OptionTypes)).ToList();
+                toReturn.Count = toReturn.Items.Count;
+                toReturn.Total = toReturn.Items.Where(p => p.StatusCode == RecordStatusCode.Active).Sum(p => p.Balance);
             }
-            foreach(var item in items)
+            foreach(var item in toReturn.Items)
             {
                 item.GCTypeName = LookupHelper.GetShortGCTypeName(item.GCType);
                 item.StatusCodeName = LookupHelper.GetRecordStatus(item.StatusCode);

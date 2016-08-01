@@ -5,6 +5,7 @@ module.exports = function (grunt) {
     var jsConfig = grunt.file.readJSON('AppConfig/scripts/files.json');
     var cssConfig = grunt.file.readJSON('AppConfig/styles/files.json');
     var cssOrderInvoiceConfig = grunt.file.readJSON('AppConfig/styles-order-invoice/files.json');
+    var cssReportConfig = grunt.file.readJSON('AppConfig/styles-report/files.json');
 
     var jsFiles = jsConfig.files;
     for (var i = 0; i < jsFiles.length; i++) {
@@ -21,10 +22,17 @@ module.exports = function (grunt) {
         cssOrderInvoiceFiles[j] = "wwwroot/" + cssOrderInvoiceFiles[j];
     }
 
+    var cssReportFiles = cssReportConfig.files;
+    for (var j = 0; j < cssReportFiles.length; j++)
+    {
+        cssReportFiles[j] = "wwwroot/" + cssReportFiles[j];
+    }
+
     grunt.initConfig({
         jsMinifiedFileName: jsConfig.minifiedFileName,
         cssMinifiedFileName: cssConfig.minifiedFileName,
         cssOrderInvoiceMinifiedFileName: cssOrderInvoiceConfig.minifiedFileName,
+        cssReportMinifiedFileName: cssReportConfig.minifiedFileName,
         pkg: grunt.file.readJSON('package.json'),
         bower: {
             install: {
@@ -43,6 +51,10 @@ module.exports = function (grunt) {
             cssorderinvoice: {
                 src: cssOrderInvoiceFiles,
                 dest: 'temp/css/<%= cssOrderInvoiceMinifiedFileName %>.css'
+            },
+            cssreportinvoice: {
+                src: cssReportFiles,
+                dest: 'temp/css/<%= cssReportMinifiedFileName %>.css'
             },
             js: {
                 src: jsFiles,
@@ -124,7 +136,8 @@ module.exports = function (grunt) {
             target: {
                 files: [
 					{ expand: true, cwd: 'temp/css/', src: ['<%= cssMinifiedFileName %>.css'], dest: 'temp/css/minified/', ext: '.min.css' },
-					{ expand: true, cwd: 'temp/css/', src: ['<%= cssOrderInvoiceMinifiedFileName %>.css'], dest: 'temp/css/minified/', ext: '.min.css' }
+					{ expand: true, cwd: 'temp/css/', src: ['<%= cssOrderInvoiceMinifiedFileName %>.css'], dest: 'temp/css/minified/', ext: '.min.css' },
+                    { expand: true, cwd: 'temp/css/', src: ['<%= cssReportMinifiedFileName %>.css'], dest: 'temp/css/minified/', ext: '.min.css' }
                 ],
                 options: {
                     shorthandCompacting: false,

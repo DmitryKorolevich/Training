@@ -1355,5 +1355,28 @@ namespace VitalChoice.Business.Services.Orders
 
             return await _sPEcommerceRepository.GetProductQualitySkusReportRawItemsAsync(filter);
         }
+
+        public async Task<KPIReport> CreateKPIReportAsync()
+        {
+            var report = new KPIReport();
+            report.Date = DateTime.Now;
+
+            var start = report.Date.AddYears(-1);
+            var end = report.Date.AddDays(1);
+            FillKPIReportSales(report.TodayYearSales, start, end);
+            start = report.Date.AddMonths(-1).AddYears(-1);
+            end = report.Date.AddMonths(-1).AddDays(1);
+            FillKPIReportSales(report.MonthAgoYearSales, start, end);
+            start = report.Date.AddYears(-2);
+            end = report.Date.AddYears(-1).AddDays(1);
+            FillKPIReportSales(report.YearAgoYearSales, start, end);
+
+            return report;
+        }
+
+        private void FillKPIReportSales(KPIReportSalesItem item, DateTime start, DateTime end)
+        {
+            
+        }
     }
 }

@@ -48,3 +48,4 @@ Post-Deployment Script Template
 :r .\Scripts\SPsForProductQualityReport.sql
 :r .\Scripts\OrderIndexes.sql
 :r .\Scripts\SettingOptionTypesData.sql
+:r .\Scripts\SPGetKPISales.sql

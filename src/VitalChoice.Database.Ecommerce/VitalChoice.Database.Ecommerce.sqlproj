@@ -198,4 +198,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SettingOptionTypesData.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetKPISales.sql" />
+  </ItemGroup>
 </Project>

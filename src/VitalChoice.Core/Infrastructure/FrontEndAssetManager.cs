@@ -11,10 +11,12 @@ namespace VitalChoice.Core.Infrastructure
 		private const string ScriptsFilePath = "AppConfig/scripts/files.json";
 		private const string StylesFilePath = "AppConfig/styles/files.json";
         private const string StylesOrderInvoiceFilePath = "AppConfig/styles-order-invoice/files.json";
+        private const string StylesReportFilePath = "AppConfig/styles-report/files.json";
 
         private readonly string _scriptsAppRelativePath;
 		private readonly string _stylesAppRelativePath;
         private readonly string _stylesOrderInvoiceAppRelativePath;
+        private readonly string _stylesReportAppRelativePath;
         private readonly JsonSerializerSettings _serializerSettings;
 
 		public FrontEndAssetManager(IHostingEnvironment env)
@@ -22,6 +24,7 @@ namespace VitalChoice.Core.Infrastructure
 			_scriptsAppRelativePath = Path.Combine(env.ContentRootPath, ScriptsFilePath);
 			_stylesAppRelativePath = Path.Combine(env.ContentRootPath, StylesFilePath);
             _stylesOrderInvoiceAppRelativePath = Path.Combine(env.ContentRootPath, StylesOrderInvoiceFilePath);
+            _stylesReportAppRelativePath = Path.Combine(env.ContentRootPath, StylesReportFilePath);
             _serializerSettings = new JsonSerializerSettings
 			{
 				ContractResolver = new CamelCasePropertyNamesContractResolver()
@@ -41,6 +44,11 @@ namespace VitalChoice.Core.Infrastructure
         public AssetInfo GetOrderInvoiceStyles()
         {
             return GetAssetInfo(_stylesOrderInvoiceAppRelativePath);
+        }
+
+        public AssetInfo GetReportStyles()
+        {
+            return GetAssetInfo(_stylesReportAppRelativePath);
         }
 
         private AssetInfo GetAssetInfo(string filePath)

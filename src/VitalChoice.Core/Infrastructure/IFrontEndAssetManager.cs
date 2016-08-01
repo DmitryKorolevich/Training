@@ -7,5 +7,6 @@ namespace VitalChoice.Core.Infrastructure
         AssetInfo GetOrderInvoiceStyles();
         AssetInfo GetScripts();
         AssetInfo GetStyles();
+        AssetInfo GetReportStyles();
     }
 }

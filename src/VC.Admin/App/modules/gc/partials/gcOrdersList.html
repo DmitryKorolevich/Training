@@ -75,20 +75,8 @@
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
                         </th>
-                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('BillingLastName')">
-                            <span>Billing Last Name</span>
-                            <span data-ng-if="filter.Sorting.Path == 'BillingLastName'">
-                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
-                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
-                            </span>
-                        </th>
-                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('ShippingLastName')">
-                            <span>Shipping Last Name</span>
-                            <span data-ng-if="filter.Sorting.Path == 'ShippingLastName'">
-                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
-                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
-                            </span>
-                        </th>
+                        <th>Billing Last Name</th>
+                        <th>Shipping Last Name</th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Type')">
                             <span>Type</span>
                             <span data-ng-if="filter.Sorting.Path == 'Type'">
