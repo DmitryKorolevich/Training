@@ -30,7 +30,7 @@
                 <tr data-ng-repeat="item in autoShips">
 	                <td>
 						<a target="_blank" href="{{baseUrl}}{{item.ProductUrl}}" title="{{item.DisplayName}}">
-							<img class="thumb" src="{{item.IconUrl}}" alt="{{item.Name}}">
+							<img class="thumb" data-ng-src="{{item.IconUrl}}" alt="{{item.Name}}">
 						</a>
 	                </td>
 	                <td>
