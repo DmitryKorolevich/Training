@@ -195,7 +195,7 @@ namespace VitalChoice.Business.Services.Products
                 {
                     balanceConditions = conditions.WithBillingAddress(filter.BillingAddress);
                 }
-                var q = (Expression<Func<GiftCertificate, bool>>)queryVisitor.Visit(conditions.Query());
+                q = (Expression<Func<GiftCertificate, bool>>)queryVisitor.Visit(balanceConditions.Query());
                 toReturn.Total = await giftCertificateRepository.Query(q).SelectSumAsync(p => p.Balance);
             }
             else
