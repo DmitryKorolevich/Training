@@ -34,6 +34,9 @@ using VitalChoice.Infrastructure.Domain.Entities.Reports;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Interfaces.Services.Settings;
+using VitalChoice.Business.Services.Bronto;
+using VitalChoice.Data.Repositories.Specifics;
+using Newtonsoft.Json;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -50,6 +53,11 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IDynamicMapper<AddressDynamic, Address> _addresMapper;
         private readonly ReferenceData _referenceData;
         private readonly ITrackingService _trackingService;
+        private readonly BrontoService _brontoService;
+        private readonly IGoogleService _googleService;
+        private readonly IEcommerceRepositoryAsync<KPICacheItem> _kPICacheItemRepository;
+        private readonly FacebookService _facebookService;
+        private readonly TwitterService _twitterService;
         private readonly ILogger _logger;
 
         public OrderReportService(
@@ -63,6 +71,11 @@ namespace VitalChoice.Business.Services.Orders
             IDiscountService discountService,
             IDynamicMapper<AddressDynamic, Address> addresMapper,
             ITrackingService trackingService,
+            BrontoService brontoService,
+            IGoogleService googleService,
+            IEcommerceRepositoryAsync<KPICacheItem> kPICacheItemRepository,
+            FacebookService facebookService,
+            TwitterService twitterService,
             ILoggerProviderExtended loggerProvider,
             ReferenceData referenceData)
         {
@@ -77,6 +90,11 @@ namespace VitalChoice.Business.Services.Orders
             _addresMapper = addresMapper;
             _referenceData = referenceData;
             _trackingService = trackingService;
+            _brontoService = brontoService;
+            _googleService = googleService;
+            _kPICacheItemRepository = kPICacheItemRepository;
+            _facebookService = facebookService;
+            _twitterService = twitterService;
             _logger = loggerProvider.CreateLogger<OrderReportService>();
         }
 
@@ -1356,27 +1374,116 @@ namespace VitalChoice.Business.Services.Orders
             return await _sPEcommerceRepository.GetProductQualitySkusReportRawItemsAsync(filter);
         }
 
+        public async Task<KPIReport> GetKPIReportAsync()
+        {
+            Func<IQueryable<KPICacheItem>, IOrderedQueryable<KPICacheItem>> sortable = x => x.OrderByDescending(y => y.DateCreated);
+            var result = await _kPICacheItemRepository.Query().OrderBy(sortable).SelectFirstOrDefaultAsync(false);
+            if (result != null)
+            {
+                return JsonConvert.DeserializeObject<KPIReport>(result.Data);
+            }
+            return null;
+        }
+
         public async Task<KPIReport> CreateKPIReportAsync()
         {
-            var report = new KPIReport();
-            report.Date = DateTime.Now;
+            KPIReport report = null;
+            try
+            {
+                report = new KPIReport();
+                report.Date = DateTime.Now;
 
-            var start = report.Date.AddYears(-1);
-            var end = report.Date.AddDays(1);
-            FillKPIReportSales(report.TodayYearSales, start, end);
-            start = report.Date.AddMonths(-1).AddYears(-1);
-            end = report.Date.AddMonths(-1).AddDays(1);
-            FillKPIReportSales(report.MonthAgoYearSales, start, end);
-            start = report.Date.AddYears(-2);
-            end = report.Date.AddYears(-1).AddDays(1);
-            FillKPIReportSales(report.YearAgoYearSales, start, end);
+                var start = report.Date.AddYears(-1);
+                var end = report.Date.AddDays(1);
+                await FillKPIReportSales(report.TodayYearSales, start, end);
+                start = report.Date.AddMonths(-1).AddYears(-1);
+                end = report.Date.AddMonths(-1).AddDays(1);
+                await FillKPIReportSales(report.MonthAgoYearSales, start, end);
+                start = report.Date.AddYears(-2);
+                end = report.Date.AddYears(-1).AddDays(1);
+                await FillKPIReportSales(report.YearAgoYearSales, start, end);
+
+                deliveryObject[] deliveryObjects = new deliveryObject[0];
+                contactObject[] activeContacts = new contactObject[0];
+                //deliveryObject[] deliveryObjects = await _brontoService.GetInfo(report.Date.AddYears(-1).AddDays(-30));
+                //contactObject[] activeContacts = await _brontoService.GetAllActiveContacts(report.Date.AddYears(-1).AddDays(-30));
+
+                start = report.Date.AddDays(-30);
+                end = report.Date.AddDays(1);
+                FillKPIReportMarketing(report.TodayMonthMarketing, start, end, activeContacts, deliveryObjects, true);
+                start = report.Date.AddMonths(-1).AddDays(-30);
+                end = report.Date.AddMonths(-1).AddDays(1);
+                FillKPIReportMarketing(report.MonthAgoMonthMarketing, start, end, activeContacts, deliveryObjects);
+                start = report.Date.AddYears(-1).AddDays(-30);
+                end = report.Date.AddYears(-1).AddDays(1);
+                FillKPIReportMarketing(report.YearAgoMonthMarketing, start, end, activeContacts, deliveryObjects);
+
+                start = report.Date.AddDays(-30);
+                end = report.Date.AddDays(1);
+                FillKPIReportRates(report.MonthRates, start, end);
+                start = report.Date.AddDays(-60);
+                end = report.Date.AddDays(1);
+                FillKPIReportRates(report.TwoMonthRates, start, end);
+                start = report.Date.AddMonths(-12);
+                end = report.Date.AddDays(1);
+                FillKPIReportRates(report.YearRates, start, end);
+
+                KPICacheItem cache = new KPICacheItem();
+                cache.DateCreated = report.Date;
+                cache.Data = JsonConvert.SerializeObject(report);
+                await _kPICacheItemRepository.InsertAsync(cache);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("KPI report generating error");
+                _logger.LogError(e.ToString());
+            }
 
             return report;
         }
 
-        private void FillKPIReportSales(KPIReportSalesItem item, DateTime start, DateTime end)
+        private async Task FillKPIReportSales(KPIReportSalesItem item, DateTime from, DateTime to)
         {
-            
+            var data = await _sPEcommerceRepository.GetKPISalesRawItemAsync(from, to);
+            item.Total = data.Total;
+            item.NewCustomers = data.NewCustomers;
+            item.Wholesales = data.Wholesales;
+            item.NewWholesales = data.NewWholesales;
+            item.Affiliates = data.Affiliates;
+            item.NewAffiliates = data.NewAffiliates;
+
+            //TODO: google part
+            //item.PaidSearch = _googleService.GetTransactionsRevenuePaid(from, to);
+            //item.OrganicSearch = _googleService.GetTransactionsRevenueOrganics(from, to);
+        }
+
+        private async Task FillKPIReportMarketing(KPIReportMarketingItem item, DateTime from, DateTime to, 
+            contactObject[] activeContacts, deliveryObject[] deliveryObjects, bool lastData=false)
+        {
+            item.NewEmailAddresses = _brontoService.GetAddressCount(activeContacts, from, to);
+            item.OpenRate = _brontoService.GetOpenRate(deliveryObjects, from, to);
+
+            if (lastData)
+            {
+                item.FacebookLikes = _facebookService.GetLikesCount();
+                item.TwitterFollowers = _twitterService.GetFollowersCount();
+            }
+            else
+            {
+                Func<IQueryable<KPICacheItem>, IOrderedQueryable<KPICacheItem>> sortable = x => x.OrderByDescending(y => y.DateCreated);
+                var cache = await _kPICacheItemRepository.Query(p=>p.DateCreated<=to).OrderBy(sortable).SelectFirstOrDefaultAsync(false);
+                if (cache != null)
+                {
+                    var report =  JsonConvert.DeserializeObject<KPIReport>(cache.Data);
+                    item.FacebookLikes = report.TodayMonthMarketing.FacebookLikes;
+                    item.TwitterFollowers = report.TodayMonthMarketing.TwitterFollowers;
+                }
+            }
+        }
+
+        private void FillKPIReportRates(KPIReportRatesItem item, DateTime from, DateTime to)
+        {
+            //TODO: google part
         }
     }
 }

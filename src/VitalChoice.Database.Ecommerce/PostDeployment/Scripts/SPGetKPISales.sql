@@ -16,6 +16,7 @@ BEGIN
 	SET NOCOUNT ON
 
 	SELECT 
+		1 Id,
 		(
 			SELECT 
 				SUM(Total)

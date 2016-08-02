@@ -49,3 +49,4 @@ Post-Deployment Script Template
 :r .\Scripts\OrderIndexes.sql
 :r .\Scripts\SettingOptionTypesData.sql
 :r .\Scripts\SPGetKPISales.sql
+:r .\Scripts\SPGetShortOrders.sql

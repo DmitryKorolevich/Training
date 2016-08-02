@@ -74,7 +74,7 @@ angular.module('app.modules.customer.controllers.customerManagementController', 
 		        if ((!$scope.address.Email || $scope.address.Email.length < 3) &&
                     (!$scope.address.LastName || $scope.address.LastName.length < 3) &&
                     (!$scope.address.FirstName || $scope.address.FirstName.length < 3) &&
-                    (!$scope.defaultShippingAddress.Address1 || $scope.address.defaultShippingAddress.length < 3) &&
+                    (!$scope.defaultShippingAddress.Address1 || $scope.defaultShippingAddress.Address1.length < 3) &&
                     (!$scope.address.SearchText || $scope.address.SearchText.length < 3) &&
                     (!$scope.defaultShippingAddress.City || $scope.defaultShippingAddress.City.length < 3) &&
                     (!$scope.defaultShippingAddress.Zip || $scope.defaultShippingAddress.Zip.length < 3) &&

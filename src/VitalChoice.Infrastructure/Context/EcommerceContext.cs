@@ -148,6 +148,16 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(f => f.Id);
             });
 
+            builder.Entity<KPIReportDBSaleRawItem>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+            });
+
+            builder.Entity<ShortOrderItemModel>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+            });
+
             #endregion
 
             builder.Entity<VCustomerFavorite>(entity =>
@@ -389,6 +399,12 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(p => p.Id);
                 entity.ToTable("VWholesaleSummaryInfo");
+            });
+
+            builder.Entity<KPICacheItem>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+                entity.ToTable("KPICacheItems");
             });
         }
     }

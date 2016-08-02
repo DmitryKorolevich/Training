@@ -438,6 +438,27 @@ namespace VitalChoice.Core.DependencyInjection
                     WAwarehouseThreshold = Int32.Parse(section["WAwarehouseThreshold"]),
                 };
             }
+            section = configuration.GetSection("App:Google");
+            options.GoogleSettings = new GoogleSettings()
+            {
+                ClientId = section["ClientId"],
+                KeyFile = section["KeyFile"],
+                KeyPass = section["KeyPass"],
+                GAAccountId = section["GAAccountId"]
+            };
+            section = configuration.GetSection("App:Twitter");
+            options.TwitterSettings = new TwitterSettings()
+            {
+                ConsumerKey = section["ConsumerKey"],
+                ConsumerSecret = section["ConsumerSecret"]
+            };
+            section = configuration.GetSection("App:Facebook");
+            options.FacebookSettings = new FacebookSettings()
+            {
+                Id = section["Id"],
+                AppId = section["AppId"],
+                AppSecret = section["AppSecret"]
+            };
         }
 
         public IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
@@ -589,6 +610,8 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<VeraCoreNotificationService>().As<IVeraCoreNotificationService>().InstancePerLifetimeScope();
             builder.RegisterType<AgentService>().As<IAgentService>().InstancePerLifetimeScope();
             builder.RegisterType<GoogleService>().As<IGoogleService>().InstancePerLifetimeScope();
+            builder.RegisterType<FacebookService>().As<FacebookService>().InstancePerLifetimeScope();
+            builder.RegisterType<TwitterService>().As<TwitterService>().InstancePerLifetimeScope();
 
             builder.RegisterMappers(typeof(ProductService).GetTypeInfo().Assembly, (type, registration) =>
             {

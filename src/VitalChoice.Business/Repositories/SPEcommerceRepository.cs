@@ -11,6 +11,7 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.InventorySkus;
+using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Entities.Reports;
 using VitalChoice.Infrastructure.Domain.Transfer.InventorySkus;
@@ -368,6 +369,29 @@ namespace VitalChoice.Business.Repositories
             var toReturn = await _context.Set<ProductQualitySkusReportItem>().FromSql
                 ("[dbo].[SPGetProductQualitySkuIssuesReport] @from={0}, @to={1}, @idsku={2}",
                 filter.From, filter.To, filter.IdSku).ToListAsync();
+            return toReturn;
+        }
+
+        public async Task<KPIReportDBSaleRawItem> GetKPISalesRawItemAsync(DateTime from, DateTime to)
+        {
+            var toReturn = await _context.Set<KPIReportDBSaleRawItem>().FromSql
+                ("[dbo].[SPGetKPISales] @from={0}, @to={1}",
+                from, to).FirstOrDefaultAsync();
+            return toReturn;
+        }
+
+        public async Task<PagedList<ShortOrderItemModel>> GetShortOrdersAsync(OrderFilter filter)
+        {
+            filter.Id = filter.Id+"%";
+
+            var data = await _context.Set<ShortOrderItemModel>().FromSql
+                ("[dbo].[SPGetShortOrders] @idcustomer={0}, @idfilter={1}," +
+                " @idobjecttype={2}, @pageindex={3}, @pagesize={4}",
+                filter.IdCustomer, filter.Id,
+                filter.OrderType, filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
+            var toReturn = new PagedList<ShortOrderItemModel>();
+            toReturn.Count = data.FirstOrDefault()?.TotalCount ?? 0;
+            toReturn.Items = data;
             return toReturn;
         }
     }

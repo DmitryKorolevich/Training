@@ -52,5 +52,7 @@ namespace VitalChoice.Interfaces.Services.Orders
 	    Task<ICollection<ProductQualitySkusReportItem>> GetProductQualitySkusReportItemsAsync(ProductQualitySkusReportFilter filter);
 
 	    Task<KPIReport> CreateKPIReportAsync();
+
+	    Task<KPIReport> GetKPIReportAsync();
 	}
 }

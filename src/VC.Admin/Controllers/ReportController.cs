@@ -34,6 +34,7 @@ namespace VC.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> KPI()
         {
+            //var model = await _orderReportService.GetKPIReportAsync();
             var model = await _orderReportService.CreateKPIReportAsync();
 
             return View(model);

@@ -1,0 +1,11 @@
+﻿IF OBJECT_ID(N'[dbo].[KPICacheItems]', N'U') IS NULL
+BEGIN
+	CREATE TABLE [dbo].[KPICacheItems]
+	(
+		[Id] INT NOT NULL PRIMARY KEY IDENTITY,
+		[DateCreated] DATETIME2 NOT NULL,
+		[Data] NVARCHAR(MAX) NOT NULL
+	);
+END
+
+GO

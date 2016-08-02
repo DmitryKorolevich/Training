@@ -8,41 +8,45 @@ using Google.Apis.Analytics.v3;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services
 {
     public class GoogleService : IGoogleService
     {
-        private readonly ILogger _logger;
-
+        private readonly string _accountId;
+        private readonly string _clientId;
+        private readonly string _keyFile;
+        private readonly string _keyPass;
         private readonly Lazy<AnalyticsService> _lclient;
+        private readonly ILogger _logger;
 
         private AnalyticsService Client => _lclient.Value;
 
         public GoogleService(
+            IOptions<AppOptions> options,
             ILoggerProviderExtended loggerProvider)
         {
+            _accountId = options.Value.GoogleSettings.GAAccountId;
+            _clientId = options.Value.GoogleSettings.ClientId;
+            _keyFile = options.Value.GoogleSettings.KeyFile;
+            _keyPass = options.Value.GoogleSettings.KeyPass;
             _logger = loggerProvider.CreateLogger<GoogleService>();
             _lclient = new Lazy<AnalyticsService>(CreateAnalyticsService);
         }
 
         private AnalyticsService CreateAnalyticsService()
         {
-            const string clientId = "481586578687@developer.gserviceaccount.com";
+            var keyUrl = Directory.GetCurrentDirectory() + @"\" + _keyFile;
 
-            const string keyFile = @"\5083717e58d4513a8e8ca2992840b54ee728d674-privatekey.p12";
-
-            const string keyPass = "notasecret";
-
-            var keyUrl = Directory.GetCurrentDirectory() + keyFile;
-
-            var certificate = new X509Certificate2(keyUrl, keyPass, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
+            var certificate = new X509Certificate2(keyUrl, _keyPass, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
 
             ServiceAccountCredential credential = new ServiceAccountCredential(
-               new ServiceAccountCredential.Initializer(clientId)
+               new ServiceAccountCredential.Initializer(_clientId)
                {
                    Scopes = new[] { AnalyticsService.Scope.AnalyticsReadonly }
                }.FromCertificate(certificate));
@@ -64,10 +68,74 @@ namespace VitalChoice.Business.Services
 
             var startDate = DateTime.Now.AddMonths(-2);
             var endDate = DateTime.Now.AddMonths(-1);
-            var results = Client.Data.Ga.Get("ga:652942", startDate.ToString("yyyy-MM-dd"),
+            var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy -MM-dd"),
                                   endDate.ToString("yyyy-MM-dd"), "ga:percentNewVisits");
             results.Segment = "gaid::-1";
             var res = double.Parse(results.Execute().TotalsForAllResults["ga:percentNewVisits"]) / 100.0;
+        }
+
+        public decimal GetCartAbandon(DateTime startDate, DateTime endDate)
+        {
+            var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy-MM-dd"),
+                                              endDate.ToString("yyyy-MM-dd"), "ga:goalAbandonRateAll");
+            results.MaxResults = 1;
+            return decimal.Parse(results.Execute().TotalsForAllResults["ga:goalAbandonRateAll"]) / 100;
+        }
+
+        public long GetUniqueVisits(DateTime startDate, DateTime endDate)
+        {
+            var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy-MM-dd"),
+                                              endDate.ToString("yyyy-MM-dd"), "ga:visitors");
+            results.Dimensions = "ga:visitCount";
+            results.MaxResults = 1;
+            return long.Parse(results.Execute().TotalsForAllResults["ga:visitors"]);
+        }
+
+        public decimal GetNewWebVisitsPercent(DateTime startDate, DateTime endDate)
+        {
+            var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy-MM-dd"),
+                                              endDate.ToString("yyyy-MM-dd"), "ga:percentNewVisits");
+            results.Segment = "gaid::-1";
+            return decimal.Parse(results.Execute().TotalsForAllResults["ga:percentNewVisits"]) / 100;
+        }
+
+        public decimal GetTransactionsRevenueOrganics(DateTime startDate, DateTime endDate)
+        {
+            var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy-MM-dd"),
+                                              endDate.ToString("yyyy-MM-dd"), "ga:transactionRevenue");
+            results.Segment = "gaid::-5";
+            results.Dimensions = "ga:medium";
+            return decimal.Parse(results.Execute().TotalsForAllResults["ga:transactionRevenue"]);
+        }
+
+        public decimal GetTransactionsRevenuePaid(DateTime startDate, DateTime endDate)
+        {
+            var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy-MM-dd"),
+                                              endDate.ToString("yyyy-MM-dd"), "ga:transactionRevenue");
+            results.Segment = "gaid::-4";
+            results.Dimensions = "ga:medium";
+            return decimal.Parse(results.Execute().TotalsForAllResults["ga:transactionRevenue"]);
+        }
+
+        public decimal GetBounceRate(DateTime startDate, DateTime endDate)
+        {
+            var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy-MM-dd"),
+                                                 endDate.ToString("yyyy-MM-dd"), "ga:visitBounceRate");
+            return decimal.Parse(results.Execute().TotalsForAllResults["ga:visitBounceRate"]) / 100;
+        }
+
+        public decimal GetConversionLevel(DateTime startDate, DateTime endDate)
+        {
+            var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy-MM-dd"),
+                                                 endDate.ToString("yyyy-MM-dd"), "ga:transactionsPerVisit");
+            return decimal.Parse(results.Execute().TotalsForAllResults["ga:transactionsPerVisit"]) / 100;
+        }
+
+        public decimal GetAov(DateTime startDate, DateTime endDate)
+        {
+            var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy-MM-dd"),
+                                                 endDate.ToString("yyyy-MM-dd"), "ga:revenuePerTransaction");
+            return decimal.Parse(results.Execute().TotalsForAllResults["ga:revenuePerTransaction"]);
         }
     }
 }

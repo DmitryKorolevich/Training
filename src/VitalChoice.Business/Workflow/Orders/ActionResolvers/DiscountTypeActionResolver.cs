@@ -4,6 +4,7 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Extensions;
 using VitalChoice.Interfaces.Services.Products;
@@ -137,7 +138,10 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
                     }
                     else
                     {
-                        dataContext.Order.Data.IsHealthwise = false;
+                        if (dataContext.Order.Discount.Code.ToLower() != ProductConstants.HEALTHWISE_DISCOUNT_CODE)
+                        {
+                            dataContext.Order.Data.IsHealthwise = false;
+                        }
                     }
                 }
             }

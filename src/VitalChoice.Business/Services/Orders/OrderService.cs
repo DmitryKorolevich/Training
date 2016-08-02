@@ -882,14 +882,9 @@ namespace VitalChoice.Business.Services.Orders
             return order?.IdCustomer;
         }
 
-        public async Task<PagedList<Order>> GetShortOrdersAsync(OrderFilter filter)
+        public async Task<PagedList<ShortOrderItemModel>> GetShortOrdersAsync(OrderFilter filter)
         {
-            Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = PerformOrderSorting(filter);
-
-            var orderQuery = new OrderQuery().WithCustomerId(filter.IdCustomer).FilterById(filter.Id).NotDeleted().WithOrderType(filter.OrderType).NotAutoShip();
-
-            var query = this._orderRepository.Query(orderQuery).OrderBy(sortable);
-            return await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            return await _sPEcommerceRepository.GetShortOrdersAsync(filter);
         }
 
         public async Task<PagedList<OrderDynamic>> GetFullOrdersAsync(OrderFilter filter)
@@ -1615,7 +1610,7 @@ namespace VitalChoice.Business.Services.Orders
                 includes => includes.Include(c => c.OptionValues).Include(c => c.PaymentMethod).
                 Include(c => c.ShippingAddress).ThenInclude(c => c.OptionValues).Include(c => c.Customer).
                 ThenInclude(p => p.ProfileAddress).ThenInclude(c => c.OptionValues).
-                Include(c => c.OrderShippingPackages), orderBy: sortable, withDefaults: true);
+                Include(c => c.OrderShippingPackages).Include(c=>c.HealthwiseOrder), orderBy: sortable, withDefaults: true);
 
             var resultList = new List<OrderInfoItem>(orders.Items.Count);
             var shippingMethods = _referenceData.OrderPreferredShipMethod;
@@ -1639,7 +1634,8 @@ namespace VitalChoice.Business.Services.Orders
                     Customer = item.Customer?.ProfileAddress.SafeData.FirstName + " " + item.Customer?.ProfileAddress.SafeData.LastName,
                     StateCode = _codeResolver.GetStateCode(item.ShippingAddress?.IdCountry ?? 0, item.ShippingAddress?.IdState ?? 0),
                     ShipTo = item.ShippingAddress?.SafeData.FirstName + " " + item.ShippingAddress?.SafeData.LastName,
-                    PreferredShipMethod = item.ShippingAddress?.SafeData.PreferredShipMethod
+                    PreferredShipMethod = item.ShippingAddress?.SafeData.PreferredShipMethod,
+                    Healthwise = item.SafeData.IsHealthwise==true,
                 };
                 await DynamicMapper.UpdateModelAsync(newItem, item);
 
@@ -2452,6 +2448,15 @@ namespace VitalChoice.Business.Services.Orders
                                 transaction.Rollback();
                                 throw;
                             }
+                        }
+                    }
+                    else
+                    {
+                        var customer = await _customerService.SelectAsync(idCustomer, true);
+                        if (customer.SafeData.HasHealthwiseOrders == false)
+                        {
+                            customer.Data.HasHealthwiseOrders = true;
+                            await _customerService.UpdateAsync(customer);
                         }
                     }
                 }

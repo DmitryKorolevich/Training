@@ -1,4 +1,5 @@
 ﻿@using System.Threading.Tasks
+@using System.Globalization
 @using Microsoft.EntityFrameworkCore.Metadata.Internal
 @using VitalChoice.Infrastructure.Domain.Transfer.Reports
 
@@ -6,6 +7,629 @@
 
 @{ 
     Layout = "~/Views/Report/_LayoutReport.cshtml";
-}    
+}
 
-@Model.Date
+<div class="main-wrapper">
+    <table width="1000" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+            <td width="230" class="table1row1a">
+                <div align="left">
+                    @Model.Date.ToShortDateString()
+                </div>
+            </td>
+            <td width="230" class="table1row1asmalltextlight">
+                <div align="right">
+                    12 month total
+                </div>
+            </td>
+            <td width="230" class="table1row1asmalltextlight2">
+                <div align="right">
+                    12 months from
+                </div>
+            </td>
+            <td width="230" class="table1row1asmalltextlight">
+                <div align="right">
+                    12 months from
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table1row2a">
+                <div align="right">
+                    Sales
+                </div>
+            </td>
+            <td width="230" class="table3row2alight">
+                <div align="right">
+                    <strong>Today</strong>
+                </div>
+            </td>
+            <td width="230" class="table3row2alight2">
+                <div align="right">
+                    1 Month Ago
+                </div>
+            </td>
+            <td width="230" class="table3row2alight">
+                <div align="right">
+                    1 Year Ago
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table1row3a">
+                <div align="right">
+                    Total
+                </div>
+            </td>
+            <td width="230" class="table1row3alight">
+                <div align="right">
+                    @Model.TodayYearSales.Total.ToString("C0")
+                </div>
+            </td>
+            <td width="230" class="table1row3a">
+                <div align="right">
+                    @Model.MonthAgoYearSales.Total.ToString("C0")
+                </div>
+            </td>
+            <td width="230" class="table1row3alight">
+                <div align="right">
+                    @Model.YearAgoYearSales.Total.ToString("C0")
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="table1row3alight">
+                <div align="right">
+                    New Customers
+                </div>
+            </td>
+            <td class="table4row3alight">
+                <div align="right">
+                    @Model.TodayYearSales.NewCustomers.ToString("C0")
+                </div>
+            </td>
+            <td class="table4row3a">
+                <div align="right">
+                    @Model.MonthAgoYearSales.NewCustomers.ToString("C0")
+                </div>
+            </td>
+            <td class="table4row3alight">
+                <div align="right">
+                    @Model.YearAgoYearSales.NewCustomers.ToString("C0")
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="table1row3a">
+                <div align="right">
+                    Wholesale
+                </div>
+            </td>
+            <td class="table1row3alight">
+                <div align="right">
+                    @Model.TodayYearSales.Wholesales.ToString("C0")
+                </div>
+            </td>
+            <td class="table1row3a">
+                <div align="right">
+                    @Model.MonthAgoYearSales.Wholesales.ToString("C0")
+                </div>
+            </td>
+            <td class="table1row3alight">
+                <div align="right">
+                    @Model.YearAgoYearSales.Wholesales.ToString("C0")
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table1row3a">
+                <div align="right">
+                    New Wholesale
+                </div>
+            </td>
+            <td width="230" class="table1row3alight">
+                <div align="right">
+                    @Model.TodayYearSales.NewWholesales.ToString("C0")
+                </div>
+            </td>
+            <td width="230" class="table1row3a">
+                <div align="right">
+                    @Model.MonthAgoYearSales.NewWholesales.ToString("C0")
+                </div>
+            </td>
+            <td width="230" class="table1row3alight">
+                <div align="right">
+                    @Model.YearAgoYearSales.NewWholesales.ToString("C0")
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table1row3alight">
+                <div align="right">
+                    Affiliate
+                </div>
+            </td>
+            <td width="230" class="table4row3alight">
+                <div align="right">
+                    @Model.TodayYearSales.Affiliates.ToString("C0")
+                </div>
+            </td>
+            <td width="230" class="table4row3a">
+                <div align="right">
+                    @Model.MonthAgoYearSales.Affiliates.ToString("C0")
+                </div>
+            </td>
+            <td width="230" class="table4row3alight">
+                <div align="right">
+                    @Model.YearAgoYearSales.Affiliates.ToString("C0")
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="table1row3alight">
+                <div align="right">
+                    New Affiliate
+                </div>
+            </td>
+            <td class="table4row3alight">
+                <div align="right">
+                    @Model.TodayYearSales.NewAffiliates.ToString("C0")
+                </div>
+            </td>
+            <td class="table4row3a">
+                <div align="right">
+                    @Model.MonthAgoYearSales.NewAffiliates.ToString("C0")
+                </div>
+            </td>
+            <td class="table4row3alight">
+                <div align="right">
+                    @Model.YearAgoYearSales.NewAffiliates.ToString("C0")
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table1row3a">
+                <div align="right">
+                    Organic Search
+                </div>
+            </td>
+            <td width="230" class="table1row3alight">
+                <div align="right">
+                    @Model.TodayYearSales.OrganicSearch.ToString("C0")
+                </div>
+            </td>
+            <td width="230" class="table1row3a">
+                <div align="right">
+                    @Model.MonthAgoYearSales.OrganicSearch.ToString("C0")
+                </div>
+            </td>
+            <td width="230" class="table1row3alight">
+                <div align="right">
+                    @Model.YearAgoYearSales.OrganicSearch.ToString("C0")
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="table1row3a">
+                <div align="right">
+                    Paid Search
+                </div>
+            </td>
+            <td class="table1row3alight">
+                <div align="right">
+                    @Model.TodayYearSales.PaidSearch.ToString("C0")
+                </div>
+            </td>
+            <td class="table1row3a">
+                <div align="right">
+                    @Model.MonthAgoYearSales.PaidSearch.ToString("C0")
+                </div>
+            </td>
+            <td class="table1row3alight">
+                <div align="right">
+                    @Model.YearAgoYearSales.PaidSearch.ToString("C0")
+                </div>
+            </td>
+        </tr>
+    </table>
+    <table width="1000" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+            <td class="table2row1bsmall">
+                <div align="right">
+                    &nbsp;
+                </div>
+            </td>
+            <td class="table1row1asmalltextlight3">
+                <div align="right">
+                    &nbsp;
+                </div>
+            </td>
+            <td class="table2row1bsmall">
+                <div align="right">
+                    &nbsp;
+                </div>
+            </td>
+            <td class="table1row1asmalltextlight3">
+                <div align="right">
+                    &nbsp;
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table2row1bsmall">
+                <div align="right">
+                    &nbsp;
+                </div>
+            </td>
+            <td width="230" class="table1row1asmalltextlight">
+                <div align="right">
+                    Last
+                </div>
+            </td>
+            <td width="230" class="table1row1asmalltextlight2">
+                <div align="right">
+                    30 days from
+                </div>
+            </td>
+            <td width="230" class="table1row1asmalltextlight">
+                <div align="right">
+                    30 days from
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table2row2a">
+                <div align="right">
+                    Marketing
+                </div>
+            </td>
+            <td width="230" class="table3row2alight">
+                <div align="right">
+                    <strong>30 Days</strong>
+                </div>
+            </td>
+            <td width="230" class="table3row2alight2">
+                <div align="right">
+                    1 Month Ago
+                </div>
+            </td>
+            <td width="230" class="table3row2alight">
+                <div align="right">
+                    1 Year Ago
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="table1row3alight">
+                <div align="right">
+                    Unique Web Visits
+                </div>
+            </td>
+            <td class="table4row3alight">
+                <div align="right">
+                    @Model.TodayMonthMarketing.UniqueVisits.ToString("N0", new CultureInfo("en-us"))
+                </div>
+            </td>
+            <td class="table4row3a">
+                <div align="right">
+                    @Model.MonthAgoMonthMarketing.UniqueVisits.ToString("N0", new CultureInfo("en-us"))
+                </div>
+            </td>
+            <td class="table4row3alight">
+                <div align="right">
+                    @Model.YearAgoMonthMarketing.UniqueVisits.ToString("N0", new CultureInfo("en-us"))
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table1row3alight">
+                <div align="right">
+                    New Web Visits
+                </div>
+            </td>
+            <td width="230" class="table4row3alight">
+                <div align="right">
+                    @Model.TodayMonthMarketing.NewWebVisitsPercent.ToString("P")
+                </div>
+            </td>
+            <td width="230" class="table4row3a">
+                <div align="right">
+                    @Model.MonthAgoMonthMarketing.NewWebVisitsPercent.ToString("P")
+                </div>
+            </td>
+            <td width="230" class="table4row3alight">
+                <div align="right">
+                    @Model.YearAgoMonthMarketing.NewWebVisitsPercent.ToString("P")
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table1row1asmalltextnewsletter">
+                <div align="right">
+                    Newsletter
+                </div>
+            </td>
+            <td width="230" class="table1row1asmalltextnewsletterlight">
+                <div align="right">
+                    &nbsp;
+                </div>
+            </td>
+            <td width="230" class="table1row1asmalltextnewsletter">
+                <div align="right">
+                    &nbsp;
+                </div>
+            </td>
+            <td width="230" class="table1row1asmalltextnewsletterlight">
+                <div align="right">
+                    &nbsp;
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table1row3a">
+                <div align="right">
+                    New Email Addresses
+                </div>
+            </td>
+            <td width="230" class="table1row3alight">
+                <div align="right">
+                    @Model.TodayMonthMarketing.NewEmailAddresses.ToString("N0", new CultureInfo("en-us"))
+                </div>
+            </td>
+            <td width="230" class="table1row3a">
+                <div align="right">
+                    @Model.MonthAgoMonthMarketing.NewEmailAddresses.ToString("N0", new CultureInfo("en-us"))
+                </div>
+            </td>
+            <td width="230" class="table1row3alight">
+                <div align="right">
+                    @Model.YearAgoMonthMarketing.NewEmailAddresses.ToString("N0", new CultureInfo("en-us"))
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="table1row3a">
+                <div align="right">
+                    Open Rate
+                </div>
+            </td>
+            <td class="table1row3alight">
+                <div align="right">
+                    @Model.TodayMonthMarketing.OpenRate.ToString("P")
+                </div>
+            </td>
+            <td class="table1row3a">
+                <div align="right">
+                    @Model.MonthAgoMonthMarketing.OpenRate.ToString("P")
+                </div>
+            </td>
+            <td class="table1row3alight">
+                <div align="right">
+                    @Model.YearAgoMonthMarketing.OpenRate.ToString("P")
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table1row1asmalltextnewsletter">
+                <div align="right">
+                    Social Media
+                </div>
+            </td>
+            <td width="230" class="table1row1asmalltextnewsletterlight">
+                <div align="right">
+                    &nbsp;
+                </div>
+            </td>
+            <td width="230" class="table1row1asmalltextnewsletter">
+                <div align="right">
+                    &nbsp;
+                </div>
+            </td>
+            <td width="230" class="table1row1asmalltextnewsletterlight">
+                <div align="right">
+                    &nbsp;
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="table1row3alight">
+                <div align="right">
+                    Facebook Likes
+                </div>
+            </td>
+            <td class="table4row3alight">
+                <div align="right">
+                    @Model.TodayMonthMarketing.FacebookLikes.ToString("N0", new CultureInfo("en-us"))
+                </div>
+            </td>
+            <td class="table4row3a">
+                <div align="right">
+                    @Model.MonthAgoMonthMarketing.FacebookLikes.ToString("N0", new CultureInfo("en-us"))
+                </div>
+            </td>
+            <td class="table4row3alight">
+                <div align="right">
+                    @Model.YearAgoMonthMarketing.FacebookLikes.ToString("N0", new CultureInfo("en-us"))
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="table1row3alight">
+                <div align="right">
+                    Twitter Followers
+                </div>
+            </td>
+            <td class="table4row3alight">
+                <div align="right">
+                    @Model.TodayMonthMarketing.TwitterFollowers.ToString("N0", new CultureInfo("en-us"))
+                </div>
+            </td>
+            <td class="table4row3a">
+                <div align="right">
+                    @Model.MonthAgoMonthMarketing.TwitterFollowers.ToString("N0", new CultureInfo("en-us"))
+                </div>
+            </td>
+            <td class="table4row3alight">
+                <div align="right">
+                    @Model.YearAgoMonthMarketing.TwitterFollowers.ToString("N0", new CultureInfo("en-us"))
+                </div>
+            </td>
+        </tr>
+    </table>
+    <table width="1000" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+            <td class="table2row1bsmall">
+                <div align="right">
+                    &nbsp;
+                </div>
+            </td>
+            <td class="table1row1asmalltextlight3">
+                <div align="right">
+                    &nbsp;
+                </div>
+            </td>
+            <td class="table2row1bsmall">
+                <div align="right">
+                    &nbsp;
+                </div>
+            </td>
+            <td class="table1row1asmalltextlight3">
+                <div align="right">
+                    &nbsp;
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table2row1bsmall">
+                <div align="right">
+                    &nbsp;
+                </div>
+            </td>
+            <td width="230" class="table1row1asmalltextlight">
+                <div align="right">
+                    Last
+                </div>
+            </td>
+            <td width="230" class="table1row1asmalltextlight2">
+                <div align="right">
+                    Last
+                </div>
+            </td>
+            <td width="230" class="table1row1asmalltextlight">
+                <div align="right">
+                    One
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table3row2a">
+                <div align="right">
+                    KPI Rates
+                </div>
+            </td>
+            <td width="230" class="table3row2alight">
+                <div align="right">
+                    <strong>30 Days</strong>
+                </div>
+            </td>
+            <td width="230" class="table3row2alight2">
+                <div align="right">
+                    60 Days
+                </div>
+            </td>
+            <td width="230" class="table3row2alight">
+                <div align="right">
+                    Year Ago
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table1row3a">
+                <div align="right">
+                    Conversion
+                </div>
+            </td>
+            <td width="230" class="table1row3alight">
+                <div align="right">
+                    @Model.MonthRates.Conversion.ToString("P")
+                </div>
+            </td>
+            <td width="230" class="table1row3a">
+                <div align="right">
+                    @Model.TwoMonthRates.Conversion.ToString("P")
+                </div>
+            </td>
+            <td width="230" class="table1row3alight">
+                <div align="right">
+                    @Model.YearRates.Conversion.ToString("P")
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table1row3a">
+                <div align="right">
+                    AOV
+                </div>
+            </td>
+            <td width="230" class="table1row3alight">
+                <div align="right">
+                    @Model.MonthRates.AOV.ToString("C0")
+                </div>
+            </td>
+            <td width="230" class="table1row3a">
+                <div align="right">
+                    @Model.TwoMonthRates.AOV.ToString("C0")
+                </div>
+            </td>
+            <td width="230" class="table1row3alight">
+                <div align="right">
+                    @Model.YearRates.AOV.ToString("C0")
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table4row3a">
+                <div align="right">
+                    Bounce
+                </div>
+            </td>
+            <td width="230" class="table4row3alight">
+                <div align="right">
+                    @Model.MonthRates.Bounce.ToString("P")
+                </div>
+            </td>
+            <td width="230" class="table4row3a">
+                <div align="right">
+                    @Model.TwoMonthRates.Bounce.ToString("P")
+                </div>
+            </td>
+            <td width="230" class="table4row3alight">
+                <div align="right">
+                    @Model.YearRates.Bounce.ToString("P")
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="230" class="table4row3a">
+                <div align="right">
+                    Cart Abandon
+                </div>
+            </td>
+            <td width="230" class="table4row3alight">
+                <div align="right">
+                    @Model.MonthRates.CartAbandon.ToString("P")
+                </div>
+            </td>
+            <td width="230" class="table4row3a">
+                <div align="right">
+                    @Model.TwoMonthRates.CartAbandon.ToString("P")
+                </div>
+            </td>
+            <td width="230" class="table4row3alight">
+                <div align="right">
+                    @Model.YearRates.CartAbandon.ToString("P")
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>

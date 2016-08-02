@@ -56,6 +56,7 @@ using VitalChoice.Interfaces.Services.VeraCore;
 using Address = VitalChoice.Ecommerce.Domain.Entities.Addresses.Address;
 using AddressType = VitalChoice.Ecommerce.Domain.Entities.Addresses.AddressType;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Services;
@@ -181,15 +182,10 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<PagedList<ShortOrderListItemModel>>> GetShortOrders([FromBody]OrderFilter filter)
+        public async Task<Result<PagedList<ShortOrderItemModel>>> GetShortOrders([FromBody]OrderFilter filter)
         {
-            var result = await _orderService.GetShortOrdersAsync(filter);
+            var toReturn = await _orderService.GetShortOrdersAsync(filter);
 
-            var toReturn = new PagedList<ShortOrderListItemModel>
-            {
-                Items = result.Items.Select(p => new ShortOrderListItemModel(p)).ToList(),
-                Count = result.Count,
-            };
             return toReturn;
         }
 

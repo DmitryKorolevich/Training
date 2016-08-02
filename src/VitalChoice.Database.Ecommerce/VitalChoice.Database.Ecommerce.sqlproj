@@ -201,4 +201,10 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPGetKPISales.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\KPICacheItems.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetShortOrders.sql" />
+  </ItemGroup>
 </Project>

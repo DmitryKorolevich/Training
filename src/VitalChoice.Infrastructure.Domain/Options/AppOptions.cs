@@ -29,5 +29,8 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public BrontoSettings Bronto { get; set; }
         public JobSettings JobSettings { get; set; }
         public VeraCoreSettings VeraCoreSettings { get; set; }
+        public GoogleSettings GoogleSettings { get; set; }
+        public TwitterSettings TwitterSettings { get; set; }
+        public FacebookSettings FacebookSettings { get; set; }
     }
 }

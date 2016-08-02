@@ -21,7 +21,7 @@ namespace VitalChoice.Interfaces.Services.Orders
 {
 	public interface IOrderService: IDynamicServiceAsync<OrderDynamic, Order>
 	{
-        Task<PagedList<Order>> GetShortOrdersAsync(OrderFilter filter);
+        Task<PagedList<ShortOrderItemModel>> GetShortOrdersAsync(OrderFilter filter);
         Task<int?> GetOrderIdCustomer(int id);
 	    Task<PagedList<OrderInfoItem>> GetOrdersAsync(VOrderFilter filter);
         Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false);

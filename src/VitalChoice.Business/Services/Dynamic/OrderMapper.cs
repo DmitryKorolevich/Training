@@ -200,6 +200,11 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.AffiliateOrderPayment = entity.AffiliateOrderPayment;
                 dynamic.OrderShippingPackages = entity.OrderShippingPackages?.Select(p => new OrderShippingPackageModelItem(p)).ToList() ??
                                                 new List<OrderShippingPackageModelItem>();
+
+                if (entity.HealthwiseOrder != null)
+                {
+                    dynamic.Data.IsHealthwise = true;
+                }
             });
         }
 

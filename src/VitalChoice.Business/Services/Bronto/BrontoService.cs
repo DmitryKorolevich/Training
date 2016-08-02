@@ -43,6 +43,9 @@ namespace VitalChoice.Business.Services.Bronto
             _logger = loggerProvider.CreateLogger<BrontoService>();
 
             BasicHttpBinding binding = new BasicHttpBinding {Security = {Mode = BasicHttpSecurityMode.Transport}};
+            binding.MaxReceivedMessageSize = int.MaxValue;
+            binding.SendTimeout =new TimeSpan(0,5,0);
+            binding.ReceiveTimeout = new TimeSpan(0, 5, 0);
             EndpointAddress endpoint = new EndpointAddress(_brontoSettings.ApiUrl);
             _lclient = new Lazy<BrontoSoapPortTypeClient>(() => new BrontoSoapPortTypeClient(binding, endpoint));
         }
@@ -223,7 +226,7 @@ namespace VitalChoice.Business.Services.Bronto
         }
 
 
-        public async Task<contactObject[]> GetAllActiveContacts()
+        public async Task<contactObject[]> GetAllActiveContacts(DateTime from)
         {
             List<contactObject> result = new List<contactObject>();
             int pageNumber = 1;
@@ -237,6 +240,16 @@ namespace VitalChoice.Business.Services.Bronto
                     filter = new contactFilter
                     {
                         status = new[] { "active" },
+                        created = new dateValue[1]
+                        {
+                            new dateValue()
+                            {
+                                @operator = filterOperator.GreaterThanEqualTo,
+                                value = from,
+                                operatorSpecified = true,
+                                valueSpecified = true
+                            }
+                        }
                     },
                     includeLists = false,
                     includeSMSKeywords = false
@@ -255,7 +268,7 @@ namespace VitalChoice.Business.Services.Bronto
             return info.Count(c => c.created > startDate && c.created < endDate.AddDays(1));
         }
 
-        public async Task<deliveryObject[]> GetInfo()
+        public async Task<deliveryObject[]> GetInfo(DateTime from)
         {
             int pageNumber = 1;
             deliveryObject[] deliveries;
@@ -265,7 +278,19 @@ namespace VitalChoice.Business.Services.Bronto
             {
                 deliveries = (await Client.readDeliveriesAsync(sessionHeader, new readDeliveries
                 {
-                    filter = new deliveryFilter(),
+                    filter = new deliveryFilter()
+                    {
+                        start = new dateValue[1]
+                        {
+                            new dateValue()
+                            {
+                                @operator = filterOperator.GreaterThanEqualTo,
+                                value = from,
+                                operatorSpecified = true,
+                                valueSpecified = true
+                            }
+                        }
+                    },
                     includeContent = false,
                     includeRecipients = false,
                     pageNumber = pageNumber
@@ -279,12 +304,12 @@ namespace VitalChoice.Business.Services.Bronto
             return result.ToArray();
         }
 
-        public double GetOpenRate(deliveryObject[] info, DateTime startDate, DateTime endDate)
+        public decimal GetOpenRate(deliveryObject[] info, DateTime startDate, DateTime endDate)
         {
             var filtered = info.Where(d => d.start > startDate && d.start < endDate.AddDays(1)).ToArray();
             long sent = filtered.Sum(d => d.numSends);
             long opened = filtered.Sum(d => d.uniqOpens);
-            return sent == 0 ? 0 : (opened / (double)sent);
+            return sent == 0 ? 0 : (opened / (decimal)sent);
         }
     }
 }
