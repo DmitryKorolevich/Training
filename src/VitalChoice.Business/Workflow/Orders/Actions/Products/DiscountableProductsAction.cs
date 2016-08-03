@@ -101,7 +101,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                         includedBySku = skus.Any(s => filteredSkus.Contains(s.Sku.Id));
                     }
                 }
-                if (!includedByCategory && !includedBySku)
+                if (!includedByCategory || !includedBySku)
                 {
                     dataContext.Messages.Add(new MessageInfo
                     {
