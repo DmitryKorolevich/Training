@@ -282,7 +282,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 TitleOverride = eProduct.SafeData.DescriptionTitleOverride,
                 Content = productContent.ContentItem.Description,
-                Hidden = eProduct.Data.DescriptionHide
+                Hidden = (bool?)eProduct.SafeData.DescriptionHide ?? false
             };
             toReturn.ReviewsTab = new TtlProductReviewsTabModel()
             {
@@ -336,7 +336,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 TitleOverride = eProduct.SafeData.RecipesTitleOverride,
                 Content = eProduct.SafeData.Recipes,
-                Hidden = eProduct.Data.RecipesHide,
+                Hidden = (bool?)eProduct.SafeData.RecipesHide ?? false,
                 Recipes = recipes.Items.Select(x => new TtlProductRecipeModel()
                 {
                     Name = x.Name,
@@ -348,14 +348,14 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 TitleOverride = eProduct.SafeData.ServingTitleOverride,
                 Content = eProduct.SafeData.Serving,
-                Hidden = eProduct.Data.ServingHide
+                Hidden = (bool?)eProduct.SafeData.ServingHide ?? false
             };
 
             toReturn.ShippingTab = new TtlProductPageTabModel()
             {
                 TitleOverride = eProduct.SafeData.ShippingTitleOverride,
                 Content = eProduct.SafeData.Shipping,
-                Hidden = eProduct.Data.ShippingHide
+                Hidden = (bool?)eProduct.SafeData.ShippingHide ?? false
             };
 
             var bestValuedSku =

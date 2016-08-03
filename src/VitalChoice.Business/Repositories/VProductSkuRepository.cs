@@ -20,6 +20,7 @@ namespace VitalChoice.Business.Repositories
 
         public async Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter, bool groupByIdProduct=true)
         {
+            //TODO: rework to not use view here
             var query = this.DbSet.AsNoTracking().Where(x => (x.StatusCode == RecordStatusCode.Active || x.StatusCode == RecordStatusCode.NotActive));
             if(!String.IsNullOrEmpty(filter.SearchText))
             {
