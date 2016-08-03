@@ -24,7 +24,34 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
             var skus = dataContext.SkuOrdereds;
             if (dataContext.Order.Discount != null)
             {
-                if (dataContext.Order.Discount.ExcludeCategories)
+                bool includedBySku = true;
+                bool includedByCategory = true;
+                //if (dataContext.Order.Discount.ExcludeCategories)
+                //{
+                //    if ((dataContext.Order.Discount.CategoryIds?.Count ?? 0) > 0)
+                //    {
+                //        if (skus.Any(s => s.Sku.Product.CategoryIds == null))
+                //        {
+                //            throw new InvalidOperationException("Product doesn't have any categories set in object.");
+                //        }
+                //        HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIds);
+                //        var excludedSkus =
+                //            skus.Where(s => s.Sku.Product.CategoryIds.Any(c => categories.Contains(c))).ToArray();
+                //        foreach (var sku in excludedSkus)
+                //        {
+                //            sku.Messages.Add(new MessageInfo()
+                //            {
+                //                MessageLevel = MessageLevel.Warning,
+                //                Message = "The discount for this product has been excluded by category"
+                //            });
+                //        }
+                //        if (excludedSkus.Length > 0)
+                //        {
+                //            return TaskCache<decimal>.DefaultCompletedTask;
+                //        }
+                //    }
+                //}
+                //else
                 {
                     if ((dataContext.Order.Discount.CategoryIds?.Count ?? 0) > 0)
                     {
@@ -33,99 +60,55 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                             throw new InvalidOperationException("Product doesn't have any categories set in object.");
                         }
                         HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIds);
-                        var excludedSkus =
-                            skus.Where(s => s.Sku.Product.CategoryIds.Any(c => categories.Contains(c))).ToArray();
-                        foreach (var sku in excludedSkus)
-                        {
-                            sku.Messages.Add(new MessageInfo()
-                            {
-                                MessageLevel = MessageLevel.Warning,
-                                Message = "The discount for this product has been excluded by category"
-                            });
-                        }
-                        if (excludedSkus.Length > 0)
-                        {
-                            return TaskCache<decimal>.DefaultCompletedTask;
-                        }
+                        includedByCategory = skus.Any(s => s.Sku.Product.CategoryIds.Any(c => categories.Contains(c)));
                     }
                 }
-                else
-                {
-                    if ((dataContext.Order.Discount.CategoryIds?.Count ?? 0) > 0)
-                    {
-                        if (skus.Any(s => s.Sku.Product.CategoryIds == null))
-                        {
-                            throw new InvalidOperationException("Product doesn't have any categories set in object.");
-                        }
-                        HashSet<int> categories = new HashSet<int>(dataContext.Order.Discount.CategoryIds);
-                        var excludedSkus =
-                            skus.Where(s => s.Sku.Product.CategoryIds.Any(c => !categories.Contains(c))).ToArray();
-                        foreach (var sku in excludedSkus)
-                        {
-                            sku.Messages.Add(
-                                new MessageInfo()
-                                {
-                                    MessageLevel = MessageLevel.Warning,
-                                    Message = "The discount for this product has been excluded by category"
-                                });
-                        }
-                        if (excludedSkus.Length > 0)
-                        {
-                            return TaskCache<decimal>.DefaultCompletedTask;
-                        }
-                    }
-                }
-                if (dataContext.Order.Discount.ExcludeSkus)
-                {
-                    if ((dataContext.Order.Discount.SkusFilter?.Count ?? 0) > 0)
-                    {
-                        if (skus.Any(s => s.Sku.Product.CategoryIds == null))
-                        {
-                            throw new InvalidOperationException("Product doesn't have any categories set in object.");
-                        }
-                        HashSet<int> filteredSkus =
-                            // ReSharper disable once AssignNullToNotNullAttribute
-                            new HashSet<int>(dataContext.Order.Discount.SkusFilter.Select(s => s.IdSku));
-                        var excludedSkus =
-                            skus.Where(s => filteredSkus.Contains(s.Sku.Id)).ToArray();
-                        foreach (var sku in excludedSkus)
-                        {
-                            sku.Messages.Add(
-                                new MessageInfo()
-                                {
-                                    MessageLevel = MessageLevel.Warning,
-                                    Message = "The discount for this product has been excluded by SKU"
-                                });
-                        }
-                        if (excludedSkus.Length > 0)
-                        {
-                            return TaskCache<decimal>.DefaultCompletedTask;
-                        }
-                    }
-                }
-                else
+                //if (dataContext.Order.Discount.ExcludeSkus)
+                //{
+                //    if ((dataContext.Order.Discount.SkusFilter?.Count ?? 0) > 0)
+                //    {
+                //        if (skus.Any(s => s.Sku.Product.CategoryIds == null))
+                //        {
+                //            throw new InvalidOperationException("Product doesn't have any categories set in object.");
+                //        }
+                //        HashSet<int> filteredSkus =
+                //            // ReSharper disable once AssignNullToNotNullAttribute
+                //            new HashSet<int>(dataContext.Order.Discount.SkusFilter.Select(s => s.IdSku));
+                //        var excludedSkus =
+                //            skus.Where(s => filteredSkus.Contains(s.Sku.Id)).ToArray();
+                //        foreach (var sku in excludedSkus)
+                //        {
+                //            sku.Messages.Add(
+                //                new MessageInfo()
+                //                {
+                //                    MessageLevel = MessageLevel.Warning,
+                //                    Message = "The discount for this product has been excluded by SKU"
+                //                });
+                //        }
+                //        if (excludedSkus.Length > 0)
+                //        {
+                //            return TaskCache<decimal>.DefaultCompletedTask;
+                //        }
+                //    }
+                //}
+                //else
                 {
                     if ((dataContext.Order.Discount.SkusFilter?.Count ?? 0) > 0)
                     {
                         HashSet<int> filteredSkus =
                             // ReSharper disable once AssignNullToNotNullAttribute
                             new HashSet<int>(dataContext.Order.Discount.SkusFilter.Select(s => s.IdSku));
-                        var excludedSkus =
-                            skus.Where(s => !filteredSkus.Contains(s.Sku.Id)).ToArray();
-                        foreach (var sku in excludedSkus)
-                        {
-                            sku.Messages.Add(
-                                new MessageInfo()
-                                {
-                                    MessageLevel = MessageLevel.Warning,
-                                    Message = "The discount for this product has been excluded by SKU"
-                                });
-                        }
-                        if (excludedSkus.Length > 0)
-                        {
-                            return TaskCache<decimal>.DefaultCompletedTask;
-                        }
+                        includedBySku = skus.Any(s => filteredSkus.Contains(s.Sku.Id));
                     }
+                }
+                if (!includedByCategory && !includedBySku)
+                {
+                    dataContext.Messages.Add(new MessageInfo
+                    {
+                        Message = "Cannot apply discount. Discount criteria not met.",
+                        Field = "DiscountCode"
+                    });
+                    return TaskCache<decimal>.DefaultCompletedTask;
                 }
                 if ((dataContext.Order.Discount.SkusAppliedOnlyTo?.Count ?? 0) > 0)
                 {
@@ -137,6 +120,15 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                         {
                             Message = "Cannot apply discount. Discountable products not found.",
                             Field = "DiscountCode"
+                        });
+                        return TaskCache<decimal>.DefaultCompletedTask;
+                    }
+                    foreach (var sku in selectedSkus)
+                    {
+                        sku.Messages.Add(new MessageInfo
+                        {
+                            Message = "Discount applied per SKU",
+                            MessageLevel = MessageLevel.Info
                         });
                     }
                     skus = selectedSkus;
@@ -158,6 +150,15 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                         {
                             Message = "Cannot apply discount. Discountable products not found.",
                             Field = "DiscountCode"
+                        });
+                        return TaskCache<decimal>.DefaultCompletedTask;
+                    }
+                    foreach (var sku in selectedSkus)
+                    {
+                        sku.Messages.Add(new MessageInfo
+                        {
+                            Message = "Discount applied per category",
+                            MessageLevel = MessageLevel.Info
                         });
                     }
                     skus = selectedSkus;

@@ -302,7 +302,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 TitleOverride = eProduct.SafeData.IngredientsTitleOverride,
                 Content = eProduct.SafeData.Ingredients,
-                Hidden = eProduct.SafeData.IngredientsHide,
+                Hidden = (bool?)eProduct.SafeData.IngredientsHide ?? false,
                 NutritionalTitle = eProduct.SafeData.NutritionalTitle,
                 IngredientsTitle = eProduct.SafeData.IngredientsTitle,
                 ServingSize = eProduct.SafeData.ServingSize,
