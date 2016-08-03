@@ -40,9 +40,13 @@
 				<span class="cart-sku-code" data-bind="text: '(' + Code() + ')', visible: Code"></span>
 			    <span class="stock-presence-note" data-bind="visible: InStock()">In Stock Ready to Ship</span>
 			    <span class="field-validation-error no-space" data-bind="text: !InStock() ? 'Out of stock' : '', attr: {'data-valmsg-for': 'Skus.i' + $index() + '.Code'}" data-valmsg-replace="true"></span>
-			    <span class="field-validation-warning no-space" data-bind="text: Warning()"></span>
-                <span class="field-validation-info no-space" data-bind="text: Info()"></span>
-			</td>
+			    <span data-bind="foreach: Warnings">
+			        <span class="field-validation-warning no-space" data-bind="text: $data"></span>
+			    </span>
+			    <span data-bind="foreach: Infos">
+			        <span class="field-validation-info no-space" data-bind="text: $data"></span>
+			    </span>
+            </td>
 			<td data-bind="text: formatCurrency(Price())"></td>
 			<td class="width-cart-quantity">
 				@if (Model.Skus.Count > 0)
@@ -92,8 +96,12 @@
 				<span class="cart-sku-code" data-bind="text: '(' + Code() + ')', visible: Code"></span>
 			    <span class="stock-presence-note" data-bind="visible: InStock()">In Stock Ready to Ship</span>
 			    <span class="field-validation-error no-space" data-bind="text: !InStock() ? 'Out of stock' : '', attr: {'data-valmsg-for': 'Promos.i' + $index() + '.Code'}" data-valmsg-replace="true"></span>
-			    <span class="field-validation-warning no-space" data-bind="text: Warning()"></span>
-                <span class="field-validation-info no-space" data-bind="text: Info()"></span>
+                <span data-bind="foreach: Warnings">
+                    <span class="field-validation-warning no-space" data-bind="text: $data"></span>
+                </span>
+                <span data-bind="foreach: Infos">
+                    <span class="field-validation-info no-space" data-bind="text: $data"></span>
+                </span>
 			</td>
 			<td data-bind="text: formatCurrency(Price())"></td>
 			<td class="width-cart-quantity" data-bind="text: Quantity"></td>
