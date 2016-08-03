@@ -1,5 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Workflow.Base;
@@ -16,10 +19,17 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Promo
         public override async Task<decimal> ExecuteActionAsync(OrderDataContext context,
             ITreeContext executionContext)
         {
-            var promoService = executionContext.Resolve<IPromotionService>();
-            context.Promotions =
-                await
-                    promoService.GetActivePromotions((CustomerType?) context.Order.Customer?.IdObjectType ?? CustomerType.Retail);
+            if (context.Order.IdObjectType == (int) OrderType.AutoShip || context.Order.IdObjectType == (int) OrderType.AutoShipOrder)
+            {
+                context.Promotions = new List<PromotionDynamic>();
+            }
+            else
+            {
+                var promoService = executionContext.Resolve<IPromotionService>();
+                context.Promotions =
+                    await
+                        promoService.GetActivePromotions((CustomerType?) context.Order.Customer?.IdObjectType ?? CustomerType.Retail);
+            }
             return 0;
         }
     }

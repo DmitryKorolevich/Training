@@ -11,6 +11,10 @@ namespace VC.Public.Models.Cart
     {
         private string _productPageUrl;
 
+        public string Warning { get; set; }
+
+        public string Info { get; set; }
+
         [Map]
 		public string Code { get; set; }
 

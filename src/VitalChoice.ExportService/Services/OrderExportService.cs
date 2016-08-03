@@ -62,6 +62,24 @@ namespace VitalChoice.ExportService.Services
             _logger = loggerFactory.CreateLogger<OrderExportService>();
         }
 
+        public async Task<bool> CardExist(CustomerExportInfo customerExportInfo)
+        {
+            await LockCustomersEvent.WaitAsync();
+            if (_writeQueue)
+            {
+                return true;
+            }
+            var uow = new UnitOfWork(_infoContext);
+            {
+                var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
+                return
+                    await
+                        rep.Query(
+                            c => customerExportInfo.IdCustomer == c.IdCustomer && customerExportInfo.IdPaymentMethod == c.IdPaymentMethod)
+                            .SelectAnyAsync();
+            }
+        }
+
         public async Task UpdateCustomerPaymentMethods(ICollection<CustomerCardData> paymentMethods)
         {
             await LockCustomersEvent.WaitAsync();

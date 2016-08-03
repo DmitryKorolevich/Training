@@ -68,6 +68,7 @@ namespace VitalChoice.Business.Services.Customers
     {
         private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepositoryAsync;
         private readonly IEcommerceRepositoryAsync<PaymentMethod> _paymentMethodRepositoryAsync;
+        private readonly IEcommerceRepositoryAsync<CustomerPaymentMethod> _customerPaymentMethodRepositoryAsync;
         private readonly OrderRepository _orderRepository;
         private readonly CustomerRepository _customerRepositoryAsync;
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
@@ -104,7 +105,7 @@ namespace VitalChoice.Business.Services.Customers
             IPaymentMethodService paymentMethodService,
             IEcommerceRepositoryAsync<VWholesaleSummaryInfo> vWholesaleSummaryInfoRepositoryAsync,
             SpEcommerceRepository sPEcommerceRepository,
-            ITransactionAccessor<EcommerceContext> transactionAccessor, IDynamicEntityOrderingExtension<Customer> orderingExtension, ReferenceData referenceData)
+            ITransactionAccessor<EcommerceContext> transactionAccessor, IDynamicEntityOrderingExtension<Customer> orderingExtension, ReferenceData referenceData, IEcommerceRepositoryAsync<CustomerPaymentMethod> customerPaymentMethodRepositoryAsync)
             : base(
                 customerMapper, customerRepositoryAsync,
                 customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, 
@@ -128,6 +129,7 @@ namespace VitalChoice.Business.Services.Customers
             _vWholesaleSummaryInfoRepositoryAsync = vWholesaleSummaryInfoRepositoryAsync;
             _sPEcommerceRepository = sPEcommerceRepository;
             _referenceData = referenceData;
+            _customerPaymentMethodRepositoryAsync = customerPaymentMethodRepositoryAsync;
         }
 
         protected override IQueryLite<Customer> BuildIncludes(IQueryLite<Customer> query)
@@ -328,6 +330,24 @@ namespace VitalChoice.Business.Services.Customers
                 await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
                 return await DynamicMapper.FromEntityAsync(entity);
             }
+        }
+
+        public async Task<bool> GetCustomerCardExist(int idCustomer, int idPaymentMethod)
+        {
+            var paymentMethod =
+                await
+                    _customerPaymentMethodRepositoryAsync.Query(
+                        p => p.Id == idPaymentMethod && p.IdCustomer == idCustomer && p.IdObjectType == (int) PaymentMethodType.CreditCard)
+                        .SelectFirstOrDefaultAsync(false);
+            if (paymentMethod != null)
+            {
+                return await _encryptedOrderExportService.CardExistAsync(new CustomerExportInfo
+                {
+                    IdCustomer = idCustomer,
+                    IdPaymentMethod = idPaymentMethod
+                });
+            }
+            return true;
         }
 
         public async Task<bool> GetCustomerHasAffiliateOrders(int idCustomer, int? excludeIdOrder = null)

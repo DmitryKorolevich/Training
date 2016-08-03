@@ -62,9 +62,28 @@ namespace VitalChoice.ExportService.Services
                     return ProcessUpdateOrderPayment(command);
                 case OrderExportServiceCommandConstants.UpdateCustomerPayment:
                     return ProcessUpdateCustomerPayments(command);
+                case OrderExportServiceCommandConstants.CardExist:
+                    return ProcessCardExistCommand(command);
                 default:
                     return false;
             }
+        }
+
+        private bool ProcessCardExistCommand(ServiceBusCommandBase command)
+        {
+            var customerExportInfo = command.Data.Data as CustomerExportInfo;
+            if (customerExportInfo == null)
+            {
+                SendCommand(new ServiceBusCommandBase(command, "Customer export data is empty"));
+                return false;
+            }
+
+            using (var scope = _rootScope.BeginLifetimeScope())
+            {
+                var orderExportService = scope.Resolve<IOrderExportService>();
+                SendCommand(new ServiceBusCommandBase(command, orderExportService.CardExist(customerExportInfo).GetAwaiter().GetResult()));
+            }
+            return true;
         }
 
         private bool ProcessUpdateCustomerPayments(ServiceBusCommandBase command)

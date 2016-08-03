@@ -22,6 +22,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                 products.Where(s => s.Sku.IdObjectType == (int) ProductType.Perishable).ToArray();
             var nonPerishableProducts =
                 products.Where(s => s.Sku.IdObjectType == (int) ProductType.NonPerishable).ToArray();
+            var gcsProducts = products.Where(p => p.Sku.IdObjectType == (int) ProductType.Gc).ToArray();
             context.SplitInfo.PerishableCount = perishableProducts.Length;
             context.SplitInfo.NonPerishableCount = nonPerishableProducts.Length;
             context.SplitInfo.PerishableAmount = perishableProducts.Sum(p => p.Amount*p.Quantity);
@@ -42,7 +43,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
                                              ||
                                              context.SplitInfo.PerishableCount > 0 && context.SplitInfo.ThresholdReached
                                              ||
-                                             context.SplitInfo.NonPerishableNonOrphanCount > 0 &&
+                                             context.SplitInfo.NonPerishableNonOrphanCount + gcsProducts.Length > 0 &&
                                              context.SplitInfo.PerishableCount > 0)
                                             && !context.SplitInfo.SpecialSkuAdded;
             if (context.SplitInfo.ShouldSplit)
@@ -51,7 +52,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
             {
                 if (context.SplitInfo.PerishableCount > 0)
                     context.SplitInfo.ProductTypes = POrderType.P;
-                else if (context.SplitInfo.NonPerishableCount > 0)
+                else if (context.SplitInfo.NonPerishableCount + gcsProducts.Length > 0)
                     context.SplitInfo.ProductTypes = POrderType.NP;
                 else
                     context.SplitInfo.ProductTypes = POrderType.Other;

@@ -100,10 +100,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
                     new GiftCertificate
                     {
                         IdSku = sku.Sku.Id,
-                        Balance = context.Order.Customer.IdObjectType == (int) CustomerType.Wholesale
-                            ? sku.Sku.WholesalePrice
-                            : sku.Sku.Price,
-                        //Code = await gcService.GenerateGCCode(),
+                        Balance = sku.Amount,
                         Email = context.Order.Customer?.Email,
                         FirstName = context.Order.Customer?.ProfileAddress.SafeData.FirstName,
                         LastName = context.Order.Customer?.ProfileAddress.SafeData.LastName,

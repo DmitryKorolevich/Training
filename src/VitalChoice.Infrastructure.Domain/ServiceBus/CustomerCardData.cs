@@ -3,6 +3,17 @@
 namespace VitalChoice.Infrastructure.Domain.ServiceBus
 {
     [DataContract]
+    public class CustomerExportInfo
+    {
+        [DataMember]
+        public int IdCustomer { get; set; }
+
+        [DataMember]
+        public int IdPaymentMethod { get; set; }
+
+    }
+
+    [DataContract]
     public class CustomerCardData
     {
         [DataMember]

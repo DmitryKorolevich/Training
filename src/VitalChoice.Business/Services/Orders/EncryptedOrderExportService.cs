@@ -149,6 +149,22 @@ namespace VitalChoice.Business.Services.Orders
             return Task.FromResult(true);
         }
 
+        public Task<bool> CardExistAsync(CustomerExportInfo customerExportInfo)
+        {
+            if (!InitSuccess)
+            {
+                return Task.FromResult(true);
+            }
+            if (customerExportInfo.IdPaymentMethod > 0 || customerExportInfo.IdCustomer > 0)
+                return
+                    SendCommand<bool>(new ServiceBusCommandWithResult(Guid.NewGuid(), OrderExportServiceCommandConstants.CardExist,
+                        ServerHostName, LocalHostName)
+                    {
+                        Data = new ServiceBusCommandData(customerExportInfo)
+                    });
+            return Task.FromResult(true);
+        }
+
         public Task<bool> UpdateCustomerPaymentMethodsAsync(ICollection<CustomerCardData> paymentMethods)
         {
             if (!InitSuccess)

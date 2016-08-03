@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Ecommerce.Domain.Entities.Promotions;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
@@ -36,9 +37,18 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Promo
                     }
                     if (sku.Sku.Product.CategoryIds.Any(category => promoCategories.Contains(category)))
                     {
+                        var discountedAmount = sku.Sku.Price - Math.Round(sku.Sku.Price*(decimal) promo.Data.Percent/100, 2);
                         if (sku.Amount == sku.Sku.Price)
                         {
-                            sku.Amount = sku.Sku.Price - Math.Round(sku.Sku.Price*(decimal) promo.Data.Percent/100, 2);
+                            sku.Amount = discountedAmount;
+                        }
+                        if (sku.Amount == discountedAmount)
+                        {
+                            sku.Messages.Add(new MessageInfo
+                            {
+                                Message = "Category Promotional Pricing",
+                                MessageLevel = MessageLevel.Info
+                            });
                         }
                     }
                 }

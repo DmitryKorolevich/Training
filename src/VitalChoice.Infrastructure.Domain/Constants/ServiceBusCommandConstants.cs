@@ -8,6 +8,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
     public static class OrderExportServiceCommandConstants
     {
         public const string ExportOrder = "application/order-export";
+        public const string CardExist = "application/check-customer-card";
         public const string UpdateOrderPayment = "application/update-order-payment";
         public const string UpdateCustomerPayment = "application/update-customer-payment";
     }

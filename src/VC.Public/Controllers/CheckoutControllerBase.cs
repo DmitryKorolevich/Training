@@ -123,6 +123,9 @@ namespace VC.Public.Controllers
 
                     result.GeneratedGCCodes = sku.GcsGenerated?.Select(g => g.Code).ToList();
 
+                    result.Warning = sku.Messages.FirstOrDefault(message => message.MessageLevel == MessageLevel.Warning).Message;
+                    result.Info = sku.Messages.FirstOrDefault(message => message.MessageLevel == MessageLevel.Info).Message;
+
                     return result;
                 }) ?? Enumerable.Empty<Task<CartSkuModel>>());
             var gcsInCart = cartModel.GiftCertificateCodes.ToArray();
@@ -174,6 +177,9 @@ namespace VC.Public.Controllers
 
                 result.GeneratedGCCodes = sku.GcsGenerated?.Select(g => g.Code).ToList();
 
+                result.Warning = sku.Messages.FirstOrDefault(message => message.MessageLevel == MessageLevel.Warning).Message;
+                result.Info = sku.Messages.FirstOrDefault(message => message.MessageLevel == MessageLevel.Info).Message;
+
                 return result;
             }));
             cartModel.Tax = order.TaxTotal;
@@ -213,8 +219,11 @@ namespace VC.Public.Controllers
             {
                 foreach (var error in sku.Messages)
                 {
-                    ModelState.AddModelError("Code".FormatCollectionError("Skus", index), error.Message);
-                    ModelState.AddModelError(string.Empty, $"{sku.Sku.Code}: {error.Message}");
+                    if (error.MessageLevel == MessageLevel.Error)
+                    {
+                        ModelState.AddModelError("Code".FormatCollectionError("Skus", index), error.Message);
+                        ModelState.AddModelError(string.Empty, $"{sku.Sku.Code}: {error.Message}");
+                    }
                 }
                 index++;
             }
@@ -223,8 +232,11 @@ namespace VC.Public.Controllers
             {
                 foreach (var error in promo.Messages)
                 {
-                    ModelState.AddModelError("Code".FormatCollectionError("Promos", index), error.Message);
-                    ModelState.AddModelError(string.Empty, $"{promo.Sku.Code}: {error.Message}");
+                    if (error.MessageLevel == MessageLevel.Error)
+                    {
+                        ModelState.AddModelError("Code".FormatCollectionError("Promos", index), error.Message);
+                        ModelState.AddModelError(string.Empty, $"{promo.Sku.Code}: {error.Message}");
+                    }
                 }
                 index++;
             }

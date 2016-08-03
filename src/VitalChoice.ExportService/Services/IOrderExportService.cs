@@ -8,6 +8,7 @@ namespace VitalChoice.ExportService.Services
 {
     public interface IOrderExportService
     {
+        Task<bool> CardExist(CustomerExportInfo customerExportInfo);
         Task UpdateCustomerPaymentMethods(ICollection<CustomerCardData> paymentMethods);
         Task UpdateOrderPaymentMethod(OrderCardData paymentMethod);
         Task<ICollection<OrderExportItemResult>> ExportOrders(ICollection<OrderExportItem> exportItems);
