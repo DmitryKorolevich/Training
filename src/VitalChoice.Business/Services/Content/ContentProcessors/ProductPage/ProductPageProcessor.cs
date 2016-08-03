@@ -282,7 +282,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 TitleOverride = eProduct.SafeData.DescriptionTitleOverride,
                 Content = productContent.ContentItem.Description,
-                Hidden = (bool?)eProduct.SafeData.DescriptionHide ?? false
+                Hidden = (bool?)eProduct.SafeData.DescriptionHide ?? true
             };
             toReturn.ReviewsTab = new TtlProductReviewsTabModel()
             {
@@ -302,7 +302,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 TitleOverride = eProduct.SafeData.IngredientsTitleOverride,
                 Content = eProduct.SafeData.Ingredients,
-                Hidden = (bool?)eProduct.SafeData.IngredientsHide ?? false,
+                Hidden = (bool?)eProduct.SafeData.IngredientsHide ?? true,
                 NutritionalTitle = eProduct.SafeData.NutritionalTitle,
                 IngredientsTitle = eProduct.SafeData.IngredientsTitle,
                 ServingSize = eProduct.SafeData.ServingSize,
@@ -336,7 +336,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 TitleOverride = eProduct.SafeData.RecipesTitleOverride,
                 Content = eProduct.SafeData.Recipes,
-                Hidden = (bool?)eProduct.SafeData.RecipesHide ?? false,
+                Hidden = (bool?)eProduct.SafeData.RecipesHide ?? true,
                 Recipes = recipes.Items.Select(x => new TtlProductRecipeModel()
                 {
                     Name = x.Name,
@@ -348,14 +348,14 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 TitleOverride = eProduct.SafeData.ServingTitleOverride,
                 Content = eProduct.SafeData.Serving,
-                Hidden = (bool?)eProduct.SafeData.ServingHide ?? false
+                Hidden = (bool?)eProduct.SafeData.ServingHide ?? true
             };
 
             toReturn.ShippingTab = new TtlProductPageTabModel()
             {
                 TitleOverride = eProduct.SafeData.ShippingTitleOverride,
                 Content = eProduct.SafeData.Shipping,
-                Hidden = (bool?)eProduct.SafeData.ShippingHide ?? false
+                Hidden = (bool?)eProduct.SafeData.ShippingHide ?? true
             };
 
             var bestValuedSku =
