@@ -2,17 +2,10 @@ GO
 USE [VitalChoice.Ecommerce]
 GO
 
-DECLARE @date DateTime
-SET @date =(SELECT TOP 1 STATS_DATE(so.object_id, index_id)
-	FROM sys.indexes si
-	inner join sys.tables so on so.object_id = si.object_id
-	WHERE si.name='IX_IdCustomer' AND si.object_id = OBJECT_ID('Orders'))
-
-IF('2016-07-27 15:09:00.100'>@date OR @date IS NULL)
-BEGIN
-
-IF(@date IS NOT NULL)
+IF EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'dbo.Orders') AND name = N'IX_IdCustomer')
 	DROP INDEX [IX_IdCustomer] ON [dbo].[Orders]
+
+GO
 
 CREATE NONCLUSTERED INDEX [IX_IdCustomer] ON [dbo].[Orders]
 (
@@ -38,21 +31,12 @@ INCLUDE ( 	[Id],
 	[NPOrderStatus],
 	[IdOrderSource]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 
-END
-
 GO
 
-DECLARE @date DateTime
-SET @date =(SELECT TOP 1 STATS_DATE(so.object_id, index_id)
-	FROM sys.indexes si
-	inner join sys.tables so on so.object_id = si.object_id
-	WHERE si.name='IX_IdCustomer_ObjectStatus_OrderStatus_ObjectType' AND si.object_id = OBJECT_ID('Orders'))
-
-IF('2016-07-27 15:09:00.100'>@date OR @date IS NULL)
-BEGIN
-
-IF(@date IS NOT NULL)
+IF EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'dbo.Orders') AND name = N'IX_IdCustomer_ObjectStatus_OrderStatus_ObjectType')
 	DROP INDEX [IX_IdCustomer_ObjectStatus_OrderStatus_ObjectType] ON [dbo].[Orders]
+
+GO
 
 CREATE NONCLUSTERED INDEX [IX_IdCustomer_ObjectStatus_OrderStatus_ObjectType] ON [dbo].[Orders]
 (
@@ -78,42 +62,24 @@ INCLUDE ( 	[Id],
 	[IdAddedBy],
 	[IdOrderSource]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 
-END
-
 GO
 
-DECLARE @date DateTime
-SET @date =(SELECT TOP 1 STATS_DATE(so.object_id, index_id)
-	FROM sys.indexes si
-	inner join sys.tables so on so.object_id = si.object_id
-	WHERE si.name='IX_Orders_IdOrderSource' AND si.object_id = OBJECT_ID('Orders'))
-
-IF('2016-07-27 15:09:00.100'>@date OR @date IS NULL)
-BEGIN
-
-IF(@date IS NOT NULL)
+IF EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'dbo.Orders') AND name = N'IX_Orders_IdOrderSource')
 	DROP INDEX [IX_Orders_IdOrderSource] ON [dbo].[Orders]
+
+GO
 
 CREATE NONCLUSTERED INDEX [IX_Orders_IdOrderSource] ON [dbo].[Orders]
 (
 	[IdOrderSource] DESC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 
-END
-
 GO
 
-DECLARE @date DateTime
-SET @date =(SELECT TOP 1 STATS_DATE(so.object_id, index_id)
-	FROM sys.indexes si
-	inner join sys.tables so on so.object_id = si.object_id
-	WHERE si.name='IX_Orders_ObjectStatus_OrderDate' AND si.object_id = OBJECT_ID('Orders'))
-
-IF('2016-07-27 15:09:00.100'>@date OR @date IS NULL)
-BEGIN
-
-IF(@date IS NOT NULL)
+IF EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'dbo.Orders') AND name = N'IX_Orders_ObjectStatus_OrderDate')
 	DROP INDEX [IX_Orders_ObjectStatus_OrderDate] ON [dbo].[Orders]
+
+GO
 
 CREATE NONCLUSTERED INDEX [IX_Orders_ObjectStatus_OrderDate] ON [dbo].[Orders]
 (
@@ -139,21 +105,12 @@ INCLUDE ( 	[Id],
 	[NPOrderStatus],
 	[IdOrderSource]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 
-END
-
 GO
 
-DECLARE @date DateTime
-SET @date =(SELECT TOP 1 STATS_DATE(so.object_id, index_id)
-	FROM sys.indexes si
-	inner join sys.tables so on so.object_id = si.object_id
-	WHERE si.name='IX_Orders_OrderStatus_ObjectStatus_ObjectType_OrderDate' AND si.object_id = OBJECT_ID('Orders'))
-
-IF('2016-07-27 15:09:00.100'>@date OR @date IS NULL)
-BEGIN
-
-IF(@date IS NOT NULL)
+IF EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'dbo.Orders') AND name = N'IX_Orders_OrderStatus_ObjectStatus_ObjectType_OrderDate')
 	DROP INDEX [IX_Orders_OrderStatus_ObjectStatus_ObjectType_OrderDate] ON [dbo].[Orders]
+
+GO
 
 CREATE NONCLUSTERED INDEX [IX_Orders_OrderStatus_ObjectStatus_ObjectType_OrderDate] ON [dbo].[Orders]
 (
@@ -179,21 +136,12 @@ INCLUDE ( 	[Id],
 	[IdAddedBy],
 	[IdOrderSource]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 
-END
-
 GO
 
-DECLARE @date DateTime
-SET @date =(SELECT TOP 1 STATS_DATE(so.object_id, index_id)
-	FROM sys.indexes si
-	inner join sys.tables so on so.object_id = si.object_id
-	WHERE si.name='IX_Orders_OrderType_Status_Date' AND si.object_id = OBJECT_ID('Orders'))
-
-IF('2016-07-27 15:09:00.100'>@date OR @date IS NULL)
-BEGIN
-
-IF(@date IS NOT NULL)
+IF EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'dbo.Orders') AND name = N'IX_Orders_OrderType_Status_Date')
 	DROP INDEX [IX_Orders_OrderType_Status_Date] ON [dbo].[Orders]
+
+GO
 
 CREATE NONCLUSTERED INDEX [IX_Orders_OrderType_Status_Date] ON [dbo].[Orders]
 (
@@ -219,21 +167,12 @@ INCLUDE ( 	[Id],
 	[IdAddedBy],
 	[IdOrderSource]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 
-END
-
 GO
 
-DECLARE @date DateTime
-SET @date =(SELECT TOP 1 STATS_DATE(so.object_id, index_id)
-	FROM sys.indexes si
-	inner join sys.tables so on so.object_id = si.object_id
-	WHERE si.name='IX_IdObjectType' AND si.object_id = OBJECT_ID('Customers'))
-
-IF('2016-07-27 15:09:00.100'>@date OR @date IS NULL)
-BEGIN
-
-IF(@date IS NOT NULL)
+IF EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'dbo.Customers') AND name = N'IX_IdObjectType')
 	DROP INDEX [IX_IdObjectType] ON [dbo].[Customers]
+
+GO	
 
 CREATE NONCLUSTERED INDEX [IX_IdObjectType] ON [dbo].[Customers]
 (
@@ -250,21 +189,12 @@ INCLUDE ( 	[Id],
 	[IdAffiliate],
 	[IdProfileAddress]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 
-END
-
 GO
 
-DECLARE @date DateTime
-SET @date =(SELECT TOP 1 STATS_DATE(so.object_id, index_id)
-	FROM sys.indexes si
-	inner join sys.tables so on so.object_id = si.object_id
-	WHERE si.name='IX_StatusCode_DateCreated' AND si.object_id = OBJECT_ID('Customers'))
-
-IF('2016-07-27 15:09:00.100'>@date OR @date IS NULL)
-BEGIN
-
-IF(@date IS NOT NULL)
+IF EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'dbo.Customers') AND name = N'IX_StatusCode_DateCreated')
 	DROP INDEX [IX_StatusCode_DateCreated] ON [dbo].[Customers]
+
+GO
 
 CREATE NONCLUSTERED INDEX [IX_StatusCode_DateCreated] ON [dbo].[Customers]
 (
@@ -281,21 +211,12 @@ INCLUDE ( 	[Id],
 	[IdProfileAddress],
 	[IdObjectType]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 
-END
-
 GO
 
-DECLARE @date DateTime
-SET @date =(SELECT TOP 1 STATS_DATE(so.object_id, index_id)
-	FROM sys.indexes si
-	inner join sys.tables so on so.object_id = si.object_id
-	WHERE si.name='IX_StatusCode' AND si.object_id = OBJECT_ID('Customers'))
-
-IF('2016-07-27 15:09:00.100'>@date OR @date IS NULL)
-BEGIN
-
-IF(@date IS NOT NULL)
+IF EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'dbo.Customers') AND name = N'IX_StatusCode')
 	DROP INDEX [IX_StatusCode] ON [dbo].[Customers]
+	
+GO
 
 CREATE NONCLUSTERED INDEX [IX_StatusCode] ON [dbo].[Customers]
 (
@@ -312,7 +233,6 @@ INCLUDE ( 	[Id],
 	[IdAffiliate],
 	[IdProfileAddress]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 
-END
 
 GO
 
@@ -412,7 +332,35 @@ INSERT INTO @aspnetUsers
 	[IsConfirmed],
 	[IdUserType]
 )
-SELECT ROW_NUMBER() OVER (ORDER BY u.Id) + @adminsLowerSpace, u.* FROM [VitalChoice.Infrastructure].dbo.AspNetUsers AS u
+SELECT ROW_NUMBER() OVER (ORDER BY u.Id) + @adminsLowerSpace, 
+	Id, 
+	PublicId, 
+	[AccessFailedCount], 
+	[ConcurrencyStamp], 
+	[Email], 
+	[EmailConfirmed], 
+	[UserName], 
+	[FirstName], 
+	[LastName], 
+	[Status], 
+	[LockoutEnabled], 
+	[LockoutEnd], 
+	[NormalizedEmail], 
+	[NormalizedUserName], 
+	[PasswordHash], 
+	[PhoneNumber], 
+	[PhoneNumberConfirmed],
+	[LastLoginDate],
+	[CreateDate],
+	[UpdatedDate],
+	[DeletedDate],
+	[SecurityStamp],
+	[TwoFactorEnabled],
+	[ConfirmationToken],
+	[TokenExpirationDate],
+	[IsConfirmed],
+	[IdUserType] 
+FROM [VitalChoice.Infrastructure].dbo.AspNetUsers AS u
 WHERE IdUserType = 1 AND Id > 1000
 
 INSERT INTO @aspnetuserroles
@@ -951,6 +899,18 @@ USE [vitalchoice2.0]
 
 --============================ Insert Base Users and Customers Entity ====================================
 
+GO
+
+ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
+DROP CONSTRAINT UQ_Customers
+
+GO
+
+ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
+DROP COLUMN IdCustomer
+
+GO
+
 ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
 ADD IdCustomer INT NOT NULL CONSTRAINT UQ_Customers UNIQUE
 GO
@@ -995,9 +955,13 @@ GO
 ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
 DROP CONSTRAINT UQ_Customers
 
+GO
+
 ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
 DROP COLUMN IdCustomer
 --============================ Insert Fields ====================================
+
+GO
 
 DECLARE @fieldType INT, @lookupId INT
 
@@ -1077,20 +1041,6 @@ INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerOptionValues
 SELECT idCustomer, @fieldType, N'True'
 FROM customers 
 WHERE pcCust_Guest = 1
-
-GO
-
-DECLARE @fieldType INT, @lookupId INT
-
-SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.CustomerOptionTypes WHERE Name = N'HasHealthwiseOrders' AND IdObjectType = 1
-
-INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerOptionValues
-(IdCustomer, IdOptionType, Value)
-SELECT idCustomer, @fieldType, N'True'
-FROM customers AS c
-INNER JOIN healthwise AS hw ON hw.customerId = c.idcustomer
-WHERE c.customerType <> 1
-GROUP BY c.idcustomer
 
 GO
 
@@ -1438,8 +1388,20 @@ CROSS APPLY [dbo].[DelimitedSplit8K](c.approvedPaymentMethods, ',') AS d
 GO
 
 ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
-ADD IdCustomer INT NULL, IdCreditCard INT NULL
+ADD IdCustomer INT NULL
 
+GO
+
+CREATE NONCLUSTERED INDEX IX_Addresses_IdCustomer ON [VitalChoice.Ecommerce].dbo.Addresses(IdCustomer)
+
+GO
+
+ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
+ADD IdCreditCard INT NULL
+
+GO
+
+CREATE NONCLUSTERED INDEX IX_Addresses_IdCreditCard ON [VitalChoice.Ecommerce].dbo.Addresses(IdCreditCard)
 
 GO
 
@@ -1460,6 +1422,8 @@ SELECT
 	c.custCreditCardId
 FROM [vitalchoice2.0].dbo.customerCreditCards AS c
 INNER JOIN [vitalchoice2.0].dbo.customers AS cc ON cc.idcustomer = c.idCustomer
+
+GO
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.AddressOptionValues
 (IdAddress, IdOptionType, Value)
@@ -1486,10 +1450,14 @@ UNPIVOT (Value FOR Name IN
 INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
 WHERE unpvt.Value IS NULL OR unpvt.Value = ''
 
+GO
+
 INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerPaymentMethods
 (DateCreated, DateEdited, IdAddress, IdCustomer, IdObjectType, StatusCode)
 SELECT c.DateCreated, c.DateEdited, a.Id, c.Id, 1, 2 FROM [VitalChoice.Ecommerce].dbo.Customers AS c
 INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.Id
+
+GO
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerPaymentMethodValues
 (IdCustomerPaymentMethod, IdOptionType, Value)
@@ -1541,6 +1509,13 @@ WHERE Value IS NULL OR Value = ''
 
 DELETE FROM [VitalChoice.Ecommerce].dbo.AddressOptionValues
 WHERE Value IS NULL OR Value = ''
+
+GO
+
+ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
+DROP INDEX IX_Addresses_IdCustomer, IX_Addresses_IdCreditCard
+
+GO
 
 ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
 DROP COLUMN IdCustomer, IdCreditCard
@@ -1603,6 +1578,8 @@ GO
 DELETE FROM [VitalChoice.Ecommerce].dbo.AddressOptionValues
 WHERE Value IS NULL OR Value = ''
 
+GO
+
 ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
 DROP COLUMN IdCustomer
 
@@ -1664,6 +1641,8 @@ GO
 
 DELETE FROM [VitalChoice.Ecommerce].dbo.AddressOptionValues
 WHERE Value IS NULL OR Value = ''
+
+GO
 
 ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
 DROP COLUMN IdCustomer
@@ -1827,7 +1806,7 @@ GO
 
 IF OBJECT_ID('dbo.ReplaceUrl') IS NOT NULL
 BEGIN
-DROP FUNCTION dbo.ReplaceUrl
+	DROP FUNCTION dbo.ReplaceUrl
 END
 GO
 CREATE FUNCTION dbo.ReplaceUrl
@@ -2650,6 +2629,8 @@ GO
 
 ALTER TABLE [VitalChoice.Infrastructure].dbo.ContentItems
 	DROP COLUMN TempId, COLUMN TempCategoryId
+
+GO
 
 ALTER TABLE [VitalChoice.Ecommerce].dbo.ProductReviews
 ADD IdOld INT NULL
@@ -3837,6 +3818,8 @@ GO
 ALTER TABLE OrderPaymentMethods
 DROP CONSTRAINT UQ_OrderPaymentMethodsOrders
 
+GO
+
 ALTER TABLE OrderPaymentMethods
 DROP COLUMN IdOrder
 
@@ -3899,6 +3882,8 @@ GO
 
 ALTER TABLE OrderAddresses
 DROP CONSTRAINT UQ_OrderAddressesOrders
+
+GO
 
 ALTER TABLE OrderAddresses
 DROP COLUMN IdOrder
@@ -4019,6 +4004,8 @@ PRINT '====shipping addresses options(auto-ship)'
 GO
 
 DROP INDEX IX_OrderAddressesIdOrder ON OrderAddresses
+
+GO
 
 ALTER TABLE OrderAddresses
 DROP COLUMN IdOrder
@@ -4265,6 +4252,8 @@ GO
 ALTER TABLE AffiliatePayments
 DROP CONSTRAINT UQ_AffiliatePaymentsOrder
 
+GO
+
 ALTER TABLE AffiliatePayments
 DROP COLUMN IdOrder
 
@@ -4391,6 +4380,8 @@ GO
 GO
 
 DROP INDEX IX_OrdersIdAutoShipOrder ON Orders
+
+GO
 
 ALTER TABLE Orders
 DROP COLUMN IdAutoShipOrder

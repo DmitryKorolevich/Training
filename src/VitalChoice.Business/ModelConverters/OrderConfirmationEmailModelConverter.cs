@@ -157,8 +157,8 @@ namespace VitalChoice.Business.ModelConverters
                         ("{0:c} will be charged to your {1} card<br/>ending in {2} exp: {3}/{4} <em>after</em> this order is shipped.",
                          model.Total, cartType,
                          dynamic.PaymentMethod.SafeData.CardNumber?.Replace("X", ""),
-                         ((DateTime)dynamic.PaymentMethod.SafeData.ExpDate).Month,
-                         ((DateTime)dynamic.PaymentMethod.SafeData.ExpDate).Year);
+                         ((DateTime)dynamic.PaymentMethod.Data.ExpDate).Month,
+                         ((DateTime)dynamic.PaymentMethod.Data.ExpDate).Year);
                     break;
                 case (int)PaymentMethodType.Check:
                     model.PaymentTypeMessage = $"Payment Method: Check #{dynamic.PaymentMethod.SafeData.CheckNumber}";
