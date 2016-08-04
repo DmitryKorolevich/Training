@@ -1410,13 +1410,13 @@ namespace VitalChoice.Business.Services.Orders
 
                 start = report.Date.AddDays(-30);
                 end = report.Date.AddDays(1);
-                FillKPIReportMarketing(report.TodayMonthMarketing, start, end, activeContacts, deliveryObjects, true);
+                await FillKPIReportMarketing(report.TodayMonthMarketing, start, end, activeContacts, deliveryObjects, true);
                 start = report.Date.AddMonths(-1).AddDays(-30);
                 end = report.Date.AddMonths(-1).AddDays(1);
-                FillKPIReportMarketing(report.MonthAgoMonthMarketing, start, end, activeContacts, deliveryObjects);
+                await FillKPIReportMarketing(report.MonthAgoMonthMarketing, start, end, activeContacts, deliveryObjects);
                 start = report.Date.AddYears(-1).AddDays(-30);
                 end = report.Date.AddYears(-1).AddDays(1);
-                FillKPIReportMarketing(report.YearAgoMonthMarketing, start, end, activeContacts, deliveryObjects);
+                await FillKPIReportMarketing(report.YearAgoMonthMarketing, start, end, activeContacts, deliveryObjects);
 
                 start = report.Date.AddDays(-30);
                 end = report.Date.AddDays(1);
