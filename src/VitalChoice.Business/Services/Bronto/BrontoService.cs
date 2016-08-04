@@ -244,7 +244,7 @@ namespace VitalChoice.Business.Services.Bronto
                         {
                             new dateValue()
                             {
-                                @operator = filterOperator.GreaterThanEqualTo,
+                                @operator = filterOperator.After,
                                 value = from,
                                 operatorSpecified = true,
                                 valueSpecified = true
@@ -284,7 +284,7 @@ namespace VitalChoice.Business.Services.Bronto
                         {
                             new dateValue()
                             {
-                                @operator = filterOperator.GreaterThanEqualTo,
+                                @operator = filterOperator.After,
                                 value = from,
                                 operatorSpecified = true,
                                 valueSpecified = true

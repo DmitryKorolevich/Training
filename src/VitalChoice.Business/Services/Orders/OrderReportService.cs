@@ -1403,10 +1403,10 @@ namespace VitalChoice.Business.Services.Orders
                 end = report.Date.AddYears(-1).AddDays(1);
                 await FillKPIReportSales(report.YearAgoYearSales, start, end);
 
-                deliveryObject[] deliveryObjects = new deliveryObject[0];
-                contactObject[] activeContacts = new contactObject[0];
-                //deliveryObject[] deliveryObjects = await _brontoService.GetInfo(report.Date.AddYears(-1).AddDays(-30));
-                //contactObject[] activeContacts = await _brontoService.GetAllActiveContacts(report.Date.AddYears(-1).AddDays(-30));
+                //deliveryObject[] deliveryObjects = new deliveryObject[0];
+                //contactObject[] activeContacts = new contactObject[0];
+                deliveryObject[] deliveryObjects = await _brontoService.GetInfo(report.Date.AddYears(-1).AddDays(-30));
+                contactObject[] activeContacts = await _brontoService.GetAllActiveContacts(report.Date.AddYears(-1).AddDays(-30));
 
                 start = report.Date.AddDays(-30);
                 end = report.Date.AddDays(1);
@@ -1463,27 +1463,18 @@ namespace VitalChoice.Business.Services.Orders
             item.NewEmailAddresses = _brontoService.GetAddressCount(activeContacts, from, to);
             item.OpenRate = _brontoService.GetOpenRate(deliveryObjects, from, to);
 
-            if (lastData)
-            {
-                item.FacebookLikes = _facebookService.GetLikesCount();
-                item.TwitterFollowers = _twitterService.GetFollowersCount();
-            }
-            else
-            {
-                Func<IQueryable<KPICacheItem>, IOrderedQueryable<KPICacheItem>> sortable = x => x.OrderByDescending(y => y.DateCreated);
-                var cache = await _kPICacheItemRepository.Query(p=>p.DateCreated<=to).OrderBy(sortable).SelectFirstOrDefaultAsync(false);
-                if (cache != null)
-                {
-                    var report =  JsonConvert.DeserializeObject<KPIReport>(cache.Data);
-                    item.FacebookLikes = report.TodayMonthMarketing.FacebookLikes;
-                    item.TwitterFollowers = report.TodayMonthMarketing.TwitterFollowers;
-                }
-            }
+            //TODO: google part
+            //item.UniqueVisits = _googleService.GetUniqueVisits(from, to);
+            //item.NewWebVisitsPercent = _googleService.GetNewWebVisitsPercent(from, to);
         }
 
         private void FillKPIReportRates(KPIReportRatesItem item, DateTime from, DateTime to)
         {
             //TODO: google part
+            //item.Conversion = _googleService.GetConversionLevel(from, to);
+            //item.AOV = _googleService.GetAov(from, to);
+            //item.Bounce = _googleService.GetBounceRate(from, to);
+            //item.CartAbandon = _googleService.GetCartAbandon(from, to);
         }
     }
 }
