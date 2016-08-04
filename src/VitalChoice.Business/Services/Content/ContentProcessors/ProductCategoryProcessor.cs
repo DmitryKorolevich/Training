@@ -333,8 +333,8 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                     SubTitle = x.SubTitle,
                 }).ToList(),
                 Skus = skuProducts?.Where(x => 
-                    x.IdVisibility.HasValue && customerVisibility.Contains(x.IdVisibility.Value) && x.SkuId.HasValue
-                    && !x.SkuHidden && targetStatuses.Contains((RecordStatusCode)x.SkuStatusCode)
+                    x.IdVisibility.HasValue && customerVisibility.Contains(x.IdVisibility.Value) && x.SkuId.HasValue && x.SkuHidden.HasValue
+                    && !x.SkuHidden.Value && targetStatuses.Contains((RecordStatusCode)x.SkuStatusCode)
                     ).Select(x => new TtlCategorySkuModel
                 {
                     IdProduct = x.IdProduct,

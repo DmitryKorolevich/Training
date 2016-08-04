@@ -168,8 +168,7 @@ namespace VitalChoice.Infrastructure.Context
 
             builder.Entity<VProductSku>(entity =>
             {
-                entity.HasKey(p => new { p.IdProduct, p.SkuId });
-                entity.Ignore(x => x.Id);
+                entity.HasKey(p => p.Id);
                 entity.Ignore(x => x.EditedByAgentId);
                 entity.ToTable("VProductSkus");
             });
@@ -271,6 +270,7 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<VAffiliateNotPaidCommission>(entity =>
             {
                 entity.HasKey(t => t.Id);
+                entity.NonCached();
                 entity.ToTable("VAffiliateNotPaidCommissions");
             });
 

@@ -23,7 +23,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 
         public RecordStatusCode? SkuStatusCode { get; set; }
 
-        public  bool SkuHidden { get; set; }
+        public  bool? SkuHidden { get; set; }
 
         public int IdProduct { get; set; }
 

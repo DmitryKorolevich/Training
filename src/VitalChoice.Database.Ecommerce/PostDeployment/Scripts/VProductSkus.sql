@@ -4,6 +4,7 @@ GO
 CREATE VIEW [dbo].[VProductSkus]
 AS 
 SELECT 
+	CAST(ROW_NUMBER() OVER (ORDER BY p.Id DESC) as INT) AS Id,
 	s.Id AS SkuId,
 	s.Code, 
 	s.Price, 

@@ -45,7 +45,9 @@
         "GoogleProductsFeedJob": "0 0 0/1 * * ?",
         "ShipDelayJob": "0 0 2 * * ?",
         "OrderProductReviewEmailsJob": "0 0 2 * * ?",
-        "VeraCoreNotificationsJob": "0 0/5 * * * ?"
+        "VeraCoreNotificationsJob": "0 0/5 * * * ?",
+        //"KPIReportJob": "0 0 3 * * ?",
+        "KPIReportJob": "0 0/2 * * * ?"
       }
     },
     "Avatax": {
@@ -88,14 +90,14 @@
     },
     "Google": {
       "ClientId": "481586578687@developer.gserviceaccount.com",
-      "KeyFile": "5083717e58d4513a8e8ca2992840b54ee728d674-privatekey.p12",
+      "KeyFile": "C:\\WindowsService\\VitalChoice.Jobs\\5083717e58d4513a8e8ca2992840b54ee728d674-privatekey.p12",
       "KeyPass": "notasecret",
       "GAAccountId": "ga:652942"
     },
     "Facebook": {
       "Id": "47801159762",
-      "AppId": "",
-      "AppSecret": ""
+      "AppId": "646339008847665",
+      "AppSecret": "3dd38a002172186d1a1513c377adfb58"
     }
   }
 }

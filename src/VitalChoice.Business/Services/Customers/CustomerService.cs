@@ -713,17 +713,17 @@ namespace VitalChoice.Business.Services.Customers
                             method.SafeData.CardNumber,
                             Model = method
                         }).ToArray();
-                    int index = 0;
+                    int[] index = {0};
                     await model.CustomerPaymentMethods.ForEachAsync(async method =>
                     {
-                        index++;
                         var errors = await _paymentMethodService.AuthorizeCreditCard(method);
                         errors.Select(error => new MessageInfo
                         {
-                            Field = error.Field.FormatCollectionError("CreditCards", index).FormatErrorWithForm("card"),
+                            Field = error.Field.FormatCollectionError("CreditCards", index[0]).FormatErrorWithForm("card"),
                             Message = error.Message,
                             MessageLevel = error.MessageLevel
                         }).ToList().Raise();
+                        index[0]++;
                     });
 
                     entity = await base.InsertAsync(model, uow);

@@ -258,9 +258,13 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpGet]
-        public async Task<Result<OrderManageModel>> GetOrder(int id, int? idcustomer = null, bool refreshprices = false)
+        public async Task<Result<OrderManageModel>> GetOrder(string id, int? idcustomer = null, bool refreshprices = false)
         {
-            if (id == 0)
+            int idOrder = 0;
+            if (id!=null && !Int32.TryParse(id, out idOrder))
+                throw new NotFoundException();
+
+            if (idOrder == 0)
             {
                 var order = _orderService.CreateNewNormalOrder(OrderStatus.Processed);
                 if (idcustomer.HasValue)
@@ -283,13 +287,14 @@ namespace VC.Admin.Controllers
                 return model;
             }
 
-            var item = await _orderService.SelectAsync(id);
-            if (item.IdObjectType != (int)OrderType.Normal && item.IdObjectType != (int)OrderType.AutoShipOrder && item.IdObjectType != (int)OrderType.AutoShip &&
-                item.IdObjectType != (int)OrderType.DropShip && item.IdObjectType != (int)OrderType.GiftList)
+            var item = await _orderService.SelectAsync(idOrder);
+            if (item==null ||
+                (item.IdObjectType != (int)OrderType.Normal && item.IdObjectType != (int)OrderType.AutoShipOrder && item.IdObjectType != (int)OrderType.AutoShip &&
+                item.IdObjectType != (int)OrderType.DropShip && item.IdObjectType != (int)OrderType.GiftList))
             {
                 throw new NotFoundException();
             }
-            if (id != 0 && refreshprices && item.Skus != null)
+            if (idOrder != 0 && refreshprices && item.Skus != null)
             {
                 var customer = await _customerService.SelectAsync(item.Customer.Id);
                 foreach (var orderSku in item.Skus)

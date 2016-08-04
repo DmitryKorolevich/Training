@@ -196,7 +196,7 @@ namespace VitalChoice.Business.Services.Affiliates
             if (!filter.WithAvailablePayCommision)
             {
                 var ids = toReturn.Items.Select(pp => pp.Id).ToList();
-                var commissions = await _vAffiliateNotPaidCommissionRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
+                var commissions = await _vAffiliateNotPaidCommissionRepository.Query(p=>ids.Contains(p.Id)).SelectAsync(false);
                 foreach (var commision in commissions)
                 {
                     var item = toReturn.Items.FirstOrDefault(p => p.Id == commision.Id);
@@ -529,11 +529,10 @@ namespace VitalChoice.Business.Services.Affiliates
                         var affiliateOrderPaymentRepository = uow.RepositoryAsync<AffiliateOrderPayment>();
                         var affiliatePaymentRepository = uow.RepositoryAsync<AffiliatePayment>();
 
-                        var orderPayments =
-                            (await
-                                affiliateOrderPaymentRepository.Query(
-                                    p => p.IdAffiliate == idAffiliate && p.Status == AffiliateOrderPaymentStatus.NotPaid &&
-                                         p.Order.DateCreated < to).SelectAsync(true)).ToList();
+                        AffiliateOrderPaymentQuery conditions = new AffiliateOrderPaymentQuery().WithIdAffiliate(idAffiliate).WithPaymentStatus(AffiliateOrderPaymentStatus.NotPaid).
+                            WithActiveOrder().WithToDate(to);
+
+                        var orderPayments =(await affiliateOrderPaymentRepository.Query(conditions).Include(p => p.Order).SelectAsync(true)).ToList();
                         if (orderPayments.Sum(p => p.Amount) < AffiliateConstants.AffiliateMinPayCommisionsAmount)
                         {
                             throw new AppValidationException(

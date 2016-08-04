@@ -41,7 +41,11 @@ namespace VitalChoice.Business.Services
 
         private AnalyticsService CreateAnalyticsService()
         {
-            var keyUrl = Directory.GetCurrentDirectory() + @"\" + _keyFile;
+            var keyUrl = _keyFile;
+            if (!Path.IsPathRooted(keyUrl))
+            {
+                keyUrl = Directory.GetCurrentDirectory() + @"\" + keyUrl;
+            }
 
             var certificate = new X509Certificate2(keyUrl, _keyPass, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
 
