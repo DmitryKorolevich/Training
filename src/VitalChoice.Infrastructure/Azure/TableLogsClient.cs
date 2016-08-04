@@ -219,10 +219,10 @@ namespace VitalChoice.Infrastructure.Azure
             {
                 page = page - 1;
             }
-            var startCondition = TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.GreaterThanOrEqual,
-                start.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
-            var endCondition = TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.LessThanOrEqual,
-                end.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
+            var startCondition = TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.GreaterThanOrEqual,
+                start);
+            var endCondition = TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.LessThan,
+                end.AddDays(1));
             var resultedCondition = TableQuery.CombineFilters(startCondition, TableOperators.And, endCondition);
             if (!string.IsNullOrEmpty(logLevel))
             {

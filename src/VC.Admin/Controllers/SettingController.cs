@@ -224,8 +224,8 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Settings)]
         public Result<PagedList<LogListItemModel>> GetLogItems([FromBody] LogItemListFilter filter)
         {
-            var end = filter.To?.AddDays(1) ?? DateTime.Today.AddDays(1);
-            var start = filter.From ?? DateTime.Today.AddDays(-1);
+            var end = filter.To ?? DateTime.Today;
+            var start = filter.From ?? DateTime.Today;
             var result = _logsClient.GetLogs(start, end, filter.AppName, filter.LogLevel, filter.Message, filter.Source,
                 filter.Paging.PageIndex,
                 filter.Paging.PageItemCount, filter.Sorting);
