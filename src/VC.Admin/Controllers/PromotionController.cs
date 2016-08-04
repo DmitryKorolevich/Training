@@ -19,6 +19,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.Products;
 using VitalChoice.Ecommerce.Domain.Entities.Promotions;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -69,9 +70,13 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<PromotionManageModel>> GetPromotion(int id)
+        public async Task<Result<PromotionManageModel>> GetPromotion(string id)
         {
-            if (id == 0)
+            int idPromotion = 0;
+            if (id != null && !Int32.TryParse(id, out idPromotion))
+                throw new NotFoundException();
+
+            if (idPromotion == 0)
             {
                 var now = DateTime.Now;
                 now = new DateTime(now.Year, now.Month, now.Day);
@@ -89,7 +94,10 @@ namespace VC.Admin.Controllers
                 };
             }
 
-            var item = await _promotionService.SelectAsync(id);
+            var item = await _promotionService.SelectAsync(idPromotion);
+            if (item == null)
+                throw new NotFoundException();
+
             PromotionManageModel toReturn = await _mapper.ToModelAsync<PromotionManageModel>(item);
 
             return toReturn;

@@ -282,7 +282,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 TitleOverride = eProduct.SafeData.DescriptionTitleOverride,
                 Content = productContent.ContentItem.Description,
-                Hidden = eProduct.Data.DescriptionHide
+                Hidden = (bool?)eProduct.SafeData.DescriptionHide ?? true
             };
             toReturn.ReviewsTab = new TtlProductReviewsTabModel()
             {
@@ -302,7 +302,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 TitleOverride = eProduct.SafeData.IngredientsTitleOverride,
                 Content = eProduct.SafeData.Ingredients,
-                Hidden = eProduct.SafeData.IngredientsHide==true,
+                Hidden = (bool?)eProduct.SafeData.IngredientsHide ?? true,
                 NutritionalTitle = eProduct.SafeData.NutritionalTitle,
                 IngredientsTitle = eProduct.SafeData.IngredientsTitle,
                 ServingSize = eProduct.SafeData.ServingSize,
@@ -336,7 +336,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 TitleOverride = eProduct.SafeData.RecipesTitleOverride,
                 Content = eProduct.SafeData.Recipes,
-                Hidden = eProduct.SafeData.RecipesHide == true,
+                Hidden = (bool?)eProduct.SafeData.RecipesHide ?? true,
                 Recipes = recipes.Items.Select(x => new TtlProductRecipeModel()
                 {
                     Name = x.Name,
@@ -348,14 +348,14 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 TitleOverride = eProduct.SafeData.ServingTitleOverride,
                 Content = eProduct.SafeData.Serving,
-                Hidden = eProduct.SafeData.ServingHide == true
+                Hidden = (bool?)eProduct.SafeData.ServingHide ?? true
             };
 
             toReturn.ShippingTab = new TtlProductPageTabModel()
             {
                 TitleOverride = eProduct.SafeData.ShippingTitleOverride,
                 Content = eProduct.SafeData.Shipping,
-                Hidden = eProduct.SafeData.ShippingHide == true
+                Hidden = (bool?)eProduct.SafeData.ShippingHide ?? true
             };
 
             var bestValuedSku =

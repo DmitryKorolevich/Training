@@ -196,7 +196,7 @@ namespace VitalChoice.Business.Services.Affiliates
             if (!filter.WithAvailablePayCommision)
             {
                 var ids = toReturn.Items.Select(pp => pp.Id).ToList();
-                var commissions = await _vAffiliateNotPaidCommissionRepository.Query(p => p.Count!=0 && ids.Contains(p.Id)).SelectAsync(false);
+                var commissions = await _vAffiliateNotPaidCommissionRepository.Query(p=>ids.Contains(p.Id)).SelectAsync(false);
                 foreach (var commision in commissions)
                 {
                     var item = toReturn.Items.FirstOrDefault(p => p.Id == commision.Id);

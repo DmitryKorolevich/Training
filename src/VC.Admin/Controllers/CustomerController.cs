@@ -475,12 +475,16 @@ namespace VC.Admin.Controllers
 
         [HttpGet]
         //[AdminAuthorize(PermissionType.Customers)]
-        public async Task<Result<AddUpdateCustomerModel>> GetExistingCustomer(int id)
+        public async Task<Result<AddUpdateCustomerModel>> GetExistingCustomer(string id)
         {
-            var result = await _customerService.SelectAsync(id, true);
+            int idCustomer = 0;
+            if (id != null && !Int32.TryParse(id, out idCustomer))
+                throw new NotFoundException();
+
+            var result = await _customerService.SelectAsync(idCustomer, true);
             if (result == null)
             {
-                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
+                throw new NotFoundException();
             }
 
             if (result.IdObjectType == (int) CustomerType.Wholesale && result.SafeData.InceptionDate == null)

@@ -19,10 +19,12 @@ using VitalChoice.Interfaces.Services.Settings;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.Products;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
-using VitalChoice.Infrastructure.Identity.UserManagers;using VitalChoice.Infrastructure.Domain.Entities.Roles;
+using VitalChoice.Infrastructure.Identity.UserManagers;
+using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Services;
 
@@ -72,9 +74,13 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<DiscountManageModel>> GetDiscount(int id)
+        public async Task<Result<DiscountManageModel>> GetDiscount(string id)
         {
-            if (id == 0)
+            int idProduct = 0;
+            if (id != null && !Int32.TryParse(id, out idProduct))
+                throw new NotFoundException();
+
+            if (idProduct == 0)
             {
                 var now = DateTime.Now;
                 now = new DateTime(now.Year, now.Month, now.Day);
@@ -93,7 +99,10 @@ namespace VC.Admin.Controllers
                 };
             }
 
-            var item = await _discountService.SelectAsync(id);
+            var item = await _discountService.SelectAsync(idProduct);
+            if (item == null)
+                throw new NotFoundException();
+
             DiscountManageModel toReturn = await _mapper.ToModelAsync<DiscountManageModel>(item);
             return toReturn;
         }

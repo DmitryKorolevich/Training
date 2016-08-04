@@ -58,8 +58,13 @@ namespace VitalChoice.Caching.Services
                 foreach (var entityType in context.Model.GetEntityTypes())
                 {
                     EntityPrimaryKeyInfo primaryKey;
-                    if (!TryGetPrimaryKey(entityType, out primaryKey))
+
+                    if (!TryGetPrimaryKey(entityType, out primaryKey) ||
+                        entityType.GetAnnotations().Any(a => a.Name == EntityBuilderExtensions.NonCachedAnnotationName))
+                    {
                         continue;
+                    }
+
                     var uniqueIndex = GetFirstUniqueIndex(entityType);
                     var conditionalList = GetConditionalIndexes(entityType);
                     var cacheCondition = GetCacheCondition(entityType);

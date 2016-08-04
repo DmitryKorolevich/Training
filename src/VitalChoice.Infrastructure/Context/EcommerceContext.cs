@@ -270,6 +270,7 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<VAffiliateNotPaidCommission>(entity =>
             {
                 entity.HasKey(t => t.Id);
+                entity.NonCached();
                 entity.ToTable("VAffiliateNotPaidCommissions");
             });
 

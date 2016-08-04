@@ -11,9 +11,9 @@ namespace VC.Public.Models.Cart
     {
         private string _productPageUrl;
 
-        public string Warning { get; set; }
+        public List<string> Warnings { get; set; }
 
-        public string Info { get; set; }
+        public List<string> Infos { get; set; }
 
         [Map]
 		public string Code { get; set; }

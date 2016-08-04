@@ -113,9 +113,13 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<AffiliateManageModel>> GetAffiliate(int id)
+        public async Task<Result<AffiliateManageModel>> GetAffiliate(string id)
         {
-            if (id == 0)
+            int idAffiliate = 0;
+            if (id != null && !Int32.TryParse(id, out idAffiliate))
+                throw new NotFoundException();
+
+            if (idAffiliate == 0)
             {
                 var now = DateTime.Now;
                 now = new DateTime(now.Year, now.Month, now.Day);
@@ -131,11 +135,10 @@ namespace VC.Admin.Controllers
                 };
             }
 
-            var item = await _affiliateService.SelectAsync(id);
+            var item = await _affiliateService.SelectAsync(idAffiliate);
             if (item == null)
-            {
-                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
-            }
+                throw new NotFoundException();
+
             AffiliateManageModel toReturn = await _mapper.ToModelAsync<AffiliateManageModel>(item);
 
             var login = await _affiliateUserService.GetAsync(toReturn.Id);

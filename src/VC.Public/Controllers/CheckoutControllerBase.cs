@@ -123,8 +123,8 @@ namespace VC.Public.Controllers
 
                     result.GeneratedGCCodes = sku.GcsGenerated?.Select(g => g.Code).ToList();
 
-                    result.Warning = sku.Messages.FirstOrDefault(message => message.MessageLevel == MessageLevel.Warning).Message;
-                    result.Info = sku.Messages.FirstOrDefault(message => message.MessageLevel == MessageLevel.Info).Message;
+                    result.Warnings = sku.Messages.Where(message => message.MessageLevel == MessageLevel.Warning).Select(message => message.Message).ToList();
+                    result.Infos = sku.Messages.Where(message => message.MessageLevel == MessageLevel.Info).Select(message => message.Message).ToList();
 
                     return result;
                 }) ?? Enumerable.Empty<Task<CartSkuModel>>());
@@ -177,8 +177,8 @@ namespace VC.Public.Controllers
 
                 result.GeneratedGCCodes = sku.GcsGenerated?.Select(g => g.Code).ToList();
 
-                result.Warning = sku.Messages.FirstOrDefault(message => message.MessageLevel == MessageLevel.Warning).Message;
-                result.Info = sku.Messages.FirstOrDefault(message => message.MessageLevel == MessageLevel.Info).Message;
+                result.Warnings = sku.Messages.Where(message => message.MessageLevel == MessageLevel.Warning).Select(message => message.Message).ToList();
+                result.Infos = sku.Messages.Where(message => message.MessageLevel == MessageLevel.Info).Select(message => message.Message).ToList();
 
                 return result;
             }));

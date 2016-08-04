@@ -36,6 +36,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.InventorySkus;
 using VitalChoice.Business.Helpers;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
@@ -207,9 +208,13 @@ namespace VC.Admin.Controllers
 
         [HttpGet]
         [AdminAuthorize(PermissionType.Products)]
-        public async Task<Result<ProductManageModel>> GetProduct(int id)
+        public async Task<Result<ProductManageModel>> GetProduct(string id)
         {
-            if (id == 0)
+            int idProduct = 0;
+            if (id != null && !Int32.TryParse(id, out idProduct))
+                throw new NotFoundException();
+
+            if (idProduct == 0)
             {
                 return new ProductManageModel()
                 {
@@ -234,7 +239,9 @@ namespace VC.Admin.Controllers
                 };
             }
 
-            var item = await productService.SelectTransferAsync(id);
+            var item = await productService.SelectTransferAsync(idProduct);
+            if(item==null || item.ProductDynamic==null)
+                throw new NotFoundException();
 
             ProductManageModel toReturn = await _mapper.ToModelAsync<ProductManageModel>(item?.ProductDynamic);
             if (item.ProductContent != null)
@@ -376,13 +383,17 @@ namespace VC.Admin.Controllers
             var category = model.Convert();
 
             return await productCategoryService.UpdateCategoriesTreeAsync(category);
-        }
+        } 
 
         [HttpGet]
         [AdminAuthorize(PermissionType.Products)]
-        public async Task<Result<ProductCategoryManageModel>> GetCategory(int id)
+        public async Task<Result<ProductCategoryManageModel>> GetCategory(string id)
         {
-            if (id == 0)
+            int idCategory = 0;
+            if (id != null && !Int32.TryParse(id, out idCategory))
+                throw new NotFoundException();
+
+            if (idCategory == 0)
             {
                 return new ProductCategoryManageModel()
                 {
@@ -393,7 +404,11 @@ namespace VC.Admin.Controllers
                     ViewType = ProductCategoryViewType.Retail,
                 };
             }
-            return new ProductCategoryManageModel((await productCategoryService.GetCategoryAsync(id)));
+            var item = await productCategoryService.GetCategoryAsync(idCategory);
+            if (item == null)
+                throw new NotFoundException();
+
+            return new ProductCategoryManageModel(item);
         }
 
         [HttpPost]
@@ -512,15 +527,23 @@ namespace VC.Admin.Controllers
 
         [HttpGet]
         [AdminAuthorize(PermissionType.Products)]
-        public async Task<Result<InventoryCategoryManageModel>> GetInventoryCategory(int id)
+        public async Task<Result<InventoryCategoryManageModel>> GetInventoryCategory(string id)
         {
-            if (id == 0)
+            int idCategory = 0;
+            if (id != null && !Int32.TryParse(id, out idCategory))
+                throw new NotFoundException();
+
+            if (idCategory == 0)
             {
                 return new InventoryCategoryManageModel()
                 {
                 };
             }
-            return new InventoryCategoryManageModel((await inventoryCategoryService.GetCategoryAsync(id)));
+            var item = await inventoryCategoryService.GetCategoryAsync(idCategory);
+            if (item == null)
+                throw new NotFoundException();
+
+            return new InventoryCategoryManageModel(item);
         }
 
         [HttpPost]
@@ -576,9 +599,13 @@ namespace VC.Admin.Controllers
 
         [HttpGet]
         [AdminAuthorize(PermissionType.Products)]
-        public async Task<Result<ProductReviewManageModel>> GetProductReview(int id)
+        public async Task<Result<ProductReviewManageModel>> GetProductReview(string id)
         {
-            if (id == 0)
+            int idReview = 0;
+            if (id != null && !Int32.TryParse(id, out idReview))
+                throw new NotFoundException();
+
+            if (idReview == 0)
             {
                 return new ProductReviewManageModel()
                 {
@@ -586,7 +613,11 @@ namespace VC.Admin.Controllers
                     Rating = 5,
                 };
             }
-            return new ProductReviewManageModel((await productReviewService.GetProductReviewAsync(id)));
+            var item = await productReviewService.GetProductReviewAsync(idReview);
+            if (item == null)
+                throw new NotFoundException();
+
+            return new ProductReviewManageModel(item);
         }
 
         [HttpPost]

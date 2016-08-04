@@ -120,9 +120,13 @@ namespace VC.Admin.Controllers
 
         [HttpGet]
         [AdminAuthorize(PermissionType.InventorySkus)]
-        public async Task<Result<InventorySkuManageModel>> GetInventorySku(int id)
+        public async Task<Result<InventorySkuManageModel>> GetInventorySku(string id)
         {
-            if (id == 0)
+            int idINS = 0;
+            if (id != null && !Int32.TryParse(id, out idINS))
+                throw new NotFoundException();
+
+            if (idINS == 0)
             {
                 return new InventorySkuManageModel()
                 {
@@ -130,11 +134,10 @@ namespace VC.Admin.Controllers
                 };
             }
 
-            var item = await _inventorySkuService.SelectAsync(id);
+            var item = await _inventorySkuService.SelectAsync(idINS);
             if (item == null)
-            {
-                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
-            }
+                throw new NotFoundException();
+
             InventorySkuManageModel toReturn = await _mapper.ToModelAsync<InventorySkuManageModel>(item);
 
             return toReturn;

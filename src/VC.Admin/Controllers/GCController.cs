@@ -26,6 +26,7 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Business.Helpers;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 
 namespace VC.Admin.Controllers
 {
@@ -112,9 +113,17 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<GCManageModel>> GetGiftCertificate(int id)
+        public async Task<Result<GCManageModel>> GetGiftCertificate(string id)
         {
-            return new GCManageModel((await GCService.GetGiftCertificateAsync(id)));
+            int idGC = 0;
+            if (id != null && !Int32.TryParse(id, out idGC))
+                throw new NotFoundException();
+
+            var item = await GCService.GetGiftCertificateAsync(idGC);
+            if (item == null)
+                throw new NotFoundException();
+
+            return new GCManageModel(item);
         }
 
         [AdminAuthorize(PermissionType.Marketing)]
