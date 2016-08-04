@@ -176,16 +176,16 @@ namespace VitalChoice.Infrastructure.Azure
                     };
 
                     //cut off upper maximum size
-                    if (message.Length > 983040)
+                    if (message.Length > 491520)
                     {
-                        message = message.Substring(0, 983040);
+                        message = message.Substring(0, 491520);
                     }
                     int seed = 0;
                     int propertyIndex = 0;
-                    while (message.Length - seed > 65536)
+                    while (message.Length - seed > 32768)
                     {
-                        TableLogEntity.MessageProperties[propertyIndex].Set(entity, message.Substring(seed, 65536));
-                        seed += 65536;
+                        TableLogEntity.MessageProperties[propertyIndex].Set(entity, message.Substring(seed, 32768));
+                        seed += 32768;
                         propertyIndex++;
                     }
                     if (message.Length - seed > 0)
@@ -203,7 +203,7 @@ namespace VitalChoice.Infrastructure.Azure
                     var op = TableOperation.Insert(new TableLogEntity(NLog.LogLevel.Fatal)
                     {
                         ShortMessage = message.Substring(0, message.Length > 150 ? 150 : message.Length),
-                        Message1 = message.Substring(0, message.Length > 65536 ? 65536 : message.Length),
+                        Message1 = message.Substring(0, message.Length > 32768 ? 32768 : message.Length),
                         Source = typeof(TableLogsClient).FullName
                     });
                     _table.Execute(op);
@@ -219,10 +219,10 @@ namespace VitalChoice.Infrastructure.Azure
             {
                 page = page - 1;
             }
-            var startCondition = TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.GreaterThanOrEqual,
-                start.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
-            var endCondition = TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.LessThanOrEqual,
-                end.ToString("yyyy-MM-ddTHH:mm:ss.fffffff"));
+            var startCondition = TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.GreaterThanOrEqual,
+                start);
+            var endCondition = TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.LessThan,
+                end.AddDays(1));
             var resultedCondition = TableQuery.CombineFilters(startCondition, TableOperators.And, endCondition);
             if (!string.IsNullOrEmpty(logLevel))
             {
