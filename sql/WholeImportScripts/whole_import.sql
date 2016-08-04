@@ -1512,8 +1512,9 @@ WHERE Value IS NULL OR Value = ''
 
 GO
 
-ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
-DROP INDEX IX_Addresses_IdCustomer, IX_Addresses_IdCreditCard
+DROP INDEX IX_Addresses_IdCustomer ON [VitalChoice.Ecommerce].dbo.Addresses
+GO
+DROP INDEX IX_Addresses_IdCreditCard ON [VitalChoice.Ecommerce].dbo.Addresses
 
 GO
 
