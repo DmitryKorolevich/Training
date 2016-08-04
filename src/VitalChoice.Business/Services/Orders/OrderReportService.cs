@@ -1437,6 +1437,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 _logger.LogError("KPI report generating error");
                 _logger.LogError(e.ToString());
+                return null;
             }
 
             return report;
