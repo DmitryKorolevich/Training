@@ -652,6 +652,12 @@ namespace VC.Admin.Controllers
             return (await _customerService.GetAddressFieldValuesByValueAsync(filter)).ToList();
         }
 
+        [HttpGet]
+        public async Task<Result<bool>> GetCustomerCardExist(int id, int idCustomer)
+        {
+            return await _customerService.GetCustomerCardExist(idCustomer, id);
+        }
+
         #region Reports
 
         [AdminAuthorize(PermissionType.Reports)]

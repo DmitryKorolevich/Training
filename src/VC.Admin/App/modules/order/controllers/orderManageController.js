@@ -284,6 +284,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 else
                 {
                     $scope.paymentInfoTab.PaymentMethodType = $scope.currentCustomer.DefaultPaymentMethod;
+                    $scope.checkCustomerCreditCardStatus();
                 }
 
                 customerEditService.syncDefaultPaymentMethod($scope);
@@ -420,6 +421,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                             else {
                                 angular.forEach($scope.currentCustomer.CreditCards, function (cardItem, index) {
                                     cardItem.IsSelected = index.toString() == $scope.paymentInfoTab.CreditCardIndex;
+                                    if (cardItem.IsSelected && cardItem.NotInStore && cardItem.IdCustomerPaymentMethod && cardItem.CardNumber.indexOf('X') >= 0)
+                                    {
+                                        billingErrorMessages += "This credit card doesn't present in the remore store, please update info. ";
+                                    }
                                 });
                             }
                         }

@@ -94,6 +94,10 @@ angular.module('app.core.dataAccess.services.customerService', [])
 		{
 		    return $http.post(baseUrl + 'GetCustomerStaticFieldValuesByValue', filter, getConfig(tracker));
 		},
+		getCustomerCardExist: function (idPaymentMethod, idCustomer, tracker)
+		{
+		    return $http.get(baseUrl + 'GetCustomerCardExist/{0}?idcustomer={1}'.format(idPaymentMethod, idCustomer), getConfig(tracker));
+		},
 
 	    //reports
 		getWholesaleSummaryReport: function (tracker)
