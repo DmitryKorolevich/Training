@@ -62,7 +62,17 @@ namespace VitalChoice.ExportService.Services
 
         public async Task ExportOrder(OrderDynamic order, ExportSide exportSide)
         {
+            var status = order.OrderStatus;
+            var npStatus = order.NPOrderStatus;
+            var pStatus = order.POrderStatus;
+
             var context = await _orderService.CalculateOrder(order, OrderStatus.Processed);
+            
+            //restore order statuses
+            order.OrderStatus = status;
+            order.NPOrderStatus = npStatus;
+            order.POrderStatus = pStatus;
+
             if (context.SplitInfo.ShouldSplit)
             {
                 VeraCoreExportOrder nonPerishablePart;
