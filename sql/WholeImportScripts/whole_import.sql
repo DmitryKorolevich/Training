@@ -1022,6 +1022,18 @@ FROM customers
 WHERE dnr = 1
 GO
 
+DECLARE @fieldType INT
+
+SELECT TOP 1 @fieldType = Id FROM [VitalChoice.Ecommerce].dbo.CustomerOptionTypes WHERE Name = N'HasHealthwiseOrders'
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerOptionValues
+(IdCustomer, IdOptionType, Value)
+SELECT idCustomer, @fieldType, N'True' 
+FROM customers AS c
+WHERE EXISTS(SELECT * FROM healthwise AS hw WHERE hw.customerId = c.idcustomer)
+
+GO
+
 DECLARE @fieldType INT, @lookupId INT
 DECLARE @SuspensionReason NVARCHAR(MAX), @IdCustomer INT
 
@@ -1694,6 +1706,11 @@ GO
 USE [vitalchoice2.0]
 GO
 --============================ Insert AspNet Users ====================================
+
+DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUsers
+WHERE IdUserType = 2 AND Id NOT IN (SELECT idCustomer FROM customers)
+
+GO
 
 SET IDENTITY_INSERT [VitalChoice.Infrastructure].dbo.AspNetUsers ON;
 

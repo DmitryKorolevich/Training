@@ -33,3 +33,20 @@ USING (
 WHEN NOT MATCHED THEN
 INSERT (IdOrder, IdOptionType, Value) VALUES (src.IdOrder, src.Id, src.DefaultValue);
 PRINT '====default values fixup (insert)'
+
+GO
+
+UPDATE v
+SET Value = N'True'
+FROM CustomerOptionValues AS v
+INNER JOIN CustomerOptionTypes AS t ON t.Id = v.IdOptionType AND t.Name = N'HasHealthwiseOrders'
+INNER JOIN Customers AS c ON c.Id = v.IdCustomer
+WHERE EXISTS(SELECT * FROM HealthwisePeriods AS hw WHERE hw.IdCustomer = c.Id)
+
+GO
+
+INSERT INTO CustomerOptionValues
+(IdCustomer, IdOptionType, Value)
+SELECT c.Id, t.Id, N'True' FROM Customers AS c
+INNER JOIN CustomerOptionTypes AS t ON t.Name = N'HasHealthwiseOrders' AND c.IdObjectType = t.IdObjectType
+WHERE EXISTS(SELECT * FROM HealthwisePeriods AS hw WHERE hw.IdCustomer = c.Id) AND NOT EXISTS(SELECT * FROM CustomerOptionValues AS v WHERE v.IdCustomer = c.Id AND v.IdOptionType = t.Id)
