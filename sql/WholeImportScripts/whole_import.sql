@@ -906,6 +906,10 @@ DROP CONSTRAINT UQ_Customers
 
 GO
 
+DROP INDEX IX_Addresses_IdCustomer ON [VitalChoice.Ecommerce].dbo.Addresses
+
+GO
+
 ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
 DROP COLUMN IdCustomer
 
@@ -930,10 +934,12 @@ SELECT
 	c.[state],
 	c.idcustomer
 FROM [vitalchoice2.0].dbo.customers AS c
+PRINT '====profile address base'
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.Users
 (Id)
 SELECT idCustomer FROM customers
+PRINT '====ecommerce user ids'
 	
 INSERT INTO [VitalChoice.Ecommerce].dbo.Customers
 (Id, DateCreated, DateEdited, Email, IdObjectType, StatusCode, IdDefaultPaymentMethod, PublicId, IdAffiliate, IdProfileAddress)
@@ -950,6 +956,7 @@ addr.Id
 FROM customers AS c
 INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS addr ON addr.IdCustomer = c.idcustomer
 LEFT JOIN [VitalChoice.Ecommerce].dbo.Affiliates AS a ON a.Id = c.idAffiliate
+PRINT '====ecommerce customers base'
 GO
 
 ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
@@ -1193,6 +1200,7 @@ UNPIVOT (Value FOR Name IN
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax, Email)
 )AS unpvt
 INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 1)
+PRINT '====address values (profile)'
 
 ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
 ADD IdCustomer INT NULL
@@ -1213,10 +1221,12 @@ SELECT
 	c.[shippingState],
 	c.idcustomer
 FROM [vitalchoice2.0].dbo.customers AS c
+PRINT '====addresses base (shipping default)'
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerToShippingAddresses
 (IdAddress, IdCustomer)
 SELECT Id, IdCustomer FROM [VitalChoice.Ecommerce].dbo.Addresses AS a WHERE IdCustomer IS NOT NULL
+PRINT '====shipping default connection'
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.AddressOptionValues
 (IdAddress, IdOptionType, Value)
@@ -1242,6 +1252,7 @@ UNPIVOT (Value FOR Name IN
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax, Email, [Default])
 )AS unpvt
 INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
+PRINT '====address values (shipping default)'
 
 GO
 
@@ -1273,10 +1284,12 @@ SELECT
 	c.idRecipient
 FROM [vitalchoice2.0].dbo.recipients AS c
 INNER JOIN [vitalchoice2.0].dbo.customers AS cc ON cc.idcustomer = c.idCustomer
+PRINT '====addresses (shipping)'
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerToShippingAddresses
 (IdAddress, IdCustomer)
 SELECT Id, IdCustomer FROM [VitalChoice.Ecommerce].dbo.Addresses AS a WHERE IdCustomer IS NOT NULL
+PRINT '====shipping default connection'
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.AddressOptionValues
 (IdAddress, IdOptionType, Value)
@@ -1301,6 +1314,7 @@ UNPIVOT (Value FOR Name IN
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax, Email)
 )AS unpvt
 INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
+PRINT '====address values (shipping)'
 
 GO
 
@@ -1315,6 +1329,7 @@ INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerNotes
 (Id, DateCreated, DateEdited, IdCustomer, Note, StatusCode)
 SELECT n.id, n.createdDate, n.createdDate, n.idCustomer, n.description, 2 FROM [vitalchoice2.0].dbo.Notes AS n
 INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS c ON c.Id = n.idCustomer
+PRINT '====customer notes'
 
 SET IDENTITY_INSERT [VitalChoice.Ecommerce].dbo.CustomerNotes OFF;
 
@@ -1324,6 +1339,7 @@ SELECT n.id, t.Id, CAST(lv.Id AS NVARCHAR(100)) FROM [vitalchoice2.0].dbo.Notes 
 INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS c ON c.Id = n.idCustomer
 INNER JOIN [VitalChoice.Ecommerce].dbo.CustomerNoteOptionTypes AS t ON t.Name = 'Priority'
 INNER JOIN [VitalChoice.Ecommerce].dbo.LookupVariants AS lv ON lv.IdLookup = t.IdLookup AND lv.ValueVariant = n.priority COLLATE Cyrillic_General_CI_AS
+PRINT '====customer notes values'
 
 GO
 
@@ -1422,6 +1438,7 @@ SELECT
 	c.custCreditCardId
 FROM [vitalchoice2.0].dbo.customerCreditCards AS c
 INNER JOIN [vitalchoice2.0].dbo.customers AS cc ON cc.idcustomer = c.idCustomer
+PRINT '====addresses (cards)'
 
 GO
 
@@ -1448,7 +1465,8 @@ UNPIVOT (Value FOR Name IN
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax, Email)
 )AS unpvt
 INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
-WHERE unpvt.Value IS NULL OR unpvt.Value = ''
+WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====address values (cards)'
 
 GO
 
@@ -1456,6 +1474,7 @@ INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerPaymentMethods
 (DateCreated, DateEdited, IdAddress, IdCustomer, IdObjectType, StatusCode)
 SELECT c.DateCreated, c.DateEdited, a.Id, c.Id, 1, 2 FROM [VitalChoice.Ecommerce].dbo.Customers AS c
 INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.Id
+PRINT '====payment method links'
 
 GO
 
@@ -1489,7 +1508,8 @@ UNPIVOT (Value FOR Name IN
 	(NameOnCard, CardNumber, CardType, ExpDate, [Default])
 )AS unpvt
 INNER JOIN [VitalChoice.Ecommerce].dbo.CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 1)
-WHERE unpvt.Value IS NULL OR unpvt.Value = ''
+WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====credit card values'
 
 GO
 
@@ -1501,6 +1521,7 @@ INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS cc ON cc.Id = c.idcustomer
 INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.idcustomer AND a.IdCreditCard = c.custCreditCardId
 INNER JOIN [VitalChoice.Ecommerce].dbo.CustomerPaymentMethods AS cp ON cp.IdCustomer = c.idCustomer AND cp.IdAddress = a.Id
 WHERE ISDATE(dbo.RC4Encode([Expiration])) = 1
+PRINT '====credit card export data'
 
 GO
 
@@ -1545,6 +1566,7 @@ SELECT
 	c.idcustomer
 FROM [vitalchoice2.0].dbo.CustomerChecks AS c
 INNER JOIN [vitalchoice2.0].dbo.customers AS cc ON cc.idcustomer = c.idCustomer
+PRINT '====addresses (checks)'
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.AddressOptionValues
 (IdAddress, IdOptionType, Value)
@@ -1568,11 +1590,13 @@ UNPIVOT (Value FOR Name IN
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax)
 )AS unpvt
 INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
+PRINT '====address values (checks)'
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerPaymentMethods
 (DateCreated, DateEdited, IdAddress, IdCustomer, IdObjectType, StatusCode)
 SELECT c.DateCreated, c.DateEdited, a.Id, c.Id, 3, 2 FROM [VitalChoice.Ecommerce].dbo.Customers AS c
 INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.Id
+PRINT '====check payment linking'
 
 GO
 
@@ -1609,6 +1633,9 @@ SELECT
 	c.idcustomer
 FROM [vitalchoice2.0].dbo.CustomerOACs AS c
 INNER JOIN [vitalchoice2.0].dbo.customers AS cc ON cc.idcustomer = c.idCustomer
+PRINT '====addresses (OAC)'
+
+GO
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.AddressOptionValues
 (IdAddress, IdOptionType, Value)
@@ -1632,11 +1659,15 @@ UNPIVOT (Value FOR Name IN
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax)
 )AS unpvt
 INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
+PRINT '====address values (OAC)'
+
+GO
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerPaymentMethods
 (DateCreated, DateEdited, IdAddress, IdCustomer, IdObjectType, StatusCode)
 SELECT c.DateCreated, c.DateEdited, a.Id, c.Id, 2, 2 FROM [VitalChoice.Ecommerce].dbo.Customers AS c
 INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.Id
+PRINT '====OAC payment linking'
 
 GO
 
@@ -1656,6 +1687,7 @@ SELECT c.idcustomer, n.Id
 FROM customers AS c
 CROSS APPLY [dbo].[DelimitedSplit8K](c.orderSpecificNotes, ',') AS d
 INNER JOIN [VitalChoice.Ecommerce].dbo.OrderNotes AS n ON n.Title = d.Item COLLATE Cyrillic_General_CI_AS
+PRINT '====customer to order notes'
 
 GO
 
@@ -1689,6 +1721,7 @@ GO
 
 DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUsers
 WHERE IdUserType = 2 AND Id NOT IN (SELECT idCustomer FROM customers)
+PRINT '====remove all new customer users (not exist in old DB)'
 
 GO
 
@@ -1749,6 +1782,9 @@ SELECT
 FROM customers AS c
 INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS cc ON cc.Id = c.idcustomer
 WHERE cc.Id NOT IN (SELECT Id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers)
+PRINT '====insert new customers'
+
+GO
 
 UPDATE [VitalChoice.Infrastructure].dbo.AspNetUsers
 SET PasswordHash = [vitalchoice2.0].dbo.[HashPassword]([vitalchoice2.0].dbo.RC4Encode(ISNULL(c.password, ''))),
@@ -1756,6 +1792,7 @@ SET PasswordHash = [vitalchoice2.0].dbo.[HashPassword]([vitalchoice2.0].dbo.RC4E
 FROM [VitalChoice.Infrastructure].dbo.AspNetUsers AS u
 INNER JOIN customers AS c ON c.idcustomer = u.Id
 WHERE u.OldPassword IS NULL AND c.password IS NOT NULL OR CONVERT(NVARCHAR(200), CAST(c.password AS VARBINARY), 2) <> CONVERT(NVARCHAR(200), u.OldPassword, 2)
+PRINT '====update passwords'
 
 SET IDENTITY_INSERT [VitalChoice.Infrastructure].dbo.AspNetUsers OFF;
 
@@ -1763,6 +1800,7 @@ INSERT INTO [VitalChoice.Infrastructure].dbo.AspNetUserRoles
 (RoleId, UserId)
 SELECT CASE WHEN customerType = 0 THEN 6 WHEN customerType = 1 THEN 7 ELSE 6 END, idCustomer
 FROM customers
+PRINT '====set up roles'
 
 GO
 
@@ -1773,7 +1811,9 @@ GO
 DELETE v
 FROM CustomerOptionValues AS v
 INNER JOIN CustomerOptionTypes AS t ON t.Id = v.IdOptionType
-WHERE t.DefaultValue = v.Value
+INNER JOIN Customers AS c ON c.Id = v.IdCustomer
+WHERE t.DefaultValue = v.Value AND t.IdObjectType <> c.IdObjectType AND t.IdObjectType IS NOT NULL
+PRINT '====remove wrong defaults (normalize)'
 
 GO
 
@@ -1782,6 +1822,7 @@ INSERT INTO CustomerOptionValues
 SELECT c.Id, t.Id, t.DefaultValue FROM Customers AS c
 INNER JOIN CustomerOptionTypes AS t ON t.IdObjectType = c.IdObjectType OR t.IdObjectType IS NULL
 WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM CustomerOptionValues AS v WHERE v.IdCustomer = c.Id AND v.IdOptionType = t.Id)
+PRINT '====setup default values not set (normalize)'
 
 GO
 
@@ -1790,6 +1831,7 @@ INSERT INTO AffiliateOptionValues
 SELECT c.Id, t.Id, t.DefaultValue FROM Affiliates AS c
 CROSS JOIN AffiliateOptionTypes AS t
 WHERE t.DefaultValue IS NOT NULL AND NOT EXISTS(SELECT * FROM AffiliateOptionValues AS v WHERE v.IdAffiliate = c.Id AND v.IdOptionType = t.Id)
+PRINT '====setup Affiliate default values not set (normalize)'
 
 GO
 
@@ -2921,6 +2963,8 @@ USE [VitalChoice.Ecommerce]
 GO
 
 DBCC CHECKIDENT('Orders', RESEED, 1)
+
+GO
 
 ALTER TABLE Orders
 ADD IdAutoShipOrder INT NULL

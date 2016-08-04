@@ -29,9 +29,10 @@ namespace VitalChoice.ExportService.Services
         private readonly IAvalaraTax _avalaraTax;
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _paymentMapper;
-        private readonly IOrderRefundService _refundService;
         private readonly VeraCoreOrderSoapClient _client;
         private const string OacDescription = "On Approved Credit";
+        private const string MarketingDescription = "Marketing-Donation";
+        private const string VcWellnessDescription = "Marketing-Promo";
         //private const string ManualCcDescription = "Manual Credit Card Process";
         private const string CheckDescription = "Check Payment";
         private const string NoChargeDescription = "No Charge";
@@ -41,13 +42,11 @@ namespace VitalChoice.ExportService.Services
 
 
         public VeraCoreExportService(IOptions<ExportOptions> options, IOrderService orderService, IAvalaraTax avalaraTax,
-            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper, IOrderRefundService refundService,
-            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> paymentMapper)
+            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper, IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> paymentMapper)
         {
             _orderService = orderService;
             _avalaraTax = avalaraTax;
             _addressMapper = addressMapper;
-            _refundService = refundService;
             _paymentMapper = paymentMapper;
             _client = new VeraCoreOrderSoapClient
             {
@@ -470,11 +469,11 @@ namespace VitalChoice.ExportService.Services
                     break;
                 case PaymentMethodType.Marketing:
                     exportOrder.Payment.PaymentType.Sequence = 1;
-                    exportOrder.Payment.PaymentType.Description = OacDescription;
+                    exportOrder.Payment.PaymentType.Description = MarketingDescription;
                     break;
                 case PaymentMethodType.VCWellnessEmployeeProgram:
                     exportOrder.Payment.PaymentType.Sequence = 1;
-                    exportOrder.Payment.PaymentType.Description = OacDescription;
+                    exportOrder.Payment.PaymentType.Description = VcWellnessDescription;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
