@@ -176,16 +176,16 @@ namespace VitalChoice.Infrastructure.Azure
                     };
 
                     //cut off upper maximum size
-                    if (message.Length > 983040)
+                    if (message.Length > 491520)
                     {
-                        message = message.Substring(0, 983040);
+                        message = message.Substring(0, 491520);
                     }
                     int seed = 0;
                     int propertyIndex = 0;
-                    while (message.Length - seed > 65536)
+                    while (message.Length - seed > 32768)
                     {
-                        TableLogEntity.MessageProperties[propertyIndex].Set(entity, message.Substring(seed, 65536));
-                        seed += 65536;
+                        TableLogEntity.MessageProperties[propertyIndex].Set(entity, message.Substring(seed, 32768));
+                        seed += 32768;
                         propertyIndex++;
                     }
                     if (message.Length - seed > 0)
@@ -203,7 +203,7 @@ namespace VitalChoice.Infrastructure.Azure
                     var op = TableOperation.Insert(new TableLogEntity(NLog.LogLevel.Fatal)
                     {
                         ShortMessage = message.Substring(0, message.Length > 150 ? 150 : message.Length),
-                        Message1 = message.Substring(0, message.Length > 65536 ? 65536 : message.Length),
+                        Message1 = message.Substring(0, message.Length > 32768 ? 32768 : message.Length),
                         Source = typeof(TableLogsClient).FullName
                     });
                     _table.Execute(op);
