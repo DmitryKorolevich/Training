@@ -804,8 +804,16 @@
                                                     </label>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <select class="form-control" id="selectPaymentMethod" data-ng-disabled="paymentInfoTab.PaymentMethodType != 1 || !currentCustomer.CreditCards || currentCustomer.CreditCards.length == 0 || orderEditDisabled" data-ng-model="paymentInfoTab.CreditCardIndex"
-                                                            data-ng-options="idx as (getCreditCardTypeName(creditCard.CardType) + ', ending in ' + getLast4(creditCard.CardNumber) + (creditCard.Default ? ' (Default)' : '')) for (idx, creditCard) in currentCustomer.CreditCards"></select>
+                                                    <div class="input-group autocomplete">
+                                                        <select class="form-control" id="selectPaymentMethod" data-ng-disabled="paymentInfoTab.PaymentMethodType != 1 || !currentCustomer.CreditCards || currentCustomer.CreditCards.length == 0 || orderEditDisabled" data-ng-model="paymentInfoTab.CreditCardIndex"
+                                                                data-ng-options="idx as (getCreditCardTypeName(creditCard.CardType) + ', ending in ' + getLast4(creditCard.CardNumber) + (creditCard.Default ? ' (Default)' : '')) for (idx, creditCard) in currentCustomer.CreditCards"
+                                                                data-ng-change="checkCustomerCreditCardStatus()"></select>
+                                                        <span class="input-group-addon">
+                                                            <i class="glyphicon glyphicon-alert"
+                                                                data-ng-show="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex] && paymentInfoTab.PaymentMethodType == 1 && currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].NotInStore"
+                                                                tooltip-placement="top-right" tooltip-animation="false" tooltip-popup-close-delay="1000" uib-tooltip="This credit card doesn't present in the remote store, please update info"></i>
+                                                        </span>
+                                                    </div>
                                                 </div>
                                                 <div class="col-md-3 padding-l-0px">
                                                     <button class="btn btn-danger pull-right" data-ng-show="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex] && paymentInfoTab.PaymentMethodType == 1 && (!currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].Default || currentCustomer.CreditCards.length==1)" data-ng-click="deleteSelectedCreditCard();">Delete</button>
