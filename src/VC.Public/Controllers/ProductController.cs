@@ -110,6 +110,10 @@ namespace VC.Public.Controllers
             var toReturn = await _categoryViewService.GetContentAsync(ControllerContext, User);
             if (toReturn != null)
             {
+                if (!string.IsNullOrEmpty(toReturn.CommandOptions.RedirectUrl))
+                {
+                    return Redirect(toReturn.CommandOptions.RedirectUrl);
+                }
                 return BaseView(new ContentPageViewModel(toReturn));
             }
             return BaseNotFoundView();

@@ -172,7 +172,8 @@ namespace VitalChoice.ContentProcessing.Base
                 MetaDescription = entity.ContentItem.MetaDescription,
                 MetaKeywords = entity.ContentItem.MetaKeywords,
                 Scripts = viewContext.Scripts,
-                SocialMeta = viewContext.SocialMeta
+                SocialMeta = viewContext.SocialMeta,
+                CommandOptions = viewContext.CommandOptions
             };
         }
 

@@ -393,21 +393,11 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Filter Products">
+                    <uib-tab heading="Products Cart Must Contain">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
-                                    <span class="legend">Cart Must Include/Exclude These Products</span>
-                                    <div class="row form-group">
-                                        <div class="col-md-12 inline">
-                                            <div class="radio">
-                                                <label><input type="radio" data-ng-model="discount.ExcludeSkus" data-ng-value="false" name="ExcludeSkus1"> Include selected products</label>
-                                            </div>
-                                            <div class="radio">
-                                                <label><input type="radio" data-ng-model="discount.ExcludeSkus" data-ng-value="true" name="ExcludeSkus2"> Exclude selected products</label>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <span class="legend">Cart Must Include These Products</span>
                                     <span class="legend">Selected Products</span>
                                     <table class="table table-striped table-hover ">
                                         <thead>
@@ -432,21 +422,11 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Filter Categories">
+                    <uib-tab heading="Categories Cart Must Contain">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
-                                    <span class="legend">Cart Must Include/Exclude These Categories</span>
-                                    <div class="row form-group">
-                                        <div class="col-md-12 inline">
-                                            <div class="radio">
-                                                <label><input type="radio" data-ng-model="discount.ExcludeCategories" data-ng-value="false" name="ExcludeCategories1"> Include selected categories</label>
-                                            </div>
-                                            <div class="radio">
-                                                <label><input type="radio" data-ng-model="discount.ExcludeCategories" data-ng-value="true" name="ExcludeCategories2"> Exclude selected categories</label>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <span class="legend">Cart Must Include These Categories</span>
                                     <div class="filter-categories categories">
                                         <button data-ng-if="!categoriesExpanded" data-ng-click="updateCategoriesCollapsed(true);" class="btn btn-primary btn-xs expand-button">Expand All</button>
                                         <button data-ng-if="categoriesExpanded" data-ng-click="updateCategoriesCollapsed(false);" class="btn btn-primary btn-xs expand-button">Collapse All</button>

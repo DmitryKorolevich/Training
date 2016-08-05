@@ -1,0 +1,18 @@
+﻿@section Meta {
+    <title>Vital Choice</title>
+}
+
+@section PageScripts {
+    <script src="@Url.Content("/app/modules/profile/gccheckform.js")"></script>
+}
+
+<div class="working-area-holder">
+    <div class="left-pane clean-border">
+        @await Component.InvokeAsync("ProfileSidebar")
+    </div>
+    <div class="right-pane clean-indent">
+        <div class="border-form-left">
+            @await Component.InvokeAsync("Area", new { name = "Wholesale Welcome Area", data = Model })
+        </div>
+    </div>
+</div>

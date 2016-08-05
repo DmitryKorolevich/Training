@@ -45,6 +45,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.ContentCrossSells;
+using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Settings;
@@ -252,7 +253,14 @@ namespace VC.Public.Controllers
 
         public IActionResult Index()
         {
-            return RedirectToAction("TopFavoriteItems");
+            if (User.IsInRole(IdentityConstants.RetailCustomer))
+            {
+                return RedirectToAction("TopFavoriteItems");
+            }
+            else
+            {
+                return View("WelcomeWholesale");
+            }
         }
 
         [HttpGet]

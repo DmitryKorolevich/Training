@@ -198,8 +198,15 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 
             var rootNavCategory = GetFilteredByVisibilityCategories(allRootCategory, customerVisibility);
 
-            return PopulateCategoryTemplateModel(viewContext.Entity, customerVisibility, 
+            var toReturn = PopulateCategoryTemplateModel(viewContext.Entity, customerVisibility, 
                 subCategoriesContent, products, productContents, rootNavCategory, allRootCategory, wholesaleCustomer, targetStatuses);
+
+            if (toReturn.SubCategories.Count == 0 && toReturn.Products.Count == 1)
+            {
+                viewContext.CommandOptions.RedirectUrl = "/product/" + toReturn.Products.First().Url;
+            }
+
+            return toReturn;
         }
 
         private ProductNavCategoryLite GetFilteredByVisibilityCategories(ProductNavCategoryLite navCategory, IList<CustomerTypeCode> visibility)

@@ -1,9 +1,15 @@
-﻿@model VC.Public.Models.Profile.SidebarModel
+﻿@using VitalChoice.Infrastructure.Identity
+
+@model VC.Public.Models.Profile.SidebarModel
 
 <div class="form-group">
 	<span class="info-text bottom-indent-small length-restricted-text">Welcome</span><br/>
 	<span class="info-text length-restricted-text">@Model.FirstName&nbsp;@Model.LastName</span><br/>
-	<span class="info-text length-restricted-text">Customer ID: @Model.Id</span>
+    <span class="info-text length-restricted-text">Customer ID: @Model.Id</span><br/>
+    @if (User.Identity.IsAuthenticated && User.IsInRole(IdentityConstants.WholesaleCustomer))
+    {
+    <span class="info-text length-restricted-text">Wholesale Customer</span>
+    }
     <hr />
 </div>
 @Html.Partial("_GCCheckForm")

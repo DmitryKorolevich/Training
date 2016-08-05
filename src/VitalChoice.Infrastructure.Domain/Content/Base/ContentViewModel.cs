@@ -13,5 +13,7 @@
         public string Scripts { get; set; }
 
         public string SocialMeta { get; set; }
+
+        public ViewContentCommandOptions CommandOptions { get; set; }
     }
 }

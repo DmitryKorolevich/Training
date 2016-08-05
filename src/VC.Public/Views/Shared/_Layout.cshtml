@@ -83,11 +83,14 @@
 					</a>
 				</div>
 				<div class="header-right-sidebar">
-					<div class="side-icon-holder">
-						<a href="/content/shipping-information">
-							<img alt="Free Shipping" src="/Assets/images/freeshiptop.png">
-						</a> 
-					</div>
+				    <div class="side-icon-holder">
+				        @if (!User.Identity.IsAuthenticated || User.IsInRole(IdentityConstants.RetailCustomer))
+				        {
+				            <a href="/content/shipping-information">
+				                <img alt="Free Shipping" src="/Assets/images/freeshiptop.png">
+				            </a>
+				        }
+				    </div>
 					<div class="header-actions-holder">
 						<div class="actions-top-nav">
 							<a href="@Url.Action("Index", "Profile")">Your Account</a>

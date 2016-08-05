@@ -29,6 +29,7 @@ namespace VitalChoice.ContentProcessing.Base
             User = user;
             ActionContext = actionContext;
             AbsoluteUrl = actionContext.HttpContext.Request.GetDisplayUrl();
+            CommandOptions=new ViewContentCommandOptions();
         }
 
         public dynamic Parameters => _parameters;
@@ -54,6 +55,8 @@ namespace VitalChoice.ContentProcessing.Base
         {
             _socialMetaStringBuilder.Append(meta);
         }
+
+        public ViewContentCommandOptions CommandOptions { get; set; }
     }
 
     public class ContentViewContext<T> : ContentViewContext

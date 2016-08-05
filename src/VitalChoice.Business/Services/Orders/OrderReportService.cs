@@ -1454,7 +1454,7 @@ namespace VitalChoice.Business.Services.Orders
             item.NewAffiliates = data.NewAffiliates;
 
             //TODO: google part
-            item.PaidSearch = _googleService.GetTransactionsRevenuePaid(from, to);
+            //item.PaidSearch = _googleService.GetTransactionsRevenuePaid(from, to);
             //item.OrganicSearch = _googleService.GetTransactionsRevenueOrganics(from, to);
         }
 

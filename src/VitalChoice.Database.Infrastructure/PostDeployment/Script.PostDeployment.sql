@@ -10,3 +10,5 @@ Post-Deployment Script Template
 --------------------------------------------------------------------------------------
 */
 set dateformat mdy
+
+:r .\Scripts\ContentAreas.sql
