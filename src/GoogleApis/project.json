@@ -4,7 +4,7 @@
   "authors": [],
   "dependencies": {
     "GoogleApis.Core": "1.0.0-*",
-    "System.IO.Compression": "4.0.0"
+    "System.IO.Compression": "4.1.0"
   },
   "frameworks": {
     "net451": {
