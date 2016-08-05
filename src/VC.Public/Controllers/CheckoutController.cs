@@ -47,6 +47,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Settings;
+using VitalChoice.ObjectMapping.Base;
 using VitalChoice.SharedWeb.Helpers;
 using VitalChoice.Validation.Models;
 using ApiException = VitalChoice.Ecommerce.Domain.Exceptions.ApiException;
@@ -299,6 +300,13 @@ namespace VC.Public.Controllers
                             cart.Order.PaymentMethod.Address = new AddressDynamic {IdObjectType = (int) AddressType.Billing};
                         }
                         await _addressConverter.UpdateObjectAsync(model, cart.Order.PaymentMethod.Address, (int) AddressType.Billing);
+                    }
+                    if (ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), (string)cart.Order.PaymentMethod.Data.CardNumber,
+                        "CardNumber"))
+                    {
+                        //BUG: SECURITY!!! do not use real ID here, look to rework synthetic generated id with matching from customer profile
+                        //BUG: The issue allows to replace payment ID and use card data from different customer (this usage would be hidden from admin UI)
+                        cart.Order.PaymentMethod.IdCustomerPaymentMethod = model.Id;
                     }
                     if (await CheckoutService.UpdateCart(cart))
                     {
