@@ -4,16 +4,19 @@
 @using VitalChoice.Interfaces.Services
 @using VitalChoice.Infrastructure.Domain.Transfer
 @model VC.Public.Models.Profile.ShippingInfoModel
+@using Microsoft.Extensions.Options
+@using VitalChoice.Infrastructure.Domain.Options
+@inject IOptions<AppOptions> appOptions
 
 @section Meta {
 	<title>Vital Choice | Manage Shipping Addresses</title>
 }
 
 @section PageScripts {
-	<script src="@Url.Content("/app/common/dataAccess.js")"></script>
-	<script src="@Url.Content("/app/modules/auth/registration.js")"></script>
-	<script src="@Url.Content("/app/modules/profile/shippingInfo.js")"></script>
-    <script src="@Url.Content("/app/modules/profile/gccheckform.js")"></script>
+	<script src="@Url.Content("/app/common/dataAccess.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+	<script src="@Url.Content("/app/modules/auth/registration.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+	<script src="@Url.Content("/app/modules/profile/shippingInfo.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+    <script src="@Url.Content("/app/modules/profile/gccheckform.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
 }
 
 @inject ReferenceData appInfrastructureService;

@@ -5,6 +5,9 @@
 @using VitalChoice.Infrastructure.Domain.Transfer
 @model VC.Public.Models.Checkout.AddUpdateBillingAddressModel
 @inject ReferenceData InfrastructureService
+@using Microsoft.Extensions.Options
+@using VitalChoice.Infrastructure.Domain.Options
+@inject IOptions<AppOptions> appOptions
 
 @section Meta {
 	<title>Wild Seafood & Organics - Vital Choice</title>
@@ -15,11 +18,11 @@
 }
 
 @section PageScripts {
-	<script src="@Url.Content("/app/modules/checkout/checkoutMain.js")"></script>
-	<script src="@Url.Content("/app/common/dataAccess.js")"></script>
-	<script src="@Url.Content("/app/modules/auth/registration.js")"></script>
-	<script src="@Url.Content("/app/common/billing.js")"></script>
-	<script src="@Url.Content("/app/modules/checkout/billingInfo.js")"></script>
+	<script src="@Url.Content("/app/modules/checkout/checkoutMain.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+	<script src="@Url.Content("/app/common/dataAccess.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+	<script src="@Url.Content("/app/modules/auth/registration.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+	<script src="@Url.Content("/app/common/billing.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+	<script src="@Url.Content("/app/modules/checkout/billingInfo.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
 }
 
 <div class="checkout-step-container working-area-holder">

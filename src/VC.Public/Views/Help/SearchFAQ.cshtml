@@ -1,8 +1,11 @@
 ﻿@using System.Threading.Tasks
 @using VC.Public.Models.Auth
+@using Microsoft.Extensions.Options
+@using VitalChoice.Infrastructure.Domain.Options
+@inject IOptions<AppOptions> appOptions
 
 @section PageScripts {
-    <script src="@Url.Content("/app/modules/help/searchfaq.js")"></script>
+    <script src="@Url.Content("/app/modules/help/searchfaq.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
 }
 
 @section EndPageStyles {

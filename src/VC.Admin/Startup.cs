@@ -7,6 +7,7 @@ using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Primitives;
 using VitalChoice.Profiling;
 
 namespace VC.Admin
@@ -77,6 +78,14 @@ namespace VC.Admin
             app.UseIdentity();
 
             app.InjectProfiler();
+
+            app.Use((context, next) =>
+            {
+                context.Response.Headers.Add("Pragma", "no-cache");
+                context.Response.Headers.Add("Cache-Control", "private, max-age=0, no-cache, no-store");
+                context.Response.Headers.Add("Expires", "-1");
+                return next();
+            });
 
             app.UseMvc(
                 builder => RouteConfig.RegisterRoutes(builder, app.ApplicationServices.GetRequiredService<IInlineConstraintResolver>()));

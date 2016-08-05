@@ -5,10 +5,13 @@
 @using System.Threading.Tasks
 @using VC.Public.Models.Auth
 @model LoginModel
+@using Microsoft.Extensions.Options
+@using VitalChoice.Infrastructure.Domain.Options
+@inject IOptions<AppOptions> appOptions
 
 @section PageScripts {
-	<script src="@Url.Content("/app/modules/auth/login.js")"></script>
-	<script src="@Url.Content("/app/modules/checkout/checkoutMain.js")"></script>
+	<script src="@Url.Content("/app/modules/auth/login.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+	<script src="@Url.Content("/app/modules/checkout/checkoutMain.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
 }
 
 @section Meta {

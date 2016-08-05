@@ -3,6 +3,9 @@
 @using VitalChoice.Infrastructure.Domain.Transfer
 @model VC.Public.Models.Profile.HelpTicketManageModel
 @inject ReferenceData appInfrastructureService;
+@using Microsoft.Extensions.Options
+@using VitalChoice.Infrastructure.Domain.Options
+@inject IOptions<AppOptions> appOptions
 
 @{
     var infrastructure = appInfrastructureService;
@@ -13,7 +16,7 @@
 }
 
 @section PageScripts {
-    <script src="@Url.Content("/app/modules/profile/helpticket.js")"></script>
+    <script src="@Url.Content("/app/modules/profile/helpticket.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
 }
 
 <script>

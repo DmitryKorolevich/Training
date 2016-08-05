@@ -3,6 +3,9 @@
 @using VitalChoice.Ecommerce.Domain.Entities.Addresses
 @using VitalChoice.Interfaces.Services
 @model VC.Public.Models.Checkout.AddUpdateShippingMethodModel
+@using Microsoft.Extensions.Options
+@using VitalChoice.Infrastructure.Domain.Options
+@inject IOptions<AppOptions> appOptions
 
 @section Meta {
     <title>Wild Seafood & Organics - Vital Choice</title>
@@ -13,10 +16,10 @@
 }
 
 @section PageScripts {
-    <script src="@Url.Content("/app/modules/checkout/checkoutMain.js")"></script>
-    <script src="@Url.Content("/app/common/dataAccess.js")"></script>
-    <script src="@Url.Content("/app/modules/auth/registration.js")"></script>
-    <script src="@Url.Content("/app/modules/checkout/shippingInfo.js")"></script>
+    <script src="@Url.Content("/app/modules/checkout/checkoutMain.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+    <script src="@Url.Content("/app/common/dataAccess.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+    <script src="@Url.Content("/app/modules/auth/registration.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+    <script src="@Url.Content("/app/modules/checkout/shippingInfo.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
 }
 
 <div class="checkout-step-container working-area-holder">

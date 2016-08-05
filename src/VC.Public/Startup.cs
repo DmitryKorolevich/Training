@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using VitalChoice.Interfaces.Services;
 using Autofac;
 using Microsoft.AspNetCore.Mvc.Internal;
+using Microsoft.Extensions.Primitives;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Core.Services;
 
@@ -83,6 +84,9 @@ namespace VC.Public
             app.UseSession();
             app.Use((context, next) =>
             {
+                context.Response.Headers.Add("Pragma", "no-cache");
+                context.Response.Headers.Add("Cache-Control", "private, max-age=0, no-cache, no-store");
+                context.Response.Headers.Add("Expires", "-1");
                 var redirectViewService = context.RequestServices.GetService<IRedirectViewService>();
                 var result = redirectViewService.CheckRedirects(context);
 
