@@ -24,6 +24,7 @@ $RootBuild = (Get-Item -Path ".\${Src}" -Verbose).FullName
 echo "Clean deploy directory..."
 ls -Path ${RootDeploy} -Include * | remove-Item -recurse 
 cp "${RootBuild}\src\VitalChoice.Jobs\nlog.config" "${RootDeploy}\nlog.config"
+cp "${RootBuild}\src\VitalChoice.Jobs\5083717e58d4513a8e8ca2992840b54ee728d674-privatekey.p12" "${RootDeploy}\5083717e58d4513a8e8ca2992840b54ee728d674-privatekey.p12"
 
 Push-Location "${RootBuild}"
 echo "Working directory: ${RootBuild}"
