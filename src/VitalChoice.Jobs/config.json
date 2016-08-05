@@ -61,12 +61,12 @@
     },
     "Email": {
       "From": "admin.staging@g2designgroup.com",
-      "Host": "smtp.1and1.com",
+      "Host": "",
       "Port": 587,
       "Secured": true,
       "Username": "admin.staging@g2designgroup.com",
       "Password": "vcstaging123",
-      "Disabled": false
+      "Disabled": true
     },
     "VeraCoreSettings": {
       "ExportFolderName": "TestExport",
