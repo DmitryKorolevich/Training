@@ -16,7 +16,7 @@ BEGIN
 	SET NOCOUNT ON
 
 	SELECT 
-		1 Id,
+		CAST(FLOOR(RAND()*(10000000-1)+1) as INT) Id,
 		(
 			SELECT 
 				SUM(Total)

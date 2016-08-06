@@ -151,6 +151,7 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<KPIReportDBSaleRawItem>(entity =>
             {
                 entity.HasKey(f => f.Id);
+                entity.NonCached();
             });
 
             builder.Entity<ShortOrderItemModel>(entity =>
