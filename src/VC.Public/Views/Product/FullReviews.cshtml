@@ -2,13 +2,16 @@
 @using System.Threading.Tasks
 @using Microsoft.AspNetCore.Mvc.Rendering
 @using VitalChoice.Interfaces.Services
-@model  VC.Public.Models.Product.FullReviewsModel
+@model VC.Public.Models.Product.FullReviewsModel
+@using Microsoft.Extensions.Options
+@using VitalChoice.Infrastructure.Domain.Options
+@inject IOptions<AppOptions> appOptions
 
 @section PageScripts {
 	<script>
 		var productPublicId = "@Model.ProductPublicId";
 	</script>
-	<script src="@Url.Content("/app/modules/product/productReview.js")"></script>
+	<script src="@Url.Content("/app/modules/product/productReview.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
 	<script src="https://www.google.com/recaptcha/api.js" async="async"></script>
 }
 

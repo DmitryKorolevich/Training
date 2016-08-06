@@ -1,13 +1,16 @@
 ﻿@using System.Threading.Tasks
 @using VC.Public.Models.Auth
 @model LoginModel
+@using Microsoft.Extensions.Options
+@using VitalChoice.Infrastructure.Domain.Options
+@inject IOptions<AppOptions> appOptions
 
 @section Meta {
 	<title>Vital Choice | Login</title>
 }
 
 @section PageScripts {
-    <script src="@Url.Content("/app/modules/auth/login.js")"></script>
+    <script src="@Url.Content("/app/modules/auth/login.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
 }
 
 <div class="working-area-holder login" data-forgot-pass-success="@(ViewBag.ForgotPassSuccess!=null && ViewBag.ForgotPassSuccess ? "Instructions on resetting your password have been emailed to your email address" : "")">

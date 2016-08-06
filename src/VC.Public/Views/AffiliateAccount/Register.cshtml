@@ -1,15 +1,18 @@
 ﻿@using System.Threading.Tasks
 @using VC.Public.Models.Affiliate
 @model AffiliateManageModel
+@using Microsoft.Extensions.Options
+@using VitalChoice.Infrastructure.Domain.Options
+@inject IOptions<AppOptions> appOptions
 
 @section Meta {
     <title>Vital Choice | Affiliate Registration</title>
 }
 
 @section PageScripts {
-    <script src="@Url.Content("/app/common/dataAccess.js")"></script>
-    <script src="@Url.Content("/app/modules/auth/registration.js")"></script>
-    <script src="@Url.Content("/app/modules/affiliateaccount/register.js")"></script>
+    <script src="@Url.Content("/app/common/dataAccess.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+    <script src="@Url.Content("/app/modules/auth/registration.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+    <script src="@Url.Content("/app/modules/affiliateaccount/register.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
 }
 
 <div class="working-area-holder affiliate-registration"> 

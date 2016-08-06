@@ -1,13 +1,16 @@
 ﻿@model IList<VC.Public.Models.Profile.LastOrderLineModel>
+@using Microsoft.Extensions.Options
+@using VitalChoice.Infrastructure.Domain.Options
+@inject IOptions<AppOptions> appOptions
 
 @section Meta {
 	<title>Vital Choice | Most Recent Order</title>
 }
 
 @section PageScripts {
-    <script src="@Url.Content("/app/modules/profile/gccheckform.js")"></script>
-    <script src="@Url.Content("/app/modules/product/addtocart.js")"></script>
-    <script src="@Url.Content("/app/modules/profile/lastorderplaced.js")"></script>
+    <script src="@Url.Content("/app/modules/profile/gccheckform.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+    <script src="@Url.Content("/app/modules/product/addtocart.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+    <script src="@Url.Content("/app/modules/profile/lastorderplaced.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
 }
 
 <div class="working-area-holder">
