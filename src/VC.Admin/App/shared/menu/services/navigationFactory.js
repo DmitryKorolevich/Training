@@ -65,6 +65,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
                         { name: 'skuPOrderTypeBreakDownReport', stateName: 'index.oneCol.skuPOrderTypeBreakDownReport', stateLabel: 'Breakdown Report', access: 3 },
                         { name: 'productCategoriesStatistic', stateName: 'index.oneCol.productCategoriesStatistic', stateLabel: 'Category Sales Report', access: 3 },
                         { name: 'healthwisePeriods', stateName: 'index.oneCol.healthwisePeriods', stateLabel: 'HealthWise Customer Report', access: 3 },
+                        { name: 'KPIReport', stateLabel: 'KPI Report (APIs)', href: '/api/report/kpi', access: null },
                         { name: 'orderSKUAddressReport', stateName: 'index.oneCol.orderSKUAddressReport', stateLabel: 'Order SKU and Address Report', access: 3 },
                         { name: 'orderSkuCountReport', stateName: 'index.oneCol.orderSkuCountReport', stateLabel: 'Order SKU Counts', access: 3 },
                         { name: 'inventorySkusUsageReport', stateName: 'index.oneCol.inventorySkusUsageReport', stateLabel: 'Parts Usage Report', access: 3 },
@@ -99,8 +100,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
                         { name: 'inventoriesSummaryUsageReport', stateName: 'index.oneCol.inventoriesSummaryUsageReport', stateLabel: 'Inventory Shipment Summary', access: 3 },
                         { name: 'vitalGreen', stateName: 'index.oneCol.vitalGreen', stateLabel: 'Review VitalGreen Statistics', access: 3 },
                         { name: 'productQualitySalesReport', stateName: 'index.oneCol.productQualitySalesReport', stateLabel: 'Product Quality Issues Report', access: 3 },
-                        { name: 'index.oneCol.serviceCodesStatistic', stateName: 'index.oneCol.serviceCodesStatistic', stateLabel: 'Service Codes Report', access: 3 },
-                        //{ name: 'kPIReport', stateName: 'index.oneCol.kPIReport', stateLabel: 'KPI Report (APIs)', access: 3 },
+                        { name: 'index.oneCol.serviceCodesStatistic', stateName: 'index.oneCol.serviceCodesStatistic', stateLabel: 'Service Codes Report', access: 3 }
 				    ]
 				},
 				{

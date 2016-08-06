@@ -56,6 +56,7 @@
                                 <li data-ng-repeat="subModule2 in subModule.subMenu" ui-sref-active="active" data-ng-if="subModule2.access==null || validatePermission(subModule2.access)">
                                     <a ng-if="subModule2.stateName" ui-sref="{{subModule2.stateName}}({name:subModule2.name})">{{subModule2.stateLabel}}</a>
                                     <a ng-if="subModule2.handler" ng-click="subModule2.handler();">{{subModule2.stateLabel}}</a>
+                                    <a ng-if="subModule2.href" target="_blank" data-ng-href="{{subModule2.href}}">{{subModule2.stateLabel}}</a>
                                 </li>
                             </ul>
                         </li>
