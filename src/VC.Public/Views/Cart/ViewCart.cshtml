@@ -16,10 +16,10 @@
 @section Meta {
 	<title>Wild Seafood & Organics - Vital Choice</title>
 }
-<div class="cart-content-top" data-bind="visible: Model.FreeShipDifference()">
+<div class="cart-content-top" data-bind="visible: Model.FreeShipDifference() && Model.FreeShipAmount()">
 	<span class="cart-head-text">IMPORTANT NOTICE</span>
     <span class="cart-subhead-text">You are only <span data-bind="text: formatCurrency(Model.FreeShipDifference())">@((Model.FreeShipDifference ?? 0).ToString("C2"))</span> from Free Shipping.</span>
-	<p class="cart-body-text">To enjoy Free Shipping simply add more items until the Cart total reaches $99.00 or more.<br/>
+	<p class="cart-body-text">To enjoy Free Shipping simply add more items until the Cart total reaches <span data-bind="text: formatCurrency(Model.FreeShipAmount())">@((Model.FreeShipAmount ?? 0).ToString("C2"))</span> or more.<br/>
 		(Gift Certificates are exempt from shipping charges). <a href="/">Continue Shopping</a></p>
 </div>
 <div class="cart-content-middle">

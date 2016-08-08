@@ -19,6 +19,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
                 if (context.Data.PromoProducts < 99)
                 {
                     context.FreeShippingThresholdDifference = 99 - context.Data.PromoProducts;
+                    context.FreeShippingThresholdAmount = 99;
                 }
                 if (context.Data.PromoProducts < 50)
                 {

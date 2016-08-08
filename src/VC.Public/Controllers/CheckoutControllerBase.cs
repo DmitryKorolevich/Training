@@ -107,6 +107,7 @@ namespace VC.Public.Controllers
                 });
             }
             cartModel.FreeShipDifference = context.FreeShippingThresholdDifference;
+            cartModel.FreeShipAmount = context.FreeShippingThresholdAmount;
             cartModel.DiscountDescription = context.Order?.Discount?.Description;
             cartModel.DiscountMessage = context.DiscountMessage;
             cartModel.Messages =

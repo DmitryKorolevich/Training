@@ -75,14 +75,15 @@ namespace VC.Public.Controllers
             if (skus.Count==0)
                 throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
             CustomerCartOrder cart;
-            if (await CustomerLoggedIn())
+            var loggedIn = await CustomerLoggedIn();
+            if (loggedIn)
             {
                 var id = GetInternalCustomerId();
                 cart = await _checkoutService.GetOrCreateCart(existingUid, id);
             }
             else
             {
-                cart = await _checkoutService.GetOrCreateCart(existingUid);
+                cart = await _checkoutService.GetOrCreateCart(existingUid, false);
             }
             SetCartUid(cart.CartUid);
 
@@ -278,7 +279,7 @@ namespace VC.Public.Controllers
             }
             else
             {
-                cart = await _checkoutService.GetOrCreateCart(existingUid);
+                cart = await _checkoutService.GetOrCreateCart(existingUid, false);
             }
             SetCartUid(cart.CartUid);
             cart.Order.Skus?.MergeKeyed(model.Skus.Where(s => s.Quantity > 0).ToArray(), ordered => ordered.Sku.Code,
