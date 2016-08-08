@@ -35,9 +35,9 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates
 
         public string GCTypeName { get; set; }
 
-        public GCWithOrderListItemModel(GiftCertificate item, ICollection<AddressOptionType> types)
+        public GCWithOrderListItemModel(GiftCertificate item, int idBillingLast, int idShippingLast)
         {
-            if(item!=null)
+            if (item != null)
             {
                 Id = item.Id;
                 Created = item.Created;
@@ -49,16 +49,15 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates
                 StatusCode = item.StatusCode;
                 GCType = item.GCType;
 
-                var lastNameOptionTypeIds = types.Where(p => p.Name == "LastName").Select(p=>p.Id).ToList();
-                var address = item?.Order?.ShippingAddress;
-                if(address!=null)
-                {
-                    ShippingLastName = address.OptionValues.FirstOrDefault(p => lastNameOptionTypeIds.Contains(p.IdOptionType))?.Value;
-                }
-                address = item?.Order?.PaymentMethod?.BillingAddress;
+                var address = item.Order?.ShippingAddress;
                 if (address != null)
                 {
-                    BillingLastName = address.OptionValues.FirstOrDefault(p => lastNameOptionTypeIds.Contains(p.IdOptionType))?.Value;
+                    ShippingLastName = address.OptionValues.FirstOrDefault(p => p.IdOptionType == idShippingLast)?.Value;
+                }
+                address = item.Order?.PaymentMethod?.BillingAddress;
+                if (address != null)
+                {
+                    BillingLastName = address.OptionValues.FirstOrDefault(p => p.IdOptionType == idBillingLast)?.Value;
                 }
             }
         }

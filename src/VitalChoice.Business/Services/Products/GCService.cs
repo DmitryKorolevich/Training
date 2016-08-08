@@ -25,6 +25,7 @@ using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services.Bronto;
 using Microsoft.EntityFrameworkCore;
 using VitalChoice.DynamicData.Helpers;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 
 namespace VitalChoice.Business.Services.Products
@@ -176,25 +177,41 @@ namespace VitalChoice.Business.Services.Products
 
             var query = giftCertificateRepository.Query(conditions).
                 Include(p => p.Order).ThenInclude(p => p.PaymentMethod).ThenInclude(p => p.BillingAddress).ThenInclude(p => p.OptionValues).
-                Include(p=>p.Order).ThenInclude(p=>p.ShippingAddress).ThenInclude(p=>p.OptionValues).OrderBy(sortable);
+                Include(p => p.Order).ThenInclude(p => p.ShippingAddress).ThenInclude(p => p.OptionValues).OrderBy(sortable);
 
-            var data= await query.SelectAsync(false);
-            var items = data.Select(p => new GCWithOrderListItemModel(p, orderAddressMapper.OptionTypes)).ToList();
+            var data = await query.SelectAsync(false);
+            var billingId =
+                orderAddressMapper.OptionTypes
+                    .First(t => (t.IdObjectType == null || t.IdObjectType == (int) AddressType.Billing) && t.Name == "LastName").Id;
+            var shippingId =
+                orderAddressMapper.OptionTypes
+                    .First(t => (t.IdObjectType == null || t.IdObjectType == (int) AddressType.Shipping) && t.Name == "LastName").Id;
+            var items = data.Select(p => new GCWithOrderListItemModel(p, billingId, shippingId));
             if (filter.ShippingAddress != null && !String.IsNullOrEmpty(filter.ShippingAddress.LastName))
             {
-                items = items.Where(p => !String.IsNullOrEmpty(p.ShippingLastName) && p.ShippingLastName.IndexOf(filter.ShippingAddress.LastName, StringComparison.OrdinalIgnoreCase) >= 0).
-                    ToList();
+                items =
+                    items.Where(
+                        p =>
+                            !String.IsNullOrEmpty(p.ShippingLastName) &&
+                            p.ShippingLastName.IndexOf(filter.ShippingAddress.LastName, StringComparison.OrdinalIgnoreCase) >= 0);
             }
             if (filter.BillingAddress != null && !String.IsNullOrEmpty(filter.BillingAddress.LastName))
             {
-                items = items.Where(p => !String.IsNullOrEmpty(p.BillingLastName) && p.BillingLastName.IndexOf(filter.BillingAddress.LastName, StringComparison.OrdinalIgnoreCase) >= 0).
-                    ToList(); ;
+                items =
+                    items.Where(
+                        p =>
+                            !String.IsNullOrEmpty(p.BillingLastName) &&
+                            p.BillingLastName.IndexOf(filter.BillingAddress.LastName, StringComparison.OrdinalIgnoreCase) >= 0);
             }
 
             GCStatisticModel toReturn = new GCStatisticModel();
+            List<GCWithOrderListItemModel> resultList = items.ToList();
+            toReturn.Count = resultList.Count;
+            toReturn.Total = resultList.Sum(p => p.Balance);
             if (filter.Paging != null)
             {
-                toReturn.Items = items.Skip((filter.Paging.PageIndex - 1) * filter.Paging.PageItemCount).Take(filter.Paging.PageItemCount).ToList();
+                resultList =
+                    resultList.Skip((filter.Paging.PageIndex - 1)*filter.Paging.PageItemCount).Take(filter.Paging.PageItemCount).ToList();
 
                 //var balanceConditions  =  new GcQuery().NotDeleted().WithFrom(filter.From).WithTo(filter.To).WithType(filter.Type).
                 //    WidthStatus(RecordStatusCode.Active);
@@ -209,12 +226,7 @@ namespace VitalChoice.Business.Services.Products
                 //q = (Expression<Func<GiftCertificate, bool>>)queryVisitor.Visit(balanceConditions.Query());
                 //toReturn.Total = await giftCertificateRepository.Query(q).SelectSumAsync(p => p.Balance);
             }
-            else
-            {
-                toReturn.Items = items;
-            }
-            toReturn.Count = items.Count;
-            toReturn.Total = items.Sum(p => p.Balance);
+            toReturn.Items = resultList;
 
             foreach (var item in toReturn.Items)
             {
