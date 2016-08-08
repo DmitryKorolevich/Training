@@ -120,8 +120,11 @@ namespace VitalChoice.Business.Services.Checkout
                 {
                     var toReturn = await GetOrCreateCart(uid, cartForCheck.IdCustomer.Value);
                     //Calculate not logged customer as a retailer anyway
-                    toReturn.Order.Customer = new CustomerDynamic();
-                    toReturn.Order.Customer.IdObjectType = (int)CustomerType.Retail;
+                    if (!loggedIn)
+                    {
+                        toReturn.Order.Customer = new CustomerDynamic();
+                        toReturn.Order.Customer.IdObjectType = (int) CustomerType.Retail;
+                    }
                     return toReturn;
                 }
                 if (cartForCheck == null)
