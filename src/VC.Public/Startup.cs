@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -84,9 +85,18 @@ namespace VC.Public
             app.UseSession();
             app.Use((context, next) =>
             {
-                context.Response.Headers.Add("Pragma", "no-cache");
-                context.Response.Headers.Add("Cache-Control", "private, max-age=0, no-cache, no-store");
-                context.Response.Headers.Add("Expires", "-1");
+                if (context.Response.Headers.All(p => p.Key != "Pragma"))
+                {
+                    context.Response.Headers.Add("Pragma", "no-cache");
+                }
+                if (context.Response.Headers.All(p => p.Key != "Cache-Control"))
+                {
+                    context.Response.Headers.Add("Cache-Control", "private, max-age=0, no-cache, no-store");
+                }
+                if (context.Response.Headers.All(p => p.Key != "Expires"))
+                {
+                    context.Response.Headers.Add("Expires", "-1");
+                }
                 var redirectViewService = context.RequestServices.GetService<IRedirectViewService>();
                 var result = redirectViewService.CheckRedirects(context);
 
