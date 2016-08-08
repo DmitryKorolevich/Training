@@ -99,7 +99,7 @@ namespace VC.Public.Controllers
             else
             {
                 var existingUid = Request.GetCartUid();
-                var result = await CheckoutService.GetOrCreateCart(existingUid);
+                var result = await CheckoutService.GetOrCreateCart(existingUid, false);
                 SetCartUid(result.CartUid);
                 return result;
             }

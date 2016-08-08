@@ -110,7 +110,7 @@ namespace VitalChoice.Business.Services.Checkout
                 .ThenInclude(p => p.ProductsToCategories);
         }
 
-        public async Task<CustomerCartOrder> GetOrCreateCart(Guid? uid)
+        public async Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, bool loggedIn)
         {
             CartExtended cart;
             if (uid.HasValue)
@@ -118,7 +118,11 @@ namespace VitalChoice.Business.Services.Checkout
                 var cartForCheck = await _cartRepository.Query(c => c.CartUid == uid.Value).SelectFirstOrDefaultAsync(false);
                 if (cartForCheck?.IdCustomer != null && cartForCheck.IdOrder != null)
                 {
-                    return await GetOrCreateCart(uid, cartForCheck.IdCustomer.Value);
+                    var toReturn = await GetOrCreateCart(uid, cartForCheck.IdCustomer.Value);
+                    //Calculate not logged customer as a retailer anyway
+                    toReturn.Order.Customer = new CustomerDynamic();
+                    toReturn.Order.Customer.IdObjectType = (int)CustomerType.Retail;
+                    return toReturn;
                 }
                 if (cartForCheck == null)
                 {

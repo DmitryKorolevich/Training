@@ -42,7 +42,9 @@ namespace VC.Public.Models.Cart
 
         public decimal? FreeShipDifference { get; set; }
 
-		[Display(Name = "Order Total")]
+        public decimal? FreeShipAmount { get; set; }
+
+        [Display(Name = "Order Total")]
 		public decimal OrderTotal { get; set; }
 
 		[Display(Name = "Discount")]

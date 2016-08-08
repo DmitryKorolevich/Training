@@ -50,6 +50,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 
         public decimal? FreeShippingThresholdDifference { get; set; }
 
+        public decimal? FreeShippingThresholdAmount { get; set; }
+
         public ICollection<LookupItem<ShippingUpgradeOption>> ShippingUpgradePOptions { get; set; }
 
         public ICollection<LookupItem<ShippingUpgradeOption>> ShippingUpgradeNpOptions { get; set; }
