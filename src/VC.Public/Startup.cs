@@ -77,7 +77,7 @@ namespace VC.Public
         {
             app.UseStaticFiles(new StaticFileOptions
             {
-                OnPrepareResponse = context => context.Context.Response.Headers.Add("Cache-Control", "public, max-age=604800")
+                OnPrepareResponse = context => context.Context.Response.Headers["Cache-Control"] = "public, max-age=604800"
             });
 
             app.UseIdentity();
