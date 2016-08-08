@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Business.CsvExportMaps.Products;
-using VitalChoice.Business.Mail;
+using VitalChoice.Business.Mailings;
 using VitalChoice.Business.Queries.Customer;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Business.Queries.Products;

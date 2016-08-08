@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using VitalChoice.Business.Mail;
+using VitalChoice.Business.Mailings;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Services.Orders;
 using VitalChoice.Data.Helpers;

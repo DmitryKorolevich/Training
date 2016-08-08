@@ -24,7 +24,7 @@ using Newtonsoft.Json;
 using VC.Admin.Models.Customers;
 using VitalChoice.Business.CsvExportMaps;
 using VitalChoice.Business.CsvExportMaps.Customers;
-using VitalChoice.Business.Mail;
+using VitalChoice.Business.Mailings;
 using VitalChoice.Business.Queries.Users;
 using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;

@@ -13,7 +13,7 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using VitalChoice.Business.Mail;
+using VitalChoice.Business.Mailings;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.Products;

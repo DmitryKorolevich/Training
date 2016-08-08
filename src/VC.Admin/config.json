@@ -40,12 +40,8 @@
       "TestEnv": false
     },
     "Email": {
-      "From": "admin.staging@g2designgroup.com",
-      "Host": "smtp.1and1.com",
-      "Port": 587,
-      "Secured": true,
-      "Username": "admin.staging@g2designgroup.com",
-      "Password": "vcstaging123",
+      "From": "noreply@shop.vitalchoice.com",
+      "ApiKey": "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",
       "Disabled": false
     },
     "AzureStorage": {

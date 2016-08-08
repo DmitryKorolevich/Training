@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using VC.Admin.Models.Customer;
 using VC.Admin.Models.Customers;
-using VitalChoice.Business.Mail;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;

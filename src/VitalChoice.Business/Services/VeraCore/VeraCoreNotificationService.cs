@@ -17,7 +17,7 @@ using VitalChoice.Interfaces.Services.VeraCore;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
-using VitalChoice.Business.Mail;
+using VitalChoice.Business.Mailings;
 using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;

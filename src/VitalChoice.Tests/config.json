@@ -48,13 +48,9 @@
     "CustomerFeedbackToEmail": "gary@g2designgroup.com",
     "MainSuperAdminEmail": "gary@g2designgroup.com",
     "Email": {
-      "From": "admin.staging@g2designgroup.com",
-      "Host": "smtp.1and1.com",
-      "Port": 587,
-      "Secured": true,
-      "Username": "admin.staging@g2designgroup.com",
-      "Password": "vcstaging123",
-      "Disabled" : false
+      "From": "noreply@shop.vitalchoice.com",
+      "ApiKey": "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",
+      "Disabled": true
     },
     "AzureStorage": {
       "StorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=stagingvcfiles;AccountKey=RxGv/t6KyB7aFPKaKIljivC0YtoYv/FR+0f5uGcORdie1h5WGigJKazfMiYL/gNJz+fGUWsUhEvGjdfwfZAq6A==;BlobEndpoint=https://stagingvcfiles.blob.core.windows.net/;TableEndpoint=https://stagingvcfiles.table.core.windows.net/;QueueEndpoint=https://stagingvcfiles.queue.core.windows.net/;FileEndpoint=https://stagingvcfiles.file.core.windows.net/",

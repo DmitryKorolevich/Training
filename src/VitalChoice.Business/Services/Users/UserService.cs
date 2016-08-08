@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using VitalChoice.Business.Mail;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
@@ -26,6 +25,7 @@ using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Users;
 using Microsoft.EntityFrameworkCore;
+using VitalChoice.Business.Mailings;
 
 namespace VitalChoice.Business.Services.Users
 {

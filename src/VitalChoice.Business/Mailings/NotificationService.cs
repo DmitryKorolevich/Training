@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using VitalChoice.Data.Repositories.Specifics;
@@ -8,10 +7,9 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Newsletters;
 using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Options;
-using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services;
 
-namespace VitalChoice.Business.Mail
+namespace VitalChoice.Business.Mailings
 {
     public class NotificationService : INotificationService
     {

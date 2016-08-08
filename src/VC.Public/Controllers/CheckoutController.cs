@@ -29,7 +29,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Helpers;
-using VitalChoice.Business.Mail;
+using VitalChoice.Business.Mailings;
 using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Core.Services;
 using VitalChoice.Data.Transaction;

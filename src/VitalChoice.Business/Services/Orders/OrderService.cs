@@ -64,7 +64,6 @@ using Renci.SshNet;
 using VitalChoice.Business.CsvImportMaps;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Mail;
-using VitalChoice.Business.Mail;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
@@ -78,6 +77,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using AddressType = VitalChoice.Ecommerce.Domain.Entities.Addresses.AddressType;
 using System.Security.Cryptography.X509Certificates;
 using Google.Apis.Auth.OAuth2;
+using VitalChoice.Business.Mailings;
 
 namespace VitalChoice.Business.Services.Orders
 {

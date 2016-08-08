@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using VitalChoice.Business.Mail;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Transaction;
@@ -21,6 +20,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
+using VitalChoice.Business.Mailings;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Business.Services.Users

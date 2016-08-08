@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Mail;
 
-namespace VitalChoice.Business.Mail
+namespace VitalChoice.Business.Mailings
 {
     public interface INotificationService
     {

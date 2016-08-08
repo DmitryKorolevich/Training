@@ -23,7 +23,8 @@
     "Authorize.Net": "1.0.0-*",
     "Renci.SshNet": "1.0.0-*",
     "GoogleApis": "1.0.0-*",
-    "GoogleApis.Auth": "1.0.0-*"
+    "GoogleApis.Auth": "1.0.0-*",
+    "SendGrid": "1.0.0-*"
   },
 
   "frameworks": {

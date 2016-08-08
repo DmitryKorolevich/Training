@@ -1720,7 +1720,7 @@ GO
 --============================ Insert AspNet Users ====================================
 
 DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUsers
-WHERE IdUserType = 2 AND Id NOT IN (SELECT idCustomer FROM customers)
+WHERE IdUserType = 2 AND (OldPassword IS NULL OR Id NOT IN (SELECT idCustomer FROM customers)
 PRINT '====remove all new customer users (not exist in old DB)'
 
 GO

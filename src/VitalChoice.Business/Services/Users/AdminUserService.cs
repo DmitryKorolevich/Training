@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using VitalChoice.Business.Mail;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Interfaces.Services;
@@ -16,6 +15,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using VitalChoice.Business.Mailings;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Transaction;

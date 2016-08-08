@@ -17,7 +17,7 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public string CustomerFeedbackToEmail { get; set; }
         public string FilesRelativePath { get; set; }
         public string FilesPath { get; set; }
-        public Email EmailConfiguration { get; set; }
+        public EmailConfiguration EmailConfiguration { get; set; }
 		public Versioning Versioning { get; set; }
 		public AzureStorage AzureStorage { get; set; }
         public FedExOptions FedExOptions { get; set; }

@@ -6,7 +6,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using VitalChoice.Business.Mail;
 using VitalChoice.Business.Services;
 using VitalChoice.Business.Services.Content;
 using VitalChoice.Business.Services.Content.ContentProcessors;
@@ -106,6 +105,7 @@ using Microsoft.Extensions.ObjectPool;
 using Newtonsoft.Json.Serialization;
 using NLog;
 using NLog.Config;
+using VitalChoice.Business.Mailings;
 using VitalChoice.Business.Services.VeraCore;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Infrastructure.Domain.Transfer;
@@ -345,14 +345,10 @@ namespace VitalChoice.Core.DependencyInjection
             options.CustomerFeedbackToEmail = configuration.GetSection("App:CustomerFeedbackToEmail").Value;
             options.FilesRelativePath = configuration.GetSection("App:FilesRelativePath").Value;
             options.FilesPath = configuration.GetSection("App:FilesPath").Value;
-            options.EmailConfiguration = new Email
+            options.EmailConfiguration = new EmailConfiguration
             {
                 From = configuration.GetSection("App:Email:From").Value,
-                Host = configuration.GetSection("App:Email:Host").Value,
-                Port = Convert.ToInt32(configuration.GetSection("App:Email:Port").Value),
-                Secured = Convert.ToBoolean(configuration.GetSection("App:Email:Secured").Value),
-                Username = configuration.GetSection("App:Email:Username").Value,
-                Password = configuration.GetSection("App:Email:Password").Value,
+                ApiKey = configuration.GetSection("App:Email:ApiKey").Value,
                 Disabled = Convert.ToBoolean(configuration.GetSection("App:Email:Disabled").Value)
             };
             options.ExportService = new ExportService
@@ -563,7 +559,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<RecipeViewService>().As<IRecipeViewService>().InstancePerLifetimeScope();
             builder.RegisterType<FAQCategoryViewService>().As<IFAQCategoryViewService>().InstancePerLifetimeScope();
             builder.RegisterType<FAQViewService>().As<IFAQViewService>().InstancePerLifetimeScope();
-            builder.RegisterType<EmailSender>().As<IEmailSender>().InstancePerLifetimeScope();
+            builder.RegisterType<EmailSender>().As<IEmailSender>().SingleInstance();
             builder.RegisterType<NotificationService>().As<INotificationService>().InstancePerLifetimeScope();
             builder.RegisterType<GCService>().As<IGcService>().InstancePerLifetimeScope();
             builder.RegisterType<ProductService>().As<IProductService>().InstancePerLifetimeScope();
