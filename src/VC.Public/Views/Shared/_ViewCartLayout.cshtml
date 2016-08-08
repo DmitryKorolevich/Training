@@ -59,22 +59,28 @@
 			    <div id="lhnChatButton">
 			    </div>
 		    </div>*@
-		    <div class="advert-top-holder">
-			    <a href="#">
-				    <img src="/Assets/images/freeship-13-2.jpg">
-			    </a>
-		    </div>
+	        <div class="advert-top-holder">
+	            @if (!User.Identity.IsAuthenticated || User.IsInRole(IdentityConstants.RetailCustomer))
+	            {
+	                <a href="#">
+	                    <img src="/Assets/images/freeship-13-2.jpg">
+	                </a>
+	            }
+	        </div>
 	    </header>
 	    <div class="view-cart-content">
 		    @RenderBody()
 	    </div>
 	    <footer>
 		    <div class="footer-cart-main">
-			    <div class="advert-bottom-holder">
-				    <a href="#">
-					    <img src="/Assets/images/freeship-13-2.jpg">
-				    </a>
-			    </div>
+		        <div class="advert-bottom-holder">
+		            @if (!User.Identity.IsAuthenticated || User.IsInRole(IdentityConstants.RetailCustomer))
+		            {
+		                <a href="#">
+		                    <img src="/Assets/images/freeship-13-2.jpg">
+		                </a>
+		            }
+		        </div>
 			    <div class="footer-cart-middle">
 				    <a href="#">
 					    <img src="/Assets/images/guarantee-13.png">

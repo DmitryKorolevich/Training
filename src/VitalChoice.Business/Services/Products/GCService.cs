@@ -123,15 +123,15 @@ namespace VitalChoice.Business.Services.Products
         {
             GcQuery conditions = new GcQuery().NotDeleted().WithFrom(filter.From).WithTo(filter.To).WithType(filter.Type).
                 WidthStatus(filter.StatusCode);
-            if (filter.ShippingAddress != null && !String.IsNullOrEmpty(filter.ShippingAddress.LastName))
-            {
-                conditions = conditions.WithShippingAddress(filter.ShippingAddress);
-            }
-            if (filter.BillingAddress != null && !String.IsNullOrEmpty(filter.BillingAddress.LastName))
-            {
-                conditions = conditions.WithBillingAddress(filter.BillingAddress);
-            }
-            var q = (Expression<Func<GiftCertificate, bool>>)queryVisitor.Visit(conditions.Query());
+            //if (filter.ShippingAddress != null && !String.IsNullOrEmpty(filter.ShippingAddress.LastName))
+            //{
+            //    conditions = conditions.WithShippingAddress(filter.ShippingAddress);
+            //}
+            //if (filter.BillingAddress != null && !String.IsNullOrEmpty(filter.BillingAddress.LastName))
+            //{
+            //    conditions = conditions.WithBillingAddress(filter.BillingAddress);
+            //}
+            //var q = (Expression<Func<GiftCertificate, bool>>)queryVisitor.Visit(conditions.Query());
 
             Func<IQueryable<GiftCertificate>, IOrderedQueryable<GiftCertificate>> sortable = x => x.OrderByDescending(y => y.Created);
             var sortOrder = filter.Sorting.SortOrder;
@@ -174,38 +174,49 @@ namespace VitalChoice.Business.Services.Products
                     break;
             }
 
-            var query = giftCertificateRepository.Query(q).
+            var query = giftCertificateRepository.Query(conditions).
                 Include(p => p.Order).ThenInclude(p => p.PaymentMethod).ThenInclude(p => p.BillingAddress).ThenInclude(p => p.OptionValues).
                 Include(p=>p.Order).ThenInclude(p=>p.ShippingAddress).ThenInclude(p=>p.OptionValues).OrderBy(sortable);
-            
+
+            var data= await query.SelectAsync(false);
+            var items = data.Select(p => new GCWithOrderListItemModel(p, orderAddressMapper.OptionTypes)).ToList();
+            if (filter.ShippingAddress != null && !String.IsNullOrEmpty(filter.ShippingAddress.LastName))
+            {
+                items = items.Where(p => !String.IsNullOrEmpty(p.ShippingLastName) && p.ShippingLastName.IndexOf(filter.ShippingAddress.LastName, StringComparison.OrdinalIgnoreCase) >= 0).
+                    ToList();
+            }
+            if (filter.BillingAddress != null && !String.IsNullOrEmpty(filter.BillingAddress.LastName))
+            {
+                items = items.Where(p => !String.IsNullOrEmpty(p.BillingLastName) && p.BillingLastName.IndexOf(filter.BillingAddress.LastName, StringComparison.OrdinalIgnoreCase) >= 0).
+                    ToList(); ;
+            }
+
             GCStatisticModel toReturn = new GCStatisticModel();
             if (filter.Paging != null)
             {
-                var data = await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
-                toReturn.Items = data.Items.Select(p => new GCWithOrderListItemModel(p, orderAddressMapper.OptionTypes)).ToList();
-                toReturn.Count = data.Count;
-                
-                var balanceConditions  =  new GcQuery().NotDeleted().WithFrom(filter.From).WithTo(filter.To).WithType(filter.Type).
-                    WidthStatus(RecordStatusCode.Active);
-                if (filter.ShippingAddress != null && !String.IsNullOrEmpty(filter.ShippingAddress.LastName))
-                {
-                    balanceConditions = conditions.WithShippingAddress(filter.ShippingAddress);
-                }
-                if (filter.BillingAddress != null && !String.IsNullOrEmpty(filter.BillingAddress.LastName))
-                {
-                    balanceConditions = conditions.WithBillingAddress(filter.BillingAddress);
-                }
-                q = (Expression<Func<GiftCertificate, bool>>)queryVisitor.Visit(balanceConditions.Query());
-                toReturn.Total = await giftCertificateRepository.Query(q).SelectSumAsync(p => p.Balance);
+                toReturn.Items = items.Skip((filter.Paging.PageIndex - 1) * filter.Paging.PageItemCount).Take(filter.Paging.PageItemCount).ToList();
+
+                //var balanceConditions  =  new GcQuery().NotDeleted().WithFrom(filter.From).WithTo(filter.To).WithType(filter.Type).
+                //    WidthStatus(RecordStatusCode.Active);
+                //if (filter.ShippingAddress != null && !String.IsNullOrEmpty(filter.ShippingAddress.LastName))
+                //{
+                //    balanceConditions = conditions.WithShippingAddress(filter.ShippingAddress);
+                //}
+                //if (filter.BillingAddress != null && !String.IsNullOrEmpty(filter.BillingAddress.LastName))
+                //{
+                //    balanceConditions = conditions.WithBillingAddress(filter.BillingAddress);
+                //}
+                //q = (Expression<Func<GiftCertificate, bool>>)queryVisitor.Visit(balanceConditions.Query());
+                //toReturn.Total = await giftCertificateRepository.Query(q).SelectSumAsync(p => p.Balance);
             }
             else
             {
-                var data = await query.SelectAsync(false);
-                toReturn.Items = data.Select(p=> new GCWithOrderListItemModel(p, orderAddressMapper.OptionTypes)).ToList();
-                toReturn.Count = toReturn.Items.Count;
-                toReturn.Total = toReturn.Items.Where(p => p.StatusCode == RecordStatusCode.Active).Sum(p => p.Balance);
+                toReturn.Items = items;
             }
-            foreach(var item in toReturn.Items)
+            toReturn.Count = items.Count;
+            toReturn.Total = items.Sum(p => p.Balance);
+
+            foreach (var item in toReturn.Items)
             {
                 item.GCTypeName = LookupHelper.GetShortGCTypeName(item.GCType);
                 item.StatusCodeName = LookupHelper.GetRecordStatus(item.StatusCode);
