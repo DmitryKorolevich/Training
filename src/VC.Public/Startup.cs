@@ -85,18 +85,9 @@ namespace VC.Public
             app.UseSession();
             app.Use((context, next) =>
             {
-                if (context.Response.Headers.All(p => p.Key != "Pragma"))
-                {
-                    context.Response.Headers.Add("Pragma", "no-cache");
-                }
-                if (context.Response.Headers.All(p => p.Key != "Cache-Control"))
-                {
-                    context.Response.Headers.Add("Cache-Control", "private, max-age=0, no-cache, no-store");
-                }
-                if (context.Response.Headers.All(p => p.Key != "Expires"))
-                {
-                    context.Response.Headers.Add("Expires", "-1");
-                }
+                context.Response.Headers["Pragma"] = "no-cache";
+                context.Response.Headers["Cache-Control"] = "private, max-age=0, no-cache, no-store";
+                context.Response.Headers["Expires"] = "-1";
                 var redirectViewService = context.RequestServices.GetService<IRedirectViewService>();
                 var result = redirectViewService.CheckRedirects(context);
 

@@ -81,9 +81,9 @@ namespace VC.Admin
 
             app.Use((context, next) =>
             {
-                context.Response.Headers.Add("Pragma", "no-cache");
-                context.Response.Headers.Add("Cache-Control", "private, max-age=0, no-cache, no-store");
-                context.Response.Headers.Add("Expires", "-1");
+                context.Response.Headers["Pragma"] = "no-cache";
+                context.Response.Headers["Cache-Control"] = "private, max-age=0, no-cache, no-store";
+                context.Response.Headers["Expires"] = "-1";
                 return next();
             });
 
