@@ -12,9 +12,9 @@ namespace VitalChoice.Infrastructure.Domain
             lock (LockObj)
             {
                 var now = DateTime.Now;
-                if (now == _lastDate)
+                if (now <= _lastDate)
                 {
-                    _lastDate = now.AddTicks(1);
+                    _lastDate = _lastDate.AddTicks(1);
                     return _lastDate;
                 }
                 _lastDate = now;
