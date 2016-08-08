@@ -8,7 +8,6 @@ using Microsoft.Extensions.Options;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
-using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -17,7 +16,7 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Content;
 using VitalChoice.Infrastructure.Domain.Content.ContentCrossSells;
-using VitalChoice.Infrastructure.UnitOfWork;
+using VitalChoice.Infrastructure.UOW;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Products;
@@ -74,7 +73,7 @@ namespace VitalChoice.Business.Services.Content
 			var toAdd = contentCrossSells.Where(x => x.Id == 0).ToList();
 			var toUpdate = contentCrossSells.Where(x => x.Id != 0).ToList();
 
-			using (var uow = new VitalChoiceUnitOfWork(_contextOptions))
+			using (var uow = new VitalChoiceUnitOfWork(_contextOptions, _options))
 			{
 				var uowRepo = uow.RepositoryAsync<ContentCrossSell>();
 

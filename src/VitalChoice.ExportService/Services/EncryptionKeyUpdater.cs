@@ -6,7 +6,7 @@ using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using VitalChoice.Data.UnitOfWork;
+using VitalChoice.Data.UOW;
 using VitalChoice.ExportService.Context;
 using VitalChoice.ExportService.Entities;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
@@ -229,7 +229,7 @@ namespace VitalChoice.ExportService.Services
             localAes.Key = localKey.Key;
             localAes.IV = localKey.IV;
 
-            using (var uow = new UnitOfWorkBase(copyContext))
+            using (var uow = new UnitOfWork(copyContext, true))
             {
                 var customersRep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
                 var totalNumber = customersRep.Query().SelectCountAsync().GetAwaiter().GetResult();

@@ -7,7 +7,7 @@ using VitalChoice.Ecommerce.Domain;
 
 #endregion
 
-namespace VitalChoice.Data.UnitOfWork
+namespace VitalChoice.Data.UOW
 {
     public interface IUnitOfWorkAsync : IUnitOfWork
     {

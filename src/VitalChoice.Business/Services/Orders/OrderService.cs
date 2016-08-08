@@ -12,7 +12,6 @@ using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
-using VitalChoice.Data.UnitOfWork;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
@@ -78,6 +77,7 @@ using AddressType = VitalChoice.Ecommerce.Domain.Entities.Addresses.AddressType;
 using System.Security.Cryptography.X509Certificates;
 using Google.Apis.Auth.OAuth2;
 using VitalChoice.Business.Mailings;
+using VitalChoice.Data.UOW;
 
 namespace VitalChoice.Business.Services.Orders
 {

@@ -9,7 +9,6 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Infrastructure.UnitOfWork;
 using System.Threading;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Ecommerce.Cache;

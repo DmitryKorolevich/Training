@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Services;
-using VitalChoice.Data.UnitOfWork;
+using VitalChoice.Data.UOW;
 using VitalChoice.DynamicData.Extensions;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;

@@ -92,7 +92,6 @@ using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Services;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Data.Transaction;
-using VitalChoice.Data.UnitOfWork;
 using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Interfaces.Services.Checkout;
@@ -241,7 +240,6 @@ namespace VitalChoice.Core.DependencyInjection
                 })
                 .SingleInstance();
             var container = BuildContainer(projectAssembly, builder);
-            UnitOfWorkBase.SetOptions(container.Resolve<IOptions<AppOptionsBase>>());
             scopeContainer.SetFactory(container.Resolve<IServiceProvider>());
             return container;
         }

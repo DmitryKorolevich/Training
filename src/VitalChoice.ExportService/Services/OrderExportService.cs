@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Data.Extensions;
-using VitalChoice.Data.UnitOfWork;
+using VitalChoice.Data.UOW;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -69,7 +69,7 @@ namespace VitalChoice.ExportService.Services
             {
                 return true;
             }
-            var uow = new UnitOfWork(_infoContext);
+            using (var uow = new UnitOfWork(_infoContext, false))
             {
                 var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
                 return
@@ -95,7 +95,7 @@ namespace VitalChoice.ExportService.Services
 
         private async Task UpdateCustomerPaymentMethodsInternal(ICollection<CustomerCardData> paymentMethods, ExportInfoContext context)
         {
-            var uow = new UnitOfWork(context);
+            using (var uow = new UnitOfWork(context, false))
             {
                 var customerIds = paymentMethods.Select(p => p.IdCustomer).Where(p => p != 0).Distinct().ToList();
                 var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
@@ -142,7 +142,7 @@ namespace VitalChoice.ExportService.Services
 
         private async Task UpdateOrderPaymentInternal(OrderCardData paymentMethod, ExportInfoContext context)
         {
-            var uow = new UnitOfWork(context);
+            using (var uow = new UnitOfWork(context, false))
             {
                 if (paymentMethod.IdOrderSource > 0 &&
                          ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), paymentMethod.CardNumber, "CardNumber"))
@@ -253,25 +253,27 @@ namespace VitalChoice.ExportService.Services
 
             var cardedOrders =
                 orderList.Where(o => o.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard).Select(o => o.Id).ToList();
-            var uow = new UnitOfWork(_infoContext);
-            var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
-            var orderPayments = (await rep.Query(o => cardedOrders.Contains(o.IdOrder)).SelectAsync(false)).ToDictionary(o => o.IdOrder);
-            foreach (var order in orderList.Where(o => o.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard).ToArray())
+            using (var uow = new UnitOfWork(_infoContext, false))
             {
-                var payment = orderPayments.GetValueOrDefault(order.Id);
-                if (payment == null)
+                var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
+                var orderPayments = (await rep.Query(o => cardedOrders.Contains(o.IdOrder)).SelectAsync(false)).ToDictionary(o => o.IdOrder);
+                foreach (var order in orderList.Where(o => o.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard).ToArray())
                 {
-                    results.Add(new OrderExportItemResult
+                    var payment = orderPayments.GetValueOrDefault(order.Id);
+                    if (payment == null)
                     {
-                        Id = order.Id,
-                        Error = "Cannot find order credit card in encrypted store",
-                        Success = false
-                    });
-                    orderList.Remove(order);
-                }
-                else
-                {
-                    order.PaymentMethod.Data.CardNumber = _encryptionHost.LocalDecrypt<string>(payment.CreditCardNumber);
+                        results.Add(new OrderExportItemResult
+                        {
+                            Id = order.Id,
+                            Error = "Cannot find order credit card in encrypted store",
+                            Success = false
+                        });
+                        orderList.Remove(order);
+                    }
+                    else
+                    {
+                        order.PaymentMethod.Data.CardNumber = _encryptionHost.LocalDecrypt<string>(payment.CreditCardNumber);
+                    }
                 }
             }
 

@@ -2,12 +2,11 @@
 using System.Data;
 using VitalChoice.Data.Transaction;
 
-namespace VitalChoice.Data.UnitOfWork
+namespace VitalChoice.Data.UOW
 {
-    public interface IUnitOfWork : IDisposable
+    public interface IUnitOfWork: IDisposable
     {
         int SaveChanges();
         IScopedTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadCommitted);
-        void Dispose(bool disposing);
     }
 }

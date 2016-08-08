@@ -9,9 +9,9 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Data.Repositories.Specifics;
-using VitalChoice.Infrastructure.UnitOfWork;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using VitalChoice.Business.Queries.Contents;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Data.Context;
@@ -21,12 +21,14 @@ using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
+using VitalChoice.Infrastructure.UOW;
 
 namespace VitalChoice.Business.Services.Content
 {
@@ -47,34 +49,38 @@ namespace VitalChoice.Business.Services.Content
         private readonly ITransactionAccessor<VitalChoiceContext> _transactionAccessor;
         private readonly IObjectLogItemExternalService _objectLogItemExternalService;
         private readonly DbContextOptions<VitalChoiceContext> _contextOptions;
+        private readonly IOptions<AppOptionsBase> _options;
 
-        public RecipeService(IRepositoryAsync<Recipe> recipeRepository, IRepositoryAsync<RecipeCrossSell> crossSellRepository, IRepositoryAsync<RelatedRecipe> relatedRecipeRepository,
-			IRepositoryAsync<ContentCategory> contentCategoryRepository,
+        public RecipeService(IRepositoryAsync<Recipe> recipeRepository, IRepositoryAsync<RecipeCrossSell> crossSellRepository,
+            IRepositoryAsync<RelatedRecipe> relatedRecipeRepository,
+            IRepositoryAsync<ContentCategory> contentCategoryRepository,
             IRepositoryAsync<RecipeToContentCategory> recipeToContentCategoryRepository,
             IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IRepositoryAsync<RecipeToProduct> recipeToProductRepository,
-			IRepositoryAsync<RecipeDefaultSetting> recipeSettingRepository,
-			IEcommerceRepositoryAsync<Product> productRepository,
-            ILoggerProviderExtended loggerProvider, 
+            IRepositoryAsync<RecipeDefaultSetting> recipeSettingRepository,
+            IEcommerceRepositoryAsync<Product> productRepository,
+            ILoggerProviderExtended loggerProvider,
             ITtlGlobalCache templatesCache,
             ITransactionAccessor<VitalChoiceContext> transactionAccessor,
-            IObjectLogItemExternalService objectLogItemExternalService, DbContextOptions<VitalChoiceContext> contextOptions)
+            IObjectLogItemExternalService objectLogItemExternalService, DbContextOptions<VitalChoiceContext> contextOptions,
+            IOptions<AppOptionsBase> options)
         {
             this._recipeRepository = recipeRepository;
-	        _crossSellRepository = crossSellRepository;
-	        _relatedRecipeRepository = relatedRecipeRepository;
-	        this._contentCategoryRepository = contentCategoryRepository;
+            _crossSellRepository = crossSellRepository;
+            _relatedRecipeRepository = relatedRecipeRepository;
+            this._contentCategoryRepository = contentCategoryRepository;
             this._recipeToContentCategoryRepository = recipeToContentCategoryRepository;
             this._contentItemToContentProcessorRepository = contentItemToContentProcessorRepository;
             this._contentTypeRepository = contentTypeRepository;
             this._recipeToProductRepository = recipeToProductRepository;
-			_recipeSettingRepository = recipeSettingRepository;
-	        this._productRepository = productRepository;
+            _recipeSettingRepository = recipeSettingRepository;
+            this._productRepository = productRepository;
             this._templatesCache = templatesCache;
             _transactionAccessor = transactionAccessor;
             _objectLogItemExternalService = objectLogItemExternalService;
             _contextOptions = contextOptions;
+            _options = options;
             _logger = loggerProvider.CreateLogger<RecipeService>();
         }
 
@@ -346,7 +352,7 @@ namespace VitalChoice.Business.Services.Content
         {
             bool toReturn = false;
 
-            using (var uow = new VitalChoiceUnitOfWork(_contextOptions))
+            using (var uow = new VitalChoiceUnitOfWork(_contextOptions, _options))
             {
                 var recipeRepository = uow.RepositoryAsync<Recipe>();
                 var recipeToContentCategoryRepository = uow.RepositoryAsync<RecipeToContentCategory>();

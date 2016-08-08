@@ -20,7 +20,7 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.Transaction;
-using VitalChoice.Data.UnitOfWork;
+using VitalChoice.Data.UOW;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;

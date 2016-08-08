@@ -3,7 +3,7 @@ using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
 using VitalChoice.Data.Transaction;
-using VitalChoice.Data.UnitOfWork;
+using VitalChoice.Data.UOW;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Extensions;
 using VitalChoice.DynamicData.Helpers;
@@ -12,7 +12,6 @@ using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Infrastructure.Context;
-using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.ObjectMapping.Base;
 

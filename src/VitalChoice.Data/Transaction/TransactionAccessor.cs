@@ -3,19 +3,19 @@ using System.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using VitalChoice.Data.Context;
-using VitalChoice.Data.UnitOfWork;
+using VitalChoice.Data.UOW;
 using VitalChoice.Ecommerce.Domain.Options;
 
 namespace VitalChoice.Data.Transaction
 {
-    public interface ITransactionAccessor<TContext> 
+    public interface ITransactionAccessor<TContext>
         where TContext : DbContext, IDataContextAsync
     {
         IScopedTransaction BeginTransaction(IsolationLevel isolation = IsolationLevel.ReadUncommitted);
         IUnitOfWorkAsync CreateUnitOfWork();
     }
 
-    public class TransactionAccessor<TContext> : ITransactionAccessor<TContext> 
+    public class TransactionAccessor<TContext> : ITransactionAccessor<TContext>
         where TContext : DbContext, IDataContextAsync
     {
         private readonly IOptions<AppOptionsBase> _appOptions;
@@ -44,10 +44,10 @@ namespace VitalChoice.Data.Transaction
         {
             if (_transaction != null && !_transaction.Closed)
             {
-                return new UnitOfWorkBase(_transaction.DbContext);
+                return new UnitOfWork(_transaction.DbContext, false);
             }
-            var context = (IDataContextAsync) Activator.CreateInstance(typeof (TContext), _appOptions, _contextOptions);
-            return new UnitOfWorkBase(context);
+            var context = (IDataContextAsync) Activator.CreateInstance(typeof(TContext), _appOptions, _contextOptions);
+            return new UnitOfWork(context, true);
         }
     }
 }

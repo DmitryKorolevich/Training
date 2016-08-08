@@ -17,7 +17,6 @@ using VitalChoice.Infrastructure.Domain.Content.Base;
 using VitalChoice.Infrastructure.Domain.Content.ContentPages;
 using VitalChoice.Infrastructure.Domain.Content.Faq;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
-using VitalChoice.Infrastructure.UnitOfWork;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Content;
 

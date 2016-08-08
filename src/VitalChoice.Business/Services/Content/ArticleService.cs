@@ -9,9 +9,9 @@ using VitalChoice.Data.Repositories;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Interfaces.Services;
-using VitalChoice.Infrastructure.UnitOfWork;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using VitalChoice.ContentProcessing.Cache;
 using VitalChoice.Data.Services;
 using VitalChoice.Ecommerce.Cache;
@@ -23,8 +23,10 @@ using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Content.Articles;
 using VitalChoice.Infrastructure.Domain.Content.Base;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.ContentManagement;
+using VitalChoice.Infrastructure.UOW;
 
 namespace VitalChoice.Business.Services.Content
 {
@@ -40,12 +42,11 @@ namespace VitalChoice.Business.Services.Content
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
         private readonly ITtlGlobalCache _templatesCache;
         private readonly DbContextOptions<VitalChoiceContext> _contextOptions;
+        private readonly IOptions<AppOptions> _appOptions;
         private readonly IObjectLogItemExternalService _objectLogItemExternalService;
         private readonly ILogger _logger;
 
-        public ArticleService(IEcommerceRepositoryAsync<ProductOptionType> optionTypeRepository,
-            IRepositoryAsync<Article> articleRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository,
-            IRepositoryAsync<ContentItem> contentItemRepository,
+        public ArticleService(IRepositoryAsync<Article> articleRepository, IRepositoryAsync<ContentCategory> contentCategoryRepository,
             IRepositoryAsync<ArticleToContentCategory> articleToContentCategoryRepository,
             IRepositoryAsync<ContentItemToContentProcessor> contentItemToContentProcessorRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
@@ -55,7 +56,7 @@ namespace VitalChoice.Business.Services.Content
             IObjectLogItemExternalService objectLogItemExternalService,
             ILoggerProviderExtended logger, 
             ITtlGlobalCache templatesCache,
-            DbContextOptions<VitalChoiceContext> contextOptions)
+            DbContextOptions<VitalChoiceContext> contextOptions, IOptions<AppOptions> appOptions)
         {
             _articleRepository = articleRepository;
             _contentCategoryRepository = contentCategoryRepository;
@@ -67,6 +68,7 @@ namespace VitalChoice.Business.Services.Content
             _productRepository = productRepository;
             _templatesCache = templatesCache;
             _contextOptions = contextOptions;
+            _appOptions = appOptions;
             _objectLogItemExternalService = objectLogItemExternalService;
             _logger = logger.CreateLogger<ArticleService>();
         }
@@ -285,7 +287,7 @@ namespace VitalChoice.Business.Services.Content
         public async Task<bool> AttachArticleToCategoriesAsync(int id, IEnumerable<int> categoryIds)
         {
             bool toReturn = false;
-            using (var uow = new VitalChoiceUnitOfWork(_contextOptions))
+            using (var uow = new VitalChoiceUnitOfWork(_contextOptions, _appOptions))
             {
                 var articleRepository = uow.RepositoryAsync<Article>();
                 var articleToContentCategoryRepository = uow.RepositoryAsync<ArticleToContentCategory>();
