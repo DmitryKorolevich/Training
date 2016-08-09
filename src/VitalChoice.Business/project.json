@@ -11,6 +11,9 @@
     "Avalara.Avatax.Rest": "1.0.0-*",
     "CsvHelper": "2.15.0.1",
     "FluentValidation": "6.4.0-beta1",
+    "Google.Apis": "1.15.0",
+    "Google.Apis.Auth": "1.15.0",
+    "Google.Apis.Analytics.v3": "1.15.0.*",
     "VitalChoice.Infrastructure": "1.0.0-*",
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
@@ -22,8 +25,6 @@
     "VitalChoice.Validation": "1.0.0-*",
     "Authorize.Net": "1.0.0-*",
     "Renci.SshNet": "1.0.0-*",
-    "GoogleApis": "1.0.0-*",
-    "GoogleApis.Auth": "1.0.0-*",
     "SendGrid": "1.0.0-*"
   },
 

@@ -82,9 +82,6 @@
     <None Include="VitalChoice_1.Database.Ecommerce.publish.xml" />
   </ItemGroup>
   <ItemGroup>
-    <RefactorLog Include="VitalChoice.Database.Ecommerce.refactorlog" />
-  </ItemGroup>
-  <ItemGroup>
     <PreDeploy Include="PreDeployment\Script.PreDeployment.sql" />
   </ItemGroup>
   <ItemGroup>

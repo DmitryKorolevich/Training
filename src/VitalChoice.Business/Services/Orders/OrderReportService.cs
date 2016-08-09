@@ -1422,13 +1422,13 @@ namespace VitalChoice.Business.Services.Orders
 
                 start = report.Date.AddDays(-30);
                 end = report.Date.AddDays(1);
-                FillKPIReportRates(report.MonthRates, start, end);
+                await FillKPIReportRates(report.MonthRates, start, end);
                 start = report.Date.AddDays(-60);
                 end = report.Date.AddDays(1);
-                FillKPIReportRates(report.TwoMonthRates, start, end);
+                await FillKPIReportRates(report.TwoMonthRates, start, end);
                 start = report.Date.AddMonths(-12);
                 end = report.Date.AddDays(1);
-                FillKPIReportRates(report.YearRates, start, end);
+                await FillKPIReportRates(report.YearRates, start, end);
 
                 KPICacheItem cache = new KPICacheItem();
                 cache.DateCreated = report.Date;
@@ -1456,8 +1456,8 @@ namespace VitalChoice.Business.Services.Orders
             item.NewAffiliates = data.NewAffiliates;
 
             //TODO: google part
-            //item.PaidSearch = _googleService.GetTransactionsRevenuePaid(from, to);
-            //item.OrganicSearch = _googleService.GetTransactionsRevenueOrganics(from, to);
+            item.PaidSearch = await _googleService.GetTransactionsRevenuePaid(from, to);
+            item.OrganicSearch = await _googleService.GetTransactionsRevenueOrganics(from, to);
         }
 
         private async Task FillKPIReportMarketing(KPIReportMarketingItem item, DateTime from, DateTime to,
@@ -1467,17 +1467,17 @@ namespace VitalChoice.Business.Services.Orders
             item.OpenRate = _brontoService.GetOpenRate(deliveryObjects, from, to);
 
             //TODO: google part
-            //item.UniqueVisits = _googleService.GetUniqueVisits(from, to);
-            //item.NewWebVisitsPercent = _googleService.GetNewWebVisitsPercent(from, to);
+            item.UniqueVisits = await _googleService.GetUniqueVisits(from, to);
+            item.NewWebVisitsPercent = await _googleService.GetNewWebVisitsPercent(from, to);
         }
 
-        private void FillKPIReportRates(KPIReportRatesItem item, DateTime from, DateTime to)
+        private async Task FillKPIReportRates(KPIReportRatesItem item, DateTime from, DateTime to)
         {
             //TODO: google part
-            //item.Conversion = _googleService.GetConversionLevel(from, to);
-            //item.AOV = _googleService.GetAov(from, to);
-            //item.Bounce = _googleService.GetBounceRate(from, to);
-            //item.CartAbandon = _googleService.GetCartAbandon(from, to);
+            item.Conversion = await _googleService.GetConversionLevel(from, to);
+            item.AOV = await _googleService.GetAov(from, to);
+            item.Bounce = await _googleService.GetBounceRate(from, to);
+            item.CartAbandon = await _googleService.GetCartAbandon(from, to);
         }
     }
 }

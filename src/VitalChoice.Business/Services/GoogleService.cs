@@ -78,68 +78,68 @@ namespace VitalChoice.Business.Services
             var res = double.Parse(results.Execute().TotalsForAllResults["ga:percentNewVisits"]) / 100.0;
         }
 
-        public decimal GetCartAbandon(DateTime startDate, DateTime endDate)
+        public async Task<decimal> GetCartAbandon(DateTime startDate, DateTime endDate)
         {
             var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy-MM-dd"),
                                               endDate.ToString("yyyy-MM-dd"), "ga:goalAbandonRateAll");
             results.MaxResults = 1;
-            return decimal.Parse(results.Execute().TotalsForAllResults["ga:goalAbandonRateAll"]) / 100;
+            return decimal.Parse((await results.ExecuteAsync()).TotalsForAllResults["ga:goalAbandonRateAll"]) / 100;
         }
 
-        public long GetUniqueVisits(DateTime startDate, DateTime endDate)
+        public async Task<long> GetUniqueVisits(DateTime startDate, DateTime endDate)
         {
             var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy-MM-dd"),
                                               endDate.ToString("yyyy-MM-dd"), "ga:visitors");
             results.Dimensions = "ga:visitCount";
             results.MaxResults = 1;
-            return long.Parse(results.Execute().TotalsForAllResults["ga:visitors"]);
+            return long.Parse((await results.ExecuteAsync()).TotalsForAllResults["ga:visitors"]);
         }
 
-        public decimal GetNewWebVisitsPercent(DateTime startDate, DateTime endDate)
+        public async Task<decimal> GetNewWebVisitsPercent(DateTime startDate, DateTime endDate)
         {
             var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy-MM-dd"),
                                               endDate.ToString("yyyy-MM-dd"), "ga:percentNewVisits");
             results.Segment = "gaid::-1";
-            return decimal.Parse(results.Execute().TotalsForAllResults["ga:percentNewVisits"]) / 100;
+            return decimal.Parse((await results.ExecuteAsync()).TotalsForAllResults["ga:percentNewVisits"]) / 100;
         }
 
-        public decimal GetTransactionsRevenueOrganics(DateTime startDate, DateTime endDate)
+        public async Task<decimal> GetTransactionsRevenueOrganics(DateTime startDate, DateTime endDate)
         {
             var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy-MM-dd"),
                                               endDate.ToString("yyyy-MM-dd"), "ga:transactionRevenue");
             results.Segment = "gaid::-5";
             results.Dimensions = "ga:medium";
-            return decimal.Parse(results.Execute().TotalsForAllResults["ga:transactionRevenue"]);
+            return decimal.Parse((await results.ExecuteAsync()).TotalsForAllResults["ga:transactionRevenue"]);
         }
 
-        public decimal GetTransactionsRevenuePaid(DateTime startDate, DateTime endDate)
+        public async Task<decimal> GetTransactionsRevenuePaid(DateTime startDate, DateTime endDate)
         {
             var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy-MM-dd"),
                                               endDate.ToString("yyyy-MM-dd"), "ga:transactionRevenue");
             results.Segment = "gaid::-4";
             results.Dimensions = "ga:medium";
-            return decimal.Parse(results.Execute().TotalsForAllResults["ga:transactionRevenue"]);
+            return decimal.Parse((await results.ExecuteAsync()).TotalsForAllResults["ga:transactionRevenue"]);
         }
 
-        public decimal GetBounceRate(DateTime startDate, DateTime endDate)
+        public async Task<decimal> GetBounceRate(DateTime startDate, DateTime endDate)
         {
             var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy-MM-dd"),
                                                  endDate.ToString("yyyy-MM-dd"), "ga:visitBounceRate");
-            return decimal.Parse(results.Execute().TotalsForAllResults["ga:visitBounceRate"]) / 100;
+            return decimal.Parse((await results.ExecuteAsync()).TotalsForAllResults["ga:visitBounceRate"]) / 100;
         }
 
-        public decimal GetConversionLevel(DateTime startDate, DateTime endDate)
+        public async Task<decimal> GetConversionLevel(DateTime startDate, DateTime endDate)
         {
             var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy-MM-dd"),
                                                  endDate.ToString("yyyy-MM-dd"), "ga:transactionsPerVisit");
-            return decimal.Parse(results.Execute().TotalsForAllResults["ga:transactionsPerVisit"]) / 100;
+            return decimal.Parse((await results.ExecuteAsync()).TotalsForAllResults["ga:transactionsPerVisit"]) / 100;
         }
 
-        public decimal GetAov(DateTime startDate, DateTime endDate)
+        public async Task<decimal> GetAov(DateTime startDate, DateTime endDate)
         {
             var results = Client.Data.Ga.Get(_accountId, startDate.ToString("yyyy-MM-dd"),
                                                  endDate.ToString("yyyy-MM-dd"), "ga:revenuePerTransaction");
-            return decimal.Parse(results.Execute().TotalsForAllResults["ga:revenuePerTransaction"]);
+            return decimal.Parse((await results.ExecuteAsync()).TotalsForAllResults["ga:revenuePerTransaction"]);
         }
     }
 }

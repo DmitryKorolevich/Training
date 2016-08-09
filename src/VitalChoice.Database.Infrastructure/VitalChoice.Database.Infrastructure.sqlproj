@@ -84,9 +84,6 @@
     <PreDeploy Include="PreDeployment\Script.PreDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
-    <RefactorLog Include="VitalChoice.Database.Infrastructure.refactorlog" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\VitalChoice.Database.Ecommerce\VitalChoice.Database.Ecommerce.sqlproj">
       <Name>VitalChoice.Database.Ecommerce</Name>
       <Project>{3b44a066-17a4-46d2-b7d1-7e67ba6aa8d0}</Project>
