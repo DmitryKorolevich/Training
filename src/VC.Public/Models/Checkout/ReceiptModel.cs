@@ -14,5 +14,9 @@ namespace VC.Public.Models.Checkout
         public bool ShowEGiftEmailForm { get; set; }
 
         public EGiftSendEmailModel EGiftSendEmail { get; set; }
+
+        public string GATransactionInfo { get; set; }
+
+        public string GAItemsInfo { get; set; }
     }
 }

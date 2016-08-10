@@ -445,6 +445,12 @@ namespace VitalChoice.Business.Services.Affiliates
             return toReturn;
         }
 
+        public async Task<AffiliateOrderPayment> GetAffiliateOrderPaymentAsync(int id)
+        {
+            var toReturn = await _affiliateOrderPaymentRepository.Query(p => p.Id == id).SelectFirstOrDefaultAsync(false);
+            return toReturn;
+        }
+
         public async Task<PagedList<AffiliateOrderPayment>> GetAffiliateOrderPayments(AffiliateOrderPaymentFilter filter)
         {
             PagedList<AffiliateOrderPayment> toReturn;

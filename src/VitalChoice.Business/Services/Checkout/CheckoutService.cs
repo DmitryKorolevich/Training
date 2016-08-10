@@ -361,9 +361,15 @@ namespace VitalChoice.Business.Services.Checkout
                             IdSku = so.Sku.Id,
                             Quantity = so.Quantity
                         }, (sku, ordered) => sku.Quantity = ordered.Quantity);
-                        cart.ShipDelayDate = cartOrder.Order.SafeData.ShipDelayType == ShipDelayType.EntireOrder
-                            ? cartOrder.Order.Data.ShipDelayDate
-                            : null;
+                        if (cartOrder.Order.SafeData.ShipDelayType != null &&
+                            (int)cartOrder.Order.SafeData.ShipDelayType == (int) ShipDelayType.EntireOrder)
+                        {
+                            cart.ShipDelayDate = cartOrder.Order.Data.ShipDelayDate;
+                        }
+                        else
+                        {
+                            cart.ShipDelayDate = cartOrder.Order.Data.ShipDelayDate = null;
+                        }
                         cart.ShippingUpgradeP = cartOrder.Order.SafeData.ShippingUpgradeP;
                         cart.ShippingUpgradeNP = cartOrder.Order.SafeData.ShippingUpgradeNP;
                         cart.IdCustomer = null;

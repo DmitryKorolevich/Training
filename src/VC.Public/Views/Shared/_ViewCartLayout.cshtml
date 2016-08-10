@@ -47,7 +47,7 @@
     @Html.Partial("_HeadTrackScripts")
 </head>
 <body class="view-cart-layout view-cart-background order-info-section-fonts">
-    @Html.Partial("_BodyBeginTrackScripts")
+    @await Component.InvokeAsync("BodyBeginTrackScripts")
     <div class="view-cart-main">
 	    <header>
 		    <div class="logo-holder">

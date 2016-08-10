@@ -1,4 +1,16 @@
-﻿<!-- Google Tag Manager -->
+﻿@using VC.Public.Models.Tracking
+
+@model BodyBeginTrackScriptsModel
+
+@if (Model.Customer != null)
+{
+    <script type="text/javascript">
+        var convert_first_name = '@Model.Customer.FirstName';
+        var convert_last_name = '@Model.Customer.LastName';
+        var convert_email = '@Model.Customer.Email';
+    </script>
+}
+<!-- Google Tag Manager -->
 <noscript>
     <iframe src="//www.googletagmanager.com/ns.html?id=GTM-MM5ZMR"
             height="0" width="0" style="display:none;visibility:hidden"></iframe>

@@ -10,6 +10,15 @@
 
 @section PageScripts {
     <script src="@Url.Content("/app/modules/checkout/checkoutMain.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+    <script type="text/javascript">
+        $(window).load(function ()
+        {
+            ga('require', 'ecommerce');
+            @Html.Raw(Model.GATransactionInfo)
+            @Html.Raw(Model.GAItemsInfo)
+            ga('ecommerce:send');      // Send transaction and item data to Google Analytics.  
+        });    
+    </script>
 }
 
 @section Meta {

@@ -33,6 +33,8 @@ namespace VitalChoice.Interfaces.Services.Affiliates
 
         Task<ICollection<AffiliatePayment>> GetAffiliatePayments(int idAffiliate);
 
+        Task<AffiliateOrderPayment> GetAffiliateOrderPaymentAsync(int id);
+
         Task<PagedList<AffiliateOrderPayment>> GetAffiliateOrderPayments(AffiliateOrderPaymentFilter filter);
 
         Task<bool> DeleteAffiliateOrderPayment(int idOrder);

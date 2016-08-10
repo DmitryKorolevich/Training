@@ -98,8 +98,8 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    subMenu: [
                         { name: 'orderAgentsStatistic', stateName: 'index.oneCol.orderAgentsStatistic', stateLabel: 'Agents Report', access: null },
                         { name: 'inventoriesSummaryUsageReport', stateName: 'index.oneCol.inventoriesSummaryUsageReport', stateLabel: 'Inventory Shipment Summary', access: 3 },
-                        { name: 'vitalGreen', stateName: 'index.oneCol.vitalGreen', stateLabel: 'Review VitalGreen Statistics', access: 3 },
                         { name: 'productQualitySalesReport', stateName: 'index.oneCol.productQualitySalesReport', stateLabel: 'Product Quality Issues Report', access: 3 },
+                        { name: 'vitalGreen', stateName: 'index.oneCol.vitalGreen', stateLabel: 'Review VitalGreen Statistics', access: 3 },
                         { name: 'index.oneCol.serviceCodesStatistic', stateName: 'index.oneCol.serviceCodesStatistic', stateLabel: 'Service Codes Report', access: 3 }
 				    ]
 				},
@@ -108,8 +108,8 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    stateLabel: 'List Processing, Analysis',
 				    subMenu: [
                         { name: 'giftCertificateReport', stateName: 'index.oneCol.manageGCOrders', stateLabel: 'Gift Certificate Report', access: 3 },
-                        { name: 'matchbackReport', stateName: 'index.oneCol.matchbackReport', stateLabel: 'Matchback and Post-Season Analysis Report', access: 3 },
                         { name: 'mailingReport', stateName: 'index.oneCol.mailingReport', stateLabel: 'Mailing List Report', access: 3 },
+                        { name: 'matchbackReport', stateName: 'index.oneCol.matchbackReport', stateLabel: 'Matchback and Post-Season Analysis Report', access: 3 },
                         //{ name: 'giftCertificateUsageReport', stateName: 'index.oneCol.giftCertificateUsageReport', stateLabel: 'Gift Certificate Usage Report', access: 3 },
                         //{ name: 'lifeTimeCalculationReport', stateName: 'index.oneCol.lifeTimeCalculationReport', stateLabel: 'Life Time Calculation Report', access: 3 },
                         //{ name: 'weeklySalesReport', stateName: 'index.oneCol.weeklySalesReport', stateLabel: 'Weekly Sales Report', access: 3 },

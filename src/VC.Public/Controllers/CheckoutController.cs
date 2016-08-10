@@ -28,6 +28,8 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using VC.Public.Models.Tracking;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Business.Services.Bronto;
@@ -630,6 +632,61 @@ namespace VC.Public.Controllers
                     {
                         Code = p.Code,
                     }).ToList(); 
+            }
+
+            //populate GA tracking info
+            var gaTrackingInfo = new GATransactionInfo();
+            gaTrackingInfo.id = order.Id;
+            gaTrackingInfo.revenue = order.Total;
+            gaTrackingInfo.shipping = order.ShippingTotal;
+            gaTrackingInfo.tax = order.TaxTotal;
+            gaTrackingInfo.affiliation = "N/A";
+            var affiliateOrderPayment = await _affiliateService.GetAffiliateOrderPaymentAsync(order.Id);
+            if (affiliateOrderPayment != null)
+            {
+                var affiliate = await _affiliateService.SelectAsync(affiliateOrderPayment.IdAffiliate);
+                if (affiliate != null)
+                {
+                    gaTrackingInfo.affiliation = affiliate.Name;
+                    if (affiliate.SafeData.Company != null)
+                    {
+                        gaTrackingInfo.affiliation += $"({affiliate.Data.Company})";
+                    }
+                    gaTrackingInfo.affiliation = gaTrackingInfo.affiliation.Replace("|", "-");
+                }
+            }
+            var data = JsonConvert.SerializeObject(gaTrackingInfo);
+            receiptModel.GATransactionInfo =$"ga('ecommerce:addTransaction', {data});";
+
+            receiptModel.GAItemsInfo=String.Empty;
+            var skus = order.Skus;
+            skus.AddRange(order.PromoSkus.Where(p=>p.Enabled));
+            foreach (var skuOrdered in skus)
+            {
+                var item = new GATransactionItemInfo();
+                item.id = order.Id;
+                item.sku = skuOrdered.Sku.Code;
+                item.quantity = skuOrdered.Quantity;
+                item.price = skuOrdered.Amount;
+
+                item.category= "NA";
+                if (skuOrdered.Sku.Product.SafeData.GoogleCategory != null)
+                {
+                    item.category =
+                        ReferenceData.GoogleCategories.FirstOrDefault(
+                            p => p.Key == skuOrdered.Sku.Product.SafeData.GoogleCategory)?.Text ?? "NA";
+                    item.category = item.category.Replace("|", "-");
+                }
+                item.name = skuOrdered.Sku.Product.Name ?? String.Empty;
+                if (!string.IsNullOrEmpty(skuOrdered.Sku.Product.SafeData.SubTitle))
+                {
+                    item.name += " " + skuOrdered.Sku.Product.Data.SubTitle;
+                }
+                item.name += $" ({skuOrdered.Sku.Product.SafeData.QTY ?? 0})";
+                item.name = item.name.Replace("|", "-");
+                
+                data = JsonConvert.SerializeObject(item);
+                receiptModel.GAItemsInfo += $"ga('ecommerce:addItem', {data});{Environment.NewLine}";
             }
 
             return View(receiptModel);
