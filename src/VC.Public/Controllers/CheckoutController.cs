@@ -682,7 +682,7 @@ namespace VC.Public.Controllers
                 {
                     item.name += " " + skuOrdered.Sku.Product.Data.SubTitle;
                 }
-                item.name += $" ({skuOrdered.Sku.Product.SafeData.QTY ?? 0})";
+                item.name += $" ({skuOrdered.Sku.SafeData.QTY ?? 0})";
                 item.name = item.name.Replace("|", "-");
                 
                 data = JsonConvert.SerializeObject(item);
