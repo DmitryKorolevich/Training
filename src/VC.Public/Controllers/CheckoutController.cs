@@ -114,6 +114,18 @@ namespace VC.Public.Controllers
             return View(new LoginModel());
         }
 
+        [HttpGet]
+        [CustomerAuthorize]
+        public async Task<Result<bool>> CheckCreditCard(int idPaymentMethod)
+        {
+            if (await CustomerLoggedIn())
+            {
+                var internalId = GetInternalCustomerId();
+                return await CustomerService.GetCustomerCardExist(internalId, idPaymentMethod);
+            }
+            return new Result<bool>(false);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Welcome(LoginModel model)

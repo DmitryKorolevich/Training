@@ -45,6 +45,7 @@ namespace VC.Public.Models.Profile
 
         [Required]
         [Display(Name = "Security Code")]
+        [Map]
         public string SecurityCode { get; set; }
 
 		public bool IsSelected { get; set; }

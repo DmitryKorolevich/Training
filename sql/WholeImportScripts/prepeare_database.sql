@@ -258,8 +258,6 @@ TRUNCATE TABLE DiscountToSelectedCategories
 DELETE FROM OneTimeDiscountToCustomerUsages
 DELETE FROM Discounts
 
-PRINT '====Wipe out all data === END'
-
 GO
 
 USE [VitalChoice.Ecommerce]
@@ -317,3 +315,90 @@ END
 
 CLOSE ind;
 DEALLOCATE ind;
+
+
+GO
+
+
+USE [VitalChoice.Ecommerce]
+
+GO
+
+DELETE FROM SkuOptionValues
+WHERE IdSku IN (
+	SELECT Id FROM Skus WHERE IdProduct IN (2469,
+	2468,
+	2467,
+	2466,
+	2465,
+	2464,
+	2463,
+	2462) 
+) OR IdSku = 2512
+
+DELETE FROM Skus
+WHERE IdProduct IN 
+	(2469,
+	2468,
+	2467,
+	2466,
+	2465,
+	2464,
+	2463,
+	2462) OR Id = 2512
+
+
+DELETE FROM ProductOptionValues
+WHERE IdProduct IN (2469,
+	2468,
+	2467,
+	2466,
+	2465,
+	2464,
+	2463,
+	2462)
+
+DELETE FROM Products
+WHERE Id IN (2469,
+	2468,
+	2467,
+	2466,
+	2465,
+	2464,
+	2463,
+	2462)
+
+GO
+
+USE [VitalChoice.Infrastructure]
+
+GO
+
+DECLARE @contentTodelete TABLE(Id INT NOT NULL PRIMARY KEY)
+
+INSERT INTO @contentTodelete
+(Id)
+SELECT ContentItemId FROM Products 
+WHERE Id IN (2469,
+	2468,
+	2467,
+	2466,
+	2465,
+	2464,
+	2463,
+	2462)
+
+DELETE FROM ContentItems
+WHERE Id IN (SELECT Id FROM @contentTodelete)
+
+DELETE FROM Products 
+WHERE Id IN (2469,
+	2468,
+	2467,
+	2466,
+	2465,
+	2464,
+	2463,
+	2462)
+GO
+PRINT '====Wipe out all data === END'
