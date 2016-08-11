@@ -159,9 +159,9 @@ namespace VC.Public.Components.Tracking
                         var purchase = new GoogleActionPurchaseInfo();
                         purchase.actionField=new GoogleActionPurchaseActionInfo();
                         purchase.actionField.id = order.Id;
-                        purchase.actionField.revenue = Math.Round(order.Total);
-                        purchase.actionField.shipping = Math.Round(order.ShippingTotal);
-                        purchase.actionField.tax = Math.Round(order.TaxTotal);
+                        purchase.actionField.revenue = Math.Round(order.Total, 2);
+                        purchase.actionField.shipping = Math.Round(order.ShippingTotal, 2);
+                        purchase.actionField.tax = Math.Round(order.TaxTotal, 2);
                         purchase.actionField.coupon = order.Discount?.Code;
 
                         purchase.actionField.affiliation = "N/A";
