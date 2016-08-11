@@ -288,7 +288,7 @@ namespace VitalChoice.Caching.Services.Cache
             var pk = EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
             var foreignKeys = EntityInfo.ForeignKeys.GetForeignKeyValues(entity);
             MarkForUpdateForeignKeys(foreignKeys, dbContext);
-            MarkForUpdateDependent(pk);
+            MarkForUpdateDependent(pk, dbContext);
             return pk;
         }
 
@@ -479,7 +479,7 @@ namespace VitalChoice.Caching.Services.Cache
             MarkForUpdateForeignKeys(foreignKeys, dbContext);
             foreach (var pk in pks)
             {
-                MarkForUpdateDependent(pk);
+                MarkForUpdateDependent(pk, dbContext);
             }
             return pks;
         }
@@ -541,7 +541,7 @@ namespace VitalChoice.Caching.Services.Cache
             }
             foreach (var pk in pks)
             {
-                MarkForUpdateDependent(pk);
+                MarkForUpdateDependent(pk, dbContext);
             }
         }
 
@@ -581,10 +581,10 @@ namespace VitalChoice.Caching.Services.Cache
                     }
                 }
             }
-            MarkForUpdateDependent(pk);
+            MarkForUpdateDependent(pk, dbContext);
         }
 
-        private void MarkForUpdateDependent(EntityKey pk)
+        private void MarkForUpdateDependent(EntityKey pk, object dbContext)
         {
             if (EntityInfo.DependentTypes == null)
                 return;
@@ -608,7 +608,7 @@ namespace VitalChoice.Caching.Services.Cache
                                     cachedItems.Where(c => !c.NeedUpdateEntity)
                                         .Select(cached => cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(cached.EntityUntyped))
                                         .ToArray();
-                                cache.MarkForUpdateByPrimaryKey(itemsList, dependentType.Value.Name);
+                                cache.MarkForUpdateByPrimaryKey(itemsList, dbContext, dependentType.Value.Name);
                             }
                             finally
                             {

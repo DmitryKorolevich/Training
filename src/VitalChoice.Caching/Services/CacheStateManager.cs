@@ -266,7 +266,7 @@ namespace VitalChoice.Caching.Services
                 foreach (
                     var opPair in
                         toMarkForAdd.SimpleJoin(cache.MarkForAdd(toMarkForAdd.Select(op => op.Entry.Entity).ToArray(),
-                            DataContext)))
+                            null)))
                 {
                     var op = opPair.Key;
                     op.PrimaryKey = opPair.Value;
@@ -282,7 +282,7 @@ namespace VitalChoice.Caching.Services
                 }
                 foreach (
                     var opPair in
-                        toUpdate.SimpleJoin(cache.MarkForUpdate(toUpdate.Select(op => op.Entry.Entity), DataContext)))
+                        toUpdate.SimpleJoin(cache.MarkForUpdate(toUpdate.Select(op => op.Entry.Entity), null)))
                 {
                     var op = opPair.Key;
                     op.PrimaryKey = opPair.Value;
@@ -298,7 +298,7 @@ namespace VitalChoice.Caching.Services
                 }
                 foreach (
                     var opPair in
-                        toDelete.SimpleJoin(cache.MarkForUpdate(toDelete.Select(op => op.Entry.Entity), DataContext)))
+                        toDelete.SimpleJoin(cache.MarkForUpdate(toDelete.Select(op => op.Entry.Entity), null)))
                 {
                     var op = opPair.Key;
                     op.PrimaryKey = opPair.Value;
@@ -347,6 +347,7 @@ namespace VitalChoice.Caching.Services
 
         private void MarkUpdateCache(IEnumerable<ImmutableEntryState> entriesToSave)
         {
+            var dbContext = DataContext as DbContext;
             var entryGroups = entriesToSave.Where(e => e.EntityType != null).Select(e => new SyncOp
             {
                 Entry = e
@@ -382,24 +383,53 @@ namespace VitalChoice.Caching.Services
                 foreach (
                     var opPair in
                         toMarkForAdd.SimpleJoin(cache.MarkForAdd(toMarkForAdd.Select(op => op.Entry.Entity).ToArray(),
-                            DataContext)))
+                            null)))
                 {
                     var op = opPair.Key;
                     op.PrimaryKey = opPair.Value;
                 }
                 foreach (
                     var opPair in
-                        toUpdate.SimpleJoin(cache.MarkForUpdate(toUpdate.Select(op => op.Entry.Entity), DataContext)))
+                        toUpdate.SimpleJoin(cache.MarkForUpdate(toUpdate.Select(op => op.Entry.Entity), null)))
                 {
                     var op = opPair.Key;
                     op.PrimaryKey = opPair.Value;
                 }
                 foreach (
                     var opPair in
-                        toDelete.SimpleJoin(cache.MarkForUpdate(toDelete.Select(op => op.Entry.Entity), DataContext)))
+                        toDelete.SimpleJoin(cache.MarkForUpdate(toDelete.Select(op => op.Entry.Entity), null)))
                 {
                     var op = opPair.Key;
                     op.PrimaryKey = opPair.Value;
+                }
+            }
+
+            //Update in two stages, perform update
+            foreach (var group in entryGroups)
+            {
+                foreach (var op in group)
+                {
+                    switch (op.Entry.State)
+                    {
+                        case EntityState.Added:
+                            if (op.PrimaryKey.IsValid)
+                            {
+                                op.Cache.Update(op.Entry.Entity, dbContext, DataContext);
+                            }
+                            break;
+                        case EntityState.Modified:
+                            if (op.PrimaryKey.IsValid)
+                            {
+                                op.Cache.Update(op.Entry.Entity, dbContext, DataContext);
+                            }
+                            break;
+                        case EntityState.Deleted:
+                            if (op.PrimaryKey.IsValid)
+                            {
+                                op.Cache.TryRemove(op.PrimaryKey);
+                            }
+                            break;
+                    }
                 }
             }
         }
