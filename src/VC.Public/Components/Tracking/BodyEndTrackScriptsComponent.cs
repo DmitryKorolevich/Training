@@ -162,7 +162,7 @@ namespace VC.Public.Components.Tracking
                         purchase.actionField.revenue = Math.Round(order.Total);
                         purchase.actionField.shipping = Math.Round(order.ShippingTotal);
                         purchase.actionField.tax = Math.Round(order.TaxTotal);
-                        purchase.actionField.coupon = "";
+                        purchase.actionField.coupon = order.Discount?.Code;
 
                         purchase.actionField.affiliation = "N/A";
                         var affiliateService = _affiliateService.Value;
