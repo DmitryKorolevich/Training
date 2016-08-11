@@ -141,7 +141,6 @@ namespace VitalChoice.Business.Services.Orders
             {
                 if (!InitSuccess)
                 {
-                    throw new ApiException();
                     return Task.FromResult(true);
                 }
                 return
