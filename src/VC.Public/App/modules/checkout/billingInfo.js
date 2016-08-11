@@ -26,7 +26,7 @@
 
 	populateCardTypes();
 
-	var cardId = $("#ddCreditCardsSelection").val() == '' ? $("#hdCreditCard").val() : $("#ddCreditCardsSelection").val();
+	var cardId = $("#ddCreditCardsSelection").val() === undefined ? $("#hdCreditCard").val() : $("#ddCreditCardsSelection").val();
 	checkCreditCard(cardId);
 	getBrontoIsUnsubscribed();
 });
