@@ -1,4 +1,6 @@
-﻿namespace VitalChoice.Ecommerce.Domain.Exceptions
+﻿using System.Runtime.Serialization;
+
+namespace VitalChoice.Ecommerce.Domain.Exceptions
 {
     public enum MessageType
     {
@@ -13,11 +15,16 @@
         Info = 2
     }
 
-    public struct MessageInfo
+    [DataContract]
+    public class MessageInfo
     {
+        [DataMember]
         public MessageType MessageType { get; set; }
+        [DataMember]
         public MessageLevel MessageLevel { get; set; }
+        [DataMember]
         public string Field { get; set; }
+        [DataMember]
         public string Message { get; set; }
 
         public override string ToString()

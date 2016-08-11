@@ -23,6 +23,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
+using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.ObjectMapping.Base;
 
 namespace VitalChoice.ExportService.Services
@@ -40,6 +41,7 @@ namespace VitalChoice.ExportService.Services
         private readonly IOrderRefundService _refundService;
         private readonly ICustomerService _customerService;
         private readonly ILifetimeScope _scope;
+        private readonly IPaymentMethodService _paymentMethodService;
         private static volatile bool _writeQueue;
         private static readonly AsyncManualResetEvent LockCustomersEvent = new AsyncManualResetEvent(true);
         private static readonly AsyncManualResetEvent LockOrdersEvent = new AsyncManualResetEvent(true);
@@ -48,7 +50,7 @@ namespace VitalChoice.ExportService.Services
         public OrderExportService(IOptions<ExportOptions> options, IObjectEncryptionHost encryptionHost,
             DbContextOptions<ExportInfoContext> contextOptions, ILoggerFactory loggerFactory,
             IVeraCoreExportService veraCoreExportService, IOrderService orderService, ExportInfoContext infoContext,
-            IOrderRefundService refundService, ICustomerService customerService, ILifetimeScope scope)
+            IOrderRefundService refundService, ICustomerService customerService, ILifetimeScope scope, IPaymentMethodService paymentMethodService)
         {
             _options = options;
             _encryptionHost = encryptionHost;
@@ -59,6 +61,7 @@ namespace VitalChoice.ExportService.Services
             _refundService = refundService;
             _customerService = customerService;
             _scope = scope;
+            _paymentMethodService = paymentMethodService;
             _logger = loggerFactory.CreateLogger<OrderExportService>();
         }
 
@@ -77,6 +80,27 @@ namespace VitalChoice.ExportService.Services
                         rep.Query(
                             c => customerExportInfo.IdCustomer == c.IdCustomer && customerExportInfo.IdPaymentMethod == c.IdPaymentMethod)
                             .SelectAnyAsync();
+            }
+        }
+
+        public async Task<List<MessageInfo>> AuthorizeCreditCard(CustomerPaymentMethodDynamic paymentMethod)
+        {
+            await LockCustomersEvent.WaitAsync();
+            if (_writeQueue)
+            {
+                return new List<MessageInfo>();
+            }
+            using (var uow = new UnitOfWork(_infoContext, false))
+            {
+                var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
+                var cardData =
+                    await
+                        rep.Query(
+                            c => paymentMethod.IdCustomer == c.IdCustomer && paymentMethod.Id == c.IdPaymentMethod)
+                            .SelectFirstOrDefaultAsync(false);
+                var cardNumber = _encryptionHost.LocalDecrypt<string>(cardData.CreditCardNumber);
+                paymentMethod.Data.CardNumber = cardNumber;
+                return await _paymentMethodService.AuthorizeCreditCard(paymentMethod);
             }
         }
 

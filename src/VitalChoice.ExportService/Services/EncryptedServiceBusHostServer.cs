@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus;
@@ -64,6 +65,8 @@ namespace VitalChoice.ExportService.Services
                     return ProcessUpdateCustomerPayments(command);
                 case OrderExportServiceCommandConstants.CardExist:
                     return ProcessCardExistCommand(command);
+                case OrderExportServiceCommandConstants.AuthorizeCard:
+                    return ProcessCardAuthorizeCommand(command);
                 default:
                     return false;
             }
@@ -82,6 +85,24 @@ namespace VitalChoice.ExportService.Services
             {
                 var orderExportService = scope.Resolve<IOrderExportService>();
                 SendCommand(new ServiceBusCommandBase(command, orderExportService.CardExist(customerExportInfo).GetAwaiter().GetResult()));
+            }
+            return true;
+        }
+
+        private bool ProcessCardAuthorizeCommand(ServiceBusCommandBase command)
+        {
+            var paymentMethod = command.Data.Data as CustomerPaymentMethodDynamic;
+            if (paymentMethod == null)
+            {
+                SendCommand(new ServiceBusCommandBase(command, "Null payment method"));
+                return false;
+            }
+
+            using (var scope = _rootScope.BeginLifetimeScope())
+            {
+                var orderExportService = scope.Resolve<IOrderExportService>();
+                SendCommand(new ServiceBusCommandBase(command,
+                    orderExportService.AuthorizeCreditCard(paymentMethod).GetAwaiter().GetResult()));
             }
             return true;
         }

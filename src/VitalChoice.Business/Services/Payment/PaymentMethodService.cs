@@ -22,6 +22,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer.PaymentMethod;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Interfaces.Services.Settings;
 
@@ -37,12 +38,13 @@ namespace VitalChoice.Business.Services.Payment
 	    private readonly ILogger _logger;
 	    private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
 	    private readonly AppSettings _appSettings;
+	    private readonly IEncryptedOrderExportService _exportService;
 
 	    public PaymentMethodService(IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
 	        IRepositoryAsync<AdminProfile> adminProfileRepository,
 	        IEcommerceRepositoryAsync<PaymentMethodToCustomerType> paymentMethodToCustomerTypeRepository,
 	        ILoggerProviderExtended loggerProvider, IOptions<AppOptions> options, ICountryNameCodeResolver countryNameCode,
-	        ITransactionAccessor<EcommerceContext> transactionAccessor, AppSettings appSettings)
+	        ITransactionAccessor<EcommerceContext> transactionAccessor, AppSettings appSettings, IEncryptedOrderExportService exportService)
 	    {
 	        _paymentMethodRepository = paymentMethodRepository;
 	        _adminProfileRepository = adminProfileRepository;
@@ -51,6 +53,7 @@ namespace VitalChoice.Business.Services.Payment
 	        _countryNameCode = countryNameCode;
 	        _transactionAccessor = transactionAccessor;
 	        _appSettings = appSettings;
+	        _exportService = exportService;
 	        _logger = loggerProvider.CreateLogger<PaymentMethodService>();
 	    }
 
@@ -177,11 +180,7 @@ namespace VitalChoice.Business.Services.Payment
             {
                 if (DynamicMapper.IsValuesMasked(paymentMethod))
                 {
-                    errors.Add(new MessageInfo
-                    {
-                        Field = "CardNumber",
-                        Message = "Please provide all credit card details to add or update card"
-                    });
+                    return await _exportService.AuthorizeCard(paymentMethod as CustomerPaymentMethodDynamic);
                 }
             }
 

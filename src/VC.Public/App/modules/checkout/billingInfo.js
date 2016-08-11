@@ -5,8 +5,14 @@
 		controlGuestCheckout();
 	});
 
+	$("body").on("change", "#CardNumber", function () {
+	    controlCardChange();
+	});
+
 	$("body").on("change", "#ddCreditCardsSelection", function () {
-		changeSelection($("#ddCreditCardsSelection").val());
+	    var cardId = $("#ddCreditCardsSelection").val();
+	    changeSelection(cardId);
+	    checkCreditCard(cardId);
 	});
 
 	$(".columns-container form").data("validator").settings.submitHandler = function (form)
@@ -15,11 +21,13 @@
 	    setTimeout(function ()
 	    {
 	        form.submit();
-	    }, 100);
+        }, 100);
 	};
 
 	populateCardTypes();
 
+	var cardId = $("#ddCreditCardsSelection").val() === undefined ? $("#hdCreditCard").val() : $("#ddCreditCardsSelection").val();
+	checkCreditCard(cardId);
 	getBrontoIsUnsubscribed();
 });
 
@@ -48,6 +56,32 @@ function changeSelection(selId) {
 	});
 }
 
+function checkCreditCard(cardId) {
+    if ($("#CardNumber").val().indexOf("X") != -1 || $("#CardNumber").val().indexOf("x") != -1) {
+        $.ajax({
+            url: "/Checkout/CheckCreditCard/" + cardId,
+            dataType: "json"
+        }).success(function (result) {
+            if (result && result.Data) {
+                $(".validation-summary-errors>ul li:contains(Please enter all credit card)").remove();
+                if ($(".validation-summary-errors>ul li").length == 0) {
+                    $(".validation-summary-errors").remove();
+                }
+            }
+            else {
+                if ($(".validation-summary-errors").length > 0) {
+                    $(".validation-summary-errors>ul").prepend('<li>For security reasons. Please enter all credit card details for this card or please select a new one to continue.</li>');
+                }
+                else {
+                    $("form").prepend('<div class="validation-summary-errors"><ul><li>For security reasons. Please enter all credit card details for this card or please select a new one to continue.</li></ul></div>');
+                }
+            }
+        }).error(function (result) {
+            notifyError();
+        });
+    }
+}
+
 function getBrontoIsUnsubscribed() {
     $.ajax({
         url: "/Checkout/GetIsUnsubscribed",
@@ -62,6 +96,15 @@ function getBrontoIsUnsubscribed() {
     }).error(function (result) {
         notifyError();
     });
+}
+
+function controlCardChange() {
+    if ($("#CardNumber").val().indexOf("X") == -1 && $("#CardNumber").val().indexOf("x") == -1) {
+        $(".validation-summary-errors>ul li:contains(Please enter all credit card)").remove();
+        if ($(".validation-summary-errors>ul li").length == 0) {
+            $(".validation-summary-errors").remove();
+        }
+    }
 }
 
 function controlGuestCheckout() {

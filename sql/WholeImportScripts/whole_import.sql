@@ -2,6 +2,27 @@ GO
 USE [VitalChoice.Ecommerce]
 GO
 
+SET IDENTITY_INSERT [VitalChoice.Ecommerce].dbo.Skus OFF;
+GO
+
+SET IDENTITY_INSERT [VitalChoice.Infrastructure].dbo.AspNetUsers OFF;
+GO
+
+SET IDENTITY_INSERT [VitalChoice.Ecommerce].dbo.CustomerNotes OFF;
+GO
+
+SET IDENTITY_INSERT [VitalChoice.Ecommerce].dbo.Products OFF;
+GO
+
+SET IDENTITY_INSERT [VitalChoice.Ecommerce].dbo.Discounts OFF;
+GO
+
+SET IDENTITY_INSERT Orders OFF;
+GO
+
+SET IDENTITY_INSERT HealthwisePeriods OFF;
+GO
+
 IF EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'dbo.Orders') AND name = N'IX_IdCustomer')
 	DROP INDEX [IX_IdCustomer] ON [dbo].[Orders]
 
@@ -899,19 +920,19 @@ USE [vitalchoice2.0]
 
 --============================ Insert Base Users and Customers Entity ====================================
 
-GO
+--GO
 
-ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
-DROP CONSTRAINT UQ_Customers
+--ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
+--DROP CONSTRAINT UQ_Customers
 
-GO
+--GO
 
-DROP INDEX IX_Addresses_IdCustomer ON [VitalChoice.Ecommerce].dbo.Addresses
+--DROP INDEX IX_Addresses_IdCustomer ON [VitalChoice.Ecommerce].dbo.Addresses
 
-GO
+--GO
 
-ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
-DROP COLUMN IdCustomer
+--ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
+--DROP COLUMN IdCustomer
 
 GO
 
@@ -1720,7 +1741,7 @@ GO
 --============================ Insert AspNet Users ====================================
 
 DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUsers
-WHERE IdUserType = 2 AND (OldPassword IS NULL OR Id NOT IN (SELECT idCustomer FROM customers)
+WHERE IdUserType = 2 AND Id NOT IN (SELECT idCustomer FROM customers)
 PRINT '====remove all new customer users (not exist in old DB)'
 
 GO
@@ -2168,8 +2189,8 @@ END
 
 GO
 
-ALTER TABLE [VitalChoice.Infrastructure].dbo.ContentItems
-	DROP COLUMN TempId, COLUMN TempCategoryId
+--ALTER TABLE [VitalChoice.Infrastructure].dbo.ContentItems
+--	DROP COLUMN TempId, COLUMN TempCategoryId
 
 GO
 
@@ -2479,7 +2500,7 @@ GO
 		CASE WHEN ISNULL(a.removed, 0) <> 0 THEN 3 ELSE CASE WHEN ISNULL(a.pcProd_SPInActive, 0) = 0 THEN 2 ELSE 1 END END
 	FROM [vitalchoice2.0].dbo.products AS a
 	INNER JOIN [VitalChoice.Ecommerce].dbo.Products AS p ON p.Id = a.pcprod_ParentPrd
-	WHERE p.Id IN (SELECT Id FROM TempProductsToMove) OR a.idProduct IN (SELECT Id FROM @additionalSkusToImport)
+	WHERE (p.Id IN (SELECT Id FROM TempProductsToMove) OR a.idProduct IN (SELECT Id FROM @additionalSkusToImport))
 
 	INSERT INTO [VitalChoice.Ecommerce].dbo.Skus
 	(Id, Code, DateCreated, DateEdited, Hidden, IdProduct, [Order], Price, WholesalePrice, StatusCode)
@@ -2786,8 +2807,11 @@ GO
 
 USE [vitalchoice2.0]
 
+GO
+
 SET IDENTITY_INSERT [VitalChoice.Ecommerce].dbo.Discounts ON;
-	
+
+GO
 --================== Price =====================
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.Discounts
@@ -3012,6 +3036,8 @@ PRINT '====Insert auto-ship templates'
 GO
 
 SET IDENTITY_INSERT Orders ON;
+
+GO
 
 INSERT INTO Orders
 (Id, IdObjectType, DateCreated, DateEdited, IdEditedBy, StatusCode, OrderStatus, IdCustomer, IdDiscount, Total, ProductsSubtotal, TaxTotal, ShippingTotal, DiscountTotal, IdAddedBy)
