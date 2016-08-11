@@ -12,7 +12,7 @@ using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Users;
 
-namespace VC.Public.Components
+namespace VC.Public.Components.Tracking
 {
     [ViewComponent(Name = "BodyBeginTrackScripts")]
     public class BodyBeginTrackScriptsComponent : ViewComponent
@@ -41,13 +41,14 @@ namespace VC.Public.Components
                 {
                     toReturn.Customer = new CustomerModel()
                     {
+                        Id = user.Id,
                         Email = user.Email,
                         FirstName = user.FirstName,
                         LastName = user.LastName
                     };
                 }
             }
-            return View("~/Views/Shared/Components/BodyBeginTrackScripts.cshtml", toReturn);
+            return View("~/Views/Shared/Components/Tracking/BodyBeginTrackScripts.cshtml", toReturn);
         }
     }
 }

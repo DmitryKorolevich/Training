@@ -5,9 +5,10 @@
 @if (Model.Customer != null)
 {
     <script type="text/javascript">
-        var convert_first_name = '@Model.Customer.FirstName';
-        var convert_last_name = '@Model.Customer.LastName';
-        var convert_email = '@Model.Customer.Email';
+        dataLayer = [{
+            'vc_account_id': '@Model.Customer.Id',
+            'event': 'ga-fires-from-gtm'
+        }];
     </script>
 }
 <!-- Google Tag Manager -->

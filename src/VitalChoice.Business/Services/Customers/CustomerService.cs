@@ -82,6 +82,7 @@ namespace VitalChoice.Business.Services.Customers
         private readonly IEncryptedOrderExportService _encryptedOrderExportService;
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly IEcommerceRepositoryAsync<VWholesaleSummaryInfo> _vWholesaleSummaryInfoRepositoryAsync;
+        private readonly IEcommerceRepositoryAsync<VOrderCountOnCustomer> _vOrderCountOnCustomerRepositoryAsync;
         private readonly SpEcommerceRepository _sPEcommerceRepository;
         private readonly ReferenceData _referenceData;
 
@@ -104,6 +105,7 @@ namespace VitalChoice.Business.Services.Customers
             ICountryNameCodeResolver countryNameCode, IEncryptedOrderExportService encryptedOrderExportService,
             IPaymentMethodService paymentMethodService,
             IEcommerceRepositoryAsync<VWholesaleSummaryInfo> vWholesaleSummaryInfoRepositoryAsync,
+            IEcommerceRepositoryAsync<VOrderCountOnCustomer> vOrderCountOnCustomerRepositoryAsync,
             SpEcommerceRepository sPEcommerceRepository,
             ITransactionAccessor<EcommerceContext> transactionAccessor, IDynamicEntityOrderingExtension<Customer> orderingExtension, ReferenceData referenceData, IEcommerceRepositoryAsync<CustomerPaymentMethod> customerPaymentMethodRepositoryAsync)
             : base(
@@ -127,6 +129,7 @@ namespace VitalChoice.Business.Services.Customers
             _encryptedOrderExportService = encryptedOrderExportService;
             _paymentMethodService = paymentMethodService;
             _vWholesaleSummaryInfoRepositoryAsync = vWholesaleSummaryInfoRepositoryAsync;
+            _vOrderCountOnCustomerRepositoryAsync = vOrderCountOnCustomerRepositoryAsync;
             _sPEcommerceRepository = sPEcommerceRepository;
             _referenceData = referenceData;
             _customerPaymentMethodRepositoryAsync = customerPaymentMethodRepositoryAsync;
@@ -835,6 +838,12 @@ namespace VitalChoice.Business.Services.Customers
         {
             var uow = CreateUnitOfWork();
             await base.UpdateAsync(model, uow);
+        }
+
+        public async Task<long> GetActiveOrderCount(int idCustomer)
+        {
+            var data = await _vOrderCountOnCustomerRepositoryAsync.Query(p => p.IdCustomer == idCustomer).SelectFirstOrDefaultAsync(false);
+            return data?.Count ?? 0;
         }
 
         #region Reports 

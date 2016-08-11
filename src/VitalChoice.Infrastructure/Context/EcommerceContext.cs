@@ -407,6 +407,13 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(f => f.Id);
                 entity.ToTable("KPICacheItems");
             });
+
+            builder.Entity<VOrderCountOnCustomer>(entity =>
+            {
+                entity.HasKey(f => f.IdCustomer);
+                entity.Ignore(f => f.Id);
+                entity.ToTable("VOrderCountOnCustomers");
+            });
         }
     }
 }

@@ -333,8 +333,8 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
                 if (billingErrorMessages)
                 {
-                    $scope.paymentInfoTab.active = true;
                     toaster.pop('error', 'Error!', billingErrorMessages, null, 'trustedHtml');
+                    $scope.options.activeTabIndex = $scope.paymentInfoTab.index;
                     deferredRecalculate.reject();
                     return;
                 }

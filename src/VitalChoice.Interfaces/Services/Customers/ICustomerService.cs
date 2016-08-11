@@ -51,9 +51,11 @@ namespace VitalChoice.Interfaces.Services.Customers
 
 	    Task UpdateEcommerceOnlyAsync(CustomerDynamic customer);
 
+	    Task<long> GetActiveOrderCount(int idCustomer);
+
         #region Reports 
 
-	    Task<WholesaleSummaryReport> GetWholesaleSummaryReportAsync();
+        Task<WholesaleSummaryReport> GetWholesaleSummaryReportAsync();
 
 	    Task<ICollection<WholesaleSummaryReportMonthStatistic>> GetWholesaleSummaryReportMonthStatisticAsync(DateTime lastMonthStartDay, int monthCount);
 

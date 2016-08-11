@@ -37,14 +37,14 @@
 	<style>
 		@await Component.InvokeAsync("CustomStyles")
 		</style>
-	<script>
+    <script>
 		@{
-			var appInfrastructure = appInfrastructureService;
+		    var appInfrastructure = appInfrastructureService;
 		}
 
 		var appSettings = { DefaultCountryId: @(appInfrastructure.DefaultCountry?.Id) }
 	</script>
-    @Html.Partial("_HeadTrackScripts")
+    @await Component.InvokeAsync("HeadTrackScripts")
 </head>
 <body class="view-cart-layout view-cart-background order-info-section-fonts">
     @await Component.InvokeAsync("BodyBeginTrackScripts")
@@ -111,6 +111,6 @@
     @*<script src="https://www.google.com/jsapi" type="text/javascript"></script>*@
     @await Component.InvokeAsync("Assets", new { assetType = "scripts" })
     @RenderSection("PageScripts", false)
-    @Html.Partial("_BodyEndTrackScripts")
+    @await Component.InvokeAsync("BodyEndTrackScripts")
 </body>
 </html>

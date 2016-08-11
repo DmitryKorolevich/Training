@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace VC.Public.Models.Tracking
 {
-    public class BodyBeginTrackScriptsModel : BaseTrackScriptsModel
+    public class GoogleActionCheckoutStepInfo
     {
-        public CustomerModel Customer { get; set; }
+        public int step { get; set; }
     }
 }

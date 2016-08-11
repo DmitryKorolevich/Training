@@ -1,0 +1,79 @@
+﻿@using VC.Public.Models.Tracking
+
+@model HeadTrackScriptsModel
+
+<!-- mobile redirect -->
+<script src='https://cloud.moovweb.net/api/public/js_redirection/vital-choice/vital-choice-prod.js'></script>
+<!-- mobile redirect -->
+<meta name='og:latitude' content='48.892917'>
+<meta name='og:longitude' content='-122.614900'>
+<meta name='og:street-address' content='2460 Salashan Loop Road'>
+<meta name='og:locality' content='Ferndale'>
+<meta name='og:region' content='WA'>
+<meta name='og:postal-code' content='98248'>
+<meta name='og:country-name' content='USA'>
+<!-- crazyegg Code -->
+<script type="text/javascript">
+        setTimeout(function(){var a=document.createElement("script");
+        var b=document.getElementsByTagName("script")[0];
+        a.src=document.location.protocol+"//script.crazyegg.com/pages/scripts/0011/3310.js?"+Math.floor(new Date().getTime()/3600000);
+        a.async=true;a.type="text/javascript";b.parentNode.insertBefore(a,b)}, 1);
+</script>
+<!-- crazyegg Code -->
+<!-- Facebook Pixel Code -->
+<script>
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+        n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+        document,'script','https://connect.facebook.net/en_US/fbevents.js');
+
+        fbq('init', '1008041505923184');
+        fbq('track', "PageView");
+</script>
+<noscript>
+    <img height="1" width="1" style="display:none"
+         src="https://www.facebook.com/tr?id=1008041505923184&ev=PageView&noscript=1" />
+</noscript>
+<!-- End Facebook Pixel Code -->
+
+@if (Model.OrderCompleteStep)
+{
+    <script>
+        // Purchase
+        // Track purchases or checkout flow completions (ex. landing on "Thank You" or confirmation page)
+        fbq('track', 'Purchase', {value: '1.00', currency: 'USD'});
+    </script>
+
+    <!-- Google Website Optimizer Tracking Script -->
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['gwo._setAccount', 'UA-413082-8']);
+        _gaq.push(['gwo._trackPageview', '/3709809489/goal']);
+        (function () {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    <!-- End of Google Website Optimizer Tracking Script -->
+
+    @if (Model.MasterTmsUdo!=null)
+     {
+        <script type="text/javascript">
+            @Html.Raw(Model.MasterTmsUdo)
+        </script>
+        <script type="text/javascript">/*DO NOT ALTER *** New Site*/(function(e){var t="1286",n=document,r,i,s={http:"http://cdn.mplxtms.com/s/MasterTMS.min.js",https:"https://secure-cdn.mplxtms.com/s/MasterTMS.min.js"},o=s[/\w+/.exec(window.location.protocol)[0]];i=n.createElement("script"),i.type="text/javascript",i.async=!0,i.src=o+"#"+t,r=n.getElementsByTagName("script")[0],r.parentNode.insertBefore(i,r),i.readyState?i.onreadystatechange=function(){if(i.readyState==="loaded"||i.readyState==="complete")i.onreadystatechange=null}:i.onload=function(){try{e()}catch(t){}}})(function(){});</script>
+    }
+}
+
+<!--uplift -->
+<script>
+(function(u,p,l,i,f,t,o,b,j){u['UpLiftPlatformObject']=f;u[f]=u[f]||function(){
+(u[f].q=u[f].q||[]).push(arguments)},u[f].l=1*new Date();b=p.createElement(l),
+j=p.getElementsByTagName(l)[0];b.async=1;b.src=i+'?id='+t;j.parentNode.insertBefore(b,j);
+u[f]('create',t,o)})(window,document,'script',
+'//cdn.uplift-platform.com/a/up.js','up','UP-53783781-1','vitalchoice.com');
+up('send','pageview');
+</script>
+<!--uplift -->

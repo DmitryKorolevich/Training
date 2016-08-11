@@ -28,6 +28,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
 	    public int? SpecialIcon { get; set; }
 
 	    public string SubProductGroupName { get; set; }
+
+        public bool ShowDiscountMessage { get; set; }
         
         public IList<TtlRelatedYoutubeVideoModel> YoutubeVideos { get; set; }
 

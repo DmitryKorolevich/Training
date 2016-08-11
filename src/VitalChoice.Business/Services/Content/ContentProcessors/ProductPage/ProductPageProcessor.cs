@@ -138,6 +138,9 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                 await
                     PopulateProductPageTemplateModel(viewContext, rootAllCategory, lastProductReviews, reviewsCount, ratingsAverage, targetStatuses,
                     viewContext.Parameters.cat);
+
+            toReturn.ShowDiscountMessage = viewContext.User.Identity.IsAuthenticated && viewContext.User.IsInRole(IdentityConstants.WholesaleCustomer);
+
             return toReturn;
         }
 

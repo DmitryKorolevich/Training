@@ -716,7 +716,7 @@ angular.module('app.modules.order.services.orderEditService', [])
         {
             //show/hide autoship option
             uiScope.autoShipOrderOptionShow = (uiScope.order.SkuOrdereds.length == 1 || (uiScope.order.SkuOrdereds.length == 2 && !uiScope.order.SkuOrdereds[1].Code))
-                && uiScope.order.PromoSkus.length == 0 && uiScope.order.SkuOrdereds[0].AutoShipProduct;
+                && uiScope.order.SkuOrdereds[0].AutoShipProduct;
             if (uiScope.autoShipOrderOptionShow)
             {
                 var items = [];
