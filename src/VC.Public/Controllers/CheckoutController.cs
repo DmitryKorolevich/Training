@@ -116,12 +116,12 @@ namespace VC.Public.Controllers
 
         [HttpGet]
         [CustomerAuthorize]
-        public async Task<Result<bool>> CheckCreditCard(int idPaymentMethod)
+        public async Task<Result<bool>> CheckCreditCard(int id)
         {
             if (await CustomerLoggedIn())
             {
                 var internalId = GetInternalCustomerId();
-                return await CustomerService.GetCustomerCardExist(internalId, idPaymentMethod);
+                return await CustomerService.GetCustomerCardExist(internalId, id);
             }
             return new Result<bool>(false);
         }
