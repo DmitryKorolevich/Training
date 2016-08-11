@@ -212,7 +212,7 @@ namespace VitalChoice.Caching.Services
                 try
                 {
                     var queryParser = queryParserFactory.GetQueryParser<T>();
-                    _cache = new RelationalCache<T>(queryParser.InternalCache, (ICacheStateManager) stateManager, logger);
+                    _cache = new RelationalCache<T>(queryParser.InternalCache, (ICacheStateManager) stateManager, logger, context);
                     _queryData = queryParser.ParseQuery(expression, context.Model, out _reparsedExpression);
                     _initSuccess = true;
                 }

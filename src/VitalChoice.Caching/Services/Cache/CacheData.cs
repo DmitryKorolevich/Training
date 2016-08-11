@@ -122,14 +122,14 @@ namespace VitalChoice.Caching.Services.Cache
             return TryRemove(key);
         }
 
-        public CachedEntity Update(object entity)
+        public CachedEntity Update(object entity, object dbContext)
         {
-            return Update((T) entity);
+            return Update((T) entity, dbContext);
         }
 
-        public CachedEntity UpdateExist(object entity)
+        public CachedEntity UpdateExist(object entity, object dbContext)
         {
-            return UpdateExist((T) entity);
+            return UpdateExist((T) entity, dbContext);
         }
 
         public bool ItemExist(EntityKey key)
@@ -175,35 +175,36 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        public CachedEntity<T> Update(T entity)
+        public CachedEntity<T> Update(T entity, object dbContext)
         {
             if (entity == null)
                 return null;
-            return UpdateUnsafe((T) entity.DeepCloneItem(_relationInfo));
+            return UpdateUnsafe((T) entity.DeepCloneItem(_relationInfo), dbContext);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private CachedEntity<T> UpdateUnsafe(T entity)
+        private CachedEntity<T> UpdateUnsafe(T entity, object dbContext)
         {
             var pk = _entityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
-            return _mainCluster.AddOrUpdate(pk, entity, e => CreateNew(pk, e), (e, exist) => UpdateExist(pk, e, exist));
+            return _mainCluster.AddOrUpdate(pk, entity, e => CreateNew(pk, e, dbContext),
+                (e, exist) => UpdateExist(pk, e, exist, dbContext));
         }
 
-        public CachedEntity<T> UpdateExist(T entity)
+        public CachedEntity<T> UpdateExist(T entity, object dbContext)
         {
             if (entity == null)
                 return null;
-            return UpdateExistUnsafe(entity);
+            return UpdateExistUnsafe(entity, dbContext);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private CachedEntity<T> UpdateExistUnsafe(T entity)
+        private CachedEntity<T> UpdateExistUnsafe(T entity, object dbContext)
         {
             var pk = _entityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
-            return _mainCluster.Update(pk, entity, (e, exist) => UpdateExist(pk, e, exist));
+            return _mainCluster.Update(pk, entity, (e, exist) => UpdateExist(pk, e, exist, dbContext));
         }
 
-        public CachedEntity<T> UpdateKeepRelations(T entity, IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities)
+        public CachedEntity<T> UpdateKeepRelations(T entity, IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities, object dbContext)
         {
             if (entity == null)
                 return null;
@@ -214,32 +215,32 @@ namespace VitalChoice.Caching.Services.Cache
                 return null;
             using (cached.Lock())
             {
-                if (!UpdateEntityWithRelations(entity, trackedEntities, cached))
+                if (!UpdateEntityWithRelations(entity, trackedEntities, cached, dbContext))
                     return null;
-                SyncInternalCache(pk, entity, cached);
+                SyncInternalCache(pk, entity, cached, dbContext);
             }
             return cached;
         }
 
         private bool UpdateEntityWithRelations(T entity, IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities,
-            CachedEntity<T> cached)
+            CachedEntity<T> cached, object dbContext)
         {
             ICollection<RelationInfo> relationsToClone;
             if (!GetAllNormalizedAndTracked(entity, trackedEntities, out relationsToClone, cached))
             {
-                cached.NeedUpdate = true;
+                cached.SetNeedUpdate(true, dbContext);
                 return false;
             }
             if (cached.Entity != null)
             {
                 entity.UpdateCloneRelations(relationsToClone, cached.Entity);
                 entity.UpdateNonRelatedObjects(cached.Entity);
-                UpdateRelations(cached.Entity, relationsToClone);
+                UpdateRelations(cached.Entity, dbContext, relationsToClone);
             }
             else
             {
                 cached.Entity = (T) entity.DeepCloneItem(_relationInfo);
-                UpdateRelations(cached.Entity, _relationInfo.Relations);
+                UpdateRelations(cached.Entity, dbContext, _relationInfo.Relations);
             }
             cached.NeedUpdateRelated.Clear();
             return true;
@@ -355,11 +356,11 @@ namespace VitalChoice.Caching.Services.Cache
             return true;
         }
 
-        public bool Update(IEnumerable<T> entities)
+        public bool Update(IEnumerable<T> entities, object dbContext)
         {
             foreach (var entity in entities.Select(e => (T) e.DeepCloneItem(_relationInfo)))
             {
-                if (entity != null && UpdateUnsafe(entity) == null)
+                if (entity != null && UpdateUnsafe(entity, dbContext) == null)
                 {
                     return false;
                 }
@@ -367,22 +368,22 @@ namespace VitalChoice.Caching.Services.Cache
             return true;
         }
 
-        public bool UpdateExist(IEnumerable<T> entities)
+        public bool UpdateExist(IEnumerable<T> entities, object dbContext)
         {
                 foreach (var entity in entities)
                 {
-                    if (entity != null && UpdateExistUnsafe(entity) == null)
+                    if (entity != null && UpdateExistUnsafe(entity, dbContext) == null)
                         return false;
                 }
             return true;
         }
 
-        public bool UpdateAll(IEnumerable<T> entities)
+        public bool UpdateAll(IEnumerable<T> entities, object dbContext)
         {
             lock (this)
             {
                 Clear();
-                var result = Update(entities);
+                var result = Update(entities, dbContext);
                 FullCollection = true;
                 NeedUpdate = false;
                 return result;
@@ -424,7 +425,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         #region Helper Methods
 
-        private void UpdateExistsRelations(T newEntity)
+        private void UpdateExistsRelations(T newEntity, object dbContext)
         {
             if (newEntity == null)
                 return;
@@ -449,7 +450,7 @@ namespace VitalChoice.Caching.Services.Cache
                         var data = cache.GetCacheData(relation);
                         foreach (var item in obj as IEnumerable)
                         {
-                            data.UpdateExist(item);
+                            data.UpdateExist(item, dbContext);
                         }
                     }
                 }
@@ -459,13 +460,13 @@ namespace VitalChoice.Caching.Services.Cache
                     if (cache.GetCacheExist(relation))
                     {
                         var data = cache.GetCacheData(relation);
-                        data.UpdateExist(obj);
+                        data.UpdateExist(obj, dbContext);
                     }
                 }
             }
         }
 
-        private void UpdateRelations(T newEntity, IEnumerable<RelationInfo> relations = null)
+        private void UpdateRelations(T newEntity, object dbContext, IEnumerable<RelationInfo> relations = null)
         {
             if (newEntity == null)
                 return;
@@ -488,19 +489,19 @@ namespace VitalChoice.Caching.Services.Cache
                     var data = cache.GetCacheData(relation);
                     foreach (var item in obj as IEnumerable)
                     {
-                        data.Update(item);
+                        data.Update(item, dbContext);
                     }
                 }
                 else
                 {
                     var cache = _cacheFactory.GetCache(objType);
                     var data = cache.GetCacheData(relation);
-                    data.Update(obj);
+                    data.Update(obj, dbContext);
                 }
             }
         }
 
-        private CachedEntity<T> CreateNew(EntityKey pk, T entity)
+        private CachedEntity<T> CreateNew(EntityKey pk, T entity, object dbContext)
         {
             var indexValue = _entityInfo.CacheableIndex.GetIndexValue(entity);
             var conditional =
@@ -524,7 +525,7 @@ namespace VitalChoice.Caching.Services.Cache
                     UniqueIndex = indexValue,
                     NonUniqueIndexes = nonUnique
                 };
-                UpdateRelations(entity);
+                UpdateRelations(entity, dbContext);
                 if (indexValue != null)
                     _indexedCluster.AddOrUpdate(indexValue, cachedEntity);
                 foreach (var conditionalIndex in conditional)
@@ -551,18 +552,18 @@ namespace VitalChoice.Caching.Services.Cache
             return cachedEntity;
         }
 
-        private CachedEntity<T> UpdateExist(EntityKey pk, T entity, CachedEntity<T> exist)
+        private CachedEntity<T> UpdateExist(EntityKey pk, T entity, CachedEntity<T> exist, object dbContext)
         {
             using (exist.Lock())
             {
                 if (exist.NeedUpdate && exist.EntityUntyped != (object) entity)
                 {
-                    SyncInternalCache(pk, entity, exist);
+                    SyncInternalCache(pk, entity, exist, dbContext);
                     if (entity != null)
                     {
                         //if (!UpdateEntityWithRelations(entity, trackedEntities, exist))
                         //    return null;
-                        UpdateRelations(entity);
+                        UpdateRelations(entity, dbContext);
                         exist.Entity = entity;
                     }
                     else
@@ -575,7 +576,7 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        private void SyncInternalCache(EntityKey pk, T entity, CachedEntity<T> cachedEntity)
+        private void SyncInternalCache(EntityKey pk, T entity, CachedEntity<T> cachedEntity, object dbContext)
         {
             var indexValue = _entityInfo.CacheableIndex.GetIndexValue(entity);
             var conditional =
@@ -649,7 +650,7 @@ namespace VitalChoice.Caching.Services.Cache
                 cachedEntity.NonUniqueIndexes = nonUnique;
                 cachedEntity.UniqueIndex = indexValue;
                 cachedEntity.ConditionalIndexes = conditional;
-                cachedEntity.NeedUpdate = false;
+                cachedEntity.SetNeedUpdate(false, dbContext);
             }
         }
 

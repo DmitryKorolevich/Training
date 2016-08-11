@@ -134,18 +134,24 @@ namespace VitalChoice.Business.Services.Orders
 
         public Task<bool> UpdateOrderPaymentMethodAsync(OrderCardData orderPaymentMethod)
         {
-            if (!InitSuccess)
-            {
-                return Task.FromResult(true);
-            }
-            if (!ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), orderPaymentMethod.CardNumber, "CardNumber") ||
+            if (
+                !ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), orderPaymentMethod.CardNumber,
+                    "CardNumber") ||
                 orderPaymentMethod.IdCustomerPaymentMethod > 0 || orderPaymentMethod.IdOrderSource > 0)
+            {
+                if (!InitSuccess)
+                {
+                    return Task.FromResult(true);
+                }
                 return
-                    SendCommand<bool>(new ServiceBusCommandWithResult(Guid.NewGuid(), OrderExportServiceCommandConstants.UpdateOrderPayment,
+                    SendCommand<bool>(new ServiceBusCommandWithResult(Guid.NewGuid(),
+                        OrderExportServiceCommandConstants.UpdateOrderPayment,
                         ServerHostName, LocalHostName)
                     {
                         Data = new ServiceBusCommandData(orderPaymentMethod)
                     });
+            }
+
             return Task.FromResult(true);
         }
 

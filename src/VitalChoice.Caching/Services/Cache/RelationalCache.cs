@@ -16,11 +16,13 @@ namespace VitalChoice.Caching.Services.Cache
         private readonly IInternalCache<T> _internalCache;
         private readonly ICacheStateManager _stateManager;
         private readonly ILogger _logger;
+        private readonly object _context;
 
-        public RelationalCache(IInternalCache<T> internalCache, ICacheStateManager stateManager, ILogger logger)
+        public RelationalCache(IInternalCache<T> internalCache, ICacheStateManager stateManager, ILogger logger, object context)
         {
             _stateManager = stateManager;
             _logger = logger;
+            _context = context;
             _internalCache = internalCache;
         }
 
@@ -139,10 +141,10 @@ namespace VitalChoice.Caching.Services.Cache
 
             if (fullCollection)
             {
-                return _internalCache.UpdateAll(entities, query.RelationInfo);
+                return _internalCache.UpdateAll(entities, query.RelationInfo, _context);
             }
 
-            return _internalCache.Update(entities, query.RelationInfo);
+            return _internalCache.Update(entities, query.RelationInfo, _context);
         }
 
         public bool Update(QueryData<T> queryData, T entity)
@@ -171,7 +173,7 @@ namespace VitalChoice.Caching.Services.Cache
                     $"<Cache Update> can't update cache, preconditions not met: {typeof(T)}\r\nExpression:\r\n{queryData.WhereExpression?.Expression.AsString()}");
                 return false;
             }
-            return _internalCache.Update(entity, queryData.RelationInfo);
+            return _internalCache.Update(entity, queryData.RelationInfo, _context);
         }
 
         private bool TryConditionalIndexes(QueryData<T> query,

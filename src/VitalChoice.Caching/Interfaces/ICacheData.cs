@@ -13,8 +13,8 @@ namespace VitalChoice.Caching.Interfaces
         CachedEntity GetUntyped(EntityKey pk);
         IEnumerable<CachedEntity> GetAllUntyped();
         CachedEntity TryRemoveUntyped(EntityKey key);
-        CachedEntity Update(object entity);
-        CachedEntity UpdateExist(object entity);
+        CachedEntity Update(object entity, object dbContext);
+        CachedEntity UpdateExist(object entity, object dbContext);
         bool ItemExist(EntityKey key);
         bool GetHasRelation(string name);
         bool FullCollection { get; }
@@ -32,12 +32,12 @@ namespace VitalChoice.Caching.Interfaces
         CachedEntity<T> Get(EntityConditionalIndexInfo conditionalIndex, EntityIndex index);
         ICollection<CachedEntity<T>> GetAll();
         CachedEntity<T> TryRemove(EntityKey key);
-        CachedEntity<T> Update(T entity);
-        CachedEntity<T> UpdateExist(T entity);
-        CachedEntity<T> UpdateKeepRelations(T entity, IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities);
-        bool Update(IEnumerable<T> entity);
-        bool UpdateExist(IEnumerable<T> entities);
-        bool UpdateAll(IEnumerable<T> entity);
+        CachedEntity<T> Update(T entity, object dbContext);
+        CachedEntity<T> UpdateExist(T entity, object dbContext);
+        CachedEntity<T> UpdateKeepRelations(T entity, IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities, object dbContext);
+        bool Update(IEnumerable<T> entity, object dbContext);
+        bool UpdateExist(IEnumerable<T> entities, object dbContext);
+        bool UpdateAll(IEnumerable<T> entity, object dbContext);
         void SetNull(EntityKey key);
         void SetNull(IEnumerable<EntityKey> keys);
     }

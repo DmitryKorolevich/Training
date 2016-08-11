@@ -81,16 +81,16 @@ namespace VitalChoice.Caching.Services
                         {
                             case SyncType.Update:
                                 op.PrimaryKey = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
-                                internalCache.MarkForUpdate(op.PrimaryKey);
+                                internalCache.MarkForUpdate(op.PrimaryKey, null);
                                 break;
                             case SyncType.Delete:
                                 op.PrimaryKey = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
-                                internalCache.MarkForUpdate(op.PrimaryKey);
+                                internalCache.MarkForUpdate(op.PrimaryKey, null);
                                 break;
                             case SyncType.Add:
                                 op.PrimaryKey = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
                                 object entity = KeyStorage.GetEntity(type, op.PrimaryKey, ScopeContainer.ScopeFactory);
-                                internalCache.MarkForAdd(entity);
+                                internalCache.MarkForAdd(entity, null);
                                 break;
                         }
                     }
@@ -113,7 +113,7 @@ namespace VitalChoice.Caching.Services
                                 if (op.Cache.ItemExistWithoutRelations(op.PrimaryKey))
                                 {
                                     var entity = KeyStorage.GetEntity(op.EntityType, op.PrimaryKey, ScopeContainer.ScopeFactory);
-                                    if (!op.Cache.Update(entity, (DbContext) null))
+                                    if (!op.Cache.Update(entity, (DbContext) null, null))
                                     {
                                         //Logger.LogWarning($"Cannot update <{op.EntityType}>{pk}");
                                     }
@@ -123,7 +123,7 @@ namespace VitalChoice.Caching.Services
                                 if (op.Cache.ItemExistWithoutRelations(op.PrimaryKey))
                                 {
                                     var entity = KeyStorage.GetEntity(op.EntityType, op.PrimaryKey, ScopeContainer.ScopeFactory);
-                                    if (!op.Cache.Update(entity, (DbContext) null))
+                                    if (!op.Cache.Update(entity, (DbContext) null, null))
                                     {
                                         //Logger.LogWarning($"Cannot update <{op.EntityType}>{pk}");
                                     }

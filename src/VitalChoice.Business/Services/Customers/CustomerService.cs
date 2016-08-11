@@ -341,8 +341,8 @@ namespace VitalChoice.Business.Services.Customers
                 await
                     _customerPaymentMethodRepositoryAsync.Query(
                         p => p.Id == idPaymentMethod && p.IdCustomer == idCustomer && p.IdObjectType == (int) PaymentMethodType.CreditCard)
-                        .SelectFirstOrDefaultAsync(false);
-            if (paymentMethod != null)
+                        .SelectAnyAsync();
+            if (paymentMethod)
             {
                 return await _encryptedOrderExportService.CardExistAsync(new CustomerExportInfo
                 {
@@ -350,7 +350,7 @@ namespace VitalChoice.Business.Services.Customers
                     IdPaymentMethod = idPaymentMethod
                 });
             }
-            return true;
+            return false;
         }
 
         public async Task<bool> GetCustomerHasAffiliateOrders(int idCustomer, int? excludeIdOrder = null)

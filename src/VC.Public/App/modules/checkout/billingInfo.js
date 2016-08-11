@@ -70,6 +70,7 @@ function checkCreditCard(cardId) {
             }
             else {
                 if ($(".validation-summary-errors").length > 0) {
+                    $(".validation-summary-errors>ul li:contains(Please enter all credit card)").remove();
                     $(".validation-summary-errors>ul").prepend('<li>For security reasons. Please enter all credit card details for this card or please select a new one to continue.</li>');
                 }
                 else {
@@ -104,6 +105,11 @@ function controlCardChange() {
         if ($(".validation-summary-errors>ul li").length == 0) {
             $(".validation-summary-errors").remove();
         }
+    }
+    else if ($(".validation-summary-errors>ul li:contains(Please enter all credit card)").length === 0)
+    {
+        var cardId = $("#ddCreditCardsSelection").val() === undefined ? $("#hdCreditCard").val() : $("#ddCreditCardsSelection").val();
+        checkCreditCard(cardId);
     }
 }
 

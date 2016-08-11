@@ -43,6 +43,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
+using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
@@ -69,6 +70,7 @@ namespace VC.Public.Controllers
         private readonly INotificationService _notificationService;
         private readonly ILogger _logger;
         private readonly ICountryNameCodeResolver _countryNameCodeResolver;
+        private readonly IEncryptedOrderExportService _exportService;
 
         public CheckoutController(IStorefrontUserService storefrontUserService,
             ICustomerService customerService,
@@ -84,7 +86,7 @@ namespace VC.Public.Controllers
             ITransactionAccessor<EcommerceContext> transactionAccessor,
             IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider,
             ExtendedUserManager userManager, ICountryNameCodeResolver countryNameCodeResolver, ReferenceData referenceData,
-            AppSettings appSettings)
+            AppSettings appSettings, IEncryptedOrderExportService exportService)
             : base(
                 customerService, referenceData, authorizationService, checkoutService, orderService,
                 skuMapper, productMapper, pageResultService, settingService, userManager, appSettings)
@@ -97,6 +99,7 @@ namespace VC.Public.Controllers
             _brontoService = brontoService;
             _transactionAccessor = transactionAccessor;
             _countryNameCodeResolver = countryNameCodeResolver;
+            _exportService = exportService;
             _affiliateService = affiliateService;
             _notificationService = notificationService;
             _logger = loggerProvider.CreateLogger<CheckoutController>();
@@ -195,7 +198,7 @@ namespace VC.Public.Controllers
 
 	            var firstCreditCard = creditCards.FirstOrDefault(x => (bool?) x.SafeData.Default == true) ??
 	                                  creditCards.FirstOrDefault();
-
+                
 	            if (firstCreditCard != null)
                 {
                     if (cart.Order.PaymentMethod?.Address == null || cart.Order.PaymentMethod.Id == 0)
@@ -315,12 +318,34 @@ namespace VC.Public.Controllers
                         }
                         await _addressConverter.UpdateObjectAsync(model, cart.Order.PaymentMethod.Address, (int) AddressType.Billing);
                     }
-                    if (ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), (string)cart.Order.PaymentMethod.Data.CardNumber,
+                    if (ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic),
+                        (string) cart.Order.PaymentMethod.Data.CardNumber,
                         "CardNumber"))
                     {
+                        if (!await CustomerService.GetCustomerCardExist(cart.Order.Customer.Id, model.Id))
+                        {
+                            ModelState.AddModelError(string.Empty,
+                                "For security reasons. Please enter all credit card details for this card or please select a new one to continue.");
+                            return View(model);
+                        }
                         //BUG: SECURITY!!! do not use real ID here, look to rework synthetic generated id with matching from customer profile
                         //BUG: The issue allows to replace payment ID and use card data from different customer (this usage would be hidden from admin UI)
                         cart.Order.PaymentMethod.IdCustomerPaymentMethod = model.Id;
+                    }
+                    else
+                    {
+                        if (!await CustomerService.GetCustomerCardExist(cart.Order.Customer.Id, model.Id))
+                        {
+                            await _exportService.UpdateCustomerPaymentMethodsAsync(new List<CustomerCardData>
+                            {
+                                new CustomerCardData
+                                {
+                                    CardNumber = (string) cart.Order.PaymentMethod.Data.CardNumber,
+                                    IdCustomer = cart.Order.Customer.Id,
+                                    IdPaymentMethod = model.Id
+                                }
+                            });
+                        }
                     }
                     if (await CheckoutService.UpdateCart(cart))
                     {

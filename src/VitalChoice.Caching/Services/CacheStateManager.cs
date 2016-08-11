@@ -34,10 +34,12 @@ namespace VitalChoice.Caching.Services
         protected Dictionary<TrackedEntityKey, object> TemporaryContextualCacheDatas;
 
         public CacheStateManager(IInternalEntityEntryFactory factory, IInternalEntityEntrySubscriber subscriber,
-            IInternalEntityEntryNotifier notifier, IValueGenerationManager valueGeneration, IModel model, IDatabase database,
+            IInternalEntityEntryNotifier notifier, IValueGenerationManager valueGeneration, IModel model,
+            IDatabase database,
             IInternalEntityCacheFactory cacheFactory, ICacheSyncProvider cacheSyncProvider, ILoggerFactory loggerFactory,
             IConcurrencyDetector concurrencyDetector, ICurrentDbContext currentDbContext)
-            : base(factory, subscriber, notifier, valueGeneration, model, database, concurrencyDetector, currentDbContext)
+            : base(
+                factory, subscriber, notifier, valueGeneration, model, database, concurrencyDetector, currentDbContext)
         {
             CacheFactory = cacheFactory;
             CacheSyncProvider = cacheSyncProvider;
@@ -108,7 +110,7 @@ namespace VitalChoice.Caching.Services
                 {
                     if (DataContext.InTransaction)
                     {
-                        UpdateCache(entriesToSave);
+                        MarkUpdateCache(entriesToSave);
                         DataContext.TransactionCommit += () => CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
                         DataContext.TransactionRollback += () => UpdateRollback(entriesToSave);
                     }
@@ -136,7 +138,7 @@ namespace VitalChoice.Caching.Services
                 {
                     if (DataContext.InTransaction)
                     {
-                        UpdateCache(entriesToSave);
+                        MarkUpdateCache(entriesToSave);
                         DataContext.TransactionCommit += () => CacheSyncProvider.SendChanges(UpdateCache(entriesToSave));
                         DataContext.TransactionRollback += () => UpdateRollback(entriesToSave);
                     }
@@ -178,7 +180,7 @@ namespace VitalChoice.Caching.Services
 
         private List<ImmutableEntryState> GetEntriesToSave()
         {
-            return (List<ImmutableEntryState>)DataContext.Tag;
+            return (List<ImmutableEntryState>) DataContext.Tag;
         }
 
         private void UpdateRollback(ICollection<ImmutableEntryState> entriesToSave)
@@ -195,7 +197,7 @@ namespace VitalChoice.Caching.Services
                             primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
                             if (primaryKey.IsValid)
                             {
-                                cache.MarkForUpdate(primaryKey);
+                                cache.MarkForUpdate(primaryKey, DataContext);
                             }
                             break;
                         case EntityState.Deleted:
@@ -203,14 +205,14 @@ namespace VitalChoice.Caching.Services
                             if (primaryKey.IsValid)
                             {
                                 var entity = entry.Entity;
-                                cache.MarkForAdd(entity);
+                                cache.MarkForAdd(entity, DataContext);
                             }
                             break;
                         case EntityState.Added:
                             primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
                             if (primaryKey.IsValid)
                             {
-                                cache.MarkForUpdate(primaryKey);
+                                cache.MarkForUpdate(primaryKey, DataContext);
                             }
                             break;
                     }
@@ -261,7 +263,10 @@ namespace VitalChoice.Caching.Services
                     //    scope.AddScopeData($"{group.Key.FullName}[{op.Entry.State}]{op.PrimaryKey}");
                     //}
                 }
-                foreach (var opPair in toMarkForAdd.SimpleJoin(cache.MarkForAdd(toMarkForAdd.Select(op => op.Entry.Entity).ToArray())))
+                foreach (
+                    var opPair in
+                        toMarkForAdd.SimpleJoin(cache.MarkForAdd(toMarkForAdd.Select(op => op.Entry.Entity).ToArray(),
+                            DataContext)))
                 {
                     var op = opPair.Key;
                     op.PrimaryKey = opPair.Value;
@@ -275,7 +280,9 @@ namespace VitalChoice.Caching.Services
                         });
                     }
                 }
-                foreach (var opPair in toUpdate.SimpleJoin(cache.MarkForUpdate(toUpdate.Select(op => op.Entry.Entity))))
+                foreach (
+                    var opPair in
+                        toUpdate.SimpleJoin(cache.MarkForUpdate(toUpdate.Select(op => op.Entry.Entity), DataContext)))
                 {
                     var op = opPair.Key;
                     op.PrimaryKey = opPair.Value;
@@ -289,7 +296,9 @@ namespace VitalChoice.Caching.Services
                         });
                     }
                 }
-                foreach (var opPair in toDelete.SimpleJoin(cache.MarkForUpdate(toDelete.Select(op => op.Entry.Entity))))
+                foreach (
+                    var opPair in
+                        toDelete.SimpleJoin(cache.MarkForUpdate(toDelete.Select(op => op.Entry.Entity), DataContext)))
                 {
                     var op = opPair.Key;
                     op.PrimaryKey = opPair.Value;
@@ -315,13 +324,13 @@ namespace VitalChoice.Caching.Services
                         case EntityState.Added:
                             if (op.PrimaryKey.IsValid)
                             {
-                                op.Cache.Update(op.Entry.Entity, dbContext);
+                                op.Cache.Update(op.Entry.Entity, dbContext, DataContext);
                             }
                             break;
                         case EntityState.Modified:
                             if (op.PrimaryKey.IsValid)
                             {
-                                op.Cache.Update(op.Entry.Entity, dbContext);
+                                op.Cache.Update(op.Entry.Entity, dbContext, DataContext);
                             }
                             break;
                         case EntityState.Deleted:
@@ -334,6 +343,65 @@ namespace VitalChoice.Caching.Services
                 }
             }
             return syncOperations;
+        }
+
+        private void MarkUpdateCache(IEnumerable<ImmutableEntryState> entriesToSave)
+        {
+            var entryGroups = entriesToSave.Where(e => e.EntityType != null).Select(e => new SyncOp
+            {
+                Entry = e
+            }).GroupBy(e => e.Entry.EntityType).ToArray();
+
+            //Update in two stages, first mark all for update/add
+            foreach (var group in entryGroups)
+            {
+                var cache = CacheFactory.GetCache(group.Key);
+                var toMarkForAdd = new List<SyncOp>();
+                var toUpdate = new List<SyncOp>();
+                var toDelete = new List<SyncOp>();
+                foreach (var op in group)
+                {
+                    op.Cache = cache;
+                    switch (op.Entry.State)
+                    {
+                        case EntityState.Modified:
+                            toUpdate.Add(op);
+                            break;
+                        case EntityState.Deleted:
+                            toDelete.Add(op);
+                            break;
+                        case EntityState.Added:
+                            toMarkForAdd.Add(op);
+                            break;
+                    }
+                    //if (op.Entry.State != EntityState.Detached && op.Entry.State != EntityState.Unchanged)
+                    //{
+                    //    scope.AddScopeData($"{group.Key.FullName}[{op.Entry.State}]{op.PrimaryKey}");
+                    //}
+                }
+                foreach (
+                    var opPair in
+                        toMarkForAdd.SimpleJoin(cache.MarkForAdd(toMarkForAdd.Select(op => op.Entry.Entity).ToArray(),
+                            DataContext)))
+                {
+                    var op = opPair.Key;
+                    op.PrimaryKey = opPair.Value;
+                }
+                foreach (
+                    var opPair in
+                        toUpdate.SimpleJoin(cache.MarkForUpdate(toUpdate.Select(op => op.Entry.Entity), DataContext)))
+                {
+                    var op = opPair.Key;
+                    op.PrimaryKey = opPair.Value;
+                }
+                foreach (
+                    var opPair in
+                        toDelete.SimpleJoin(cache.MarkForUpdate(toDelete.Select(op => op.Entry.Entity), DataContext)))
+                {
+                    var op = opPair.Key;
+                    op.PrimaryKey = opPair.Value;
+                }
+            }
         }
     }
 }

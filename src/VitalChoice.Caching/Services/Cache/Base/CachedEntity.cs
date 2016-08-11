@@ -10,8 +10,9 @@ namespace VitalChoice.Caching.Services.Cache.Base
     public interface ICachedEntity
     {
         DateTime CreatedDate { get; }
-        bool NeedUpdate { get; set; }
+        bool NeedUpdate { get; }
         object EntityUntyped { get; }
+        bool NeedUpdateEntity { get; }
     }
 
     public interface ICachedEntity<T>
@@ -24,6 +25,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
 
         private readonly ThreadLocal<LockStatement> _localStatement;
+        private volatile object _dbContextRequestedUpdate;
 
         protected CachedEntity()
         {
@@ -43,10 +45,22 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
         public HashSet<string> NeedUpdateRelated { get; } = new HashSet<string>();
 
-        public virtual bool NeedUpdate
+        public virtual bool NeedUpdate => _needUpdate;
+
+        public virtual void SetNeedUpdate(bool needUpdate, object dbContext)
         {
-            get { return _needUpdate; }
-            set { _needUpdate = value; }
+            if (needUpdate)
+            {
+                _dbContextRequestedUpdate = dbContext;
+            }
+            else
+            {
+                if (_dbContextRequestedUpdate == dbContext)
+                {
+                    return;
+                }
+            }
+            _needUpdate = needUpdate;
         }
 
         public bool NeedUpdateEntity => _needUpdate;
@@ -112,10 +126,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
         }
 
         public override bool NeedUpdate
-        {
-            get { return _cacheData.FullCollection && _cacheData.NeedUpdate || base.NeedUpdate || NeedUpdateRelated.Count > 0; }
-            set { base.NeedUpdate = value; }
-        }
+            => _cacheData.FullCollection && _cacheData.NeedUpdate || base.NeedUpdate || NeedUpdateRelated.Count > 0;
 
         public override object EntityUntyped => _value;
 
