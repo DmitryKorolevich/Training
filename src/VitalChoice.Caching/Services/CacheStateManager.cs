@@ -197,7 +197,7 @@ namespace VitalChoice.Caching.Services
                             primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
                             if (primaryKey.IsValid)
                             {
-                                cache.MarkForUpdate(primaryKey, DataContext);
+                                cache.MarkForUpdateByPrimaryKey(primaryKey, DataContext);
                             }
                             break;
                         case EntityState.Deleted:
@@ -212,7 +212,7 @@ namespace VitalChoice.Caching.Services
                             primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
                             if (primaryKey.IsValid)
                             {
-                                cache.MarkForUpdate(primaryKey, DataContext);
+                                cache.MarkForUpdateByPrimaryKey(primaryKey, DataContext);
                             }
                             break;
                     }

@@ -260,14 +260,14 @@ namespace VitalChoice.Caching.Services.Cache
         public EntityKey MarkForUpdate(T entity, object dbContext)
         {
             var pk = EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
-            MarkForUpdate(pk, dbContext);
+            MarkForUpdateByPrimaryKey(pk, dbContext, null);
             return pk;
         }
 
         public ICollection<EntityKey> MarkForUpdate(IEnumerable<T> entities, object dbContext)
         {
             var pks = new HashSet<EntityKey>(entities.Select(e => EntityInfo.PrimaryKey.GetPrimaryKeyValue(e)));
-            MarkForUpdate(pks, dbContext);
+            MarkForUpdateByPrimaryKey(pks, dbContext, null);
             return pks;
         }
 
@@ -347,11 +347,11 @@ namespace VitalChoice.Caching.Services.Cache
         public ICollection<EntityKey> MarkForUpdate(IEnumerable<object> entities, object dbContext)
         {
             var pks = entities.Select(e => EntityInfo.PrimaryKey.GetPrimaryKeyValue(e)).ToList();
-            MarkForUpdate(pks, dbContext);
+            MarkForUpdateByPrimaryKey(pks, dbContext, null);
             return pks;
         }
 
-        public void MarkForUpdate(EntityKey pk, object dbContext, string hasRelation)
+        public void MarkForUpdateByPrimaryKey(EntityKey pk, object dbContext, string hasRelation)
         {
             if (pk == null)
                 return;
@@ -363,7 +363,7 @@ namespace VitalChoice.Caching.Services.Cache
             MarkForUpdateInternal(pk, cacheDatas, hasRelation, dbContext);
         }
 
-        public void MarkForUpdate(ICollection<EntityKey> pks, object dbContext, string hasRelation)
+        public void MarkForUpdateByPrimaryKey(ICollection<EntityKey> pks, object dbContext, string hasRelation)
         {
             if (pks == null)
                 return;
@@ -608,7 +608,7 @@ namespace VitalChoice.Caching.Services.Cache
                                     cachedItems.Where(c => !c.NeedUpdateEntity)
                                         .Select(cached => cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(cached.EntityUntyped))
                                         .ToArray();
-                                cache.MarkForUpdate(itemsList, dependentType.Value.Name);
+                                cache.MarkForUpdateByPrimaryKey(itemsList, dependentType.Value.Name);
                             }
                             finally
                             {
@@ -629,7 +629,7 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 var cache = CacheFactory.GetCache(keyGroup.Key.DependentType);
                 var itemPks = keyGroup.Value.Select(fk => keyGroup.Key.KeyMapping.MapForeignToPrincipal(fk));
-                cache.MarkForUpdate(itemPks.ToArray(), dbContext, keyGroup.Key.Name);
+                cache.MarkForUpdateByPrimaryKey(itemPks.ToArray(), dbContext, keyGroup.Key.Name);
             }
         }
 
@@ -644,7 +644,7 @@ namespace VitalChoice.Caching.Services.Cache
                 {
                     var cache = CacheFactory.GetCache(foreignKey.Key.DependentType);
                     var itemPk = foreignKey.Key.KeyMapping.MapForeignToPrincipal(foreignKey.Value);
-                    cache.MarkForUpdate(itemPk, dbContext, foreignKey.Key.Name);
+                    cache.MarkForUpdateByPrimaryKey(itemPk, dbContext, foreignKey.Key.Name);
                 }
             }
         }

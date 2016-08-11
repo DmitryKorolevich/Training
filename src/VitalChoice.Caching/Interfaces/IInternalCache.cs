@@ -18,8 +18,8 @@ namespace VitalChoice.Caching.Interfaces
         ICollection<EntityKey> MarkForUpdate(IEnumerable<object> entities, object dbContext);
         void SetNull(IEnumerable<EntityKey> keys, RelationInfo relationInfo);
         void SetNull(EntityKey key, RelationInfo relationInfo);
-        void MarkForUpdate(EntityKey pk, object dbContext, string hasRelation = null);
-        void MarkForUpdate(ICollection<EntityKey> pks, object dbContext, string hasRelation = null);
+        void MarkForUpdateByPrimaryKey(EntityKey pk, object dbContext, string hasRelation = null);
+        void MarkForUpdateByPrimaryKey(ICollection<EntityKey> pks, object dbContext, string hasRelation = null);
         EntityKey MarkForAdd(object entity, object dbContext);
         ICollection<EntityKey> MarkForAdd(ICollection<object> entities, object dbContext);
         bool TryRemove(object entity);

@@ -84,7 +84,7 @@ namespace VitalChoice.Caching.GC
                                         using (cached.Lock())
                                         {
                                             var pk = internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(cached.EntityUntyped);
-                                            internalCache.MarkForUpdate(pk, null);
+                                            internalCache.MarkForUpdateByPrimaryKey(pk, null);
                                         }
                                     }
                                     cache.Clear();
@@ -98,7 +98,7 @@ namespace VitalChoice.Caching.GC
                                         using (cached.Lock())
                                         {
                                             var pk = internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(cached.EntityUntyped);
-                                            internalCache.MarkForUpdate(pk, null);
+                                            internalCache.MarkForUpdateByPrimaryKey(pk, null);
                                             cache.TryRemoveUntyped(
                                                 internalCache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(cached.EntityUntyped));
                                         }

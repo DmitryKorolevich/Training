@@ -81,11 +81,11 @@ namespace VitalChoice.Caching.Services
                         {
                             case SyncType.Update:
                                 op.PrimaryKey = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
-                                internalCache.MarkForUpdate(op.PrimaryKey, null);
+                                internalCache.MarkForUpdateByPrimaryKey(op.PrimaryKey, null);
                                 break;
                             case SyncType.Delete:
                                 op.PrimaryKey = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
-                                internalCache.MarkForUpdate(op.PrimaryKey, null);
+                                internalCache.MarkForUpdateByPrimaryKey(op.PrimaryKey, null);
                                 break;
                             case SyncType.Add:
                                 op.PrimaryKey = op.SyncOperation.Key.ToPrimaryKey(pkInfo);

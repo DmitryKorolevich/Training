@@ -493,29 +493,6 @@ namespace VitalChoice.ExportService.Services
             }
         }
 
-        private static void ParseDiscountInfo<T>(BaseOrderContext<T> context, VeraCoreExportOrder exportOrder,
-            ExportSide exportSide) 
-            where T : ItemOrdered
-        {
-            if (context.DiscountTotal > 0)
-            {
-                switch (exportSide)
-                {
-                    case ExportSide.All:
-                        exportOrder.Money.DiscountAmount = context.DiscountTotal;
-                        break;
-                    case ExportSide.Perishable:
-                        exportOrder.Money.DiscountAmount = context.BaseSplitInfo.PerishableDiscount;
-                        break;
-                    case ExportSide.NonPerishable:
-                        exportOrder.Money.DiscountAmount = context.BaseSplitInfo.NonPerishableDiscount;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(exportSide), exportSide, null);
-                }
-            }
-        }
-
         private static void ParseProductInfo(OrderRefundDynamic refund, VeraCoreExportOrder exportOrder)
         {
             exportOrder.Offers = new[]
@@ -560,6 +537,33 @@ namespace VitalChoice.ExportService.Services
                     {
                         offers.Add(CreateGcOffer(context.GiftCertificatesSubtotal, ref lineIndex));
                     }
+                    if (context.DiscountTotal > 0)
+                    {
+                        offers.Add(new OfferOrdered
+                        {
+                            OrderShipToKey = new OrderShipToKey
+                            {
+                                Key = "1"
+                            },
+                            LineNumber = lineIndex,
+                            Quantity = 1,
+                            UnitPrice = -context.DiscountTotal,
+                            ProductDetails = new[]
+                            {
+                                new OrderProductDetail
+                                {
+                                    PartNumber = "0"
+                                }
+                            },
+                            Offer = new OfferID
+                            {
+                                Header = new OfferIDHeader
+                                {
+                                    ID = AmountDiscountSku
+                                }
+                            }
+                        });
+                    }
                     break;
                 case ExportSide.Perishable:
                     offers.AddRange(
@@ -567,6 +571,33 @@ namespace VitalChoice.ExportService.Services
                     if (context.SplitInfo.PerishableGiftCertificateAmount < 0)
                     {
                         offers.Add(CreateGcOffer(context.SplitInfo.PerishableGiftCertificateAmount, ref lineIndex));
+                    }
+                    if (context.DiscountTotal > 0)
+                    {
+                        offers.Add(new OfferOrdered
+                        {
+                            OrderShipToKey = new OrderShipToKey
+                            {
+                                Key = "1"
+                            },
+                            LineNumber = lineIndex,
+                            Quantity = 1,
+                            UnitPrice = -context.SplitInfo.PerishableDiscount,
+                            ProductDetails = new[]
+                            {
+                                new OrderProductDetail
+                                {
+                                    PartNumber = "0"
+                                }
+                            },
+                            Offer = new OfferID
+                            {
+                                Header = new OfferIDHeader
+                                {
+                                    ID = AmountDiscountSku
+                                }
+                            }
+                        });
                     }
                     break;
                 case ExportSide.NonPerishable:
@@ -576,37 +607,36 @@ namespace VitalChoice.ExportService.Services
                     {
                         offers.Add(CreateGcOffer(context.SplitInfo.NonPerishableGiftCertificateAmount, ref lineIndex));
                     }
+                    if (context.DiscountTotal > 0)
+                    {
+                        offers.Add(new OfferOrdered
+                        {
+                            OrderShipToKey = new OrderShipToKey
+                            {
+                                Key = "1"
+                            },
+                            LineNumber = lineIndex,
+                            Quantity = 1,
+                            UnitPrice = -context.SplitInfo.NonPerishableDiscount,
+                            ProductDetails = new[]
+                            {
+                                new OrderProductDetail
+                                {
+                                    PartNumber = "0"
+                                }
+                            },
+                            Offer = new OfferID
+                            {
+                                Header = new OfferIDHeader
+                                {
+                                    ID = AmountDiscountSku
+                                }
+                            }
+                        });
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(exportSide), exportSide, null);
-            }
-            if (exportOrder.Money.DiscountAmount > 0)
-            {
-                offers.Add(new OfferOrdered
-                {
-                    OrderShipToKey = new OrderShipToKey
-                    {
-                        Key = "1"
-                    },
-                    LineNumber = lineIndex,
-                    Quantity = 1,
-                    UnitPrice = -exportOrder.Money.DiscountAmount,
-                    ProductDetails = new[]
-                    {
-                        new OrderProductDetail
-                        {
-                            PartNumber = "0"
-                        }
-                    },
-                    Offer = new OfferID
-                    {
-                        Header = new OfferIDHeader
-                        {
-                            ID = AmountDiscountSku
-                        }
-                    }
-                });
-                exportOrder.Money.DiscountAmount = null;
             }
             exportOrder.Offers = offers.ToArray();
         }
@@ -703,7 +733,6 @@ namespace VitalChoice.ExportService.Services
                 }
             };
             ParseGeneralInfo(order, result, exportSide);
-            ParseDiscountInfo(context, result, exportSide);
             ParsePaymentInfo(order, context, result, exportSide);
             await ParseBillingInfo(order.PaymentMethod, order.Customer, result);
             await ParseShippingInfo(order, context, result, exportSide);
