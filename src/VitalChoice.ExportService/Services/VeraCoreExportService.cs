@@ -31,8 +31,9 @@ namespace VitalChoice.ExportService.Services
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _paymentMapper;
         private readonly VeraCoreOrderSoapClient _client;
         private const string OacDescription = "On Approved Credit";
-        private const string MarketingDescription = "Marketing-Donation";
-        private const string VcWellnessDescription = "Marketing-Promo";
+        private const string MarketingDonationDescription = "Marketing-Donation";
+        private const string MarketingPromoDescription = "Marketing-Promo";
+        private const string VcWellnessDescription = "VC Wellness";
         //private const string ManualCcDescription = "Manual Credit Card Process";
         private const string CheckDescription = "Check Payment";
         private const string NoChargeDescription = "No Charge";
@@ -401,7 +402,8 @@ namespace VitalChoice.ExportService.Services
             return giftMessage;
         }
 
-        private void ParsePaymentInfo(OrderDynamic order, OrderDataContext context, VeraCoreExportOrder exportOrder, ExportSide exportSide)
+        private void ParsePaymentInfo(OrderDynamic order, OrderDataContext context, VeraCoreExportOrder exportOrder,
+            ExportSide exportSide)
         {
             decimal chargeAmount;
             switch (exportSide)
@@ -409,8 +411,8 @@ namespace VitalChoice.ExportService.Services
                 case ExportSide.All:
                     chargeAmount = context.Total;
 
-                    if (order.PaymentMethod.IdObjectType != (int)PaymentMethodType.Check ||
-                        (bool?)order.PaymentMethod.SafeData.PaidInFull == true)
+                    if (order.PaymentMethod.IdObjectType != (int) PaymentMethodType.Check ||
+                        (bool?) order.PaymentMethod.SafeData.PaidInFull == true)
                     {
                         exportOrder.Money.TaxAmount = context.TaxTotal;
                     }
@@ -418,8 +420,8 @@ namespace VitalChoice.ExportService.Services
                 case ExportSide.Perishable:
                     chargeAmount = context.SplitInfo.PerishableTotal;
 
-                    if (order.PaymentMethod.IdObjectType != (int)PaymentMethodType.Check ||
-                        (bool?)order.PaymentMethod.SafeData.PaidInFull == true)
+                    if (order.PaymentMethod.IdObjectType != (int) PaymentMethodType.Check ||
+                        (bool?) order.PaymentMethod.SafeData.PaidInFull == true)
                     {
                         exportOrder.Money.TaxAmount = context.SplitInfo.PerishableTax;
                     }
@@ -427,8 +429,8 @@ namespace VitalChoice.ExportService.Services
                 case ExportSide.NonPerishable:
                     chargeAmount = context.SplitInfo.NonPerishableTotal;
 
-                    if (order.PaymentMethod.IdObjectType != (int)PaymentMethodType.Check ||
-                        (bool?)order.PaymentMethod.SafeData.PaidInFull == true)
+                    if (order.PaymentMethod.IdObjectType != (int) PaymentMethodType.Check ||
+                        (bool?) order.PaymentMethod.SafeData.PaidInFull == true)
                     {
                         exportOrder.Money.TaxAmount = context.SplitInfo.NonPerishableTax;
                     }
@@ -442,7 +444,8 @@ namespace VitalChoice.ExportService.Services
                     var expDate = (DateTime) order.PaymentMethod.Data.ExpDate;
                     exportOrder.Payment.PaymentType.Sequence = 1;
                     //NOTBUG: revisit manual CC payment, we not using manual payment anymore
-                    exportOrder.Payment.PaymentType.Description = FormatCcType((CreditCardType) order.PaymentMethod.Data.CardType);
+                    exportOrder.Payment.PaymentType.Description =
+                        FormatCcType((CreditCardType) order.PaymentMethod.Data.CardType);
                     exportOrder.Payment.CCExpirationDate = $"{expDate.Month:D2}{expDate.Year%100:D2}";
                     exportOrder.Payment.CCNumber = order.PaymentMethod.Data.CardNumber;
                     exportOrder.Payment.PaymentAmount = chargeAmount;
@@ -469,7 +472,10 @@ namespace VitalChoice.ExportService.Services
                     break;
                 case PaymentMethodType.Marketing:
                     exportOrder.Payment.PaymentType.Sequence = 1;
-                    exportOrder.Payment.PaymentType.Description = MarketingDescription;
+                    exportOrder.Payment.PaymentType.Description =
+                        (int) order.PaymentMethod.Data.MarketingPromotionType == 1
+                            ? MarketingPromoDescription
+                            : MarketingDonationDescription;
                     break;
                 case PaymentMethodType.VCWellnessEmployeeProgram:
                     exportOrder.Payment.PaymentType.Sequence = 1;
