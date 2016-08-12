@@ -15,6 +15,7 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public string MainSuperAdminEmail{get;set; }
         public string CustomerServiceToEmail { get; set; }
         public string CustomerFeedbackToEmail { get; set; }
+        public string OrderShippingNotificationBcc { get; set; }
         public string FilesRelativePath { get; set; }
         public string FilesPath { get; set; }
         public EmailConfiguration EmailConfiguration { get; set; }

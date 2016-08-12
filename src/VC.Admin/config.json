@@ -12,6 +12,8 @@
     "CustomerServiceToEmail": "gary@g2designgroup.com",
     "CustomerFeedbackToEmail": "gary@g2designgroup.com",
     "MainSuperAdminEmail": "gary@g2designgroup.com",
+    "OrderShippingNotificationBcc": "",
+    //cdbdf92c@trustpilotservice.com
 
     "GenerateLowercaseUrls": true,
     "EnableBundlingAndMinification": true,

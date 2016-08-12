@@ -4,6 +4,9 @@
     "AdminHost": "admin.staging.g2-dg.com",
     "DefaultCacheExpirationTermMinutes": 1440,
     "DefaultCultureId": "en-US",
+    "OrderShippingNotificationBcc": "",
+    //cdbdf92c@trustpilotservice.com
+
     "Connection": {
       "UserName": "dev_vcdb_login",
       "Password": "CCQLaskw3pMFU9XqE6CHp28m",

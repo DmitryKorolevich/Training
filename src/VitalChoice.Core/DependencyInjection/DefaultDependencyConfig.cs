@@ -341,13 +341,14 @@ namespace VitalChoice.Core.DependencyInjection
             options.MainSuperAdminEmail = configuration.GetSection("App:MainSuperAdminEmail").Value;
             options.CustomerServiceToEmail = configuration.GetSection("App:CustomerServiceToEmail").Value;
             options.CustomerFeedbackToEmail = configuration.GetSection("App:CustomerFeedbackToEmail").Value;
+            options.OrderShippingNotificationBcc = configuration.GetSection("App:OrderShippingNotificationBcc").Value;
             options.FilesRelativePath = configuration.GetSection("App:FilesRelativePath").Value;
             options.FilesPath = configuration.GetSection("App:FilesPath").Value;
             options.EmailConfiguration = new EmailConfiguration
             {
                 From = configuration.GetSection("App:Email:From").Value,
                 ApiKey = configuration.GetSection("App:Email:ApiKey").Value,
-                Disabled = Convert.ToBoolean(configuration.GetSection("App:Email:Disabled").Value)
+                Disabled = Convert.ToBoolean(configuration.GetSection("App:Email:Disabled").Value),
             };
             options.ExportService = new ExportService
             {

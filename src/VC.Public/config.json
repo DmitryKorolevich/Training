@@ -8,6 +8,9 @@
     "MainSuperAdminEmail": "gary@g2designgroup.com",
     "CustomerServiceToEmail": "gary@g2designgroup.com",
     "CustomerFeedbackToEmail": "gary@g2designgroup.com",
+    "OrderShippingNotificationBcc": "",
+    //cdbdf92c@trustpilotservice.com
+
     "GenerateLowercaseUrls": true,
     "EnableBundlingAndMinification": true,
     "Versioning": {
@@ -57,7 +60,8 @@
     "AuthorizeNet": {
       "ApiLogin": "36qq5ECXB",
       "ApiKey": "4r5Zv38R56BY6tLW",
-      "TestEnv": false
+      "TestEnv": false,
+      "OrderShippingNotificationBcc": ""
     },
     "AzureStorage": {
       "StorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=stagingvcfiles;AccountKey=RxGv/t6KyB7aFPKaKIljivC0YtoYv/FR+0f5uGcORdie1h5WGigJKazfMiYL/gNJz+fGUWsUhEvGjdfwfZAq6A==;BlobEndpoint=https://stagingvcfiles.blob.core.windows.net/;TableEndpoint=https://stagingvcfiles.table.core.windows.net/;QueueEndpoint=https://stagingvcfiles.queue.core.windows.net/;FileEndpoint=https://stagingvcfiles.file.core.windows.net/",

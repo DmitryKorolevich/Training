@@ -19,6 +19,7 @@ namespace VitalChoice.Business.Mailings
         private static string _mainSuperAdminEmail;
         private static string _adminHost;
         private static string _publicHost;
+        private static string _orderShippingNotificationBcc;
 
         public NotificationService(IEmailSender emailSender,
             IEmailTemplateService emailTemplateService,
@@ -31,6 +32,7 @@ namespace VitalChoice.Business.Mailings
             _mainSuperAdminEmail = appOptions.Value.MainSuperAdminEmail;
             _adminHost = appOptions.Value.AdminHost;
             _publicHost = appOptions.Value.PublicHost;
+            _orderShippingNotificationBcc = appOptions.Value.OrderShippingNotificationBcc;
         }
 
         #region SendEmails
@@ -271,7 +273,7 @@ namespace VitalChoice.Business.Mailings
             {
                 foreach (var item in items)
                 {
-                    await emailSender.SendEmailAsync(item.Key.ToEmail, item.Value.Subject, item.Value.Body);
+                    await emailSender.SendEmailAsync(item.Key.ToEmail, item.Value.Subject, item.Value.Body, bccEmail: _orderShippingNotificationBcc);
                 }
             }
         }
