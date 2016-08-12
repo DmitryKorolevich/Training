@@ -884,6 +884,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<PagedList<ShortOrderItemModel>> GetShortOrdersAsync(OrderFilter filter)
         {
+            filter.SelectOnlyTop = true;
             return await _sPEcommerceRepository.GetShortOrdersAsync(filter);
         }
 

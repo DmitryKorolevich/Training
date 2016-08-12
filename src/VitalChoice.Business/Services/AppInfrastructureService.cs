@@ -423,7 +423,7 @@ namespace VitalChoice.Business.Services
             
         }
 
-        private async Task SetupAppSettings()
+        public async Task SetupAppSettings()
         {
             var affiliateReportDateOption =
                 await _appOptionRepository.Query(p => p.OptionName == AffiliateConstants.AffiliateOrderPaymentsCountToDateOptionName)
@@ -435,7 +435,7 @@ namespace VitalChoice.Business.Services
                 var date = TimeZoneInfo.ConvertTime(firstDayOfCurrentMonth, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local);
                 var dbDate = DateTime.MinValue;
                 DateTime.TryParse(affiliateReportDateOption.OptionValue, out dbDate);
-                if (date != dbDate)
+                if (date > dbDate)
                 {
                     affiliateReportDateOption.OptionValue = date.ToString("yyyy-MM-dd hh:mm:ss.fff");
                     _appOptionRepository.Update(affiliateReportDateOption);

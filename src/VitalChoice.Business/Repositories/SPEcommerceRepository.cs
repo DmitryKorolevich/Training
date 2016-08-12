@@ -386,9 +386,9 @@ namespace VitalChoice.Business.Repositories
 
             var data = await _context.Set<ShortOrderItemModel>().FromSql
                 ("[dbo].[SPGetShortOrders] @idcustomer={0}, @idfilter={1}," +
-                " @idobjecttype={2}, @pageindex={3}, @pagesize={4}",
+                " @idobjecttype={2}, @pageindex={3}, @pagesize={4}, @onlytop={5}",
                 filter.IdCustomer, filter.Id,
-                filter.OrderType, filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
+                filter.OrderType, filter.Paging?.PageIndex, filter.Paging?.PageItemCount, filter.SelectOnlyTop).ToListAsync();
             var toReturn = new PagedList<ShortOrderItemModel>();
             toReturn.Count = data.FirstOrDefault()?.TotalCount ?? 0;
             toReturn.Items = data;

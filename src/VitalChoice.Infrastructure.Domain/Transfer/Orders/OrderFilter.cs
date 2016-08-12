@@ -5,5 +5,6 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
     public class OrderFilter : OrderFilterBase
 	{
         public OrderType? OrderType { get; set; }
+        public bool SelectOnlyTop { get; set; }
     }
 }

@@ -204,4 +204,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPGetShortOrders.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\Indexes.sql" />
+  </ItemGroup>
 </Project>

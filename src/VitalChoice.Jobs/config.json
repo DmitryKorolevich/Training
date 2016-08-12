@@ -49,6 +49,7 @@
         "ShipDelayJob": "0 0 2 * * ?",
         "OrderProductReviewEmailsJob": "0 0 2 * * ?",
         "VeraCoreNotificationsJob": "0 0/5 * * * ?",
+        "AppOptionsSetupJob": "0 0 2 * * ?",
         "KPIReportJob": "0 0 3 * * ?"
         //"KPIReportJob": "0 0/9 * * * ?"
       }

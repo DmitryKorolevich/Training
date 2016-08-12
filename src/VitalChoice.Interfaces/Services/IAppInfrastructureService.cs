@@ -7,5 +7,6 @@ namespace VitalChoice.Interfaces.Services
     {
         ReferenceData CachedData { get; }
         Task<ReferenceData> GetDataAsync();
+        Task SetupAppSettings();
     }
 }
