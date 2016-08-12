@@ -92,25 +92,29 @@
 				        }
 				    </div>
 					<div class="header-actions-holder">
-						<div class="actions-top-nav">
-							<a href="@Url.Action("Index", "Profile")">Your Account</a>
-							@if (User.Identity.IsAuthenticated)
+					    <div class="actions-top-nav">
+					        @if (User.Identity.IsAuthenticated && User.IsInRole(IdentityConstants.WholesaleCustomer))
                             {
-                                if (User.HasClaim(IdentityConstants.AffiliateRole, "true"))
-                                {
-                                    <a href="@Url.Action("Logout", "AffiliateAccount")">Log Out</a>
-                                }
-                                else
-                                {
-                                    <a href="@Url.Action("Logout", "Account")">Log Out</a>
-                                }
+                                <a class="wholesale-home" href="/products/wholesale">Wholesale Home</a>
                             }
-                            else
-                            {
-								<a href="@Url.Action("RegisterEmail", "Account")">Register</a>
-							}
-							<a class="last-child" href="/content/contact-customer-service">Contact Us</a>
-						</div>
+					        <a href="@Url.Action("Index", "Profile")">Your Account</a>
+					        @if (User.Identity.IsAuthenticated)
+					        {
+					            if (User.HasClaim(IdentityConstants.AffiliateRole, "true"))
+					            {
+					                <a href="@Url.Action("Logout", "AffiliateAccount")">Log Out</a>
+					            }
+					            else
+					            {
+					                <a href="@Url.Action("Logout", "Account")">Log Out</a>
+					            }
+					        }
+					        else
+					        {
+					            <a href="@Url.Action("RegisterEmail", "Account")">Register</a>
+					        }
+					        <a class="last-child" href="/content/contact-customer-service">Contact Us</a>
+					    </div>
 						<div class="cart-work-area">
 							<a class="view-cart" href="@Url.Action("ViewCart", "Cart")">
 								<div class="cart-icon"></div>
