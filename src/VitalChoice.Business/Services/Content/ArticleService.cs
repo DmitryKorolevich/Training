@@ -37,6 +37,7 @@ namespace VitalChoice.Business.Services.Content
         private readonly IRepositoryAsync<ArticleToContentCategory> _articleToContentCategoryRepository;
         private readonly IRepositoryAsync<ContentItemToContentProcessor> _contentItemToContentProcessorRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> _contentTypeRepository;
+        private readonly IRepositoryAsync<MasterContentItem> _masterContentRepository;
         private readonly IRepositoryAsync<ArticleToProduct> _articleToProductRepository;
         private readonly IRepositoryAsync<ArticleBonusLink> _articleBonusLinkRepository;
         private readonly IEcommerceRepositoryAsync<Product> _productRepository;
@@ -56,7 +57,7 @@ namespace VitalChoice.Business.Services.Content
             IObjectLogItemExternalService objectLogItemExternalService,
             ILoggerProviderExtended logger, 
             ITtlGlobalCache templatesCache,
-            DbContextOptions<VitalChoiceContext> contextOptions, IOptions<AppOptions> appOptions)
+            DbContextOptions<VitalChoiceContext> contextOptions, IOptions<AppOptions> appOptions, IRepositoryAsync<MasterContentItem> masterContentRepository)
         {
             _articleRepository = articleRepository;
             _contentCategoryRepository = contentCategoryRepository;
@@ -69,6 +70,7 @@ namespace VitalChoice.Business.Services.Content
             _templatesCache = templatesCache;
             _contextOptions = contextOptions;
             _appOptions = appOptions;
+            _masterContentRepository = masterContentRepository;
             _objectLogItemExternalService = objectLogItemExternalService;
             _logger = logger.CreateLogger<ArticleService>();
         }
@@ -207,6 +209,14 @@ namespace VitalChoice.Business.Services.Content
                 if (contentType?.DefaultMasterContentItemId == null)
                 {
                     throw new Exception("The default master template isn't confugurated. Please contact support.");
+                }
+                if (
+                    await
+                        _masterContentRepository.Query(
+                            m => m.Id == contentType.DefaultMasterContentItemId.Value && m.StatusCode == RecordStatusCode.Deleted)
+                            .SelectAnyAsync())
+                {
+                    throw new Exception("The default master template has been removed. Please contact support.");
                 }
                 dbItem.MasterContentItemId = contentType.DefaultMasterContentItemId.Value;
             }

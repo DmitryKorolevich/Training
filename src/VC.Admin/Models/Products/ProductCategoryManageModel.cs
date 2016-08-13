@@ -49,7 +49,7 @@ namespace VC.Admin.Models.Products
 
         public RecordStatusCode StatusCode { get; set; }
 
-        public int? MasterContentItemId { get; set; }
+        public int MasterContentItemId { get; set; }
 
         public int? ParentId { get; set; }
 
@@ -117,7 +117,7 @@ namespace VC.Admin.Models.Products
                     ParentId = ParentId,
                     StatusCode = StatusCode,
                 },
-                MasterContentItemId = MasterContentItemId ?? 0,
+                MasterContentItemId = MasterContentItemId,
                 LongDescription = LongDescription,
                 HideLongDescription = HideLongDescription,
                 LongDescriptionBottom = LongDescriptionBottom,

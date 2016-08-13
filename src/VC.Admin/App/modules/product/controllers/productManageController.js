@@ -159,11 +159,16 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 .success(function (result) {
                 	if (result.Success) {
                 		$scope.masters = result.Data;
+                		var hasDefailt = false;
                 		$.each($scope.masters, function (index, master) {
-                			if (master.IsDefault) {
-                				$scope.MasterContentItemId = master.Id;
-                			};
+                		    if (master.IsDefault || $scope.masters.length == 1) {
+                		        hasDefailt = true;
+                		        $scope.MasterContentItemId = master.Id;
+                		    };
                 		});
+                		if (!hasDefailt) {
+                		    $scope.MasterContentItemId = $scope.masters[0].Id;
+                		}
                 		allowLoadProduct();
                 	} else {
                 		errorHandler(result);
