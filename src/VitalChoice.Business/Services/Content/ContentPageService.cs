@@ -30,6 +30,7 @@ namespace VitalChoice.Business.Services.Content
         private readonly IObjectLogItemExternalService objectLogItemExternalService;
         private readonly ITtlGlobalCache templatesCache;
         private readonly ILogger logger;
+        private readonly IRepositoryAsync<MasterContentItem> _masterContentRepository;
 
         public ContentPageService(IRepositoryAsync<ContentPage> contentPageRepository,
             IRepositoryAsync<ContentCategory> contentCategoryRepository,
@@ -37,7 +38,7 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
             ILoggerProviderExtended logger, 
-            ITtlGlobalCache templatesCache)
+            ITtlGlobalCache templatesCache, IRepositoryAsync<MasterContentItem> masterContentRepository)
         {
             this.contentPageRepository = contentPageRepository;
             this.contentCategoryRepository = contentCategoryRepository;
@@ -45,6 +46,7 @@ namespace VitalChoice.Business.Services.Content
             this.contentTypeRepository = contentTypeRepository;
             this.objectLogItemExternalService = objectLogItemExternalService;
             this.templatesCache = templatesCache;
+            _masterContentRepository = masterContentRepository;
             this.logger = logger.CreateLogger<ContentPageService>();
         }
 
@@ -153,6 +155,14 @@ namespace VitalChoice.Business.Services.Content
                     if (contentType == null || !contentType.DefaultMasterContentItemId.HasValue)
                     {
                         throw new Exception("The default master template isn't confugurated. Please contact support.");
+                    }
+                    if (
+                    await
+                        _masterContentRepository.Query(
+                            m => m.Id == contentType.DefaultMasterContentItemId.Value && m.StatusCode == RecordStatusCode.Deleted)
+                            .SelectAnyAsync())
+                    {
+                        throw new Exception("The default master template has been removed. Please contact support.");
                     }
                     model.MasterContentItemId = contentType.DefaultMasterContentItemId.Value;
                 }

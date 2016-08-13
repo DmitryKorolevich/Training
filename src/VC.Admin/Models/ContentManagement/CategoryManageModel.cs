@@ -38,7 +38,7 @@ namespace VC.Admin.Models.ContentManagement
 
         public ContentType Type { get; set; }
 
-        public int? MasterContentItemId { get; set; }
+        public int MasterContentItemId { get; set; }
 
         public int? ParentId { get; set; }
 
@@ -82,7 +82,7 @@ namespace VC.Admin.Models.ContentManagement
             toReturn.Url = Url?.Trim();
             toReturn.Url = toReturn.Url?.ToLower();
             toReturn.FileUrl = FileUrl?.Trim();
-            toReturn.MasterContentItemId = MasterContentItemId.HasValue ? MasterContentItemId.Value : 0;
+            toReturn.MasterContentItemId = MasterContentItemId;
             toReturn.ParentId = ParentId;
             toReturn.Type = Type;
             toReturn.ContentItem = new ContentItem();

@@ -142,13 +142,16 @@ function ($scope, $rootScope, $state, $stateParams, contentService, settingServi
                 if (result.Success)
                 {
                     $scope.masters = result.Data;
-                    $.each($scope.masters, function (index, master)
-                    {
-                        if (master.IsDefault)
-                        {
+                    var hasDefailt = false;
+                    $.each($scope.masters, function (index, master) {
+                        if (master.IsDefault || $scope.masters.length == 1) {
+                            hasDefailt = true;
                             $scope.MasterContentItemId = master.Id;
                         };
                     });
+                    if (!hasDefailt) {
+                        $scope.MasterContentItemId = $scope.masters[0].Id;
+                    }
                     $scope.MastersLoaded = true;
                     refreshFAQ();
                 } else
