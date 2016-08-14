@@ -25,12 +25,12 @@
       "Encrypt": true
     },
     "ExportService": {
-      "PlainConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=PlainRights;SharedAccessKey=WiTkXyGW0OpnpSqJ9TMMrVx0wAH+eRm0MVyE1YEmOtw=",
-      "EncryptedConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=EncryptedRights;SharedAccessKey=A2tJQGyhAhf02hb9/W2W2WYVH8ulzDZPQjW8pWEtj8U=",
+      "PlainConnectionString": "Endpoint=sb://staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=l1XNjdRaaMjJ1glYnDwjnIiw+9yaX6E2vksJXa4zBSk=",
+      "EncryptedConnectionString": "Endpoint=sb://staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=l1XNjdRaaMjJ1glYnDwjnIiw+9yaX6E2vksJXa4zBSk=",
       "PlainQueueName": "plain_export",
       "EncryptedQueueName": "encrypted_export",
-      "CertThumbprint": "505BDC22499CF0F4692CF18D69CDC32F0F285545",
-      "RootThumbprint": "89735BE3169BE34AB67B65C7D9EFFD2C230A9D98",
+      "CertThumbprint": "‎FCA7608492B3908D81C845A7FC51CEC4CB5FB5E0",
+      "RootThumbprint": "F06F3F3FC0B276358AEAB83C614B46181D0C1CC9",
       "EncryptionHostSessionExpire": true,
       "ServerHostName": "export-server"
     },
@@ -86,7 +86,7 @@
       "CacheScanPeriodSeconds": 900 //15 minutes
     },
     "CacheSyncOptions": {
-      "ConnectionString": "Endpoint=sb://vitalchoice-staging-bus.servicebus.windows.net/;SharedAccessKeyName=ClientServer;SharedAccessKey=hemZgxBH/foCscmtPdhF8wvbWfh8aF9GR4ShqfnCPnY=",
+      "ConnectionString": "Endpoint=sb://staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=l1XNjdRaaMjJ1glYnDwjnIiw+9yaX6E2vksJXa4zBSk=",
       "ServiceBusQueueName": "caching",
       "Enabled": true
     },
