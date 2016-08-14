@@ -29,7 +29,7 @@
       "EncryptedConnectionString": "Endpoint=sb://staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=l1XNjdRaaMjJ1glYnDwjnIiw+9yaX6E2vksJXa4zBSk=",
       "PlainQueueName": "plain_export",
       "EncryptedQueueName": "encrypted_export",
-      "CertThumbprint": "‎FCA7608492B3908D81C845A7FC51CEC4CB5FB5E0",
+      "CertThumbprint": "FCA7608492B3908D81C845A7FC51CEC4CB5FB5E0",
       "RootThumbprint": "F06F3F3FC0B276358AEAB83C614B46181D0C1CC9",
       "EncryptionHostSessionExpire": true,
       "ServerHostName": "export-server"
