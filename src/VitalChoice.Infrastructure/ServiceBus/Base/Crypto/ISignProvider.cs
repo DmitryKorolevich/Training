@@ -2,10 +2,14 @@ using System;
 
 namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
 {
-    public interface ISignProvider : IDisposable
+    public interface ISignCheckProvider : IDisposable
+    {
+        bool VerifyData(byte[] data, byte[] sign);
+    }
+
+    public interface ISignProvider : ISignCheckProvider
     {
         byte[] GetPrivateKey();
-        bool VerifyData(byte[] data, byte[] sign);
         byte[] SignData(byte[] data);
     }
 }

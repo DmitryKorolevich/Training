@@ -28,12 +28,13 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
         private readonly string _localEncryptionPath;
         private readonly ILogger _logger;
         private readonly Random _rnd;
-        
+
         private readonly ISignProvider _signProvider;
-        private readonly Aes _localAes;
+        private readonly AesCng _localAes;
         private readonly Dictionary<Guid, SessionInfo> _sessions = new Dictionary<Guid, SessionInfo>();
         private readonly ManualResetEvent _disposeEvent;
         private readonly Thread _sessionExpiration;
+        private readonly IReadOnlyDictionary<string, ISignCheckProvider> _remoteSignCheckProviders;
 
         /// <summary>
         /// Server Mode
@@ -46,7 +47,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             try
             {
                 X509Certificate2 cert;
-                _signProvider = GetPublicCertificate(StoreName.My, options.Value.ExportService.CertThumbprint, true, out cert);
+                _signProvider = GetSignProvider(StoreName.My, options.Value.ExportService.CertThumbprint, out cert);
                 if (cert == null)
                 {
                     _signProvider?.Dispose();
@@ -57,17 +58,12 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                     LocalCert = cert;
                 }
 
-                GetPublicCertificate(StoreName.Root, options.Value.ExportService.RootThumbprint, false, out cert);
-                if (cert == null)
+                RootCert = GetCaCertificate(options.Value.ExportService.RootThumbprint);
+                if (RootCert == null)
                 {
                     return;
                 }
-                RootCert = cert;
-
-                if (!ValidateClientCertificate(LocalCert))
-                {
-                    throw new InvalidOperationException("Client and/or root certificate(s) doesn't valid.");
-                }
+                _remoteSignCheckProviders = GetPublicSignCheckProviders(StoreName.My, RootCert);
                 if (options.Value.ExportService.EncryptionHostSessionExpire)
                 {
                     _disposeEvent = new ManualResetEvent(false);
@@ -99,41 +95,11 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
 
         public X509Certificate2 LocalCert { get; }
 
-        public T LocalDecrypt<T>(byte[] data)
-        {
-            using (var memory = new MemoryStream())
-            {
-                using (var decryptor = _localAes.CreateDecryptor())
-                {
+        public T LocalDecrypt<T>(byte[] data) => (T) ObjectSerializer.Deserialize(Decrypt(_localAes, data));
 
-                    using (CryptoStream cs = new CryptoStream(memory, decryptor, CryptoStreamMode.Write))
-                    {
-                        cs.Write(data, 0, data.Length);
-                        cs.FlushFinalBlock();
-                        return (T) ObjectSerializer.Deserialize(memory.ToArray());
-                    }
-                }
-            }
-        }
+        public byte[] LocalEncrypt(object obj) => Encrypt(_localAes, ObjectSerializer.Serialize(obj));
 
-        public byte[] LocalEncrypt(object obj)
-        {
-            var plainData = ObjectSerializer.Serialize(obj);
-            using (var memory = new MemoryStream())
-            {
-                using (var encryptor = _localAes.CreateEncryptor())
-                {
-                    using (CryptoStream cs = new CryptoStream(memory, encryptor, CryptoStreamMode.Write))
-                    {
-                        cs.Write(plainData, 0, plainData.Length);
-                        cs.FlushFinalBlock();
-                        return memory.ToArray();
-                    }
-                }
-            }
-        }
-
-        public bool ValidateClientCertificate(X509Certificate2 clientCert)
+        public static bool ValidateClientCertificate(X509Certificate2 clientCert, X509Certificate2 rootCa)
         {
             if (clientCert == null)
                 throw new ArgumentNullException(nameof(clientCert));
@@ -149,9 +115,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                     UrlRetrievalTimeout = TimeSpan.Zero
                 }
             };
-            validationChain.ChainPolicy.ExtraStore.Add(RootCert);
-            var valid = validationChain.Build(clientCert);
-            return valid;
+            validationChain.ChainPolicy.ExtraStore.Add(rootCa);
+            return validationChain.Build(clientCert);
         }
 
         public byte[] RsaDecrypt(byte[] data, RSACng rsa)
@@ -196,12 +161,12 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             return result;
         }
 
-        public T AesDecryptVerify<T>(TransportCommandData data, Guid session)
-            where T: ServiceBusCommandBase
+        public T AesDecryptVerify<T>(TransportCommandData command, Guid session)
+            where T : ServiceBusCommandBase
         {
-            if (data == null)
-                throw new ArgumentNullException(nameof(data));
-            if (data.Data == null)
+            if (command == null)
+                throw new ArgumentNullException(nameof(command));
+            if (command.Data == null)
                 return default(T);
             SessionInfo encryption;
             lock (_sessions)
@@ -209,24 +174,13 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                 if (!_sessions.TryGetValue(session, out encryption))
                     return default(T);
             }
-            if (VerifyCommandSign(data))
+            if (VerifyCommandSign(command))
             {
                 byte[] plainData = null;
                 try
                 {
-                    using (var memory = new MemoryStream())
-                    {
-                        using (var decryptor = encryption.Aes.CreateDecryptor())
-                        {
-                            using (CryptoStream cs = new CryptoStream(memory, decryptor, CryptoStreamMode.Write))
-                            {
-                                cs.Write(data.Data, 0, data.Data.Length);
-                                cs.FlushFinalBlock();
-                                plainData = memory.ToArray();
-                                return (T) ObjectSerializer.Deserialize(plainData);
-                            }
-                        }
-                    }
+                    plainData = Decrypt(encryption.Aes, command.Data);
+                    return (T) ObjectSerializer.Deserialize(plainData);
                 }
                 catch (SerializationException)
                 {
@@ -258,22 +212,11 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             }
             try
             {
-                using (var encryptor = encryption.Aes.CreateEncryptor())
-                {
-                    var plainData = ObjectSerializer.Serialize(command);
-                    using (var memory = new MemoryStream())
-                    {
-                        using (CryptoStream cs = new CryptoStream(memory, encryptor, CryptoStreamMode.Write))
-                        {
-                            cs.Write(plainData, 0, plainData.Length);
-                            cs.FlushFinalBlock();
-                            var encryptedData = memory.ToArray();
-                            var result = new TransportCommandData(encryptedData);
-                            SignCommand(result);
-                            return result;
-                        }
-                    }
-                }
+                var plainData = ObjectSerializer.Serialize(command);
+                var encryptedData = Encrypt(encryption.Aes, plainData);
+                var result = new TransportCommandData(encryptedData);
+                SignCommand(result);
+                return result;
             }
             catch (CryptographicException e)
             {
@@ -321,7 +264,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
 
         public bool RegisterSession(Guid session, string hostName, KeyExchange keyExchange)
         {
-            Aes aes = Aes.Create();
+            AesCng aes = new AesCng();
             if (aes == null)
                 throw new InvalidOperationException("Cannot initialize AES encryption");
             aes.KeySize = 256;
@@ -340,49 +283,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                 _sessions.Add(session, encryption);
             }
             return true;
-        }
-
-        private void RegisterSession(Guid session, KeyExchange keyCombined)
-        {
-            Aes aes = Aes.Create();
-            if (aes == null)
-                throw new InvalidOperationException("Cannot initialize AES encryption");
-            aes.KeySize = 256;
-            aes.Key = keyCombined.Key;
-            aes.IV = keyCombined.IV;
-            aes.Padding = PaddingMode.PKCS7;
-            SessionInfo encryption = new SessionInfo
-            {
-                Aes = aes
-            };
-            lock (_sessions)
-            {
-                if (_sessions.ContainsKey(session))
-                {
-                    _sessions[session] = encryption;
-                }
-                else
-                {
-                    _sessions.Add(session, encryption);
-                }
-            }
-        }
-
-        private KeyExchange CreateSession(Guid session)
-        {
-            lock (_sessions)
-            {
-                if (_sessions.ContainsKey(session))
-                    return null;
-                Aes aes = Aes.Create();
-                if (aes == null)
-                    throw new InvalidOperationException("Cannot initialize AES encryption");
-                aes.KeySize = 256;
-                aes.GenerateKey();
-                aes.GenerateIV();
-                aes.Padding = PaddingMode.PKCS7;
-                return new KeyExchange(aes.Key, aes.IV);
-            }
         }
 
         public void RemoveSession(Guid session)
@@ -414,10 +314,134 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                 }
                 _sessions.Clear();
             }
+            foreach (var signCheckProvider in _remoteSignCheckProviders.Values)
+            {
+                signCheckProvider.Dispose();
+            }
         }
-        
-        private ISignProvider GetPublicCertificate(StoreName storeName, string thumbprint, bool provideSigning,
-            out X509Certificate2 result)
+
+        public Guid GetSession()
+        {
+            lock (_sessions)
+            {
+                var chooseSession = _rnd.Next(0, MaxSessions);
+                if (_sessions.Count < chooseSession + 1)
+                {
+                    var newSession = Guid.NewGuid();
+                    var keys = CreateSession(newSession);
+                    RegisterSession(newSession, keys);
+                    return newSession;
+                }
+                return _sessions.Keys.Skip(chooseSession).FirstOrDefault();
+            }
+        }
+
+        public KeyExchange GetSessionKeys(Guid session)
+        {
+            lock (_sessions)
+            {
+                SessionInfo sessionInfo;
+                if (_sessions.TryGetValue(session, out sessionInfo))
+                {
+                    return new KeyExchange(sessionInfo.Aes.Key, sessionInfo.Aes.IV);
+                }
+                return null;
+            }
+        }
+
+        public async Task LockSession(Guid session)
+        {
+            SessionInfo sessionInfo;
+            bool getResult;
+            lock (_sessions)
+            {
+                getResult = _sessions.TryGetValue(session, out sessionInfo);
+            }
+            if (getResult)
+            {
+                await sessionInfo.SemaphoreSlim.WaitAsync();
+            }
+        }
+
+        public void UnlockSession(Guid session)
+        {
+            lock (_sessions)
+            {
+                SessionInfo sessionInfo;
+                if (_sessions.TryGetValue(session, out sessionInfo))
+                {
+                    sessionInfo.SemaphoreSlim.Release();
+                }
+            }
+        }
+
+        private void RegisterSession(Guid session, KeyExchange keyCombined)
+        {
+            var aes = new AesCng();
+            if (aes == null)
+                throw new InvalidOperationException("Cannot initialize AES encryption");
+            aes.KeySize = 256;
+            aes.Key = keyCombined.Key;
+            aes.IV = keyCombined.IV;
+            aes.Padding = PaddingMode.PKCS7;
+            SessionInfo encryption = new SessionInfo
+            {
+                Aes = aes
+            };
+            lock (_sessions)
+            {
+                if (_sessions.ContainsKey(session))
+                {
+                    _sessions[session] = encryption;
+                }
+                else
+                {
+                    _sessions.Add(session, encryption);
+                }
+            }
+        }
+
+        private KeyExchange CreateSession(Guid session)
+        {
+            lock (_sessions)
+            {
+                if (_sessions.ContainsKey(session))
+                    return null;
+                var aes = new AesCng { KeySize = 256 };
+                aes.GenerateKey();
+                aes.GenerateIV();
+                aes.Padding = PaddingMode.PKCS7;
+                return new KeyExchange(aes.Key, aes.IV);
+            }
+        }
+
+        private X509Certificate2 GetCaCertificate(string thumbprint)
+        {
+            var certStore = new X509Store(StoreName.Root, StoreLocation.LocalMachine);
+            certStore.Open(OpenFlags.ReadOnly);
+            try
+            {
+                var localCerts = certStore.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, true);
+                if (localCerts.Count == 0)
+                {
+                    _logger.LogCritical(
+                        $"Cannot find Certificate in Store <{certStore.Name}:{certStore.Location}> with thumbprint <{thumbprint}>");
+                    return null;
+                }
+                var cert = localCerts[0];
+                return new X509Certificate2(cert.Export(X509ContentType.Cert));
+            }
+            finally
+            {
+#if !NETSTANDARD1_6
+                certStore.Close();
+#else
+                certStore.Dispose();
+#endif
+            }
+        }
+
+        private ISignProvider GetSignProvider(StoreName storeName, string thumbprint, out X509Certificate2 result)
         {
             var certStore = new X509Store(storeName, StoreLocation.LocalMachine);
             certStore.Open(OpenFlags.ReadOnly);
@@ -435,11 +459,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                 }
                 var cert = localCerts[0];
                 result = new X509Certificate2(cert.Export(X509ContentType.Cert));
-                if (provideSigning)
-                {
-                    return GetSignProvider(cert);
-                }
-                return null;
+                return CreateSignProvider(cert);
             }
             finally
             {
@@ -451,7 +471,57 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             }
         }
 
-        private ISignProvider GetSignProvider(X509Certificate2 cert)
+        private Dictionary<string, ISignCheckProvider> GetPublicSignCheckProviders(StoreName storeName, X509Certificate2 rootCa)
+        {
+            var certStore = new X509Store(storeName, StoreLocation.LocalMachine);
+            certStore.Open(OpenFlags.ReadOnly);
+            try
+            {
+                var localCerts = certStore.Certificates.Find(X509FindType.FindByIssuerDistinguishedName, rootCa.IssuerName, true);
+                Dictionary<string, ISignCheckProvider> result = new Dictionary<string, ISignCheckProvider>();
+                foreach (var localCert in localCerts)
+                {
+                    if (!localCert.HasPrivateKey && ValidateClientCertificate(localCert, rootCa))
+                    {
+                        // ReSharper disable once AssignNullToNotNullAttribute
+                        result.Add(localCert.Thumbprint, CreateSignCheckProvider(localCert));
+                    }
+                }
+                return result;
+            }
+            finally
+            {
+#if !NETSTANDARD1_6
+                certStore.Close();
+#else
+                certStore.Dispose();
+#endif
+            }
+        }
+
+        private ISignCheckProvider CreateSignCheckProvider(X509Certificate2 cert)
+        {
+            if (!cert.HasPrivateKey)
+                throw new InvalidOperationException("Certificate has no private key imported.");
+
+            switch (SignAlgorithmType)
+            {
+                case "RSA":
+                case "System.Security.Cryptography.RSA":
+                    return new RsaSignProvider(cert.GetRSAPublicKey());
+                case "DSA":
+                case "System.Security.Cryptography.DSA":
+                    return new DsaSignProvider(cert.GetDSAPublicKey());
+                case "ECDsa":
+                case "ECDsaCng":
+                case "System.Security.Cryptography.ECDsaCng":
+                    return new ECDsaSignProvider(cert.GetECDsaPublicKey());
+                default:
+                    throw new NotImplementedException($"{SignAlgorithmType} is not supported");
+            }
+        }
+
+        private ISignProvider CreateSignProvider(X509Certificate2 cert)
         {
             if (!cert.HasPrivateKey)
                 throw new InvalidOperationException("Certificate has no private key imported.");
@@ -542,7 +612,13 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             if (commandData == null)
                 throw new ArgumentNullException(nameof(commandData));
 
-            if (commandData.Certificate?.PublicKey.Key == null || (commandData.Sign == null && commandData.Data?.Length > 0))
+            ISignCheckProvider signProvider;
+            if (!_remoteSignCheckProviders.TryGetValue(commandData.CertThumbprint, out signProvider))
+            {
+                _logger.LogWarning("Incoming certificate thumbprint is invalid");
+                return false;
+            }
+            if (commandData.Sign == null && commandData.Data?.Length > 0)
             {
                 _logger.LogWarning("Incoming signature is invalid");
                 return false;
@@ -552,39 +628,9 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                 return true;
             }
 
-            if (!ValidateClientCertificate(commandData.Certificate))
+            if (!signProvider.VerifyData(commandData.Data, commandData.Sign))
             {
-                _logger.LogWarning(
-                    $"Invalid certificate:\n Server Thumbprint: {RootCert.Thumbprint}\n Client Thumbprint: {commandData.Certificate.Thumbprint}");
-                return false;
-            }
-
-            bool verifyResult;
-
-            switch (SignAlgorithmType)
-            {
-                case "RSA":
-                case "System.Security.Cryptography.RSA":
-                    var rsa = commandData.Certificate.GetRSAPublicKey();
-                    verifyResult = rsa.VerifyData(commandData.Data, commandData.Sign, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-                    break;
-                case "DSA":
-                case "System.Security.Cryptography.DSA":
-                    var dsa = commandData.Certificate.GetDSAPublicKey();
-                    verifyResult = dsa.VerifyData(commandData.Data, commandData.Sign, HashAlgorithmName.SHA256);
-                    break;
-                case "ECDsa":
-                case "ECDsaCng":
-                case "System.Security.Cryptography.ECDsaCng":
-                    var ecdsa = commandData.Certificate.GetECDsaPublicKey();
-                    verifyResult = ecdsa.VerifyData(commandData.Data, commandData.Sign, HashAlgorithmName.SHA256);
-                    break;
-                default:
-                    throw new NotImplementedException($"{SignAlgorithmType} is not implemented");
-            }
-            if (!verifyResult)
-            {
-                _logger.LogWarning($"Invalid sign. Remote Certificate Thumbprint: {commandData.Certificate.Thumbprint}, ");
+                _logger.LogWarning($"Invalid sign. Remote Certificate Thumbprint: {commandData.CertThumbprint}, ");
                 return false;
             }
             return true;
@@ -595,7 +641,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             if (_signProvider == null)
                 return;
             commandData.Sign = _signProvider.SignData(commandData.Data);
-            commandData.Certificate = LocalCert;
+            commandData.CertThumbprint = LocalCert.Thumbprint;
         }
 
         private byte[] Take(byte[] data, int length)
@@ -613,66 +659,61 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             return sha.ComputeHash(pk);
         }
 
-        public Guid GetSession()
+        private byte[] Encrypt(AesCng aes, byte[] data)
         {
-            lock (_sessions)
+            using (var encryptor = aes.CreateEncryptor())
             {
-                var chooseSession = _rnd.Next(0, MaxSessions);
-                if (_sessions.Count < chooseSession + 1)
-                {
-                    var newSession = Guid.NewGuid();
-                    var keys = CreateSession(newSession);
-                    RegisterSession(newSession, keys);
-                    return newSession;
-                }
-                return _sessions.Keys.Skip(chooseSession).FirstOrDefault();
+                return TransformBlocks(data, encryptor);
             }
         }
 
-        public KeyExchange GetSessionKeys(Guid session)
+        private byte[] Decrypt(AesCng aes, byte[] encryptedData)
         {
-            lock (_sessions)
+            using (var decryptor = aes.CreateDecryptor())
             {
-                SessionInfo sessionInfo;
-                if (_sessions.TryGetValue(session, out sessionInfo))
-                {
-                    return new KeyExchange(sessionInfo.Aes.Key, sessionInfo.Aes.IV);
-                }
-                return null;
+                return TransformBlocks(encryptedData, decryptor);
             }
         }
 
-        public async Task LockSession(Guid session)
+        private static byte[] TransformBlocks(byte[] data, ICryptoTransform transform)
         {
-            SessionInfo sessionInfo;
-            bool getResult;
-            lock (_sessions)
+            var blockSize = transform.InputBlockSize;
+            if (data.Length <= blockSize)
             {
-                getResult = _sessions.TryGetValue(session, out sessionInfo);
+                return transform.TransformFinalBlock(data, 0, data.Length);
             }
-            if (getResult)
-            {
-                await sessionInfo.SemaphoreSlim.WaitAsync();
-            }
-        }
 
-        public void UnlockSession(Guid session)
-        {
-            lock (_sessions)
+            int seed = 0;
+            byte[] result;
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (data.Length%blockSize == 0)
             {
-                SessionInfo sessionInfo;
-                if (_sessions.TryGetValue(session, out sessionInfo))
-                {
-                    sessionInfo.SemaphoreSlim.Release();
-                }
+                result = new byte[data.Length];
             }
+            else
+            {
+                result = new byte[(data.Length/blockSize + 1)*blockSize];
+            }
+            while (seed < data.Length - blockSize)
+            {
+                transform.TransformBlock(data, seed, blockSize, result, seed);
+                seed += blockSize;
+            }
+            var finalBlock = transform.TransformFinalBlock(data, seed, data.Length - seed);
+            var resultedSize = seed + finalBlock.Length;
+            if (resultedSize < result.Length)
+            {
+                Array.Resize(ref result, resultedSize);
+            }
+            Buffer.BlockCopy(finalBlock, 0, result, seed, finalBlock.Length);
+            return result;
         }
 
         private class SessionInfo : IDisposable
         {
             public SemaphoreSlim SemaphoreSlim { get; } = new SemaphoreSlim(1);
             public bool Authenticated { get; set; }
-            public Aes Aes { get; set; }
+            public AesCng Aes { get; set; }
             public DateTime Expiration { get; } = DateTime.Now.AddHours(1);
             public string HostName { get; set; }
 

@@ -13,7 +13,7 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
         }
 
         [DataMember]
-        public X509Certificate2 Certificate { get; set; }
+        public string CertThumbprint { get; set; }
 
         [DataMember]
         public byte[] Data { get; set; }
