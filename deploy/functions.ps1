@@ -16,7 +16,7 @@ function CopyTarget($targetName) {
 function BuildAll($deployPath) {
 	Push-Location ".."
 	echo "Publishing project..."
-	dotnet publish -o "${deployPath}" -f net451 -r active -c Release
+	dotnet publish -o "${deployPath}" -f net462 -r active -c Release
 	if(-Not $?)
 	{
 		exit $LASTEXITCODE

@@ -39,11 +39,11 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
         /// <summary>
         /// Server Mode
         /// </summary>
-        public ObjectEncryptionHost(IOptions<AppOptions> options, ILogger logger)
+        public ObjectEncryptionHost(IOptions<AppOptions> options, ILoggerFactory logger)
         {
             _rnd = new Random();
             _localEncryptionPath = options.Value.LocalEncryptionKeyPath;
-            _logger = logger;
+            _logger = logger.CreateLogger<ObjectEncryptionHost>();
             try
             {
                 X509Certificate2 cert;
@@ -74,7 +74,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             }
             catch (Exception e)
             {
-                logger.LogCritical(e.Message, e);
+                _logger.LogCritical(e.ToString());
             }
         }
 
