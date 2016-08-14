@@ -12,6 +12,7 @@ using VitalChoice.CreditCards.Entities;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 using Microsoft.EntityFrameworkCore;
 using VitalChoice.Data.Extensions;
+using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 
 namespace VitalChoice.CreditCards
 {

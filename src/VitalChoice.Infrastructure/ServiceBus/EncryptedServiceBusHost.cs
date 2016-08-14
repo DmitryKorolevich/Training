@@ -12,6 +12,7 @@ using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 
 namespace VitalChoice.Infrastructure.ServiceBus
 {
@@ -216,7 +217,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         protected virtual BrokeredMessage CreatePlainMessage(ServiceBusCommandBase command)
         {
-            return new BrokeredMessage(EncryptionHost.RsaSignWithConvert(command))
+            return new BrokeredMessage(EncryptionHost.SignWithConvert(command))
             {
                 TimeToLive = command.TimeToLeave,
                 CorrelationId = command.Destination
@@ -310,7 +311,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 return;
             }
             ServiceBusCommandBase remoteCommand;
-            if (EncryptionHost.RsaVerifyWithConvert(message.GetBody<TransportCommandData>(), out remoteCommand))
+            if (EncryptionHost.VerifySignWithConvert(message.GetBody<TransportCommandData>(), out remoteCommand))
             {
                 WeakReference<ServiceBusCommandBase> commandReference;
                 _commands.TryGetValue(remoteCommand, out commandReference);

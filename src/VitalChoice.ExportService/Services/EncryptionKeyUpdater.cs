@@ -11,7 +11,7 @@ using VitalChoice.ExportService.Context;
 using VitalChoice.ExportService.Entities;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Extensions;
-using VitalChoice.Infrastructure.ServiceBus.Base;
+using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 
 namespace VitalChoice.ExportService.Services
 {

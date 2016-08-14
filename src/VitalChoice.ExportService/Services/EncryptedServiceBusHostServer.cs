@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 using Autofac;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,14 +9,14 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus;
-using VitalChoice.Infrastructure.ServiceBus.Base;
+using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 
 namespace VitalChoice.ExportService.Services
 {
     public sealed class EncryptedServiceBusHostServer : EncryptedServiceBusHost
     {
         private readonly ILifetimeScope _rootScope;
-        private readonly RSACryptoServiceProvider _keyExchangeProvider;
+        private readonly RSACng _keyExchangeProvider;
         public override string LocalHostName => ServerHostName;
 
         public EncryptedServiceBusHostServer(IOptions<AppOptions> appOptions, ILoggerFactory loggerFactory,
@@ -26,7 +25,7 @@ namespace VitalChoice.ExportService.Services
         {
             _rootScope = rootScope;
             EncryptionHost.OnSessionExpired += OnSessionRemoved;
-            _keyExchangeProvider = new RSACryptoServiceProvider(4096);
+            _keyExchangeProvider = new RSACng();
         }
 
         protected override bool ProcessPlainCommand(ServiceBusCommandBase command)
@@ -34,7 +33,7 @@ namespace VitalChoice.ExportService.Services
             switch (command.CommandName)
             {
                 case ServiceBusCommandConstants.GetPublicKey:
-                    RSAParameters publicKey = _keyExchangeProvider.ExportParameters(false);
+                    var publicKey = _keyExchangeProvider.Key.Export(CngKeyBlobFormat.GenericPublicBlob);
                     SendPlainCommand(new ServiceBusCommandBase(command, publicKey));
                     break;
                 case ServiceBusCommandConstants.SetSessionKey:

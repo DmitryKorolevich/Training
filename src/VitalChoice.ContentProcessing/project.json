@@ -16,6 +16,6 @@
     "Templates": "2.7.14"
   },
   "frameworks": {
-    "net451": { }
+    "net462": { }
   }
 }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus.Base;
+using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services
