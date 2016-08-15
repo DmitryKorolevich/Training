@@ -99,26 +99,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
 
         public byte[] LocalEncrypt(object obj) => Encrypt(_localAes, ObjectSerializer.Serialize(obj));
 
-        public static bool ValidateClientCertificate(X509Certificate2 clientCert, X509Certificate2 rootCa)
-        {
-            if (clientCert == null)
-                throw new ArgumentNullException(nameof(clientCert));
-
-            X509Chain validationChain = new X509Chain
-            {
-                ChainPolicy =
-                {
-                    RevocationMode = X509RevocationMode.NoCheck,
-                    RevocationFlag = X509RevocationFlag.EntireChain,
-                    VerificationFlags = X509VerificationFlags.NoFlag,
-                    VerificationTime = DateTime.Now,
-                    UrlRetrievalTimeout = TimeSpan.Zero
-                }
-            };
-            validationChain.ChainPolicy.ExtraStore.Add(rootCa);
-            return validationChain.Build(clientCert);
-        }
-
         public byte[] RsaDecrypt(byte[] data, RSACng rsa)
         {
             if (data == null || rsa == null)
@@ -480,6 +460,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             certStore.Open(OpenFlags.ReadOnly);
             try
             {
+                // ReSharper disable once AssignNullToNotNullAttribute
                 var localCerts = certStore.Certificates.Find(X509FindType.FindByIssuerDistinguishedName, rootCa.IssuerName.Name, true);
                 Dictionary<string, ISignCheckProvider> result = new Dictionary<string, ISignCheckProvider>();
                 foreach (var localCert in localCerts)
@@ -658,6 +639,26 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             sha.Initialize();
             var pk = _signProvider.GetPrivateKey();
             return sha.ComputeHash(pk);
+        }
+
+        private static bool ValidateClientCertificate(X509Certificate2 clientCert, X509Certificate2 rootCa)
+        {
+            if (clientCert == null)
+                throw new ArgumentNullException(nameof(clientCert));
+
+            X509Chain validationChain = new X509Chain
+            {
+                ChainPolicy =
+                {
+                    RevocationMode = X509RevocationMode.NoCheck,
+                    RevocationFlag = X509RevocationFlag.EntireChain,
+                    VerificationFlags = X509VerificationFlags.NoFlag,
+                    VerificationTime = DateTime.Now,
+                    UrlRetrievalTimeout = TimeSpan.Zero
+                }
+            };
+            validationChain.ChainPolicy.ExtraStore.Add(rootCa);
+            return validationChain.Build(clientCert);
         }
 
         private byte[] Encrypt(AesCng aes, byte[] data)
