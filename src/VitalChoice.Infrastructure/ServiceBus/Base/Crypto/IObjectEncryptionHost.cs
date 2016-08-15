@@ -26,8 +26,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
         TransportCommandData AesEncryptSign(ServiceBusCommandBase command, Guid session);
         Guid GetSession();
         bool SessionExist(Guid session);
-        void SetAuthenticated(Guid session);
-        bool IsAuthenticated(Guid session);
         void RemoveSession(Guid session);
         bool RegisterSession(Guid session, string hostName, KeyExchange keyCombined);
         KeyExchange GetSessionKeys(Guid session);

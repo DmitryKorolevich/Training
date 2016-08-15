@@ -217,31 +217,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             }
         }
 
-        public bool IsAuthenticated(Guid session)
-        {
-            lock (_sessions)
-            {
-                SessionInfo info;
-                if (_sessions.TryGetValue(session, out info))
-                {
-                    return info.Authenticated;
-                }
-            }
-            return false;
-        }
-
-        public void SetAuthenticated(Guid session)
-        {
-            lock (_sessions)
-            {
-                SessionInfo info;
-                if (_sessions.TryGetValue(session, out info))
-                {
-                    info.Authenticated = true;
-                }
-            }
-        }
-
         public bool RegisterSession(Guid session, string hostName, KeyExchange keyExchange)
         {
             AesCng aes = new AesCng();
