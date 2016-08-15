@@ -115,7 +115,7 @@
                                                                 <input type="text" name="SKU{{$index}}" class="form-control" placeholder="SKU" data-ng-model="item.Code"
                                                                        typeahead-min-length="1" uib-typeahead="sku.Code as (sku.Code+' - '+ sku.DescriptionName) for sku in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU"
                                                                        typeahead-on-select="skuChanged($index)" data-ng-blur="skuChanged($index)"
-                                                                       typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
+                                                                       typeahead-wait-ms="200" data-ng-disabled="orderEditDisabled">
                                                             </div>
                                                         </td>
                                                         <td class="type">
@@ -131,7 +131,7 @@
                                                             <div class="input-group autocomplete">
                                                                 <input type="text" name="ProductName{{$index}}" class="form-control" placeholder="Product Name" data-ng-model="item.ProductName"
                                                                        typeahead-min-length="1" uib-typeahead="sku.DescriptionName as sku.DescriptionName for sku in getSKUsByProductName($viewValue)" typeahead-loading="loadingSKUsByProductNane"
-                                                                       typeahead-on-select="productNameChanged($index)" typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
+                                                                       typeahead-on-select="productNameChanged($index)" typeahead-wait-ms="200" data-ng-disabled="orderEditDisabled">
                                                             </div>
                                                             <div data-ng-if="item.GCCodes" class="input-group">
                                                                 <span data-ng-repeat="gc in item.GCCodes"><em>GC Code: {{gc}}</em><br /></span>

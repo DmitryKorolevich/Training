@@ -60,6 +60,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Services;
+using VitalChoice.Infrastructure.Domain;
 
 namespace VC.Admin.Controllers
 {
@@ -1530,7 +1531,7 @@ namespace VC.Admin.Controllers
 
             var idCustomer = Int32.Parse(form["idcustomer"]);
             int? idPaymentMethod = null;
-            OrderType orderType = (OrderType)Int32.Parse(form["ordertype"]);
+            OrderImportType orderType = (OrderImportType)Int32.Parse(form["ordertype"]);
             if (form.ContainsKey("idpaymentmethod"))
             {
                 idPaymentMethod = Int32.Parse(form["idpaymentmethod"]);

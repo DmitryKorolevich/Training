@@ -51,6 +51,7 @@ using VitalChoice.Business.Services;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Identity.UserManagers;
+using VitalChoice.Infrastructure.Domain;
 
 namespace VC.Admin.Controllers
 {

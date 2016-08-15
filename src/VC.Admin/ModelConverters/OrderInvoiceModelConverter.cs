@@ -26,6 +26,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Interfaces.Services.Users;
+using VitalChoice.Infrastructure.Domain;
 
 namespace VC.Admin.ModelConverters
 {

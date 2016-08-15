@@ -1754,81 +1754,70 @@ namespace VitalChoice.Business.Services.Orders
 
         #region OrdersImport
 
-        public async Task<bool> ImportOrders(byte[] file, string fileName, OrderType orderType, int idCustomer, int? idPaymentMethod, int idAddedBy)
+        public async Task<bool> ImportOrders(byte[] file, string fileName, OrderImportType orderType, int idCustomer, int? idPaymentMethod, int idAddedBy)
         {
             var customer = await _customerService.SelectAsync(idCustomer);
             if (customer == null)
             {
                 throw new AppValidationException("Invalid file format");
             }
+
+            BaseOrderImportProcessor processor = null;
             CustomerPaymentMethodDynamic paymentMethod = null;
-            if (orderType == OrderType.GiftList)
-            {
-                if (!customer.ApprovedPaymentMethods.Contains((int)PaymentMethodType.NoCharge))
-                {
-                    throw new AppValidationException("Payment method \"No Charge\" should be allowed");
-                }
-                paymentMethod = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == idPaymentMethod);
-                if (paymentMethod == null || paymentMethod.IdObjectType != (int)PaymentMethodType.CreditCard ||
-                    paymentMethod.Address == null)
-                {
-                    throw new AppValidationException("Payment method \"Credit Card\" should be configured");
-                }
-            }
-            if (orderType == OrderType.DropShip)
-            {
-                if (!customer.ApprovedPaymentMethods.Contains((int) PaymentMethodType.Oac))
-                {
-                    throw new AppValidationException("Payment method \"On Approved Credit\" should be allowed");
-                }
-                paymentMethod = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == idPaymentMethod);
-                if (paymentMethod == null || paymentMethod.IdObjectType != (int) PaymentMethodType.Oac ||
-                    paymentMethod.Address==null)
-                {
-                    throw new AppValidationException("Payment method \"On Approved Credit\" should be configured");
-                }
-            }
-            if (orderType != OrderType.GiftList && orderType != OrderType.DropShip)
-            {
-                throw new ApiException("Orders import with the given orderType isn't implemented");
-            }
 
-            List<OrderBaseImportItem> records = null;
-            Dictionary<string, OrderValidationGenericProperty> validationSettings = null;
-            var countries = await _countryService.GetCountriesAsync(new CountryFilter());
-            using (var memoryStream = new MemoryStream(file))
+            switch (orderType)
             {
-                using (var streamReader = new StreamReader(memoryStream))
-                {
-                    CsvConfiguration configuration = new CsvConfiguration();
-                    configuration.TrimFields = true;
-                    configuration.TrimHeaders = true;
-                    configuration.RegisterClassMap<OrderGiftListImportItemCsvMap>();
-                    configuration.RegisterClassMap<OrderDropShipImportItemCsvMap>();
-                    using (var csv = new CsvReader(streamReader, configuration))
+                case OrderImportType.GiftList:
+                    if (!customer.ApprovedPaymentMethods.Contains((int)PaymentMethodType.NoCharge))
                     {
-                        records = ProcessImportOrderItems(csv, orderType, countries, out validationSettings);
+                        throw new AppValidationException("Payment method \"No Charge\" should be allowed");
                     }
-                }
+                    paymentMethod = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == idPaymentMethod);
+                    if (paymentMethod == null || paymentMethod.IdObjectType != (int)PaymentMethodType.CreditCard ||
+                        paymentMethod.Address == null)
+                    {
+                        throw new AppValidationException("Payment method \"Credit Card\" should be configured");
+                    }
+                    processor = new GiftListOrderImportProcessor(_countryService, Mapper, _addressMapper);
+
+                    break;
+                case OrderImportType.DropShip:
+                    if (!customer.ApprovedPaymentMethods.Contains((int)PaymentMethodType.Oac))
+                    {
+                        throw new AppValidationException("Payment method \"On Approved Credit\" should be allowed");
+                    }
+                    paymentMethod = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == idPaymentMethod);
+                    if (paymentMethod == null || paymentMethod.IdObjectType != (int)PaymentMethodType.Oac ||
+                        paymentMethod.Address == null)
+                    {
+                        throw new AppValidationException("Payment method \"On Approved Credit\" should be configured");
+                    }
+                    processor = new DropShipOrderImportProcessor(_countryService, Mapper, _addressMapper);
+
+                    break;
+                case OrderImportType.DropShipAAFES:
+                    if (!customer.ApprovedPaymentMethods.Contains((int)PaymentMethodType.Oac))
+                    {
+                        throw new AppValidationException("Payment method \"On Approved Credit\" should be allowed");
+                    }
+                    paymentMethod = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == idPaymentMethod);
+                    if (paymentMethod == null || paymentMethod.IdObjectType != (int)PaymentMethodType.Oac ||
+                        paymentMethod.Address == null)
+                    {
+                        throw new AppValidationException("Payment method \"On Approved Credit\" should be configured");
+                    }
+                    processor = new DropShipAAFESSOrderImportProcessor(_countryService, Mapper, _addressMapper);
+
+                    break;
+                default:
+                    throw new ApiException("Orders import with the given orderType isn't implemented");
             }
 
-            if (records != null && validationSettings != null)
-            {
-                ValidateOrderImportItems(records, validationSettings);
-            }
-
-            //throw parsing and validation errors
-            var messages = FormatRowsRecordErrorMessages(records);
-            if (messages.Count > 0)
-            {
-                throw new AppValidationException(messages);
-            }
-
-            var map = await OrdersForImportBaseConvert(records, orderType, customer, paymentMethod, idAddedBy);
+            var map = await processor.ParseAndValidateAsync(file, orderType, customer, paymentMethod, idAddedBy);
 
             await LoadSkusDynamic(map, customer);
             //not found SKU errors
-            messages = FormatRowsRecordErrorMessages(records);
+            var messages = processor.FormatRowsRecordErrorMessages(map.SelectMany(p=>p.OrderImportItems));
             if (messages.Count > 0)
             {
                 throw new AppValidationException(messages);
@@ -1841,13 +1830,14 @@ namespace VitalChoice.Business.Services.Orders
 
                 var context = await CalculateOrder(item.Order, orderCombinedStatus);
 
-                item.OrderImportItem.ErrorMessages.AddRange(context.Messages);
-                item.OrderImportItem.ErrorMessages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages));
-                item.OrderImportItem.ErrorMessages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages));
+                var firstRow = item.OrderImportItems.First();
+                firstRow.ErrorMessages.AddRange(context.Messages);
+                firstRow.ErrorMessages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages));
+                firstRow.ErrorMessages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages));
             }
 
             //throw calculating errors
-            messages = FormatRowsRecordErrorMessages(map.Select(p => p.OrderImportItem));
+            messages = processor.FormatRowsRecordErrorMessages(map.SelectMany(p => p.OrderImportItems));
             if (messages.Count > 0)
             {
                 throw new AppValidationException(messages);
@@ -1856,7 +1846,7 @@ namespace VitalChoice.Business.Services.Orders
             var orders = map.Select(p => p.Order).ToList();
             orders = await InsertRangeAsync(orders);
 
-            if (orderType == OrderType.GiftList && idPaymentMethod.HasValue)
+            if (orderType == OrderImportType.GiftList && idPaymentMethod.HasValue)
             {
                 await SendGLOrdersImportEmailAsync(orders, customer, idPaymentMethod.Value, idAddedBy);
             }
@@ -1885,7 +1875,7 @@ namespace VitalChoice.Business.Services.Orders
             await _notificationService.SendGLOrdersImportEmailAsync(model);
         }
 
-        private async Task LoadSkusDynamic(List<OrderImportItemOrderDynamic> map, CustomerDynamic customer)
+        private async Task LoadSkusDynamic(IList<OrderImportItemOrderDynamic> map, CustomerDynamic customer)
         {
             List<string> requestCodes = map.Select(p => p.Order).Where(p => p.Skus != null).SelectMany(p => p.Skus).Where(p => p.Sku != null).Select(p => p.Sku.Code).ToList();
 
@@ -1900,7 +1890,8 @@ namespace VitalChoice.Business.Services.Orders
                         var dbSku = dbSkus.FirstOrDefault(p => p.Sku.Code == sku.Sku.Code);
                         if (dbSku == null)
                         {
-                            item.OrderImportItem.ErrorMessages.Add(AddErrorMessage("SKU " + index, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuNotFoundOrderImport], "SKU " + index, sku.Sku.Code)));
+                            var firstRecord = item.OrderImportItems.First();
+                            firstRecord.ErrorMessages.Add(AddErrorMessage("SKU " + index, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuNotFoundOrderImport], "SKU " + index, sku.Sku.Code)));
                             continue;
                         }
                         else
@@ -1917,278 +1908,6 @@ namespace VitalChoice.Business.Services.Orders
                     }
                 }
             }
-        }
-
-        private async Task<List<OrderImportItemOrderDynamic>> OrdersForImportBaseConvert(List<OrderBaseImportItem> records, OrderType orderType,
-            CustomerDynamic customer, CustomerPaymentMethodDynamic paymentMethod, int idAddedBy)
-        {
-            List<OrderImportItemOrderDynamic> toReturn = new List<OrderImportItemOrderDynamic>();
-            foreach (var record in records)
-            {
-                var order = Mapper.CreatePrototype((int) orderType);
-                order.IdEditedBy = idAddedBy;
-                order.Customer = customer;
-                order.ShippingAddress = await _addressMapper.FromModelAsync(record, (int) AddressType.Shipping);
-                record.SetFields(order, paymentMethod);
-                toReturn.Add(new OrderImportItemOrderDynamic
-                {
-                    OrderImportItem = record, Order = order,
-                });
-            }
-            return toReturn;
-        }
-
-        private List<OrderBaseImportItem> ProcessImportOrderItems(CsvReader reader, OrderType orderType, ICollection<Country> countries, out Dictionary<string, OrderValidationGenericProperty> validationSettings)
-        {
-            List<OrderBaseImportItem> toReturn = new List<OrderBaseImportItem>();
-
-            Type orderImportItemType;
-            if (orderType == OrderType.GiftList)
-            {
-                orderImportItemType = typeof(OrderGiftListImportItem);
-            }
-            else if (orderType == OrderType.DropShip)
-            {
-                orderImportItemType = typeof(OrderDropShipImportItem);
-            }
-            else
-            {
-                throw new ApiException("Orders import with the given orderType isn't implemented");
-            }
-            PropertyInfo[] modelProperties = orderImportItemType.GetProperties();
-            validationSettings = GetOrderImportValidationSettings(modelProperties);
-
-            var shipDateProperty = modelProperties.FirstOrDefault(p => p.Name == nameof(OrderGiftListImportItem.ShipDelayDate));
-            var shipDateHeader = shipDateProperty?.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault()?.Name;
-
-            var skuProperties = typeof(OrderSkuImportItem).GetProperties();
-            var skuProperty = skuProperties.FirstOrDefault(p => p.Name == nameof(OrderSkuImportItem.SKU));
-            var skuBaseHeader = skuProperty?.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault()?.Name;
-            var qtyProperty = skuProperties.FirstOrDefault(p => p.Name == nameof(OrderSkuImportItem.QTY));
-            var qtyBaseHeader = qtyProperty?.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault()?.Name; // ReSharper disable all
-
-            int rowNumber = 1;
-            try
-            {
-                while (reader.Read())
-                {
-                    OrderBaseImportItem item = (OrderBaseImportItem) reader.GetRecord(orderImportItemType);
-                    item.RowNumber = rowNumber;
-                    var messages = new List<MessageInfo>();
-                    rowNumber++;
-
-                    if (orderImportItemType == typeof(OrderGiftListImportItem))
-                    {
-                        ((OrderGiftListImportItem) item).ShipDelayDate = ParseOrderShipDate(reader, shipDateHeader, ref messages);
-                    }
-                    if (orderImportItemType == typeof(OrderDropShipImportItem))
-                    {
-                        ((OrderDropShipImportItem) item).ShipDelayDate = ParseOrderShipDate(reader, shipDateHeader, ref messages);
-                    }
-                    item.Skus = ParseOrderSkus(reader, skuBaseHeader, qtyBaseHeader, ref messages);
-
-                    int? idState = null;
-                    int? idCountry = null;
-                    GetContryAndState(item.State, item.Country, countries, ref messages, out idState, out idCountry);
-                    item.IdState = idState;
-                    item.IdCountry = idCountry;
-
-                    if (!String.IsNullOrEmpty(item.Phone))
-                    {
-                        item.Phone = item.Phone.Replace(" ", "").Replace("+", "").Replace("-", "");
-                    }
-
-                    item.ErrorMessages = messages;
-                    toReturn.Add(item);
-                }
-            }
-            catch (Exception)
-            {
-                throw new AppValidationException("Invalid file format");
-            }
-            return toReturn;
-        }
-
-        private void ValidateOrderImportItems(ICollection<OrderBaseImportItem> models, Dictionary<string, OrderValidationGenericProperty> settings)
-        {
-            EmailValidator emailValidator = new EmailValidator();
-            var emailRegex = new Regex(emailValidator.Expression, RegexOptions.IgnoreCase);
-            foreach (var model in models)
-            {
-                foreach (var pair in settings)
-                {
-                    var setting = pair.Value;
-
-                    bool valid = true;
-                    if (typeof(string) == setting.PropertyType)
-                    {
-                        string value = (string) setting.Get(model);
-                        if (setting.IsRequired && String.IsNullOrEmpty(value))
-                        {
-                            model.ErrorMessages.Add(AddErrorMessage(setting.DisplayName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsRequired], setting.DisplayName)));
-                            valid = false;
-                        }
-
-                        if (valid && setting.MaxLength.HasValue && !String.IsNullOrEmpty(value) && value.Length > setting.MaxLength.Value)
-                        {
-                            model.ErrorMessages.Add(AddErrorMessage(setting.DisplayName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldMaxLength], setting.DisplayName, setting.MaxLength.Value)));
-                            valid = false;
-                        }
-
-                        if (valid && setting.IsEmail && !String.IsNullOrEmpty(value))
-                        {
-                            if (!emailRegex.IsMatch(value))
-                            {
-                                model.ErrorMessages.Add(AddErrorMessage(setting.DisplayName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsInvalidEmail], setting.DisplayName)));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private Dictionary<string, OrderValidationGenericProperty> GetOrderImportValidationSettings(ICollection<PropertyInfo> modelProperties)
-        {
-            Dictionary<string, OrderValidationGenericProperty> toReturn = new Dictionary<string, OrderValidationGenericProperty>();
-            foreach (var modelProperty in modelProperties)
-            {
-                var displayAttribute = modelProperty.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault();
-                if (displayAttribute != null)
-                {
-                    OrderValidationGenericProperty item = new OrderValidationGenericProperty();
-                    item.DisplayName = displayAttribute.Name;
-                    item.PropertyInfo = modelProperty;
-                    item.PropertyType = modelProperty.PropertyType;
-                    item.Get = modelProperty.GetMethod?.CompileAccessor<object, object>();
-                    var requiredAttribute = modelProperty.GetCustomAttributes<RequiredAttribute>(true).FirstOrDefault();
-                    if (requiredAttribute != null)
-                    {
-                        item.IsRequired = true;
-                    }
-                    var emailAddressAttribute = modelProperty.GetCustomAttributes<EmailAddressAttribute>(true).FirstOrDefault();
-                    if (emailAddressAttribute != null)
-                    {
-                        item.IsEmail = true;
-                    }
-                    var maxLengthAttribute = modelProperty.GetCustomAttributes<MaxLengthAttribute>(true).FirstOrDefault();
-                    if (maxLengthAttribute != null)
-                    {
-                        item.MaxLength = maxLengthAttribute.Length;
-                    }
-                    toReturn.Add(modelProperty.Name, item);
-                }
-            }
-
-            return toReturn;
-        }
-
-        private void GetContryAndState(string stateCode, string countryCode, ICollection<Country> countries, ref List<MessageInfo> messages, out int? idState, out int? idCountry)
-        {
-            idState = null;
-            idCountry = null;
-            if (!String.IsNullOrEmpty(countryCode))
-            {
-                var country = countries.FirstOrDefault(p => p.CountryCode == countryCode);
-                if (country != null)
-                {
-                    idCountry = country.Id;
-                    if (!String.IsNullOrEmpty(stateCode))
-                    {
-                        var state = country.States.FirstOrDefault(p => p.StateCode == stateCode);
-                        if (state == null)
-                        {
-                            messages.Add(AddErrorMessage(nameof(OrderBaseImportItem.State), String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidFieldValue], nameof(OrderBaseImportItem.State))));
-                        }
-                        else
-                        {
-                            idState = state.Id;
-                        }
-                    }
-                }
-                else
-                {
-                    messages.Add(AddErrorMessage(nameof(OrderBaseImportItem.Country), String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidFieldValue], nameof(OrderBaseImportItem.Country))));
-                }
-            }
-        }
-
-        private DateTime? ParseOrderShipDate(CsvReader reader, string columnName, ref List<MessageInfo> messages)
-        {
-            DateTime? toReturn = null;
-            DateTime shipDate;
-            var sShipDate = reader.GetField<string>(columnName);
-            if (!String.IsNullOrEmpty(sShipDate))
-            {
-                if (DateTime.TryParse(sShipDate, CultureInfo.InvariantCulture, DateTimeStyles.None, out shipDate))
-                {
-                    toReturn = TimeZoneInfo.ConvertTime(shipDate, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local);
-                    if (toReturn < DateTime.Now)
-                    {
-                        messages.Add(AddErrorMessage(columnName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.MustBeFutureDateError], columnName)));
-                    }
-                }
-                else
-                {
-                    messages.Add(AddErrorMessage(columnName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ParseDateError], columnName)));
-                }
-            }
-
-            return toReturn;
-        }
-
-        private ICollection<OrderSkuImportItem> ParseOrderSkus(CsvReader reader, string skuColumnName, string qtyColumnName, ref List<MessageInfo> messages)
-        {
-            List<OrderSkuImportItem> toReturn = new List<OrderSkuImportItem>();
-            int number = 1;
-            bool existInHeaders = true;
-            while (existInHeaders)
-            {
-                existInHeaders = reader.FieldHeaders.Contains($"{skuColumnName} {number}");
-                existInHeaders = existInHeaders && reader.FieldHeaders.Contains($"{qtyColumnName} {number}");
-
-                if (existInHeaders)
-                {
-                    var sku = reader.GetField<string>($"{skuColumnName} {number}");
-                    var sqty = reader.GetField<string>($"{qtyColumnName} {number}");
-
-                    if (!String.IsNullOrEmpty(sku) || !String.IsNullOrEmpty(sqty))
-                    {
-                        int qty = 0;
-                        Int32.TryParse(sqty, out qty);
-                        if (qty == 0)
-                        {
-                            messages.Add(AddErrorMessage($"{qtyColumnName} {number}", String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ParseIntError], $"{qtyColumnName} {number}")));
-                        }
-                        else
-                        {
-                            OrderSkuImportItem item = new OrderSkuImportItem();
-                            item.SKU = sku;
-                            item.QTY = qty;
-                            toReturn.Add(item);
-                        }
-                    }
-                }
-
-                number++;
-            }
-            if (toReturn.Count == 0)
-            {
-                messages.Add(AddErrorMessage(null, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ZeroSkusForOrderInImport])));
-            }
-            return toReturn;
-        }
-
-        private ICollection<MessageInfo> FormatRowsRecordErrorMessages(IEnumerable<OrderBaseImportItem> items)
-        {
-            List<MessageInfo> toReturn = new List<MessageInfo>();
-            foreach (var item in items)
-            {
-                toReturn.AddRange(item.ErrorMessages.Select(p => new MessageInfo()
-                {
-                    Field = p.Field, Message = String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.OrderImportRowError], item.RowNumber, p.Message),
-                }));
-            }
-            return toReturn;
         }
 
         private MessageInfo AddErrorMessage(string field, string message)

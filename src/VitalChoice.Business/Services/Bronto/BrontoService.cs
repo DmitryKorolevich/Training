@@ -24,6 +24,7 @@ using System.Threading;
 using FluentValidation.Validators;
 using Microsoft.Extensions.Options;
 using VitalChoice.Business.Helpers;
+using VitalChoice.Infrastructure.Domain;
 
 namespace VitalChoice.Business.Services.Bronto
 {

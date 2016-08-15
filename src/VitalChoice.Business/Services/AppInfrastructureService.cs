@@ -416,9 +416,6 @@ namespace VitalChoice.Business.Services
             referenceData.Warehouses = LookupHelper.GetWarehouses();
             referenceData.ProductCategoryViewTypes = LookupHelper.GetProductCategoryViewTypes();
 
-            //BUG: shoule be moved to the specific worker
-            await SetupAppSettings();
-
             return referenceData;
             
         }

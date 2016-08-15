@@ -40,7 +40,7 @@
                         <div class="input-group autocomplete col-md-12">
                             <input type="text" name="Sku" class="form-control" placeholder="Product SKU" data-ng-change="filterChanged();" data-ng-model="filter.Sku" autocomplete="off" data-ng-minlength="3"
                                    typeahead-min-length="1" uib-typeahead="sku.Code as sku.Code for sku in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU"
-                                   typeahead-wait-ms="100">
+                                   typeahead-wait-ms="200">
                         </div>
                         <div class="error-container" ng-show="forms.form.submitted && forms.form.Sku.$invalid">
                             <small class="error" ng-show="forms.form.Sku.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Product SKU")}}</small>
@@ -50,7 +50,7 @@
                         <div class="input-group autocomplete col-md-12">
                             <input type="text" name="InvSku" class="form-control" placeholder="Inventory Code" data-ng-change="filterChanged();" data-ng-model="filter.InvSku" autocomplete="off" data-ng-minlength="3"
                                    typeahead-min-length="1" uib-typeahead="sku.Code as sku.Code for sku in getInvSKUsBySKU($viewValue)" typeahead-loading="loadingInvSKUsBySKU"
-                                   typeahead-wait-ms="100">
+                                   typeahead-wait-ms="200">
                         </div>
                         <div class="error-container" ng-show="forms.form.submitted && forms.form.InvSku.$invalid">
                             <small class="error" ng-show="forms.form.InvSku.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Part SKU")}}</small>
