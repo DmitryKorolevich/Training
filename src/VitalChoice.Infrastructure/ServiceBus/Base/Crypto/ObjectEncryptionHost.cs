@@ -701,7 +701,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             {
                 if (resultSeed + blockSize > result.Length)
                 {
-                    Array.Resize(ref result, resultSeed + blockSize*2);
+                    Array.Resize(ref result, resultSeed + blockSize);
                 }
                 resultSeed += transform.TransformBlock(data, sourceSeed, blockSize, result, resultSeed);
                 sourceSeed += blockSize;
