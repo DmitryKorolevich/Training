@@ -30,7 +30,7 @@
                         <div class="input-group autocomplete col-md-12">
                             <input type="text" name="SkuCode" class="form-control" placeholder="Product SKU" data-ng-model="filter.SkuCode" autocomplete="off"
                                    typeahead-min-length="1" uib-typeahead="sku.Code as sku.Code for sku in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU"
-                                   typeahead-wait-ms="100">
+                                   typeahead-wait-ms="200">
                             <span class="input-group-addon">
                                 <i ng-show="loadingSKUsBySKU" class="glyphicon glyphicon-refresh"></i>
                             </span>

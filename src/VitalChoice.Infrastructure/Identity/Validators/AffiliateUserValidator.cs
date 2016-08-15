@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using VitalChoice.Infrastructure.Domain;
 #if NET451
 using System.Net.Mail;
 #endif
@@ -77,17 +78,13 @@ namespace VitalChoice.Infrastructure.Identity.Validators
                 errors.Add(Describer.InvalidEmail(email));
                 return;
             }
-#if NET451
-            try
-            {
-                var m = new MailAddress(email);
-            }
-            catch (FormatException)
+
+            if (!email.IsValidEmail())
             {
                 errors.Add(Describer.InvalidEmail(email));
                 return;
             }
-#endif
+
             //var owner = await manager.FindByEmailAsync(email);
             //if (owner != null &&
             //    !string.Equals(await manager.GetUserIdAsync(owner), await manager.GetUserIdAsync(user)))

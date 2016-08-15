@@ -6,6 +6,7 @@ using VC.Public.Models.Profile;
 using VitalChoice.Business.Helpers;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain;
 
 namespace VC.Public.ModelConverters.Customer
 {

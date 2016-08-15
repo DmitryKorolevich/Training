@@ -20,23 +20,8 @@ BEGIN
 	IF(@onlytop=1)
 	BEGIN
 
-		WITH tempOrders
-		(
-			Id, 
-			IdObjectType, 
-			IdCustomer,
-			OrderStatus,
-			POrderStatus, 
-			NPOrderStatus, 
-			DateCreated,
-			DateEdited,
-			ProductsSubtotal, 
-			Total,
-			TotalCount
-		)
-		AS
-		(
 		SELECT
+			TOP(@pagesize)
 			o.Id,
 			o.IdObjectType,
 			o.IdCustomer, 
@@ -47,18 +32,13 @@ BEGIN
 			o.DateEdited,
 			o.ProductsSubtotal,
 			o.Total,
-			0
+			0 TotalCount
 		FROM Orders o WITH(NOLOCK)
 		WHERE
 			(o.Id LIKE @idfilter) AND
 			o.StatusCode!=3 AND o.IdObjectType!=2 AND 
 			(@idobjecttype IS NULL OR o.IdObjectType = @idobjecttype) AND
 			(@idcustomer IS NULL OR o.IdCustomer = @idcustomer)
-		)
-
-		SELECT TOP(@pagesize)
-			* 
-		FROM tempOrders
 		ORDER BY Id ASC
 		OPTION(RECOMPILE)
 

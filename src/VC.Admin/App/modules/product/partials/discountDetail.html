@@ -211,7 +211,8 @@
                                                 <div class="col-md-9">
                                                     <div class="input-group autocomplete">
                                                         <input type="text" name="ProductSKU" class="form-control" placeholder="Product SKU" data-ng-model="discount.ProductSKU" required
-                                                               typeahead-min-length="3" uib-typeahead="code for code in getSkus($viewValue)" typeahead-loading="loadingSkus">
+                                                               typeahead-min-length="3" typeahead-wait-ms="200"
+                                                               uib-typeahead="code for code in getSkus($viewValue)" typeahead-loading="loadingSkus">
                                                         <span class="input-group-addon">
                                                             <i ng-show="loadingSkus" class="glyphicon glyphicon-refresh"></i>
                                                         </span>

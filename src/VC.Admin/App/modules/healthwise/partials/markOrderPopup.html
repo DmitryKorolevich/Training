@@ -10,7 +10,7 @@
                     <div class="col-md-9">
                         <div class="input-group autocomplete">
                             <input type="text" name="IdOrder" class="form-control" placeholder="Order #" data-ng-model="options.IdOrder" required numbers-only
-                                   typeahead-min-length="3" uib-typeahead="item.Id as item.Id for item in getOrders($viewValue)" typeahead-loading="loadingOrders">
+                                   typeahead-min-length="3" typeahead-wait-ms="200" uib-typeahead="item.Id as item.Id for item in getOrders($viewValue)" typeahead-loading="loadingOrders">
                             <span class="input-group-addon">
                                 <i ng-show="loadingOrders" class="glyphicon glyphicon-refresh"></i>
                             </span>

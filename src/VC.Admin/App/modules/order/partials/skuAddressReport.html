@@ -35,7 +35,7 @@
                         <div class="input-group autocomplete col-md-12">
                             <input type="text" name="SKU" class="form-control" placeholder="SKU" data-ng-model="filter.SkuCode" autocomplete="off"
                                    typeahead-min-length="1" uib-typeahead="item.Code as item.Code for item in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU"
-                                   typeahead-wait-ms="100" data-ng-change="filterChanged();">
+                                   typeahead-wait-ms="200" data-ng-change="filterChanged();">
                             <span class="input-group-addon">
                                 <i ng-show="loadingSKUsBySKU" class="glyphicon glyphicon-refresh"></i>
                             </span>
@@ -45,7 +45,7 @@
                         <div class="input-group autocomplete col-md-12">
                             <input data-ng-disabled="filter.WithoutDiscount" type="text" name="DiscountCode" class="form-control" placeholder="Discount Code" data-ng-model="filter.DiscountCode" autocomplete="off"
                                    typeahead-min-length="1" uib-typeahead="item.Code as item.Code for item in getDiscounts($viewValue)" typeahead-loading="loadingDiscountCodesByCode"
-                                   typeahead-wait-ms="100" data-ng-change="filterChanged();">
+                                   typeahead-wait-ms="200" data-ng-change="filterChanged();">
                             <span class="input-group-addon">
                                 <i ng-show="loadingDiscountCodesByCode" class="glyphicon glyphicon-refresh"></i>
                             </span>

@@ -27,6 +27,7 @@ using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain;
 
 namespace VC.Admin.Controllers
 {

@@ -88,7 +88,7 @@
                                                                 <input type="text" name="SKU{{$index}}" class="form-control" placeholder="SKU" data-ng-model="item.Code"
                                                                        typeahead-min-length="1" uib-typeahead="sku.Code as (sku.Code+' - '+ sku.DescriptionName) for sku in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU"
                                                                        typeahead-on-select="skuChanged($index)" data-ng-blur="skuChanged($index)"
-                                                                       typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
+                                                                       typeahead-wait-ms="200" data-ng-disabled="orderEditDisabled">
                                                             </div>
                                                         </td>
                                                         <td class="type">
@@ -104,7 +104,7 @@
                                                             <div class="input-group autocomplete">
                                                                 <input type="text" name="ProductName{{$index}}" class="form-control" placeholder="Product Name" data-ng-model="item.ProductName"
                                                                        typeahead-min-length="1" uib-typeahead="sku.DescriptionName as sku.DescriptionName for sku in getSKUsByProductName($viewValue)" typeahead-loading="loadingSKUsByProductNane"
-                                                                       typeahead-on-select="productNameChanged($index)" typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
+                                                                       typeahead-on-select="productNameChanged($index)" typeahead-wait-ms="200" data-ng-disabled="orderEditDisabled">
                                                             </div>
                                                             <div data-ng-if="item.GCCodes" class="input-group">
                                                                 <span data-ng-repeat="gc in item.GCCodes"><em>GC Code: {{gc}}</em><br /></span>
@@ -429,7 +429,7 @@
                                                             <div class="input-group autocomplete">
                                                                 <input type="text" name="DiscountCode" class="form-control" placeholder="Discount Code" data-ng-model="order.DiscountCode" autocomplete="off"
                                                                        typeahead-min-length="1" uib-typeahead="code for code in getDiscounts($viewValue)" typeahead-loading="loadingDiscounts" data-ng-blur="requestRecalculate()"
-                                                                       typeahead-on-select="requestRecalculate()" typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
+                                                                       typeahead-on-select="requestRecalculate()" typeahead-wait-ms="200" data-ng-disabled="orderEditDisabled">
                                                             </div>
                                                             <div class="error-container" ng-show="forms.mainForm2.submitted && forms.mainForm2.DiscountCode.$invalid">
                                                                 <small class="error" ng-show="forms.mainForm2.DiscountCode.$error.server">{{calculateServerMessages.GetMessage('DiscountCode')}}</small>
@@ -450,7 +450,7 @@
                                                                         <div class="input-group autocomplete code">
                                                                             <input type="text" name="Code" class="form-control" placeholder="Gift Certificate" data-ng-model="gc.Code" autocomplete="off"
                                                                                    typeahead-min-length="1" uib-typeahead="code for code in getGCs($viewValue)" typeahead-loading="loadingGCs" data-ng-blur="gcLostFocus($index, gc.Code)"
-                                                                                   typeahead-on-select="requestRecalculate()" typeahead-wait-ms="100" data-ng-disabled="orderEditDisabled">
+                                                                                   typeahead-on-select="requestRecalculate()" typeahead-wait-ms="200" data-ng-disabled="orderEditDisabled">
                                                                         </div>
                                                                         <div class="error-container small-block" ng-show="forms.GCs.skussubmitted && forms.GCs.i{{$index}}.Code.$invalid">
                                                                             <small class="error" ng-show="forms.GCs.i{{$index}}.Code.$error.server">{{calculateServerMessages.GetMessage('Code','GCs',$index)}}</small>
