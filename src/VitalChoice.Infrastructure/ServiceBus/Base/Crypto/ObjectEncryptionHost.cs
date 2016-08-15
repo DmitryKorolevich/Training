@@ -314,9 +314,12 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                 }
                 _sessions.Clear();
             }
-            foreach (var signCheckProvider in _remoteSignCheckProviders.Values)
+            if (_remoteSignCheckProviders != null)
             {
-                signCheckProvider.Dispose();
+                foreach (var signCheckProvider in _remoteSignCheckProviders.Values)
+                {
+                    signCheckProvider.Dispose();
+                }
             }
         }
 
@@ -477,11 +480,12 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             certStore.Open(OpenFlags.ReadOnly);
             try
             {
-                var localCerts = certStore.Certificates.Find(X509FindType.FindByIssuerDistinguishedName, rootCa.IssuerName, true);
+                var localCerts = certStore.Certificates.Find(X509FindType.FindByIssuerDistinguishedName, rootCa.IssuerName.Name, true);
                 Dictionary<string, ISignCheckProvider> result = new Dictionary<string, ISignCheckProvider>();
                 foreach (var localCert in localCerts)
                 {
-                    if (!localCert.HasPrivateKey && ValidateClientCertificate(localCert, rootCa))
+                    if (rootCa.Thumbprint != localCert.Thumbprint && !localCert.HasPrivateKey &&
+                        ValidateClientCertificate(localCert, rootCa))
                     {
                         // ReSharper disable once AssignNullToNotNullAttribute
                         result.Add(localCert.Thumbprint, CreateSignCheckProvider(localCert));
@@ -501,9 +505,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
 
         private ISignCheckProvider CreateSignCheckProvider(X509Certificate2 cert)
         {
-            if (!cert.HasPrivateKey)
-                throw new InvalidOperationException("Certificate has no private key imported.");
-
             switch (SignAlgorithmType)
             {
                 case "RSA":
