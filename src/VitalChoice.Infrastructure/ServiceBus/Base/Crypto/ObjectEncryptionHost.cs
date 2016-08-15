@@ -699,7 +699,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             }
             while (sourceSeed < data.Length - blockSize)
             {
-                if (resultSeed + blockSize < result.Length)
+                if (resultSeed + blockSize > result.Length)
                 {
                     Array.Resize(ref result, resultSeed + blockSize*2);
                 }
