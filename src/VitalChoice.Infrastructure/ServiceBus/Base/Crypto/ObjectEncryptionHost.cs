@@ -679,41 +679,35 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
 
         private static byte[] TransformBlocks(byte[] data, ICryptoTransform transform)
         {
-            var blockSize = transform.InputBlockSize;
-            if (data.Length <= blockSize)
-            {
-                return transform.TransformFinalBlock(data, 0, data.Length);
-            }
+            //var blockSize = transform.InputBlockSize;
+            //if (data.Length <= blockSize)
+            //{
+            return transform.TransformFinalBlock(data, 0, data.Length);
+            //}
 
-            int sourceSeed = 0;
-            int resultSeed = 0;
-            byte[] result;
-            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (data.Length%blockSize == 0)
-            {
-                result = new byte[data.Length];
-            }
-            else
-            {
-                result = new byte[(data.Length/blockSize + 1)*blockSize];
-            }
-            while (sourceSeed < data.Length - blockSize)
-            {
-                if (resultSeed + blockSize > result.Length)
-                {
-                    Array.Resize(ref result, resultSeed + blockSize);
-                }
-                resultSeed += transform.TransformBlock(data, sourceSeed, blockSize, result, resultSeed);
-                sourceSeed += blockSize;
-            }
-            var finalBlock = transform.TransformFinalBlock(data, sourceSeed, data.Length - sourceSeed);
-            var finalSize = resultSeed + finalBlock.Length;
-            if (finalSize != result.Length)
-            {
-                Array.Resize(ref result, finalSize);
-            }
-            Buffer.BlockCopy(finalBlock, 0, result, resultSeed, finalBlock.Length);
-            return result;
+            //int sourceSeed = 0;
+            //int resultSeed = 0;
+            //byte[] result;
+            //// ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            //var remainingSize = data.Length%blockSize;
+            //if (remainingSize == 0)
+            //{
+            //    result = new byte[data.Length];
+            //}
+            //else
+            //{
+            //    result = new byte[(data.Length/blockSize + 1)*blockSize];
+            //}
+            //resultSeed += transform.TransformBlock(data, sourceSeed, data.Length/blockSize*blockSize, result, resultSeed);
+            //sourceSeed += blockSize;
+            //var finalBlock = transform.TransformFinalBlock(data, sourceSeed, data.Length - sourceSeed);
+            //var finalSize = resultSeed + finalBlock.Length;
+            //if (finalSize != result.Length)
+            //{
+            //    Array.Resize(ref result, finalSize);
+            //}
+            //Buffer.BlockCopy(finalBlock, 0, result, resultSeed, finalBlock.Length);
+            //return result;
         }
 
         private class SessionInfo : IDisposable
