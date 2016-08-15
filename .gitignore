@@ -191,3 +191,4 @@ artifacts
 /src/VC.Public/wwwroot/app
 internalLog.txt
 /src/VitalChoice.CustomerFiles/attachments
+/src/VitalChoice.ExportService/out

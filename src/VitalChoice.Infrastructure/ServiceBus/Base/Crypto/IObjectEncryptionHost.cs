@@ -1,10 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 
-namespace VitalChoice.Infrastructure.ServiceBus.Base
+namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
 {
     public interface IObjectEncryptionHost : IDisposable
     {
@@ -13,21 +14,13 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         X509Certificate2 LocalCert { get; }
         T LocalDecrypt<T>(byte[] data);
         byte[] LocalEncrypt(object obj);
-        bool ValidateClientCertificate(X509Certificate2 clientCert);
-#if !NETSTANDARD1_5
-        byte[] RsaDecrypt(byte[] data, RSACryptoServiceProvider rsa);
-        byte[] RsaEncrypt(byte[] data, RSACryptoServiceProvider rsa);
-#else
-        byte[] RsaDecrypt(byte[] data, RSA rsa);
-        byte[] RsaEncrypt(byte[] data, RSA rsa);
-#endif
-
-        bool RsaVerifyWithConvert<T>(TransportCommandData command, out T result)
+        byte[] RsaDecrypt(byte[] data, RSACng rsa);
+        byte[] RsaEncrypt(byte[] data, RSACng rsa);
+        bool VerifySignWithConvert<T>(TransportCommandData command, out T result)
             where T : ServiceBusCommandBase;
+        TransportCommandData SignWithConvert(ServiceBusCommandBase command);
 
-        TransportCommandData RsaSignWithConvert(ServiceBusCommandBase command);
-
-        T AesDecryptVerify<T>(TransportCommandData data, Guid session)
+        T AesDecryptVerify<T>(TransportCommandData command, Guid session)
             where T : ServiceBusCommandBase;
 
         TransportCommandData AesEncryptSign(ServiceBusCommandBase command, Guid session);

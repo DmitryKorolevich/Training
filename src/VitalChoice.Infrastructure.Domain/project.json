@@ -10,6 +10,6 @@
     "WindowsAzure.Storage": "7.1.2"
   },
   "frameworks": {
-    "net451": { }
+    "net462": { }
   }
 }

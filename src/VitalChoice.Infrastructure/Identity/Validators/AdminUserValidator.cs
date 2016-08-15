@@ -10,10 +10,6 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain;
 
-#if !NETSTANDARD1_5
-
-#endif
-
 namespace VitalChoice.Infrastructure.Identity.Validators
 {
     public class AdminUserValidator : UserValidator<ApplicationUser>

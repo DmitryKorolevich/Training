@@ -10,6 +10,7 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus.Base;
+using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.ObjectMapping.Base;

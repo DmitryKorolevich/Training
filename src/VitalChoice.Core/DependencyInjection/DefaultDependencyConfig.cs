@@ -108,6 +108,7 @@ using VitalChoice.Business.Mailings;
 using VitalChoice.Business.Services.VeraCore;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services.VeraCore;
 using IContainer = Autofac.IContainer;

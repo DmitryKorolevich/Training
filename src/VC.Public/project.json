@@ -80,7 +80,7 @@
     "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0-*"
   },
   "frameworks": {
-    "net451": {
+    "net462": {
     }
   },
   "tools": {

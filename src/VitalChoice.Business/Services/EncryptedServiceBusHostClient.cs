@@ -14,36 +14,35 @@ using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.ServiceBus.Base;
+using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 
 namespace VitalChoice.Business.Services
 {
     public sealed class EncryptedServiceBusHostClient : EncryptedServiceBusHost, IEncryptedServiceBusHostClient
     {
-        private volatile RSACryptoServiceProvider _keyExchangeProvider;
+        private volatile RSACng _keyExchangeProvider;
         private readonly SemaphoreSlim _publicKeyLock = new SemaphoreSlim(1);
 
         public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerFactory loggerProvider,
             IObjectEncryptionHost encryptionHost, IHostingEnvironment env)
             : base(appOptions, loggerProvider.CreateLogger<EncryptedServiceBusHostClient>(), encryptionHost, env)
         {
-            _keyExchangeProvider = new RSACryptoServiceProvider();
         }
 
-        private async Task<RSACryptoServiceProvider> GetKeyExchangeProvider()
+        private async Task<RSACng> GetKeyExchangeProvider()
         {
             await _publicKeyLock.WaitAsync();
             try
             {
-                if (!_keyExchangeProvider.PublicOnly)
+                if (_keyExchangeProvider == null)
                 {
                     var publicKey =
                         await
-                            ExecutePlainCommand<RSAParameters>(new ServiceBusCommandWithResult(Guid.NewGuid(),
+                            ExecutePlainCommand<byte[]>(new ServiceBusCommandWithResult(Guid.NewGuid(),
                                 ServiceBusCommandConstants.GetPublicKey, ServerHostName, LocalHostName));
-                    var validKey = publicKey.Modulus != null && !publicKey.Modulus.All(b => b == 0);
-                    if (validKey)
+                    if (publicKey?.Length > 0)
                     {
-                        _keyExchangeProvider.ImportParameters(publicKey);
+                        _keyExchangeProvider = new RSACng(CngKey.Import(publicKey, CngKeyBlobFormat.GenericPublicBlob));
                     }
                     else
                     {
@@ -108,7 +107,7 @@ namespace VitalChoice.Business.Services
                     await _publicKeyLock.WaitAsync();
                     try
                     {
-                        _keyExchangeProvider = new RSACryptoServiceProvider();
+                        _keyExchangeProvider = null;
                     }
                     finally
                     {
@@ -123,14 +122,14 @@ namespace VitalChoice.Business.Services
             return await AuthenticateClientWithLock(EncryptionHost.GetSession());
         }
 
-        private async Task<RSACryptoServiceProvider> TryGetKeyProvider()
+        private async Task<RSACng> TryGetKeyProvider()
         {
             var keyExchangeProvider = await GetKeyExchangeProvider();
             if (keyExchangeProvider == null)
             {
                 try
                 {
-                    _keyExchangeProvider = new RSACryptoServiceProvider();
+                    _keyExchangeProvider = null;
                 }
                 finally
                 {

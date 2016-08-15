@@ -7,6 +7,6 @@
     "Autofac.Extensions.DependencyInjection": "4.0.0-*"
   },
   "frameworks": {
-    "net451": { }
+    "net462": { }
   }
 }

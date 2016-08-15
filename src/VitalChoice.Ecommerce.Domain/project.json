@@ -13,7 +13,7 @@
     "allowUnsafe": true 
   },
   "frameworks": {
-    "net451": {
+    "net462": {
       "frameworkAssemblies": {
         "System.Runtime.Serialization": "",
         "System.Xml": "",
