@@ -685,7 +685,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                 return transform.TransformFinalBlock(data, 0, data.Length);
             }
 
-            int seed = 0;
+            int sourceSeed = 0;
+            int resultSeed = 0;
             byte[] result;
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (data.Length%blockSize == 0)
@@ -696,18 +697,22 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             {
                 result = new byte[(data.Length/blockSize + 1)*blockSize];
             }
-            while (seed < data.Length - blockSize)
+            while (sourceSeed < data.Length - blockSize)
             {
-                transform.TransformBlock(data, seed, blockSize, result, seed);
-                seed += blockSize;
+                if (resultSeed + blockSize < result.Length)
+                {
+                    Array.Resize(ref result, resultSeed + blockSize*2);
+                }
+                resultSeed += transform.TransformBlock(data, sourceSeed, blockSize, result, resultSeed);
+                sourceSeed += blockSize;
             }
-            var finalBlock = transform.TransformFinalBlock(data, seed, data.Length - seed);
-            var resultedSize = seed + finalBlock.Length;
-            if (resultedSize < result.Length)
+            var finalBlock = transform.TransformFinalBlock(data, sourceSeed, data.Length - sourceSeed);
+            var finalSize = resultSeed + finalBlock.Length;
+            if (finalSize != result.Length)
             {
-                Array.Resize(ref result, resultedSize);
+                Array.Resize(ref result, finalSize);
             }
-            Buffer.BlockCopy(finalBlock, 0, result, seed, finalBlock.Length);
+            Buffer.BlockCopy(finalBlock, 0, result, resultSeed, finalBlock.Length);
             return result;
         }
 
