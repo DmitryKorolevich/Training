@@ -23,7 +23,7 @@ namespace VC.Admin.Controllers
         private readonly ILogger logger;
 
         public FileController(IFileService fileService,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerFactory loggerProvider)
         {
             this.fileService = fileService;
             this.logger = loggerProvider.CreateLogger<FileController>();

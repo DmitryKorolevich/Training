@@ -22,7 +22,7 @@ namespace VitalChoice.Business.Services.VeraCore
 
         public VeraCoreSFTPService(
             IOptions<AppOptions> options,
-            ILoggerProviderExtended logger)
+            ILoggerFactory logger)
         {
             _options = options;
             _logger = logger.CreateLogger<VeraCoreSFTPService>();

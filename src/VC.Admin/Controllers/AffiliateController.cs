@@ -59,7 +59,7 @@ namespace VC.Admin.Controllers
         public AffiliateController(
             IAffiliateService affiliateService,
             IAffiliateUserService affiliateUserService,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             IDynamicMapper<AffiliateDynamic, Affiliate> mapper,
             ICsvExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> csvExportAffiliateOrderListItemService,
             IOrderService orderService,

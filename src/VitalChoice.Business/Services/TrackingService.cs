@@ -13,7 +13,7 @@ namespace VitalChoice.Business.Services
         private readonly ILogger _logger;
 
         public TrackingService(
-            ILoggerProviderExtended loggerProvider)
+            ILoggerFactory loggerProvider)
         {
             _logger = loggerProvider.CreateLogger<TrackingService>();
         }

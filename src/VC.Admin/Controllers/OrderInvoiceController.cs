@@ -61,7 +61,7 @@ namespace VC.Admin.Controllers
             IOrderService orderService,
             IDynamicMapper<OrderDynamic, Order> mapper,
             ITokenService tokenService,
-            //ILoggerProviderExtended loggerProvider,
+            //ILoggerFactory loggerProvider,
             //ICustomerService customerService,
             //IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             IOptions<AppOptions> options

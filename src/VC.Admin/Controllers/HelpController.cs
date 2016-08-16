@@ -38,7 +38,7 @@ namespace VC.Admin.Controllers
         private readonly ILogger _logger;
 
         public HelpController(IHelpService helpService,
-            ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager, ReferenceData referenceData)
+            ILoggerFactory loggerProvider, ExtendedUserManager userManager, ReferenceData referenceData)
         {
             _helpService = helpService;
             _userManager = userManager;

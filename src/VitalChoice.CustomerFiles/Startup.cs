@@ -39,78 +39,76 @@ namespace VitalChoice.CustomerFiles
                     {
                         var set = context.Set<VCustomerOldFile>();
                         var allList = set.ToList();
-                        ThreadLocal<ILifetimeScope> scopes = new ThreadLocal<ILifetimeScope>(() => lifetimeScope.BeginLifetimeScope());
-                        ThreadLocal<IEcommerceRepositoryAsync<Customer>> customerRepository =
+                        var scopes = new ThreadLocal<ILifetimeScope>(() => lifetimeScope.BeginLifetimeScope());
+                        var customerRepository =
                             new ThreadLocal<IEcommerceRepositoryAsync<Customer>>(() =>
                             {
                                 var threadScope = scopes.Value;
                                 return threadScope.Resolve<IEcommerceRepositoryAsync<Customer>>();
                             });
-                        ThreadLocal<ICustomerService> customerService =
+                        var customerService =
                             new ThreadLocal<ICustomerService>(() =>
                             {
                                 var threadScope = scopes.Value;
                                 return threadScope.Resolve<ICustomerService>();
                             });
-                        List<Task> taskList = new List<Task>();
-                        foreach (var group in allList.GroupBy(r => r.IdCustomer))
+                        Parallel.ForEach(allList.GroupBy(r => r.IdCustomer), new ParallelOptions
                         {
-                            taskList.Add(
-                                Task.Factory.StartNew(recordGroup =>
+                            CancellationToken = CancellationToken.None,
+                            MaxDegreeOfParallelism = 16,
+                            TaskScheduler = TaskScheduler.Default
+                        }, fileRecordGroup =>
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            Console.WriteLine($"Importing {fileRecordGroup.Key}");
+                            Console.ResetColor();
+                            List<Tuple<string, VCustomerOldFile>> uploadedFiles = new List<Tuple<string, VCustomerOldFile>>();
+                            var customer =
+                                customerRepository.Value.Query(f => f.Id == fileRecordGroup.Key)
+                                    .Include(c => c.Files)
+                                    .SelectFirstOrDefault(true);
+                            Guid publicId = customer.PublicId;
+                            if (customer.Files.Count != fileRecordGroup.Count())
+                            {
+                                foreach (var fileRecord in fileRecordGroup)
                                 {
-                                    var fileRecordGroup = (IGrouping<int, VCustomerOldFile>) recordGroup;
-                                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                                    Console.WriteLine($"Importing {fileRecordGroup.Key}");
-                                    Console.ResetColor();
-                                    List<Tuple<string, VCustomerOldFile>> uploadedFiles = new List<Tuple<string, VCustomerOldFile>>();
-                                    var customer =
-                                        customerRepository.Value.Query(f => f.Id == fileRecordGroup.Key)
-                                            .Include(c => c.Files)
-                                            .SelectFirstOrDefault(true);
-                                    Guid publicId = customer.PublicId;
-                                    if (customer.Files.Count != fileRecordGroup.Count())
+                                    if (File.Exists(fileRecord.Name))
                                     {
-                                        foreach (var fileRecord in fileRecordGroup)
+                                        Console.WriteLine($"Importing {fileRecord.OriginalFileName}");
+                                        var content = File.ReadAllBytes(fileRecord.Name);
+                                        uploadedFiles.Add(
+                                            new Tuple<string, VCustomerOldFile>(
+                                                customerService.Value.UploadFileAsync(content, fileRecord.OriginalFileName, publicId)
+                                                    .GetAwaiter()
+                                                    .GetResult(), fileRecord));
+                                    }
+                                }
+                                if (uploadedFiles.Any())
+                                {
+                                    try
+                                    {
+                                        customer.Files.AddRange(uploadedFiles.Select(fileName => new CustomerFile
                                         {
-                                            if (File.Exists(fileRecord.Name))
-                                            {
-                                                Console.WriteLine($"Importing {fileRecord.OriginalFileName}");
-                                                var content = File.ReadAllBytes(fileRecord.Name);
-                                                uploadedFiles.Add(
-                                                    new Tuple<string, VCustomerOldFile>(
-                                                        customerService.Value.UploadFileAsync(content, fileRecord.OriginalFileName, publicId)
-                                                            .GetAwaiter()
-                                                            .GetResult(), fileRecord));
-                                            }
-                                        }
-                                        if (uploadedFiles.Any())
+                                            Description = fileName.Item2.Description,
+                                            FileName = fileName.Item1,
+                                            IdCustomer = customer.Id,
+                                            UploadDate = fileName.Item2.UploadDate
+                                        }));
+                                        customerRepository.Value.SaveChanges();
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                                        Console.WriteLine($"[{e.Source}] Import Failed!\r\n{e}");
+                                        Console.ResetColor();
+                                        lock (lifetimeScope)
                                         {
-                                            try
-                                            {
-                                                customer.Files.AddRange(uploadedFiles.Select(fileName => new CustomerFile
-                                                {
-                                                    Description = fileName.Item2.Description,
-                                                    FileName = fileName.Item1,
-                                                    IdCustomer = customer.Id,
-                                                    UploadDate = fileName.Item2.UploadDate
-                                                }));
-                                                customerRepository.Value.SaveChanges();
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                Console.ForegroundColor = ConsoleColor.DarkRed;
-                                                Console.WriteLine($"[{e.Source}] Import Failed!\r\n{e}");
-                                                Console.ResetColor();
-                                                lock (lifetimeScope)
-                                                {
-                                                    File.AppendAllText("errors.txt", $"{fileRecordGroup.Key}\r\n");
-                                                }
-                                            }
+                                            File.AppendAllText("errors.txt", $"{fileRecordGroup.Key}\r\n");
                                         }
                                     }
-                                }, group));
-                        }
-                        Task.WhenAll(taskList).GetAwaiter().GetResult();
+                                }
+                            }
+                        });
                     }
                 }
                 Console.ForegroundColor = ConsoleColor.DarkGreen;

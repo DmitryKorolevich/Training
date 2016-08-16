@@ -15,7 +15,7 @@ namespace VitalChoice.Business.Services.Content
         private readonly ILogger _logger;
 
         public GeneralContentService(IRepositoryAsync<ContentProcessorEntity> contentProcessorRepository,
-            IRepositoryAsync<ContentTypeEntity> contentTypeRepository, ILoggerProviderExtended loggerProvider)
+            IRepositoryAsync<ContentTypeEntity> contentTypeRepository, ILoggerFactory loggerProvider)
         {
             this.contentTypeRepository = contentTypeRepository;
             this.contentProcessorRepository = contentProcessorRepository;

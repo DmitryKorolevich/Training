@@ -28,7 +28,7 @@ namespace VitalChoice.Business.Services.VeraCore
 
         public VeraCoreFilesCacheService(
             IOptions<AppOptions> options,
-            ILoggerProviderExtended logger)
+            ILoggerFactory logger)
         {
             _options = options;
             _logger = logger.CreateLogger<VeraCoreFilesCacheService>();

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Interfaces;
@@ -28,7 +29,7 @@ namespace VitalChoice.Business.Services.Content
         private readonly IRecipeService _recipeService;
 
         public RecipeViewService(ITtlGlobalCache templatesCache,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             IContentProcessorService processorService,
             IRepositoryAsync<Recipe> contentRepository,
             IObjectMapper<ContentParametersModel> mapper,

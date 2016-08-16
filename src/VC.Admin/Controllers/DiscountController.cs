@@ -44,7 +44,7 @@ namespace VC.Admin.Controllers
         public DiscountController(
             IDiscountService discountService, 
             IProductService productService,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             IDynamicMapper<DiscountDynamic, Discount> mapper,
             IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager, ReferenceData referenceData)
         {

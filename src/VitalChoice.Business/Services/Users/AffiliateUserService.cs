@@ -20,6 +20,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
@@ -39,7 +40,7 @@ namespace VitalChoice.Business.Services.Users
             IOptions<AppOptions> options, 
             IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
             IEcommerceRepositoryAsync<Affiliate> affiliateRepositoryAsync,
-            IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor, ILoggerProviderExtended loggerProvider) :
+            IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor, ILoggerFactory loggerProvider) :
             base(
                 userManager,
                 roleManager,

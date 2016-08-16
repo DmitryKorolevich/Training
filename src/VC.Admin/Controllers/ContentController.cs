@@ -49,7 +49,7 @@ namespace VC.Admin.Controllers
 
         public ContentController(IMasterContentService masterContentService, ICategoryService categoryService,
             IRecipeService recipeService, IFAQService faqService, IArticleService articleService, IContentPageService contentPageService,
-            IEmailTemplateService emailTemplateService, ILoggerProviderExtended loggerProvider,
+            IEmailTemplateService emailTemplateService, ILoggerFactory loggerProvider,
             IContentCrossSellService contentCrossSellService, IProductService productService, ExtendedUserManager userManager)
         {
             this.masterContentService = masterContentService;

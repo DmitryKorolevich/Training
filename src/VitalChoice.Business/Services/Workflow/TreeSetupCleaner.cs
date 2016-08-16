@@ -25,7 +25,7 @@ namespace VitalChoice.Business.Services.Workflow
             IEcommerceRepositoryAsync<WorkflowResolverPath> resolverPathsRepository,
             IEcommerceRepositoryAsync<WorkflowActionDependency> actionDependenciesRepository,
             IEcommerceRepositoryAsync<WorkflowActionAggregation> actionAggregationsRepository,
-            ILoggerProviderExtended loggerProvider, ITransactionAccessor<EcommerceContext> transactionAccessor)
+            ILoggerFactory loggerProvider, ITransactionAccessor<EcommerceContext> transactionAccessor)
         {
             _treeRepository = treeRepository;
             _executorsRepository = executorsRepository;

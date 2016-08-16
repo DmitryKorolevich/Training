@@ -41,7 +41,7 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<Order> orderRepository,
             ISettingService settingService,
             ICountryService countryService,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerFactory loggerProvider)
         {
             _orderService = orderService;
             _orderRefundService = orderRefundService;

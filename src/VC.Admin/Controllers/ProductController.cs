@@ -68,7 +68,7 @@ namespace VC.Admin.Controllers
             IDynamicServiceAsync<ProductDynamic, Product> productUniversalService,
             IInventoryCategoryService inventoryCategoryService,
             IProductReviewService productReviewService,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             ISettingService settingService,
             IDynamicMapper<ProductDynamic, Product> mapper,
             ICsvExportService<ProductCategoryStatisticTreeItemModel, ProductCategoryStatisticTreeItemCsvMap> productCategoryStatisticTreeItemCSVExportService,

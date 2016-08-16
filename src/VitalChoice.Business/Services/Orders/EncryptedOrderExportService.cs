@@ -47,7 +47,7 @@ namespace VitalChoice.Business.Services.Orders
                     if (!string.IsNullOrEmpty(o.Error))
                     {
                         Logger.LogError(o.Error);
-                        exportedAction(new OrderExportItemResult()
+                        exportedAction(new OrderExportItemResult
                         {
                             Success = false,
                             Error = o.Error
@@ -105,13 +105,14 @@ namespace VitalChoice.Business.Services.Orders
                                 else
                                 {
                                     var exportResult = (OrderExportItemResult) o.Data;
-                                    results.Add(exportResult);
-                                    sentItems.Remove(exportResult.Id);
-                                    if (sentItems.Count == 0)
+                                    if (exportResult.Id == -1)
                                     {
                                         EncryptionHost.UnlockSession(cmd.SessionId);
                                         doneAllEvent.Set();
+                                        return;
                                     }
+                                    results.Add(exportResult);
+                                    sentItems.Remove(exportResult.Id);
                                 }
                             }
                         });

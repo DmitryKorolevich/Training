@@ -17,7 +17,7 @@ namespace VitalChoice.Business.Services
         public BackendSettingsService(
             IEcommerceRepositoryAsync<Country> countryRepository,
             IEcommerceRepositoryAsync<State> stateRepository,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerFactory loggerProvider)
         {
             _countryRepository = countryRepository;
             _stateRepository = stateRepository;

@@ -15,6 +15,7 @@ using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using System.Net;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.ObjectMapping.Interfaces;
@@ -24,7 +25,7 @@ namespace VitalChoice.Business.Services.Content
     public class FAQCategoryViewService : ContentViewService<ContentCategory, CategoryContentParametersModel>, IFAQCategoryViewService
     {
         public FAQCategoryViewService(ITtlGlobalCache templatesCache,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             IContentProcessorService processorService,
             IRepositoryAsync<ContentCategory> contentRepository,
             IObjectMapper<CategoryContentParametersModel> mapper,

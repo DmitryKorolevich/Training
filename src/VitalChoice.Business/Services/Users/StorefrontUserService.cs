@@ -21,6 +21,7 @@ using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
@@ -35,7 +36,7 @@ namespace VitalChoice.Business.Services.Users
 			ReferenceData referenceData, INotificationService notificationService,
 			IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
             IEcommerceRepositoryAsync<Customer> customerRepositoryAsync,
-            IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor, ILoggerProviderExtended loggerProvider)
+            IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor, ILoggerFactory loggerProvider)
 			: base(
 				userManager, roleManager, context, signInManager, referenceData, notificationService, options,
 				ecommerceRepositoryAsync, userValidator, transactionAccessor, loggerProvider)

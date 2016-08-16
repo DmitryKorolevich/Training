@@ -35,7 +35,7 @@ namespace VitalChoice.Business.Services.Content
     public class ContentPageViewService : ContentViewService<ContentPage, ContentParametersModel>, IContentPageViewService
     {
 
-        public ContentPageViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
+        public ContentPageViewService(ITtlGlobalCache templatesCache, ILoggerFactory loggerProvider,
             IContentProcessorService processorService, IRepositoryAsync<ContentPage> contentRepository,
             IObjectMapper<ContentParametersModel> mapper, IObjectMapperFactory mapperFactory,
             IOptions<AppOptions> appOptions)

@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Core.Lifetime;
@@ -297,38 +298,42 @@ namespace VitalChoice.ExportService.Services
             }
 
             var rootScope = ((LifetimeScope) _scope).RootLifetimeScope;
-            List<Task> taskList = new List<Task>();
-            foreach (var order in orderList)
+            Parallel.ForEach(orderList, new ParallelOptions
             {
-                taskList.Add(
-                    Task.Factory.StartNew(() =>
+                MaxDegreeOfParallelism = 16,
+                CancellationToken = CancellationToken.None,
+                TaskScheduler = TaskScheduler.Default
+            }, order =>
+            {
+                using (var scope = rootScope.BeginLifetimeScope())
+                {
+                    var veracoreExportService = scope.Resolve<IVeraCoreExportService>();
+                    try
                     {
-                        using (var scope = rootScope.BeginLifetimeScope())
+                        veracoreExportService.ExportOrder(order, orders[order.Id].OrderType).GetAwaiter().GetResult();
+                        exportCallBack(new OrderExportItemResult
                         {
-                            var veracoreExportService = scope.Resolve<IVeraCoreExportService>();
-                            try
-                            {
-                                veracoreExportService.ExportOrder(order, orders[order.Id].OrderType).GetAwaiter().GetResult();
-                                exportCallBack(new OrderExportItemResult
-                                {
-                                    Id = order.Id,
-                                    Success = true
-                                });
-                            }
-                            catch (Exception e)
-                            {
-                                exportCallBack(new OrderExportItemResult
-                                {
-                                    Error = e.ToString(),
-                                    Id = order.Id,
-                                    Success = false
-                                });
-                            }
-                        }
-                    }));
-            }
-            await Task.WhenAll(taskList).ConfigureAwait(false);
+                            Id = order.Id,
+                            Success = true
+                        });
+                    }
+                    catch (Exception e)
+                    {
+                        exportCallBack(new OrderExportItemResult
+                        {
+                            Error = e.ToString(),
+                            Id = order.Id,
+                            Success = false
+                        });
+                    }
+                }
+            });
             await _orderService.UpdateRangeAsync(orderList);
+            exportCallBack(new OrderExportItemResult
+            {
+                Id = -1,
+                Success = true
+            });
         }
 
         private async Task DoExportRefunds(ICollection<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack)

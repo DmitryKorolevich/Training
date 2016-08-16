@@ -43,6 +43,7 @@ using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Business.CsvExportMaps.Customers;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Business.Services.Orders;
@@ -102,7 +103,7 @@ namespace VC.Admin.Controllers
         public OrderController(
             IOrderService orderService,
             IOrderRefundService orderRefundService,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             OrderMapper mapper,
             OrderRefundMapper orderRefundMapper,
             ICustomerService customerService,

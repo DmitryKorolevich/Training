@@ -27,7 +27,7 @@ namespace VC.Admin.Controllers
         public VitalGreenController(
             IVitalGreenService vitalGreenService,
             ICsvExportService<VitalGreenRequest, VitalGreenRequestCsvMap> csvExportVitalGreenRequestService,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerFactory loggerProvider)
         {
             _vitalGreenService = vitalGreenService;
             _csvExportVitalGreenRequestService = csvExportVitalGreenRequestService;

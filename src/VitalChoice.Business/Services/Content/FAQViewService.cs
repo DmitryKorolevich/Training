@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Interfaces;
@@ -27,7 +28,7 @@ namespace VitalChoice.Business.Services.Content
     public class FAQViewService : ContentViewService<FAQ, ContentParametersModel>, IFAQViewService
     {
         public FAQViewService(ITtlGlobalCache templatesCache,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             IContentProcessorService processorService,
             IRepositoryAsync<FAQ> contentRepository,
             IObjectMapper<ContentParametersModel> mapper,

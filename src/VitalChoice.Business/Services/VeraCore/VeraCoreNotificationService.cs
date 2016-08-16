@@ -75,7 +75,7 @@ namespace VitalChoice.Business.Services.VeraCore
             INotificationService notificationService,
             IAvalaraTax avalaraTax,
             OrderMapper orderMapper,
-            ILoggerProviderExtended logger, IWorkflowFactory treeFactory, ICustomerService customerService, OrderRefundMapper refundMapper)
+            ILoggerFactory logger, IWorkflowFactory treeFactory, ICustomerService customerService, OrderRefundMapper refundMapper)
         {
             _options = options;
             _veraCoreProcessItemRepository = veraCoreProcessItemRepository;

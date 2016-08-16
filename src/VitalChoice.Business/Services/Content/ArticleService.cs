@@ -55,7 +55,7 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<ArticleBonusLink> articleBonusLinkRepository,
             IEcommerceRepositoryAsync<Product> productRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended logger, 
+            ILoggerFactory logger, 
             ITtlGlobalCache templatesCache,
             DbContextOptions<VitalChoiceContext> contextOptions, IOptions<AppOptions> appOptions, IRepositoryAsync<MasterContentItem> masterContentRepository)
         {

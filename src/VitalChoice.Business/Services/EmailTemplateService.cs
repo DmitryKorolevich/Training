@@ -45,7 +45,7 @@ namespace VitalChoice.Business.Services
         public EmailTemplateService(
             IRepositoryAsync<EmailTemplate> emailTemplateRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
-            ILoggerProviderExtended logger, ITtlGlobalCache templatesCache)
+            ILoggerFactory logger, ITtlGlobalCache templatesCache)
         {
             this._emailTemplateRepository = emailTemplateRepository;
             this._contentTypeRepository = contentTypeRepository;

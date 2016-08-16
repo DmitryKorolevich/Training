@@ -55,7 +55,7 @@ namespace VitalChoice.Business.Services.HelpService
             INotificationService notificationService,
             IBlobStorageClient storageClient,
             IOptions<AppOptions> appOptions,
-            ILoggerProviderExtended loggerProvider, ITransactionAccessor<EcommerceContext> ecommerceTransactionAccessor,
+            ILoggerFactory loggerProvider, ITransactionAccessor<EcommerceContext> ecommerceTransactionAccessor,
             ITransactionAccessor<VitalChoiceContext> infrastructureTransactionAccessor)
         {
             _helpTicketRepository = helpTicketRepository;

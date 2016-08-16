@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Business.Queries.Products;
 using VitalChoice.Data.Helpers;
@@ -52,7 +53,7 @@ namespace VitalChoice.Business.Services.Products
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepositoryAsync, DiscountMapper mapper,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider, DynamicExtensionsRewriter queryVisitor,
+            ILoggerFactory loggerProvider, DynamicExtensionsRewriter queryVisitor,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
             IEcommerceRepositoryAsync<OneTimeDiscountToCustomerUsage> oneTimeDiscountRepository,
             IDynamicEntityOrderingExtension<Discount> orderingExtension)

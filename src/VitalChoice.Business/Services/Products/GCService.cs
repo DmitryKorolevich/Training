@@ -48,7 +48,7 @@ namespace VitalChoice.Business.Services.Products
             UserManager<ApplicationUser> userManager, 
             INotificationService notificationService,
             OrderAddressMapper orderAddressMapper,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             DynamicExtensionsRewriter queryVisitor)
         {
             this.giftCertificateRepository = giftCertificateRepository;

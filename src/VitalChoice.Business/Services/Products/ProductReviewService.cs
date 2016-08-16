@@ -26,7 +26,7 @@ namespace VitalChoice.Business.Services.Products
         public ProductReviewService(IEcommerceRepositoryAsync<VProductsWithReview> vProductsWithReviewRepository,
             IEcommerceRepositoryAsync<ProductReview> productReviewRepository,
             IEcommerceRepositoryAsync<Product> productRepository,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerFactory loggerProvider)
         {
             this._vProductsWithReviewRepository = vProductsWithReviewRepository;
             this._productReviewRepository = productReviewRepository;

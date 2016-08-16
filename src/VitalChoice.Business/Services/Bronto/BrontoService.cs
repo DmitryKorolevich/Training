@@ -38,7 +38,7 @@ namespace VitalChoice.Business.Services.Bronto
         private BrontoSoapPortTypeClient Client => _lclient.Value;
 
         public BrontoService(IOptions<AppOptions> options,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerFactory loggerProvider)
         {
             _brontoSettings = options.Value.Bronto;
             _logger = loggerProvider.CreateLogger<BrontoService>();

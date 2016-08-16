@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using CsvHelper;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Business.CsvImportMaps;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -16,6 +17,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -26,11 +28,11 @@ namespace VitalChoice.Business.Services.Orders
         private const string USA = "United States";
 
         public DropShipAAFESSOrderImportProcessor(
-            ICountryService countryService,
+            ICountryNameCodeResolver countryService,
             IDynamicMapper<OrderDynamic, Order> orderMapper,
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
-            ReferenceData referenceData)
-            : base(countryService, orderMapper, addressMapper, referenceData)
+            ReferenceData referenceData, ILoggerFactory loggerFactory)
+            : base(countryService, orderMapper, addressMapper, referenceData, loggerFactory.CreateLogger<DropShipAAFESSOrderImportProcessor>())
         {
         }
 
@@ -51,7 +53,7 @@ namespace VitalChoice.Business.Services.Orders
             var countryName = csv.GetField<string>(SHIPTO_COUNTRY);
             if (!String.IsNullOrEmpty(countryName))
             {
-                var country = Countries.FirstOrDefault(p => p.CountryName == countryName);
+                var country = CountryService.GetCountryByName(countryName);
                 if (country != null)
                 {
                     item.IdCountry = country.Id;
@@ -63,7 +65,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         if (!String.IsNullOrEmpty(stateCode))
                         {
-                            var state = country.States.FirstOrDefault(p => p.StateCode == stateCode);
+                            var state = CountryService.GetStateByCode(country.Id, stateCode);
                             if (state == null)
                             {
                                 messages.Add(AddErrorMessage(SHIPTO_STATE, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidFieldValue], SHIPTO_STATE)));

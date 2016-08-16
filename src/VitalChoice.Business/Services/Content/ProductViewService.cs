@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Cache;
@@ -30,7 +31,7 @@ namespace VitalChoice.Business.Services.Content
     {
         private readonly IProductService _productService;
 
-        public ProductViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
+        public ProductViewService(ITtlGlobalCache templatesCache, ILoggerFactory loggerProvider,
             IContentProcessorService processorService, IRepositoryAsync<ProductContent> contentRepository,
             IObjectMapper<ProductViewForCustomerModel> mapper, IObjectMapperFactory mapperFactory, IProductService productService,
             IOptions<AppOptions> appOptions)

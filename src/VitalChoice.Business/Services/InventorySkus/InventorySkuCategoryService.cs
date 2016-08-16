@@ -23,7 +23,7 @@ namespace VitalChoice.Business.Services.InventorySkus
 
         public InventorySkuCategoryService(IEcommerceRepositoryAsync<InventorySkuCategory> inventorySkuCategoryEcommerceRepository,
             IEcommerceRepositoryAsync<InventorySku> inventorySkuEcommerceRepository,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerFactory loggerProvider)
         {
             _inventorySkuCategoryEcommerceRepository = inventorySkuCategoryEcommerceRepository;
             _inventorySkuEcommerceRepository = inventorySkuEcommerceRepository;

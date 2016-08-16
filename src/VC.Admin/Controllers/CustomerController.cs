@@ -76,7 +76,7 @@ namespace VC.Admin.Controllers
             IDynamicMapper<AddressDynamic, Address> addressMapper, ICountryService countryService,
             IGenericService<AdminProfile> adminProfileService, IDynamicServiceAsync<AddressDynamic, Address> addressService,
             IDynamicServiceAsync<CustomerNoteDynamic, CustomerNote> notesService,
-            IDynamicMapper<CustomerNoteDynamic, CustomerNote> noteMapper, ILoggerProviderExtended loggerProvider,
+            IDynamicMapper<CustomerNoteDynamic, CustomerNote> noteMapper, ILoggerFactory loggerProvider,
             IStorefrontUserService storefrontUserService,
             IObjectHistoryLogService objectHistoryLogService,
             ICsvExportService<ExtendedVCustomer, CustomersForAffiliatesCsvMap> csvExportCustomersForAffiliatesService,

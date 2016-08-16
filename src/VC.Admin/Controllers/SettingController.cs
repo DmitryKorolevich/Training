@@ -65,7 +65,7 @@ namespace VC.Admin.Controllers
             IObjectHistoryLogService objectHistoryLogService,
             ICatalogRequestAddressService catalogRequestAddressService,
             ICsvExportService<CatalogRequestAddressListItemModel, CatalogRequestAddressListItemModelCsvMap> exportCatalogRequestAddressService,
-            ILoggerProviderExtended loggerProvider, ITableLogsClient logsClient, AppSettings appSettings)
+            ILoggerFactory loggerProvider, ITableLogsClient logsClient, AppSettings appSettings)
         {
             this.logViewService = logViewService;
             this.countryService = countryService;

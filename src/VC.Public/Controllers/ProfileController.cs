@@ -87,7 +87,7 @@ namespace VC.Public.Controllers
             IHelpService helpService,
             IHealthwiseService healthwiseService, ReferenceData referenceData,
             IAuthorizationService authorizationService, ICheckoutService checkoutService,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             IPageResultService pageResultService, IDynamicMapper<SkuDynamic, Sku> skuMapper,
             IDynamicMapper<ProductDynamic, Product> productMapper,
             IDynamicMapper<OrderDynamic, Order> orderMapper,

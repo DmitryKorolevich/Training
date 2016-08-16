@@ -62,7 +62,7 @@ namespace VitalChoice.Business.Services.Healthwise
             IGcService gcService,
             INotificationService notificationService,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
-            ILoggerProviderExtended loggerProvider, DbContextOptions<EcommerceContext> eccomerceContextOptions, AppSettings appSettings, IOptions<AppOptionsBase> options)
+            ILoggerFactory loggerProvider, DbContextOptions<EcommerceContext> eccomerceContextOptions, AppSettings appSettings, IOptions<AppOptionsBase> options)
         {
             _vHealthwisePeriodRepository = vHealthwisePeriodRepository;
             _healthwiseOrderRepository = healthwiseOrderRepository;
