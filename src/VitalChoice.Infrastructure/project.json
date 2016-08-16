@@ -7,14 +7,13 @@
     "VitalChoice.Data": "1.0.0-*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
     "VitalChoice.Infrastructure.Domain": "1.0.0-*",
-    "VitalChoice.Ecommerce": "1.0.0-*",
-    "WindowsAzure.Storage": "7.1.2"
+    "VitalChoice.Ecommerce": "1.0.0-*"
   },
 
   "frameworks": {
     "net462": {
       "dependencies": {
-        "WindowsAzure.ServiceBus": "3.3.1",
+        "WindowsAzure.ServiceBus": "3.3.2",
         "Microsoft.WindowsAzure.ConfigurationManager": "3.2.1",
         "NLog": "4.3.5"
       }
