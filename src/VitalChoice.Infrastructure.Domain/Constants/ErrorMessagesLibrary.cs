@@ -103,7 +103,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             {Keys.WrongCaptcha, "The reCAPTCHA wasn't entered correctly"},
             {Keys.CustomerWasModified, "The customer has been activated by a store front user. Please refresh this page before making changes"},
             {Keys.SkuNotFound, "Product SKU has not been found in the database"},
-            {Keys.OrderImportRowError, "Row number {0} error: {1}"},
+            {Keys.OrderImportRowError, "Row number(s) {0} error: {1}"},
             {Keys.ParseDateError, "{0} can't be parsed(format 'MM/dd/yyyy')"},
             {Keys.ParseIntError, "{0} can't be parsed"},
             {Keys.ZeroSkusForOrderInImport, "Order should have at least one sku with specified qty"},

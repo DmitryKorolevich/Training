@@ -1824,31 +1824,38 @@ namespace VitalChoice.Business.Services.Orders
                 throw new AppValidationException(messages);
             }
 
+            var calculationMessages = new Dictionary<IList<int>, IList<MessageInfo>>();
             foreach (var item in map)
             {
                 var orderCombinedStatus = item.Order.OrderStatus ?? OrderStatus.Processed;
                 item.Order.Data.ShipDelayType = item.Order.SafeData.ShipDelayDate != null ? ShipDelayType.EntireOrder : ShipDelayType.None;
 
                 var context = await CalculateOrder(item.Order, orderCombinedStatus);
-                if (context.ShippingUpgradePOptions==null || context.ShippingUpgradePOptions.FirstOrDefault(p => p.Key == ShippingUpgradeOption.Overnight) ==
-                    null)
+                if (orderType == OrderImportType.DropShipAAFES)
                 {
-                    item.Order.Data.ShippingUpgradeP = null;
-                }
-                if (context.ShippingUpgradeNpOptions == null || context.ShippingUpgradeNpOptions.FirstOrDefault(p => p.Key == ShippingUpgradeOption.Overnight) ==
-                    null)
-                {
-                    item.Order.Data.ShippingUpgradeNP = null;
+                    if (context.ShippingUpgradePOptions == null ||
+                        context.ShippingUpgradePOptions.FirstOrDefault(p => p.Key == ShippingUpgradeOption.Overnight) ==
+                        null)
+                    {
+                        item.Order.Data.ShippingUpgradeP = null;
+                    }
+                    if (context.ShippingUpgradeNpOptions == null ||
+                        context.ShippingUpgradeNpOptions.FirstOrDefault(p => p.Key == ShippingUpgradeOption.Overnight) ==
+                        null)
+                    {
+                        item.Order.Data.ShippingUpgradeNP = null;
+                    }
                 }
 
-                var firstRow = item.OrderImportItems.First();
-                firstRow.ErrorMessages.AddRange(context.Messages);
-                firstRow.ErrorMessages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages));
-                firstRow.ErrorMessages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages));
+                var rows = item.OrderImportItems.Select(p => p.RowNumber).ToList();
+                var tempMessages = new List<MessageInfo>(context.Messages);
+                tempMessages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages));
+                tempMessages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages));
+                calculationMessages.Add(rows, tempMessages);
             }
 
             //throw calculating errors
-            messages = processor.FormatRowsRecordErrorMessages(map.SelectMany(p => p.OrderImportItems));
+            messages = FormatCalculationRowsRecordErrorMessages(calculationMessages);
             if (messages.Count > 0)
             {
                 throw new AppValidationException(messages);
@@ -1866,14 +1873,15 @@ namespace VitalChoice.Business.Services.Orders
 
                     var context = await CalculateOrder(item.Order, orderCombinedStatus);
 
-                    var firstRow = item.OrderImportItems.First();
-                    firstRow.ErrorMessages.AddRange(context.Messages);
-                    firstRow.ErrorMessages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages));
-                    firstRow.ErrorMessages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages));
+                    var rows = item.OrderImportItems.Select(p => p.RowNumber).ToList();
+                    var tempMessages =new List<MessageInfo>(context.Messages);
+                    tempMessages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages));
+                    tempMessages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages));
+                    calculationMessages.Add(rows, tempMessages);
                 }
 
                 //throw calculating errors
-                messages = processor.FormatRowsRecordErrorMessages(map.SelectMany(p => p.OrderImportItems));
+                messages = FormatCalculationRowsRecordErrorMessages(calculationMessages);
                 if (messages.Count > 0)
                 {
                     throw new AppValidationException(messages);
@@ -1889,6 +1897,29 @@ namespace VitalChoice.Business.Services.Orders
             }
 
             return true;
+        }
+
+        private ICollection<MessageInfo> FormatCalculationRowsRecordErrorMessages(Dictionary<IList<int>, IList<MessageInfo>> items)
+        {
+            List<MessageInfo> toReturn = new List<MessageInfo>();
+            foreach (var item in items)
+            {
+                var rowNumbers = String.Empty;
+                for (int i = 0; i < item.Key.Count; i++)
+                {
+                    rowNumbers += item.Key[i];
+                    if (i != item.Key.Count - 1)
+                    {
+                        rowNumbers += ",";
+                    }
+                }
+                toReturn.AddRange(item.Value.Select(p => new MessageInfo()
+                {
+                    Field = p.Field,
+                    Message = String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.OrderImportRowError], rowNumbers, p.Message),
+                }));
+            }
+            return toReturn;
         }
 
         private async Task SendGLOrdersImportEmailAsync(ICollection<OrderDynamic> orders, CustomerDynamic customer, int idPaymentMethod, int idAddedBy)
