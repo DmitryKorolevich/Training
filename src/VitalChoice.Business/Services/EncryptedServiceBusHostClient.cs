@@ -65,9 +65,6 @@ namespace VitalChoice.Business.Services
 
             await EncryptionHost.LockSession(sessionId);
 
-            if (EncryptionHost.IsAuthenticated(sessionId))
-                return sessionId;
-
             if (EncryptionHost.SessionExist(sessionId))
             {
                 try
@@ -77,7 +74,6 @@ namespace VitalChoice.Business.Services
                             ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(sessionId, ServiceBusCommandConstants.CheckSessionKey,
                                 ServerHostName, LocalHostName)))
                     {
-                        EncryptionHost.SetAuthenticated(sessionId);
                         return sessionId;
                     }
 
@@ -97,7 +93,6 @@ namespace VitalChoice.Business.Services
                             Data = new ServiceBusCommandData(EncryptionHost.RsaEncrypt(existingKeys.ToCombined(), keyExchangeProvider))
                         }))
                     {
-                        EncryptionHost.SetAuthenticated(sessionId);
                         return sessionId;
                     }
                 }
