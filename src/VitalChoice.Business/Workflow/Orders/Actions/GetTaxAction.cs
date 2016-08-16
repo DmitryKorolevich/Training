@@ -30,12 +30,12 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
                 {
                     npGetType = npGetType | TaxGetType.Commit | TaxGetType.SavePermanent;
                 }
-                await Task.WhenAll(Task.Run(async () =>
+                await Task.WhenAll(Task.Factory.StartNew(() =>
                 {
-                    context.SplitInfo.PerishableTax = await taxService.GetTax(context, pGetType);
-                }), Task.Run(async () =>
+                    context.SplitInfo.PerishableTax = taxService.GetTax(context, pGetType).GetAwaiter().GetResult();
+                }), Task.Factory.StartNew(() =>
                 {
-                    context.SplitInfo.NonPerishableTax = await taxService.GetTax(context, npGetType);
+                    context.SplitInfo.NonPerishableTax = taxService.GetTax(context, npGetType).GetAwaiter().GetResult();
                 }));
                 context.TaxTotal = context.SplitInfo.PerishableTax + context.SplitInfo.NonPerishableTax;
             }

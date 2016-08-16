@@ -278,5 +278,15 @@ namespace VitalChoice.Data.Repositories
                 Context.SetState(entity, EntityState.Detached);
             }
         }
+
+        public void SaveChanges()
+        {
+            Context.SaveChanges();
+        }
+
+        public Task SaveChangesAsync()
+        {
+            return Context.SaveChangesAsync();
+        }
     }
 }

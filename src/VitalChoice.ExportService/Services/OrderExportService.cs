@@ -48,7 +48,8 @@ namespace VitalChoice.ExportService.Services
         public OrderExportService(IOptions<ExportOptions> options, IObjectEncryptionHost encryptionHost,
             DbContextOptions<ExportInfoContext> contextOptions, ILoggerFactory loggerFactory,
             IVeraCoreExportService veraCoreExportService, IOrderService orderService, ExportInfoContext infoContext,
-            IOrderRefundService refundService, ICustomerService customerService, ILifetimeScope scope, IPaymentMethodService paymentMethodService)
+            IOrderRefundService refundService, ICustomerService customerService, ILifetimeScope scope,
+            IPaymentMethodService paymentMethodService)
         {
             _options = options;
             _encryptionHost = encryptionHost;
@@ -167,7 +168,7 @@ namespace VitalChoice.ExportService.Services
             using (var uow = new UnitOfWork(context, false))
             {
                 if (paymentMethod.IdOrderSource > 0 &&
-                         ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), paymentMethod.CardNumber, "CardNumber"))
+                    ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), paymentMethod.CardNumber, "CardNumber"))
                 {
                     var orderRep = uow.RepositoryAsync<OrderPaymentMethodExport>();
                     var orderPayment =
@@ -188,7 +189,7 @@ namespace VitalChoice.ExportService.Services
                     }
                 }
                 else if (paymentMethod.IdCustomerPaymentMethod > 0 &&
-                    ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), paymentMethod.CardNumber, "CardNumber"))
+                         ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic), paymentMethod.CardNumber, "CardNumber"))
                 {
                     var customerRep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
                     var customerData =
@@ -239,23 +240,19 @@ namespace VitalChoice.ExportService.Services
             }
         }
 
-        public async Task<ICollection<OrderExportItemResult>> ExportOrders(ICollection<OrderExportItem> exportItems)
+        public async Task ExportOrders(ICollection<OrderExportItem> exportItems,
+            Action<OrderExportItemResult> exportCallBack)
         {
             if (_writeQueue)
             {
                 throw new ApiException("Orders cannot be exported while encrypted database update is in progress");
             }
 
-            List<OrderExportItemResult> results = new List<OrderExportItemResult>();
-            var lockObject = new object();
-
-            await ExportOrders(exportItems, results, lockObject);
-            await ExportRefunds(exportItems, results, lockObject);
-
-            return results;
+            await DoExportOrders(exportItems, exportCallBack);
+            await DoExportRefunds(exportItems, exportCallBack);
         }
 
-        private async Task ExportOrders(ICollection<OrderExportItem> exportItems, List<OrderExportItemResult> results, object lockObject)
+        private async Task DoExportOrders(ICollection<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack)
         {
             var orders = exportItems.Where(i => !i.IsRefund).ToDictionary(o => o.Id);
 
@@ -284,7 +281,7 @@ namespace VitalChoice.ExportService.Services
                     var payment = orderPayments.GetValueOrDefault(order.Id);
                     if (payment == null)
                     {
-                        results.Add(new OrderExportItemResult
+                        exportCallBack(new OrderExportItemResult
                         {
                             Id = order.Id,
                             Error = "Cannot find order credit card in encrypted store",
@@ -300,42 +297,41 @@ namespace VitalChoice.ExportService.Services
             }
 
             var rootScope = ((LifetimeScope) _scope).RootLifetimeScope;
-            await Task.WhenAll(orderList.Select(async order =>
+            List<Task> taskList = new List<Task>();
+            foreach (var order in orderList)
             {
-                using (var scope = rootScope.BeginLifetimeScope())
-                {
-                    var veracoreExportService = scope.Resolve<IVeraCoreExportService>();
-                    try
+                taskList.Add(
+                    Task.Factory.StartNew(() =>
                     {
-                        await veracoreExportService.ExportOrder(order, orders[order.Id].OrderType);
-                        lock (lockObject)
+                        using (var scope = rootScope.BeginLifetimeScope())
                         {
-                            results.Add(new OrderExportItemResult
+                            var veracoreExportService = scope.Resolve<IVeraCoreExportService>();
+                            try
                             {
-                                Id = order.Id,
-                                Success = true
-                            });
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        lock (lockObject)
-                        {
-                            results.Add(new OrderExportItemResult
+                                veracoreExportService.ExportOrder(order, orders[order.Id].OrderType).GetAwaiter().GetResult();
+                                exportCallBack(new OrderExportItemResult
+                                {
+                                    Id = order.Id,
+                                    Success = true
+                                });
+                            }
+                            catch (Exception e)
                             {
-                                Error = e.ToString(),
-                                Id = order.Id,
-                                Success = false
-                            });
+                                exportCallBack(new OrderExportItemResult
+                                {
+                                    Error = e.ToString(),
+                                    Id = order.Id,
+                                    Success = false
+                                });
+                            }
                         }
-                    }
-                }
-            })).ConfigureAwait(false);
-            
+                    }));
+            }
+            await Task.WhenAll(taskList).ConfigureAwait(false);
             await _orderService.UpdateRangeAsync(orderList);
         }
 
-        private async Task ExportRefunds(ICollection<OrderExportItem> exportItems, List<OrderExportItemResult> results, object lockObject)
+        private async Task DoExportRefunds(ICollection<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack)
         {
             var refundList =
                 new HashSet<OrderRefundDynamic>(
@@ -356,27 +352,21 @@ namespace VitalChoice.ExportService.Services
                 try
                 {
                     await _veraCoreExportService.ExportRefund(refund);
-                    lock (lockObject)
+                    exportCallBack(new OrderExportItemResult
                     {
-                        results.Add(new OrderExportItemResult
-                        {
-                            Id = refund.Id,
-                            Success = true
-                        });
-                    }
+                        Id = refund.Id,
+                        Success = true
+                    });
                 }
                 catch (Exception e)
                 {
-                    lock (lockObject)
+                    refundList.Remove(refund);
+                    exportCallBack(new OrderExportItemResult
                     {
-                        refundList.Remove(refund);
-                        results.Add(new OrderExportItemResult
-                        {
-                            Error = e.ToString(),
-                            Id = refund.Id,
-                            Success = false
-                        });
-                    }
+                        Error = e.ToString(),
+                        Id = refund.Id,
+                        Success = false
+                    });
                 }
             });
 
@@ -402,52 +392,46 @@ namespace VitalChoice.ExportService.Services
             {
                 try
                 {
-                    await Task.Run(async () =>
+                    CustomerCardData customerCard;
+                    List<CustomerCardData> customerCards = new List<CustomerCardData>();
+                    while (InMemoryCustomerCardDatas.TryDequeue(out customerCard))
                     {
-                        CustomerCardData customerCard;
-                        List<CustomerCardData> customerCards = new List<CustomerCardData>();
-                        while (InMemoryCustomerCardDatas.TryDequeue(out customerCard))
-                        {
-                            customerCards.Add(customerCard);
-                        }
-                        await UpdateCustomerPaymentMethodsInternal(customerCards, realContext);
-                        LockCustomersEvent.Reset();
-                        LockOrdersEvent.Reset();
-                        customerCards.Clear();
-                        while (InMemoryCustomerCardDatas.TryDequeue(out customerCard))
-                        {
-                            customerCards.Add(customerCard);
-                        }
-                        await UpdateCustomerPaymentMethodsInternal(customerCards, realContext);
-                        customerCards.Clear();
-                    });
-                    await Task.Run(async () =>
+                        customerCards.Add(customerCard);
+                    }
+                    await UpdateCustomerPaymentMethodsInternal(customerCards, realContext);
+                    LockCustomersEvent.Reset();
+                    LockOrdersEvent.Reset();
+                    customerCards.Clear();
+                    while (InMemoryCustomerCardDatas.TryDequeue(out customerCard))
                     {
-                        OrderCardData cardData;
-                        while (InMemoryOrderCardDatas.TryDequeue(out cardData))
+                        customerCards.Add(customerCard);
+                    }
+                    await UpdateCustomerPaymentMethodsInternal(customerCards, realContext);
+                    customerCards.Clear();
+                    OrderCardData cardData;
+                    while (InMemoryOrderCardDatas.TryDequeue(out cardData))
+                    {
+                        try
                         {
-                            try
-                            {
-                                await UpdateOrderPaymentInternal(cardData, realContext);
-                            }
-                            catch (Exception e)
-                            {
-                                _logger.LogError(e.ToString());
-                            }
+                            await UpdateOrderPaymentInternal(cardData, realContext);
                         }
-                        LockOrdersEvent.Reset();
-                        while (InMemoryOrderCardDatas.TryDequeue(out cardData))
+                        catch (Exception e)
                         {
-                            try
-                            {
-                                await UpdateOrderPaymentInternal(cardData, realContext);
-                            }
-                            catch (Exception e)
-                            {
-                                _logger.LogError(e.ToString());
-                            }
+                            _logger.LogError(e.ToString());
                         }
-                    });
+                    }
+                    LockOrdersEvent.Reset();
+                    while (InMemoryOrderCardDatas.TryDequeue(out cardData))
+                    {
+                        try
+                        {
+                            await UpdateOrderPaymentInternal(cardData, realContext);
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogError(e.ToString());
+                        }
+                    }
                 }
                 catch (Exception e)
                 {

@@ -41,5 +41,7 @@ namespace VitalChoice.Data.Repositories
         Task<bool> DeleteAllAsync(CancellationToken cancellationToken, IEnumerable<TEntity> entitySet);
 	    void Detach(TEntity entity);
         void DetachAll(IEnumerable<TEntity> entity);
-    }
+        void SaveChanges();
+        Task SaveChangesAsync();
+	}
 }

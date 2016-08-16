@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -13,7 +14,7 @@ namespace VitalChoice.ExportService.Services
         Task<List<MessageInfo>> AuthorizeCreditCard(CustomerPaymentMethodDynamic paymentMethod);
         Task UpdateCustomerPaymentMethods(ICollection<CustomerCardData> paymentMethods);
         Task UpdateOrderPaymentMethod(OrderCardData paymentMethod);
-        Task<ICollection<OrderExportItemResult>> ExportOrders(ICollection<OrderExportItem> exportItems);
+        Task ExportOrders(ICollection<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack);
         void SwitchToInMemoryContext();
         Task SwitchToRealContext();
     }

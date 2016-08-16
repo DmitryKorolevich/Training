@@ -97,7 +97,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers.Async
         {
             lock (_sync)
             {
-                Task.Run(() => _tcs.TrySetResult(true));
+                Task.Factory.StartNew(() => _tcs.TrySetResult(true));
                 _tcs.Task.Wait();
             }
         }

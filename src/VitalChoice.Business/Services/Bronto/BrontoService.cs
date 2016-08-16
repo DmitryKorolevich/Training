@@ -53,7 +53,7 @@ namespace VitalChoice.Business.Services.Bronto
 
         public void PushSubscribe(string email, bool subscribe)
         {
-            Task.Run(() =>
+            Task.Factory.StartNew(() =>
             {
                 var unsubscribed = GetIsUnsubscribed(email).GetAwaiter().GetResult();
                 if (subscribe && (unsubscribed ?? true))
