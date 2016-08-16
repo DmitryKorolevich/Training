@@ -46,6 +46,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			        {
 			            uploadOrderTypes.splice(0, 0, { Key: 3, Text: 'Dropship Orders' });
 			        }
+			        uploadOrderTypes.splice(0, 0, { Key: 8, Text: 'AAFES Order Import' });
                     $scope.uploadOrderTypes = uploadOrderTypes;
 			        $scope.currentCustomer.ActivatePending = false;
 			        $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
@@ -564,7 +565,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			            {
 			                data.idpaymentmethod = $scope.options.UploadOrderCreditCard;
 			            }
-			            if ($scope.options.UploadOrderType == 3)//ds
+			            if ($scope.options.UploadOrderType == 3 || $scope.options.UploadOrderType == 8)//ds
 			            {
 			                if ($scope.currentCustomer.Oac == null || $scope.currentCustomer.Oac.Id == 0)
 			                {

@@ -60,22 +60,27 @@
 		<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 	<![endif]-->
     @await Component.InvokeAsync("BodyBeginTrackScripts")
+    <div>
+        <div class="header-top main">
+            <div class="header-top-left">
+                <img alt="Call Anytime" src="/assets/images/callanytime13.png" />
+            </div>
+            <div class="header-top-middle">
+                <div class="trustpilot-widget" data-locale="en-US" data-template-id="5418052cfbfb950d88702476" data-businessunit-id="51975a73000064000533c457" data-style-height="30px" data-style-width="100%" data-theme="light" data-stars="4,5,3"></div>
+            </div>
+            <div class="header-top-right">
+                <div id="lhnContainer">
+                    <div id="lhnChatButton"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 	<div class="separator-top"></div>
+    <div class="alert-banner">
+        @await Component.InvokeAsync("Area", new { name = "Alert Top Section Above Nav" })
+    </div>
 	<div class="main">
 		<header>
-			<div class="header-top">
-				<div class="header-top-left">
-					<img alt="Call Anytime" src="/assets/images/callanytime13.png" />
-				</div>
-				<div class="header-top-middle">
-					<div class="trustpilot-widget" data-locale="en-US" data-template-id="5418052cfbfb950d88702476" data-businessunit-id="51975a73000064000533c457" data-style-height="30px" data-style-width="100%" data-theme="light" data-stars="4,5,3"></div>
-				</div>
-				<div class="header-top-right">
-					<div id="lhnContainer">
-						<div id="lhnChatButton"></div>
-					</div>
-				</div>
-			</div>
 			<div class="header-main">
 				<div class="logo-holder">
 					<a href="/">
@@ -179,7 +184,7 @@
 		</header>
 		<div class="content">
             <div class="alert-banner">
-                @await Component.InvokeAsync("Area", new { name = "Alert Top Section" })
+                @await Component.InvokeAsync("Area", new { name = "Alert Top Section Below Nav" })
             </div>
 			<div class="content-dynamic">
 				@RenderBody()

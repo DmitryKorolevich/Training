@@ -207,4 +207,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\Indexes.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\OrderOptionTypes.sql" />
+  </ItemGroup>
 </Project>

@@ -62,7 +62,7 @@
                                                         </div>
                                                     </form>
                                                 </div>
-                                                <label data-ng-if="order.IdObjectType!=3" class="checkbox-inline">
+                                                <label class="checkbox-inline">
                                                     <input type="checkbox" data-ng-model="order.GiftOrder" data-ng-disabled="orderEditDisabled" data-ng-change="giftOrderChanged()">Gift Order
                                                     <i class="fa fa-gift"></i>
                                                 </label>
@@ -363,7 +363,7 @@
                                                             <span>{{order.StandardShippingCharges | currency}}</span>
                                                         </div>
                                                     </div>
-                                                    <div data-ng-if="shippingUpgradePOptions && shippingUpgradePOptions.length!=0 && order.IdObjectType!=3" class="form-group">
+                                                    <div data-ng-if="shippingUpgradePOptions && shippingUpgradePOptions.length!=0" class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Upgrade Perishable Shipping</label>
                                                         <div class="col-md-5">
                                                             <select data-ng-disabled="!shippingUpgradePOptions || shippingUpgradePOptions.length==0 || orderEditDisabled" class="form-control" name="ShippingUpgradeP" data-ng-model="order.ShippingUpgradeP" ng-options="item.Key as item.Text for item in shippingUpgradePOptions" data-ng-change="requestRecalculate()">
@@ -371,7 +371,7 @@
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    <div data-ng-if="shippingUpgradeNPOptions && shippingUpgradeNPOptions.length!=0 && order.IdObjectType!=3" class="form-group">
+                                                    <div data-ng-if="shippingUpgradeNPOptions && shippingUpgradeNPOptions.length!=0" class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Upgrade Non-Perishable Shipping</label>
                                                         <div class="col-md-5">
                                                             <select data-ng-disabled="!shippingUpgradeNPOptions || shippingUpgradeNPOptions.length==0 || orderEditDisabled" class="form-control" name="ShippingUpgradeNP" data-ng-model="order.ShippingUpgradeNP" ng-options="item.Key as item.Text for item in shippingUpgradeNPOptions" data-ng-change="requestRecalculate()">
@@ -394,7 +394,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div data-ng-if="order.IdObjectType!=3" class="form-group">
+                                                    <div class="form-group">
                                                         <label for="type" class="col-md-7 control-label">Shipping Override (-)</label>
                                                         <div class="col-md-5">
                                                             <div class="input-group">

@@ -13,6 +13,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -21,8 +22,9 @@ namespace VitalChoice.Business.Services.Orders
         public GiftListOrderImportProcessor(
             ICountryService countryService,
             IDynamicMapper<OrderDynamic, Order> orderMapper,
-            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper)
-            : base(countryService, orderMapper, addressMapper)
+            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
+            ReferenceData referenceData)
+            : base(countryService, orderMapper, addressMapper, referenceData)
         {
         }
 

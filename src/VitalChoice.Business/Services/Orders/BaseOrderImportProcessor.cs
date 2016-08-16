@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography.Xml;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CsvHelper;
@@ -22,6 +23,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -30,6 +32,7 @@ namespace VitalChoice.Business.Services.Orders
         protected readonly ICountryService CountryService;
         protected readonly IDynamicMapper<OrderDynamic, Order> OrderMapper;
         protected readonly IDynamicMapper<AddressDynamic, OrderAddress> AddressMapper;
+        protected readonly ReferenceData ReferenceData;
 
         protected abstract Type RecordType { get; }
         protected abstract Type RecordMapType { get; }
@@ -40,11 +43,13 @@ namespace VitalChoice.Business.Services.Orders
         protected BaseOrderImportProcessor(
             ICountryService countryService,
             IDynamicMapper<OrderDynamic, Order> orderMapper,
-            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper)
+            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
+            ReferenceData referenceData)
         {
             CountryService = countryService;
             OrderMapper = orderMapper;
             AddressMapper = addressMapper;
+            ReferenceData = referenceData;
             Messages = new List<MessageInfo>();
         }
 
@@ -71,6 +76,7 @@ namespace VitalChoice.Business.Services.Orders
                     CsvConfiguration configuration = new CsvConfiguration();
                     configuration.TrimFields = true;
                     configuration.TrimHeaders = true;
+                    configuration.WillThrowOnMissingField = false;
                     configuration.RegisterClassMap(RecordMapType);
                     using (var csv = new CsvReader(streamReader, configuration))
                     {

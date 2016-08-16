@@ -45,3 +45,21 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name]='Alert Top Section Above Nav')
+BEGIN
+
+	UPDATE [dbo].[ContentAreas]
+	SET Name='Alert Top Section Below Nav'
+	WHERE Name='Alert Top Section'
+
+	INSERT INTO [dbo].[ContentAreas]
+	([Name], [Template], [StatusCode], [Created], [Updated])
+	VALUES
+	(N'Alert Top Section Above Nav', N'<div class="top-banner">
+    <img src="/Assets/images/flood-alert-8-2016.jpg">
+</div>', 2, GETDATE(), GETDATE())
+
+END
+
+GO

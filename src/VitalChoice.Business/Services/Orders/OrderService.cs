@@ -78,6 +78,7 @@ using System.Security.Cryptography.X509Certificates;
 using Google.Apis.Auth.OAuth2;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Data.UOW;
+using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -1778,7 +1779,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         throw new AppValidationException("Payment method \"Credit Card\" should be configured");
                     }
-                    processor = new GiftListOrderImportProcessor(_countryService, Mapper, _addressMapper);
+                    processor = new GiftListOrderImportProcessor(_countryService, Mapper, _addressMapper, _referenceData);
 
                     break;
                 case OrderImportType.DropShip:
@@ -1792,7 +1793,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         throw new AppValidationException("Payment method \"On Approved Credit\" should be configured");
                     }
-                    processor = new DropShipOrderImportProcessor(_countryService, Mapper, _addressMapper);
+                    processor = new DropShipOrderImportProcessor(_countryService, Mapper, _addressMapper, _referenceData);
 
                     break;
                 case OrderImportType.DropShipAAFES:
@@ -1806,7 +1807,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         throw new AppValidationException("Payment method \"On Approved Credit\" should be configured");
                     }
-                    processor = new DropShipAAFESSOrderImportProcessor(_countryService, Mapper, _addressMapper);
+                    processor = new DropShipAAFESSOrderImportProcessor(_countryService, Mapper, _addressMapper, _referenceData);
 
                     break;
                 default:
@@ -1829,6 +1830,16 @@ namespace VitalChoice.Business.Services.Orders
                 item.Order.Data.ShipDelayType = item.Order.SafeData.ShipDelayDate != null ? ShipDelayType.EntireOrder : ShipDelayType.None;
 
                 var context = await CalculateOrder(item.Order, orderCombinedStatus);
+                if (context.ShippingUpgradePOptions==null || context.ShippingUpgradePOptions.FirstOrDefault(p => p.Key == ShippingUpgradeOption.Overnight) ==
+                    null)
+                {
+                    item.Order.Data.ShippingUpgradeP = null;
+                }
+                if (context.ShippingUpgradeNpOptions == null || context.ShippingUpgradeNpOptions.FirstOrDefault(p => p.Key == ShippingUpgradeOption.Overnight) ==
+                    null)
+                {
+                    item.Order.Data.ShippingUpgradeNP = null;
+                }
 
                 var firstRow = item.OrderImportItems.First();
                 firstRow.ErrorMessages.AddRange(context.Messages);
@@ -1841,6 +1852,32 @@ namespace VitalChoice.Business.Services.Orders
             if (messages.Count > 0)
             {
                 throw new AppValidationException(messages);
+            }
+
+            //additional recalculation for setting shiping to 0
+            if (orderType == OrderImportType.DropShipAAFES)
+            {
+                foreach (var item in map)
+                {
+                    item.Order.Data.ShippingOverride = item.Order.ShippingTotal;
+
+                    var orderCombinedStatus = item.Order.OrderStatus ?? OrderStatus.Processed;
+                    item.Order.Data.ShipDelayType = item.Order.SafeData.ShipDelayDate != null ? ShipDelayType.EntireOrder : ShipDelayType.None;
+
+                    var context = await CalculateOrder(item.Order, orderCombinedStatus);
+
+                    var firstRow = item.OrderImportItems.First();
+                    firstRow.ErrorMessages.AddRange(context.Messages);
+                    firstRow.ErrorMessages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages));
+                    firstRow.ErrorMessages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages));
+                }
+
+                //throw calculating errors
+                messages = processor.FormatRowsRecordErrorMessages(map.SelectMany(p => p.OrderImportItems));
+                if (messages.Count > 0)
+                {
+                    throw new AppValidationException(messages);
+                }
             }
 
             var orders = map.Select(p => p.Order).ToList();
