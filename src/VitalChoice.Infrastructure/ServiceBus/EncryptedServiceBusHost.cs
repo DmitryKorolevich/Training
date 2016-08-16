@@ -1,6 +1,7 @@
 ﻿#if !NETSTANDARD1_5
 using System;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
@@ -50,10 +51,35 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         private void Initialize(IOptions<AppOptions> appOptions, ILogger logger)
         {
-            EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.PlainConnectionString,
-                appOptions.Value.ExportService.PlainQueueName, LocalHostName);
-            EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.EncryptedConnectionString,
-                appOptions.Value.ExportService.EncryptedQueueName, LocalHostName);
+            try
+            {
+                try
+                {
+                    EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.PlainConnectionString,
+                        appOptions.Value.ExportService.PlainQueueName, LocalHostName);
+                }
+                catch
+                {
+                    Thread.Sleep(TimeSpan.FromSeconds(1));
+                    EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.PlainConnectionString,
+                        appOptions.Value.ExportService.PlainQueueName, LocalHostName);
+                }
+                try
+                {
+                    EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.EncryptedConnectionString,
+                        appOptions.Value.ExportService.EncryptedQueueName, LocalHostName);
+                }
+                catch
+                {
+                    Thread.Sleep(TimeSpan.FromSeconds(1));
+                    EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.EncryptedConnectionString,
+                        appOptions.Value.ExportService.EncryptedQueueName, LocalHostName);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogCritical(e.ToString());
+            }
 
             _plainClient = new ServiceBusHostOneToMany(logger, () =>
             {
