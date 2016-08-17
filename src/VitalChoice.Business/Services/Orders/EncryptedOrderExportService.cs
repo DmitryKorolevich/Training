@@ -190,6 +190,23 @@ namespace VitalChoice.Business.Services.Orders
             return Task.FromResult(new List<MessageInfo>());
         }
 
+        public Task<List<MessageInfo>> AuthorizeCard(OrderCardData paymentData)
+        {
+            if (!InitSuccess || paymentData == null)
+            {
+                return Task.FromResult(new List<MessageInfo>());
+            }
+            if (paymentData.IdOrder > 0)
+                return
+                    SendCommand<List<MessageInfo>>(new ServiceBusCommandWithResult(Guid.NewGuid(),
+                        OrderExportServiceCommandConstants.AuthorizeCardInOrder,
+                        ServerHostName, LocalHostName)
+                    {
+                        Data = new ServiceBusCommandData(paymentData)
+                    });
+            return Task.FromResult(new List<MessageInfo>());
+        }
+
         public Task<bool> UpdateCustomerPaymentMethodsAsync(ICollection<CustomerCardData> paymentMethods)
         {
             if (!InitSuccess)

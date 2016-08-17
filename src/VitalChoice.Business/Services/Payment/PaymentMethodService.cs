@@ -179,16 +179,27 @@ namespace VitalChoice.Business.Services.Payment
             }
             else
             {
-                if (DynamicMapper.IsValuesMasked(paymentMethod) && paymentMethod is CustomerPaymentMethodDynamic &&
-                    paymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
+                if (DynamicMapper.IsValuesMasked(paymentMethod))
                 {
-                    var customerPayment = (CustomerPaymentMethodDynamic) paymentMethod;
-                    return await _exportService.AuthorizeCard(new CustomerCardData
+                    if (paymentMethod is CustomerPaymentMethodDynamic && paymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
                     {
-                        IdCustomer = customerPayment.IdCustomer,
-                        IdPaymentMethod = customerPayment.Id,
-                        SecurityCode = securityCode
-                    });
+                        var customerPayment = (CustomerPaymentMethodDynamic) paymentMethod;
+                        return await _exportService.AuthorizeCard(new CustomerCardData
+                        {
+                            IdCustomer = customerPayment.IdCustomer,
+                            IdPaymentMethod = customerPayment.Id,
+                            SecurityCode = securityCode
+                        });
+                    }
+                    if (paymentMethod is OrderPaymentMethodDynamic && paymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
+                    {
+                        var customerPayment = (OrderPaymentMethodDynamic) paymentMethod;
+                        return await _exportService.AuthorizeCard(new OrderCardData
+                        {
+                            IdOrder = customerPayment.IdOrder,
+                            SecurityCode = securityCode
+                        });
+                    }
                 }
             }
 
