@@ -90,7 +90,7 @@ namespace VitalChoice.ExportService.Services
 
         private bool ProcessCardAuthorizeCommand(ServiceBusCommandBase command)
         {
-            var paymentMethod = command.Data.Data as CustomerPaymentMethodDynamic;
+            var paymentMethod = command.Data.Data as CustomerCardData;
             if (paymentMethod == null)
             {
                 SendCommand(new ServiceBusCommandBase(command, "Null payment method"));

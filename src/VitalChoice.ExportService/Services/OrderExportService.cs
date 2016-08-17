@@ -83,7 +83,7 @@ namespace VitalChoice.ExportService.Services
             }
         }
 
-        public async Task<List<MessageInfo>> AuthorizeCreditCard(CustomerPaymentMethodDynamic paymentMethod)
+        public async Task<List<MessageInfo>> AuthorizeCreditCard(CustomerCardData paymentMethod)
         {
             await LockCustomersEvent.WaitAsync();
             if (_writeQueue || paymentMethod == null)
@@ -96,7 +96,7 @@ namespace VitalChoice.ExportService.Services
                 var cardData =
                     await
                         rep.Query(
-                            c => paymentMethod.IdCustomer == c.IdCustomer && paymentMethod.Id == c.IdPaymentMethod)
+                            c => paymentMethod.IdCustomer == c.IdCustomer && paymentMethod.IdPaymentMethod == c.IdPaymentMethod)
                             .SelectFirstOrDefaultAsync(false);
                 if (cardData == null)
                 {
@@ -105,8 +105,16 @@ namespace VitalChoice.ExportService.Services
                     throw new ApiException(error);
                 }
                 var cardNumber = _encryptionHost.LocalDecrypt<string>(cardData.CreditCardNumber);
-                paymentMethod.Data.CardNumber = cardNumber;
-                return await _paymentMethodService.AuthorizeCreditCard(paymentMethod);
+                var customer = await _customerService.SelectAsync(paymentMethod.IdCustomer, true);
+                var customerPaymentMethod = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == paymentMethod.IdPaymentMethod);
+                if (customerPaymentMethod == null)
+                {
+                    return new List<MessageInfo>();
+                }
+
+                customerPaymentMethod.Data.CardNumber = cardNumber;
+                customerPaymentMethod.Data.SecurityCode = paymentMethod.SecurityCode;
+                return await _paymentMethodService.AuthorizeCreditCard(customerPaymentMethod);
             }
         }
 

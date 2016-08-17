@@ -24,6 +24,9 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
 
         [DataMember]
         public string CardNumber { get; set; }
+
+        [DataMember]
+        public string SecurityCode { get; set; }
     }
 
     [DataContract]
