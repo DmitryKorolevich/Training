@@ -1,5 +1,9 @@
-﻿IF OBJECT_ID(N'[dbo].[SPGetAAFESReport]', N'P') IS NOT NULL
+﻿GO
+
+IF OBJECT_ID(N'[dbo].[SPGetAAFESReport]', N'P') IS NOT NULL
+BEGIN
 	DROP PROCEDURE [dbo].[SPGetAAFESReport]
+END
 
 GO
 
