@@ -18,11 +18,11 @@
     },
     "ExportConnection": {
       "UserName": "dev_expdb_login",
-      "Password": "1230123",
-      "Server": "localhost",
-      "AdminUserName": "",
-      "AdminPassword": "",
-      "Encrypt": false
+      "Password": "8n8HfhzbzgwbwBgMpmE9vPdz",
+      "Server": "tcp:dad4lghbj.database.windows.net,1433",
+      "AdminUserName": "multiarc@dad4lghbj",
+      "AdminPassword": "5QG93n@FTPsqx^$fdrbdwpGZq",
+      "Encrypt": true
     },
     "ExportService": {
       "PlainConnectionString": "Endpoint=sb://staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=l1XNjdRaaMjJ1glYnDwjnIiw+9yaX6E2vksJXa4zBSk=",

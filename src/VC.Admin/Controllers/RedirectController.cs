@@ -27,7 +27,7 @@ namespace VC.Admin.Controllers
         private readonly ExtendedUserManager _userManager;
         private readonly ILogger _logger;
 
-        public RedirectController(IRedirectService redirectService, ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager)
+        public RedirectController(IRedirectService redirectService, ILoggerFactory loggerProvider, ExtendedUserManager userManager)
         {
             _redirectService = redirectService;
             _userManager = userManager;

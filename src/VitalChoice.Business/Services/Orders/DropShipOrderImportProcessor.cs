@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using CsvHelper;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Business.CsvImportMaps;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -14,17 +15,18 @@ using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services.Orders
 {
     public class DropShipOrderImportProcessor : StandartOrderImportProcessor
     {
         public DropShipOrderImportProcessor(
-            ICountryService countryService,
+            ICountryNameCodeResolver countryService,
             IDynamicMapper<OrderDynamic, Order> orderMapper,
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
-            ReferenceData referenceData)
-            : base(countryService, orderMapper, addressMapper, referenceData)
+            ReferenceData referenceData, ILoggerFactory loggerFactory)
+            : base(countryService, orderMapper, addressMapper, referenceData, loggerFactory.CreateLogger<DropShipOrderImportProcessor>())
         {
         }
 
@@ -42,7 +44,7 @@ namespace VitalChoice.Business.Services.Orders
             var skuProperty = skuProperties.FirstOrDefault(p => p.Name == nameof(OrderSkuImportItem.SKU));
             var skuBaseHeader = skuProperty?.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault()?.Name;
             var qtyProperty = skuProperties.FirstOrDefault(p => p.Name == nameof(OrderSkuImportItem.QTY));
-            var qtyBaseHeader = qtyProperty?.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault()?.Name; // ReSharper disable all
+            var qtyBaseHeader = qtyProperty?.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault()?.Name;
 
             item.ShipDelayDate = ParseOrderShipDate(csv, shipDateHeader, ref messages);
             item.Skus = ParseOrderSkus(csv, skuBaseHeader, qtyBaseHeader, ref messages);

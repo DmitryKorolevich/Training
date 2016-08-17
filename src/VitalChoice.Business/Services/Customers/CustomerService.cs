@@ -100,7 +100,7 @@ namespace VitalChoice.Business.Services.Customers
             IOptions<AppOptions> appOptions,
             IStorefrontUserService storefrontUserService,
             IEcommerceRepositoryAsync<Affiliate> affiliateRepositoryAsync,
-            ILoggerProviderExtended loggerProvider, DynamicExtensionsRewriter queryVisitor,
+            ILoggerFactory loggerProvider, DynamicExtensionsRewriter queryVisitor,
             AddressOptionValueRepository addressOptionValueRepositoryAsync, CustomerAddressMapper customerAddressMapper,
             ICountryNameCodeResolver countryNameCode, IEncryptedOrderExportService encryptedOrderExportService,
             IPaymentMethodService paymentMethodService,

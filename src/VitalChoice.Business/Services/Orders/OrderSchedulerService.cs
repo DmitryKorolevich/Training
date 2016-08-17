@@ -44,7 +44,7 @@ namespace VitalChoice.Business.Services.Orders
             IOptions<AppOptions> options,
             IEcommerceRepositoryAsync<OrderShippingPackage> orderShippingPackageRepository,
             IEcommerceRepositoryAsync<NewsletterBlockedEmail> newsletterBlockedEmailRepository,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerFactory loggerProvider)
         {
             _orderService = orderService;
             _customerService = customerService;

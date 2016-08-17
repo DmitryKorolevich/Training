@@ -27,7 +27,7 @@ namespace VitalChoice.Business.Services.Settings
         private readonly ILogger logger;
 
         public CountryService(IEcommerceRepositoryAsync<Country> countryRepository,
-            IEcommerceRepositoryAsync<State> stateRepository, ILoggerProviderExtended loggerProvider)
+            IEcommerceRepositoryAsync<State> stateRepository, ILoggerFactory loggerProvider)
         {
             this.countryRepository = countryRepository;
             this.stateRepository = stateRepository;

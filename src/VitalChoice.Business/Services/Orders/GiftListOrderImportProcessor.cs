@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using CsvHelper;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Business.CsvImportMaps;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -14,24 +15,26 @@ using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services.Orders
 {
     public class GiftListOrderImportProcessor : StandartOrderImportProcessor
     {
         public GiftListOrderImportProcessor(
-            ICountryService countryService,
+            ICountryNameCodeResolver countryService,
             IDynamicMapper<OrderDynamic, Order> orderMapper,
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
-            ReferenceData referenceData)
-            : base(countryService, orderMapper, addressMapper, referenceData)
+            ReferenceData referenceData, ILoggerFactory loggerFactory)
+            : base(countryService, orderMapper, addressMapper, referenceData, loggerFactory.CreateLogger<GiftListOrderImportProcessor>())
         {
         }
 
-        protected override Type RecordType => typeof (OrderGiftListImportItem);
+        protected override Type RecordType => typeof(OrderGiftListImportItem);
         protected override Type RecordMapType => typeof(OrderGiftListImportItemCsvMap);
 
-        protected override void ParseAdditionalInfo(OrderBaseImportItem baseItem, CsvReader csv, PropertyInfo[] modelProperties, ref List<MessageInfo> messages)
+        protected override void ParseAdditionalInfo(OrderBaseImportItem baseItem, CsvReader csv, PropertyInfo[] modelProperties,
+            ref List<MessageInfo> messages)
         {
             var item = (OrderGiftListImportItem) baseItem;
 
@@ -49,7 +52,8 @@ namespace VitalChoice.Business.Services.Orders
 
             int? idState = null;
             int? idCountry = null;
-            ParseContryAndStateCodes(csv,nameof(OrderGiftListImportItem.State), nameof(OrderGiftListImportItem.Country), ref messages, out idState, out idCountry);
+            ParseContryAndStateCodes(csv, nameof(OrderGiftListImportItem.State), nameof(OrderGiftListImportItem.Country), ref messages,
+                out idState, out idCountry);
             item.IdState = idState;
             item.IdCountry = idCountry;
 
@@ -59,16 +63,17 @@ namespace VitalChoice.Business.Services.Orders
             }
         }
 
-        protected override async Task<List<OrderImportItemOrderDynamic>> OrdersForImportBaseConvert(List<OrderBaseImportItem> records, OrderImportType orderType,
+        protected override async Task<List<OrderImportItemOrderDynamic>> OrdersForImportBaseConvert(List<OrderBaseImportItem> records,
+            OrderImportType orderType,
             CustomerDynamic customer, CustomerPaymentMethodDynamic paymentMethod, int idAddedBy)
         {
             List<OrderImportItemOrderDynamic> toReturn = new List<OrderImportItemOrderDynamic>();
-            foreach (var record in records.Select(p => (OrderGiftListImportItem)p))
+            foreach (var record in records.Select(p => (OrderGiftListImportItem) p))
             {
-                var order = OrderMapper.CreatePrototype((int)orderType);
+                var order = OrderMapper.CreatePrototype((int) orderType);
                 order.IdEditedBy = idAddedBy;
                 order.Customer = customer;
-                order.ShippingAddress = await AddressMapper.FromModelAsync(record, (int)AddressType.Shipping);
+                order.ShippingAddress = await AddressMapper.FromModelAsync(record, (int) AddressType.Shipping);
                 record.SetFields(order, paymentMethod);
                 var item = new OrderImportItemOrderDynamic();
                 item.Order = order;

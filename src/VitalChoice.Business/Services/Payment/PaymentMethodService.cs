@@ -43,7 +43,7 @@ namespace VitalChoice.Business.Services.Payment
 	    public PaymentMethodService(IEcommerceRepositoryAsync<PaymentMethod> paymentMethodRepository,
 	        IRepositoryAsync<AdminProfile> adminProfileRepository,
 	        IEcommerceRepositoryAsync<PaymentMethodToCustomerType> paymentMethodToCustomerTypeRepository,
-	        ILoggerProviderExtended loggerProvider, IOptions<AppOptions> options, ICountryNameCodeResolver countryNameCode,
+	        ILoggerFactory loggerProvider, IOptions<AppOptions> options, ICountryNameCodeResolver countryNameCode,
 	        ITransactionAccessor<EcommerceContext> transactionAccessor, AppSettings appSettings, IEncryptedOrderExportService exportService)
 	    {
 	        _paymentMethodRepository = paymentMethodRepository;

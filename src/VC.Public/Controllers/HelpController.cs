@@ -61,7 +61,7 @@ namespace VC.Public.Controllers
             ReCaptchaValidator reCaptchaValidator,
             IOptions<AppOptions> options,
             INotificationService notificationService,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             IProductService productService,
             BrontoService brontoService,
             IPageResultService pageResultService) : base(pageResultService)

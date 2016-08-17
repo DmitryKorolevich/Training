@@ -71,7 +71,7 @@ namespace VC.Admin.Controllers
             InventorySkuMapper mapper,
             ISettingService settingService,
             ICsvExportService<InventorySkuUsageReportItemForExport, InventorySkuUsageReportItemForExportCsvMap> inventorySkuUsageReportItemForExportCSVExportService,
-            ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager)
+            ILoggerFactory loggerProvider, ExtendedUserManager userManager)
         {
             _inventorySkuCategoryService = inventorySkuCategoryService;
             _inventorySkuService = inventorySkuService;

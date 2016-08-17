@@ -28,7 +28,7 @@ namespace VitalChoice.Business.Services.Products
 
         public InventoryCategoryService(IEcommerceRepositoryAsync<InventoryCategory> inventoryCategoryEcommerceRepository,
             IExtendedDynamicReadServiceAsync<ProductDynamic, Product> productService,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerFactory loggerProvider)
         {
             this.inventoryCategoryEcommerceRepository = inventoryCategoryEcommerceRepository;
             this.productService = productService;

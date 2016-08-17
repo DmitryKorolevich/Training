@@ -35,7 +35,7 @@ namespace VC.Admin.Controllers
             IHealthwiseService healthwiseService,
             IOrderService orderService,
             INotificationService notificationService,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             ExtendedUserManager userManager, ReferenceData referenceData, AppSettings appSettings)
         {
             _healthwiseService = healthwiseService;

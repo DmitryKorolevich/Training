@@ -30,7 +30,7 @@ namespace VitalChoice.Business.Services.Content
 
 	    public ContentEditService(IRepositoryAsync<MasterContentItem> masterContentItemRepository,
 	        IRepositoryAsync<ContentItem> contentItemRepository, 
-	        ILoggerProviderExtended loggerProvider)
+	        ILoggerFactory loggerProvider)
 	    {
 	        this.masterContentItemRepository = masterContentItemRepository;
 	        this.contentItemRepository = contentItemRepository;

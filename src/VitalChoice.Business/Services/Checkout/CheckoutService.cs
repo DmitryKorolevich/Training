@@ -64,7 +64,7 @@ namespace VitalChoice.Business.Services.Checkout
         public CheckoutService(IEcommerceRepositoryAsync<CartExtended> cartRepository,
             SkuMapper skuMapper, ProductMapper productMapper, OrderMapper orderMapper,
             IOrderService orderService, EcommerceContext context,
-            ILoggerProviderExtended loggerProvider, ICustomerService customerService,
+            ILoggerFactory loggerProvider, ICustomerService customerService,
             IEcommerceRepositoryAsync<CartToSku> cartToSkusRepository,
             IDynamicReadServiceAsync<AddressDynamic, OrderAddress> addressService, ICountryService countryService,
             IEcommerceRepositoryAsync<OrderToSku> orderToSkuRepository, IRepositoryAsync<ProductContent> productContentRep,

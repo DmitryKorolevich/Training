@@ -43,7 +43,7 @@ namespace VitalChoice.Business.Services.Orders
             OrderRefundMapper mapper,
             IObjectLogItemExternalService objectLogItemExternalService,
             IEcommerceRepositoryAsync<OrderOptionValue> orderValueRepositoryAsync,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             DynamicExtensionsRewriter queryVisitor,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
             IGcService gcService,

@@ -35,7 +35,7 @@ namespace VitalChoice.Business.Services.Avatax
         //TODO move out tax code to global settings
         internal const string ShippingTaxCode = "FR020100";
 
-        public AvalaraTax(ITaxService taxService, IOptions<AppOptions> options, ILoggerProviderExtended loggerProvider,
+        public AvalaraTax(ITaxService taxService, IOptions<AppOptions> options, ILoggerFactory loggerProvider,
             IDynamicMapper<AddressDynamic, OrderAddress> mapper, ICountryNameCodeResolver countryNameCode)
         {
             _taxService = taxService;

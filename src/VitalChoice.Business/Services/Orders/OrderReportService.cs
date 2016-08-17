@@ -76,7 +76,7 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<KPICacheItem> kPICacheItemRepository,
             FacebookService facebookService,
             TwitterService twitterService,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             ReferenceData referenceData)
         {
             _orderService = orderService;

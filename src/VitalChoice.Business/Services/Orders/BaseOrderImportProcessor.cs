@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
 using FluentValidation.Validators;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Business.CsvImportMaps;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -29,27 +30,28 @@ namespace VitalChoice.Business.Services.Orders
 {
     public abstract class BaseOrderImportProcessor
     {
-        protected readonly ICountryService CountryService;
+        protected readonly ICountryNameCodeResolver CountryService;
         protected readonly IDynamicMapper<OrderDynamic, Order> OrderMapper;
         protected readonly IDynamicMapper<AddressDynamic, OrderAddress> AddressMapper;
         protected readonly ReferenceData ReferenceData;
+        private readonly ILogger _logger;
 
         protected abstract Type RecordType { get; }
         protected abstract Type RecordMapType { get; }
-        protected ICollection<Country> Countries { get; set; }
 
         public ICollection<MessageInfo> Messages { get; private set; }
 
         protected BaseOrderImportProcessor(
-            ICountryService countryService,
+            ICountryNameCodeResolver countryService,
             IDynamicMapper<OrderDynamic, Order> orderMapper,
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
-            ReferenceData referenceData)
+            ReferenceData referenceData, ILogger logger)
         {
             CountryService = countryService;
             OrderMapper = orderMapper;
             AddressMapper = addressMapper;
             ReferenceData = referenceData;
+            _logger = logger;
             Messages = new List<MessageInfo>();
         }
 
@@ -68,7 +70,6 @@ namespace VitalChoice.Business.Services.Orders
 
             List<OrderBaseImportItem> records = new List<OrderBaseImportItem>();
             Dictionary<string, OrderValidationGenericProperty> validationSettings = null;
-            Countries = await CountryService.GetCountriesAsync(new CountryFilter());
             using (var memoryStream = new MemoryStream(file))
             {
                 using (var streamReader = new StreamReader(memoryStream))
@@ -101,7 +102,8 @@ namespace VitalChoice.Business.Services.Orders
                         }
                         catch (Exception e)
                         {
-                            throw new AppValidationException("Invalid file format");
+                            _logger.LogError(e.ToString());
+                            throw new AppValidationException(e.Message);
                         }
                     }
                 }
@@ -146,13 +148,13 @@ namespace VitalChoice.Business.Services.Orders
             var countryCode = reader.GetField<string>(countryColumnName);
             if (!String.IsNullOrEmpty(countryCode))
             {
-                var country = Countries.FirstOrDefault(p => p.CountryCode == countryCode);
+                var country = CountryService.GetCountryByCode(countryCode);
                 if (country != null)
                 {
                     idCountry = country.Id;
                     if (!String.IsNullOrEmpty(stateCode))
                     {
-                        var state = country.States.FirstOrDefault(p => p.StateCode == stateCode);
+                        var state = CountryService.GetStateByCode(country.Id, stateCode);
                         if (state == null)
                         {
                             messages.Add(AddErrorMessage(stateColumnName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidFieldValue], stateColumnName)));

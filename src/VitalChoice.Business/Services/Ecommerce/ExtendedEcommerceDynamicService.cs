@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Services;
@@ -31,7 +32,7 @@ namespace VitalChoice.Business.Services.Ecommerce
             IEcommerceRepositoryAsync<TOptionValue> optionValueRepositoryAsync,
             IEcommerceRepositoryAsync<BigStringValue> bigStringRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider, DynamicExtensionsRewriter queryVisitor,
+            ILoggerFactory loggerProvider, DynamicExtensionsRewriter queryVisitor,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
             IDynamicEntityOrderingExtension<TEntity> orderingExtension)
             : base(

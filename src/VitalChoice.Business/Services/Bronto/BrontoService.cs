@@ -38,7 +38,7 @@ namespace VitalChoice.Business.Services.Bronto
         private BrontoSoapPortTypeClient Client => _lclient.Value;
 
         public BrontoService(IOptions<AppOptions> options,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerFactory loggerProvider)
         {
             _brontoSettings = options.Value.Bronto;
             _logger = loggerProvider.CreateLogger<BrontoService>();
@@ -53,7 +53,7 @@ namespace VitalChoice.Business.Services.Bronto
 
         public void PushSubscribe(string email, bool subscribe)
         {
-            Task.Run(() =>
+            Task.Factory.StartNew(() =>
             {
                 var unsubscribed = GetIsUnsubscribed(email).GetAwaiter().GetResult();
                 if (subscribe && (unsubscribed ?? true))

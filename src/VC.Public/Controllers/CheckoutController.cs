@@ -84,7 +84,7 @@ namespace VC.Public.Controllers
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
             BrontoService brontoService,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
-            IPageResultService pageResultService, ISettingService settingService, ILoggerProviderExtended loggerProvider,
+            IPageResultService pageResultService, ISettingService settingService, ILoggerFactory loggerProvider,
             ExtendedUserManager userManager, ICountryNameCodeResolver countryNameCodeResolver, ReferenceData referenceData,
             AppSettings appSettings, IEncryptedOrderExportService exportService)
             : base(

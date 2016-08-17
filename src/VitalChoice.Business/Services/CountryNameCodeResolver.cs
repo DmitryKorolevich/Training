@@ -19,6 +19,14 @@ namespace VitalChoice.Business.Services
             _countrySource = new Lazy<ICollection<Country>>(() => countryService.GetCountriesAsync().GetAwaiter().GetResult());
         }
 
+        private Dictionary<string, Country> _countryNames;
+
+        private Dictionary<int, Dictionary<string, State>> _statesNames;
+
+        private Dictionary<string, Country> _countryCodes;
+
+        private Dictionary<int, Dictionary<string, State>> _statesCodes;
+
         private Dictionary<string, int> _countries;
 
         private Dictionary<string, Dictionary<string, int>> _states;
@@ -26,6 +34,72 @@ namespace VitalChoice.Business.Services
         private Dictionary<int, Country> _coutryCodes;
 
         private Dictionary<int, Dictionary<int, State>> _stateCodes;
+
+        public Country GetCountryByName(string name)
+        {
+            if (_countryNames == null)
+            {
+                _countryNames = _countrySource.Value.ToDictionary(c => c.CountryName, StringComparer.OrdinalIgnoreCase);
+            }
+            Country result;
+            if (_countryNames.TryGetValue(name, out result))
+            {
+                return result;
+            }
+            return null;
+        }
+
+        public Country GetCountryByCode(string code)
+        {
+            if (_countryCodes == null)
+            {
+                _countryCodes = _countrySource.Value.ToDictionary(c => c.CountryCode, StringComparer.OrdinalIgnoreCase);
+            }
+            Country result;
+            if (_countryCodes.TryGetValue(code, out result))
+            {
+                return result;
+            }
+            return null;
+        }
+
+        public State GetStateByName(int idCountry, string name)
+        {
+            if (_statesNames == null)
+            {
+                _statesNames = _countrySource.Value.ToDictionary(c => c.Id,
+                    c => c.States.ToDictionary(s => s.StateName, StringComparer.OrdinalIgnoreCase));
+            }
+            Dictionary<string, State> states;
+            if (_statesNames.TryGetValue(idCountry, out states))
+            {
+                State result;
+                if (states.TryGetValue(name, out result))
+                {
+                    return result;
+                }
+            }
+            return null;
+        }
+
+        public State GetStateByCode(int idCountry, string code)
+        {
+            if (_statesCodes == null)
+            {
+                _statesCodes = _countrySource.Value.ToDictionary(c => c.Id,
+                    c => c.States.ToDictionary(s => s.StateCode, StringComparer.OrdinalIgnoreCase));
+            }
+            Dictionary<string, State> states;
+            if (_statesCodes.TryGetValue(idCountry, out states))
+            {
+                State result;
+                if (states.TryGetValue(code, out result))
+                {
+                    return result;
+                }
+            }
+            return null;
+        }
 
         public bool IsState(int idState, string countryCode, string stateCode)
         {

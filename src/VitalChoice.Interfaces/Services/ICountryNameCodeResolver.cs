@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VitalChoice.Interfaces.Services
 {
     public interface ICountryNameCodeResolver
     {
+        Country GetCountryByName(string name);
+        Country GetCountryByCode(string code);
+        State GetStateByName(int idCountry, string name);
+        State GetStateByCode(int idCountry, string code);
         bool IsState(int idState, string countryCode, string stateCode);
         bool IsState(AddressDynamic address, string countryCode, string stateCode);
         bool IsCountry(AddressDynamic address, string countryCode);

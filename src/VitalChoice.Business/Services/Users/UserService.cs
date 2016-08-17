@@ -53,7 +53,7 @@ namespace VitalChoice.Business.Services.Users
 	    protected UserService(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, VitalChoiceContext context,
 	        SignInManager<ApplicationUser> signInManager, ReferenceData referenceData,
 	        INotificationService notificationService, IOptions<AppOptions> options, IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
-	        IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor, ILoggerProviderExtended loggerProvider)
+	        IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor, ILoggerFactory loggerProvider)
 	    {
 	        UserManager = userManager;
 	        RoleManager = roleManager;

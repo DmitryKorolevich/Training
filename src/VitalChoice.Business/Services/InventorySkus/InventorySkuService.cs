@@ -57,7 +57,7 @@ namespace VitalChoice.Business.Services.InventorySkus
             ITransactionAccessor<EcommerceContext> transactionAccessor,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IEcommerceRepositoryAsync<SkuToInventorySku> skuToInventorySkuRepository,
-            ILoggerProviderExtended loggerProvider, IDynamicEntityOrderingExtension<InventorySku> orderingExtension) : base(
+            ILoggerFactory loggerProvider, IDynamicEntityOrderingExtension<InventorySku> orderingExtension) : base(
                 mapper, inventorySkuRepository, inventorySkuValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension)
         {

@@ -25,7 +25,7 @@ namespace VitalChoice.Business.Services.Dynamic
 
         public ProductMapper(ITypeConverter converter,
             IModelConverterService converterService,
-            SkuMapper skuMapper, IEcommerceRepositoryAsync<ProductOptionType> productRepositoryAsync, ILoggerProviderExtended loggerProvider)
+            SkuMapper skuMapper, IEcommerceRepositoryAsync<ProductOptionType> productRepositoryAsync, ILoggerFactory loggerProvider)
             : base(converter, converterService, productRepositoryAsync)
         {
             _skuMapper = skuMapper;

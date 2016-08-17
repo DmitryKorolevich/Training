@@ -142,18 +142,17 @@ namespace VitalChoice.Infrastructure.Services
                     if (!string.IsNullOrEmpty(item.Data))
                     {
                         var blobUploadTask =
-                            Task.Run(
-                                async () =>
-                                    await
-                                        _blobStorageClient.UploadBlobAsStringAsync(_objectHistoryContainerName,
-                                            item.PartitionKey + item.RowKey, item.Data));
+                            Task.Factory.StartNew(
+                                () =>
+                                    _blobStorageClient.UploadBlobAsStringAsync(_objectHistoryContainerName,
+                                        item.PartitionKey + item.RowKey, item.Data).GetAwaiter().GetResult());
                         uploadTasks.Add(blobUploadTask);
                     }
 
-                    var tableInsertTask = Task.Run(async () =>
+                    var tableInsertTask = Task.Factory.StartNew(() =>
                     {
                         var op = TableOperation.Insert(item);
-                        await _table.ExecuteAsync(op);
+                        _table.Execute(op);
                     });
                     uploadTasks.Add(tableInsertTask);
                 }

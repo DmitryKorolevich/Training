@@ -31,7 +31,7 @@ namespace VitalChoice.Business.Services
 
         public FacebookService(
             IOptions<AppOptions> options,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerFactory loggerProvider)
         {
             var accessToken = $"{options.Value.FacebookSettings.AppId}|{options.Value.FacebookSettings.AppSecret}";
             _accessLink = $"https://graph.facebook.com/{options.Value.FacebookSettings.Id}?fields=likes&access_token={accessToken}";

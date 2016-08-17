@@ -14,6 +14,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using System;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Infrastructure.Domain.Options;
@@ -37,7 +38,7 @@ namespace VitalChoice.Business.Services.Users
             IEcommerceRepositoryAsync<User> ecommerceRepositoryAsync,
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             IRepositoryAsync<AdminTeam> adminTeamRepository,
-            IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor, ILoggerProviderExtended loggerProvider) : 
+            IUserValidator<ApplicationUser> userValidator, ITransactionAccessor<VitalChoiceContext> transactionAccessor, ILoggerFactory loggerProvider) : 
             base(userManager, roleManager, context, signInManager, referenceData, notificationService, options, ecommerceRepositoryAsync, userValidator, transactionAccessor, loggerProvider)
 		{
             _adminProfileRepository = adminProfileRepository;

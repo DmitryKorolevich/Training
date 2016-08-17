@@ -29,7 +29,7 @@ namespace VitalChoice.Business.Services
 
         public GoogleService(
             IOptions<AppOptions> options,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerFactory loggerProvider)
         {
             _accountId = options.Value.GoogleSettings.GAAccountId;
             _clientId = options.Value.GoogleSettings.ClientId;

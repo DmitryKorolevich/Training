@@ -32,7 +32,7 @@ namespace VitalChoice.Business.Services
 
         public TwitterService(
             IOptions<AppOptions> options,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerFactory loggerProvider)
         {
             _twitterConsumerKey = options.Value.TwitterSettings.ConsumerKey;
             _twitterConsumerSecret = options.Value.TwitterSettings.ConsumerSecret;

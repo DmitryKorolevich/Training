@@ -104,7 +104,7 @@ namespace VitalChoice.Business.Services.Products
             IBlobStorageClient storageClient,
             IProductCategoryService productCategoryService,
             IOptions<AppOptions> options,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             IEcommerceRepositoryAsync<VCustomerFavorite> vCustomerRepositoryAsync,
             SpEcommerceRepository sPEcommerceRepository, DynamicExtensionsRewriter queryVisitor,
             ITransactionAccessor<EcommerceContext> transactionAccessor,

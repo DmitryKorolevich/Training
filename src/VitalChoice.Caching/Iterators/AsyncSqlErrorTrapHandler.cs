@@ -51,7 +51,7 @@ namespace VitalChoice.Caching.Iterators
                         throw;
                     }
                     await
-                        Task.Run(
+                        Task.Factory.StartNew(
                             () =>
                                 Thread.Sleep(
                                     TimeSpan.FromMilliseconds(_rnd.Next(SqlErrorTrapConfiguration.RetryWaitTimeMin,
@@ -106,7 +106,7 @@ namespace VitalChoice.Caching.Iterators
                         throw;
                     }
                     await
-                        Task.Run(
+                        Task.Factory.StartNew(
                             () =>
                                 Thread.Sleep(
                                     TimeSpan.FromMilliseconds(_rnd.Next(SqlErrorTrapConfiguration.RetryWaitTimeMin,
@@ -162,7 +162,7 @@ namespace VitalChoice.Caching.Iterators
                         throw;
                     }
                     await
-                        Task.Run(
+                        Task.Factory.StartNew(
                             () =>
                                 Thread.Sleep(
                                     TimeSpan.FromMilliseconds(_rnd.Next(SqlErrorTrapConfiguration.RetryWaitTimeMin,

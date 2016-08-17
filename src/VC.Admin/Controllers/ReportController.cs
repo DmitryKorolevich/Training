@@ -25,7 +25,7 @@ namespace VC.Admin.Controllers
 
         public ReportController(
             IOrderReportService orderReportService,
-            ILoggerProviderExtended loggerProvider)
+            ILoggerFactory loggerProvider)
         {
             _orderReportService = orderReportService;
             this._logger = loggerProvider.CreateLogger<ReportController>();

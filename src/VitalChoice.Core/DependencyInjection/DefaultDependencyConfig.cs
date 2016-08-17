@@ -221,16 +221,16 @@ namespace VitalChoice.Core.DependencyInjection
             }
             builder.RegisterInstance(configuration).As<IConfiguration>();
             builder.RegisterType<LoggerProviderExtended>()
-                .As<ILoggerProviderExtended>()
                 .As<ILoggerProvider>()
+                .AsSelf()
                 .SingleInstance();
-            builder.Register(cc => cc.Resolve<ILoggerProviderExtended>().Factory).As<ILoggerFactory>().SingleInstance();
+            builder.Register(cc => cc.Resolve<LoggerProviderExtended>().Factory).As<ILoggerFactory>().SingleInstance();
 
             //TODO: omit ILogger override in config parameter
-            builder.Register((cc, pp) => cc.Resolve<ILoggerProviderExtended>().CreateLogger("Root")).As<ILogger>();
+            builder.Register((cc, pp) => cc.Resolve<LoggerProviderExtended>().CreateLogger("Root")).As<ILogger>();
             builder.RegisterGeneric(typeof(Logger<>))
                 .WithParameter((pi, cc) => pi.ParameterType == typeof(ILoggerFactory),
-                    (pi, cc) => cc.Resolve<ILoggerProviderExtended>().Factory)
+                    (pi, cc) => cc.Resolve<LoggerProviderExtended>().Factory)
                 .As(typeof(ILogger<>));
 
             builder.RegisterType<LocalizationService>()
@@ -652,8 +652,6 @@ namespace VitalChoice.Core.DependencyInjection
 #endif
             builder.RegisterType<ObjectEncryptionHost>()
                 .As<IObjectEncryptionHost>()
-                .WithParameter((pi, cc) => pi.ParameterType == typeof(ILogger),
-                    (pi, cc) => cc.Resolve<ILoggerProviderExtended>().CreateLogger(typeof(ObjectEncryptionHost)))
                 .SingleInstance();
             builder.RegisterType<EncryptedOrderExportService>().As<IEncryptedOrderExportService>().InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(TransactionAccessor<>)).As(typeof(ITransactionAccessor<>)).InstancePerLifetimeScope();

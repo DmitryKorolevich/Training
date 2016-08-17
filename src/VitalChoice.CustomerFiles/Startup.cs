@@ -10,17 +10,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Templates.Strings.Core;
 using VitalChoice.CustomerFiles.Context;
 using VitalChoice.CustomerFiles.Entities;
-using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Interfaces.Services.Customers;
 
 namespace VitalChoice.CustomerFiles
@@ -43,89 +39,71 @@ namespace VitalChoice.CustomerFiles
                     {
                         var set = context.Set<VCustomerOldFile>();
                         var allList = set.ToList();
-                        ThreadLocal<ILifetimeScope> scopes = new ThreadLocal<ILifetimeScope>(() => lifetimeScope.BeginLifetimeScope());
-                        ThreadLocal<ICustomerService> customerService = new ThreadLocal<ICustomerService>(() =>
+                        var scopes = new ThreadLocal<ILifetimeScope>(() => lifetimeScope.BeginLifetimeScope());
+                        var customerRepository =
+                            new ThreadLocal<IEcommerceRepositoryAsync<Customer>>(() =>
+                            {
+                                var threadScope = scopes.Value;
+                                return threadScope.Resolve<IEcommerceRepositoryAsync<Customer>>();
+                            });
+                        var customerService =
+                            new ThreadLocal<ICustomerService>(() =>
+                            {
+                                var threadScope = scopes.Value;
+                                return threadScope.Resolve<ICustomerService>();
+                            });
+                        Parallel.ForEach(allList.GroupBy(r => r.IdCustomer), new ParallelOptions
                         {
-                            var threadScope = scopes.Value;
-                            return threadScope.Resolve<ICustomerService>();
-                        });
-                        allList.GroupBy(r => r.IdCustomer).AsParallel().ForEach(fileRecordGroup =>
+                            CancellationToken = CancellationToken.None,
+                            MaxDegreeOfParallelism = 16,
+                            TaskScheduler = TaskScheduler.Default
+                        }, fileRecordGroup =>
                         {
-
                             Console.ForegroundColor = ConsoleColor.DarkGreen;
                             Console.WriteLine($"Importing {fileRecordGroup.Key}");
                             Console.ResetColor();
                             List<Tuple<string, VCustomerOldFile>> uploadedFiles = new List<Tuple<string, VCustomerOldFile>>();
-                            CustomerDynamic customer = customerService.Value.SelectAsync(fileRecordGroup.Key, true).GetAwaiter().GetResult();
-                            if (customer != null)
+                            var customer =
+                                customerRepository.Value.Query(f => f.Id == fileRecordGroup.Key)
+                                    .Include(c => c.Files)
+                                    .SelectFirstOrDefault(true);
+                            Guid publicId = customer.PublicId;
+                            if (customer.Files.Count != fileRecordGroup.Count())
                             {
-                                Guid publicId = customer.PublicId;
-                                if (customer.Files.Count != fileRecordGroup.Count())
+                                foreach (var fileRecord in fileRecordGroup)
                                 {
-                                    foreach (var fileRecord in fileRecordGroup)
+                                    if (File.Exists(fileRecord.Name))
                                     {
-                                        if (File.Exists(fileRecord.Name))
-                                        {
-                                            Console.WriteLine($"Importing {fileRecord.OriginalFileName}");
-                                            var content = File.ReadAllBytes(fileRecord.Name);
-                                            uploadedFiles.Add(
-                                                new Tuple<string, VCustomerOldFile>(
-                                                    customerService.Value.UploadFileAsync(content, fileRecord.OriginalFileName, publicId)
-                                                        .GetAwaiter()
-                                                        .GetResult(), fileRecord));
-                                        }
+                                        Console.WriteLine($"Importing {fileRecord.OriginalFileName}");
+                                        var content = File.ReadAllBytes(fileRecord.Name);
+                                        uploadedFiles.Add(
+                                            new Tuple<string, VCustomerOldFile>(
+                                                customerService.Value.UploadFileAsync(content, fileRecord.OriginalFileName, publicId)
+                                                    .GetAwaiter()
+                                                    .GetResult(), fileRecord));
                                     }
-                                    if (uploadedFiles.Any())
+                                }
+                                if (uploadedFiles.Any())
+                                {
+                                    try
                                     {
-                                        try
+                                        customer.Files.AddRange(uploadedFiles.Select(fileName => new CustomerFile
                                         {
-                                            customer.Files.AddRange(uploadedFiles.Select(fileName => new CustomerFile
-                                            {
-                                                Description = fileName.Item2.Description,
-                                                FileName = fileName.Item1,
-                                                IdCustomer = customer.Id,
-                                                UploadDate = fileName.Item2.UploadDate
-                                            }));
-                                            customerService.Value.UpdateEcommerceOnlyAsync(customer).GetAwaiter().GetResult();
-                                        }
-                                        catch (DbUpdateConcurrencyException)
+                                            Description = fileName.Item2.Description,
+                                            FileName = fileName.Item1,
+                                            IdCustomer = customer.Id,
+                                            UploadDate = fileName.Item2.UploadDate
+                                        }));
+                                        customerRepository.Value.SaveChanges();
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                                        Console.WriteLine($"[{e.Source}] Import Failed!\r\n{e}");
+                                        Console.ResetColor();
+                                        lock (lifetimeScope)
                                         {
-                                            try
-                                            {
-                                                customer =
-                                                    customerService.Value.SelectAsync(fileRecordGroup.Key, true).GetAwaiter().GetResult();
-                                                if (customer != null)
-                                                {
-                                                    customer.Files.AddRange(uploadedFiles.Select(fileName => new CustomerFile
-                                                    {
-                                                        Description = fileName.Item2.Description,
-                                                        FileName = fileName.Item1,
-                                                        IdCustomer = customer.Id,
-                                                        UploadDate = fileName.Item2.UploadDate
-                                                    }));
-                                                    customerService.Value.UpdateEcommerceOnlyAsync(customer).GetAwaiter().GetResult();
-                                                }
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                Console.ForegroundColor = ConsoleColor.DarkRed;
-                                                Console.WriteLine($"[{e.Source}] Import Failed!\r\n{e}");
-                                                Console.ResetColor();
-                                                lock (lifetimeScope)
-                                                {
-                                                    File.AppendAllText("errors.txt", $"{fileRecordGroup.Key}\r\n");
-                                                }
-                                            }
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            Console.ForegroundColor = ConsoleColor.DarkRed;
-                                            Console.WriteLine($"[{e.Source}] Import Failed!\r\n{e}");
-                                            Console.ResetColor();
-                                            lock (lifetimeScope)
-                                            {
-                                                File.AppendAllText("errors.txt", $"{fileRecordGroup.Key}\r\n");
-                                            }
+                                            File.AppendAllText("errors.txt", $"{fileRecordGroup.Key}\r\n");
                                         }
                                     }
                                 }

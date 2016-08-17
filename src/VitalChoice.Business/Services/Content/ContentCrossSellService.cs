@@ -32,7 +32,7 @@ namespace VitalChoice.Business.Services.Content
 	    private readonly ILogger _logger;
 
 	    public ContentCrossSellService(IRepositoryAsync<ContentCrossSell> repository, IOptions<AppOptionsBase> options,
-	        IEcommerceRepositoryAsync<Sku> skuRepositoryAsync, ILoggerProviderExtended loggerProvider, DbContextOptions<VitalChoiceContext> contextOptions)
+	        IEcommerceRepositoryAsync<Sku> skuRepositoryAsync, ILoggerFactory loggerProvider, DbContextOptions<VitalChoiceContext> contextOptions)
 	    {
 	        _repository = repository;
 	        _options = options;

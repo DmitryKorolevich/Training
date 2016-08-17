@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Avatax;
@@ -30,13 +31,9 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
                 {
                     npGetType = npGetType | TaxGetType.Commit | TaxGetType.SavePermanent;
                 }
-                await Task.WhenAll(Task.Run(async () =>
-                {
-                    context.SplitInfo.PerishableTax = await taxService.GetTax(context, pGetType);
-                }), Task.Run(async () =>
-                {
-                    context.SplitInfo.NonPerishableTax = await taxService.GetTax(context, npGetType);
-                }));
+                Func<Task> getPTax = async () => context.SplitInfo.PerishableTax = await taxService.GetTax(context, pGetType);
+                Func<Task> getNpTax = async () => context.SplitInfo.NonPerishableTax = await taxService.GetTax(context, npGetType);
+                await Task.WhenAll(getPTax(), getNpTax());
                 context.TaxTotal = context.SplitInfo.PerishableTax + context.SplitInfo.NonPerishableTax;
             }
             else

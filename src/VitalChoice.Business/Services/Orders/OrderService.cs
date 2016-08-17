@@ -97,7 +97,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly SpEcommerceRepository _sPEcommerceRepository;
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly IEcommerceRepositoryAsync<OrderToGiftCertificate> _orderToGiftCertificateRepositoryAsync;
-        private readonly ICountryService _countryService;
+        private readonly ICountryNameCodeResolver _countryService;
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
         private readonly IProductService _productService;
         private readonly INotificationService _notificationService;
@@ -115,6 +115,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly OrderRepository _orderRepository;
         private readonly AppSettings _appSettings;
         private readonly IGoogleService _googleService;
+        private readonly ILoggerFactory _loggerFactory;
 
         public OrderService(
             IEcommerceRepositoryAsync<VOrderWithRegionInfoItem> vOrderWithRegionInfoItemRepository,
@@ -127,7 +128,7 @@ namespace VitalChoice.Business.Services.Orders
             ProductMapper productMapper,
             CustomerMapper customerMapper,
             ICustomerService customerService, IWorkflowFactory treeFactory,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             IEcommerceRepositoryAsync<VCustomer> vCustomerRepositoryAsync,
             DynamicExtensionsRewriter queryVisitor,
             IEncryptedOrderExportService encryptedOrderExportService,
@@ -140,7 +141,7 @@ namespace VitalChoice.Business.Services.Orders
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
             IProductService productService,
             INotificationService notificationService,
-            ICountryService countryService, ITransactionAccessor<EcommerceContext> transactionAccessor, SkuMapper skuMapper,
+            ICountryNameCodeResolver countryService, ITransactionAccessor<EcommerceContext> transactionAccessor, SkuMapper skuMapper,
             IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository, IDiscountService discountService,
             IEcommerceRepositoryAsync<VAutoShip> vAutoShipRepository, IEcommerceRepositoryAsync<VAutoShipOrder> vAutoShipOrderRepository,
             AffiliateOrderPaymentRepository affiliateOrderPaymentRepository, ICountryNameCodeResolver codeResolver,
@@ -178,6 +179,7 @@ namespace VitalChoice.Business.Services.Orders
             _productService = productService;
             _notificationService = notificationService;
             _googleService = googleService;
+            _loggerFactory = loggerProvider;
         }
 
         private async Task<Order> InsertAsyncInternal(OrderDynamic model, IUnitOfWorkAsync uow)
@@ -1779,7 +1781,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         throw new AppValidationException("Payment method \"Credit Card\" should be configured");
                     }
-                    processor = new GiftListOrderImportProcessor(_countryService, Mapper, _addressMapper, _referenceData);
+                    processor = new GiftListOrderImportProcessor(_countryService, Mapper, _addressMapper, _referenceData, _loggerFactory);
 
                     break;
                 case OrderImportType.DropShip:
@@ -1793,7 +1795,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         throw new AppValidationException("Payment method \"On Approved Credit\" should be configured");
                     }
-                    processor = new DropShipOrderImportProcessor(_countryService, Mapper, _addressMapper, _referenceData);
+                    processor = new DropShipOrderImportProcessor(_countryService, Mapper, _addressMapper, _referenceData, _loggerFactory);
 
                     break;
                 case OrderImportType.DropShipAAFES:
@@ -1807,7 +1809,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         throw new AppValidationException("Payment method \"On Approved Credit\" should be configured");
                     }
-                    processor = new DropShipAAFESSOrderImportProcessor(_countryService, Mapper, _addressMapper, _referenceData);
+                    processor = new DropShipAAFESSOrderImportProcessor(_countryService, Mapper, _addressMapper, _referenceData, _loggerFactory);
 
                     break;
                 default:

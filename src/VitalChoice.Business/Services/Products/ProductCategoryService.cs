@@ -41,7 +41,7 @@ namespace VitalChoice.Business.Services.Products
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             SpEcommerceRepository sPEcommerceRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             ITtlGlobalCache templatesCache)
         {
             this.productCategoryRepository = productCategoryRepository;

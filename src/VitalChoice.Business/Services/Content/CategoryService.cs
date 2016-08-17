@@ -50,7 +50,7 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<ArticleToContentCategory> articleToContentCategory,
             IRepositoryAsync<Article> articleRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended logger, 
+            ILoggerFactory logger, 
             IRepositoryAsync<ContentPageToContentCategory> contentPageToContentCategory, 
             IRepositoryAsync<ContentPage> contentPageRepository, 
             ITtlGlobalCache templatesCache, IRepositoryAsync<MasterContentItem> masterContentRepository)

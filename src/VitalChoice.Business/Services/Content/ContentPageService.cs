@@ -37,7 +37,7 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<ContentPageToContentCategory> contentPageToContentCategoryRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
-            ILoggerProviderExtended logger, 
+            ILoggerFactory logger, 
             ITtlGlobalCache templatesCache, IRepositoryAsync<MasterContentItem> masterContentRepository)
         {
             this.contentPageRepository = contentPageRepository;

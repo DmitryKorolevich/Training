@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Cache;
@@ -27,7 +28,7 @@ namespace VitalChoice.Business.Services.Content
 
         private readonly IEcommerceRepositoryAsync<ProductCategory> _productCategoryEcommerceRepository;
 
-        public CategoryViewService(ITtlGlobalCache templatesCache, ILoggerProviderExtended loggerProvider,
+        public CategoryViewService(ITtlGlobalCache templatesCache, ILoggerFactory loggerProvider,
             IContentProcessorService processorService, IRepositoryAsync<ProductCategoryContent> contentRepository,
             IObjectMapper<ProductViewForCustomerModel> mapper, IObjectMapperFactory mapperFactory,
             IEcommerceRepositoryAsync<ProductCategory> productCategoryEcommerceRepository,

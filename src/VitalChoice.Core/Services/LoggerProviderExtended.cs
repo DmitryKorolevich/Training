@@ -82,7 +82,8 @@ namespace VitalChoice.Core.Services
                 _logger = logger;
             }
 
-            public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+            public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception,
+                Func<TState, Exception, string> formatter)
             {
                 var nLogLogLevel = GetLogLevel(logLevel);
                 var message = formatter != null
@@ -134,7 +135,7 @@ namespace VitalChoice.Core.Services
         }
     }
 
-    public class LoggerProviderExtended : ILoggerProviderExtended
+    public class LoggerProviderExtended : ILoggerProvider
     {
         private readonly ILoggerFactory _factory;
 
@@ -176,16 +177,6 @@ namespace VitalChoice.Core.Services
             name = name ?? string.Empty;
             ILogger logger = _factory.CreateLogger(name);
             return logger;
-        }
-
-        public ILogger CreateLogger(Type type)
-        {
-            return CreateLogger(type?.FullName ?? string.Empty);
-        }
-
-        public ILogger<T> CreateLogger<T>()
-        {
-            return _factory.CreateLogger<T>();
         }
 
         public void Dispose()

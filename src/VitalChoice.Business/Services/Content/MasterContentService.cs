@@ -41,7 +41,7 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
             IRepositoryAsync<ContentCategory> contentCategoryRepository, IRepositoryAsync<Recipe> recipeRepository,
             IRepositoryAsync<FAQ> faqRepository, IRepositoryAsync<Article> articleRepository,
-            IRepositoryAsync<ContentPage> contentPageRepository, ILoggerProviderExtended loggerProvider,
+            IRepositoryAsync<ContentPage> contentPageRepository, ILoggerFactory loggerProvider,
             IRepositoryAsync<ProductContent> productContentRepository, IRepositoryAsync<EmailTemplate> emailTemplateRepository)
         {
             this._masterContentItemRepository = masterContentItemRepository;

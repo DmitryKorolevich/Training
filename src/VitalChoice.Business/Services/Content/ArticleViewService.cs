@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.ContentProcessing.Interfaces;
@@ -23,7 +24,7 @@ namespace VitalChoice.Business.Services.Content
     public class ArticleViewService : ContentViewService<Article, ContentParametersModel>, IArticleViewService
     {
         public ArticleViewService(ITtlGlobalCache templatesCache,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             IContentProcessorService processorService,
             IRepositoryAsync<Article> contentRepository,
             IObjectMapper<ContentParametersModel> mapper,

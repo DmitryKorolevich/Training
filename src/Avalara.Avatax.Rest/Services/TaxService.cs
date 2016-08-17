@@ -40,7 +40,7 @@ namespace Avalara.Avatax.Rest.Services
         private readonly JsonSerializer _serializer;
         private readonly ILogger _logger;
 
-        public TaxService(IOptions<AppOptions> options, ILoggerProviderExtended loggerProvider)
+        public TaxService(IOptions<AppOptions> options, ILoggerFactory loggerProvider)
         {
             _logger = loggerProvider.CreateLogger<TaxService>();
             _accountNumber = options.Value.Avatax.AccountNumber;

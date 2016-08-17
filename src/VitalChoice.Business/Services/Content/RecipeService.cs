@@ -60,7 +60,7 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<RecipeToProduct> recipeToProductRepository,
             IRepositoryAsync<RecipeDefaultSetting> recipeSettingRepository,
             IEcommerceRepositoryAsync<Product> productRepository,
-            ILoggerProviderExtended loggerProvider,
+            ILoggerFactory loggerProvider,
             ITtlGlobalCache templatesCache,
             ITransactionAccessor<VitalChoiceContext> transactionAccessor,
             IObjectLogItemExternalService objectLogItemExternalService, DbContextOptions<VitalChoiceContext> contextOptions,

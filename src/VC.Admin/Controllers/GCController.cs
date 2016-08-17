@@ -42,7 +42,7 @@ namespace VC.Admin.Controllers
         public GCController(IGcService GCService,
             IOrderSchedulerService OrderSchedulerService,
             ICsvExportService<GCWithOrderListItemModel, GcWithOrderListItemModelCsvMap> gCWithOrderListItemModelCsvMapCSVExportService,
-            ILoggerProviderExtended loggerProvider, ExtendedUserManager userManager)
+            ILoggerFactory loggerProvider, ExtendedUserManager userManager)
         {
             this.GCService = GCService;
             this.OrderSchedulerService = OrderSchedulerService;

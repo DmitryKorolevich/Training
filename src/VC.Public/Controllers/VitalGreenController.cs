@@ -34,7 +34,7 @@ namespace VC.Public.Controllers
 
         public VitalGreenController(IVitalGreenService vitalGreenService,
                                     IFedExService fedExService,
-                                    ILoggerProviderExtended loggerProvider,
+                                    ILoggerFactory loggerProvider,
                                     IPageResultService pageResultService) : base(pageResultService)
         {
             _vitalGreenService = vitalGreenService;

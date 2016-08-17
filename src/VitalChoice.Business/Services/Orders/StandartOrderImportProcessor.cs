@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Business.CsvImportMaps;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -27,11 +28,11 @@ namespace VitalChoice.Business.Services.Orders
     public abstract class StandartOrderImportProcessor : BaseOrderImportProcessor
     {
         protected StandartOrderImportProcessor(
-            ICountryService countryService,
+            ICountryNameCodeResolver countryService,
             IDynamicMapper<OrderDynamic, Order> orderMapper,
             IDynamicMapper<AddressDynamic, OrderAddress> addressMapper,
-            ReferenceData referenceData)
-            : base(countryService, orderMapper, addressMapper, referenceData)
+            ReferenceData referenceData, ILogger logger)
+            : base(countryService, orderMapper, addressMapper, referenceData, logger)
         {
         }
 

@@ -32,7 +32,7 @@ namespace VitalChoice.Business.Services.Orders
 
 	    public OrderNoteService(IEcommerceRepositoryAsync<OrderNote> orderNoteRepository,
 	        IEcommerceRepositoryAsync<OrderNoteToCustomerType> orderNoteToCustomerTypeRepository,
-	        IRepositoryAsync<AdminProfile> adminProfileRepository, ILoggerProviderExtended loggerProvider,
+	        IRepositoryAsync<AdminProfile> adminProfileRepository, ILoggerFactory loggerProvider,
 	        ITransactionAccessor<EcommerceContext> infrastructureTransactionAccessor)
 	    {
 	        _orderNoteRepository = orderNoteRepository;

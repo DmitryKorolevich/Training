@@ -41,7 +41,7 @@ namespace VC.Admin.Controllers
         public PromotionController(
             IPromotionService promotionService, 
             IProductService productService, 
-            ILoggerProviderExtended loggerProvider, 
+            ILoggerFactory loggerProvider, 
             IDynamicMapper<PromotionDynamic, Promotion> mapper,
             IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager)
         {

@@ -226,11 +226,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             aes.Key = keyExchange.Key;
             aes.IV = keyExchange.IV;
             aes.Padding = PaddingMode.PKCS7;
-            SessionInfo encryption = new SessionInfo
-            {
-                Aes = aes,
-                HostName = hostName
-            };
+            SessionInfo encryption = new SessionInfo(aes, hostName);
             lock (_sessions)
             {
                 if (_sessions.ContainsKey(session))
@@ -342,10 +338,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             aes.Key = keyCombined.Key;
             aes.IV = keyCombined.IV;
             aes.Padding = PaddingMode.PKCS7;
-            SessionInfo encryption = new SessionInfo
-            {
-                Aes = aes
-            };
+            SessionInfo encryption = new SessionInfo(aes);
             lock (_sessions)
             {
                 if (_sessions.ContainsKey(session))
@@ -365,7 +358,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             {
                 if (_sessions.ContainsKey(session))
                     return null;
-                var aes = new AesCng { KeySize = 256 };
+                var aes = new AesCng {KeySize = 256};
                 aes.GenerateKey();
                 aes.GenerateIV();
                 aes.Padding = PaddingMode.PKCS7;
@@ -654,44 +647,21 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
 
         private static byte[] TransformBlocks(byte[] data, ICryptoTransform transform)
         {
-            //var blockSize = transform.InputBlockSize;
-            //if (data.Length <= blockSize)
-            //{
             return transform.TransformFinalBlock(data, 0, data.Length);
-            //}
-
-            //int sourceSeed = 0;
-            //int resultSeed = 0;
-            //byte[] result;
-            //// ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            //var remainingSize = data.Length%blockSize;
-            //if (remainingSize == 0)
-            //{
-            //    result = new byte[data.Length];
-            //}
-            //else
-            //{
-            //    result = new byte[(data.Length/blockSize + 1)*blockSize];
-            //}
-            //resultSeed += transform.TransformBlock(data, sourceSeed, data.Length/blockSize*blockSize, result, resultSeed);
-            //sourceSeed += blockSize;
-            //var finalBlock = transform.TransformFinalBlock(data, sourceSeed, data.Length - sourceSeed);
-            //var finalSize = resultSeed + finalBlock.Length;
-            //if (finalSize != result.Length)
-            //{
-            //    Array.Resize(ref result, finalSize);
-            //}
-            //Buffer.BlockCopy(finalBlock, 0, result, resultSeed, finalBlock.Length);
-            //return result;
         }
 
         private class SessionInfo : IDisposable
         {
+            public SessionInfo(AesCng aes, string hostName = null)
+            {
+                Aes = aes;
+                HostName = hostName;
+            }
+
             public SemaphoreSlim SemaphoreSlim { get; } = new SemaphoreSlim(1);
-            public bool Authenticated { get; set; }
-            public AesCng Aes { get; set; }
+            public AesCng Aes { get; }
             public DateTime Expiration { get; } = DateTime.Now.AddHours(1);
-            public string HostName { get; set; }
+            public string HostName { get; }
 
             public void Dispose()
             {
