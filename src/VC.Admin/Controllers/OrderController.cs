@@ -89,6 +89,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<MatchbackReportItem, MatchbackReportItemCsvMap> _matchbackReportItemСSVExportService;
         private readonly ICsvExportService<MailingReportItem, MailingReportItemCsvMap> _mailingReportItemСSVExportService;
         private readonly ICsvExportService<ShippedViaReportRawOrderItem, ShippedViaItemsReportOrderItemCsvMap> _shippedViaItemsReportOrderItemCsvMapСSVExportService;
+        private readonly ICsvExportService<AAFESReportItem, AAFESReportItemCsvMap> _aAFESReportItemCsvMapСSVExportService;
         private readonly INotificationService _notificationService;
         private readonly BrontoService _brontoService;
         private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
@@ -121,6 +122,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<MailingReportItem, MailingReportItemCsvMap> mailingReportItemСSVExportService,
             ICsvExportService<ShippedViaReportRawOrderItem, ShippedViaItemsReportOrderItemCsvMap>
                 shippedViaItemsReportOrderItemCsvMapСSVExportService,
+            ICsvExportService<AAFESReportItem, AAFESReportItemCsvMap> aAFESReportItemCsvMapСSVExportService,
             INotificationService notificationService,
             BrontoService brontoService,
             IOrderReportService orderReportService,
@@ -149,6 +151,7 @@ namespace VC.Admin.Controllers
             _matchbackReportItemСSVExportService = matchbackReportItemСSVExportService;
             _mailingReportItemСSVExportService = mailingReportItemСSVExportService;
             _shippedViaItemsReportOrderItemCsvMapСSVExportService = shippedViaItemsReportOrderItemCsvMapСSVExportService;
+            _aAFESReportItemCsvMapСSVExportService = aAFESReportItemCsvMapСSVExportService;
             _notificationService = notificationService;
             _brontoService = brontoService;
             _orderReportService = orderReportService;
@@ -1507,6 +1510,45 @@ namespace VC.Admin.Controllers
         {
             var toReturn = await _orderReportService.GetProductQualitySkusReportItemsAsync(filter);
             return toReturn.ToList();
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<ICollection<AAFESReportItem>>> GetAAFESReportItems([FromBody]AAFESReportFilter filter)
+        {
+            var toReturn = await _orderReportService.GetAAFESReportItemsAsync(filter);
+            return toReturn.ToList();
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<FileResult> GetAAFESReportItemsReportFile([FromQuery]string shipfrom, [FromQuery]string shipto)
+        {
+            var dShipFrom = shipfrom.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dShipTo = shipto.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            if (!dShipFrom.HasValue || !dShipTo.HasValue)
+            {
+                return null;
+            }
+
+            AAFESReportFilter filter = new AAFESReportFilter()
+            {
+                ShipFrom = dShipFrom.Value,
+                ShipTo = dShipTo.Value.AddDays(1),
+            };
+            filter.Paging = null;
+
+            var data = await _orderReportService.GetAAFESReportItemsAsync(filter);
+
+            var result = _aAFESReportItemCsvMapСSVExportService.ExportToCsv(data);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.AAFES_SHIP_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
         }
 
         #endregion

@@ -159,6 +159,13 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(f => f.Id);
             });
 
+            builder.Entity<AAFESReportItem>(entity =>
+            {
+                entity.Ignore(f => f.Id);
+                entity.Ignore(f => f.ServiceUrl);
+                entity.HasKey(f => f.RowNumber);
+            });
+
             #endregion
 
             builder.Entity<VCustomerFavorite>(entity =>

@@ -54,5 +54,7 @@ namespace VitalChoice.Interfaces.Services.Orders
 	    Task<KPIReport> CreateKPIReportAsync();
 
 	    Task<KPIReport> GetKPIReportAsync();
+
+	    Task<ICollection<AAFESReportItem>> GetAAFESReportItemsAsync(AAFESReportFilter filter);
 	}
 }

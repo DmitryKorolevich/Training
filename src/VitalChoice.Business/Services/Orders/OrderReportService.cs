@@ -37,6 +37,7 @@ using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Data.Repositories.Specifics;
 using Newtonsoft.Json;
+using VitalChoice.Infrastructure.Domain.Entities.Orders;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -1478,6 +1479,16 @@ namespace VitalChoice.Business.Services.Orders
             item.AOV = await _googleService.GetAov(from, to);
             item.Bounce = await _googleService.GetBounceRate(from, to);
             item.CartAbandon = await _googleService.GetCartAbandon(from, to);
+        }
+
+        public async Task<ICollection<AAFESReportItem>> GetAAFESReportItemsAsync(AAFESReportFilter filter)
+        {
+            var toReturn = await _sPEcommerceRepository.GetAAFESReportItemsAsync(filter);
+            toReturn.ForEach(p =>
+            {
+                p.ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber);
+            });
+            return toReturn;
         }
     }
 }

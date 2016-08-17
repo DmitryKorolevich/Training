@@ -283,5 +283,14 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.post(baseUrl + 'GetProductQualitySkusReportItems', filter, getConfig(tracker));
 	    },
+	    getAAFESReportItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetAAFESReportItems', filter, getConfig(tracker));
+	    },
+	    getAAFESReportItemsReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + ('GetAAFESReportItemsReportFile?{0}buildNumber={1}')
+                .format(generateQueryParamsBasedOnFilter(filter), buildNumber);
+	    },
 	};
 }]);

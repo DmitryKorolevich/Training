@@ -29,6 +29,7 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.exportResultController',
 	'app.modules.order.controllers.productQualitySalesReportController',
 	'app.modules.order.controllers.productQualitySkusReportController',
+	'app.modules.order.controllers.aAFESShipReportController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -154,6 +155,11 @@ angular.module('app.modules.order', [
 				    url: '/report/sku-issue?{from:string}{to:string}{skucode:string}',
 				    templateUrl: 'app/modules/order/partials/productQualitySkusReport.html',
 				    controller: 'productQualitySkusReportController'
+				})
+				.state('index.oneCol.aAFESShipReport', {
+				    url: '/report/aafes-ship',
+				    templateUrl: 'app/modules/order/partials/aAFESShipReport.html',
+				    controller: 'aAFESShipReportController'
 				});
 		}
 ]);

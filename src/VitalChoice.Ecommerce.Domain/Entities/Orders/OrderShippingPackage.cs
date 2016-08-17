@@ -29,5 +29,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Orders
 
         public Warehouse IdWarehouse { get; set; }
 
+        public int? Quantity { get; set; }
+
     }
 }

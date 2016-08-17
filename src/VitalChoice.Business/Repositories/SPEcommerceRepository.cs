@@ -394,5 +394,13 @@ namespace VitalChoice.Business.Repositories
             toReturn.Items = data;
             return toReturn;
         }
+
+        public async Task<ICollection<AAFESReportItem>> GetAAFESReportItemsAsync(AAFESReportFilter filter)
+        {
+            var toReturn = await _context.Set<AAFESReportItem>().FromSql
+                ("[dbo].[SPGetAAFESReport] @from={0}, @to={1}, @shipfrom={2}, @shipto={3}",
+                filter.From, filter.To, filter.ShipFrom, filter.ShipTo).ToListAsync();
+            return toReturn;
+        }
     }
 }

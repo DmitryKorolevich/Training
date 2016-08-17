@@ -422,6 +422,14 @@ namespace VitalChoice.Business.Services.VeraCore
                                             ? Warehouse.WA
                                             : Warehouse.VA
                                     };
+                                    if (!string.IsNullOrEmpty(itemInformation.QuantityShipped))
+                                    {
+                                        int quantity;
+                                        if (Int32.TryParse(itemInformation.QuantityShipped, out quantity))
+                                        {
+                                            package.Quantity = quantity;
+                                        }
+                                    }
 
                                     packages.Add(package);
                                 }

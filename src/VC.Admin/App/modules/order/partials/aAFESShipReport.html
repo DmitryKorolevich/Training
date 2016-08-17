@@ -1,0 +1,69 @@
+﻿<div class="container-fluid aafes-ship-report">
+    <div class="well">
+        <span class="legend">AAFES Ship Report</span>
+        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+            <fieldset>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="Shipfrom" data-ng-change="filterChanged();" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.ShipFrom" is-open="fromOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.From.$invalid">
+                            <small class="error" ng-show="forms.form.From.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","From")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="ShipTo" data-ng-change="filterChanged();" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.ShipTo" is-open="toOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.To.$invalid">
+                            <small class="error" ng-show="forms.form.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
+                        <a target="_self" class="btn btn-primary pull-right" data-ng-href="{{options.exportUrl}}">Export</a>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <spinner-overlay data-loading="refreshTracker.active()">            
+            <div>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>ORDER_NO</th>
+                        <th>SKU_NO</th>
+                        <th>QUANTITY</th>
+                        <th>SHIP_METHOD</th>
+                        <th>TRACKING_NO</th>
+                        <th>INVOICE_NO</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="item in items">
+                            <td>{{::item.OrderNotes}}</td>
+                            <td>{{::item.Code}}</td>
+                            <td>{{::item.Quantity}}</td>
+                            <td>{{::item.ShipMethodFreightCarrier}}</td>
+                            <td>
+                                <a target="_blank" data-ng-href="{{item.ServiceUrl}}">{{::item.TrackingNumber}}</a>
+                            </td>
+                            <td>
+                                <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.IdOrder })' : item.IdObjectType==6 ? 'index.oneCol.orderRefundDetail({id: item.IdOrder })' : 'index.oneCol.orderDetail({id: item.IdOrder })'}}">{{::item.IdOrder}}</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </spinner-overlay>
+    </div>
+</div>

@@ -29,5 +29,6 @@
         public const string MATCHBACK_REPORT = "Matchback_and_Post_Season_Analysis_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
         public const string MAILING_REPORT = "Mailing_List_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
         public const string SHIPPED_ORDERS_REPORT = "Shipped_Order_Listing_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+        public const string AAFES_SHIP_REPORT = "AAFES-ship-report-{0:MM-dd-yyyy-hh-mm-ss}.csv";
     }
 }

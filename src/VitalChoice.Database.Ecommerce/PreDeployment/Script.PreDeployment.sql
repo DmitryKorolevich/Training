@@ -11,3 +11,4 @@
 */
 
 :r .\Scripts\KPICacheItems.sql
+:r .\Scripts\OrderShippingPackages.sql
