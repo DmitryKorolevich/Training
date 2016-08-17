@@ -20,6 +20,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.Transfer.PaymentMethod;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Orders;
@@ -169,7 +170,7 @@ namespace VitalChoice.Business.Services.Payment
 
             var securityCode = paymentMethod.SafeData.SecurityCode;
 
-            if (securityCode == null)
+            if (string.IsNullOrEmpty(securityCode))
             {
                 if (DynamicMapper.IsValuesMasked(paymentMethod))
                 {
@@ -178,9 +179,27 @@ namespace VitalChoice.Business.Services.Payment
             }
             else
             {
-                if (DynamicMapper.IsValuesMasked(paymentMethod) && paymentMethod is CustomerPaymentMethodDynamic)
+                if (DynamicMapper.IsValuesMasked(paymentMethod))
                 {
-                    return await _exportService.AuthorizeCard((CustomerPaymentMethodDynamic) paymentMethod);
+                    if (paymentMethod is CustomerPaymentMethodDynamic && paymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
+                    {
+                        var customerPayment = (CustomerPaymentMethodDynamic) paymentMethod;
+                        return await _exportService.AuthorizeCard(new CustomerCardData
+                        {
+                            IdCustomer = customerPayment.IdCustomer,
+                            IdPaymentMethod = customerPayment.Id,
+                            SecurityCode = securityCode
+                        });
+                    }
+                    if (paymentMethod is OrderPaymentMethodDynamic && paymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
+                    {
+                        var customerPayment = (OrderPaymentMethodDynamic) paymentMethod;
+                        return await _exportService.AuthorizeCard(new OrderCardData
+                        {
+                            IdOrder = customerPayment.IdOrder,
+                            SecurityCode = securityCode
+                        });
+                    }
                 }
             }
 

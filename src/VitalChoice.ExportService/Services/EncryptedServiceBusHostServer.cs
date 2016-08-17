@@ -66,6 +66,8 @@ namespace VitalChoice.ExportService.Services
                     return ProcessCardExistCommand(command);
                 case OrderExportServiceCommandConstants.AuthorizeCard:
                     return ProcessCardAuthorizeCommand(command);
+                case OrderExportServiceCommandConstants.AuthorizeCardInOrder:
+                    return ProcessCardAuthorizeInOrderCommand(command);
                 default:
                     return false;
             }
@@ -90,7 +92,25 @@ namespace VitalChoice.ExportService.Services
 
         private bool ProcessCardAuthorizeCommand(ServiceBusCommandBase command)
         {
-            var paymentMethod = command.Data.Data as CustomerPaymentMethodDynamic;
+            var paymentMethod = command.Data.Data as CustomerCardData;
+            if (paymentMethod == null)
+            {
+                SendCommand(new ServiceBusCommandBase(command, "Null payment method"));
+                return false;
+            }
+
+            using (var scope = _rootScope.BeginLifetimeScope())
+            {
+                var orderExportService = scope.Resolve<IOrderExportService>();
+                SendCommand(new ServiceBusCommandBase(command,
+                    orderExportService.AuthorizeCreditCard(paymentMethod).GetAwaiter().GetResult()));
+            }
+            return true;
+        }
+
+        private bool ProcessCardAuthorizeInOrderCommand(ServiceBusCommandBase command)
+        {
+            var paymentMethod = command.Data.Data as OrderCardData;
             if (paymentMethod == null)
             {
                 SendCommand(new ServiceBusCommandBase(command, "Null payment method"));

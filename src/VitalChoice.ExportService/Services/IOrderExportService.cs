@@ -11,7 +11,8 @@ namespace VitalChoice.ExportService.Services
     public interface IOrderExportService
     {
         Task<bool> CardExist(CustomerExportInfo customerExportInfo);
-        Task<List<MessageInfo>> AuthorizeCreditCard(CustomerPaymentMethodDynamic paymentMethod);
+        Task<List<MessageInfo>> AuthorizeCreditCard(CustomerCardData paymentMethod);
+        Task<List<MessageInfo>> AuthorizeCreditCard(OrderCardData paymentMethod);
         Task UpdateCustomerPaymentMethods(ICollection<CustomerCardData> paymentMethods);
         Task UpdateOrderPaymentMethod(OrderCardData paymentMethod);
         Task ExportOrders(ICollection<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack);

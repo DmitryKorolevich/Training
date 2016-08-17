@@ -173,19 +173,36 @@ namespace VitalChoice.Business.Services.Orders
             return Task.FromResult(true);
         }
 
-        public Task<List<MessageInfo>> AuthorizeCard(CustomerPaymentMethodDynamic customerPaymentMethod)
+        public Task<List<MessageInfo>> AuthorizeCard(CustomerCardData paymentData)
         {
-            if (!InitSuccess || customerPaymentMethod == null)
+            if (!InitSuccess || paymentData == null)
             {
                 return Task.FromResult(new List<MessageInfo>());
             }
-            if (customerPaymentMethod.Id > 0 || customerPaymentMethod.IdCustomer > 0)
+            if (paymentData.IdCustomer > 0 || paymentData.IdPaymentMethod > 0)
                 return
                     SendCommand<List<MessageInfo>>(new ServiceBusCommandWithResult(Guid.NewGuid(),
                         OrderExportServiceCommandConstants.AuthorizeCard,
                         ServerHostName, LocalHostName)
                     {
-                        Data = new ServiceBusCommandData(customerPaymentMethod)
+                        Data = new ServiceBusCommandData(paymentData)
+                    });
+            return Task.FromResult(new List<MessageInfo>());
+        }
+
+        public Task<List<MessageInfo>> AuthorizeCard(OrderCardData paymentData)
+        {
+            if (!InitSuccess || paymentData == null)
+            {
+                return Task.FromResult(new List<MessageInfo>());
+            }
+            if (paymentData.IdOrder > 0)
+                return
+                    SendCommand<List<MessageInfo>>(new ServiceBusCommandWithResult(Guid.NewGuid(),
+                        OrderExportServiceCommandConstants.AuthorizeCardInOrder,
+                        ServerHostName, LocalHostName)
+                    {
+                        Data = new ServiceBusCommandData(paymentData)
                     });
             return Task.FromResult(new List<MessageInfo>());
         }
