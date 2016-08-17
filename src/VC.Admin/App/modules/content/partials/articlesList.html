@@ -23,7 +23,7 @@
             <button class="btn btn-primary btn-right width-160px margin-right-15px" data-ng-click="openBonusLinks()">Manage Bonus Links</button>
         </div>
         <spinner-overlay data-loading="refreshTracker.active()">
-            <table class="table table-striped table-hover ">
+            <table id="data-grid" class="table table-striped table-hover ">
                 <thead>
                     <tr>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Title')">
@@ -79,14 +79,14 @@
             </table>
         </spinner-overlay>
         <uib-pagination boundary-links="true"
-                    total-items="totalItems"
-                    items-per-page="filter.Paging.PageItemCount"
-                    data-ng-model="filter.Paging.PageIndex"
-                    previous-text="&lsaquo;"
-                    next-text="&rsaquo;"
-                    first-text="&laquo;"
-                    last-text="&raquo;"
-                    data-ng-change="pageChanged()">
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        previous-text="&lsaquo;"
+                        next-text="&rsaquo;"
+                        first-text="&laquo;"
+                        last-text="&raquo;"
+                        data-ng-change="pageChanged();scrollTo('data-grid');">
         </uib-pagination>
     </div>
 </div>

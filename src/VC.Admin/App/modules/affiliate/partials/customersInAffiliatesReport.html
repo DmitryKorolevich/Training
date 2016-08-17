@@ -2,7 +2,7 @@
     <div class="well">
         <span class="legend">Affiliates Summary</span>
         <spinner-overlay data-loading="refreshTracker.active()">
-            <table class="table table-striped table-hover ">
+            <table id="data-grid-customers" class="table table-striped table-hover ">
                 <thead>
                     <tr>
                         <th>Affiliate Id</th>
@@ -29,7 +29,7 @@
                     next-text="&rsaquo;"
                     first-text="&laquo;"
                     last-text="&raquo;"
-                    data-ng-change="pageChanged()">
+                    data-ng-change="pageChanged();scrollTo('data-grid-customers');">
         </uib-pagination>
     </div>
 </div>

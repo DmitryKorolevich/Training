@@ -1,6 +1,6 @@
 ﻿<div class="well row customer-orders-list orders">
     <spinner-overlay data-loading="addEditTracker.active()">
-        <table class="table table-striped order-statuses">
+        <table id="data-grid-orders" class="table table-striped order-statuses">
             <thead>
                 <tr>
                     <th class="status" data-ng-click="filter.Sorting.applySort('OrderStatus')">
@@ -109,6 +109,6 @@
                 next-text="&rsaquo;"
                 first-text="&laquo;"
                 last-text="&raquo;"
-                data-ng-change="ordersPageChanged()">
+                data-ng-change="ordersPageChanged();scrollTo('data-grid-orders');">
     </uib-pagination>
 </div>

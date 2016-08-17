@@ -498,7 +498,7 @@
                                     </div>
                                 </div>
                                 <spinner-overlay data-loading="refreshCustomersTracker.active()">
-                                    <table class="table table-striped">
+                                    <table id="data-grid-customers" class="table table-striped">
                                         <thead>
                                             <tr>
                                                 <th>Customer Id</th>
@@ -527,7 +527,7 @@
                                             next-text="&rsaquo;"
                                             first-text="&laquo;"
                                             last-text="&raquo;"
-                                            data-ng-change="customersPageChanged()">
+                                            data-ng-change="customersPageChanged();scrollTo('data-grid-customers');">
                                 </uib-pagination>
                             </div>
                         </div>
@@ -557,7 +557,7 @@
                                     </div>
                                 </div>
                                 <spinner-overlay data-loading="refreshOrdersTracker.active()">
-                                    <table class="table table-striped order-statuses">
+                                    <table id="data-grid-orders" class="table table-striped order-statuses">
                                         <thead>
                                             <tr>
                                                 <th>Order #</th>
@@ -598,7 +598,7 @@
                                             next-text="&rsaquo;"
                                             first-text="&laquo;"
                                             last-text="&raquo;"
-                                            data-ng-change="ordersPageChanged()">
+                                            data-ng-change="ordersPageChanged();scrollTo('data-grid-orders');">
                                 </uib-pagination>
                             </div>
                         </div>

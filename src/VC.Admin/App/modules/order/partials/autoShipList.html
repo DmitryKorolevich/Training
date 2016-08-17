@@ -1,6 +1,6 @@
 ﻿<div class="well row customer-orders-list orders">
     <spinner-overlay data-loading="addEditTracker.active()">
-        <table class="table table-striped order-statuses">
+        <table id="data-grid-autoships" class="table table-striped order-statuses">
             <thead>
                 <tr>
                     <th colspan="2">
@@ -80,6 +80,6 @@
                 next-text="&rsaquo;"
                 first-text="&laquo;"
                 last-text="&raquo;"
-                data-ng-change="autoShipsPageChanged()">
+                data-ng-change="autoShipsPageChanged();scrollTo('data-grid-autoships');">
     </uib-pagination>
 </div>

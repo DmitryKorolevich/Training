@@ -58,7 +58,7 @@
         </div>
         <hr />
         <spinner-overlay data-loading="refreshTracker.active()">
-            <table class="table table-striped table-hover ">
+            <table id="data-grid-gcs" class="table table-striped table-hover ">
                 <thead>
                     <tr>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Code')">
@@ -126,7 +126,7 @@
                     next-text="&rsaquo;"
                     first-text="&laquo;"
                     last-text="&raquo;"
-                    data-ng-change="pageChanged()">
+                    data-ng-change="pageChanged();scrollTo('data-grid-gcs');">
         </uib-pagination>
     </div>
 </div>

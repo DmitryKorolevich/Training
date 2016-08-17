@@ -166,7 +166,7 @@
                 </div>
             </div>
             <div class="orders">
-                <table class="table table-striped order-statuses">
+                <table id="data-grid" class="table table-striped order-statuses">
                     <thead>
                         <tr>
                             <th>Order #</th>
@@ -261,7 +261,7 @@
                         next-text="&rsaquo;"
                         first-text="&laquo;"
                         last-text="&raquo;"
-                        data-ng-change="pageChanged()">
+                        data-ng-change="pageChanged();scrollTo('data-grid');">
         </uib-pagination>
     </div>
 </div>
