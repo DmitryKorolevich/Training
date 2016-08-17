@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -111,7 +112,7 @@ namespace VitalChoice.ExportService.Services
                 {
                     return new List<MessageInfo>();
                 }
-
+                File.AppendAllText("D:\\card_auth.txt", cardNumber);
                 customerPaymentMethod.Data.CardNumber = cardNumber;
                 customerPaymentMethod.Data.SecurityCode = paymentMethod.SecurityCode;
                 return await _paymentMethodService.AuthorizeCreditCard(customerPaymentMethod);

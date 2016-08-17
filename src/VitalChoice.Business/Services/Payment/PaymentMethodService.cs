@@ -179,7 +179,8 @@ namespace VitalChoice.Business.Services.Payment
             }
             else
             {
-                if (DynamicMapper.IsValuesMasked(paymentMethod) && paymentMethod is CustomerPaymentMethodDynamic)
+                if (DynamicMapper.IsValuesMasked(paymentMethod) && paymentMethod is CustomerPaymentMethodDynamic &&
+                    paymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
                 {
                     var customerPayment = (CustomerPaymentMethodDynamic) paymentMethod;
                     return await _exportService.AuthorizeCard(new CustomerCardData

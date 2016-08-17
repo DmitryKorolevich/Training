@@ -369,30 +369,28 @@ namespace VC.Public.Controllers
             {
                 var creditCardToUpdate =
                     currentCustomer.CustomerPaymentMethods.Single(
-                        x => x.IdObjectType == (int)PaymentMethodType.CreditCard && x.Id == model.Id);
-                currentCustomer.CustomerPaymentMethods.Remove(creditCardToUpdate);
-            }
+                        x => x.IdObjectType == (int) PaymentMethodType.CreditCard && x.Id == model.Id);
 
-            var otherAddresses = currentCustomer.CustomerPaymentMethods.Where(x => x.IdObjectType == (int)PaymentMethodType.CreditCard).ToList();
-            if (model.Default)
-            {
-                foreach (var otherAddress in otherAddresses)
+                var otherAddresses =
+                    currentCustomer.CustomerPaymentMethods.Where(x => x.IdObjectType == (int) PaymentMethodType.CreditCard).ToList();
+                if (model.Default)
                 {
-                    otherAddress.Data.Default = false;
+                    foreach (var otherAddress in otherAddresses)
+                    {
+                        otherAddress.Data.Default = false;
+                    }
                 }
+
+                if (otherAddresses.Count == 0)
+                {
+                    model.Default = true;
+                }
+
+                await _customerPaymentMethodConverter.UpdateObjectAsync(model, creditCardToUpdate, (int) PaymentMethodType.CreditCard);
+                await _addressConverter.UpdateObjectAsync(model, creditCardToUpdate.Address, (int) AddressType.Billing);
             }
 
-            if (otherAddresses.Count == 0)
-            {
-                model.Default = true;
-            }
 
-            var customerPaymentMethod = await _customerPaymentMethodConverter.FromModelAsync(model, (int)PaymentMethodType.CreditCard);
-            customerPaymentMethod.Data.SecurityCode = model.SecurityCode;
-
-            customerPaymentMethod.Address = await _addressConverter.FromModelAsync(model, (int)AddressType.Billing);
-
-            currentCustomer.CustomerPaymentMethods.Add(customerPaymentMethod);
             try
             {
                 currentCustomer = await CustomerService.UpdateAsync(currentCustomer);
