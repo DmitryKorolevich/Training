@@ -447,6 +447,7 @@ function ($scope, $rootScope, $state, $stateParams, $uibModal, $timeout, appBoot
 
         $scope.pageChanged = function () {
             renderFiles();
+            $('.table .wrapper').scrollTop(0);
         };
 
         var renderRow = function (file) {

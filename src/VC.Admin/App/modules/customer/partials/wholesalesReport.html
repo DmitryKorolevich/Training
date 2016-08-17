@@ -29,7 +29,7 @@
         </form>
         <hr />
         <spinner-overlay data-loading="refreshTracker.active()">
-            <table class="table table-striped table-hover margin-bottom-30px">
+            <table id="data-grid" class="table table-striped table-hover margin-bottom-30px">
                 <thead>
                     <tr>
                         <th>Account ID</th>
@@ -74,7 +74,7 @@
                         next-text="&rsaquo;"
                         first-text="&laquo;"
                         last-text="&raquo;"
-                        data-ng-change="pageChanged()">
+                        data-ng-change="pageChanged();scrollTo('data-grid');">
         </uib-pagination>
     </div>
 </div>

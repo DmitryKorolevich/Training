@@ -43,7 +43,7 @@
             <button data-ng-click="open();" class="btn btn-primary">Add New Promotion</button>
         </div>
         <spinner-overlay data-loading="refreshTracker.active()">
-            <table class="table table-striped table-hover ">
+            <table id="data-grid" class="table table-striped table-hover ">
                 <thead>
                     <tr>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Description')">
@@ -136,7 +136,7 @@
                     next-text="&rsaquo;"
                     first-text="&laquo;"
                     last-text="&raquo;"
-                    data-ng-change="pageChanged()">
+                    data-ng-change="pageChanged();scrollTo('data-grid');">
         </uib-pagination>
     </div>
 </div>

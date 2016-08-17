@@ -35,7 +35,7 @@
             </div>
         </div>
         <spinner-overlay data-loading="refreshTracker.active()">
-            <table class="table table-striped">
+            <table id="data-grid" class="table table-striped">
                 <thead>
                     <tr>
                         <th>Customer</th>
@@ -92,7 +92,7 @@
                     next-text="&rsaquo;"
                     first-text="&laquo;"
                     last-text="&raquo;"
-                    data-ng-change="pageChanged()">
+                    data-ng-change="pageChanged();scrollTo('data-grid');">
         </uib-pagination>
     </div>
 </div>
