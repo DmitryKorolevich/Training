@@ -133,8 +133,11 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
             order.Data.OrderNotes = OrderNotes;
             order.Data.ShipDelayType = ShipDelayDate.HasValue ? ShipDelayType.EntireOrder : ShipDelayType.None;
             order.Data.ShipDelayDate = ShipDelayDate;
-            order.Data.GiftOrder = true;
-            order.Data.GiftMessage = GiftMessage;
+            if (!string.IsNullOrEmpty(GiftMessage))
+            {
+                order.Data.GiftMessage = GiftMessage;
+                order.Data.GiftOrder = true;
+            }
             order.Data.ShippingUpgradeP = ShippingUpgradeOption.Overnight;
             order.Data.ShippingUpgradeNP = ShippingUpgradeOption.Overnight;
         }

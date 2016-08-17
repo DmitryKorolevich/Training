@@ -163,7 +163,7 @@
     "app/modules/setting/controllers/addEditOrderNoteController.js",
     "app/modules/setting/controllers/objectLogReportController.js",
     "app/modules/setting/controllers/objectHistorySectionController.js",
-    "app/modules/setting/controllers/errorDetailsController.js",
+    "app/modules/setting/controllers/infoDetailsPopupController.js",
     "app/modules/setting/controllers/lookupsController.js",
     "app/modules/setting/controllers/lookupDetailController.js",
     "app/modules/setting/controllers/profileScopesController.js",

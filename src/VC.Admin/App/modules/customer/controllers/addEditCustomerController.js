@@ -587,14 +587,18 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			            {
 			                deferred.resolve();
 			                if (result.Success)
-			                {                                
+			                {
 			                    $scope.$broadcast('customerOrders#in#refresh');
-			                    toaster.pop('success', "Success!", "Successfully imported");
+			                    modalUtil.open('app/modules/setting/partials/infoDetailsPopup.html', 'infoDetailsPopupController', {
+			                        Header: "Success!",
+			                        Messages: [{ Message: "Successfully imported" }]
+			                    }, {size: 'xs'});
 			                } else
 			                {
 			                    if (result.Messages)
 			                    {
-			                        modalUtil.open('app/modules/setting/partials/errorDetailsPopup.html', 'errorDetailsController', {
+			                        modalUtil.open('app/modules/setting/partials/infoDetailsPopup.html', 'infoDetailsPopupController', {
+			                            Header: "Error details",
 			                            Messages: result.Messages
 			                        });
 			                    }

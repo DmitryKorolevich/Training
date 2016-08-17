@@ -3,17 +3,26 @@
 angular.module('app.core.utils.appBootstrap', [])
     .service('appBootstrap',
     [
-        'infrastructureService', '$rootScope', 'toaster', 'authenticationService', 'cacheService', '$location',
+        'infrastructureService', '$rootScope', '$anchorScroll', 'toaster', 'authenticationService', 'cacheService', '$location',
         'ngProgress', 'webStorageUtil',
         'confirmUtil', function(infrastructureService,
             $rootScope,
+            $anchorScroll,
             toaster,
             authenticationService,
             cacheService,
             $location,
             ngProgress,
             webStorageUtil,
-            confirmUtil) {
+            confirmUtil)
+        {
+            function scrollTo(id)
+            {
+                $location.hash(id);
+                $anchorScroll();
+                $location.hash('');
+            };
+
             function getReferenceItem(lookup, key) {
                 if (lookup) {
                     return $.grep(lookup,
@@ -174,6 +183,7 @@ angular.module('app.core.utils.appBootstrap', [])
                         toaster.pop('error', "Error!", "Server error occured");
                     });
 
+                $rootScope.scrollTo = scrollTo;
                 $rootScope.getReferenceItem = getReferenceItem;
                 $rootScope.getValidationMessage = getValidationMessage;
                 $rootScope.logout = logout;

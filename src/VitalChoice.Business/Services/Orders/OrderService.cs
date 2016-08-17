@@ -1848,9 +1848,11 @@ namespace VitalChoice.Business.Services.Orders
                 }
 
                 var rows = item.OrderImportItems.Select(p => p.RowNumber).ToList();
-                var tempMessages = new List<MessageInfo>(context.Messages);
-                tempMessages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages));
-                tempMessages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages));
+                var tempMessages = new List<MessageInfo>(context.Messages.Where(p=>p.MessageLevel==MessageLevel.Error));
+                tempMessages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages)
+                    .Where(p => p.MessageLevel == MessageLevel.Error));
+                tempMessages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages)
+                    .Where(p => p.MessageLevel == MessageLevel.Error));
                 calculationMessages.Add(rows, tempMessages);
             }
 
@@ -1874,9 +1876,11 @@ namespace VitalChoice.Business.Services.Orders
                     var context = await CalculateOrder(item.Order, orderCombinedStatus);
 
                     var rows = item.OrderImportItems.Select(p => p.RowNumber).ToList();
-                    var tempMessages =new List<MessageInfo>(context.Messages);
-                    tempMessages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages));
-                    tempMessages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages));
+                    var tempMessages = new List<MessageInfo>(context.Messages.Where(p => p.MessageLevel == MessageLevel.Error));
+                    tempMessages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages)
+                        .Where(p => p.MessageLevel == MessageLevel.Error));
+                    tempMessages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages)
+                        .Where(p => p.MessageLevel == MessageLevel.Error));
                     calculationMessages.Add(rows, tempMessages);
                 }
 

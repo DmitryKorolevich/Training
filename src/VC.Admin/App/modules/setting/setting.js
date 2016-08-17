@@ -12,7 +12,7 @@ angular.module('app.modules.setting', [
 	'app.modules.setting.controllers.addEditOrderNoteController',
 	'app.modules.setting.controllers.objectLogReportController',
 	'app.modules.setting.controllers.objectHistorySectionController',
-	'app.modules.setting.controllers.errorDetailsController',
+	'app.modules.setting.controllers.infoDetailsPopupController',
 	'app.modules.setting.controllers.lookupsController',
 	'app.modules.setting.controllers.lookupDetailController',
 	'app.modules.setting.controllers.profileScopesController',
