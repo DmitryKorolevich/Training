@@ -178,9 +178,9 @@ namespace VitalChoice.Business.Services.Payment
             }
             else
             {
-                if (DynamicMapper.IsValuesMasked(paymentMethod))
+                if (DynamicMapper.IsValuesMasked(paymentMethod) && paymentMethod is CustomerPaymentMethodDynamic)
                 {
-                    return await _exportService.AuthorizeCard(paymentMethod as CustomerPaymentMethodDynamic);
+                    return await _exportService.AuthorizeCard((CustomerPaymentMethodDynamic) paymentMethod);
                 }
             }
 

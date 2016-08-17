@@ -86,7 +86,7 @@ namespace VitalChoice.ExportService.Services
         public async Task<List<MessageInfo>> AuthorizeCreditCard(CustomerPaymentMethodDynamic paymentMethod)
         {
             await LockCustomersEvent.WaitAsync();
-            if (_writeQueue)
+            if (_writeQueue || paymentMethod == null)
             {
                 return new List<MessageInfo>();
             }
@@ -98,6 +98,12 @@ namespace VitalChoice.ExportService.Services
                         rep.Query(
                             c => paymentMethod.IdCustomer == c.IdCustomer && paymentMethod.Id == c.IdPaymentMethod)
                             .SelectFirstOrDefaultAsync(false);
+                if (cardData == null)
+                {
+                    var error = $"Cannot find customer saved payment for customer: {paymentMethod.IdCustomer}";
+                    _logger.LogWarning(error);
+                    throw new ApiException(error);
+                }
                 var cardNumber = _encryptionHost.LocalDecrypt<string>(cardData.CreditCardNumber);
                 paymentMethod.Data.CardNumber = cardNumber;
                 return await _paymentMethodService.AuthorizeCreditCard(paymentMethod);

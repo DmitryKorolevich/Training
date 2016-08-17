@@ -649,7 +649,7 @@ namespace VitalChoice.Business.Services.Customers
                         IdCustomer = p.Model.IdCustomer
                     }).ToArray()))
                     {
-                        Logger.LogError("Cannot update customer payment info on remote.");
+                        throw new ApiException("Cannot update customer payment info on remote.");
                     }
 
                     await _storefrontUserService.UpdateAsync(appUser, roles, password);
@@ -687,7 +687,6 @@ namespace VitalChoice.Business.Services.Customers
 
             var suspendedCustomer = (int)CustomerStatus.Suspended;
 
-            Task<bool> updatePaymentsTask;
             Customer entity;
 
             using (var transaction = uow.BeginTransaction())
@@ -733,13 +732,12 @@ namespace VitalChoice.Business.Services.Customers
 
                     model.CustomerPaymentMethods.ForEach(p => p.IdCustomer = entity.Id);
 
-                    updatePaymentsTask =
-                        _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies.Select(p => new CustomerCardData
-                        {
-                            CardNumber = p.CardNumber,
-                            IdPaymentMethod = p.Model.Id,
-                            IdCustomer = p.Model.IdCustomer
-                        }).ToArray());
+                    var updatePaymentsTask = _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies.Select(p => new CustomerCardData
+                    {
+                        CardNumber = p.CardNumber,
+                        IdPaymentMethod = p.Model.Id,
+                        IdCustomer = p.Model.IdCustomer
+                    }).ToArray());
 
                     if (!await updatePaymentsTask)
                     {
