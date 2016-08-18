@@ -7,7 +7,9 @@
 @inject ReferenceData appInfrastructureService;
 
 @Html.HiddenFor(x=>x.ShipAddressIdToOverride)
-@Html.HiddenFor(x=>x.PreferredShipMethod)
+@Html.HiddenFor(x => x.PreferredShipMethod)
+<input id="hdCountry" value="@Html.DisplayForEx(x => x.IdCountry)" type="hidden">
+<input id="hdState" value="@Html.DisplayForEx(x => x.IdState)" type="hidden">
 <div class="form-two-column">
 	<div class="form-group">
 		@Html.LabelFor(m => m.FirstName, new {@class = "control-label"})
