@@ -14,8 +14,8 @@ namespace VitalChoice.Interfaces.Services.Orders
         Task<List<OrderExportItemResult>> ExportOrdersAsync(OrderExportData exportData);
         Task<bool> UpdateOrderPaymentMethodAsync(OrderCardData orderPaymentMethod);
         Task<bool> CardExistAsync(CustomerExportInfo customerExportInfo);
-        Task<List<MessageInfo>> AuthorizeCard(CustomerCardData paymentData);
-        Task<List<MessageInfo>> AuthorizeCard(OrderCardData paymentData);
+        Task<List<MessageInfo>> AuthorizeCard(CustomerPaymentMethodDynamic paymentData);
+        Task<List<MessageInfo>> AuthorizeCard(OrderPaymentMethodDynamic paymentData);
         Task<bool> UpdateCustomerPaymentMethodsAsync(ICollection<CustomerCardData> paymentMethods);
     }
 }
