@@ -32,8 +32,6 @@
         </div>
         @using (Html.BeginForm("AddUpdateShippingMethod", "Checkout", null, FormMethod.Post, null, new { @class = "form-regular medium-small", role = "form" }))
         {
-            <input id="hdCountry" value="@Html.DisplayForEx(x => x.IdCountry)" type="hidden">
-            <input id="hdState" value="@Html.DisplayForEx(x => x.IdState)" type="hidden">
             @Html.AntiForgeryToken()
             <span class="checkout-notification-important margin-top-small margin-bottom-small">OR</span>
             <div class="form-group">
