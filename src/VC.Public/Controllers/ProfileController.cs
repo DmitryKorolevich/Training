@@ -389,6 +389,29 @@ namespace VC.Public.Controllers
                 await _customerPaymentMethodConverter.UpdateObjectAsync(model, creditCardToUpdate, (int) PaymentMethodType.CreditCard);
                 await _addressConverter.UpdateObjectAsync(model, creditCardToUpdate.Address, (int) AddressType.Billing);
             }
+            else
+            {
+                var otherAddresses =
+                    currentCustomer.CustomerPaymentMethods.Where(x => x.IdObjectType == (int) PaymentMethodType.CreditCard).ToList();
+
+                if (model.Default)
+                {
+                    foreach (var otherAddress in otherAddresses)
+                    {
+                        otherAddress.Data.Default = false;
+                    }
+                }
+
+                if (otherAddresses.Count == 0)
+                {
+                    model.Default = true;
+                }
+
+                var newMethod = await _customerPaymentMethodConverter.FromModelAsync(model, (int) PaymentMethodType.CreditCard);
+                newMethod.Address = await _addressConverter.FromModelAsync(model, (int) AddressType.Billing);
+
+                currentCustomer.CustomerPaymentMethods.Add(newMethod);
+            }
 
 
             try
