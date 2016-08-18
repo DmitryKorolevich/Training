@@ -1,4 +1,7 @@
-﻿$(function () {
+﻿$(function ()
+{
+    var ignoreCanadaNotice = false;
+
 	controlGuestCheckout();
 
 	$("body").on("click", "#GuestCheckout", function() {
@@ -15,13 +18,57 @@
 	    checkCreditCard(cardId);
 	});
 
-	$(".columns-container form").data("validator").settings.submitHandler = function (form)
+	$("body").on("click", ".canada-shipping-notice .arrow-right-blue", function ()
 	{
+	    $("#canada-shipping-notice").dialog('close');
+	    var form = $(".columns-container form").get(0);
 	    $(".columns-container .overlay").show();
+	    ignoreCanadaNotice = true;
 	    setTimeout(function ()
 	    {
 	        form.submit();
-        }, 100);
+	    }, 100);
+	});
+
+	$(".columns-container form").data("validator").settings.submitHandler = function (form)
+	{
+	    var idCustomerType = $(".columns-container form #hdIdCustomerType").val();
+	    var countryName = $(".columns-container form #ddCountry option:selected").text();
+	    if (idCustomerType == 1 && countryName != "United States" && !ignoreCanadaNotice)
+	    {
+	        $(".columns-container .overlay").show();
+	        $.ajax({
+	            url: "/Checkout/CanadaShippingNoticeView",
+	            dataType: "html",
+	            type: "GET"
+	        }).success(function (result, textStatus, xhr)
+	        {
+	            $(result).dialog({
+	                resizable: false,
+	                modal: true,
+	                minWidth: 450,
+	                dialogClass: "canada-shipping-notice",
+	                close: function ()
+	                {
+	                    $(this).dialog('destroy').remove();
+	                }
+	            });
+	        }).error(function (result)
+	        {
+	            notifyError();
+	        }).complete(function ()
+	        {
+	            $(".columns-container .overlay").hide();
+	        });
+	    }
+	    else
+	    {
+	        $(".columns-container .overlay").show();
+	        setTimeout(function ()
+	        {
+	            form.submit();
+	        }, 100);
+	    }
 	};
 
 	populateCardTypes();

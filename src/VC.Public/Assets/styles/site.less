@@ -4607,6 +4607,20 @@ footer {
     margin-bottom: 10px;
 }
 
+.ui-dialog.canada-shipping-notice{
+    .red{
+        color: #990000;
+    }
+
+    .blue{
+        color: #2b6c82;
+    }
+}
+
+.centered-text{
+	text-align: center;
+}
+
 .youtube-popup-container {
     display: none;
 }
@@ -5179,6 +5193,28 @@ body.view-cart-background {
 
         &.minus-button-red:hover {
             background-color: #BD281E;
+        }
+    }
+
+    .ui-dialog{
+        .ui-dialog-buttonpane{
+            button, input[type=submit], input[type=button], a.button {
+                display: inline-block;
+                position: relative;
+                padding: 0;
+                line-height: normal;
+                vertical-align: middle;
+                text-align: center;
+                overflow: visible;
+
+                &:hover {
+                    background-color: #E8E8E8;
+                }
+            }
+
+            button.ui-state-hover{               
+                background-color: #E8E8E8;
+            }
         }
     }
 }
