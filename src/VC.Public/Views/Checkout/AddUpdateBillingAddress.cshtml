@@ -39,6 +39,7 @@
         {
             @Html.AntiForgeryToken()
             @Html.ValidationSummary(true, "")
+            <input id="hdIdCustomerType" value="@Html.DisplayForEx(x => x.IdCustomerType)" type="hidden">
             if (ViewBag.CreditCards != null && ViewBag.CreditCards.Count > 1)
             {
                 <div class="form-group">

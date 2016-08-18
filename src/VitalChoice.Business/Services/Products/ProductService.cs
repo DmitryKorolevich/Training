@@ -1100,13 +1100,12 @@ namespace VitalChoice.Business.Services.Products
             var productIds = temp.Items.Select(x => x.Id).ToList();
             var batch = productIds.Take(BaseAppConstants.DEFAULT_MAX_ALLOWED_PARAMS_SQL).ToList();
             var i = 0;
-            var pairs = new List<KeyValuePair<int, string>>();
+            var pairs = new Dictionary<int, string>();
             while (batch.Count > 0)
             {
-                // ReSharper disable once AccessToModifiedClosure
-                pairs.AddRange(
-                    (await _productContentRepository.Query(p => batch.Contains(p.Id)).SelectAsync(false)).Select(
-                        x => new KeyValuePair<int, string>(x.Id, x.Url)));
+                var tempIds = batch;
+                pairs.AddRange((await _productContentRepository.Query(p => tempIds.Contains(p.Id)).SelectAsync(false)).Select(
+                        x => new KeyValuePair<int,string>(x.Id, x.Url)));
 
                 i++;
                 batch =
@@ -1114,20 +1113,23 @@ namespace VitalChoice.Business.Services.Products
                         .Take(BaseAppConstants.DEFAULT_MAX_ALLOWED_PARAMS_SQL)
                         .ToList();
             }
-
+            
             var favorites = new PagedList<VCustomerFavoriteFull>();
             foreach (var item in temp.Items)
             {
-                favorites.Items.Add(new VCustomerFavoriteFull
+                if (pairs.ContainsKey(item.Id))
                 {
-                    Id = item.Id,
-                    IdCustomer = item.Id,
-                    ProductName = item.ProductName,
-                    ProductSubTitle = item.ProductSubTitle,
-                    ProductThumbnail = item.ProductThumbnail,
-                    Quantity = item.Quantity,
-                    Url = pairs.Single(x => x.Key == item.Id).Value
-                });
+                    favorites.Items.Add(new VCustomerFavoriteFull
+                    {
+                        Id = item.Id,
+                        IdCustomer = item.Id,
+                        ProductName = item.ProductName,
+                        ProductSubTitle = item.ProductSubTitle,
+                        ProductThumbnail = item.ProductThumbnail,
+                        Quantity = item.Quantity,
+                        Url = pairs.Single(x => x.Key == item.Id).Value
+                    });
+                }
             }
 
             favorites.Count = temp.Count;

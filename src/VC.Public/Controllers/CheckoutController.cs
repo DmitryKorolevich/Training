@@ -224,6 +224,7 @@ namespace VC.Public.Controllers
                 }
 
                 addUpdateModel.Email = currentCustomer.Email;
+                addUpdateModel.IdCustomerType = currentCustomer.IdObjectType;
             }
             else
             {
@@ -233,6 +234,7 @@ namespace VC.Public.Controllers
                     await _orderPaymentMethodConverter.UpdateModelAsync<BillingInfoModel>(addUpdateModel, cart.Order.PaymentMethod);
                 }
                 addUpdateModel.Email = cart.Order.Customer?.Email;
+                addUpdateModel.IdCustomerType=(int)CustomerType.Retail;
             }
 
             return View(addUpdateModel);
@@ -270,6 +272,7 @@ namespace VC.Public.Controllers
                 {
                     await PopulateCreditCardsLookup();
                 }
+                model.IdCustomerType = cart?.Order?.Customer?.IdObjectType ?? (int)CustomerType.Retail;
                 return View(model);
             }
             Func<Task<ApplicationUser>> loginTask = null;
@@ -326,6 +329,8 @@ namespace VC.Public.Controllers
                         {
                             ModelState.AddModelError(string.Empty,
                                 "For security reasons. Please enter all credit card details for this card or please select a new one to continue.");
+
+                            model.IdCustomerType = cart?.Order?.Customer?.IdObjectType ?? (int)CustomerType.Retail;
                             return View(model);
                         }
                         //BUG: SECURITY!!! do not use real ID here, look to rework synthetic generated id with matching from customer profile
@@ -405,6 +410,7 @@ namespace VC.Public.Controllers
                 }
             }
 
+            model.IdCustomerType = cart?.Order?.Customer?.IdObjectType ?? (int)CustomerType.Retail;
             return View(model);
         }
 
@@ -428,7 +434,7 @@ namespace VC.Public.Controllers
 
         [HttpGet]
         [CustomerStatusCheck]
-        public async Task<IActionResult> AddUpdateShippingMethod()
+        public async Task<IActionResult> AddUpdateShippingMethod(bool? canadaissue=false)
         {
             if (await IsCartEmpty())
             {
@@ -576,6 +582,12 @@ namespace VC.Public.Controllers
 
                             cart.Order.Customer = await CustomerService.UpdateAsync(cart.Order.Customer);
                         }
+
+                        if (IsCanadaShippingIssue(cart.Order.Customer, cart.Order))
+                        {
+                            return RedirectToAction("AddUpdateShippingMethod",new { canadaissue = true });
+                        }
+
                         return RedirectToAction("ReviewOrder");
                     }
                 }
@@ -593,6 +605,18 @@ namespace VC.Public.Controllers
             }
 
             return View(model);
+        }
+
+        private bool IsCanadaShippingIssue(CustomerDynamic customer, OrderDynamic order)
+        {
+            var toReturn = false;
+            if (customer.IdObjectType == (int) CustomerType.Retail && order.ShippingAddress.IdCountry !=
+                ReferenceData.DefaultCountry.Id) //USA
+            {
+                toReturn = order.Skus.Any(p => p.Sku.Product.IdObjectType == (int) ProductType.Perishable)
+                           || order.PromoSkus.Any(p => p.Enabled && p.Sku.Product.IdObjectType == (int) ProductType.Perishable);
+            }
+            return toReturn;
         }
 
         [HttpGet]
@@ -629,6 +653,11 @@ namespace VC.Public.Controllers
             var loggedIn = await EnsureLoggedIn(cart);
             if (loggedIn != null)
             {
+                if (IsCanadaShippingIssue(cart.Order.Customer, cart.Order))
+                {
+                    return Url.Action("AddUpdateShippingMethod", "Checkout", new { canadaissue = true });
+                }
+
                 if (await CheckoutService.SaveOrder(cart))
                 {
                     HttpContext.Session.SetInt32(CheckoutConstants.ReceiptSessionOrderId, cart.Order.Id);
@@ -768,6 +797,18 @@ namespace VC.Public.Controllers
                         Code = p.Code,
                     }).ToList();
             return PartialView("_SendEGiftEmail", newModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CanadaShippingNoticeView()
+        {
+            return PartialView("_CanadaShippingNotice");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CanadaShippingIssueView()
+        {
+            return PartialView("_CanadaShippingIssue");
         }
 
         private List<KeyValuePair<string, AddressDynamic>> GetShippingAddresses(OrderDynamic order, CustomerDynamic currentCustomer)

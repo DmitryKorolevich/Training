@@ -36,6 +36,47 @@
     };
 
     controlUpdateSavedState();
+
+    var param = getQueryParameterByName("canadaissue");
+    if (param)
+    {
+        $(".columns-container .overlay").show();
+        $.ajax({
+            url: "/Checkout/CanadaShippingIssueView",
+            dataType: "html",
+            type: "GET"
+        }).success(function (result, textStatus, xhr)
+        {
+            $(result).dialog({
+                resizable: false,
+                modal: true,
+                minWidth: 450,
+                dialogClass: "canada-shipping-notice",
+                open: function(event,ui) {
+                    $(this).parent().focus();
+                },
+                close: function ()
+                {
+                    $(this).dialog('destroy').remove();
+                },
+                buttons: [
+                    {
+                        text: "Ok",
+                        click: function ()
+                        {
+                            $(this).dialog("close");
+                        }
+                    }
+                ]
+            });
+        }).error(function (result)
+        {
+            notifyError();
+        }).complete(function ()
+        {
+            $(".columns-container .overlay").hide();
+        });
+    }
 });
 
 function controlUpdateSavedState() {
