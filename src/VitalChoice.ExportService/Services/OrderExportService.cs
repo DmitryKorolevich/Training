@@ -11,7 +11,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Data.Extensions;
+using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.UOW;
+using VitalChoice.DynamicData.Validation;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -84,10 +87,10 @@ namespace VitalChoice.ExportService.Services
             }
         }
 
-        public async Task<List<MessageInfo>> AuthorizeCreditCard(CustomerCardData paymentMethod)
+        public async Task<List<MessageInfo>> AuthorizeCreditCard(CustomerPaymentMethodDynamic customerPaymentMethod)
         {
             await LockCustomersEvent.WaitAsync();
-            if (_writeQueue || paymentMethod == null)
+            if (_writeQueue || customerPaymentMethod == null)
             {
                 return new List<MessageInfo>();
             }
@@ -97,28 +100,21 @@ namespace VitalChoice.ExportService.Services
                 var cardData =
                     await
                         rep.Query(
-                            c => paymentMethod.IdCustomer == c.IdCustomer && paymentMethod.IdPaymentMethod == c.IdPaymentMethod)
+                            c => customerPaymentMethod.IdCustomer == c.IdCustomer && customerPaymentMethod.Id == c.IdPaymentMethod)
                             .SelectFirstOrDefaultAsync(false);
                 if (cardData == null)
                 {
-                    var error = $"Cannot find customer saved payment for customer: {paymentMethod.IdCustomer}";
+                    var error = $"Cannot find customer saved payment for customer: {customerPaymentMethod.IdCustomer}";
                     _logger.LogWarning(error);
                     throw new ApiException(error);
                 }
                 var cardNumber = _encryptionHost.LocalDecrypt<string>(cardData.CreditCardNumber);
-                var customer = await _customerService.SelectAsync(paymentMethod.IdCustomer, true);
-                var customerPaymentMethod = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == paymentMethod.IdPaymentMethod);
-                if (customerPaymentMethod == null)
-                {
-                    return new List<MessageInfo>();
-                }
                 customerPaymentMethod.Data.CardNumber = cardNumber;
-                customerPaymentMethod.Data.SecurityCode = paymentMethod.SecurityCode;
                 return await _paymentMethodService.AuthorizeCreditCard(customerPaymentMethod);
             }
         }
 
-        public async Task<List<MessageInfo>> AuthorizeCreditCard(OrderCardData paymentMethod)
+        public async Task<List<MessageInfo>> AuthorizeCreditCard(OrderPaymentMethodDynamic paymentMethod)
         {
             await LockCustomersEvent.WaitAsync();
             if (_writeQueue || paymentMethod == null)
@@ -127,27 +123,60 @@ namespace VitalChoice.ExportService.Services
             }
             using (var uow = new UnitOfWork(_infoContext, false))
             {
-                var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
-                var cardData =
-                    await
-                        rep.Query(
-                            c => paymentMethod.IdOrder == c.IdOrder)
-                            .SelectFirstOrDefaultAsync(false);
-                if (cardData == null)
+                PaymentMethodExport cardData;
+                if (paymentMethod.IdOrderSource > 0)
                 {
-                    var error = $"Cannot find order saved payment for order: {paymentMethod.IdOrder}";
-                    _logger.LogWarning(error);
-                    throw new ApiException(error);
+                    var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
+                    cardData =
+                        await
+                            rep.Query(
+                                c => paymentMethod.IdOrderSource.Value == c.IdOrder)
+                                .SelectFirstOrDefaultAsync(false);
+                    if (cardData == null)
+                    {
+                        // ReSharper disable once PossibleInvalidOperationException
+                        var error = $"Cannot find order saved payment in order: {paymentMethod.IdOrderSource.Value}";
+                        _logger.LogWarning(error);
+                        throw new ApiException(error);
+                    }
                 }
+                else if (paymentMethod.IdCustomerPaymentMethod > 0)
+                {
+                    var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
+                    cardData =
+                        await
+                            rep.Query(
+                                c => paymentMethod.IdCustomerPaymentMethod.Value == c.IdPaymentMethod)
+                                .SelectFirstOrDefaultAsync(false);
+                    if (cardData == null)
+                    {
+                        // ReSharper disable once PossibleInvalidOperationException
+                        var error =
+                            $"Cannot find order saved payment in customer payment method: {paymentMethod.IdCustomerPaymentMethod.Value}";
+                        _logger.LogWarning(error);
+                        throw new ApiException(error);
+                    }
+                }
+                else
+                {
+                    var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
+                    cardData =
+                        await
+                            rep.Query(
+                                c => paymentMethod.IdOrder == c.IdOrder)
+                                .SelectFirstOrDefaultAsync(false);
+                    if (cardData == null)
+                    {
+                        var error = $"Cannot find order saved payment for order: {paymentMethod.IdOrder}";
+                        _logger.LogWarning(error);
+                        throw new ApiException(error);
+                    }
+                }
+
+
                 var cardNumber = _encryptionHost.LocalDecrypt<string>(cardData.CreditCardNumber);
-                var order = await _orderService.SelectAsync(paymentMethod.IdOrder, true);
-                if (order == null)
-                {
-                    return new List<MessageInfo>();
-                }
-                order.PaymentMethod.Data.CardNumber = cardNumber;
-                order.PaymentMethod.Data.SecurityCode = paymentMethod.SecurityCode;
-                return await _paymentMethodService.AuthorizeCreditCard(order.PaymentMethod);
+                paymentMethod.Data.CardNumber = cardNumber;
+                return await _paymentMethodService.AuthorizeCreditCard(paymentMethod);
             }
         }
 
@@ -247,7 +276,7 @@ namespace VitalChoice.ExportService.Services
                     if (customerData != null)
                     {
                         paymentMethod.CardNumber = _encryptionHost.LocalDecrypt<string>(customerData.CreditCardNumber);
-
+                        
                         await UpdateOrderPayment(paymentMethod, uow);
                         await uow.SaveChangesAsync();
                     }

@@ -10,7 +10,6 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
 
         [DataMember]
         public int IdPaymentMethod { get; set; }
-
     }
 
     [DataContract]
