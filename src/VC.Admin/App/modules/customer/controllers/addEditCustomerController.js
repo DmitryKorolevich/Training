@@ -62,11 +62,11 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 
 			        customerEditService.syncCountry($scope, $scope.currentCustomer.ProfileAddress);
 
+			        $scope.paymentInfoTab.CreditCardIndex = "0";
 			        angular.forEach($scope.currentCustomer.CreditCards, function (creditCard, index)
 			        {
 			            creditCard.formName = 'card';
 			            customerEditService.syncCountry($scope, creditCard.Address);
-			            $scope.paymentInfoTab.CreditCardIndex = "0";
 			            if (creditCard.Default)
 			            {
 			                $scope.paymentInfoTab.CreditCardIndex = index.toString();
