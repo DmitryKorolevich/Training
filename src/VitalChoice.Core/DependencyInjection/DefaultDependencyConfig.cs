@@ -426,6 +426,7 @@ namespace VitalChoice.Core.DependencyInjection
                 options.VeraCoreSettings = new VeraCoreSettings
                 {
                     ExportFolderName = section["ExportFolderName"],
+                    GiftListFolderName = section["GiftListFolderName"],
                     ServerHost = section["ServerHost"],
                     UserName = section["UserName"],
                     Password = section["Password"],

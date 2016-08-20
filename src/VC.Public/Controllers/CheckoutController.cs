@@ -44,6 +44,7 @@ using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
+using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
@@ -800,13 +801,13 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> CanadaShippingNoticeView()
+        public IActionResult CanadaShippingNoticeView()
         {
             return PartialView("_CanadaShippingNotice");
         }
 
         [HttpGet]
-        public async Task<IActionResult> CanadaShippingIssueView()
+        public IActionResult CanadaShippingIssueView()
         {
             return PartialView("_CanadaShippingIssue");
         }

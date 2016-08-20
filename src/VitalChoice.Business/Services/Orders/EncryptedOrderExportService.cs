@@ -9,6 +9,7 @@ using VitalChoice.Ecommerce.Domain.Helpers.Async;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
+using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 using VitalChoice.Interfaces.Services;
@@ -132,6 +133,22 @@ namespace VitalChoice.Business.Services.Orders
                 throw new ApiException("Export timeout");
             }
             return results;
+        }
+
+        public Task ExportGiftListCreditCard(GiftListExportModel model)
+        {
+            if (!InitSuccess)
+            {
+                return TaskCache.CompletedTask;
+            }
+            if (model.IdPaymentMethod > 0 || model.IdCustomer > 0)
+                return
+                    SendCommand<bool>(new ServiceBusCommandWithResult(Guid.NewGuid(), OrderExportServiceCommandConstants.ExportGiftListCard,
+                        ServerHostName, LocalHostName)
+                    {
+                        Data = new ServiceBusCommandData(model)
+                    });
+            return TaskCache.CompletedTask;
         }
 
         public Task<bool> UpdateOrderPaymentMethodAsync(OrderCardData orderPaymentMethod)

@@ -4,10 +4,12 @@ using Autofac;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using VitalChoice.Infrastructure.Domain;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
+using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 
@@ -68,9 +70,29 @@ namespace VitalChoice.ExportService.Services
                     return ProcessCardAuthorizeCommand(command);
                 case OrderExportServiceCommandConstants.AuthorizeCardInOrder:
                     return ProcessCardAuthorizeInOrderCommand(command);
+                case OrderExportServiceCommandConstants.ExportGiftListCard:
+                    return ProcessGiftListCardExport(command);
                 default:
                     return false;
             }
+        }
+
+        private bool ProcessGiftListCardExport(ServiceBusCommandBase command)
+        {
+            var customerExportInfo = command.Data.Data as GiftListExportModel;
+            if (customerExportInfo == null)
+            {
+                SendCommand(command.CreateError("Gift list export data is empty"));
+                return false;
+            }
+
+            using (var scope = _rootScope.BeginLifetimeScope())
+            {
+                var orderExportService = scope.Resolve<IOrderExportService>();
+                orderExportService.ExportGiftListCreditCard(customerExportInfo).GetAwaiter().GetResult();
+                SendCommand(command.CreateResult(true));
+            }
+            return true;
         }
 
         private bool ProcessCardExistCommand(ServiceBusCommandBase command)
@@ -78,14 +100,14 @@ namespace VitalChoice.ExportService.Services
             var customerExportInfo = command.Data.Data as CustomerExportInfo;
             if (customerExportInfo == null)
             {
-                SendCommand(new ServiceBusCommandBase(command, "Customer export data is empty"));
+                SendCommand(command.CreateError("Customer export data is empty"));
                 return false;
             }
 
             using (var scope = _rootScope.BeginLifetimeScope())
             {
                 var orderExportService = scope.Resolve<IOrderExportService>();
-                SendCommand(new ServiceBusCommandBase(command, orderExportService.CardExist(customerExportInfo).GetAwaiter().GetResult()));
+                SendCommand(command.CreateResult(orderExportService.CardExist(customerExportInfo).GetAwaiter().GetResult()));
             }
             return true;
         }
@@ -183,7 +205,10 @@ namespace VitalChoice.ExportService.Services
         private void OnSessionRemoved(Guid session, string hostName)
         {
             ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(session, ServiceBusCommandConstants.SessionExpired, hostName,
-                LocalHostName)).GetAwaiter().GetResult();
+                LocalHostName)
+            {
+                TimeToLeave = TimeSpan.FromMinutes(6)
+            }).GetAwaiter().GetResult();
         }
 
         public override void Dispose()

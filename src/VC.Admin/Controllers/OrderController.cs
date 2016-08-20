@@ -62,6 +62,7 @@ using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Services;
 using VitalChoice.Infrastructure.Domain;
+using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 
 namespace VC.Admin.Controllers
 {

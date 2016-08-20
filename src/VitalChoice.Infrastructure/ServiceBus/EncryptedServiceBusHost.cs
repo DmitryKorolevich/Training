@@ -13,6 +13,7 @@ using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 
 namespace VitalChoice.Infrastructure.ServiceBus

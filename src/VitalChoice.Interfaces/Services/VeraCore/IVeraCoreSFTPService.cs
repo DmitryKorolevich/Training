@@ -6,7 +6,9 @@ namespace VitalChoice.Interfaces.Services.VeraCore
 {
     public interface IVeraCoreSFTPService
     {
-        string WorkingDirectory { get; }
+        string GetWorkingDirectory();
+
+        void UploadFile(VeraCoreSFTPOptions options, Stream file, string name);
 
         ICollection<VeraCoreFileInfo> GetFileList(VeraCoreSFTPOptions options);
 

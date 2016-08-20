@@ -38,6 +38,16 @@
       "UserName": "g2dev",
       "Password": "G2dev2016#"
     },
+    "VeraCoreSettings": {
+      "ExportFolderName": "TestExport",
+      "GiftListFolderName": "TestGiftList",
+      "ServerHost": "ftpvc5.veracore.com",
+      "UserName": "vitalchoice2",
+      "Password": "vitalchoice!32",
+      "ServerPort": "22",
+      "ArchivePath": "C:\\WindowsService\\SFTPCache",
+      "WAwarehouseThreshold": 609000
+    },
     "AuthorizeNet": {
       "ApiLogin": "36qq5ECXB",
       "ApiKey": "4r5Zv38R56BY6tLW",

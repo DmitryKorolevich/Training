@@ -78,6 +78,7 @@ using System.Security.Cryptography.X509Certificates;
 using Google.Apis.Auth.OAuth2;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Data.UOW;
+using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 
 namespace VitalChoice.Business.Services.Orders
@@ -875,6 +876,13 @@ namespace VitalChoice.Business.Services.Orders
             if (dynamic.Customer.StatusCode == (int) CustomerStatus.Suspended)
             {
                 throw new CustomerSuspendException();
+            }
+            if (dynamic.IsAnyNotIncomplete())
+            {
+                if (dynamic.Skus?.Count == 0)
+                {
+                    throw new AppValidationException("You cannot place order without products");
+                }
             }
             return base.ValidateAsync(dynamic);
         }
@@ -1757,7 +1765,8 @@ namespace VitalChoice.Business.Services.Orders
 
         #region OrdersImport
 
-        public async Task<bool> ImportOrders(byte[] file, string fileName, OrderImportType orderType, int idCustomer, int? idPaymentMethod, int idAddedBy)
+        public async Task<bool> ImportOrders(byte[] file, string fileName, OrderImportType orderType, int idCustomer, int? idPaymentMethod,
+            int idAddedBy)
         {
             var customer = await _customerService.SelectAsync(idCustomer);
             if (customer == null)
@@ -1771,12 +1780,12 @@ namespace VitalChoice.Business.Services.Orders
             switch (orderType)
             {
                 case OrderImportType.GiftList:
-                    if (!customer.ApprovedPaymentMethods.Contains((int)PaymentMethodType.NoCharge))
+                    if (!customer.ApprovedPaymentMethods.Contains((int) PaymentMethodType.NoCharge))
                     {
                         throw new AppValidationException("Payment method \"No Charge\" should be allowed");
                     }
                     paymentMethod = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == idPaymentMethod);
-                    if (paymentMethod == null || paymentMethod.IdObjectType != (int)PaymentMethodType.CreditCard ||
+                    if (paymentMethod == null || paymentMethod.IdObjectType != (int) PaymentMethodType.CreditCard ||
                         paymentMethod.Address == null)
                     {
                         throw new AppValidationException("Payment method \"Credit Card\" should be configured");
@@ -1785,12 +1794,12 @@ namespace VitalChoice.Business.Services.Orders
 
                     break;
                 case OrderImportType.DropShip:
-                    if (!customer.ApprovedPaymentMethods.Contains((int)PaymentMethodType.Oac))
+                    if (!customer.ApprovedPaymentMethods.Contains((int) PaymentMethodType.Oac))
                     {
                         throw new AppValidationException("Payment method \"On Approved Credit\" should be allowed");
                     }
                     paymentMethod = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == idPaymentMethod);
-                    if (paymentMethod == null || paymentMethod.IdObjectType != (int)PaymentMethodType.Oac ||
+                    if (paymentMethod == null || paymentMethod.IdObjectType != (int) PaymentMethodType.Oac ||
                         paymentMethod.Address == null)
                     {
                         throw new AppValidationException("Payment method \"On Approved Credit\" should be configured");
@@ -1799,17 +1808,18 @@ namespace VitalChoice.Business.Services.Orders
 
                     break;
                 case OrderImportType.DropShipAAFES:
-                    if (!customer.ApprovedPaymentMethods.Contains((int)PaymentMethodType.Oac))
+                    if (!customer.ApprovedPaymentMethods.Contains((int) PaymentMethodType.Oac))
                     {
                         throw new AppValidationException("Payment method \"On Approved Credit\" should be allowed");
                     }
                     paymentMethod = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == idPaymentMethod);
-                    if (paymentMethod == null || paymentMethod.IdObjectType != (int)PaymentMethodType.Oac ||
+                    if (paymentMethod == null || paymentMethod.IdObjectType != (int) PaymentMethodType.Oac ||
                         paymentMethod.Address == null)
                     {
                         throw new AppValidationException("Payment method \"On Approved Credit\" should be configured");
                     }
-                    processor = new DropShipAAFESSOrderImportProcessor(_countryService, Mapper, _addressMapper, _referenceData, _loggerFactory);
+                    processor = new DropShipAAFESSOrderImportProcessor(_countryService, Mapper, _addressMapper, _referenceData,
+                        _loggerFactory);
 
                     break;
                 default:
@@ -1820,7 +1830,7 @@ namespace VitalChoice.Business.Services.Orders
 
             await LoadSkusDynamic(map, customer);
             //not found SKU errors
-            var messages = processor.FormatRowsRecordErrorMessages(map.SelectMany(p=>p.OrderImportItems));
+            var messages = processor.FormatRowsRecordErrorMessages(map.SelectMany(p => p.OrderImportItems));
             if (messages.Count > 0)
             {
                 throw new AppValidationException(messages);
@@ -1850,7 +1860,7 @@ namespace VitalChoice.Business.Services.Orders
                 }
 
                 var rows = item.OrderImportItems.Select(p => p.RowNumber).ToList();
-                var tempMessages = new List<MessageInfo>(context.Messages.Where(p=>p.MessageLevel==MessageLevel.Error));
+                var tempMessages = new List<MessageInfo>(context.Messages.Where(p => p.MessageLevel == MessageLevel.Error));
                 tempMessages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages)
                     .Where(p => p.MessageLevel == MessageLevel.Error));
                 tempMessages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages)
@@ -1873,7 +1883,9 @@ namespace VitalChoice.Business.Services.Orders
                     item.Order.Data.ShippingOverride = item.Order.ShippingTotal;
 
                     var orderCombinedStatus = item.Order.OrderStatus ?? OrderStatus.Processed;
-                    item.Order.Data.ShipDelayType = item.Order.SafeData.ShipDelayDate != null ? ShipDelayType.EntireOrder : ShipDelayType.None;
+                    item.Order.Data.ShipDelayType = item.Order.SafeData.ShipDelayDate != null
+                        ? ShipDelayType.EntireOrder
+                        : ShipDelayType.None;
 
                     var context = await CalculateOrder(item.Order, orderCombinedStatus);
 
@@ -1895,11 +1907,26 @@ namespace VitalChoice.Business.Services.Orders
             }
 
             var orders = map.Select(p => p.Order).ToList();
-            orders = await InsertRangeAsync(orders);
 
-            if (orderType == OrderImportType.GiftList && idPaymentMethod.HasValue)
+            using (var transaction = TransactionAccessor.BeginTransaction())
             {
-                await SendGLOrdersImportEmailAsync(orders, customer, idPaymentMethod.Value, idAddedBy);
+                try
+                {
+                    orders = await InsertRangeAsync(orders);
+
+                    if (orderType == OrderImportType.GiftList && idPaymentMethod.HasValue)
+                    {
+                        await ExportGlCardDetails(orders, customer, idPaymentMethod.Value, idAddedBy);
+                        await SendGlOrdersImportEmailAsync(orders, customer, idPaymentMethod.Value, idAddedBy);
+                    }
+
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
             }
 
             return true;
@@ -1928,25 +1955,59 @@ namespace VitalChoice.Business.Services.Orders
             return toReturn;
         }
 
-        private async Task SendGLOrdersImportEmailAsync(ICollection<OrderDynamic> orders, CustomerDynamic customer, int idPaymentMethod, int idAddedBy)
+        private async Task SendGlOrdersImportEmailAsync(ICollection<OrderDynamic> orders, CustomerDynamic customer, int idPaymentMethod,
+            int idAddedBy)
         {
-            GLOrdersImportEmail model = new GLOrdersImportEmail();
-            model.Date = DateTime.Now;
-            model.IdCustomer = customer.Id;
-            model.CustomerFirstName = customer.ProfileAddress.SafeData.FirstName;
-            model.CustomerLastName = customer.ProfileAddress.SafeData.LastName;
+            var model = await GetGlEmailModelAsync(orders, customer, idPaymentMethod, idAddedBy);
+            await _notificationService.SendGLOrdersImportEmailAsync(model);
+        }
+
+        private async Task ExportGlCardDetails(ICollection<OrderDynamic> orders, CustomerDynamic customer, int idPaymentMethod, int idAddedBy)
+        {
+            var exportModel = await GetGlExportModelAsync(orders, customer, idPaymentMethod, idAddedBy);
+            await _encryptedOrderExportService.ExportGiftListCreditCard(exportModel);
+        }
+
+        private async Task<GiftListExportModel> GetGlExportModelAsync(ICollection<OrderDynamic> orders, CustomerDynamic customer,
+            int idPaymentMethod, int idAddedBy)
+        {
+            var profile = await _adminProfileRepository.Query(p => p.Id == idAddedBy).SelectFirstOrDefaultAsync(false);
+            var model = new GiftListExportModel
+            {
+                Date = DateTime.Now,
+                IdCustomer = customer.Id,
+                CustomerFirstName = customer.ProfileAddress.SafeData.FirstName,
+                CustomerLastName = customer.ProfileAddress.SafeData.LastName,
+                IdPaymentMethod = idPaymentMethod,
+                Agent = profile?.AgentId,
+                ImportedOrdersCount = orders.Count,
+                ImportedOrdersAmount = orders.Sum(p => p.Total),
+                OrderIds = orders.Select(p => p.Id).ToList()
+            };
+            return model;
+        }
+
+        private async Task<GLOrdersImportEmail> GetGlEmailModelAsync(ICollection<OrderDynamic> orders, CustomerDynamic customer,
+            int idPaymentMethod, int idAddedBy)
+        {
+            var profile = await _adminProfileRepository.Query(p => p.Id == idAddedBy).SelectFirstOrDefaultAsync(false);
+            GLOrdersImportEmail model = new GLOrdersImportEmail
+            {
+                Date = DateTime.Now,
+                IdCustomer = customer.Id,
+                CustomerFirstName = customer.ProfileAddress.SafeData.FirstName,
+                CustomerLastName = customer.ProfileAddress.SafeData.LastName,
+                Agent = profile?.AgentId,
+                ImportedOrdersCount = orders.Count,
+                ImportedOrdersAmount = orders.Sum(p => p.Total),
+                OrderIds = orders.Select(p => p.Id).ToList()
+            };
             var creditCard = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == idPaymentMethod);
             if (creditCard != null)
             {
                 model.CardNumber = creditCard.SafeData.CardNumber;
             }
-            var profile = (await _adminProfileRepository.Query(p => p.Id == idAddedBy).SelectFirstOrDefaultAsync(false));
-            model.Agent = profile?.AgentId;
-            model.ImportedOrdersCount = orders.Count;
-            model.ImportedOrdersAmount = orders.Sum(p => p.Total);
-            model.OrderIds = orders.Select(p => p.Id).ToList();
-
-            await _notificationService.SendGLOrdersImportEmailAsync(model);
+            return model;
         }
 
         private async Task LoadSkusDynamic(IList<OrderImportItemOrderDynamic> map, CustomerDynamic customer)
