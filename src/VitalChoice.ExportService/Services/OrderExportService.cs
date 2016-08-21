@@ -116,7 +116,7 @@ namespace VitalChoice.ExportService.Services
                 using (var memory = new MemoryStream(byteData))
                 {
                     _sftpService.UploadFile(VeraCoreSFTPOptions.GiftList, memory,
-                        $"Gift-List_Upload_{model.IdCustomer}_{model.Date:yyyy-MM-dd}.txt");
+                        $"Gift-List_Upload_{model.IdCustomer}_{model.Date:yyyy-MM-dd_hh_mm_tt}.txt");
                 }
             });
         }

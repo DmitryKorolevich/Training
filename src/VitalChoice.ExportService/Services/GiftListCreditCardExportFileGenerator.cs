@@ -14,8 +14,8 @@ namespace VitalChoice.ExportService.Services
     public class GiftListCreditCardExportFileGenerator : IDisposable, IGiftListCreditCardExportFileGenerator
     {
         private readonly TtlTemplate _template;
-        protected static string DocumentTemplate { get; } = @"@using(){{VitalChoice.Infrastructure.Domain.Mail}}
-@model(){{GLOrdersImportEmail}}
+        protected static string DocumentTemplate { get; } = @"@using(){{VitalChoice.Infrastructure.Domain.Mail}};
+@model(){{GLOrdersImportEmail}};
 Summary of the following Gift List Import completed @date(Date) {{MM'/'dd'/'yyyy hh:mm tt}}
 Agent: @(Agent)
 Customer Name: @(CustomerFirstName) @(CustomerLastName)

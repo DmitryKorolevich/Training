@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -28,6 +29,7 @@ namespace VitalChoice.Profiling.Base
                 using (var scope = new ProfilingScope(context.Request.Path + context.Request.QueryString))
                 {
                     scope.Start = DateTime.Now;
+                    context.Response.Headers["X-Diag-ProcessStartTime"] = scope.Start.ToString("O");
                     try
                     {
                         await _requestDelegate.Invoke(context);
@@ -37,6 +39,8 @@ namespace VitalChoice.Profiling.Base
                         try
                         {
                             scope.Stop();
+                            context.Response.Headers["X-Diag-ProcessElapsedMilliseconds"] =
+                                scope.TimeElapsed.TotalMilliseconds.ToString(CultureInfo.InvariantCulture);
                             _request.OnFinishedRequest(scope);
                         }
                         catch (Exception e)
