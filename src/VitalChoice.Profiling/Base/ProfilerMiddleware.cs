@@ -35,9 +35,9 @@ namespace VitalChoice.Profiling.Base
                         try
                         {
                             var localScope = (ProfilingScope) sc;
+                            localScope.Stop();
                             context.Response.Headers["X-Diag-ProcessElapsedMilliseconds"] =
                                 localScope.TimeElapsed.TotalMilliseconds.ToString(CultureInfo.InvariantCulture);
-                            localScope.Stop();
                             _request.OnFinishedRequest(localScope);
                         }
                         catch (Exception e)
