@@ -30,24 +30,23 @@ namespace VitalChoice.Profiling.Base
                 {
                     scope.Start = DateTime.Now;
                     context.Response.Headers["X-Diag-ProcessStartTime"] = scope.Start.ToString("O");
-                    try
-                    {
-                        await _requestDelegate.Invoke(context);
-                    }
-                    finally
+                    context.Response.OnStarting(sc =>
                     {
                         try
                         {
-                            scope.Stop();
+                            var localScope = (ProfilingScope) sc;
                             context.Response.Headers["X-Diag-ProcessElapsedMilliseconds"] =
-                                scope.TimeElapsed.TotalMilliseconds.ToString(CultureInfo.InvariantCulture);
-                            _request.OnFinishedRequest(scope);
+                                localScope.TimeElapsed.TotalMilliseconds.ToString(CultureInfo.InvariantCulture);
+                            localScope.Stop();
+                            _request.OnFinishedRequest(localScope);
                         }
                         catch (Exception e)
                         {
                             _logger.LogError(e.ToString());
                         }
-                    }
+                        return Task.CompletedTask;
+                    }, scope);
+                    await _requestDelegate.Invoke(context);
                 }
                 try
                 {
