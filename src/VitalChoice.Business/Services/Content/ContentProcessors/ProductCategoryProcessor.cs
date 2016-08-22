@@ -146,11 +146,13 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 await DenyAccessIfWholesaleRuleApplied(category, viewContext, wholesaleCustomer);
                 DenyAccessIfRetailRuleApplied(category, viewContext, wholesaleCustomer);
 
+                var visibleForCustomerTypes = customerVisibility.Cast<CustomerTypeCode?>().ToList();
+
                 foreach (var subCategory in category.SubCategories)
                 {
                     var subCategoryContent = await
                         _productCategoryRepository.Query(
-                            p => p.Id == subCategory.Id && p.NavIdVisible.HasValue && customerVisibility.Contains(p.NavIdVisible.Value))
+                            p => p.Id == subCategory.Id && p.NavIdVisible != null && visibleForCustomerTypes.Contains(p.NavIdVisible))
                             .SelectFirstOrDefaultAsync(false);
                     if (subCategoryContent != null)
                     {
