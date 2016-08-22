@@ -12,3 +12,4 @@ Post-Deployment Script Template
 set dateformat mdy
 
 :r .\Scripts\ContentAreas.sql
+:r .\Scripts\Indexes.sql

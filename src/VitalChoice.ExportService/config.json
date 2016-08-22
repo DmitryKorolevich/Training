@@ -40,7 +40,7 @@
     },
     "VeraCoreSettings": {
       "ExportFolderName": "TestExport",
-      "GiftListFolderName": "TestGiftList",
+      "GiftListFolderName": "GiftListExport",
       "ServerHost": "ftpvc5.veracore.com",
       "UserName": "vitalchoice2",
       "Password": "vitalchoice!32",
