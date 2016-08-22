@@ -29,13 +29,13 @@ namespace VitalChoice.Profiling.Base
                 using (var scope = new ProfilingScope(context.Request.Path + context.Request.QueryString))
                 {
                     scope.Start = DateTime.Now;
-                    context.Response.Headers["X-Diag-ProcessStartTime"] = scope.Start.ToString("O");
                     context.Response.OnStarting(sc =>
                     {
                         try
                         {
                             var localScope = (ProfilingScope) sc;
                             localScope.Stop();
+                            context.Response.Headers["X-Diag-ProcessStartTime"] = localScope.Start.ToString("O");
                             context.Response.Headers["X-Diag-ProcessElapsedMilliseconds"] =
                                 localScope.TimeElapsed.TotalMilliseconds.ToString(CultureInfo.InvariantCulture);
                             _request.OnFinishedRequest(localScope);
