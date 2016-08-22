@@ -316,7 +316,7 @@ namespace VC.Admin.Controllers
             var order = await _mapper.FromModelAsync(model);
             if (model == null || order == null)
             {
-                throw new ApiException("Empty Order");
+                return new Result<OrderCalculateModel>(false);
             }
             await _orderService.OrderTypeSetup(order);
             var orderContext = await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus);
