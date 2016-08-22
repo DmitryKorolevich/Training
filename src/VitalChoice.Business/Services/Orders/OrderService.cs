@@ -744,6 +744,8 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task OrderTypeSetup(OrderDynamic order)
         {
+            if (order == null)
+                return;
             var orderType = ((bool?) order.SafeData.MailOrder ?? false) ? (int?) SourceOrderType.MailOrder : null;
             var idOrder = order.Id;
             if (idOrder != 0)
