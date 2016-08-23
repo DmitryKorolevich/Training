@@ -269,22 +269,12 @@ namespace VitalChoice.Caching.Services.Cache
                     {
                         return false;
                     }
-                    var pkInfo = relation.EntityInfo.PrimaryKey;
                     var newItems = newRelated as IEnumerable<object>;
-                    if (pkInfo == null)
-                    {
-                        return false;
-                    }
                     foreach (var newItem in newItems)
                     {
-                        var pk = pkInfo.GetPrimaryKeyValue(newItem);
-                        if (!pk.IsValid)
-                        {
-                            return false;
-                        }
                         if (stateManager != null)
                         {
-                            if (!stateManager.IsTracked(entityInfo, newItem))
+                            if (!stateManager.IsTracked(relation.EntityInfo, newItem))
                             {
                                 return false;
                             }
@@ -322,7 +312,7 @@ namespace VitalChoice.Caching.Services.Cache
                         }
                         if (stateManager != null)
                         {
-                            if (!stateManager.IsTracked(entityInfo, entity))
+                            if (!stateManager.IsTracked(relation.EntityInfo, newRelated))
                             {
                                 return false;
                             }

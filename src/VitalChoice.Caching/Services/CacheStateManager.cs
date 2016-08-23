@@ -55,6 +55,8 @@ namespace VitalChoice.Caching.Services
         {
             var trackData = ContextualCacheDatas.Value;
             var pk = info.PrimaryKey.GetPrimaryKeyValue(entity);
+            if (!pk.IsValid)
+                return false;
             var key = new TrackedEntityKey(info.EntityType, pk);
             if (trackData.ContainsKey(key))
             {
