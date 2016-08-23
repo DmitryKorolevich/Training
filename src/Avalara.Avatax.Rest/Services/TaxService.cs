@@ -12,7 +12,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using VitalChoice.Infrastructure.Domain.Avatax;
 using VitalChoice.Infrastructure.Domain.Options;
-using VitalChoice.Interfaces.Services;
 
 namespace Avalara.Avatax.Rest.Services
 {

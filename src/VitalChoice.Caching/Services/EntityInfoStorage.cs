@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
@@ -14,7 +13,6 @@ using VitalChoice.Caching.GC;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Base;
-using VitalChoice.Caching.Relational.ChangeTracking;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -321,76 +319,76 @@ namespace VitalChoice.Caching.Services
             return (LambdaExpression) fullCacheAnnotation?.Value;
         }
 
-        public IDictionary<TrackedEntityKey, InternalEntityEntry> GetTrackData(DbContext context)
-        {
-            if (context == null)
-                return null;
-            var trackData = new Dictionary<TrackedEntityKey, InternalEntityEntry>();
-            try
-            {
-                foreach (
-                    var group in
-                        context.StateManager.Entries
-                            .Where(e => e.Entity != null && e.EntityState != EntityState.Detached)
-                            .GroupBy(e => e.Entity.GetType()))
-                {
-                    var keyInfo = GetPrimaryKeyInfo(group.Key);
-                    if (keyInfo == null)
-                        continue;
+        //public IDictionary<TrackedEntityKey, InternalEntityEntry> GetTrackData(DbContext context)
+        //{
+        //    if (context == null)
+        //        return null;
+        //    var trackData = new Dictionary<TrackedEntityKey, InternalEntityEntry>();
+        //    try
+        //    {
+        //        foreach (
+        //            var group in
+        //                context.StateManager.Entries
+        //                    .Where(e => e.Entity != null && e.EntityState != EntityState.Detached)
+        //                    .GroupBy(e => e.Entity.GetType()))
+        //        {
+        //            var keyInfo = GetPrimaryKeyInfo(group.Key);
+        //            if (keyInfo == null)
+        //                continue;
 
-                    foreach (var entry in group)
-                    {
-                        var key = new TrackedEntityKey(group.Key,
-                            keyInfo.GetPrimaryKeyValue(entry.Entity));
-                        if (!trackData.ContainsKey(key))
-                            trackData.Add(key, entry);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-            }
-            return trackData;
-        }
+        //            foreach (var entry in group)
+        //            {
+        //                var key = new TrackedEntityKey(group.Key,
+        //                    keyInfo.GetPrimaryKeyValue(entry.Entity));
+        //                if (!trackData.ContainsKey(key))
+        //                    trackData.Add(key, entry);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.LogError(e.ToString());
+        //    }
+        //    return trackData;
+        //}
 
-        public IDictionary<TrackedEntityKey, InternalEntityEntry> GetTrackData(DbContext context, out HashSet<object> trackedObjects)
-        {
-            if (context == null)
-            {
-                trackedObjects = null;
-                return null;
-            }
-            var trackData = new Dictionary<TrackedEntityKey, InternalEntityEntry>();
-            trackedObjects = new HashSet<object>();
-            try
-            {
-                foreach (
-                    var group in
-                        context.StateManager.Entries
-                            .Where(e => e.Entity != null && e.EntityState != EntityState.Detached)
-                            .GroupBy(e => e.Entity.GetType()))
-                {
-                    var keyInfo = GetPrimaryKeyInfo(group.Key);
-                    if (keyInfo == null)
-                        continue;
+        //public IDictionary<TrackedEntityKey, InternalEntityEntry> GetTrackData(DbContext context, out HashSet<object> trackedObjects)
+        //{
+        //    if (context == null)
+        //    {
+        //        trackedObjects = null;
+        //        return null;
+        //    }
+        //    var trackData = new Dictionary<TrackedEntityKey, InternalEntityEntry>();
+        //    trackedObjects = new HashSet<object>();
+        //    try
+        //    {
+        //        foreach (
+        //            var group in
+        //                context.StateManager.Entries
+        //                    .Where(e => e.Entity != null && e.EntityState != EntityState.Detached)
+        //                    .GroupBy(e => e.Entity.GetType()))
+        //        {
+        //            var keyInfo = GetPrimaryKeyInfo(group.Key);
+        //            if (keyInfo == null)
+        //                continue;
 
-                    foreach (var entry in group)
-                    {
-                        trackedObjects.Add(entry.Entity);
-                        var key = new TrackedEntityKey(group.Key,
-                            keyInfo.GetPrimaryKeyValue(entry.Entity));
-                        if (!trackData.ContainsKey(key))
-                            trackData.Add(key, entry);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-            }
-            return trackData;
-        }
+        //            foreach (var entry in group)
+        //            {
+        //                trackedObjects.Add(entry.Entity);
+        //                var key = new TrackedEntityKey(group.Key,
+        //                    keyInfo.GetPrimaryKeyValue(entry.Entity));
+        //                if (!trackData.ContainsKey(key))
+        //                    trackData.Add(key, entry);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.LogError(e.ToString());
+        //    }
+        //    return trackData;
+        //}
 
         public bool HaveKeys(Type entityType)
         {

@@ -204,7 +204,7 @@ namespace VitalChoice.Caching.Services.Cache
             return _mainCluster.Update(pk, entity, (e, exist) => UpdateExist(pk, e, exist, dbContext));
         }
 
-        public CachedEntity<T> UpdateKeepRelations(T entity, IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities, object dbContext)
+        public CachedEntity<T> UpdateKeepRelations(T entity, ICacheStateManager stateManager, object dbContext)
         {
             if (entity == null)
                 return null;
@@ -215,18 +215,18 @@ namespace VitalChoice.Caching.Services.Cache
                 return null;
             using (cached.Lock())
             {
-                if (!UpdateEntityWithRelations(entity, trackedEntities, cached, dbContext))
+                if (!UpdateEntityWithRelations(entity, stateManager, cached, dbContext))
                     return null;
                 SyncInternalCache(pk, entity, cached, dbContext);
             }
             return cached;
         }
 
-        private bool UpdateEntityWithRelations(T entity, IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities,
+        private bool UpdateEntityWithRelations(T entity, ICacheStateManager stateManager,
             CachedEntity<T> cached, object dbContext)
         {
             ICollection<RelationInfo> relationsToClone;
-            if (!GetAllNormalizedAndTracked(entity, trackedEntities, out relationsToClone, cached))
+            if (!GetAllNormalizedAndTracked(entity, stateManager, out relationsToClone, cached))
             {
                 cached.SetNeedUpdate(true, dbContext);
                 return false;
@@ -247,15 +247,15 @@ namespace VitalChoice.Caching.Services.Cache
         }
 
         private bool GetAllNormalizedAndTracked(object entity,
-            IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities, out ICollection<RelationInfo> relationsToClone,
+            ICacheStateManager stateManager, out ICollection<RelationInfo> relationsToClone,
             CachedEntity<T> cached)
         {
 
             relationsToClone = _relationInfo.Relations.Where(r => cached.NeedUpdateRelated.Contains(r.Name)).ToArray();
-            return GetIsNormalized(entity, trackedEntities, relationsToClone, _entityInfo);
+            return GetIsNormalized(entity, stateManager, relationsToClone, _entityInfo);
         }
 
-        private bool GetIsNormalized(object entity, IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities,
+        private bool GetIsNormalized(object entity, ICacheStateManager stateManager,
             ICollection<RelationInfo> relationsToClone, EntityInfo entityInfo)
         {
             foreach (var relation in relationsToClone)
@@ -283,19 +283,14 @@ namespace VitalChoice.Caching.Services.Cache
                         {
                             return false;
                         }
-                        if (trackedEntities != null)
+                        if (stateManager != null)
                         {
-                            InternalEntityEntry entry;
-                            if (!trackedEntities.TryGetValue(new TrackedEntityKey(relation.RelationType, pk), out entry))
-                            {
-                                return false;
-                            }
-                            if (entry.EntityState == EntityState.Detached || entry.Entity != newItem)
+                            if (!stateManager.IsTracked(entityInfo, newItem))
                             {
                                 return false;
                             }
                         }
-                        if (!GetIsNormalized(newItem, trackedEntities, relation.Relations, relation.EntityInfo))
+                        if (!GetIsNormalized(newItem, stateManager, relation.Relations, relation.EntityInfo))
                         {
                             return false;
                         }
@@ -312,17 +307,9 @@ namespace VitalChoice.Caching.Services.Cache
                             {
                                 return false;
                             }
-                            if (trackedEntities == null)
+                            if (stateManager?.IsTracked(entityInfo, entity) ?? true)
                             {
                                 return false;
-                            }
-                            InternalEntityEntry entry;
-                            if (trackedEntities.TryGetValue(new TrackedEntityKey(relation.RelationType, newRelatedKey), out entry))
-                            {
-                                if (entry.Entity != null)
-                                {
-                                    return false;
-                                }
                             }
                             if (_cacheFactory.CacheExist(relation.RelationType))
                             {
@@ -334,19 +321,14 @@ namespace VitalChoice.Caching.Services.Cache
                             }
                             continue;
                         }
-                        if (trackedEntities != null)
+                        if (stateManager != null)
                         {
-                            InternalEntityEntry entry;
-                            if (!trackedEntities.TryGetValue(new TrackedEntityKey(relation.RelationType, newRelatedKey), out entry))
-                            {
-                                return false;
-                            }
-                            if (entry.EntityState == EntityState.Detached || entry.Entity != newRelated)
+                            if (!stateManager.IsTracked(entityInfo, entity))
                             {
                                 return false;
                             }
                         }
-                        if (!GetIsNormalized(newRelated, trackedEntities, relation.Relations, relation.EntityInfo))
+                        if (!GetIsNormalized(newRelated, stateManager, relation.Relations, relation.EntityInfo))
                         {
                             return false;
                         }
