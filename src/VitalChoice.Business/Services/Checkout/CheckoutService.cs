@@ -256,6 +256,31 @@ namespace VitalChoice.Business.Services.Checkout
                                     await _orderService.UpdateAsync(cartDataSource.Order);
                                 }
                             }
+                            else
+                            {
+                                if (cart.IdCustomer != idCustomer && cart.IdOrder != null)
+                                {
+                                    var currectOrder = await _orderService.SelectAsync(cart.IdOrder.Value, true);
+                                    var newCart = await CreateNew(idCustomer);
+                                    var newCartOrder = await InitCartOrderModel(newCart);
+                                    newCartOrder.Order.Customer = await _customerService.SelectAsync(idCustomer, true);
+                                    newCartOrder.Order.Skus = currectOrder.Skus;
+                                    newCartOrder.Order.PromoSkus = currectOrder.PromoSkus;
+                                    newCartOrder.Order.Discount = currectOrder.Discount;
+                                    newCartOrder.Order.GiftCertificates = currectOrder.GiftCertificates;
+
+                                    newCartOrder.Order =
+                                        (await _orderService.CalculateStorefrontOrder(newCartOrder.Order, OrderStatus.Incomplete)).Order;
+
+                                    newCartOrder.Order = await _orderService.InsertAsync(newCartOrder.Order);
+
+                                    transaction.Commit();
+
+                                    await FillProductContentDetails(newCartOrder);
+
+                                    return newCartOrder;
+                                }
+                            }
                         }
                         else
                         {
@@ -294,24 +319,7 @@ namespace VitalChoice.Business.Services.Checkout
                     {
                         result.Order = await _orderService.SelectAsync(cart.IdOrder.Value, true);
                         result.Order.Customer = await _customerService.SelectAsync(idCustomer, true);
-                        var products = result.Order.Skus.Select(s => s.Sku.IdProduct).Distinct().ToList();
-                        var skus = result.Order.Skus.Select(s => s.Sku.Id).ToList();
-                        var productUrls =
-                            await
-                                _productContentRep.Query(p => products.Contains(p.Id)).Distinct().SelectAsync(false);
-                        var skuAmounts =
-                            (await
-                                _skuRepository.Query(s => skus.Contains(s.Id))
-                                    .Distinct()
-                                    .SelectAsync(false)).ToDictionary(s => s.Id);
-                        result.Order.Skus.UpdateKeyed(productUrls, s => s.Sku.IdProduct, arg => arg.Id,
-                            (s, p) =>
-                            {
-                                s.Sku.Product.Url = p.Url;
-                                s.Amount = result.Order.Customer.IdObjectType == (int)CustomerType.Wholesale
-                                    ? skuAmounts[s.Sku.Id].WholesalePrice
-                                    : skuAmounts[s.Sku.Id].Price;
-                            });
+                        await FillProductContentDetails(result);
                     }
                     transaction.Commit();
                 }
@@ -328,6 +336,28 @@ namespace VitalChoice.Business.Services.Checkout
             }
 
             return result;
+        }
+
+        private async Task FillProductContentDetails(CustomerCartOrder result)
+        {
+            var products = result.Order.Skus.Select(s => s.Sku.IdProduct).Distinct().ToList();
+            var skus = result.Order.Skus.Select(s => s.Sku.Id).ToList();
+            var productUrls =
+                await
+                    _productContentRep.Query(p => products.Contains(p.Id)).Distinct().SelectAsync(false);
+            var skuAmounts =
+                (await
+                    _skuRepository.Query(s => skus.Contains(s.Id))
+                        .Distinct()
+                        .SelectAsync(false)).ToDictionary(s => s.Id);
+            result.Order.Skus.UpdateKeyed(productUrls, s => s.Sku.IdProduct, arg => arg.Id,
+                (s, p) =>
+                {
+                    s.Sku.Product.Url = p.Url;
+                    s.Amount = result.Order.Customer.IdObjectType == (int) CustomerType.Wholesale
+                        ? skuAmounts[s.Sku.Id].WholesalePrice
+                        : skuAmounts[s.Sku.Id].Price;
+                });
         }
 
         private async Task<CartExtended> CreateNew(int? idCustomer = null)

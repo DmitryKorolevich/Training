@@ -250,7 +250,6 @@ namespace VitalChoice.Caching.Services.Cache
             ICacheStateManager stateManager, out ICollection<RelationInfo> relationsToClone,
             CachedEntity<T> cached)
         {
-
             relationsToClone = _relationInfo.Relations.Where(r => cached.NeedUpdateRelated.Contains(r.Name)).ToArray();
             return GetIsNormalized(entity, stateManager, relationsToClone, _entityInfo);
         }
