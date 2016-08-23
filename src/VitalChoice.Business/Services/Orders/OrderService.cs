@@ -1023,7 +1023,7 @@ namespace VitalChoice.Business.Services.Orders
                             List<GiftCertificate> usedGcs = new List<GiftCertificate>();
                             if (order.GiftCertificates?.Count > 0)
                             {
-                                var ids = order.GiftCertificates.Select(p => p.GiftCertificate?.Id).ToList();
+                                var ids = order.GiftCertificates.Select(p => p.GiftCertificate?.Id).Distinct().ToList();
                                 usedGcs = await giftCertificateRepository.Query(p => ids.Contains(p.Id)).SelectAsync(true);
 
                                 if (IsAllCancel(pOrderType, order))
@@ -1177,12 +1177,13 @@ namespace VitalChoice.Business.Services.Orders
 
         private async Task ChargeGiftCertificates(OrderDynamic model, IUnitOfWorkAsync uow)
         {
-            if (model.IsAnyNotIncomplete())
+            if (model.IsAnyNotIncomplete() && model.GiftCertificates.Count > 0)
             {
                 var gcsRep = uow.RepositoryAsync<GiftCertificate>();
                 var gcs = model.GiftCertificates.Select(g => g.GiftCertificate.Id).Distinct().ToList();
                 var gcsInDb = await gcsRep.Query(g => gcs.Contains(g.Id)).SelectAsync(true);
-                gcsInDb.UpdateKeyed(model.GiftCertificates.Select(g => g.GiftCertificate), g => g.Id, (gcDb, gc) => gcDb.Balance = gc.Balance);
+                gcsInDb.UpdateKeyed(model.GiftCertificates.Select(g => g.GiftCertificate), g => g.Id,
+                    (gcDb, gc) => gcDb.Balance = gc.Balance);
             }
         }
 
