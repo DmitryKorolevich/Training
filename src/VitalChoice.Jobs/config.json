@@ -4,6 +4,8 @@
     "AdminHost": "admin.staging.g2-dg.com",
     "DefaultCacheExpirationTermMinutes": 1440,
     "DefaultCultureId": "en-US",
+    "CustomerServiceToEmail": "customercare@vitalchoice.com",
+    "CustomerFeedbackToEmail": "feedback@vitalchoice.com",
     "OrderShippingNotificationBcc": "",
     //cdbdf92c@trustpilotservice.com
 

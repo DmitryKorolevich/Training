@@ -7,5 +7,6 @@
     </p>
 </div>
 <div class="modal-footer">
-	<button class="btn btn-default" data-ng-click="cancel()">Cancel</button>
+    <button data-ng-if="OkButton" class="btn btn-success" data-ng-click="ok()">{{OkButton.Label}}</button>
+	<button data-ng-if="CancelButtom" class="btn btn-default" data-ng-click="cancel()">{{CancelButtom.Label}}</button>
 </div>

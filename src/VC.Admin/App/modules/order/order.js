@@ -36,6 +36,12 @@ angular.module('app.modules.order', [
 		function ($stateProvider, $urlRouterProvider) {
 
 		    $stateProvider
+                /*dashboard*/
+				.state('index.oneCol.dashboard', {
+				    url: '',
+				    templateUrl: 'app/modules/order/partials/ordersList.html',
+				    controller: 'ordersController'
+				})
 				.state('index.oneCol.manageOrders', {
 				    url: '/orders?{from:string}{to:string}{idsku:int}',
 				    templateUrl: 'app/modules/order/partials/ordersList.html',

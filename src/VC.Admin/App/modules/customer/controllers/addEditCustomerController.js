@@ -45,8 +45,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			        if ($scope.currentCustomer.CustomerType==2)//wholesale
 			        {
 			            uploadOrderTypes.splice(0, 0, { Key: 3, Text: 'Dropship Orders' });
+			            uploadOrderTypes.splice(0, 0, { Key: 8, Text: 'AAFES Order Import' });
 			        }
-			        uploadOrderTypes.splice(0, 0, { Key: 8, Text: 'AAFES Order Import' });
                     $scope.uploadOrderTypes = uploadOrderTypes;
 			        $scope.currentCustomer.ActivatePending = false;
 			        $scope.options.DBStatusCode = $scope.currentCustomer.StatusCode;
@@ -591,7 +591,14 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			                    $scope.$broadcast('customerOrders#in#refresh');
 			                    modalUtil.open('app/modules/setting/partials/infoDetailsPopup.html', 'infoDetailsPopupController', {
 			                        Header: "Success!",
-			                        Messages: [{ Message: "Successfully imported" }]
+			                        Messages: [{ Message: "Successfully imported" }],
+			                        OkButton: {
+			                            Label: 'Ok',
+			                            Handler: function ()
+			                            {
+			                                $state.go('index.oneCol.manageOrders');
+			                            }
+			                        },
 			                    }, {size: 'xs'});
 			                } else
 			                {

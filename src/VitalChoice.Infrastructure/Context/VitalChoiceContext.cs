@@ -157,7 +157,7 @@ namespace VitalChoice.Infrastructure.Context
                 entity
                     .HasOne(p => p.User)
                     .WithMany()
-                    .HasForeignKey(p => p.UserId)
+                    .HasForeignKey(p => p.IdEditedBy)
                     .HasPrincipalKey(p => p.Id);
             });
 
@@ -423,6 +423,7 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(p => p.Id);
                 entity.ToTable("CustomPublicStyles");
+                entity.Ignore(p => p.StatusCode);
                 entity
                     .HasOne(p => p.User)
                     .WithMany()

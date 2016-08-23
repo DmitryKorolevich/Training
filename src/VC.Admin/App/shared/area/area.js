@@ -11,6 +11,10 @@ angular.module('app.shared.area', [
 			.state('index.notFound', {
 				url: '/404',
 				templateUrl: 'app/shared/area/partials/404.html'
+			})
+			.state('index.ie', {
+			    url: '/ie',
+			    templateUrl: 'app/shared/area/partials/ie.html'
 			});
 	}
 ]);

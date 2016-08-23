@@ -1,10 +1,11 @@
 ﻿using System;
 using VitalChoice.Ecommerce.Domain;
+using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 
 namespace VitalChoice.Infrastructure.Domain.Content
 {
-    public class CustomPublicStyle : Entity
+    public class CustomPublicStyle : LogEntity
 	{
 		public string Name { get; set; }
 
@@ -13,8 +14,6 @@ namespace VitalChoice.Infrastructure.Domain.Content
 		public DateTime Updated { get; set; }
 
 		public string Styles { get; set; }
-
-		public int? IdEditedBy { get; set; }
 
 		public ApplicationUser User { get; set; }
 	}

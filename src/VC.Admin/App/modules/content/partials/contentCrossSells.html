@@ -43,7 +43,7 @@
 																		<div class="" data-ng-click="$event.stopPropagation()">
 																			<label class="control-label col-md-3">Image</label>
 																			<div class="col-md-9">
-																				<filefield name="Image" placeholder="Cross Sell Image" ng-model="crossSellProduct.ImageUrl" required></filefield>
+																				<filefield name="ImageUrl" placeholder="Cross Sell Image" ng-model="crossSellProduct.ImageUrl" required></filefield>
 																				<div class="error-container" ng-show="forms.submitted && forms.Items.i{{$index}}.ImageUrl.$invalid">
 																					<small class="error" ng-show="forms.Items.i{{$index}}.ImageUrl.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Image")}}</small>
 																					<small class="error" ng-show="forms.Items.i{{$index}}.ImageUrl.$error.server">{{serverMessages.GetMessage('ImageUrl','Items',$index)}}</small>

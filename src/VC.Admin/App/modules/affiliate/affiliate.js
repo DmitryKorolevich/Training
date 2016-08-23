@@ -7,6 +7,7 @@ angular.module('app.modules.affiliate', [
 	'app.modules.affiliate.controllers.customersInAffiliatesReportController',
 	'app.modules.affiliate.controllers.affiliatesSummaryReportController',
 	'app.modules.affiliate.controllers.affiliatePayCommissionsController',
+	'app.modules.affiliate.controllers.affiliateOrderImportReportController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -38,6 +39,11 @@ angular.module('app.modules.affiliate', [
             	    url: '/report/affiliates-summary',
             	    templateUrl: 'app/modules/affiliate/partials/affiliatesSummaryReport.html',
             	    controller: 'affiliatesSummaryReportController'
+            	})
+            	.state('index.oneCol.affiliateOrderImportReport', {
+            	    url: '/report/upload-affiliate-file',
+            	    templateUrl: 'app/modules/affiliate/partials/affiliateOrderImportReport.html',
+            	    controller: 'affiliateOrderImportReportController'
             	});
 		}
 ]);

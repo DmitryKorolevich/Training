@@ -9,8 +9,8 @@
     "DefaultCultureId": "en-US",
     "PublicHost": "staging.g2-dg.com",
     "AdminHost": "admin.staging.g2-dg.com",
-    "CustomerServiceToEmail": "gary@g2designgroup.com",
-    "CustomerFeedbackToEmail": "gary@g2designgroup.com",
+    "CustomerServiceToEmail": "customercare@vitalchoice.com",
+    "CustomerFeedbackToEmail": "feedback@vitalchoice.com",
     "MainSuperAdminEmail": "gary@g2designgroup.com",
     "OrderShippingNotificationBcc": "",
     //cdbdf92c@trustpilotservice.com

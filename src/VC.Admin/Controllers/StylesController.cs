@@ -36,7 +36,7 @@ namespace VC.Admin.Controllers
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
 			}
 
-			return new StylesModel() { CSS = res.Styles};
+	        return new StylesModel(res);
 		}
 
 		[HttpPost]
@@ -47,7 +47,7 @@ namespace VC.Admin.Controllers
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindRecord]);
 			}
-
+            
 			res.IdEditedBy = Convert.ToInt32(_userManager.GetUserId(User));
 			res.Updated = DateTime.Now;
 			res.Styles = model.CSS;
