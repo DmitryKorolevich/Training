@@ -118,7 +118,7 @@ namespace VC.Admin.Controllers
             int userId;
             if(Int32.TryParse(sUserId,out userId))
             {
-                item.UserId = userId;
+                item.IdEditedBy = userId;
             }
 
             item = await masterContentService.UpdateMasterContentItemAsync(item);

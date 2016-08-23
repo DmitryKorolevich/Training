@@ -37,10 +37,14 @@ using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using VC.Admin.Models.Affiliate;
 using VitalChoice.Business.CsvExportMaps.Customers;
+using VitalChoice.Business.CsvImportMaps;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Infrastructure.Domain.Avatax;
 using VitalChoice.Infrastructure.Domain.Entities.Reports;
 using VitalChoice.Infrastructure.Identity.UserManagers;
@@ -81,6 +85,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<MailingReportItem, MailingReportItemCsvMap> _mailingReportItemСSVExportService;
         private readonly ICsvExportService<ShippedViaReportRawOrderItem, ShippedViaItemsReportOrderItemCsvMap> _shippedViaItemsReportOrderItemCsvMapСSVExportService;
         private readonly ICsvExportService<AAFESReportItem, AAFESReportItemCsvMap> _aAFESReportItemCsvMapСSVExportService;
+        private readonly ICsvExportService<AfiiliateOrderItemImportExportModel, AfiiliateOrderItemImportExportCsvMap> _afiiliateOrderItemImportExportСSVExportService;
         private readonly INotificationService _notificationService;
         private readonly BrontoService _brontoService;
         private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
@@ -90,6 +95,7 @@ namespace VC.Admin.Controllers
         private readonly IAvalaraTax _avalaraTax;
         private readonly IEncryptedOrderExportService _exportService;
         private readonly ICountryNameCodeResolver _countryNameCodeResolver;
+        private readonly ICacheProvider _cache;
         private readonly ReferenceData _referenceData;
 
         public OrderController(
@@ -114,6 +120,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<ShippedViaReportRawOrderItem, ShippedViaItemsReportOrderItemCsvMap>
                 shippedViaItemsReportOrderItemCsvMapСSVExportService,
             ICsvExportService<AAFESReportItem, AAFESReportItemCsvMap> aAFESReportItemCsvMapСSVExportService,
+            ICsvExportService<AfiiliateOrderItemImportExportModel, AfiiliateOrderItemImportExportCsvMap> afiiliateOrderItemImportExportСSVExportService,
             INotificationService notificationService,
             BrontoService brontoService,
             IOrderReportService orderReportService,
@@ -124,6 +131,7 @@ namespace VC.Admin.Controllers
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMethodMapper,
             IDynamicMapper<AddressDynamic, Address> addressMapper, ExtendedUserManager userManager,
             IAvalaraTax avalaraTax, IEncryptedOrderExportService exportService, ICountryNameCodeResolver countryNameCodeResolver,
+            ICacheProvider cache,
             ReferenceData referenceData)
         {
             _orderService = orderService;
@@ -143,6 +151,7 @@ namespace VC.Admin.Controllers
             _mailingReportItemСSVExportService = mailingReportItemСSVExportService;
             _shippedViaItemsReportOrderItemCsvMapСSVExportService = shippedViaItemsReportOrderItemCsvMapСSVExportService;
             _aAFESReportItemCsvMapСSVExportService = aAFESReportItemCsvMapСSVExportService;
+            _afiiliateOrderItemImportExportСSVExportService = afiiliateOrderItemImportExportСSVExportService;
             _notificationService = notificationService;
             _brontoService = brontoService;
             _orderReportService = orderReportService;
@@ -158,6 +167,7 @@ namespace VC.Admin.Controllers
             _avalaraTax = avalaraTax;
             _exportService = exportService;
             _countryNameCodeResolver = countryNameCodeResolver;
+            _cache = cache;
             _referenceData = referenceData;
         }
 
@@ -1540,6 +1550,49 @@ namespace VC.Admin.Controllers
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileName = String.Format(FileConstants.AAFES_SHIP_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<AfiiliateOrderItemImportReport>> GetAffiliateOrdersInfo()
+        {
+            var form = await Request.ReadFormAsync();
+            using (var stream = form.Files[0].OpenReadStream())
+            {
+                var fileContent = stream.ReadFully();
+
+                var data = await _orderReportService.GetAffiliateOrdersInfo(fileContent);
+
+                var guid = Guid.NewGuid().ToString().ToLower();
+                _cache.SetItem(String.Format(CacheKeys.ReportFormat, guid), data);
+
+                return new AfiiliateOrderItemImportReport()
+                {
+                    Id = guid,
+                    Items = data
+                };
+            }
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<FileResult> GetAffiliateOrdersInfoReportFile(string id)
+        {
+            var items = _cache.GetItem<ICollection<AfiiliateOrderItemImportExportModel>>(String.Format(CacheKeys.ReportFormat, id));
+            if (items == null)
+            {
+                throw new AppValidationException("Please reload a file.");
+            }
+
+            var result = _afiiliateOrderItemImportExportСSVExportService.ExportToCsv(items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.AFFILIATE_ORDER_STATUSES_REPORT, DateTime.Now)
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());

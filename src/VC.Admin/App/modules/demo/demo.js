@@ -15,12 +15,6 @@ angular.module('app.modules.demo',
 		function($stateProvider, $urlRouterProvider) {
 
 			$stateProvider
-				/*dashboard*/
-				.state('index.oneCol.dashboard', {
-					url: '',
-					templateUrl: 'app/modules/demo/partials/dashboard.html',
-					controller: 'dashboardController'
-				})
 				/*orders*/
 				.state('index.oneCol.locateOrder', {
 					url: '/orders/locate',

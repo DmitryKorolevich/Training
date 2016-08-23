@@ -29,6 +29,7 @@ using System.Dynamic;
 using Templates.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using Templates.Runtime;
+using VitalChoice.Data.Services;
 using VitalChoice.Infrastructure.Domain.Content.Emails;
 
 namespace VitalChoice.Business.Services
@@ -38,6 +39,7 @@ namespace VitalChoice.Business.Services
         private readonly IRepositoryAsync<EmailTemplate> _emailTemplateRepository;
         private readonly IRepositoryAsync<ContentTypeEntity> _contentTypeRepository;
         private readonly ITtlGlobalCache _templatesCache;
+        private readonly IObjectLogItemExternalService _objectLogItemExternalService;
         private readonly ILogger _logger;
 
         private static Dictionary<string, Type> _modelTypes;
@@ -45,12 +47,15 @@ namespace VitalChoice.Business.Services
         public EmailTemplateService(
             IRepositoryAsync<EmailTemplate> emailTemplateRepository,
             IRepositoryAsync<ContentTypeEntity> contentTypeRepository,
-            ILoggerFactory logger, ITtlGlobalCache templatesCache)
+            IObjectLogItemExternalService objectLogItemExternalService,
+            ILoggerFactory logger, 
+            ITtlGlobalCache templatesCache)
         {
-            this._emailTemplateRepository = emailTemplateRepository;
-            this._contentTypeRepository = contentTypeRepository;
-            this._templatesCache = templatesCache;
-            this._logger = logger.CreateLogger<EmailTemplateService>();
+            _emailTemplateRepository = emailTemplateRepository;
+            _contentTypeRepository = contentTypeRepository;
+            _templatesCache = templatesCache;
+            _objectLogItemExternalService = objectLogItemExternalService;
+            _logger = logger.CreateLogger<EmailTemplateService>();
         }
 
         static EmailTemplateService()
@@ -235,6 +240,8 @@ namespace VitalChoice.Business.Services
                 {
                     await _emailTemplateRepository.UpdateAsync(dbItem);
                 }
+
+                await _objectLogItemExternalService.LogItem(dbItem);
             }
 
             return dbItem;

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Queries.Content;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Data.Repositories;
+using VitalChoice.Data.Services;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Content.Articles;
@@ -34,6 +35,7 @@ namespace VitalChoice.Business.Services.Content
         private readonly IRepositoryAsync<ContentPage> _contentPageRepository;
         private readonly IRepositoryAsync<ProductContent> _productContentRepository;
         private readonly IRepositoryAsync<EmailTemplate> _emailTemplateRepository;
+        private readonly IObjectLogItemExternalService _objectLogItemExternalService;
         private readonly ILogger _logger;
 
         public MasterContentService(IRepositoryAsync<MasterContentItem> masterContentItemRepository,
@@ -42,7 +44,8 @@ namespace VitalChoice.Business.Services.Content
             IRepositoryAsync<ContentCategory> contentCategoryRepository, IRepositoryAsync<Recipe> recipeRepository,
             IRepositoryAsync<FAQ> faqRepository, IRepositoryAsync<Article> articleRepository,
             IRepositoryAsync<ContentPage> contentPageRepository, ILoggerFactory loggerProvider,
-            IRepositoryAsync<ProductContent> productContentRepository, IRepositoryAsync<EmailTemplate> emailTemplateRepository)
+            IRepositoryAsync<ProductContent> productContentRepository, IRepositoryAsync<EmailTemplate> emailTemplateRepository,
+            IObjectLogItemExternalService objectLogItemExternalService)
         {
             this._masterContentItemRepository = masterContentItemRepository;
             this._masterContentItemToProcessorsRepository = masterContentItemToProcessorsRepository;
@@ -54,6 +57,7 @@ namespace VitalChoice.Business.Services.Content
             this._contentPageRepository = contentPageRepository;
             _productContentRepository = productContentRepository;
             _emailTemplateRepository = emailTemplateRepository;
+            _objectLogItemExternalService = objectLogItemExternalService;
             _logger = loggerProvider.CreateLogger<MasterContentService>();
         }
 
@@ -157,7 +161,7 @@ namespace VitalChoice.Business.Services.Content
 
                 dbItem.Name = model.Name;
                 dbItem.Template = model.Template;
-                dbItem.UserId = model.UserId;
+                dbItem.IdEditedBy = model.IdEditedBy;
                 dbItem.Updated = DateTime.Now;
 
                 if (model.Id == 0)
@@ -184,6 +188,8 @@ namespace VitalChoice.Business.Services.Content
                         await _contentTypeRepository.UpdateAsync(contentType);
                     }
                 }
+
+                await _objectLogItemExternalService.LogItem(dbItem);
             }
 
             return dbItem;

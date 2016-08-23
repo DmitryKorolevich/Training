@@ -38,6 +38,11 @@ using VitalChoice.Business.Services.Bronto;
 using VitalChoice.Data.Repositories.Specifics;
 using Newtonsoft.Json;
 using VitalChoice.Infrastructure.Domain.Entities.Orders;
+using System.IO;
+using System.Reflection;
+using CsvHelper;
+using CsvHelper.Configuration;
+using VitalChoice.Business.CsvImportMaps;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -1488,6 +1493,72 @@ namespace VitalChoice.Business.Services.Orders
             {
                 p.ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber);
             });
+            return toReturn;
+        }
+
+        public async Task<ICollection<AfiiliateOrderItemImportExportModel>> GetAffiliateOrdersInfo(byte[] file)
+        {
+            List<AfiiliateOrderItemImportExportModel> toReturn =null;
+            using (var memoryStream = new MemoryStream(file))
+            {
+                using (var streamReader = new StreamReader(memoryStream))
+                {
+                    CsvConfiguration configuration = new CsvConfiguration();
+                    configuration.TrimFields = true;
+                    configuration.TrimHeaders = true;
+                    configuration.WillThrowOnMissingField = false;
+                    configuration.RegisterClassMap<AfiiliateOrderItemImportExportCsvMap>();
+                    using (var csv = new CsvReader(streamReader, configuration))
+                    {
+                        try
+                        {
+                            toReturn = csv.GetRecords<AfiiliateOrderItemImportExportModel>().ToList();
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogError(e.ToString());
+                            throw new AppValidationException(e.Message);
+                        }
+
+                        int i = 0;
+                        var groups = toReturn.GroupBy(x => i++ / SqlConstants.MAX_CONTAINS_COUNT).ToList();
+                        foreach (var group in groups)
+                        {
+                            var ids = group.Select(p => p.IdOrder).ToList();
+                            var items = await _orderRepository.Query(p => ids.Contains(p.Id) && p.StatusCode != (int)RecordStatusCode.Deleted).SelectAsync(false);
+                            foreach (var afiiliateOrderItemImportExportModel in group)
+                            {
+                                var item = items.FirstOrDefault(p => p.Id == afiiliateOrderItemImportExportModel.IdOrder);
+                                if (item != null)
+                                {
+                                    afiiliateOrderItemImportExportModel.OrderStatus = item.OrderStatus;
+                                    afiiliateOrderItemImportExportModel.POrderStatus = item.POrderStatus;
+                                    afiiliateOrderItemImportExportModel.NPOrderStatus = item.NPOrderStatus;
+                                    if (afiiliateOrderItemImportExportModel.OrderStatus.HasValue)
+                                    {
+                                        afiiliateOrderItemImportExportModel.StatusMessage =
+                                            _referenceData.OrderStatuses.FirstOrDefault(p => p.Key ==
+                                                                                             (int)afiiliateOrderItemImportExportModel.OrderStatus.Value)?.Text;
+                                    }
+                                    else
+                                    {
+                                        var pPart = _referenceData.OrderStatuses.FirstOrDefault(p => p.Key ==
+                                                      (int?)afiiliateOrderItemImportExportModel.POrderStatus)?.Text;
+                                        var nPPart = _referenceData.OrderStatuses.FirstOrDefault(p => p.Key ==
+                                                      (int?)afiiliateOrderItemImportExportModel.NPOrderStatus)?.Text;
+                                        afiiliateOrderItemImportExportModel.StatusMessage = $"P - {pPart}, NP - {nPPart}";
+                                    }
+                                }
+                                else
+                                {
+                                    afiiliateOrderItemImportExportModel.StatusMessage = "Does Not Exist";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             return toReturn;
         }
     }

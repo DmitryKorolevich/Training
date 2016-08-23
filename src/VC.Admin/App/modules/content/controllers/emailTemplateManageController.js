@@ -1,10 +1,23 @@
 ﻿'use strict';
 
 angular.module('app.modules.content.controllers.emailTemplateManageController', [])
-.controller('emailTemplateManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'contentService', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $rootScope, $state, $stateParams, contentService, toaster, confirmUtil, promiseTracker)
+.controller('emailTemplateManageController', ['$scope', '$rootScope', '$state', '$stateParams', 'contentService', 'settingService', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $rootScope, $state, $stateParams, contentService, settingService, toaster, confirmUtil, promiseTracker)
     {
         $scope.refreshTracker = promiseTracker("get");
+
+        function refreshHistory()
+        {
+            if ($scope.emailTemplate && $scope.emailTemplate.Id)
+            {
+                var data = {};
+                data.service = settingService;
+                data.tracker = $scope.refreshTracker;
+                data.idObject = $scope.emailTemplate.Id;
+                data.idObjectType = 18//email template
+                $scope.$broadcast('objectHistorySection#in#refresh', data);
+            }
+        }
 
         function successSaveHandler(result)
         {
@@ -14,6 +27,7 @@ angular.module('app.modules.content.controllers.emailTemplateManageController', 
                 $scope.id = result.Data.Id;
                 $scope.emailTemplate.Id = result.Data.Id;
                 $scope.emailTemplate.MasterContentItemId = result.Data.MasterContentItemId;
+                refreshHistory();
             } else
             {
                 var messages = "";
@@ -91,6 +105,7 @@ angular.module('app.modules.content.controllers.emailTemplateManageController', 
                         {
                             $scope.emailTemplate.MasterContentItemId = $scope.MasterContentItemId;
                         };
+                        refreshHistory();
                     } else
                     {
                         errorHandler(result);

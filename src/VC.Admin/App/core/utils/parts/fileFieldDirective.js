@@ -4,7 +4,7 @@
         restrict: 'EA',
         replace: true,
         template: '<p class="input-group">' +
-                    '<input type="text" placeholder="{{placeHolder}}" class="form-control disabled" ng-model="inputValue" disabled/>' +
+                    '<input type="text" placeholder="{{placeHolder}}" {{required}} class="form-control disabled" ng-model="inputValue" disabled/>' +
                     '<span class="input-group-btn">' +
                         '<button type="button" class="btn btn-default" data-ng-class="{disabled: disabled}" data-ng-show="inputValue" data-ng-click="clear()"><i class="glyphicon glyphicon-remove-circle"></i></button>' +
                         '<button type="button" class="btn btn-default" data-ng-show="inputValue" data-ng-click="openPreview()"><i class="glyphicon glyphicon-eye-open"></i></button>' +
@@ -39,6 +39,14 @@
                 self.baseUrl = 'https://' + $rootScope.ReferenceData.PublicHost + '{0}';
             }
             $scope.placeHolder = $attrs.placeholder;
+            if ($attrs.required)
+            {
+                $scope.required = "required";
+            }
+            else
+            {
+                $scope.required = "";
+            }
 
             ngModelCtrl.$render = function () {
                 self.render();
@@ -52,10 +60,7 @@
             else
             {
                 $scope.inputValue = null;
-            }
-            if ($attrs.required) {
-                ngModelCtrl.$setValidity('required', ngModelCtrl.$viewValue);
-            }            
+            }        
             if ($attrs.disabled!=undefined) {
                 $scope.disabled = true;
             }

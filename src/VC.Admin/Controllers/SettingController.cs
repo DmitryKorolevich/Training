@@ -19,6 +19,7 @@ using Microsoft.Net.Http.Headers;
 using System;
 using Newtonsoft.Json;
 using VC.Admin.Models.ContentManagement;
+using VC.Admin.Models.EmailTemplates;
 using VC.Admin.Models.Orders;
 using VC.Admin.Models.Products;
 using VC.Admin.Models.Settings;
@@ -37,6 +38,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Infrastructure.Domain.Content;
+using VitalChoice.Infrastructure.Domain.Content.Emails;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Services;
@@ -341,6 +343,15 @@ namespace VC.Admin.Controllers
                     break;
                 case ObjectType.ContentArea:
                     toReturn = new KeyValuePair<Type, Type>(typeof(ContentArea), typeof(ContentAreaReadModel));
+                    break;
+                case ObjectType.MasterContentItem:
+                    toReturn = new KeyValuePair<Type, Type>(typeof(MasterContentItem), typeof(MasterContentItemManageModel));
+                    break;
+                case ObjectType.EmailTemplate:
+                    toReturn = new KeyValuePair<Type, Type>(typeof(EmailTemplate), typeof(EmailTemplateManageModel));
+                    break;
+                case ObjectType.CustomPublicStyle:
+                    toReturn = new KeyValuePair<Type, Type>(typeof(CustomPublicStyle), typeof(StylesModel));
                     break;
                 default:
                     throw new NotImplementedException();

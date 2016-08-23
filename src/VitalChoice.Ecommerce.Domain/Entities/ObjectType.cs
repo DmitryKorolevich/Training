@@ -16,5 +16,8 @@
         ContentCategory = 12,
         ProductCategoryContent = 14,
         ContentArea = 15,
+        MasterContentItem = 17,
+        EmailTemplate = 18,
+        CustomPublicStyle = 19,
     }
 }

@@ -243,7 +243,7 @@ namespace VitalChoice.Infrastructure.Services
         private ObjectType GetObjectType(string name, LogObjectType logType)
         {
             ObjectType result = ObjectType.Unknown;
-            if (logType == LogObjectType.Dynamic || logType == LogObjectType.Entity)
+            if (logType != LogObjectType.Other)
             {
                 if (logType == LogObjectType.Dynamic)
                 {

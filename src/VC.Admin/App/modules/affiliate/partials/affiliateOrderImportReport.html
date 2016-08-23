@@ -1,0 +1,38 @@
+﻿<div class="container-fluid upload-affiliate-order-report">
+    <div class="well">
+        <span class="legend">Upload Affiliate File</span>
+        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+            <fieldset>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <button class="btn btn-primary" ngf-select ngf-change="upload($files)" accept=".csv,">Upload file</button>
+                        <a target="_self" class="btn btn-primary pull-right" data-ng-if="options.exportUrl" data-ng-href="{{options.exportUrl}}">Export</a>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <spinner-overlay data-loading="refreshTracker.active()">            
+            <div>
+                <table class="table table-striped order-statuses">
+                    <thead>
+                    <tr>
+                        <th>Order Id</th>
+                        <th>Order Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="item in report.Items">
+                            <td>{{::item.IdOrder}}</td>
+                            <td data-ng-if="item.OrderStatus || item.POrderStatus || item.NPOrderStatus">
+                                <div data-ng-include="'app/modules/order/partials/orderStatusSection.html'"></div>
+                            </td>
+                            <td data-ng-if="!(item.OrderStatus || item.POrderStatus || item.NPOrderStatus)">
+                                {{::item.StatusMessage}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </spinner-overlay>
+    </div>
+</div>
