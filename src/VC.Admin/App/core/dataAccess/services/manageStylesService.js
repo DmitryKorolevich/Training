@@ -14,7 +14,7 @@ angular.module('app.core.dataAccess.services.manageStylesService', [])
 
 	return {
 		saveStyles: function (model, tracker) {
-			return $http.post(baseUrl + 'UpdateStyles', { CSS: model }, getConfig(tracker));
+			return $http.post(baseUrl + 'UpdateStyles', model, getConfig(tracker));
 		},
 		getStyles: function (tracker) {
 			return $http.get(baseUrl + 'GetStyles', getConfig(tracker));

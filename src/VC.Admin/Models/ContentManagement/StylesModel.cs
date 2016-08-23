@@ -11,8 +11,11 @@ namespace VC.Admin.Models.ContentManagement
 
         public StylesModel(CustomPublicStyle item)
         {
-            Id = item.Id;
-            CSS = item.Styles;
+            if (item != null)
+            {
+                Id = item.Id;
+                CSS = item.Styles;
+            }
         }
     }
 }
