@@ -9,6 +9,8 @@ namespace VitalChoice.Caching.Interfaces
 {
     public interface ICacheStateManager : IStateManager
     {
+        bool IsTracked(EntityInfo info, object entity);
+        bool IsAllTracked(EntityInfo info, IEnumerable<object> entities);
         void AcceptTrackData();
         void RejectTrackData();
         object GetOrAddTracked(EntityInfo info, object entity, out bool cloned);

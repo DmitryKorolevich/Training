@@ -228,13 +228,13 @@ namespace VitalChoice.Caching.Services.Cache
             if (entity == null)
                 return false;
 
-            var trackData = _infoStorage.GetTrackData(context);
+            var stateManager = (ICacheStateManager) context?.StateManager;
 
             var result = CacheStorage.AllCacheDatas.Count > 0;
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var data in CacheStorage.AllCacheDatas)
             {
-                result = result && data.UpdateKeepRelations(entity, trackData, context) != null;
+                result = result && data.UpdateKeepRelations(entity, stateManager, context) != null;
             }
             return result;
         }

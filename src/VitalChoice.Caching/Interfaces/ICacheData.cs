@@ -34,7 +34,7 @@ namespace VitalChoice.Caching.Interfaces
         CachedEntity<T> TryRemove(EntityKey key);
         CachedEntity<T> Update(T entity, object dbContext);
         CachedEntity<T> UpdateExist(T entity, object dbContext);
-        CachedEntity<T> UpdateKeepRelations(T entity, IDictionary<TrackedEntityKey, InternalEntityEntry> trackedEntities, object dbContext);
+        CachedEntity<T> UpdateKeepRelations(T entity, ICacheStateManager stateManager, object dbContext);
         bool Update(IEnumerable<T> entity, object dbContext);
         bool UpdateExist(IEnumerable<T> entities, object dbContext);
         bool UpdateAll(IEnumerable<T> entity, object dbContext);
