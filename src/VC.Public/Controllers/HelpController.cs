@@ -1,16 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using VitalChoice.Core.Base;
-using VitalChoice.Interfaces.Services.Users;
-using VC.Public.Models;
-using VitalChoice.Interfaces.Services.Settings;
-using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
-using VitalChoice.Interfaces.Services;
-using VitalChoice.Ecommerce.Domain.Exceptions;
-using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
-using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.CatalogRequests;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -18,8 +8,6 @@ using VC.Public.Models.Help;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
-using System.Collections.Generic;
-using System.IO;
 using Microsoft.Extensions.Options;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Ecommerce.Domain.Mail;
@@ -30,9 +18,7 @@ using Microsoft.Net.Http.Headers;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Business.Models.Help;
 using VitalChoice.Business.Services.Bronto;
-using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Mail;
-using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Validation.Models;
 
@@ -45,7 +31,6 @@ namespace VC.Public.Controllers
         private const string ContactServiceTempData = "contact-service-messsage";
 
         private readonly IExtendedDynamicServiceAsync<AddressDynamic, CatalogRequestAddress, AddressOptionType, CatalogRequestAddressOptionValue> _catalogRequestAddressService;
-        private readonly IAppInfrastructureService _appInfrastructureService;
         private readonly IDynamicMapper<AddressDynamic, CatalogRequestAddress> _catalogRequestAddressMapper;
         private readonly ReCaptchaValidator _reCaptchaValidator;
         private readonly IOptions<AppOptions> _options;
@@ -56,18 +41,15 @@ namespace VC.Public.Controllers
 
         public HelpController(
             IExtendedDynamicServiceAsync<AddressDynamic, CatalogRequestAddress, AddressOptionType, CatalogRequestAddressOptionValue> catalogRequestAddressService,
-            IAppInfrastructureService appInfrastructureService,
             IDynamicMapper<AddressDynamic, CatalogRequestAddress> catalogRequestAddressMapper,
             ReCaptchaValidator reCaptchaValidator,
             IOptions<AppOptions> options,
             INotificationService notificationService,
             ILoggerFactory loggerProvider,
             IProductService productService,
-            BrontoService brontoService,
-            IPageResultService pageResultService) : base(pageResultService)
+            BrontoService brontoService)
         {
             _catalogRequestAddressService = catalogRequestAddressService;
-            _appInfrastructureService = appInfrastructureService;
             _catalogRequestAddressMapper = catalogRequestAddressMapper;
             _reCaptchaValidator = reCaptchaValidator;
             _options = options;

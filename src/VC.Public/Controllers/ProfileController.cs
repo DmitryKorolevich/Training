@@ -87,13 +87,12 @@ namespace VC.Public.Controllers
             IHelpService helpService,
             IHealthwiseService healthwiseService, ReferenceData referenceData,
             IAuthorizationService authorizationService, ICheckoutService checkoutService,
-            ILoggerFactory loggerProvider,
-            IPageResultService pageResultService, IDynamicMapper<SkuDynamic, Sku> skuMapper,
+            ILoggerFactory loggerProvider, IDynamicMapper<SkuDynamic, Sku> skuMapper,
             IDynamicMapper<ProductDynamic, Product> productMapper,
             IDynamicMapper<OrderDynamic, Order> orderMapper,
             IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter, ExtendedUserManager userManager,
             IContentCrossSellService contentCrossSellService, ICountryNameCodeResolver countryNameCodeResolver)
-            : base(customerService, authorizationService, checkoutService, pageResultService, userManager, referenceData)
+            : base(customerService, authorizationService, checkoutService, userManager, referenceData)
         {
             _storefrontUserService = storefrontUserService;
             _addressConverter = addressConverter;

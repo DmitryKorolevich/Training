@@ -40,8 +40,7 @@ namespace VC.Public.Controllers
         public AffiliateAccountController(
             IAffiliateUserService userService,
             IDynamicMapper<AffiliateDynamic, Affiliate> affiliateMapper,
-            IAffiliateService affiliateService,
-            IPageResultService pageResultService, ExtendedUserManager userManager, ReferenceData referenceData) : base(pageResultService)
+            IAffiliateService affiliateService, ExtendedUserManager userManager, ReferenceData referenceData)
         {
             _userService = userService;
             _affiliateMapper = affiliateMapper;

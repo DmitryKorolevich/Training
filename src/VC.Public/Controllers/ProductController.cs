@@ -33,8 +33,7 @@ namespace VC.Public.Controllers
             ReCaptchaValidator reCaptchaValidator, 
             IProductService productService,
             IProductCategoryService productCategoryService,
-            IProductReviewService productReviewService,
-            IPageResultService pageResultService) : base(pageResultService)
+            IProductReviewService productReviewService)
         {
 		    _categoryViewService = categoryViewService;
 		    _productViewService = productViewService;

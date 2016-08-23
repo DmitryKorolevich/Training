@@ -20,8 +20,7 @@ namespace VC.Public.Controllers.Content
             IArticleCategoryViewService articleCategoryViewService,
             IArticleViewService articleViewService,
             ICategoryService categoryService,
-            IArticleService articleService,
-            IPageResultService pageResultService) : base(pageResultService)
+            IArticleService articleService)
         {
             _articleCategoryViewService = articleCategoryViewService;
             _articleViewService = articleViewService;

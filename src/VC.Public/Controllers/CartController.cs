@@ -11,6 +11,7 @@ using VC.Public.Models.Cart;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Services;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Checkout;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
@@ -55,11 +56,10 @@ namespace VC.Public.Controllers
             IOrderService orderService, IProductService productService, ICheckoutService checkoutService,
             IAuthorizationService authorizationService, ReferenceData appReferenceData,
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
-            IDiscountService discountService, IGcService gcService, IContentCrossSellService contentCrossSellService,
-            IPageResultService pageResultService, ISettingService settingService, ExtendedUserManager userManager, AppSettings appSettings)
+            IDiscountService discountService, IGcService gcService, IContentCrossSellService contentCrossSellService, ISettingService settingService, ExtendedUserManager userManager, AppSettings appSettings)
             : base(
                 customerService, appReferenceData, authorizationService, checkoutService, orderService, skuMapper, productMapper,
-                pageResultService, settingService, userManager, appSettings)
+                settingService, userManager, appSettings)
         {
             _productService = productService;
             _checkoutService = checkoutService;
@@ -68,10 +68,83 @@ namespace VC.Public.Controllers
             _contentCrossSellService = contentCrossSellService;
         }
 
-        private async Task<Tuple<OrderDataContext, CustomerCartOrder>> AddToCartInternal(ICollection<CartSkuModel> skuModels, int? autoshipFrequency = null)
+        private async Task<Tuple<OrderDataContext, CustomerCartOrder>> AddToCartInternal(CartSkuModel skuModelToAdd,
+            int? autoshipFrequency = null)
         {
             var existingUid = Request.GetCartUid();
-            var skus = await _productService.GetSkusOrderedAsync(skuModels.Select(p => p.Code).ToList());
+            var sku = await _productService.GetSkuOrderedAsync(skuModelToAdd.Code);
+            if (sku == null)
+                throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
+            CustomerCartOrder cart;
+            var loggedIn = await CustomerLoggedIn();
+            if (loggedIn)
+            {
+                var id = GetInternalCustomerId();
+                cart = await _checkoutService.GetOrCreateCart(existingUid, id);
+            }
+            else
+            {
+                cart = await _checkoutService.GetOrCreateCart(existingUid, false);
+            }
+            SetCartUid(cart.CartUid);
+
+            if (sku.Sku.SafeData.AutoShipProduct == true && autoshipFrequency.HasValue)
+            {
+                cart.Order.PromoSkus.Clear();
+                cart.Order.Skus.Clear();
+                cart.Order.Discount = null;
+                cart.Order.GiftCertificates.Clear();
+
+                cart.Order.IdObjectType = (int) OrderType.AutoShip;
+                cart.Order.Data.AutoShipFrequency = autoshipFrequency;
+            }
+            else if (cart.Order.Skus.Count > 0 && cart.Order.IdObjectType == (int) OrderType.AutoShip)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CartContainsAutoShip]);
+            }
+            else
+            {
+                cart.Order.IdObjectType = (int) OrderType.Normal;
+            }
+
+            cart.Order.Skus.AddUpdateKeyed(new[] {sku},
+                ordered => ordered.Sku.Code, skuModel => skuModel.Sku.Code, skuModel =>
+                {
+                    var targetQuantity = 1;
+                    if (skuModel.Sku.Code == skuModelToAdd.Code)
+                    {
+                        if (skuModelToAdd.Quantity > 0)
+                        {
+                            targetQuantity = skuModelToAdd.Quantity;
+                        }
+                    }
+                    skuModel.Quantity = targetQuantity;
+                    skuModel.Amount = HasRole(RoleType.Wholesale) ? skuModel.Sku.WholesalePrice : skuModel.Sku.Price;
+                    return skuModel;
+                },
+                (ordered, skuModel) =>
+                {
+                    var targetQuantity = 1;
+                    if (skuModel.Sku.Code == skuModelToAdd.Code)
+                    {
+                        if (skuModelToAdd.Quantity > 0)
+                        {
+                            targetQuantity = skuModelToAdd.Quantity;
+                        }
+                    }
+                    ordered.Quantity += targetQuantity;
+                });
+
+            var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
+            if (!await _checkoutService.UpdateCart(cart))
+                throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
+            return new Tuple<OrderDataContext, CustomerCartOrder>(context, cart);
+        }
+
+        private async Task<Tuple<OrderDataContext, CustomerCartOrder>> AddToCartInternal(Dictionary<string, CartSkuModel> skuModels, int? autoshipFrequency = null)
+        {
+            var existingUid = Request.GetCartUid();
+            var skus = await _productService.GetSkusOrderedAsync(skuModels.Values.Select(p => p.Code).ToList());
             if (skus.Count == 0)
                 throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
             CustomerCartOrder cart;
@@ -109,15 +182,31 @@ namespace VC.Public.Controllers
             cart.Order.Skus.AddUpdateKeyed(skus,
                 ordered => ordered.Sku.Code, skuModel => skuModel.Sku.Code, skuModel =>
                 {
-                    var cartSkuModel = skuModels.FirstOrDefault(p => p.Code == skuModel.Sku.Code);
-                    skuModel.Quantity = cartSkuModel.Quantity > 0 ? cartSkuModel.Quantity : 1;
+                    CartSkuModel cartSkuModel;
+                    var targetQuantity = 1;
+                    if (skuModels.TryGetValue(skuModel.Sku.Code, out cartSkuModel))
+                    {
+                        if (cartSkuModel.Quantity > 0)
+                        {
+                            targetQuantity = cartSkuModel.Quantity;
+                        }
+                    }
+                    skuModel.Quantity = targetQuantity;
                     skuModel.Amount = HasRole(RoleType.Wholesale) ? skuModel.Sku.WholesalePrice : skuModel.Sku.Price;
                     return skuModel;
                 },
                 (ordered, skuModel) =>
                 {
-                    var cartSkuModel = skuModels.FirstOrDefault(p => p.Code == skuModel.Sku.Code);
-                    ordered.Quantity += cartSkuModel.Quantity > 0 ? cartSkuModel.Quantity : 1;
+                    CartSkuModel cartSkuModel;
+                    var targetQuantity = 1;
+                    if (skuModels.TryGetValue(skuModel.Sku.Code, out cartSkuModel))
+                    {
+                        if (cartSkuModel.Quantity > 0)
+                        {
+                            targetQuantity = cartSkuModel.Quantity;
+                        }
+                    }
+                    ordered.Quantity += targetQuantity;
                 });
 
             var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
@@ -220,7 +309,7 @@ namespace VC.Public.Controllers
             {
                 var result = new ViewCartModel();
 
-                var res = await AddToCartInternal(skus);
+                var res = await AddToCartInternal(skus.ToDictionary(s => s.Code));
 
                 await FillModel(result, res.Item2.Order, res.Item1);
                 SetCartUid(res.Item2.CartUid);
@@ -248,12 +337,12 @@ namespace VC.Public.Controllers
         {
             var result = new ViewCartModel();
 
-            var res = await AddToCartInternal(new[] {new CartSkuModel()
+            var res = await AddToCartInternal(
+                new CartSkuModel
                 {
                     Code = skuCode,
-                    Quantity = 1,
-                }
-            });
+                    Quantity = 1
+                });
 
             await FillModel(result, res.Item2.Order, res.Item1);
             SetCartUid(res.Item2.CartUid);
@@ -390,11 +479,10 @@ namespace VC.Public.Controllers
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AnyAutoShipOption]);
             }
 
-            await AddToCartInternal(new[] {new CartSkuModel()
-                {
-                    Code = model.SkuCode,
-                    Quantity = 1,
-                }
+            await AddToCartInternal(new CartSkuModel
+            {
+                Code = model.SkuCode,
+                Quantity = 1
             }, model.IdSchedule);
 
             return RedirectToAction("AddUpdateBillingAddress", "Checkout");

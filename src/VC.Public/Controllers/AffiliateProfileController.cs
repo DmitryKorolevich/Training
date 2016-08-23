@@ -41,8 +41,7 @@ namespace VC.Public.Controllers
             IAffiliateUserService affiliateUserService,
             IAffiliateService affiliateService,
             IDynamicMapper<AffiliateDynamic, Affiliate> affiliateMapper,
-            IOptions<AppOptions> appOptions,
-            IPageResultService pageResultService, ExtendedUserManager userManager) : base(pageResultService)
+            IOptions<AppOptions> appOptions, ExtendedUserManager userManager)
         {
             _affiliateUserService = affiliateUserService;
             _affiliateService = affiliateService;

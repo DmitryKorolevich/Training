@@ -22,14 +22,16 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
+using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 using VitalChoice.Infrastructure.Identity.UserManagers;
+using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Orders;
 
 namespace VC.Public.Controllers
 {
 	[AllowAnonymous]
-    public class AccountController : BaseMvcController
+    public class AccountController : PublicControllerBase
 	{
 		private readonly IStorefrontUserService _userService;
 		private readonly ICustomerService _customerService;
@@ -42,26 +44,27 @@ namespace VC.Public.Controllers
 
 
 	    public AccountController(
-            IStorefrontUserService userService,
-            IDynamicMapper<CustomerDynamic, Customer> customerMapper, 
-            ICustomerService customerService,
-            IAffiliateService affiliateService,
-            IPaymentMethodService paymentMethodService,
-            INotificationService notificationService,
-            IOrderSchedulerService orderSchedulerService,
-            IPageResultService pageResultService, ExtendedUserManager userManager) : base(pageResultService)
-		{
-			_userService = userService;
-			_customerMapper = customerMapper;
-			_customerService = customerService;
-            _affiliateService = affiliateService;
-            _paymentMethodService = paymentMethodService;
-            _notificationService = notificationService;
-            _orderSchedulerService = orderSchedulerService;
+	        IStorefrontUserService userService,
+	        IDynamicMapper<CustomerDynamic, Customer> customerMapper,
+	        ICustomerService customerService,
+	        IAffiliateService affiliateService,
+	        IPaymentMethodService paymentMethodService,
+	        INotificationService notificationService,
+	        IOrderSchedulerService orderSchedulerService,
+	        ExtendedUserManager userManager, IAuthorizationService authorizationService, ICheckoutService checkoutService,
+	        ReferenceData referenceData) : base(customerService, authorizationService, checkoutService, userManager, referenceData)
+	    {
+	        _userService = userService;
+	        _customerMapper = customerMapper;
+	        _customerService = customerService;
+	        _affiliateService = affiliateService;
+	        _paymentMethodService = paymentMethodService;
+	        _notificationService = notificationService;
+	        _orderSchedulerService = orderSchedulerService;
 	        _userManager = userManager;
-		}
+	    }
 
-        [HttpGet]
+	    [HttpGet]
         public async Task<Result<bool>> TestReviewEmail(int id)
         {
             await _orderSchedulerService.SendOrderProductReviewEmailTest(id);
@@ -96,6 +99,11 @@ namespace VC.Public.Controllers
 		    try
 		    {
 			    user = await _userService.SignInAsync(model.Email, model.Password);
+		        if (GetCurrentCartUid() == null)
+		        {
+		            var cart = await CheckoutService.GetOrCreateCart(null, user.Id);
+		            SetCartUid(cart.CartUid);
+		        }
 		    }
 		    catch (WholesalePendingException)
 		    {

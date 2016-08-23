@@ -84,7 +84,7 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'CustomerNotes') AND name = N'IX_CustomerNoteIdCustomer')
+IF NOT EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'CustomerNotes') AND name = N'IX_IdCustomer')
 BEGIN
 	CREATE NONCLUSTERED INDEX [IX_IdCustomer] ON [dbo].[CustomerNotes] ([IdCustomer])
 END

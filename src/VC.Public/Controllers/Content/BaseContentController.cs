@@ -15,9 +15,5 @@ namespace VC.Public.Controllers.Content
         {
             return View("~/Views/Content/ContentPage.cshtml", model);
         }
-
-        public BaseContentController(IPageResultService pageResultService) : base(pageResultService)
-        {
-        }
 	}
 }

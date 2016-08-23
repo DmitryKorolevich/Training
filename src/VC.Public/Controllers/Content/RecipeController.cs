@@ -12,21 +12,17 @@ namespace VC.Public.Controllers.Content
     {
         private readonly IRecipeCategoryViewService _recipeCategoryViewService;
         private readonly IRecipeViewService _recipeViewService;
-        //private readonly IContentEditService _contentService;
         private readonly ICategoryService _categoryService;
         private readonly IRecipeService _recipeService;
 
         public RecipeController(
             IRecipeCategoryViewService recipeCategoryViewService,
             IRecipeViewService recipeViewService,
-            //IContentEditService contentService,
             ICategoryService categoryService,
-            IRecipeService recipeService,
-            IPageResultService pageResultService) : base(pageResultService)
+            IRecipeService recipeService)
         {
             _recipeCategoryViewService = recipeCategoryViewService;
             _recipeViewService = recipeViewService;
-            //_contentService = contentService;
             _categoryService = categoryService;
             _recipeService = recipeService;
         }
@@ -95,61 +91,5 @@ namespace VC.Public.Controllers.Content
 
             return BaseNotFoundView();
         }
-
-        //[HttpGet]
-        //public async Task<IActionResult> EditContent(int id) {
-        //    var item = await _contentService.GetContentItemAsync(id);
-        //    if (item != null)
-        //    {
-        //        return View("~/Views/Content/EditDemo.cshtml", new ContentEditModel
-        //        {
-        //            Id = item.Id,
-        //            Template = item.Template
-        //        });
-        //    }
-        //    return BaseNotFoundView();
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> UpdateContent(int id, ContentEditModel model)
-        //{
-        //    var item = await _contentService.GetContentItemAsync(id);
-        //    if (item != null)
-        //    {
-        //        item.Template = model.Template;
-        //        item.Updated = DateTime.Now;
-        //        await _contentService.UpdateContentItemAsync(item);
-        //        return RedirectToAction("EditContent", new {id = id});
-        //    }
-        //    return BaseNotFoundView();
-        //}
-
-        //[HttpGet]
-        //public async Task<IActionResult> EditMasterContent(int id)
-        //{
-        //    var item = await _contentService.GetMasterContentItemAsync(id);
-        //    if (item != null) {
-        //        return View("~/Views/Content/EditDemo.cshtml", new ContentEditModel
-        //        {
-        //            Id = item.Id,
-        //            Template = item.Template,
-        //            Master = true
-        //        });
-        //    }
-        //    return BaseNotFoundView();
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> UpdateMasterContent(int id, ContentEditModel model) {
-        //    var item = await _contentService.GetMasterContentItemAsync(id);
-        //    if (item != null)
-        //    {
-        //        item.Template = model.Template;
-        //        item.Updated = DateTime.Now;
-        //        await _contentService.UpdateMasterContentItemAsync(item);
-        //        return RedirectToAction("EditMasterContent", new { id = id });
-        //    }
-        //    return BaseNotFoundView();
-        //}
     }
 }

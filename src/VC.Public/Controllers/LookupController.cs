@@ -8,16 +8,12 @@ using VitalChoice.Validation.Models;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using VitalChoice.Business.Services.Customers;
-using VitalChoice.Core.Infrastructure;
-using VitalChoice.Core.Services;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Infrastructure.Identity.UserManagers;
-using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 
 namespace VC.Public.Controllers
@@ -31,10 +27,9 @@ namespace VC.Public.Controllers
         private readonly ICustomerService _customerService;
 
         public LookupController(ICountryService countryService,
-            IPageResultService pageResultService,
             ReferenceData referenceData,
             ExtendedUserManager userManager,
-            ICustomerService customerService) : base(pageResultService)
+            ICustomerService customerService)
 	    {
 	        _countryService = countryService;
 	        _referenceData = referenceData;

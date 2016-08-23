@@ -1,21 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using VC.Public.Helpers;
 using VC.Public.Models.Cart;
-using VitalChoice.Core.Base;
-using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
-using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
-using VitalChoice.Infrastructure.Domain.Entities.Roles;
-using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
-using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Core.Services;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
@@ -23,10 +14,8 @@ using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Transfer;
-using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
-using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Orders;
@@ -44,9 +33,8 @@ namespace VC.Public.Controllers
 
         protected CheckoutControllerBase(ICustomerService customerService,
             ReferenceData referenceData, IAuthorizationService authorizationService, ICheckoutService checkoutService,
-            IOrderService orderService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
-            IPageResultService pageResultService, ISettingService settingService, ExtendedUserManager userManager, AppSettings appSettings) : base(customerService,
-                authorizationService, checkoutService, pageResultService, userManager, referenceData)
+            IOrderService orderService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper, ISettingService settingService, ExtendedUserManager userManager, AppSettings appSettings) : base(customerService,
+                authorizationService, checkoutService, userManager, referenceData)
         {
             OrderService = orderService;
             SkuMapper = skuMapper;

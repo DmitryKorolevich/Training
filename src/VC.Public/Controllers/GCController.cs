@@ -1,27 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Newtonsoft.Json;
-using VC.Public.ModelConverters;
-using VC.Public.Models.Auth;
-using VC.Public.Models.Profile;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Interfaces.Services.Customers;
-using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
-using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Models;
 using VC.Public.Models.GC;
-using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VC.Public.Controllers
@@ -32,8 +17,7 @@ namespace VC.Public.Controllers
 	{
 		private readonly IGcService _gcService;
 
-		public GCController(IGcService gcService,
-            IPageResultService pageResultService) : base(pageResultService)
+		public GCController(IGcService gcService)
 		{
             _gcService = gcService;
 		}

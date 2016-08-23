@@ -84,13 +84,12 @@ namespace VC.Public.Controllers
             IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter,
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
             BrontoService brontoService,
-            ITransactionAccessor<EcommerceContext> transactionAccessor,
-            IPageResultService pageResultService, ISettingService settingService, ILoggerFactory loggerProvider,
+            ITransactionAccessor<EcommerceContext> transactionAccessor, ISettingService settingService, ILoggerFactory loggerProvider,
             ExtendedUserManager userManager, ICountryNameCodeResolver countryNameCodeResolver, ReferenceData referenceData,
             AppSettings appSettings, IEncryptedOrderExportService exportService)
             : base(
                 customerService, referenceData, authorizationService, checkoutService, orderService,
-                skuMapper, productMapper, pageResultService, settingService, userManager, appSettings)
+                skuMapper, productMapper, settingService, userManager, appSettings)
         {
             _storefrontUserService = storefrontUserService;
             _paymentMethodConverter = paymentMethodConverter;

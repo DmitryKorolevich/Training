@@ -1580,7 +1580,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
-        public async Task<FileResult> GetAffiliateOrdersInfoReportFile(string id)
+        public FileResult GetAffiliateOrdersInfoReportFile(string id)
         {
             var items = _cache.GetItem<ICollection<AfiiliateOrderItemImportExportModel>>(String.Format(CacheKeys.ReportFormat, id));
             if (items == null)

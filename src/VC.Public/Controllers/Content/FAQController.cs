@@ -13,19 +13,18 @@ namespace VC.Public.Controllers.Content
         private readonly IFAQCategoryViewService _faqCategoryViewService;
         private readonly IFAQViewService _faqViewService;
         private readonly ICategoryService _categoryService;
-        private readonly IFAQService _fAQService;
+        private readonly IFAQService _faqService;
 
         public FaqController(
             IFAQCategoryViewService faqCategoryViewService,
             IFAQViewService faqViewService,
             ICategoryService categoryService,
-            IFAQService fAQService,
-            IPageResultService pageResultService) : base(pageResultService)
+            IFAQService faqService)
         {
             _faqCategoryViewService = faqCategoryViewService;
             _faqViewService = faqViewService;
             _categoryService = categoryService;
-            _fAQService = fAQService;
+            _faqService = faqService;
         }
 
         [HttpGet]
@@ -83,7 +82,7 @@ namespace VC.Public.Controllers.Content
             int idold;
             if (Int32.TryParse(idFAQ, out idold))
             {
-                var item = await _fAQService.GetFAQByIdOldAsync(idold);
+                var item = await _faqService.GetFAQByIdOldAsync(idold);
                 if (!string.IsNullOrEmpty(item?.Url))
                 {
                     return RedirectPermanent($"/faq/{item.Url}");

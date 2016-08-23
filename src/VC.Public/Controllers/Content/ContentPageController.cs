@@ -21,17 +21,13 @@ namespace VC.Public.Controllers.Content
 {
     public class ContentPageController : BaseContentController
     {
-        private readonly IContentEditService _contentService;
         private readonly IContentPageViewService _contentPageViewService;
         private readonly IContentPageService _contentPageService;
 
         public ContentPageController(
-            IContentEditService contentService,
             IContentPageViewService contentPageViewService,
-            IContentPageService contentPageService,
-            IPageResultService pageResultService) : base(pageResultService)
+            IContentPageService contentPageService)
         {
-		    _contentService = contentService;
             _contentPageViewService = contentPageViewService;
             _contentPageService = contentPageService;
         }

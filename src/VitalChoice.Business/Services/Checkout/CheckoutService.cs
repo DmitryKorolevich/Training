@@ -118,14 +118,21 @@ namespace VitalChoice.Business.Services.Checkout
                 var cartForCheck = await _cartRepository.Query(c => c.CartUid == uid.Value).SelectFirstOrDefaultAsync(false);
                 if (cartForCheck?.IdCustomer != null && cartForCheck.IdOrder != null)
                 {
-                    var toReturn = await GetOrCreateCart(uid, cartForCheck.IdCustomer.Value);
-                    //Calculate not logged customer as a retailer anyway
-                    if (!loggedIn)
+                    if (loggedIn)
+                        return await GetOrCreateCart(uid, cartForCheck.IdCustomer.Value);
+
+                    //Create new cart and treat customer as Retail by default
+                    var oldCart = await GetOrCreateCart(uid, cartForCheck.IdCustomer.Value);
+                    oldCart.Order.Customer = new CustomerDynamic {IdObjectType = (int) CustomerType.Retail};
+                    var newUid = Guid.NewGuid();
+                    var newCart = new CartExtended
                     {
-                        toReturn.Order.Customer = new CustomerDynamic();
-                        toReturn.Order.Customer.IdObjectType = (int) CustomerType.Retail;
-                    }
-                    return toReturn;
+                        CartUid = newUid,
+                        IdCustomer = null
+                    };
+                    UpdateCartEntity(oldCart, newCart);
+                    await _cartRepository.InsertGraphAsync(newCart);
+                    return await GetOrCreateCart(newUid, false);
                 }
                 if (cartForCheck == null)
                 {
@@ -141,10 +148,10 @@ namespace VitalChoice.Business.Services.Checkout
             {
                 cart = await CreateNew();
             }
-            return await InitCartOrder(cart);
+            return await InitCartOrderModel(cart);
         }
 
-        private async Task<CustomerCartOrder> InitCartOrder(CartExtended cart)
+        private async Task<CustomerCartOrder> InitCartOrderModel(CartExtended cart)
         {
             var newOrder = _orderService.Mapper.CreatePrototype((int) OrderType.Normal);
             newOrder.Data.OrderType = (int) SourceOrderType.Web;
@@ -199,7 +206,7 @@ namespace VitalChoice.Business.Services.Checkout
 
         public async Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, int idCustomer)
         {
-            CustomerCartOrder result = null;
+            CustomerCartOrder result;
             using (var transaction = _context.BeginTransaction())
             {
                 try
@@ -212,9 +219,42 @@ namespace VitalChoice.Business.Services.Checkout
                         {
                             if (cart.IdCustomer == null)
                             {
+                                var customerCart =
+                                    await
+                                        _cartRepository.Query(c => c.IdCustomer == idCustomer)
+                                            .SelectFirstOrDefaultAsync(true);
+
                                 var dbCart = await _cartRepository.Query(c => c.CartUid == cart.CartUid).SelectFirstOrDefaultAsync(true);
-                                dbCart.IdCustomer = idCustomer;
-                                await _context.SaveChangesAsync();
+
+                                if (customerCart?.IdOrder != null)
+                                {
+                                    var cartDataSource = new CustomerCartOrder
+                                    {
+                                        CartUid = cart.CartUid,
+                                        Order = await _orderService.SelectAsync(customerCart.IdOrder.Value, true)
+                                    };
+                                    cartDataSource.Order.Customer = await _customerService.SelectAsync(idCustomer, true);
+
+                                    var currentCart = await InitCartOrderModel(cart);
+
+                                    cartDataSource.CartUid = cart.CartUid;
+                                    cartDataSource.Order.Skus = currentCart.Order.Skus;
+                                    cartDataSource.Order.Discount = currentCart.Order.Discount;
+                                    cartDataSource.Order.GiftCertificates = currentCart.Order.GiftCertificates;
+                                    cartDataSource.Order.PromoSkus = currentCart.Order.PromoSkus;
+
+                                    cart.IdCustomer = idCustomer;
+                                    cart.IdOrder = customerCart.IdOrder;
+                                    dbCart.IdCustomer = idCustomer;
+                                    dbCart.IdOrder = customerCart.IdOrder;
+                                    customerCart.IdOrder = null;
+                                    customerCart.IdCustomer = null;
+
+                                    await _context.SaveChangesAsync();
+                                    cartDataSource.Order =
+                                        (await _orderService.CalculateStorefrontOrder(cartDataSource.Order, OrderStatus.Incomplete)).Order;
+                                    await _orderService.UpdateAsync(cartDataSource.Order);
+                                }
                             }
                         }
                         else
@@ -238,7 +278,7 @@ namespace VitalChoice.Business.Services.Checkout
                     }
                     if (cart.IdOrder == null)
                     {
-                        var anonymCart = await InitCartOrder(cart);
+                        var anonymCart = await InitCartOrderModel(cart);
                         var customer = await _customerService.SelectAsync(idCustomer, true);
                         anonymCart.Order.Customer = customer;
                         anonymCart.Order = await _orderService.InsertAsync(anonymCart.Order);
@@ -321,7 +361,7 @@ namespace VitalChoice.Business.Services.Checkout
                     {
                         return false;
                     }
-                    if (cartOrder.Order.Customer?.Id != 0)
+                    if (cartOrder.Order.Customer?.Id > 0)
                     {
                         var customerBackup = cartOrder.Order.Customer;
 
@@ -345,35 +385,7 @@ namespace VitalChoice.Business.Services.Checkout
                     }
                     else
                     {
-                        cart.DiscountCode = cartOrder.Order.Discount?.Code;
-                        cart.GiftCertificates?.MergeKeyed(cartOrder.Order.GiftCertificates, c => c.IdGiftCertificate,
-                            co => co.GiftCertificate.Id,
-                            co => new CartToGiftCertificate
-                            {
-                                Amount = co.Amount,
-                                IdCart = cart.Id,
-                                IdGiftCertificate = co.GiftCertificate.Id
-                            }, (certificate, order) => certificate.Amount = order.Amount);
-                        cart.Skus?.MergeKeyed(cartOrder.Order.Skus, s => s.IdSku, so => so.Sku.Id, so => new CartToSku
-                        {
-                            Amount = so.Amount,
-                            IdCart = cart.Id,
-                            IdSku = so.Sku.Id,
-                            Quantity = so.Quantity
-                        }, (sku, ordered) => sku.Quantity = ordered.Quantity);
-                        if (cartOrder.Order.SafeData.ShipDelayType != null &&
-                            (int)cartOrder.Order.SafeData.ShipDelayType == (int) ShipDelayType.EntireOrder)
-                        {
-                            cart.ShipDelayDate = cartOrder.Order.Data.ShipDelayDate;
-                        }
-                        else
-                        {
-                            cart.ShipDelayDate = cartOrder.Order.Data.ShipDelayDate = null;
-                        }
-                        cart.ShippingUpgradeP = cartOrder.Order.SafeData.ShippingUpgradeP;
-                        cart.ShippingUpgradeNP = cartOrder.Order.SafeData.ShippingUpgradeNP;
-                        cart.IdCustomer = null;
-                        cart.IdOrder = null;
+                        UpdateCartEntity(cartOrder, cart);
                     }
                     await _context.SaveChangesAsync();
                     transaction.Commit();
@@ -390,6 +402,39 @@ namespace VitalChoice.Business.Services.Checkout
                 }
             }
             return true;
+        }
+
+        private static void UpdateCartEntity(CustomerCartOrder cartOrder, CartExtended cart)
+        {
+            cart.DiscountCode = cartOrder.Order.Discount?.Code;
+            cart.GiftCertificates?.MergeKeyed(cartOrder.Order.GiftCertificates, c => c.IdGiftCertificate,
+                co => co.GiftCertificate.Id,
+                co => new CartToGiftCertificate
+                {
+                    Amount = co.Amount,
+                    IdCart = cart.Id,
+                    IdGiftCertificate = co.GiftCertificate.Id
+                }, (certificate, order) => certificate.Amount = order.Amount);
+            cart.Skus?.MergeKeyed(cartOrder.Order.Skus, s => s.IdSku, so => so.Sku.Id, so => new CartToSku
+            {
+                Amount = so.Amount,
+                IdCart = cart.Id,
+                IdSku = so.Sku.Id,
+                Quantity = so.Quantity
+            }, (sku, ordered) => sku.Quantity = ordered.Quantity);
+            if (cartOrder.Order.SafeData.ShipDelayType != null &&
+                (int) cartOrder.Order.SafeData.ShipDelayType == (int) ShipDelayType.EntireOrder)
+            {
+                cart.ShipDelayDate = cartOrder.Order.Data.ShipDelayDate;
+            }
+            else
+            {
+                cart.ShipDelayDate = cartOrder.Order.Data.ShipDelayDate = null;
+            }
+            cart.ShippingUpgradeP = cartOrder.Order.SafeData.ShippingUpgradeP;
+            cart.ShippingUpgradeNP = cartOrder.Order.SafeData.ShippingUpgradeNP;
+            cart.IdCustomer = null;
+            cart.IdOrder = null;
         }
 
         public async Task<bool> SaveOrder(CustomerCartOrder cartOrder)

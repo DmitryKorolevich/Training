@@ -11,13 +11,6 @@ namespace VitalChoice.Core.Base
     [SetAffiliateCookieFilter]
     public abstract class BaseMvcController : BaseController
     {
-        private readonly IPageResultService _pageResultService;
-
-        protected BaseMvcController(IPageResultService pageResultService)
-        {
-            _pageResultService = pageResultService;
-        }
-
         public virtual IActionResult BaseNotFoundView()
         {
             return new NotFoundResult();

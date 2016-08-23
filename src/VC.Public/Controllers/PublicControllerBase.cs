@@ -34,14 +34,15 @@ namespace VC.Public.Controllers
         private readonly ExtendedUserManager _userManager;
         protected readonly ReferenceData ReferenceData;
 
-        protected PublicControllerBase(ICustomerService customerService, IAuthorizationService authorizationService, ICheckoutService checkoutService,
-            IPageResultService pageResultService, ExtendedUserManager userManager, ReferenceData referenceData) : base(pageResultService)
+        protected PublicControllerBase(ICustomerService customerService, IAuthorizationService authorizationService,
+            ICheckoutService checkoutService,
+            ExtendedUserManager userManager, ReferenceData referenceData)
         {
             CheckoutService = checkoutService;
             _userManager = userManager;
             ReferenceData = referenceData;
             AuthorizationService = authorizationService;
-			CustomerService = customerService;
+            CustomerService = customerService;
         }
 
         protected async Task<bool> CustomerLoggedIn()
@@ -68,10 +69,23 @@ namespace VC.Public.Controllers
 
         protected int GetInternalCustomerId()
         {
-            var context = HttpContext;
             var internalId = Convert.ToInt32(_userManager.GetUserId(User));
 
             return internalId;
+        }
+
+        protected Guid? GetCurrentCartUid()
+        {
+            var uid = Request.Cookies[CheckoutConstants.CartUidCookieName];
+            if (!string.IsNullOrEmpty(uid))
+            {
+                Guid result;
+                if (Guid.TryParse(uid, out result))
+                {
+                    return result;
+                }
+            }
+            return null;
         }
 
         protected void SetCartUid(Guid uid)
