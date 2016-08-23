@@ -34,7 +34,8 @@ using VitalChoice.ObjectMapping.Base;
 
 namespace VitalChoice.Business.Services.Products
 {
-    public class PromotionService : ExtendedEcommerceDynamicService<PromotionDynamic, Promotion, PromotionOptionType, PromotionOptionValue>, IPromotionService
+    public class PromotionService : ExtendedEcommerceDynamicService<PromotionDynamic, Promotion, PromotionOptionType, PromotionOptionValue>,
+        IPromotionService
     {
         private readonly IEcommerceRepositoryAsync<Promotion> _promotionRepository;
         private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
@@ -60,7 +61,7 @@ namespace VitalChoice.Business.Services.Products
         protected override Task<List<MessageInfo>> ValidateAsync(PromotionDynamic dynamic)
         {
             List<MessageInfo> errors = new List<MessageInfo>();
-            if (dynamic.IdObjectType == (int)PromotionType.BuyXGetY)
+            if (dynamic.IdObjectType == (int) PromotionType.BuyXGetY)
             {
                 if (dynamic.PromotionsToBuySkus == null || dynamic.PromotionsToBuySkus.Count == 0)
                 {
@@ -189,7 +190,8 @@ namespace VitalChoice.Business.Services.Products
                 item.OptionValues = new List<PromotionOptionValue>();
                 item.OptionTypes = new List<PromotionOptionType>();
             }
-            PagedList<PromotionDynamic> toReturn = new PagedList<PromotionDynamic>(result.Items.Select(p => DynamicMapper.FromEntity(p)).ToList(), result.Count);
+            PagedList<PromotionDynamic> toReturn =
+                new PagedList<PromotionDynamic>(result.Items.Select(p => DynamicMapper.FromEntity(p)).ToList(), result.Count);
             if (toReturn.Items.Count > 0)
             {
                 var ids = result.Items.Where(p => p.IdAddedBy.HasValue).Select(p => p.IdAddedBy.Value).Distinct().ToList();
@@ -211,10 +213,34 @@ namespace VitalChoice.Business.Services.Products
 
         public Task<List<PromotionDynamic>> GetActivePromotions(CustomerType customerType)
         {
-            return SelectAsync(
-                new PromotionQuery().IsActive()
-                    .WithDateStatus(DateStatus.Live)
-                    .AllowCustomerType(customerType), withDefaults: true);
+            switch (customerType)
+            {
+                case CustomerType.Retail:
+                    return
+                        GetRetailPromos();
+                case CustomerType.Wholesale:
+                    return
+                        GetWholesalePromos();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(customerType), customerType, null);
+            }
+        }
+
+        private List<PromotionDynamic> _retailPromos;
+        private List<PromotionDynamic> _wholesalePromos;
+
+        private async Task<List<PromotionDynamic>> GetWholesalePromos()
+        {
+            return _wholesalePromos ?? (_wholesalePromos = await SelectAsync(
+                new PromotionQuery().IsActive().WithDateStatus(DateStatus.Live).AllowCustomerType(CustomerType.Wholesale),
+                withDefaults: true));
+        }
+
+        private async Task<List<PromotionDynamic>> GetRetailPromos()
+        {
+            return _retailPromos ?? (_retailPromos = await
+                SelectAsync(new PromotionQuery().IsActive().WithDateStatus(DateStatus.Live).AllowCustomerType(CustomerType.Retail),
+                    withDefaults: true));
         }
 
         #endregion

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
-namespace VitalChoice.Infrastructure.Domain.ServiceBus
+namespace VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts
 {
 #if !NETSTANDARD1_5
     [Serializable]

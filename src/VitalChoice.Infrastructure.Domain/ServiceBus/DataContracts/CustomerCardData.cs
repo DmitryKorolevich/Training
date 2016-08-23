@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace VitalChoice.Infrastructure.Domain.ServiceBus
+namespace VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts
 {
     [DataContract]
     public class CustomerExportInfo

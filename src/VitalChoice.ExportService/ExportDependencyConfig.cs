@@ -25,6 +25,7 @@ namespace VitalChoice.ExportService
             services.AddScoped<IVeraCoreExportService, VeraCoreExportService>();
             services.AddScoped<EncryptionKeyUpdater>();
             services.AddSingleton<EncryptedServiceBusHostServer>();
+            services.AddSingleton<IGiftListCreditCardExportFileGenerator, GiftListCreditCardExportFileGenerator>();
         }
 
         protected override void FinishCustomRegistrations(ContainerBuilder builder)

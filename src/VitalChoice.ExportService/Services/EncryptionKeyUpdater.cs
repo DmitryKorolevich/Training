@@ -10,6 +10,7 @@ using VitalChoice.Data.UOW;
 using VitalChoice.ExportService.Context;
 using VitalChoice.ExportService.Entities;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
+using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.Extensions;
 using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 

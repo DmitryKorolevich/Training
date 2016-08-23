@@ -2,14 +2,12 @@
 using System.Threading.Tasks;
 using VitalChoice.Validation.Models;
 using System;
-using System.IO;
 using VitalChoice.Core.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Customers;
-using VitalChoice.Interfaces.Services.Settings;
 using Newtonsoft.Json;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
@@ -18,7 +16,6 @@ using VitalChoice.Infrastructure.Domain.Entities.Permissions;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using System.Linq;
-using Microsoft.Extensions.Options;
 using VC.Admin.Models.Orders;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -33,15 +30,12 @@ using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Mail;
-using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.SharedWeb.Models.Orders;
-using VitalChoice.Business.Helpers;
 using VitalChoice.SharedWeb.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Infrastructure.Domain.Transfer.Reports;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -49,23 +43,20 @@ using VC.Admin.Models.Affiliate;
 using VitalChoice.Business.CsvExportMaps.Customers;
 using VitalChoice.Business.CsvImportMaps;
 using VitalChoice.Business.Mailings;
-using VitalChoice.Business.Services.Orders;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Infrastructure.Domain.Avatax;
 using VitalChoice.Infrastructure.Domain.Entities.Reports;
 using VitalChoice.Infrastructure.Identity.UserManagers;
-using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 using VitalChoice.Interfaces.Services.Avatax;
-using VitalChoice.Interfaces.Services.VeraCore;
 using Address = VitalChoice.Ecommerce.Domain.Entities.Addresses.Address;
 using AddressType = VitalChoice.Ecommerce.Domain.Entities.Addresses.AddressType;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities.Orders;
-using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Services;
 using VitalChoice.Infrastructure.Domain;
+using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 
 namespace VC.Admin.Controllers
 {
@@ -333,6 +324,10 @@ namespace VC.Admin.Controllers
         public async Task<Result<OrderCalculateModel>> CalculateOrder([FromBody]OrderManageModel model)
         {
             var order = await _mapper.FromModelAsync(model);
+            if (model == null || order == null)
+            {
+                return new Result<OrderCalculateModel>(false);
+            }
             await _orderService.OrderTypeSetup(order);
             var orderContext = await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus);
 

@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.Extensions.Primitives;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Core.Services;
+using VitalChoice.Profiling;
 
 namespace VC.Public
 {
@@ -81,6 +82,8 @@ namespace VC.Public
             });
 
             app.UseIdentity();
+
+            app.InjectProfiler();
 
             app.UseSession();
             app.Use((context, next) =>

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using System.Security.Cryptography.X509Certificates;
 
-namespace VitalChoice.Infrastructure.Domain.ServiceBus
+namespace VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts
 {
     [DataContract]
     public class TransportCommandData

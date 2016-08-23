@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
@@ -11,22 +12,22 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Data.Extensions;
-using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.UOW;
-using VitalChoice.DynamicData.Validation;
-using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
+using VitalChoice.Ecommerce.Domain.Entities.VeraCore;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Helpers.Async;
 using VitalChoice.ExportService.Context;
 using VitalChoice.ExportService.Entities;
 using VitalChoice.Infrastructure.Domain.Dynamic;
-using VitalChoice.Infrastructure.Domain.ServiceBus;
+using VitalChoice.Infrastructure.Domain.Mail;
+using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Payments;
+using VitalChoice.Interfaces.Services.VeraCore;
 using VitalChoice.ObjectMapping.Base;
 
 namespace VitalChoice.ExportService.Services
@@ -45,6 +46,8 @@ namespace VitalChoice.ExportService.Services
         private readonly ICustomerService _customerService;
         private readonly ILifetimeScope _scope;
         private readonly IPaymentMethodService _paymentMethodService;
+        private readonly IVeraCoreSFTPService _sftpService;
+        private readonly IGiftListCreditCardExportFileGenerator _giftListFileGenerator;
         private static volatile bool _writeQueue;
         private static readonly AsyncManualResetEvent LockCustomersEvent = new AsyncManualResetEvent(true);
         private static readonly AsyncManualResetEvent LockOrdersEvent = new AsyncManualResetEvent(true);
@@ -54,7 +57,7 @@ namespace VitalChoice.ExportService.Services
             DbContextOptions<ExportInfoContext> contextOptions, ILoggerFactory loggerFactory,
             IVeraCoreExportService veraCoreExportService, IOrderService orderService, ExportInfoContext infoContext,
             IOrderRefundService refundService, ICustomerService customerService, ILifetimeScope scope,
-            IPaymentMethodService paymentMethodService)
+            IPaymentMethodService paymentMethodService, IVeraCoreSFTPService sftpService, IGiftListCreditCardExportFileGenerator giftListFileGenerator)
         {
             _options = options;
             _encryptionHost = encryptionHost;
@@ -66,7 +69,56 @@ namespace VitalChoice.ExportService.Services
             _customerService = customerService;
             _scope = scope;
             _paymentMethodService = paymentMethodService;
+            _sftpService = sftpService;
+            _giftListFileGenerator = giftListFileGenerator;
             _logger = loggerFactory.CreateLogger<OrderExportService>();
+        }
+
+        public async Task ExportGiftListCreditCard(GiftListExportModel model)
+        {
+            await LockCustomersEvent.WaitAsync();
+            if (_writeQueue)
+            {
+                throw new ApiException("Cannot place gift list file with CC info while encrypted database update is in progress");
+            }
+
+            string plainCreditCard;
+
+            using (var uow = new UnitOfWork(_infoContext, false))
+            {
+                var cardData = await GetCustomerPaymentMethod(model.IdPaymentMethod, model.IdCustomer, uow);
+                if (cardData == null)
+                {
+                    var error = $"Cannot find customer saved payment for customer: {model.IdCustomer}";
+                    _logger.LogWarning(error);
+                    throw new ApiException(error);
+                }
+
+                plainCreditCard = _encryptionHost.LocalDecrypt<string>(cardData.CreditCardNumber);
+            }
+
+            var templateData = new GLOrdersImportEmail
+            {
+                IdCustomer = model.IdCustomer,
+                Agent = model.Agent,
+                CardNumber = plainCreditCard,
+                CustomerFirstName = model.CustomerFirstName,
+                CustomerLastName = model.CustomerLastName,
+                Date = model.Date,
+                ImportedOrdersAmount = model.ImportedOrdersAmount,
+                ImportedOrdersCount = model.ImportedOrdersCount,
+                OrderIds = model.OrderIds
+            };
+            var byteData = Encoding.Unicode.GetBytes(_giftListFileGenerator.GenerateText(templateData));
+
+            await Task.Factory.StartNew(() =>
+            {
+                using (var memory = new MemoryStream(byteData))
+                {
+                    _sftpService.UploadFile(VeraCoreSFTPOptions.GiftList, memory,
+                        $"Gift-List_Upload_{model.IdCustomer}_{model.Date:yyyy-MM-dd_hh_mm_tt}.txt");
+                }
+            });
         }
 
         public async Task<bool> CardExist(CustomerExportInfo customerExportInfo)
@@ -142,15 +194,10 @@ namespace VitalChoice.ExportService.Services
                 }
                 else if (paymentMethod.IdCustomerPaymentMethod > 0)
                 {
-                    var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
-                    cardData =
-                        await
-                            rep.Query(
-                                c => paymentMethod.IdCustomerPaymentMethod.Value == c.IdPaymentMethod)
-                                .SelectFirstOrDefaultAsync(false);
+                    // ReSharper disable once PossibleInvalidOperationException
+                    cardData = await GetCustomerPaymentMethod(paymentMethod.IdCustomerPaymentMethod.Value, uow);
                     if (cardData == null)
                     {
-                        // ReSharper disable once PossibleInvalidOperationException
                         var error =
                             $"Cannot find order saved payment in customer payment method: {paymentMethod.IdCustomerPaymentMethod.Value}";
                         _logger.LogWarning(error);
@@ -178,6 +225,26 @@ namespace VitalChoice.ExportService.Services
                 paymentMethod.Data.CardNumber = cardNumber;
                 return await _paymentMethodService.AuthorizeCreditCard(paymentMethod);
             }
+        }
+
+        private static async Task<CustomerPaymentMethodExport> GetCustomerPaymentMethod(int idPaymentMethod, int idCustomer, UnitOfWork uow)
+        {
+            var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
+            var cardData = await
+                rep.Query(
+                    c => idPaymentMethod == c.IdPaymentMethod && c.IdCustomer == idCustomer)
+                    .SelectFirstOrDefaultAsync(false);
+            return cardData;
+        }
+
+        private static async Task<CustomerPaymentMethodExport> GetCustomerPaymentMethod(int idPaymentMethod, UnitOfWork uow)
+        {
+            var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
+            var cardData = await
+                rep.Query(
+                    c => idPaymentMethod == c.IdPaymentMethod)
+                    .SelectFirstOrDefaultAsync(false);
+            return cardData;
         }
 
         public async Task UpdateCustomerPaymentMethods(ICollection<CustomerCardData> paymentMethods)

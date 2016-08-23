@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
+using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 
 namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
 {
@@ -505,8 +506,12 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                 }
                 foreach (var expiredSession in expiredSessions)
                 {
-                    OnSessionExpired?.Invoke(expiredSession.Key, expiredSession.Value.HostName);
-                    RemoveSession(expiredSession.Key);
+                    Task.Factory.StartNew(session =>
+                    {
+                        var sessionPair = (KeyValuePair<Guid, SessionInfo>) session;
+                        OnSessionExpired?.Invoke(sessionPair.Key, sessionPair.Value.HostName);
+                        RemoveSession(sessionPair.Key);
+                    }, expiredSession).ConfigureAwait(false);
                 }
             }
         }

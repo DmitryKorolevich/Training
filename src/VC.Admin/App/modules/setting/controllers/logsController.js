@@ -11,7 +11,7 @@
         currentDate.setHours(0, 0, 0, 0);
         self.AppName = 'VC.Admin';
         self.To = currentDate.shiftDate('+1d');
-        self.From = currentDate.shiftDate('-1m');
+        self.From = currentDate.shiftDate('-1d');
         self.Paging = { PageIndex: 1, PageItemCount: 100 };
         self.Sorting = gridSorterUtil.resolve(refreshLogs, "Date", "Desc")
     };

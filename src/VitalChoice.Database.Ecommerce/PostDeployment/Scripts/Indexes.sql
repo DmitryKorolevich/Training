@@ -83,3 +83,15 @@ CREATE NONCLUSTERED INDEX [IX_Orders_OrderType_Status] ON [dbo].[Orders]
 END
 
 GO
+
+IF NOT EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'CustomerNotes') AND name = N'IX_CustomerNoteIdCustomer')
+BEGIN
+	CREATE NONCLUSTERED INDEX [IX_IdCustomer] ON [dbo].[CustomerNotes] ([IdCustomer])
+END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'Orders') AND name = N'IX_ObjectType_StatusCode')
+BEGIN
+	CREATE NONCLUSTERED INDEX [IX_ObjectType_StatusCode] ON [dbo].[Orders] ([IdObjectType], [StatusCode]) INCLUDE ([Id], [NPOrderStatus], [OrderStatus], [POrderStatus])
+END

@@ -13,13 +13,14 @@ namespace VitalChoice.Infrastructure.Domain.Constants
         public const string AuthorizeCardInOrder = "application/authorize-card-in-order";
         public const string UpdateOrderPayment = "application/update-order-payment";
         public const string UpdateCustomerPayment = "application/update-customer-payment";
+        public const string ExportGiftListCard = "application/export-gift-list-card";
     }
 
     public static class ServiceBusCommandConstants
     {
-        public const string GetPublicKey = "application/get-public-key";
-        public const string SetSessionKey = "application/set-session-key";
-        public const string CheckSessionKey = "application/check-session-key";
-        public const string SessionExpired = "application/session-key-expired";
+        public const string GetPublicKey = "session/get-public-key";
+        public const string SetSessionKey = "session/set-session-key";
+        public const string CheckSessionKey = "session/check-session-key";
+        public const string SessionExpired = "session/session-key-expired";
     }
 }

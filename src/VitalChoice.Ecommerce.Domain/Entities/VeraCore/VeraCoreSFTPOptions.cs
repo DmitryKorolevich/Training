@@ -2,6 +2,7 @@
 {
     public enum VeraCoreSFTPOptions
     {
-        Export
+        Export,
+        GiftList
     }
 }

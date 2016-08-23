@@ -526,17 +526,25 @@ namespace VC.Admin.ModelConverters
         {
             if ((model.GCs?.Count ?? 0) > 0)
             {
-                ICollection<string> codes =
+                var codes =
                     // ReSharper disable once AssignNullToNotNullAttribute
                     model.GCs.Select(g => g.Code).Where(c => !string.IsNullOrWhiteSpace(c)).ToList();
-                var gcs = await _gcService.GetGiftCertificatesAsync(g => codes.Contains(g.Code));
-                var gcIds = gcs.Select(g => g.Id).Distinct().ToList();
-                var gcsOrdered = await _gcInOrderRep.Query(g => gcIds.Contains(g.IdGiftCertificate) && g.IdOrder == dynamic.Id).SelectAsync(false);
-                dynamic.GiftCertificates = gcs.Select(g => new GiftCertificateInOrder
+                if (codes.Count > 0)
                 {
-                    GiftCertificate = g,
-                    Amount = gcsOrdered.Where(gco => gco.IdGiftCertificate == g.Id).Select(gco => gco.Amount).FirstOrDefault()
-                }).ToList();
+                    var gcs = await _gcService.GetGiftCertificatesAsync(g => codes.Contains(g.Code));
+                    var gcIds = gcs.Select(g => g.Id).Distinct().ToList();
+                    var gcsOrdered =
+                        await _gcInOrderRep.Query(g => gcIds.Contains(g.IdGiftCertificate) && g.IdOrder == dynamic.Id).SelectAsync(false);
+                    dynamic.GiftCertificates = gcs.Select(g => new GiftCertificateInOrder
+                    {
+                        GiftCertificate = g,
+                        Amount = gcsOrdered.Where(gco => gco.IdGiftCertificate == g.Id).Select(gco => gco.Amount).FirstOrDefault()
+                    }).ToList();
+                }
+                else
+                {
+                    dynamic.GiftCertificates = new List<GiftCertificateInOrder>();
+                }
             }
         }
 

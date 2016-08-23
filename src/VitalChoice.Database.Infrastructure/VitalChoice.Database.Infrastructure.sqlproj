@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Azure.publish.xml" />
+    <None Include="PostDeployment\Scripts\Indexes.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />

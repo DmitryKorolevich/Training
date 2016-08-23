@@ -55,6 +55,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Azure;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
+using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.ObjectMapping.Base;

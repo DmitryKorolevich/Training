@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Renci.SshNet;
@@ -28,53 +29,54 @@ namespace VitalChoice.Business.Services.VeraCore
             _logger = logger.CreateLogger<VeraCoreSFTPService>();
         }
 
-        protected void Reconnect()
-        {
-            if (_sftpClient != null)
-            {
-                if (_sftpClient.IsConnected)
-                {
-                    _sftpClient.Disconnect();
-                }
-                _sftpClient.Dispose();
-            }
-            var connectionInfo = new PasswordConnectionInfo(_options.Value.VeraCoreSettings.ServerHost,
-                _options.Value.VeraCoreSettings.ServerPort,
-                _options.Value.VeraCoreSettings.UserName, _options.Value.VeraCoreSettings.Password);
-            connectionInfo.Timeout = new TimeSpan(0, 0, 1);
-
-            _sftpClient = new SftpClient(connectionInfo);
-            _sftpClient.Connect();
-        }
-
         public void Dispose()
         {
-            if (_sftpClient != null)
-            {
-                if (_sftpClient.IsConnected)
-                    _sftpClient.Disconnect();
-                _sftpClient.Dispose();
-            }
+            if (_sftpClient?.IsConnected ?? false)
+                _sftpClient.Disconnect();
+            _sftpClient?.Dispose();
         }
 
-        public string WorkingDirectory
+        public string GetWorkingDirectory()
         {
-            get
+            EnsureClient();
+            return _sftpClient.WorkingDirectory;
+        }
+
+        public void UploadFile(VeraCoreSFTPOptions options, Stream file, string name)
+        {
+            EnsureClient();
+            try
             {
-                if (_sftpClient == null)
+                switch (options)
                 {
-                    Reconnect();
+                    case VeraCoreSFTPOptions.GiftList:
+                        CreateAndChangeDirectory(_options.Value.VeraCoreSettings.GiftListFolderName);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(options));
                 }
-                return _sftpClient.WorkingDirectory;
+                _sftpClient.UploadFile(file, name, false);
+            }
+            catch (Exception e)
+            {
+                Reconnect();
+                switch (options)
+                {
+                    case VeraCoreSFTPOptions.GiftList:
+                        CreateAndChangeDirectory(_options.Value.VeraCoreSettings.GiftListFolderName);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(options));
+                }
+                _sftpClient.UploadFile(file, name, false);
+
+                _logger.LogError(e.ToString());
             }
         }
 
         public ICollection<VeraCoreFileInfo> GetFileList(VeraCoreSFTPOptions options)
         {
-            if (_sftpClient == null)
-            {
-                Reconnect();
-            }
+            EnsureClient();
             IEnumerable<SftpFile> files;
             try
             {
@@ -84,7 +86,7 @@ namespace VitalChoice.Business.Services.VeraCore
                         _sftpClient.ChangeDirectory(_options.Value.VeraCoreSettings.ExportFolderName);
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException("options");
+                        throw new ArgumentOutOfRangeException(nameof(options));
                 }
                 files = _sftpClient.ListDirectory(".");
             }
@@ -97,7 +99,7 @@ namespace VitalChoice.Business.Services.VeraCore
                         _sftpClient.ChangeDirectory(_options.Value.VeraCoreSettings.ExportFolderName);
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException("options");
+                        throw new ArgumentOutOfRangeException(nameof(options));
                 }
                 files  = _sftpClient.ListDirectory(".");
 
@@ -115,19 +117,13 @@ namespace VitalChoice.Business.Services.VeraCore
 
         public void RemoveFile(string fileName)
         {
-            if (_sftpClient == null)
-            {
-                Reconnect();
-            }
+            EnsureClient();
             _sftpClient.DeleteFile(fileName);
         }
 
         public MemoryStream DownloadFileData(string fileName)
         {
-            if (_sftpClient == null)
-            {
-                Reconnect();
-            }
+            EnsureClient();
             var result = new MemoryStream();
             try
             {
@@ -144,6 +140,47 @@ namespace VitalChoice.Business.Services.VeraCore
             }
             result.Seek(0, SeekOrigin.Begin);
             return result;
+        }
+
+        protected virtual void EnsureClient()
+        {
+            if (_sftpClient == null)
+            {
+                _sftpClient = CreateAndConnect();
+            }
+        }
+
+        protected virtual void Reconnect()
+        {
+            if (_sftpClient?.IsConnected ?? false)
+            {
+                _sftpClient.Disconnect();
+            }
+            _sftpClient?.Dispose();
+
+            _sftpClient = CreateAndConnect();
+        }
+
+        protected virtual SftpClient CreateAndConnect()
+        {
+            var connectionInfo = new PasswordConnectionInfo(_options.Value.VeraCoreSettings.ServerHost,
+                _options.Value.VeraCoreSettings.ServerPort,
+                _options.Value.VeraCoreSettings.UserName, _options.Value.VeraCoreSettings.Password)
+            {
+                Timeout = new TimeSpan(0, 0, 30)
+            };
+            var result = new SftpClient(connectionInfo);
+            result.Connect();
+            return result;
+        }
+
+        private void CreateAndChangeDirectory(string dirName)
+        {
+            if (!_sftpClient.Exists(dirName))
+            {
+                _sftpClient.CreateDirectory(dirName);
+            }
+            _sftpClient.ChangeDirectory(dirName);
         }
     }
 }

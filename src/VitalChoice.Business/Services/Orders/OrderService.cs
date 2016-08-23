@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Customer;
@@ -41,26 +40,8 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Workflow.Core;
 using Microsoft.Extensions.Logging;
-using VitalChoice.ObjectMapping.Base;
-using VitalChoice.ObjectMapping.Interfaces;
-using System.IO;
-using CsvHelper;
-using CsvHelper.Configuration;
-using VitalChoice.Business.CsvExportMaps;
 using VitalChoice.Infrastructure.Domain.Entities.Orders;
-using System.Reflection;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using VitalChoice.Interfaces.Services.Settings;
-using VitalChoice.Infrastructure.Domain.Transfer.Country;
-using FluentValidation.Validators;
-using System.Text.RegularExpressions;
-using Google.Apis.Analytics.v3;
-using Google.Apis.Services;
 using Microsoft.AspNetCore.Mvc.Internal;
-using Microsoft.CodeAnalysis.CSharp;
-using Renci.SshNet;
-using VitalChoice.Business.CsvImportMaps;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Data.Extensions;
@@ -70,14 +51,10 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Avatax;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Exceptions;
-using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Extensions;
-using VitalChoice.Infrastructure.Domain.Transfer.Reports;
-using AddressType = VitalChoice.Ecommerce.Domain.Entities.Addresses.AddressType;
-using System.Security.Cryptography.X509Certificates;
-using Google.Apis.Auth.OAuth2;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Data.UOW;
+using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 
 namespace VitalChoice.Business.Services.Orders
@@ -554,30 +531,6 @@ namespace VitalChoice.Business.Services.Orders
                     orderToSku.Sku.OptionTypes = _skuMapper.FilterByType(orderToSku.Sku.Product.IdObjectType);
                     orderToSku.Sku.Product.OptionTypes = optionTypes;
                 }
-                //var invalidSkuOrdered =
-                //    entities.SelectMany(o => o.Skus)
-                //        .Where(s => s.Sku?.Product == null || s.Sku.OptionTypes == null)
-                //        .ToArray();
-                //var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
-                //var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
-                //    .Include(s => s.OptionValues)
-                //    .Include(s => s.Product)
-                //    .ThenInclude(p => p.OptionValues)
-                //    .Include(s => s.Product)
-                //    .ThenInclude(p => p.ProductsToCategories)
-                //    .SelectAsync(false)).ToDictionary(s => s.Id);
-                //foreach (var orderToSku in invalidSkuOrdered)
-                //{
-                //    Sku sku;
-                //    if (invalidSkus.TryGetValue(orderToSku.IdSku, out sku))
-                //    {
-                //        var optionTypes = _productMapper.FilterByType(sku.Product.IdObjectType);
-                //        orderToSku.Sku = sku;
-                //        orderToSku.Sku.Product = sku.Product;
-                //        orderToSku.Sku.OptionTypes = optionTypes;
-                //        orderToSku.Sku.Product.OptionTypes = optionTypes;
-                //    }
-                //}
             }
             if (entities.All(e => e.PromoSkus != null))
             {
@@ -589,30 +542,6 @@ namespace VitalChoice.Business.Services.Orders
                     orderToSku.Sku.OptionTypes = _skuMapper.FilterByType(orderToSku.Sku.Product.IdObjectType);
                     orderToSku.Sku.Product.OptionTypes = optionTypes;
                 }
-                //var invalidSkuOrdered =
-                //    entities.SelectMany(o => o.Skus)
-                //        .Where(s => s.Sku?.Product == null || s.Sku.OptionTypes == null)
-                //        .ToArray();
-                //var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
-                //var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
-                //    .Include(s => s.OptionValues)
-                //    .Include(s => s.Product)
-                //    .ThenInclude(p => p.OptionValues)
-                //    .Include(s => s.Product)
-                //    .ThenInclude(p => p.ProductsToCategories)
-                //    .SelectAsync(false)).ToDictionary(s => s.Id);
-                //foreach (var orderToSku in invalidSkuOrdered)
-                //{
-                //    Sku sku;
-                //    if (invalidSkus.TryGetValue(orderToSku.IdSku, out sku))
-                //    {
-                //        var optionTypes = _productMapper.FilterByType(sku.Product.IdObjectType);
-                //        orderToSku.Sku = sku;
-                //        orderToSku.Sku.Product = sku.Product;
-                //        orderToSku.Sku.OptionTypes = optionTypes;
-                //        orderToSku.Sku.Product.OptionTypes = optionTypes;
-                //    }
-                //}
             }
             return TaskCache.CompletedTask;
         }
@@ -626,12 +555,16 @@ namespace VitalChoice.Business.Services.Orders
             {
                 var toLoadUp =
                     new HashSet<int>(updated.GiftCertificates.Where(g => g.GiftCertificate == null).Select(g => g.IdGiftCertificate));
-                var gcs = await gcRep.Query(g => toLoadUp.Contains(g.Id)).SelectAsync(true);
+                List<GiftCertificate> gcs = null;
+                if (toLoadUp.Count > 0)
+                {
+                    gcs = await gcRep.Query(g => toLoadUp.Contains(g.Id)).SelectAsync(true);
+                }
                 updated.GiftCertificates.ForEach(g =>
                 {
                     if (g.GiftCertificate == null)
                     {
-                        g.GiftCertificate = gcs.FirstOrDefault(db => db.Id == g.IdGiftCertificate);
+                        g.GiftCertificate = gcs?.FirstOrDefault(db => db.Id == g.IdGiftCertificate);
                     }
                     if (g.GiftCertificate != null)
                     {
@@ -743,6 +676,8 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task OrderTypeSetup(OrderDynamic order)
         {
+            if (order == null)
+                return;
             var orderType = ((bool?) order.SafeData.MailOrder ?? false) ? (int?) SourceOrderType.MailOrder : null;
             var idOrder = order.Id;
             if (idOrder != 0)
@@ -875,6 +810,13 @@ namespace VitalChoice.Business.Services.Orders
             if (dynamic.Customer.StatusCode == (int) CustomerStatus.Suspended)
             {
                 throw new CustomerSuspendException();
+            }
+            if (dynamic.IsAnyNotIncomplete())
+            {
+                if (dynamic.Skus?.Count == 0)
+                {
+                    throw new AppValidationException("You cannot place order without products");
+                }
             }
             return base.ValidateAsync(dynamic);
         }
@@ -1081,7 +1023,7 @@ namespace VitalChoice.Business.Services.Orders
                             List<GiftCertificate> usedGcs = new List<GiftCertificate>();
                             if (order.GiftCertificates?.Count > 0)
                             {
-                                var ids = order.GiftCertificates.Select(p => p.GiftCertificate?.Id).ToList();
+                                var ids = order.GiftCertificates.Select(p => p.GiftCertificate?.Id).Distinct().ToList();
                                 usedGcs = await giftCertificateRepository.Query(p => ids.Contains(p.Id)).SelectAsync(true);
 
                                 if (IsAllCancel(pOrderType, order))
@@ -1235,12 +1177,13 @@ namespace VitalChoice.Business.Services.Orders
 
         private async Task ChargeGiftCertificates(OrderDynamic model, IUnitOfWorkAsync uow)
         {
-            if (model.IsAnyNotIncomplete())
+            if (model.IsAnyNotIncomplete() && model.GiftCertificates.Count > 0)
             {
                 var gcsRep = uow.RepositoryAsync<GiftCertificate>();
                 var gcs = model.GiftCertificates.Select(g => g.GiftCertificate.Id).Distinct().ToList();
                 var gcsInDb = await gcsRep.Query(g => gcs.Contains(g.Id)).SelectAsync(true);
-                gcsInDb.UpdateKeyed(model.GiftCertificates.Select(g => g.GiftCertificate), g => g.Id, (gcDb, gc) => gcDb.Balance = gc.Balance);
+                gcsInDb.UpdateKeyed(model.GiftCertificates.Select(g => g.GiftCertificate), g => g.Id,
+                    (gcDb, gc) => gcDb.Balance = gc.Balance);
             }
         }
 
@@ -1757,7 +1700,8 @@ namespace VitalChoice.Business.Services.Orders
 
         #region OrdersImport
 
-        public async Task<bool> ImportOrders(byte[] file, string fileName, OrderImportType orderType, int idCustomer, int? idPaymentMethod, int idAddedBy)
+        public async Task<bool> ImportOrders(byte[] file, string fileName, OrderImportType orderType, int idCustomer, int? idPaymentMethod,
+            int idAddedBy)
         {
             var customer = await _customerService.SelectAsync(idCustomer);
             if (customer == null)
@@ -1771,12 +1715,12 @@ namespace VitalChoice.Business.Services.Orders
             switch (orderType)
             {
                 case OrderImportType.GiftList:
-                    if (!customer.ApprovedPaymentMethods.Contains((int)PaymentMethodType.NoCharge))
+                    if (!customer.ApprovedPaymentMethods.Contains((int) PaymentMethodType.NoCharge))
                     {
                         throw new AppValidationException("Payment method \"No Charge\" should be allowed");
                     }
                     paymentMethod = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == idPaymentMethod);
-                    if (paymentMethod == null || paymentMethod.IdObjectType != (int)PaymentMethodType.CreditCard ||
+                    if (paymentMethod == null || paymentMethod.IdObjectType != (int) PaymentMethodType.CreditCard ||
                         paymentMethod.Address == null)
                     {
                         throw new AppValidationException("Payment method \"Credit Card\" should be configured");
@@ -1785,12 +1729,12 @@ namespace VitalChoice.Business.Services.Orders
 
                     break;
                 case OrderImportType.DropShip:
-                    if (!customer.ApprovedPaymentMethods.Contains((int)PaymentMethodType.Oac))
+                    if (!customer.ApprovedPaymentMethods.Contains((int) PaymentMethodType.Oac))
                     {
                         throw new AppValidationException("Payment method \"On Approved Credit\" should be allowed");
                     }
                     paymentMethod = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == idPaymentMethod);
-                    if (paymentMethod == null || paymentMethod.IdObjectType != (int)PaymentMethodType.Oac ||
+                    if (paymentMethod == null || paymentMethod.IdObjectType != (int) PaymentMethodType.Oac ||
                         paymentMethod.Address == null)
                     {
                         throw new AppValidationException("Payment method \"On Approved Credit\" should be configured");
@@ -1799,17 +1743,18 @@ namespace VitalChoice.Business.Services.Orders
 
                     break;
                 case OrderImportType.DropShipAAFES:
-                    if (!customer.ApprovedPaymentMethods.Contains((int)PaymentMethodType.Oac))
+                    if (!customer.ApprovedPaymentMethods.Contains((int) PaymentMethodType.Oac))
                     {
                         throw new AppValidationException("Payment method \"On Approved Credit\" should be allowed");
                     }
                     paymentMethod = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == idPaymentMethod);
-                    if (paymentMethod == null || paymentMethod.IdObjectType != (int)PaymentMethodType.Oac ||
+                    if (paymentMethod == null || paymentMethod.IdObjectType != (int) PaymentMethodType.Oac ||
                         paymentMethod.Address == null)
                     {
                         throw new AppValidationException("Payment method \"On Approved Credit\" should be configured");
                     }
-                    processor = new DropShipAAFESSOrderImportProcessor(_countryService, Mapper, _addressMapper, _referenceData, _loggerFactory);
+                    processor = new DropShipAAFESSOrderImportProcessor(_countryService, Mapper, _addressMapper, _referenceData,
+                        _loggerFactory);
 
                     break;
                 default:
@@ -1820,7 +1765,7 @@ namespace VitalChoice.Business.Services.Orders
 
             await LoadSkusDynamic(map, customer);
             //not found SKU errors
-            var messages = processor.FormatRowsRecordErrorMessages(map.SelectMany(p=>p.OrderImportItems));
+            var messages = processor.FormatRowsRecordErrorMessages(map.SelectMany(p => p.OrderImportItems));
             if (messages.Count > 0)
             {
                 throw new AppValidationException(messages);
@@ -1850,7 +1795,7 @@ namespace VitalChoice.Business.Services.Orders
                 }
 
                 var rows = item.OrderImportItems.Select(p => p.RowNumber).ToList();
-                var tempMessages = new List<MessageInfo>(context.Messages.Where(p=>p.MessageLevel==MessageLevel.Error));
+                var tempMessages = new List<MessageInfo>(context.Messages.Where(p => p.MessageLevel == MessageLevel.Error));
                 tempMessages.AddRange(context.SkuOrdereds.Where(p => p.Messages != null).SelectMany(p => p.Messages)
                     .Where(p => p.MessageLevel == MessageLevel.Error));
                 tempMessages.AddRange(context.PromoSkus.Where(p => p.Enabled && p.Messages != null).SelectMany(p => p.Messages)
@@ -1873,7 +1818,9 @@ namespace VitalChoice.Business.Services.Orders
                     item.Order.Data.ShippingOverride = item.Order.ShippingTotal;
 
                     var orderCombinedStatus = item.Order.OrderStatus ?? OrderStatus.Processed;
-                    item.Order.Data.ShipDelayType = item.Order.SafeData.ShipDelayDate != null ? ShipDelayType.EntireOrder : ShipDelayType.None;
+                    item.Order.Data.ShipDelayType = item.Order.SafeData.ShipDelayDate != null
+                        ? ShipDelayType.EntireOrder
+                        : ShipDelayType.None;
 
                     var context = await CalculateOrder(item.Order, orderCombinedStatus);
 
@@ -1895,11 +1842,26 @@ namespace VitalChoice.Business.Services.Orders
             }
 
             var orders = map.Select(p => p.Order).ToList();
-            orders = await InsertRangeAsync(orders);
 
-            if (orderType == OrderImportType.GiftList && idPaymentMethod.HasValue)
+            using (var transaction = TransactionAccessor.BeginTransaction())
             {
-                await SendGLOrdersImportEmailAsync(orders, customer, idPaymentMethod.Value, idAddedBy);
+                try
+                {
+                    orders = await InsertRangeAsync(orders);
+
+                    if (orderType == OrderImportType.GiftList && idPaymentMethod.HasValue)
+                    {
+                        await ExportGlCardDetails(orders, customer, idPaymentMethod.Value, idAddedBy);
+                        await SendGlOrdersImportEmailAsync(orders, customer, idPaymentMethod.Value, idAddedBy);
+                    }
+
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
             }
 
             return true;
@@ -1928,32 +1890,73 @@ namespace VitalChoice.Business.Services.Orders
             return toReturn;
         }
 
-        private async Task SendGLOrdersImportEmailAsync(ICollection<OrderDynamic> orders, CustomerDynamic customer, int idPaymentMethod, int idAddedBy)
+        private async Task SendGlOrdersImportEmailAsync(ICollection<OrderDynamic> orders, CustomerDynamic customer, int idPaymentMethod,
+            int idAddedBy)
         {
-            GLOrdersImportEmail model = new GLOrdersImportEmail();
-            model.Date = DateTime.Now;
-            model.IdCustomer = customer.Id;
-            model.CustomerFirstName = customer.ProfileAddress.SafeData.FirstName;
-            model.CustomerLastName = customer.ProfileAddress.SafeData.LastName;
+            var model = await GetGlEmailModelAsync(orders, customer, idPaymentMethod, idAddedBy);
+            await _notificationService.SendGLOrdersImportEmailAsync(model);
+        }
+
+        private async Task ExportGlCardDetails(ICollection<OrderDynamic> orders, CustomerDynamic customer, int idPaymentMethod, int idAddedBy)
+        {
+            var exportModel = await GetGlExportModelAsync(orders, customer, idPaymentMethod, idAddedBy);
+            await _encryptedOrderExportService.ExportGiftListCreditCard(exportModel);
+        }
+
+        private async Task<GiftListExportModel> GetGlExportModelAsync(ICollection<OrderDynamic> orders, CustomerDynamic customer,
+            int idPaymentMethod, int idAddedBy)
+        {
+            var profile = await _adminProfileRepository.Query(p => p.Id == idAddedBy).SelectFirstOrDefaultAsync(false);
+            var model = new GiftListExportModel
+            {
+                Date = DateTime.Now,
+                IdCustomer = customer.Id,
+                CustomerFirstName = customer.ProfileAddress.SafeData.FirstName,
+                CustomerLastName = customer.ProfileAddress.SafeData.LastName,
+                IdPaymentMethod = idPaymentMethod,
+                Agent = profile?.AgentId,
+                ImportedOrdersCount = orders.Count,
+                ImportedOrdersAmount = orders.Sum(p => p.Total),
+                OrderIds = orders.Select(p => p.Id).ToList()
+            };
+            return model;
+        }
+
+        private async Task<GLOrdersImportEmail> GetGlEmailModelAsync(ICollection<OrderDynamic> orders, CustomerDynamic customer,
+            int idPaymentMethod, int idAddedBy)
+        {
+            var profile = await _adminProfileRepository.Query(p => p.Id == idAddedBy).SelectFirstOrDefaultAsync(false);
+            GLOrdersImportEmail model = new GLOrdersImportEmail
+            {
+                Date = DateTime.Now,
+                IdCustomer = customer.Id,
+                CustomerFirstName = customer.ProfileAddress.SafeData.FirstName,
+                CustomerLastName = customer.ProfileAddress.SafeData.LastName,
+                Agent = profile?.AgentId,
+                ImportedOrdersCount = orders.Count,
+                ImportedOrdersAmount = orders.Sum(p => p.Total),
+                OrderIds = orders.Select(p => p.Id).ToList()
+            };
             var creditCard = customer.CustomerPaymentMethods.FirstOrDefault(p => p.Id == idPaymentMethod);
             if (creditCard != null)
             {
                 model.CardNumber = creditCard.SafeData.CardNumber;
             }
-            var profile = (await _adminProfileRepository.Query(p => p.Id == idAddedBy).SelectFirstOrDefaultAsync(false));
-            model.Agent = profile?.AgentId;
-            model.ImportedOrdersCount = orders.Count;
-            model.ImportedOrdersAmount = orders.Sum(p => p.Total);
-            model.OrderIds = orders.Select(p => p.Id).ToList();
-
-            await _notificationService.SendGLOrdersImportEmailAsync(model);
+            return model;
         }
 
         private async Task LoadSkusDynamic(IList<OrderImportItemOrderDynamic> map, CustomerDynamic customer)
         {
-            List<string> requestCodes = map.Select(p => p.Order).Where(p => p.Skus != null).SelectMany(p => p.Skus).Where(p => p.Sku != null).Select(p => p.Sku.Code).ToList();
+            List<string> requestCodes =
+                map.Where(p => p.Order.Skus != null)
+                    .SelectMany(p => p.Order.Skus)
+                    .Where(p => p.Sku != null)
+                    .Select(p => p.Sku.Code)
+                    .Distinct()
+                    .ToList();
 
-            var dbSkus = await _productService.GetSkusOrderedAsync(requestCodes);
+            var dbSkus = (await _productService.GetSkusOrderedAsync(requestCodes)).ToDictionary(p => p.Sku.Code,
+                StringComparer.OrdinalIgnoreCase);
             foreach (var item in map)
             {
                 if (item.Order.Skus != null)
@@ -1961,21 +1964,25 @@ namespace VitalChoice.Business.Services.Orders
                     int index = 1;
                     foreach (var sku in item.Order.Skus)
                     {
-                        var dbSku = dbSkus.FirstOrDefault(p => p.Sku.Code == sku.Sku.Code);
-                        if (dbSku == null)
-                        {
-                            var firstRecord = item.OrderImportItems.First();
-                            firstRecord.ErrorMessages.Add(AddErrorMessage("SKU " + index, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuNotFoundOrderImport], "SKU " + index, sku.Sku.Code)));
-                            continue;
-                        }
-                        else
+                        SkuOrdered dbSku;
+                        if (dbSkus.TryGetValue(sku.Sku.Code, out dbSku))
                         {
                             sku.Sku.Product = dbSku.Sku.Product;
                             sku.Sku = dbSku.Sku;
                             if (sku.Sku != null)
                             {
-                                sku.Amount = customer.IdObjectType == (int) CustomerType.Retail ? sku.Sku.Price : customer.IdObjectType == (int) CustomerType.Wholesale ? sku.Sku.WholesalePrice : 0;
+                                sku.Amount = customer.IdObjectType == (int) CustomerType.Retail
+                                    ? sku.Sku.Price
+                                    : customer.IdObjectType == (int) CustomerType.Wholesale ? sku.Sku.WholesalePrice : 0;
                             }
+                        }
+                        else
+                        {
+                            var firstRecord = item.OrderImportItems.First();
+                            firstRecord.ErrorMessages.Add(AddErrorMessage("SKU " + index,
+                                String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuNotFoundOrderImport], "SKU " + index,
+                                    sku.Sku.Code)));
+                            continue;
                         }
 
                         index++;
@@ -2143,8 +2150,12 @@ namespace VitalChoice.Business.Services.Orders
 
         private async Task UpdateHealthwiseOrderWithOrder(OrderDynamic model, IUnitOfWorkAsync uow)
         {
-            //model.IsHealthwise = true;
-            await UpdateHealthwiseOrderInnerAsync(uow, model.Id, model.Customer.Id, DateTime.Now, (bool?) model.SafeData.IsHealthwise ?? false, model.IsFirstHealthwise);
+            if (model.IdObjectType == (int) OrderType.AutoShipOrder || model.IdObjectType == (int) OrderType.Normal)
+            {
+                await
+                    UpdateHealthwiseOrderInnerAsync(uow, model.Id, model.Customer.Id, DateTime.Now,
+                        (bool?) model.SafeData.IsHealthwise ?? false, model.IsFirstHealthwise);
+            }
         }
 
         private async Task UpdateHealthwiseOrderInnerAsync(IUnitOfWorkAsync uow, int idOrder, int idCustomer, DateTime orderDateCreated, bool isHealthwise, bool isFirstHealthwise)
@@ -2157,7 +2168,7 @@ namespace VitalChoice.Business.Services.Orders
             }
             else
             {
-                HealthwiseOrder healthwiseOrder = (await healthwiseOrderRepositoryAsync.Query(p => p.Id == idOrder).SelectFirstOrDefaultAsync(false));
+                HealthwiseOrder healthwiseOrder = await healthwiseOrderRepositoryAsync.Query(p => p.Id == idOrder).SelectFirstOrDefaultAsync(false);
                 if (healthwiseOrder == null)
                 {
                     //BUG: doesn't make any sense to delete not exists HW order
