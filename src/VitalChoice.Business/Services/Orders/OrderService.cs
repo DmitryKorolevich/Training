@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Business.Queries.Customer;
@@ -41,26 +40,8 @@ using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Workflow.Core;
 using Microsoft.Extensions.Logging;
-using VitalChoice.ObjectMapping.Base;
-using VitalChoice.ObjectMapping.Interfaces;
-using System.IO;
-using CsvHelper;
-using CsvHelper.Configuration;
-using VitalChoice.Business.CsvExportMaps;
 using VitalChoice.Infrastructure.Domain.Entities.Orders;
-using System.Reflection;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using VitalChoice.Interfaces.Services.Settings;
-using VitalChoice.Infrastructure.Domain.Transfer.Country;
-using FluentValidation.Validators;
-using System.Text.RegularExpressions;
-using Google.Apis.Analytics.v3;
-using Google.Apis.Services;
 using Microsoft.AspNetCore.Mvc.Internal;
-using Microsoft.CodeAnalysis.CSharp;
-using Renci.SshNet;
-using VitalChoice.Business.CsvImportMaps;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Data.Extensions;
@@ -70,12 +51,7 @@ using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Avatax;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Exceptions;
-using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Extensions;
-using VitalChoice.Infrastructure.Domain.Transfer.Reports;
-using AddressType = VitalChoice.Ecommerce.Domain.Entities.Addresses.AddressType;
-using System.Security.Cryptography.X509Certificates;
-using Google.Apis.Auth.OAuth2;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Data.UOW;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
@@ -555,30 +531,6 @@ namespace VitalChoice.Business.Services.Orders
                     orderToSku.Sku.OptionTypes = _skuMapper.FilterByType(orderToSku.Sku.Product.IdObjectType);
                     orderToSku.Sku.Product.OptionTypes = optionTypes;
                 }
-                //var invalidSkuOrdered =
-                //    entities.SelectMany(o => o.Skus)
-                //        .Where(s => s.Sku?.Product == null || s.Sku.OptionTypes == null)
-                //        .ToArray();
-                //var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
-                //var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
-                //    .Include(s => s.OptionValues)
-                //    .Include(s => s.Product)
-                //    .ThenInclude(p => p.OptionValues)
-                //    .Include(s => s.Product)
-                //    .ThenInclude(p => p.ProductsToCategories)
-                //    .SelectAsync(false)).ToDictionary(s => s.Id);
-                //foreach (var orderToSku in invalidSkuOrdered)
-                //{
-                //    Sku sku;
-                //    if (invalidSkus.TryGetValue(orderToSku.IdSku, out sku))
-                //    {
-                //        var optionTypes = _productMapper.FilterByType(sku.Product.IdObjectType);
-                //        orderToSku.Sku = sku;
-                //        orderToSku.Sku.Product = sku.Product;
-                //        orderToSku.Sku.OptionTypes = optionTypes;
-                //        orderToSku.Sku.Product.OptionTypes = optionTypes;
-                //    }
-                //}
             }
             if (entities.All(e => e.PromoSkus != null))
             {
@@ -590,30 +542,6 @@ namespace VitalChoice.Business.Services.Orders
                     orderToSku.Sku.OptionTypes = _skuMapper.FilterByType(orderToSku.Sku.Product.IdObjectType);
                     orderToSku.Sku.Product.OptionTypes = optionTypes;
                 }
-                //var invalidSkuOrdered =
-                //    entities.SelectMany(o => o.Skus)
-                //        .Where(s => s.Sku?.Product == null || s.Sku.OptionTypes == null)
-                //        .ToArray();
-                //var skuIds = new HashSet<int>(invalidSkuOrdered.Select(s => s.IdSku));
-                //var invalidSkus = (await _skusRepository.Query(p => skuIds.Contains(p.Id))
-                //    .Include(s => s.OptionValues)
-                //    .Include(s => s.Product)
-                //    .ThenInclude(p => p.OptionValues)
-                //    .Include(s => s.Product)
-                //    .ThenInclude(p => p.ProductsToCategories)
-                //    .SelectAsync(false)).ToDictionary(s => s.Id);
-                //foreach (var orderToSku in invalidSkuOrdered)
-                //{
-                //    Sku sku;
-                //    if (invalidSkus.TryGetValue(orderToSku.IdSku, out sku))
-                //    {
-                //        var optionTypes = _productMapper.FilterByType(sku.Product.IdObjectType);
-                //        orderToSku.Sku = sku;
-                //        orderToSku.Sku.Product = sku.Product;
-                //        orderToSku.Sku.OptionTypes = optionTypes;
-                //        orderToSku.Sku.Product.OptionTypes = optionTypes;
-                //    }
-                //}
             }
             return TaskCache.CompletedTask;
         }
@@ -627,12 +555,16 @@ namespace VitalChoice.Business.Services.Orders
             {
                 var toLoadUp =
                     new HashSet<int>(updated.GiftCertificates.Where(g => g.GiftCertificate == null).Select(g => g.IdGiftCertificate));
-                var gcs = await gcRep.Query(g => toLoadUp.Contains(g.Id)).SelectAsync(true);
+                List<GiftCertificate> gcs = null;
+                if (toLoadUp.Count > 0)
+                {
+                    gcs = await gcRep.Query(g => toLoadUp.Contains(g.Id)).SelectAsync(true);
+                }
                 updated.GiftCertificates.ForEach(g =>
                 {
                     if (g.GiftCertificate == null)
                     {
-                        g.GiftCertificate = gcs.FirstOrDefault(db => db.Id == g.IdGiftCertificate);
+                        g.GiftCertificate = gcs?.FirstOrDefault(db => db.Id == g.IdGiftCertificate);
                     }
                     if (g.GiftCertificate != null)
                     {
@@ -2014,9 +1946,16 @@ namespace VitalChoice.Business.Services.Orders
 
         private async Task LoadSkusDynamic(IList<OrderImportItemOrderDynamic> map, CustomerDynamic customer)
         {
-            List<string> requestCodes = map.Select(p => p.Order).Where(p => p.Skus != null).SelectMany(p => p.Skus).Where(p => p.Sku != null).Select(p => p.Sku.Code).ToList();
+            List<string> requestCodes =
+                map.Where(p => p.Order.Skus != null)
+                    .SelectMany(p => p.Order.Skus)
+                    .Where(p => p.Sku != null)
+                    .Select(p => p.Sku.Code)
+                    .Distinct()
+                    .ToList();
 
-            var dbSkus = await _productService.GetSkusOrderedAsync(requestCodes);
+            var dbSkus = (await _productService.GetSkusOrderedAsync(requestCodes)).ToDictionary(p => p.Sku.Code,
+                StringComparer.OrdinalIgnoreCase);
             foreach (var item in map)
             {
                 if (item.Order.Skus != null)
@@ -2024,21 +1963,25 @@ namespace VitalChoice.Business.Services.Orders
                     int index = 1;
                     foreach (var sku in item.Order.Skus)
                     {
-                        var dbSku = dbSkus.FirstOrDefault(p => p.Sku.Code == sku.Sku.Code);
-                        if (dbSku == null)
-                        {
-                            var firstRecord = item.OrderImportItems.First();
-                            firstRecord.ErrorMessages.Add(AddErrorMessage("SKU " + index, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuNotFoundOrderImport], "SKU " + index, sku.Sku.Code)));
-                            continue;
-                        }
-                        else
+                        SkuOrdered dbSku;
+                        if (dbSkus.TryGetValue(sku.Sku.Code, out dbSku))
                         {
                             sku.Sku.Product = dbSku.Sku.Product;
                             sku.Sku = dbSku.Sku;
                             if (sku.Sku != null)
                             {
-                                sku.Amount = customer.IdObjectType == (int) CustomerType.Retail ? sku.Sku.Price : customer.IdObjectType == (int) CustomerType.Wholesale ? sku.Sku.WholesalePrice : 0;
+                                sku.Amount = customer.IdObjectType == (int) CustomerType.Retail
+                                    ? sku.Sku.Price
+                                    : customer.IdObjectType == (int) CustomerType.Wholesale ? sku.Sku.WholesalePrice : 0;
                             }
+                        }
+                        else
+                        {
+                            var firstRecord = item.OrderImportItems.First();
+                            firstRecord.ErrorMessages.Add(AddErrorMessage("SKU " + index,
+                                String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuNotFoundOrderImport], "SKU " + index,
+                                    sku.Sku.Code)));
+                            continue;
                         }
 
                         index++;
@@ -2206,8 +2149,12 @@ namespace VitalChoice.Business.Services.Orders
 
         private async Task UpdateHealthwiseOrderWithOrder(OrderDynamic model, IUnitOfWorkAsync uow)
         {
-            //model.IsHealthwise = true;
-            await UpdateHealthwiseOrderInnerAsync(uow, model.Id, model.Customer.Id, DateTime.Now, (bool?) model.SafeData.IsHealthwise ?? false, model.IsFirstHealthwise);
+            if (model.IdObjectType == (int) OrderType.AutoShipOrder || model.IdObjectType == (int) OrderType.Normal)
+            {
+                await
+                    UpdateHealthwiseOrderInnerAsync(uow, model.Id, model.Customer.Id, DateTime.Now,
+                        (bool?) model.SafeData.IsHealthwise ?? false, model.IsFirstHealthwise);
+            }
         }
 
         private async Task UpdateHealthwiseOrderInnerAsync(IUnitOfWorkAsync uow, int idOrder, int idCustomer, DateTime orderDateCreated, bool isHealthwise, bool isFirstHealthwise)
@@ -2220,7 +2167,7 @@ namespace VitalChoice.Business.Services.Orders
             }
             else
             {
-                HealthwiseOrder healthwiseOrder = (await healthwiseOrderRepositoryAsync.Query(p => p.Id == idOrder).SelectFirstOrDefaultAsync(false));
+                HealthwiseOrder healthwiseOrder = await healthwiseOrderRepositoryAsync.Query(p => p.Id == idOrder).SelectFirstOrDefaultAsync(false);
                 if (healthwiseOrder == null)
                 {
                     //BUG: doesn't make any sense to delete not exists HW order
