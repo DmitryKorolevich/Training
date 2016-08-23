@@ -53,7 +53,7 @@ namespace VitalChoice.Caching.Services
 
         public bool IsTracked(EntityInfo info, object entity)
         {
-            var trackData = TemporaryContextualCacheDatas ?? ContextualCacheDatas.Value;
+            var trackData = ContextualCacheDatas.Value;
             var pk = info.PrimaryKey.GetPrimaryKeyValue(entity);
             var key = new TrackedEntityKey(info.EntityType, pk);
             if (trackData.ContainsKey(key))
@@ -67,7 +67,7 @@ namespace VitalChoice.Caching.Services
 
         public bool IsAllTracked(EntityInfo info, IEnumerable<object> entities)
         {
-            var trackData = TemporaryContextualCacheDatas ?? ContextualCacheDatas.Value;
+            var trackData = ContextualCacheDatas.Value;
             var pkInfo = info.PrimaryKey;
             foreach (var entity in entities)
             {
