@@ -22,7 +22,7 @@ angular.module('app.modules.content.controllers.manageStylesController', [])
     	function successSaveHandler(result) {
     		if (result.Success) {
     			toaster.pop('success', "Success!", "Successfully saved");
-    			$scope.model.css = result.Data.CSS;
+    			$scope.model.CSS = result.Data.CSS;
     			refreshHistory();
     		} else {
     			var messages = "";
@@ -40,14 +40,13 @@ angular.module('app.modules.content.controllers.manageStylesController', [])
     	};
 
     	function initialize() {
-		    $scope.model = { css: ""};
+		    $scope.model = { CSS: ""};
 		    $scope.previewUrl = 'http://' + $rootScope.ReferenceData.PublicHost + '/?preview=true';
 
     		manageStylesService.getStyles($scope.refreshTracker)
 		        .success(function (result) {
 		        	if (result.Success) {
-		        	    $scope.model.css = result.Data.CSS;
-		        	    $scope.model.Id = result.Data.Id;
+		        	    $scope.model = result.Data;
 		        	    refreshHistory();
 		        	} else {
 		        		var messages = "";
@@ -68,7 +67,7 @@ angular.module('app.modules.content.controllers.manageStylesController', [])
     	};
 
     	$scope.save = function () {
-    		manageStylesService.saveStyles($scope.model.css, $scope.editTracker)
+    		manageStylesService.saveStyles($scope.model, $scope.editTracker)
 		    .success(function (result) {
 		    	successSaveHandler(result);
 		    }).error(function (result) {
