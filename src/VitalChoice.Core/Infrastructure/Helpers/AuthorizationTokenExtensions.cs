@@ -98,7 +98,8 @@ namespace VitalChoice.Core.Infrastructure.Helpers
             }
         }
 
-        public static async Task<Token> SpinAuthorizationToken(this HttpContext context, ITokenService tokenService, Token currentToken, ApplicationUser user, IObjectEncryptionHost encryptionHost)
+        public static async Task<Token> SpinAuthorizationToken(this HttpContext context, ITokenService tokenService, Token currentToken,
+            ApplicationUser user, IObjectEncryptionHost encryptionHost)
         {
             if (currentToken == null)
             {
@@ -126,7 +127,7 @@ namespace VitalChoice.Core.Infrastructure.Helpers
             var newAuthorization = new ClientAuthorization
             {
                 AuthToken = resultToken.IdToken,
-                WholeHash = Encoding.Unicode.GetBytes(resultToken.IdToken.ToString("N") + user.PasswordHash)
+                WholeHash = encryptionHost.HashBytes(Encoding.Unicode.GetBytes(resultToken.IdToken.ToString("N") + user.PasswordHash))
             };
             context.Response.Cookies.Delete(CheckoutConstants.CustomerAuthToken);
             context.Response.Cookies.Append(CheckoutConstants.CustomerAuthToken,
