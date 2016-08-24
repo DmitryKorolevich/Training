@@ -31,6 +31,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Customers;
@@ -586,8 +587,8 @@ namespace VitalChoice.Business.Services.Checkout
             {
                 cart.ShipDelayDate = cartOrder.Order.Data.ShipDelayDate = null;
             }
-            cart.ShippingUpgradeP = cartOrder.Order.SafeData.ShippingUpgradeP;
-            cart.ShippingUpgradeNP = cartOrder.Order.SafeData.ShippingUpgradeNP;
+            cart.ShippingUpgradeP = (ShippingUpgradeOption?) (int?) cartOrder.Order.SafeData.ShippingUpgradeP;
+            cart.ShippingUpgradeNP = (ShippingUpgradeOption?) (int?) cartOrder.Order.SafeData.ShippingUpgradeNP;
             cart.IdCustomer = null;
             cart.IdOrder = null;
         }

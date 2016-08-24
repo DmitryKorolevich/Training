@@ -33,8 +33,9 @@ namespace VC.Public.Controllers
 
         protected CheckoutControllerBase(ICustomerService customerService,
             ReferenceData referenceData, IAuthorizationService authorizationService, ICheckoutService checkoutService,
-            IOrderService orderService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper, ISettingService settingService, ExtendedUserManager userManager, AppSettings appSettings) : base(customerService,
-                authorizationService, checkoutService, userManager, referenceData)
+            IOrderService orderService, IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
+            ISettingService settingService, ExtendedUserManager userManager, AppSettings appSettings) : base(customerService,
+            authorizationService, checkoutService, userManager, referenceData)
         {
             OrderService = orderService;
             SkuMapper = skuMapper;
@@ -55,7 +56,7 @@ namespace VC.Public.Controllers
 
             if (cartModel.GiftCertificateCodes.Count == 0)
             {
-                cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty }); //needed to to force first input to appear
+                cartModel.GiftCertificateCodes.Add(new CartGcModel() {Value = string.Empty}); //needed to to force first input to appear
             }
             return cartModel;
         }
@@ -86,7 +87,8 @@ namespace VC.Public.Controllers
                 ModelState.AddModelError(string.Empty, cartModel.TopGlobalMessage);
             }
             var gcMessages = context.GcMessageInfos.ToDictionary(m => m.Field);
-            if (!string.IsNullOrWhiteSpace(cartModel.DiscountCode) && order.Discount == null && !((bool?)order.SafeData.IsHealthwise ?? false))
+            if (!string.IsNullOrWhiteSpace(cartModel.DiscountCode) && order.Discount == null &&
+                !((bool?) order.SafeData.IsHealthwise ?? false))
             {
                 context.Messages.Add(new MessageInfo
                 {
@@ -112,8 +114,12 @@ namespace VC.Public.Controllers
 
                     result.GeneratedGCCodes = sku.GcsGenerated?.Select(g => g.Code).ToList();
 
-                    result.Warnings = sku.Messages.Where(message => message.MessageLevel == MessageLevel.Warning).Select(message => message.Message).ToList();
-                    result.Infos = sku.Messages.Where(message => message.MessageLevel == MessageLevel.Info).Select(message => message.Message).ToList();
+                    result.Warnings =
+                        sku.Messages.Where(message => message.MessageLevel == MessageLevel.Warning)
+                            .Select(message => message.Message)
+                            .ToList();
+                    result.Infos =
+                        sku.Messages.Where(message => message.MessageLevel == MessageLevel.Info).Select(message => message.Message).ToList();
 
                     return result;
                 }) ?? Enumerable.Empty<Task<CartSkuModel>>());
@@ -149,7 +155,7 @@ namespace VC.Public.Controllers
                 Enumerable.Empty<CartGcModel>());
             if (hasEmpty)
             {
-                cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty });
+                cartModel.GiftCertificateCodes.Add(new CartGcModel() {Value = string.Empty});
             }
             cartModel.ShippingUpgradeNPOptions = context.ShippingUpgradeNpOptions;
             cartModel.ShippingUpgradePOptions = context.ShippingUpgradePOptions;
@@ -166,8 +172,10 @@ namespace VC.Public.Controllers
 
                 result.GeneratedGCCodes = sku.GcsGenerated?.Select(g => g.Code).ToList();
 
-                result.Warnings = sku.Messages.Where(message => message.MessageLevel == MessageLevel.Warning).Select(message => message.Message).ToList();
-                result.Infos = sku.Messages.Where(message => message.MessageLevel == MessageLevel.Info).Select(message => message.Message).ToList();
+                result.Warnings =
+                    sku.Messages.Where(message => message.MessageLevel == MessageLevel.Warning).Select(message => message.Message).ToList();
+                result.Infos =
+                    sku.Messages.Where(message => message.MessageLevel == MessageLevel.Info).Select(message => message.Message).ToList();
 
                 return result;
             }));
@@ -176,7 +184,7 @@ namespace VC.Public.Controllers
             cartModel.DiscountCode = order.Discount?.Code;
             cartModel.ShippingCost = order.ShippingTotal;
             cartModel.SubTotal = order.ProductsSubtotal;
-            if (((ShipDelayType?)order.SafeData.ShipDelayType ?? ShipDelayType.None) != ShipDelayType.None)
+            if (((ShipDelayType?) order.SafeData.ShipDelayType ?? ShipDelayType.None) != ShipDelayType.None)
             {
                 cartModel.ShipAsap = false;
                 cartModel.ShippingDate = order.SafeData.ShipDelayDate;
@@ -186,19 +194,19 @@ namespace VC.Public.Controllers
                 cartModel.ShipAsap = true;
                 cartModel.ShippingDate = null;
             }
-            cartModel.ShippingUpgradeP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeP;
-            cartModel.ShippingUpgradeNP = (ShippingUpgradeOption?)order.SafeData.ShippingUpgradeNP;
-            cartModel.AutoShip = order.IdObjectType == (int)OrderType.AutoShip;
+            cartModel.ShippingUpgradeP = (ShippingUpgradeOption?) (int?) order.SafeData.ShippingUpgradeP;
+            cartModel.ShippingUpgradeNP = (ShippingUpgradeOption?) (int?) order.SafeData.ShippingUpgradeNP;
+            cartModel.AutoShip = order.IdObjectType == (int) OrderType.AutoShip;
 
             if (cartModel.GiftCertificateCodes.Count == 0)
             {
-                cartModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty });
+                cartModel.GiftCertificateCodes.Add(new CartGcModel() {Value = string.Empty});
             }
 
             foreach (
                 var message in
-                    context.Messages?.Where(m => m.MessageLevel == MessageLevel.Error) ??
-                    Enumerable.Empty<MessageInfo>())
+                context.Messages?.Where(m => m.MessageLevel == MessageLevel.Error) ??
+                Enumerable.Empty<MessageInfo>())
             {
                 ModelState.AddModelError(message.Field, message.Message);
             }
