@@ -71,7 +71,7 @@ namespace VC.Public.Controllers
         private async Task<Tuple<OrderDataContext, CustomerCartOrder>> AddToCartInternal(CartSkuModel skuModelToAdd,
             int? autoshipFrequency = null)
         {
-            var existingUid = Request.GetCartUid();
+            var existingUid = HttpContext.GetCartUid();
             var sku = await _productService.GetSkuOrderedAsync(skuModelToAdd.Code);
             if (sku == null)
                 throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
@@ -143,7 +143,7 @@ namespace VC.Public.Controllers
 
         private async Task<Tuple<OrderDataContext, CustomerCartOrder>> AddToCartInternal(Dictionary<string, CartSkuModel> skuModels, int? autoshipFrequency = null)
         {
-            var existingUid = Request.GetCartUid();
+            var existingUid = HttpContext.GetCartUid();
             var skus = await _productService.GetSkusOrderedAsync(skuModels.Values.Select(p => p.Code).ToList());
             if (skus.Count == 0)
                 throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
@@ -365,7 +365,7 @@ namespace VC.Public.Controllers
                 model.ShippingDate = null;
             }
 
-            var existingUid = Request.GetCartUid();
+            var existingUid = HttpContext.GetCartUid();
             CustomerCartOrder cart;
             if (await CustomerLoggedIn())
             {

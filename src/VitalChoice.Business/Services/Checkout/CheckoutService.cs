@@ -221,6 +221,11 @@ namespace VitalChoice.Business.Services.Checkout
 
                                     newCartOrder.Order = await _orderService.InsertAsync(newCartOrder.Order);
 
+                                    var dbCart =
+                                        await _cartRepository.Query(c => c.CartUid == newCart.CartUid).SelectFirstOrDefaultAsync(true);
+                                    dbCart.IdOrder = newCartOrder.Order.Id;
+                                    await _context.SaveChangesAsync();
+
                                     transaction.Commit();
 
                                     await FillProductContentDetails(newCartOrder);

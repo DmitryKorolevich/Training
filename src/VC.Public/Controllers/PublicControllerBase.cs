@@ -90,6 +90,7 @@ namespace VC.Public.Controllers
 
         protected void SetCartUid(Guid uid)
         {
+            HttpContext.Items[CheckoutConstants.CartUidCookieName] = uid;
             Response.Cookies.Delete(CheckoutConstants.CartUidCookieName);
             Response.Cookies.Append(CheckoutConstants.CartUidCookieName, uid.ToString(), new CookieOptions
             {
@@ -105,14 +106,14 @@ namespace VC.Public.Controllers
             }
             if (loggedIn.Value)
             {
-                var existingUid = Request.GetCartUid();
+                var existingUid = HttpContext.GetCartUid();
                 var result = await CheckoutService.GetOrCreateCart(existingUid, GetInternalCustomerId());
                 SetCartUid(result.CartUid);
                 return result;
             }
             else
             {
-                var existingUid = Request.GetCartUid();
+                var existingUid = HttpContext.GetCartUid();
                 var result = await CheckoutService.GetOrCreateCart(existingUid, false);
                 SetCartUid(result.CartUid);
                 return result;

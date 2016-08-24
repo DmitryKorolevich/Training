@@ -69,7 +69,7 @@ namespace VC.Public.Components.Tracking
             }
             else
             {
-                var existingUid = context.Request.GetCartUid();
+                var existingUid = context.GetCartUid();
                 if (existingUid.HasValue)
                 {
                     var loggedIn =

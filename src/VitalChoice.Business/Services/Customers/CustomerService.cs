@@ -338,10 +338,16 @@ namespace VitalChoice.Business.Services.Customers
 
         public async Task<bool> GetCustomerCardExist(int idCustomer, int idPaymentMethod)
         {
+            if (idPaymentMethod <= 0)
+            {
+                return true;
+            }
             var paymentMethod =
                 await
                     _customerPaymentMethodRepositoryAsync.Query(
-                        p => p.Id == idPaymentMethod && p.IdCustomer == idCustomer && p.IdObjectType == (int) PaymentMethodType.CreditCard)
+                            p =>
+                                p.Id == idPaymentMethod && p.IdCustomer == idCustomer &&
+                                p.IdObjectType == (int) PaymentMethodType.CreditCard)
                         .SelectAnyAsync();
             if (paymentMethod)
             {

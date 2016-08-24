@@ -6,16 +6,21 @@ namespace VC.Public.Helpers
 {
     public static class CartHelperExtension
     {
-        public static Guid? GetCartUid(this HttpRequest request)
+        public static Guid? GetCartUid(this HttpContext context)
         {
-            var cartUidString = request.Cookies[CheckoutConstants.CartUidCookieName];
-            Guid? existingUid = null;
+            if (context.Items.ContainsKey(CheckoutConstants.CartUidCookieName))
+            {
+                return (Guid) context.Items[CheckoutConstants.CartUidCookieName];
+            }
+
+            var cartUidString = context.Request.Cookies[CheckoutConstants.CartUidCookieName];
             Guid cartUid;
             if (Guid.TryParse(cartUidString, out cartUid))
             {
-                existingUid = cartUid;
+                context.Items[CheckoutConstants.CartUidCookieName] = cartUid;
+                return cartUid;
             }
-            return existingUid;
+            return null;
         }
     }
 }

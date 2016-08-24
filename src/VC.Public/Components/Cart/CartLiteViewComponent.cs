@@ -20,7 +20,7 @@ namespace VC.Public.Components.Cart
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var uid = _actionContextAccessor.ActionContext.HttpContext.Request.GetCartUid();
+            var uid = _actionContextAccessor.ActionContext.HttpContext.GetCartUid();
             return Content(uid == null ? "0" : (await _checkoutService.GetCartItemsCount(uid.Value)).ToString());
         }
     }

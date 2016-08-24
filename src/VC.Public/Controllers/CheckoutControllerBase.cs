@@ -45,7 +45,7 @@ namespace VC.Public.Controllers
 
         protected async Task<bool> IsCartEmpty()
         {
-            var uid = Request.GetCartUid();
+            var uid = HttpContext.GetCartUid();
             return uid == null || await CheckoutService.GetCartItemsCount(uid.Value) == 0;
         }
 
