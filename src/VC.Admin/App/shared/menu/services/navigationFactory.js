@@ -90,7 +90,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    stateLabel: 'Affiliates',
 				    subMenu: [
                         { name: 'affiliateSummaryInformation', stateName: 'index.oneCol.affiliatesSummaryReport', stateLabel: 'Affiliate Summary Information', access: 3 },
-                        { name: 'affiliateOrderImportReport', stateName: 'index.oneCol.affiliateOrderImportReport', stateLabel: 'Upload Affiliate File', access: 3 },
+                        { name: 'affiliateOrderImportReport', stateName: 'index.oneCol.affiliateOrderImportReport', stateLabel: 'CJ Affiliate Order Status Upload', access: 3 },
 				    ]
 				},
 				{

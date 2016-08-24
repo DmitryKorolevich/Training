@@ -17,6 +17,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using VitalChoice.Infrastructure.Domain.Transfer.CatalogRequests;
 using Microsoft.Net.Http.Headers;
 using System;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using VC.Admin.Models.ContentManagement;
 using VC.Admin.Models.EmailTemplates;
@@ -42,12 +43,17 @@ using VitalChoice.Infrastructure.Domain.Content.Emails;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Services;
+using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Profiling.Base;
 
 namespace VC.Admin.Controllers
 {
     public class SettingController : BaseApiController
     {
+        private const string Admin_Areas = "Admin Below Nav Critical Alert Message";
+        private static readonly Regex TemplateReplaceExpression = new Regex("\\{([a-z_@][a-z0-9_\\.]*)\\}",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
         private readonly ILogViewService logViewService;
         private readonly ICountryService countryService;
         private readonly ISettingService settingService;
@@ -58,6 +64,7 @@ namespace VC.Admin.Controllers
         private readonly ILogger logger;
         private readonly ITableLogsClient _logsClient;
         private readonly AppSettings _appSettings;
+        private readonly IContentAreaService _contentAreaService;
 
         public SettingController(
             ILogViewService logViewService,
@@ -67,7 +74,10 @@ namespace VC.Admin.Controllers
             IObjectHistoryLogService objectHistoryLogService,
             ICatalogRequestAddressService catalogRequestAddressService,
             ICsvExportService<CatalogRequestAddressListItemModel, CatalogRequestAddressListItemModelCsvMap> exportCatalogRequestAddressService,
-            ILoggerFactory loggerProvider, ITableLogsClient logsClient, AppSettings appSettings)
+            ILoggerFactory loggerProvider, 
+            ITableLogsClient logsClient,
+            AppSettings appSettings,
+            IContentAreaService contentAreaService)
         {
             this.logViewService = logViewService;
             this.countryService = countryService;
@@ -79,6 +89,7 @@ namespace VC.Admin.Controllers
             _logsClient = logsClient;
             _appSettings = appSettings;
             this.logger = loggerProvider.CreateLogger<SettingController>();
+            _contentAreaService = contentAreaService;
         }
 
         #region Lookups
@@ -216,6 +227,15 @@ namespace VC.Admin.Controllers
             settings.Data.CreditCardAuthorizations = model.CreditCardAuthorizations;
 
             return await settingService.UpdateSettingsAsync(settings);
+        }
+
+        [HttpGet]
+        public async Task<Result<ICollection<ContentArea>>> GetContentAreas()
+        {
+            var names = Admin_Areas.Split(',');
+            var areas = await _contentAreaService.GetContentAreaByNameAsync(names);
+
+            return areas.ToList();
         }
 
         #endregion

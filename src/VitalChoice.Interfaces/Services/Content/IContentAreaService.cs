@@ -13,5 +13,7 @@ namespace VitalChoice.Interfaces.Services.Content
 	    Task<ContentArea> GetContentAreaAsync(int id);
 
 	    Task<ContentArea> GetContentAreaByNameAsync(string name);
+
+        Task<ICollection<ContentArea>> GetContentAreaByNameAsync(ICollection<string> names);
     }
 }

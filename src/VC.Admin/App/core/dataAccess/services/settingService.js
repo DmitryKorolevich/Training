@@ -77,6 +77,10 @@ angular.module('app.core.dataAccess.services.settingService', [])
 	    updateGlobalSettings: function (model, tracker) {
 	        return $http.post(baseUrl + 'UpdateGlobalSettings', model, getConfig(tracker));
 	    },
+	    getContentAreas: function (tracker)
+	    {
+	        return $http.get(baseUrl + 'GetContentAreas', getConfig(tracker));
+	    },
 
 	    //catalog requests
 	    getCatalogRequests: function (tracker)

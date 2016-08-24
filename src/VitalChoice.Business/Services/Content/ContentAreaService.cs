@@ -26,10 +26,15 @@ namespace VitalChoice.Business.Services.Content
 
 		public async Task<ContentArea> GetContentAreaByNameAsync(string name)
 		{
-			return await Repository.Query(x => x.Name.Equals(name)).SelectFirstOrDefaultAsync(false);
+			return await Repository.Query(x => x.Name==name).SelectFirstOrDefaultAsync(false);
 		}
 
-		public async Task<IList<ContentArea>> GetContentAreasAsync()
+        public async Task<ICollection<ContentArea>> GetContentAreaByNameAsync(ICollection<string> names)
+        {
+            return await Repository.Query(x => names.Contains(x.Name)).SelectAsync(false);
+        }
+
+        public async Task<IList<ContentArea>> GetContentAreasAsync()
 		{
 			return await Repository.Query().Include(x=>x.User).ThenInclude(x=>x.Profile).SelectAsync(false);
 		}

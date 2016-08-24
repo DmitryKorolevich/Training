@@ -38,6 +38,11 @@ namespace VC.Admin
                 name: "defaultApi",
                 template: "api/{controller}/{action}/{id?}");
 
+            routeBuilder.MapRoute(
+                name: "IEDetect",
+                template: "ie",
+                defaults: new { controller = "Home", action = "IE" });
+
             routeBuilder.Routes.Add(new Route(new HomeRouter(routeBuilder.DefaultHandler), "default",
                 "{*url}",
                 new RouteValueDictionary(new {controller = "Home", action = "Index"}), null, null, inlineConstraintResolver));

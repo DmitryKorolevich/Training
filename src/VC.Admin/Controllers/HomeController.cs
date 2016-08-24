@@ -12,5 +12,10 @@ namespace VC.Admin.Controllers
         {
             return View();
         }
+
+        public IActionResult IE()
+        {
+            return View();
+        }
     }
 }

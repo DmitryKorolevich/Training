@@ -3,68 +3,21 @@
 angular.module('app.core.utils.appBootstrap', [])
     .service('appBootstrap',
     [
-        'infrastructureService', '$rootScope', '$anchorScroll', 'toaster', 'authenticationService', 'cacheService', '$location',
+        'infrastructureService', '$rootScope', '$anchorScroll', 'toaster', 'authenticationService',
+        'cacheService', 'settingService', '$location',
         'ngProgress', 'webStorageUtil',
-        'confirmUtil', function(infrastructureService,
+        'confirmUtil', function (infrastructureService,
             $rootScope,
             $anchorScroll,
             toaster,
             authenticationService,
             cacheService,
+            settingService,
             $location,
             ngProgress,
             webStorageUtil,
             confirmUtil)
         {
-            var ieVersion=null;
-
-            function detectIE()
-            {
-                if (ieVersion != null)
-                    return ieVersion;
-
-                var ua = window.navigator.userAgent;
-
-                // IE 10
-                // ua = 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)';
-
-                // IE 11
-                // ua = 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko';
-
-                // Edge 12 (Spartan)
-                // ua = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36 Edge/12.0';
-
-                // Edge 13
-                // ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586';
-
-                var msie = ua.indexOf('MSIE ');
-                if (msie > 0)
-                {
-                    // IE 10 or older => return version number
-                    ieVersion = parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
-                }
-
-                var trident = ua.indexOf('Trident/');
-                if (trident > 0)
-                {
-                    // IE 11 => return version number
-                    var rv = ua.indexOf('rv:');
-                    ieVersion = parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
-                }
-
-                var edge = ua.indexOf('Edge/');
-                if (edge > 0)
-                {
-                    // Edge (IE 12+) => return version number
-                    ieVersion = parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
-                }
-
-                if (ieVersion == null)
-                    ieVersion = false;
-
-                return ieVersion;
-            }
-
             function scrollTo(id)
             {
                 $location.hash(id);
@@ -72,50 +25,64 @@ angular.module('app.core.utils.appBootstrap', [])
                 $location.hash('');
             };
 
-            function getReferenceItem(lookup, key) {
-                if (lookup) {
+            function getReferenceItem(lookup, key)
+            {
+                if (lookup)
+                {
                     return $.grep(lookup,
-                        function(elem) {
+                        function (elem)
+                        {
                             return elem.Key === key;
                         })[0];
                 }
                 return null;
             };
 
-            function stopPropagation($event) {
+            function stopPropagation($event)
+            {
                 $event.preventDefault();
                 $event.stopPropagation();
             };
 
-            function getValidationMessage(key, field, arg) {
+            function getValidationMessage(key, field, arg)
+            {
                 var item = getReferenceItem($rootScope.ReferenceData.Labels, key);
                 var messageFormat;
-                if (item) {
+                if (item)
+                {
                     messageFormat = item.Text;
-                } else {
+                } else
+                {
                     messageFormat = key;
                 }
                 var message = '';
-                if (field) {
+                if (field)
+                {
                     var item = getReferenceItem($rootScope.ReferenceData.Labels,
                         Array.isArray(field) ? field[0] : field);
-                    if (item) {
-                        if (Array.isArray(field)) {
+                    if (item)
+                    {
+                        if (Array.isArray(field))
+                        {
                             field[0] = item.Text;
-                        } else {
+                        } else
+                        {
                             field = item.Text;
                         }
                     }
                     message = messageFormat.format(field, arg);
-                } else {
+                } else
+                {
                     message = messageFormat;
                 }
 
                 return message;
             };
 
-            function validatePermission(permission) {
-                if (!$rootScope.authenticated || !$rootScope.currentUser) {
+            function validatePermission(permission)
+            {
+                if (!$rootScope.authenticated || !$rootScope.currentUser)
+                {
                     return false;
                 }
 
@@ -123,8 +90,10 @@ angular.module('app.core.utils.appBootstrap', [])
                     $rootScope.currentUser.Permissions.indexOf(permission) > -1;
             };
 
-            function validatePermissionMenuItem(menuItem) {
-                if (!$rootScope.authenticated || !$rootScope.currentUser) {
+            function validatePermissionMenuItem(menuItem)
+            {
+                if (!$rootScope.authenticated || !$rootScope.currentUser)
+                {
                     return false;
                 }
 
@@ -132,11 +101,14 @@ angular.module('app.core.utils.appBootstrap', [])
                     return true;
 
                 var result = false;
-                if (menuItem && menuItem.subMenu) {
+                if (menuItem && menuItem.subMenu)
+                {
                     $.each(menuItem.subMenu,
-                        function(index, subMenuItem) {
+                        function (index, subMenuItem)
+                        {
                             if (subMenuItem.access == null ||
-                                $rootScope.currentUser.Permissions.indexOf(subMenuItem.access) > -1) {
+                                $rootScope.currentUser.Permissions.indexOf(subMenuItem.access) > -1)
+                            {
                                 result = true;
                                 return false;
                             }
@@ -146,21 +118,26 @@ angular.module('app.core.utils.appBootstrap', [])
                 return result;
             };
 
-            function logout() {
+            function logout()
+            {
                 authenticationService.logout()
-                    .success(function() {
+                    .success(function ()
+                    {
                         $rootScope.authenticated = false;
                         $rootScope.currentUser = {};
 
                         $rootScope.$state.go("index.oneCol.login");
                     })
-                    .error(function() {
+                    .error(function ()
+                    {
                         //handle error
                     });
             }
 
-            function unauthorizedArea(path) {
-                if (!path && path != "") {
+            function unauthorizedArea(path)
+            {
+                if (!path && path != "")
+                {
                     path = $location.path();
                 }
 
@@ -169,66 +146,116 @@ angular.module('app.core.utils.appBootstrap', [])
                     path.indexOf("/authentication/passwordreset") > -1;
             };
 
-            function cacheStatus() {
-                cacheService.getCacheStatus()
-                    .success(function(cacheResult) {
-                        if (cacheResult.Success && cacheResult.Data) {
-                            $rootScope.cacheState = cacheResult.Data;
-                        }
-                        if ($rootScope.authenticated)
+            function cacheStatus()
+            {
+                if ($rootScope.authenticated)
+                {
+                    cacheService.getCacheStatus()
+                        .success(function (cacheResult)
+                        {
+                            if (cacheResult.Success && cacheResult.Data)
+                            {
+                                $rootScope.cacheState = cacheResult.Data;
+                            }
+
                             setTimeout(cacheStatus, 5000);
-                        else {
-                            setTimeout(cacheStatus, 20000);
-                        }
-                    })
-                    .error(function() {
-                        $rootScope.cacheState = [{ "Error": 0 }];
-                        setTimeout(cacheStatus, 60000);
-                    });
+                        })
+                        .error(function ()
+                        {
+                            $rootScope.cacheState = [{ "Error": 0 }];
+                            setTimeout(cacheStatus, 60000);
+                        });
+                }
+                else
+                {
+                    setTimeout(cacheStatus, 2000);
+                }
             }
 
-            function initialize() {
+            function checkAreas()
+            {
+                if ($rootScope.authenticated)
+                {
+                    settingService.getContentAreas()
+                        .success(function (result)
+                        {
+                            if (result.Success && result.Data)
+                            {
+                                $.each(result.Data, function (index, item)
+                                {
+                                    if (item.Template)
+                                    {
+                                        $('.area[data-area-name="' + item.Name + '"]').html(item.Template);
+                                    }
+                                });
+                            }
+
+                            setTimeout(checkAreas, 60000);
+                        })
+                        .error(function ()
+                        {
+                            setTimeout(checkAreas, 60000);
+                        });
+                }
+                else
+                {
+                    setTimeout(checkAreas, 2000);
+                }
+            }
+
+            function initialize()
+            {
                 bindRootScope();
 
                 $rootScope.appStarted = false;
                 $rootScope.Math = window.Math;
                 $rootScope.ReferenceData = {};
 
+                cacheStatus();
+                checkAreas();
+
                 infrastructureService.getReferenceData()
-                    .success(function(res) {
-                        if (res.Success) {
+                    .success(function (res)
+                    {
+                        if (res.Success)
+                        {
                             $rootScope.ReferenceData = res.Data;
 
-                            if (!$rootScope.unauthorizedArea()) {
+                            if (!$rootScope.unauthorizedArea())
+                            {
                                 authenticationService.getCurrenUser()
-                                    .success(function(res) {
-                                        if (res.Success && res.Data) {
+                                    .success(function (res)
+                                    {
+                                        if (res.Success && res.Data)
+                                        {
                                             $rootScope.authenticated = true;
                                             $rootScope.currentUser = res.Data;
-
-                                            cacheStatus();
-
-                                        } else {
+                                        } else
+                                        {
                                             $rootScope.authenticated = false;
 
                                             $rootScope.$state.go("index.oneCol.login");
                                         }
                                         $rootScope.appStarted = true;
                                     })
-                                    .error(function() {
+                                    .error(function ()
+                                    {
                                         toaster.pop('error', "Error!", "Can't get current user info");
                                     });
 
-                            } else {
+                            } else
+                            {
                                 $rootScope.authenticated = false;
                                 $rootScope.appStarted = true;
                             }
 
-                        } else {
+                        } else
+                        {
                             toaster.pop('error', 'Error!', "Unable to initialize app properly");
                         }
                     })
-                    .error(function(res) {
+                    .error(function (res)
+                    {
                         toaster.pop('error', "Error!", "Server error occured");
                     });
 
@@ -244,55 +271,58 @@ angular.module('app.core.utils.appBootstrap', [])
                 $rootScope.UIOptions.DatepickerFormat = 'MM/dd/yyyy';
             }
 
-            function bindRootScope() {
+            function bindRootScope()
+            {
                 $rootScope.$on('$stateChangeStart',
-                    function(event, toState, toParams, fromState, fromParams) {
+                    function (event, toState, toParams, fromState, fromParams)
+                    {
                         if ($rootScope.appStarted &&
                             $rootScope.$state.href(toState) != null &&
                             !$rootScope.unauthorizedArea($rootScope.$state.href(toState)) &&
-                            !$rootScope.authenticated) {
+                            !$rootScope.authenticated)
+                        {
                             toaster.pop('warning', "Caution!", "You must login before accessing this area.");
 
                             event.preventDefault();
                         } else
                         {
-                            if (toState.name!='index.ie' && detectIE())
-                            {
-                                $rootScope.$state.go('index.ie');
-                                event.preventDefault();
-                            }
-
                             ngProgress.start();
 
-                            if ($rootScope.lastRemediationKey) {
+                            if ($rootScope.lastRemediationKey)
+                            {
                                 webStorageUtil.removeSession($rootScope.lastRemediationKey);
                                 $rootScope.lastRemediationKey = null;
                             }
                         }
                     });
                 $rootScope.$on('$stateChangeSuccess',
-                    function(event, toState, toParams, fromState, fromParams) {
+                    function (event, toState, toParams, fromState, fromParams)
+                    {
                         ngProgress.complete();
                         $rootScope.$state.previous = angular.copy(fromState);
                         $rootScope.$state.previous.params = fromParams;
                     });
                 $rootScope.$on('$stateChangeError',
-                    function() {
+                    function ()
+                    {
                         ngProgress.complete();
                     });
                 $rootScope.$on('$stateNotFound',
-                    function() {
+                    function ()
+                    {
                         ngProgress.complete();
                     });
             }
 
             var data = [];
 
-            var setData = function(name, value) {
+            var setData = function (name, value)
+            {
                 data[name] = value;
             };
 
-            var getData = function(name) {
+            var getData = function (name)
+            {
                 return data[name];
             };
 

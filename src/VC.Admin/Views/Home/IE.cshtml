@@ -1,0 +1,33 @@
+﻿@{
+	Layout = "~/Views/Shared/_LayoutIE.cshtml";
+}
+
+<div data-ui-view="">
+    <div class="container-fluid">
+        <div class="row fade" data-ng-show="appStarted">
+            <div data-ui-view="topMenu">
+                <nav class="navbar margin-zero custom-navbar-top">
+                    <div class="container-fluid">
+                        <div class="navbar-header">
+                            <a href="#" ui-sref="index.oneCol.dashboard"><img class="logo" src="/assets/images/logo.png"></a>
+                        </div>
+                        <div class="collapse navbar-collapse"></div>
+                    </div>
+                </nav>
+                <nav class="navbar navbar-inverse custom-navbar-bottom">
+                    <div class="container-fluid">
+                        <div class="navbar-header"></div>
+                        <div class="collapse navbar-collapse"></div>
+                    </div>
+                </nav>
+            </div>
+            <div data-ui-view="workingPanel">
+                <div data-ui-view="" data-ng-if="appStarted">
+                    <div class="container-fluid">
+                        <span class="legend">Internet Explorer Detected</span><p>We have detected that you are running Internet Explorer. This browser is not fully supported by this admin area. Please close this page and use a different browser to access the admin until further notice. If you feel you are receiving this message in error, please contact support.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

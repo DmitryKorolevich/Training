@@ -63,3 +63,16 @@ BEGIN
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name]='Admin Below Nav Critical Alert Message')
+BEGIN
+
+	INSERT INTO [dbo].[ContentAreas]
+	([Name], [Template], [StatusCode], [Created], [Updated])
+	VALUES
+	(N'Admin Below Nav Critical Alert Message', N'<div class="padding-bottom-5px padding-top-5px">Some Message</div>', 2, GETDATE(), GETDATE())
+
+END
+
+GO
+
