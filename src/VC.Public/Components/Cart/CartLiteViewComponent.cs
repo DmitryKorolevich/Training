@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using VC.Public.Helpers;
+using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Interfaces.Services.Checkout;
 
 namespace VC.Public.Components.Cart

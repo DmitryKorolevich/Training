@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using VC.Public.Helpers;
 using VC.Public.Models.Cart;
+using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Interfaces.Services.Customers;
@@ -66,7 +67,7 @@ namespace VC.Public.Controllers
             var cart = await GetCurrentCart();
             var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
             await FillModel(cartModel, cart.Order, context);
-            SetCartUid(cart.CartUid);
+            HttpContext.SetCartUid(cart.CartUid);
         }
 
         protected async Task FillModel(ViewCartModel cartModel, OrderDynamic order, OrderDataContext context)

@@ -13,6 +13,7 @@ using VitalChoice.Interfaces.Services.Affiliates;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using VC.Public.Helpers;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Core.Services;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
@@ -27,6 +28,9 @@ using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Orders;
+using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
+using VitalChoice.Interfaces.Services;
 
 namespace VC.Public.Controllers
 {
@@ -41,9 +45,11 @@ namespace VC.Public.Controllers
         private readonly INotificationService _notificationService;
         private readonly IOrderSchedulerService _orderSchedulerService;
 	    private readonly ExtendedUserManager _userManager;
+	    private readonly ITokenService _tokenService;
+        private readonly IObjectEncryptionHost _encryptionHost;
 
 
-	    public AccountController(
+        public AccountController(
 	        IStorefrontUserService userService,
 	        IDynamicMapper<CustomerDynamic, Customer> customerMapper,
 	        ICustomerService customerService,
@@ -52,7 +58,7 @@ namespace VC.Public.Controllers
 	        INotificationService notificationService,
 	        IOrderSchedulerService orderSchedulerService,
 	        ExtendedUserManager userManager, IAuthorizationService authorizationService, ICheckoutService checkoutService,
-	        ReferenceData referenceData) : base(customerService, authorizationService, checkoutService, userManager, referenceData)
+	        ReferenceData referenceData, ITokenService tokenService, IObjectEncryptionHost encryptionHost) : base(customerService, authorizationService, checkoutService, userManager, referenceData)
 	    {
 	        _userService = userService;
 	        _customerMapper = customerMapper;
@@ -62,6 +68,8 @@ namespace VC.Public.Controllers
 	        _notificationService = notificationService;
 	        _orderSchedulerService = orderSchedulerService;
 	        _userManager = userManager;
+	        _tokenService = tokenService;
+	        _encryptionHost = encryptionHost;
 	    }
 
 	    [HttpGet]
@@ -99,11 +107,12 @@ namespace VC.Public.Controllers
 	        try
 	        {
 	            user = await _userService.SignInAsync(model.Email, model.Password);
-	            var cartUid = GetCurrentCartUid();
+                await HttpContext.SpinAuthorizationToken(_tokenService, null, user, _encryptionHost);
+	            var cartUid = HttpContext.GetCartUid();
 	            if (cartUid == null || await CheckoutService.GetCartItemsCount(cartUid.Value) == 0)
 	            {
 	                var cart = await CheckoutService.GetOrCreateCart(null, user.Id);
-	                SetCartUid(cart.CartUid);
+                    HttpContext.SetCartUid(cart.CartUid);
 	            }
 	        }
 	        catch (WholesalePendingException)
@@ -133,32 +142,32 @@ namespace VC.Public.Controllers
         public async Task<Result<string>> CheckEmail(object model, string email)
         {
             var user = await _userService.FindAsync(email);
-
             return user != null ? $"/account/login?alreadytakenemail={email}&type=2" : null;//2 - wholesale
         }
 
-        public async Task<IActionResult> Logout()
-		{
-            var context = HttpContext;
+	    public async Task<IActionResult> Logout()
+	    {
+	        var context = HttpContext;
 
-			if (context.User.Identity.IsAuthenticated)
-			{
-				var user = await _userService.FindAsync(_userManager.GetUserName(context.User));
-				if (user == null)
-				{
-                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser])
-                    {
-                        ViewName = "Login"
-                    };
-				}
+	        if (context.User.Identity.IsAuthenticated)
+	        {
+	            var user = await _userService.FindAsync(_userManager.GetUserName(context.User));
+	            if (user == null)
+	            {
+	                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser])
+	                {
+	                    ViewName = "Login"
+	                };
+	            }
 
-				await _userService.SignOutAsync(user);
-			}
+	            await _userService.SignOutAsync(user);
+	            await HttpContext.RemoveAuthorizationToken();
+	        }
 
-			return RedirectToAction("Index", "Home");
-		}
+	        return RedirectToAction("Index", "Home");
+	    }
 
-		[HttpGet]
+	    [HttpGet]
 		public async Task<IActionResult> Activate(Guid id)
 		{
             ApplicationUser result;
@@ -415,7 +424,7 @@ namespace VC.Public.Controllers
             }
 
             await _userService.SignInAsync(await _userService.FindAsync(model.Email));
-
+            await HttpContext.SpinAuthorizationToken(_tokenService, null, user, _encryptionHost);
 
             return await Login(new LoginModel() { Email = model.Email, Password = model.Password }, string.Empty);
 		}

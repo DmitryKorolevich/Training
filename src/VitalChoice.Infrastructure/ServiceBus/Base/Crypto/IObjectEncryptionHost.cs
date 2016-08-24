@@ -10,6 +10,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
 {
     public interface IObjectEncryptionHost : IDisposable
     {
+        byte[] HashBytes(byte[] data);
+        string HashString(string data);
         void UpdateLocalKey(KeyExchange key);
         KeyExchange GetLocalKey();
         X509Certificate2 LocalCert { get; }

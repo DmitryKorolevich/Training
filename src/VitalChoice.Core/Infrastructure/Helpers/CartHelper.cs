@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using VitalChoice.Infrastructure.Domain.Constants;
 
-namespace VC.Public.Helpers
+namespace VitalChoice.Core.Infrastructure.Helpers
 {
     public static class CartHelperExtension
     {
@@ -21,6 +21,16 @@ namespace VC.Public.Helpers
                 return cartUid;
             }
             return null;
+        }
+
+        public static void SetCartUid(this HttpContext context, Guid uid)
+        {
+            context.Items[CheckoutConstants.CartUidCookieName] = uid;
+            context.Response.Cookies.Delete(CheckoutConstants.CartUidCookieName);
+            context.Response.Cookies.Append(CheckoutConstants.CartUidCookieName, uid.ToString(), new CookieOptions
+            {
+                Expires = DateTime.Now.AddYears(1)
+            });
         }
     }
 }

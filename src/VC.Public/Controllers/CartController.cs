@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using VC.Public.Helpers;
 using VC.Public.Models.Cart;
 using VitalChoice.Core.Infrastructure;
+using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Core.Services;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Checkout;
@@ -86,7 +87,7 @@ namespace VC.Public.Controllers
             {
                 cart = await _checkoutService.GetOrCreateCart(existingUid, false);
             }
-            SetCartUid(cart.CartUid);
+            HttpContext.SetCartUid(cart.CartUid);
 
             if (sku.Sku.SafeData.AutoShipProduct == true && autoshipFrequency.HasValue)
             {
@@ -158,7 +159,7 @@ namespace VC.Public.Controllers
             {
                 cart = await _checkoutService.GetOrCreateCart(existingUid, false);
             }
-            SetCartUid(cart.CartUid);
+            HttpContext.SetCartUid(cart.CartUid);
 
             if (skus.Count == 1 && skus.First().Sku.SafeData.AutoShipProduct == true && autoshipFrequency.HasValue)
             {
@@ -312,7 +313,7 @@ namespace VC.Public.Controllers
                 var res = await AddToCartInternal(skus.ToDictionary(s => s.Code));
 
                 await FillModel(result, res.Item2.Order, res.Item1);
-                SetCartUid(res.Item2.CartUid);
+                HttpContext.SetCartUid(res.Item2.CartUid);
                 HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderId);
 
                 cartRes = result;
@@ -345,7 +346,7 @@ namespace VC.Public.Controllers
                 });
 
             await FillModel(result, res.Item2.Order, res.Item1);
-            SetCartUid(res.Item2.CartUid);
+            HttpContext.SetCartUid(res.Item2.CartUid);
             HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderId);
             return result;
         }
@@ -376,7 +377,7 @@ namespace VC.Public.Controllers
             {
                 cart = await _checkoutService.GetOrCreateCart(existingUid, false);
             }
-            SetCartUid(cart.CartUid);
+            HttpContext.SetCartUid(cart.CartUid);
             cart.Order.Skus?.MergeKeyed(model.Skus.Where(s => s.Quantity > 0).ToArray(), ordered => ordered.Sku.Code,
                 skuModel => skuModel.Code, skuModel =>
                 {

@@ -55,7 +55,7 @@ namespace VitalChoice.ExportService.Services
                     var lastWriteTime = File.GetLastWriteTime(_keyFilePath);
                     if (DateTime.Now - lastWriteTime > TimeSpan.FromDays(30) && _options.Value.ScheduleDayTimeHour == DateTime.Now.Hour)
                     {
-                        Aes newAes;
+                        AesCng newAes;
                         var key = CreateNewKey(out newAes);
                         using (
                             SqlConnection conn =
@@ -220,11 +220,7 @@ namespace VitalChoice.ExportService.Services
         {
             _logger.LogWarning("Starting DB recrypt");
             var copyContext = new ExportInfoCopyContext(_options, _contextOptions);
-            var localAes = Aes.Create();
-            if (localAes == null)
-            {
-                throw new CryptographicException("Cannot create AES");
-            }
+            var localAes = new AesCng();
             var localKey = _encryptionHost.GetLocalKey();
             localAes.KeySize = 256;
             localAes.Key = localKey.Key;
@@ -265,9 +261,9 @@ namespace VitalChoice.ExportService.Services
             }
         }
 
-        private static KeyExchange CreateNewKey(out Aes aes)
+        private static KeyExchange CreateNewKey(out AesCng aes)
         {
-            aes = Aes.Create();
+            aes = new AesCng();
             if (aes == null)
             {
                 throw new CryptographicException("Cannot create AES");

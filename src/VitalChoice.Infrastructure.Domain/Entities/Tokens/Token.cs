@@ -7,6 +7,7 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Tokens
 {
     public enum TokenType
     {
-        OrderInvoicePDFAdminGenerateRequest=1
+        OrderInvoicePdfAdminGenerateRequest = 1,
+        CustomerAutoReLoginToken = 2
     }
 }

@@ -1,13 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Core.Infrastructure.Models;
+using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities.Tokens;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
+using VitalChoice.Interfaces.Services.Users;
 
 namespace VitalChoice.Core.Infrastructure
 {
@@ -22,8 +33,10 @@ namespace VitalChoice.Core.Infrastructure
 
         protected void Fail(AuthorizationFilterContext context)
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>();
-            parameters.Add("returnUrl", context.HttpContext.Request.Path);
+            var parameters = new Dictionary<string, object>
+            {
+                {"returnUrl", context.HttpContext.Request.Path}
+            };
             context.Result = new RedirectToActionResult("Login", "Account", parameters);
         }
 
@@ -56,8 +69,10 @@ namespace VitalChoice.Core.Infrastructure
                 {
                     if (claimUser.HasClaim(x => x.Type == IdentityConstants.AffiliateRole))
                     {
-                        Dictionary<string, object> parameters = new Dictionary<string, object>();
-                        parameters.Add("returnUrl", context.HttpContext.Request.Path);
+                        Dictionary<string, object> parameters = new Dictionary<string, object>
+                        {
+                            {"returnUrl", context.HttpContext.Request.Path}
+                        };
                         context.Result = new RedirectToActionResult("Login", "Account", parameters);
                         return;
                     }
@@ -66,5 +81,7 @@ namespace VitalChoice.Core.Infrastructure
 
             Fail(context);
         }
+
+        
     }
 }

@@ -1,12 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace VitalChoice.Ecommerce.Domain.Helpers
 {
     public static class ArrayExtensions
     {
+        public static string ToHexString(this byte[] data)
+        {
+            var builder = new StringBuilder(data.Length * 2);
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var i = 0; i < data.Length; i++)
+            {
+                builder.Append(data[i].ToString("X2"));
+            }
+            return builder.ToString();
+        }
+
+        public static byte[] FromHexString(this string hexData)
+        {
+            if (string.IsNullOrEmpty(hexData))
+                return null;
+            try
+            {
+                var result = new byte[hexData.Length/2];
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < result.Length; i++)
+                {
+                    result[i] = byte.Parse(hexData.Substring(i*2, 2), NumberStyles.HexNumber);
+                }
+                return result;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public static unsafe bool AreEqualsTo(this byte[] src, byte[] dest)
         {
             fixed (byte* sp = src)
@@ -40,5 +73,6 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
             return 0;
         }
+
     }
 }
