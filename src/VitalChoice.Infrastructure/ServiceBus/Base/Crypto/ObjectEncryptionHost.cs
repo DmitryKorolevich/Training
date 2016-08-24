@@ -88,7 +88,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
         {
             var sha = new SHA256Cng();
             sha.Initialize();
-            return sha.TransformFinalBlock(data, 0, data.Length);
+            return sha.ComputeHash(data, 0, data.Length);
         }
 
         public string HashString(string str)
@@ -96,7 +96,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             var sha = new SHA256Cng();
             sha.Initialize();
             var data = Encoding.Unicode.GetBytes(str);
-            return sha.TransformFinalBlock(data, 0, data.Length).ToHexString();
+            return sha.ComputeHash(data, 0, data.Length).ToHexString();
         }
 
         public void UpdateLocalKey(KeyExchange key)
