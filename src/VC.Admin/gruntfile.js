@@ -122,6 +122,7 @@ module.exports = function (grunt) {
             },
             release: {
                 files: [
+				    { src: 'app/app.ie.js', dest: 'wwwroot/app/app.ie.js' },
 					{ expand: true, cwd: 'temp/js/minified/', src: ['**'], dest: 'wwwroot/' },
 			        { expand: true, cwd: 'temp/css/minified/', src: ['**'], dest: 'wwwroot/' },
 					{ expand: true, cwd: 'assets/images/', src: ['**'], dest: 'wwwroot/assets/images/' },
