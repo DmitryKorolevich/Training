@@ -213,16 +213,15 @@ namespace VitalChoice.Business.Services.Products
 
         public Task<List<PromotionDynamic>> GetActivePromotions(CustomerType customerType)
         {
+
             switch (customerType)
             {
-                case CustomerType.Retail:
-                    return
-                        GetRetailPromos();
                 case CustomerType.Wholesale:
                     return
                         GetWholesalePromos();
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(customerType), customerType, null);
+                    return
+                        GetRetailPromos();
             }
         }
 
