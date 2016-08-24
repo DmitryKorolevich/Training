@@ -13,7 +13,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Core.Infrastructure
 {
-    public class AffiliateAuthorizeAttribute : Attribute, IAuthorizationFilter
+    public class AffiliateAuthorizeAttribute : Attribute, IAsyncAuthorizationFilter
     {
         protected void Fail(AuthorizationFilterContext context)
         {
@@ -21,7 +21,7 @@ namespace VitalChoice.Core.Infrastructure
             context.Result = new RedirectToActionResult("Login", "AffiliateAccount", parameters);
         }
 
-        public void OnAuthorization(AuthorizationFilterContext context)
+        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             var authorizationService = context.HttpContext.RequestServices.GetService<IAuthorizationService>();
 
@@ -29,7 +29,7 @@ namespace VitalChoice.Core.Infrastructure
             if (context.HttpContext.User.Identity.IsAuthenticated)
             {
                 var result =
-                    authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile).GetAwaiter().GetResult();
+                    await authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile);
                 if (result)
                 {
                     if (claimUser.HasClaim(x => x.Type == IdentityConstants.AffiliateRole))

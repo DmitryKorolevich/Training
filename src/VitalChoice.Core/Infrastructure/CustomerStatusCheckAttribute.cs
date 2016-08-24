@@ -16,14 +16,14 @@ using VitalChoice.Validation.Models;
 
 namespace VitalChoice.Core.Infrastructure
 {
-	public class CustomerStatusCheckAttribute : Attribute, IAuthorizationFilter
+	public class CustomerStatusCheckAttribute : Attribute, IAsyncAuthorizationFilter
     {
-		public void OnAuthorization(AuthorizationFilterContext context)
-		{
+        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
+        {
 			var authorizationService = context.HttpContext.RequestServices.GetService<IAuthorizationService>();
 		    var userManager = context.HttpContext.RequestServices.GetService<ExtendedUserManager>();
 			var claimUser = context.HttpContext.User;
-			var result = authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile).GetAwaiter().GetResult();
+			var result = await authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile);
 			if (result)
 			{
 				if (claimUser.HasClaim(x=>x.Type == IdentityConstants.CustomerRoleType))
@@ -33,7 +33,7 @@ namespace VitalChoice.Core.Infrastructure
                     if(Int32.TryParse(sUserId, out userId))
                     {
                         var customerService = context.HttpContext.RequestServices.GetService<ICustomerService>();
-                        var status = customerService.GetCustomerStatusAsync(userId).GetAwaiter().GetResult();
+                        var status = await customerService.GetCustomerStatusAsync(userId);
                         if (status == CustomerStatus.Suspended)
                         {
                             var acceptHeader = context.HttpContext.Request.Headers["Accept"];

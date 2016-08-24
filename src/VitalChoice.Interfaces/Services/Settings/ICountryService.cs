@@ -8,6 +8,8 @@ namespace VitalChoice.Interfaces.Services.Settings
 	public interface ICountryService
     {
         Task<ICollection<Country>> GetCountriesAsync(CountryFilter filter = null);
+
+        ICollection<Country> GetCountries(CountryFilter filter = null);
         Task<Country> GetCountryAsync(int id);
         Task<bool> UpdateCountriesOrderAsync(ICollection<Country> model);
         Task<Country> UpdateCountryAsync(Country model);

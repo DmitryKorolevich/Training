@@ -1,11 +1,7 @@
 ﻿using System;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.DependencyInjection;
-using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;
-using VitalChoice.Infrastructure.Identity;
 
 namespace VitalChoice.Core.GlobalFilters
 {
@@ -36,22 +32,6 @@ namespace VitalChoice.Core.GlobalFilters
                 }
             }
 
-            base.OnActionExecuted(context);
-        }
-    }
-
-    public class CustomerAutoReloginFilter : ActionFilterAttribute
-    {
-        public override void OnActionExecuted(ActionExecutedContext context)
-        {
-            var claimUser = context.HttpContext.User;
-            var authorizationService = context.HttpContext.RequestServices.GetService<IAuthorizationService>();
-            var result =
-                authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile).GetAwaiter().GetResult();
-            if (!result)
-            {
-                context.HttpContext.AuthorizeFromCookie().GetAwaiter().GetResult();
-            }
             base.OnActionExecuted(context);
         }
     }

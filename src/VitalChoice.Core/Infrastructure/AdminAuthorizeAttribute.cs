@@ -16,7 +16,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 namespace VitalChoice.Core.Infrastructure
 {
     [AttributeUsage(AttributeTargets.All)]
-    public class AdminAuthorizeAttribute : Attribute, IAuthorizationFilter
+    public class AdminAuthorizeAttribute : Attribute, IAsyncAuthorizationFilter
     {
         private readonly IList<int> _permissions;
 
@@ -35,13 +35,13 @@ namespace VitalChoice.Core.Infrastructure
             context.Result = context.HttpContext.User.Identity.IsAuthenticated ? new StatusCodeResult(403) : new UnauthorizedResult();
         }
 
-        public void OnAuthorization(AuthorizationFilterContext context)
+        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             var authorizationService = context.HttpContext.RequestServices.GetService<IAuthorizationService>();
 
             var claimUser = context.HttpContext.User;
             var result =
-                authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile).GetAwaiter().GetResult();
+                await authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile);
             if (result)
             {
                 if (_permissions == null || !(_permissions.Count > 0))

@@ -1,28 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Infrastructure.Identity;
-using VitalChoice.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Core.Infrastructure.Models;
-using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.Infrastructure.Domain.Constants;
-using VitalChoice.Infrastructure.Domain.Entities.Tokens;
-using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer;
-using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
-using VitalChoice.Interfaces.Services.Users;
 
 namespace VitalChoice.Core.Infrastructure
 {
-    public class CustomerAuthorizeAttribute : Attribute, IAuthorizationFilter
+    public class CustomerAuthorizeAttribute : Attribute, IAsyncAuthorizationFilter
     {
         private readonly bool _notConfirmedAllowed;
 
@@ -40,13 +29,13 @@ namespace VitalChoice.Core.Infrastructure
             context.Result = new RedirectToActionResult("Login", "Account", parameters);
         }
 
-        public void OnAuthorization(AuthorizationFilterContext context)
+        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             var authorizationService = context.HttpContext.RequestServices.GetService<IAuthorizationService>();
 
             var claimUser = context.HttpContext.User;
             var result =
-                authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile).GetAwaiter().GetResult();
+                await authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile);
             if (result)
             {
                 if (!_notConfirmedAllowed && claimUser.HasClaim(x => x.Type == IdentityConstants.NotConfirmedClaimType))

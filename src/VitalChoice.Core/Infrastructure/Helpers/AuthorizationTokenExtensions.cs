@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using VitalChoice.Business.Services.Checkout;
 using VitalChoice.Core.Infrastructure.Models;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;
@@ -20,7 +19,7 @@ namespace VitalChoice.Core.Infrastructure.Helpers
 {
     public static class AuthorizationTokenExtensions
     {
-        public static async Task<bool> AuthorizeFromCookie(this HttpContext context)
+        public static async Task<ClaimsPrincipal> AuthorizeFromCookie(this HttpContext context)
         {
             var encryptedCookie = context.Request.Cookies[CheckoutConstants.CustomerAuthToken].FromHexString();
             if (encryptedCookie != null && encryptedCookie.Length > 0)
@@ -64,14 +63,15 @@ namespace VitalChoice.Core.Infrastructure.Helpers
                                         var cart = await checkoutService.GetOrCreateCart(null, user.Id);
                                         context.SetCartUid(cart.CartUid);
                                     }
-                                    return true;
+                                    var signInManager = context.RequestServices.GetRequiredService<SignInManager<ApplicationUser>>();
+                                    return await signInManager.CreateUserPrincipalAsync(user);
                                 }
                             }
                         }
                     }
                 }
             }
-            return false;
+            return null;
         }
 
         public static async Task RemoveAuthorizationToken(this HttpContext context)
