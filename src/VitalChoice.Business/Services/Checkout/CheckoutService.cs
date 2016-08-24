@@ -151,59 +151,6 @@ namespace VitalChoice.Business.Services.Checkout
             return await InitCartOrderModel(cart);
         }
 
-        private async Task<CustomerCartOrder> InitCartOrderModel(CartExtended cart)
-        {
-            var newOrder = _orderService.Mapper.CreatePrototype((int) OrderType.Normal);
-            newOrder.Data.OrderType = (int) SourceOrderType.Web;
-            if (newOrder.Customer != null)
-            {
-                newOrder.Customer.IdObjectType = (int) CustomerType.Retail;
-            }
-            newOrder.StatusCode = (int) RecordStatusCode.Active;
-            newOrder.OrderStatus = OrderStatus.Incomplete;
-            newOrder.GiftCertificates = cart.GiftCertificates?.Select(g => new GiftCertificateInOrder
-            {
-                Amount = g.Amount,
-                GiftCertificate = g.GiftCertificate
-            }).ToList() ?? new List<GiftCertificateInOrder>();
-            if (!string.IsNullOrEmpty(cart.DiscountCode))
-            {
-                newOrder.Discount = await _discountService.GetByCode(cart.DiscountCode);
-            }
-            newOrder.Skus = cart.Skus?.Select(s =>
-            {
-                s.Sku.OptionTypes =
-                    _skuMapper.FilterByType(s.Sku.Product.IdObjectType);
-                s.Sku.Product.OptionTypes = _productMapper.FilterByType(s.Sku.Product.IdObjectType);
-                var productUrl = _productContentRep.Query(p => p.Id == s.Sku.IdProduct).Select(p => p.Url, false).FirstOrDefault();
-                var sku = _skuMapper.FromEntity(s.Sku, true);
-                sku.Product.Url = productUrl;
-                return new SkuOrdered
-                {
-                    Amount = s.Sku.Price,
-                    Sku = sku,
-                    Quantity = s.Quantity
-                };
-            }).ToList() ?? new List<SkuOrdered>();
-            newOrder.ShippingAddress = _addressService.Mapper.CreatePrototype((int) AddressType.Shipping);
-            newOrder.ShippingAddress.IdCountry = (await _countryService.GetCountriesAsync(new CountryFilter
-            {
-                CountryCode = "US"
-            })).FirstOrDefault()?.Id ?? 0;
-            if (cart.ShipDelayDate != null)
-            {
-                newOrder.Data.ShipDelayType = ShipDelayType.EntireOrder;
-                newOrder.Data.ShipDelayDate = cart.ShipDelayDate;
-            }
-            newOrder.Data.ShippingUpgradeP = cart.ShippingUpgradeP;
-            newOrder.Data.ShippingUpgradeNP = cart.ShippingUpgradeNP;
-            return new CustomerCartOrder
-            {
-                CartUid = cart.CartUid,
-                Order = newOrder
-            };
-        }
-
         public async Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, int idCustomer)
         {
             CustomerCartOrder result;
@@ -338,40 +285,6 @@ namespace VitalChoice.Business.Services.Checkout
             return result;
         }
 
-        private async Task FillProductContentDetails(CustomerCartOrder result)
-        {
-            var products = result.Order.Skus.Select(s => s.Sku.IdProduct).Distinct().ToList();
-            var skus = result.Order.Skus.Select(s => s.Sku.Id).ToList();
-            var productUrls =
-                await
-                    _productContentRep.Query(p => products.Contains(p.Id)).Distinct().SelectAsync(false);
-            var skuAmounts =
-                (await
-                    _skuRepository.Query(s => skus.Contains(s.Id))
-                        .Distinct()
-                        .SelectAsync(false)).ToDictionary(s => s.Id);
-            result.Order.Skus.UpdateKeyed(productUrls, s => s.Sku.IdProduct, arg => arg.Id,
-                (s, p) =>
-                {
-                    s.Sku.Product.Url = p.Url;
-                    s.Amount = result.Order.Customer.IdObjectType == (int) CustomerType.Wholesale
-                        ? skuAmounts[s.Sku.Id].WholesalePrice
-                        : skuAmounts[s.Sku.Id].Price;
-                });
-        }
-
-        private async Task<CartExtended> CreateNew(int? idCustomer = null)
-        {
-            var newUid = Guid.NewGuid();
-            var cart = new CartExtended
-            {
-                CartUid = newUid,
-                IdCustomer = idCustomer
-            };
-            await _cartRepository.InsertGraphAsync(cart);
-            return await BuildIncludes(_cartRepository.Query(c => c.CartUid == newUid)).SelectFirstOrDefaultAsync(false);
-        }
-
         public async Task<bool> UpdateCart(CustomerCartOrder cartOrder)
         {
             if (cartOrder?.Order == null)
@@ -434,47 +347,6 @@ namespace VitalChoice.Business.Services.Checkout
             return true;
         }
 
-        private static void UpdateCartEntity(CustomerCartOrder cartOrder, CartExtended cart)
-        {
-            cart.DiscountCode = cartOrder.Order.Discount?.Code;
-            if (cart.GiftCertificates == null)
-            {
-                cart.GiftCertificates = new List<CartToGiftCertificate>();
-            }
-            cart.GiftCertificates?.MergeKeyed(cartOrder.Order.GiftCertificates, c => c.IdGiftCertificate,
-                co => co.GiftCertificate.Id,
-                co => new CartToGiftCertificate
-                {
-                    Amount = co.Amount,
-                    IdCart = cart.Id,
-                    IdGiftCertificate = co.GiftCertificate.Id
-                }, (certificate, order) => certificate.Amount = order.Amount);
-            if (cart.Skus == null)
-            {
-                cart.Skus = new List<CartToSku>();
-            }
-            cart.Skus?.MergeKeyed(cartOrder.Order.Skus, s => s.IdSku, so => so.Sku.Id, so => new CartToSku
-            {
-                Amount = so.Amount,
-                IdCart = cart.Id,
-                IdSku = so.Sku.Id,
-                Quantity = so.Quantity
-            }, (sku, ordered) => sku.Quantity = ordered.Quantity);
-            if (cartOrder.Order.SafeData.ShipDelayType != null &&
-                (int) cartOrder.Order.SafeData.ShipDelayType == (int) ShipDelayType.EntireOrder)
-            {
-                cart.ShipDelayDate = cartOrder.Order.Data.ShipDelayDate;
-            }
-            else
-            {
-                cart.ShipDelayDate = cartOrder.Order.Data.ShipDelayDate = null;
-            }
-            cart.ShippingUpgradeP = cartOrder.Order.SafeData.ShippingUpgradeP;
-            cart.ShippingUpgradeNP = cartOrder.Order.SafeData.ShippingUpgradeNP;
-            cart.IdCustomer = null;
-            cart.IdOrder = null;
-        }
-
         public async Task<bool> SaveOrder(CustomerCartOrder cartOrder)
         {
             if (cartOrder?.Order == null)
@@ -529,11 +401,12 @@ namespace VitalChoice.Business.Services.Checkout
 
                     if (sendOrderConfirm && cartOrder.Order?.Customer != null)
                     {
-                        var customer = await _customerRepository.Query(p => p.Id == cartOrder.Order.Customer.Id).SelectFirstOrDefaultAsync(false);
+                        var customer =
+                            await _customerRepository.Query(p => p.Id == cartOrder.Order.Customer.Id).SelectFirstOrDefaultAsync(false);
                         if (!string.IsNullOrEmpty(customer?.Email))
                         {
                             OrderDynamic mailOrder;
-                            if (cartOrder.Order.IdObjectType == (int)OrderType.AutoShip)
+                            if (cartOrder.Order.IdObjectType == (int) OrderType.AutoShip)
                             {
                                 var ids = await _orderService.SelectAutoShipOrdersAsync(cartOrder.Order.Id);
 
@@ -583,6 +456,135 @@ namespace VitalChoice.Business.Services.Checkout
                 return skus.Sum(s => s.Quantity);
             }
             return 0;
+        }
+
+        private async Task<CustomerCartOrder> InitCartOrderModel(CartExtended cart)
+        {
+            var newOrder = _orderService.Mapper.CreatePrototype((int) OrderType.Normal);
+            newOrder.Data.OrderType = (int) SourceOrderType.Web;
+            if (newOrder.Customer != null)
+            {
+                newOrder.Customer.IdObjectType = (int) CustomerType.Retail;
+            }
+            newOrder.StatusCode = (int) RecordStatusCode.Active;
+            newOrder.OrderStatus = OrderStatus.Incomplete;
+            newOrder.GiftCertificates = cart.GiftCertificates?.Select(g => new GiftCertificateInOrder
+                                        {
+                                            Amount = g.Amount,
+                                            GiftCertificate = g.GiftCertificate
+                                        }).ToList() ?? new List<GiftCertificateInOrder>();
+            if (!string.IsNullOrEmpty(cart.DiscountCode))
+            {
+                newOrder.Discount = await _discountService.GetByCode(cart.DiscountCode);
+            }
+            newOrder.Skus = cart.Skus?.Select(s =>
+                            {
+                                s.Sku.OptionTypes =
+                                    _skuMapper.FilterByType(s.Sku.Product.IdObjectType);
+                                s.Sku.Product.OptionTypes = _productMapper.FilterByType(s.Sku.Product.IdObjectType);
+                                var productUrl =
+                                    _productContentRep.Query(p => p.Id == s.Sku.IdProduct).Select(p => p.Url, false).FirstOrDefault();
+                                var sku = _skuMapper.FromEntity(s.Sku, true);
+                                sku.Product.Url = productUrl;
+                                return new SkuOrdered
+                                {
+                                    Amount = s.Sku.Price,
+                                    Sku = sku,
+                                    Quantity = s.Quantity
+                                };
+                            }).ToList() ?? new List<SkuOrdered>();
+            newOrder.ShippingAddress = _addressService.Mapper.CreatePrototype((int) AddressType.Shipping);
+            newOrder.ShippingAddress.IdCountry = (await _countryService.GetCountriesAsync(new CountryFilter
+                                                 {
+                                                     CountryCode = "US"
+                                                 })).FirstOrDefault()?.Id ?? 0;
+            if (cart.ShipDelayDate != null)
+            {
+                newOrder.Data.ShipDelayType = ShipDelayType.EntireOrder;
+                newOrder.Data.ShipDelayDate = cart.ShipDelayDate;
+            }
+            newOrder.Data.ShippingUpgradeP = cart.ShippingUpgradeP;
+            newOrder.Data.ShippingUpgradeNP = cart.ShippingUpgradeNP;
+            return new CustomerCartOrder
+            {
+                CartUid = cart.CartUid,
+                Order = newOrder
+            };
+        }
+
+        private async Task FillProductContentDetails(CustomerCartOrder result)
+        {
+            var products = result.Order.Skus.Select(s => s.Sku.IdProduct).Distinct().ToList();
+            var skus = result.Order.Skus.Select(s => s.Sku.Id).ToList();
+            var productUrls =
+                await
+                    _productContentRep.Query(p => products.Contains(p.Id)).Distinct().SelectAsync(false);
+            var skuAmounts =
+            (await
+                _skuRepository.Query(s => skus.Contains(s.Id))
+                    .Distinct()
+                    .SelectAsync(false)).ToDictionary(s => s.Id);
+            result.Order.Skus.UpdateKeyed(productUrls, s => s.Sku.IdProduct, arg => arg.Id,
+                (s, p) =>
+                {
+                    s.Sku.Product.Url = p.Url;
+                    s.Amount = result.Order.Customer.IdObjectType == (int) CustomerType.Wholesale
+                        ? skuAmounts[s.Sku.Id].WholesalePrice
+                        : skuAmounts[s.Sku.Id].Price;
+                });
+        }
+
+        private async Task<CartExtended> CreateNew(int? idCustomer = null)
+        {
+            var newUid = Guid.NewGuid();
+            var cart = new CartExtended
+            {
+                CartUid = newUid,
+                IdCustomer = idCustomer
+            };
+            await _cartRepository.InsertGraphAsync(cart);
+            return await BuildIncludes(_cartRepository.Query(c => c.CartUid == newUid)).SelectFirstOrDefaultAsync(false);
+        }
+
+        private static void UpdateCartEntity(CustomerCartOrder cartOrder, CartExtended cart)
+        {
+            cart.DiscountCode = cartOrder.Order.Discount?.Code;
+            if (cart.GiftCertificates == null)
+            {
+                cart.GiftCertificates = new List<CartToGiftCertificate>();
+            }
+            cart.GiftCertificates.MergeKeyed(cartOrder.Order.GiftCertificates, c => c.IdGiftCertificate,
+                co => co.GiftCertificate.Id,
+                co => new CartToGiftCertificate
+                {
+                    Amount = co.Amount,
+                    IdCart = cart.Id,
+                    IdGiftCertificate = co.GiftCertificate.Id
+                }, (certificate, order) => certificate.Amount = order.Amount);
+            if (cart.Skus == null)
+            {
+                cart.Skus = new List<CartToSku>();
+            }
+            cart.Skus.MergeKeyed(cartOrder.Order.Skus, s => s.IdSku, so => so.Sku.Id, so => new CartToSku
+            {
+                Amount = so.Amount,
+                IdCart = cart.Id,
+                IdSku = so.Sku.Id,
+                Quantity = so.Quantity
+            }, (sku, ordered) => sku.Quantity = ordered.Quantity);
+            if (cartOrder.Order.SafeData.ShipDelayType != null &&
+                (int) cartOrder.Order.SafeData.ShipDelayType == (int) ShipDelayType.EntireOrder)
+            {
+                cart.ShipDelayDate = cartOrder.Order.Data.ShipDelayDate;
+            }
+            else
+            {
+                cart.ShipDelayDate = cartOrder.Order.Data.ShipDelayDate = null;
+            }
+            cart.ShippingUpgradeP = cartOrder.Order.SafeData.ShippingUpgradeP;
+            cart.ShippingUpgradeNP = cartOrder.Order.SafeData.ShippingUpgradeNP;
+            cart.IdCustomer = null;
+            cart.IdOrder = null;
         }
     }
 }
