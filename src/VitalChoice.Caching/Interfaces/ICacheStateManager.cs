@@ -13,7 +13,7 @@ namespace VitalChoice.Caching.Interfaces
         bool IsTracked(EntityInfo info, EntityKey pk, object entity);
         void AcceptTrackData();
         void RejectTrackData();
-        object GetOrAddTracked(EntityInfo info, object entity, out bool cloned);
+        object GetOrAddTracked(EntityInfo info, object entity, out bool hasCloned);
         IEnumerable<object> GetOrAddTracked(EntityInfo info, IEnumerable<object> entities);
     }
 }

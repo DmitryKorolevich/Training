@@ -65,7 +65,7 @@ namespace VitalChoice.Caching.Services
             return newEntry?.EntityState != EntityState.Detached && newEntry?.Entity == entity;
         }
 
-        public object GetOrAddTracked(EntityInfo info, object entity, out bool cloned)
+        public object GetOrAddTracked(EntityInfo info, object entity, out bool hasCloned)
         {
             var tempData = GetTempData();
             var pk = info.PrimaryKey.GetPrimaryKeyValue(entity);
@@ -73,19 +73,19 @@ namespace VitalChoice.Caching.Services
             object result;
             if (tempData.TryGetValue(key, out result))
             {
-                cloned = false;
+                hasCloned = false;
                 return result;
             }
 
             var newEntry = TryGetEntry(info.EfPrimaryKey, entity)?.Entity;
             if (newEntry == null)
             {
-                cloned = true;
+                hasCloned = true;
                 newEntry = entity.Clone(info.EntityType);
             }
             else
             {
-                cloned = false;
+                hasCloned = false;
             }
             tempData.Add(key, newEntry);
             return newEntry;
