@@ -51,41 +51,18 @@ namespace VitalChoice.Caching.Services
 
         public void RejectTrackData() => TemporaryContextualCacheDatas = null;
 
-        public bool IsTracked(EntityInfo info, object entity)
+        public bool IsTracked(EntityInfo info, EntityKey pk, object entity)
         {
             var trackData = ContextualCacheDatas.Value;
-            var pk = info.PrimaryKey.GetPrimaryKeyValue(entity);
-            if (!pk.IsValid)
-                return false;
             var key = new TrackedEntityKey(info.EntityType, pk);
             if (trackData.ContainsKey(key))
             {
                 return true;
             }
-
+            if (entity == null)
+                entity = info.CreateEntityFromKey(pk);
             var newEntry = TryGetEntry(info.EfPrimaryKey, entity);
             return newEntry?.EntityState != EntityState.Detached && newEntry?.Entity == entity;
-        }
-
-        public bool IsAllTracked(EntityInfo info, IEnumerable<object> entities)
-        {
-            var trackData = ContextualCacheDatas.Value;
-            var pkInfo = info.PrimaryKey;
-            foreach (var entity in entities)
-            {
-                var pk = pkInfo.GetPrimaryKeyValue(entity);
-                var key = new TrackedEntityKey(info.EntityType, pk);
-
-                if (trackData.ContainsKey(key))
-                    continue;
-
-                var newEntry = TryGetEntry(info.EfPrimaryKey, entity);
-                if (newEntry.EntityState == EntityState.Detached || newEntry.Entity != entity)
-                {
-                    return false;
-                }
-            }
-            return true;
         }
 
         public object GetOrAddTracked(EntityInfo info, object entity, out bool cloned)

@@ -5,6 +5,7 @@ using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Relational.ChangeTracking;
+using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Extensions
 {
@@ -104,6 +105,19 @@ namespace VitalChoice.Caching.Extensions
                 return null;
 
             return new EntityIndex(GetValues(entity, conditionalInfo));
+        }
+
+        public static object CreateEntityFromKey(this EntityInfo entityInfo, EntityKey pk)
+        {
+            var result = Activator.CreateInstance(entityInfo.EntityType);
+
+            var itemsCount = entityInfo.PrimaryKey.Infos.Length;
+            var items = entityInfo.PrimaryKey.Infos;
+            for (int i = 0; i < itemsCount; i++)
+            {
+                items[i].SetClrValue(result, pk.Values[i]);
+            }
+            return result;
         }
 
         private static EntityValue<EntityValueInfo>[] GetValues<T>(object entity, EntityValueGroupInfo<T> pkInfo)

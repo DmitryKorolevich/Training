@@ -250,6 +250,7 @@ namespace VitalChoice.Caching.Services.Cache
             ICacheStateManager stateManager, out ICollection<RelationInfo> relationsToClone,
             CachedEntity<T> cached)
         {
+
             relationsToClone = _relationInfo.Relations.Where(r => cached.NeedUpdateRelated.Contains(r.Name)).ToArray();
             return GetIsNormalized(entity, stateManager, relationsToClone, _entityInfo);
         }
@@ -269,12 +270,22 @@ namespace VitalChoice.Caching.Services.Cache
                     {
                         return false;
                     }
+                    var pkInfo = relation.EntityInfo.PrimaryKey;
                     var newItems = newRelated as IEnumerable<object>;
+                    if (pkInfo == null)
+                    {
+                        return false;
+                    }
                     foreach (var newItem in newItems)
                     {
+                        var pk = pkInfo.GetPrimaryKeyValue(newItem);
+                        if (!pk.IsValid)
+                        {
+                            return false;
+                        }
                         if (stateManager != null)
                         {
-                            if (!stateManager.IsTracked(relation.EntityInfo, newItem))
+                            if (!stateManager.IsTracked(relation.EntityInfo, pk, newItem))
                             {
                                 return false;
                             }
@@ -296,7 +307,7 @@ namespace VitalChoice.Caching.Services.Cache
                             {
                                 return false;
                             }
-                            if (stateManager?.IsTracked(entityInfo, entity) ?? true)
+                            if (stateManager?.IsTracked(relation.EntityInfo, newRelatedKey, null) ?? true)
                             {
                                 return false;
                             }
@@ -312,7 +323,7 @@ namespace VitalChoice.Caching.Services.Cache
                         }
                         if (stateManager != null)
                         {
-                            if (!stateManager.IsTracked(relation.EntityInfo, newRelated))
+                            if (!stateManager.IsTracked(relation.EntityInfo, newRelatedKey, newRelated))
                             {
                                 return false;
                             }

@@ -5,19 +5,22 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Relational.Base
 {
-    public class EntityValueInfo : IEquatable<EntityValueInfo>, IClrPropertyGetter
+    public class EntityValueInfo : IEquatable<EntityValueInfo>, IClrPropertyGetter, IClrPropertySetter
     {
         private readonly IClrPropertyGetter _property;
+        private readonly IClrPropertySetter _setter;
         public Type PropertyType { get; }
         public int ItemIndex { get; internal set; }
         private readonly Func<object, object> _valueConvert;
+        private readonly Func<object, object> _valueConvertToSet;
 
-        public EntityValueInfo(string name, IClrPropertyGetter property, Type propertyType)
+        public EntityValueInfo(string name, IClrPropertyGetter property, IClrPropertySetter setter, Type propertyType)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
             _property = property;
+            _setter = setter;
             PropertyType = propertyType;
             ItemIndex = -1;
             if (propertyType.GetTypeInfo().IsEnum)
@@ -25,9 +28,11 @@ namespace VitalChoice.Caching.Relational.Base
 #if !NETSTANDARD1_5
                 var enumTypeCode = Enum.GetUnderlyingType(propertyType).GetTypeCode();
                 _valueConvert = value => Convert.ChangeType(value, enumTypeCode);
+                _valueConvertToSet = value => Convert.ChangeType(value, propertyType);
 #else
                 var enumType = Enum.GetUnderlyingType(propertyType);
                 _valueConvert = value => Convert.ChangeType(value, enumType);
+                _valueConvertToSet = value => Convert.ChangeType(value, propertyType);
 #endif
             }
 
@@ -43,7 +48,7 @@ namespace VitalChoice.Caching.Relational.Base
 
         public override bool Equals(object obj)
         {
-            if ((object)this == obj)
+            if ((object) this == obj)
                 return true;
             var keyInfo = obj as EntityValueInfo;
             if (keyInfo != null)
@@ -81,6 +86,11 @@ namespace VitalChoice.Caching.Relational.Base
         public object GetClrValue(object instance)
         {
             return _valueConvert == null ? _property.GetClrValue(instance) : _valueConvert(_property.GetClrValue(instance));
+        }
+
+        public void SetClrValue(object instance, object value)
+        {
+            _setter.SetClrValue(instance, _valueConvertToSet?.Invoke(value) ?? value);
         }
     }
 }

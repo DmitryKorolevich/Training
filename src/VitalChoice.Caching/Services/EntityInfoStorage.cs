@@ -660,7 +660,7 @@ namespace VitalChoice.Caching.Services
         {
             return properties.Select(
                 property =>
-                    new EntityValueInfo(property.Name, property.GetGetter(), property.ClrType));
+                        new EntityValueInfo(property.Name, property.GetGetter(), property.GetSetter(), property.ClrType));
         }
 
         private interface IGetEntityCaller
