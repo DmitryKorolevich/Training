@@ -183,10 +183,7 @@ angular.module('app.core.utils.appBootstrap', [])
                             {
                                 $.each(result.Data, function (index, item)
                                 {
-                                    if (item.Template)
-                                    {
-                                        $('.area[data-area-name="' + item.Name + '"]').html(item.Template);
-                                    }
+                                    $('.area[data-area-name="' + item.Name + '"]').html(item.Template);
                                 });
                             }
 
