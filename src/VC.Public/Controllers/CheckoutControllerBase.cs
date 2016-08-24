@@ -205,8 +205,7 @@ namespace VC.Public.Controllers
 
             foreach (
                 var message in
-                context.Messages?.Where(m => m.MessageLevel == MessageLevel.Error) ??
-                Enumerable.Empty<MessageInfo>())
+                context.Messages.Where(m => m.MessageLevel == MessageLevel.Error))
             {
                 ModelState.AddModelError(message.Field, message.Message);
             }
