@@ -96,25 +96,26 @@ namespace VC.Public.Controllers
 			}
 
             ApplicationUser user = null;
-		    try
-		    {
-			    user = await _userService.SignInAsync(model.Email, model.Password);
-		        if (GetCurrentCartUid() == null)
-		        {
-		            var cart = await CheckoutService.GetOrCreateCart(null, user.Id);
-		            SetCartUid(cart.CartUid);
-		        }
-		    }
-		    catch (WholesalePendingException)
-		    {
-			    return Redirect("/content/wholesale-review");
-		    }
-		    catch (AppValidationException e)
-		    {
-				ModelState.AddModelError(string.Empty, e.Messages.First().Message);
-				return View("Login", model);
-			}
-		    if (user == null)
+	        try
+	        {
+	            user = await _userService.SignInAsync(model.Email, model.Password);
+	            var cartUid = GetCurrentCartUid();
+	            if (cartUid == null || await CheckoutService.GetCartItemsCount(cartUid.Value) == 0)
+	            {
+	                var cart = await CheckoutService.GetOrCreateCart(null, user.Id);
+	                SetCartUid(cart.CartUid);
+	            }
+	        }
+	        catch (WholesalePendingException)
+	        {
+	            return Redirect("/content/wholesale-review");
+	        }
+	        catch (AppValidationException e)
+	        {
+	            ModelState.AddModelError(string.Empty, e.Messages.First().Message);
+	            return View("Login", model);
+	        }
+	        if (user == null)
 			{
 				ModelState.AddModelError(string.Empty,ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
 				return View("Login", model);
