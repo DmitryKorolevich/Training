@@ -437,6 +437,10 @@ namespace VitalChoice.Business.Services.Checkout
         private static void UpdateCartEntity(CustomerCartOrder cartOrder, CartExtended cart)
         {
             cart.DiscountCode = cartOrder.Order.Discount?.Code;
+            if (cart.GiftCertificates == null)
+            {
+                cart.GiftCertificates = new List<CartToGiftCertificate>();
+            }
             cart.GiftCertificates?.MergeKeyed(cartOrder.Order.GiftCertificates, c => c.IdGiftCertificate,
                 co => co.GiftCertificate.Id,
                 co => new CartToGiftCertificate
@@ -445,6 +449,10 @@ namespace VitalChoice.Business.Services.Checkout
                     IdCart = cart.Id,
                     IdGiftCertificate = co.GiftCertificate.Id
                 }, (certificate, order) => certificate.Amount = order.Amount);
+            if (cart.Skus == null)
+            {
+                cart.Skus = new List<CartToSku>();
+            }
             cart.Skus?.MergeKeyed(cartOrder.Order.Skus, s => s.IdSku, so => so.Sku.Id, so => new CartToSku
             {
                 Amount = so.Amount,
