@@ -1,5 +1,5 @@
 ﻿<div class="modal-header">
-    <h3 class="modal-title">Manage Products Order</h3>
+    <h3 class="modal-title">Manage Products</h3>
 </div>
 <div class="modal-body manage-products-order">
     <spinner-overlay data-loading="refreshTracker.active()">
@@ -11,19 +11,34 @@
                             <fieldset>
                                 <div class="form-group">
                                     <div class="col-md-12 padding-0px">
-                                        <div class="col-md-1">
+                                        <div class="col-md-1 form-control-static">
                                             <div class="sortable-move btn btn-info">
                                                 <i class="glyphicon glyphicon-sort"></i>
                                             </div>
                                         </div>
-                                        <div class="col-md-8 form-control-static">
-                                            <span>{{item.DisplayName}}</span>
+                                        <div class="col-md-5 form-control-static">
+                                            <span>{{item.Name}}<br />{{item.SubTitle}}</span>
                                         </div>
-                                        <div class="col-md-3 form-control-static">
+                                        <div class="col-md-2 form-control-static">
+                                            <span data-ng-repeat="sku in item.SKUs">
+                                                <span class="sku" data-ng-class="{'not-in-stock': !sku.InStock}">{{sku.Code}}</span>
+                                                {{$last!=true ? " / " : ""}}
+                                            </span>
+                                        </div>
+                                        <div class="col-md-1 form-control-static">
+                                            <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
+                                            <span data-ng-if="item.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
+                                        </div>
+                                        <div class="col-md-2 form-control-static">
                                             <span data-ng-if="item.IdVisibility==1" class="label label-info  font-default">All</span>
                                             <span data-ng-if="item.IdVisibility==2" class="label label-wholesale font-default">Wholesale Only</span>
                                             <span data-ng-if="item.IdVisibility==3" class="label label-retail font-default">Retail Only</span>
                                             <span data-ng-if="!item.IdVisibility" class="label label-warning font-default">Hidden</span>
+                                        </div>
+                                        <div class="col-md-1 form-control-static">
+                                            <div class="pull-right">
+                                                <button class="btn btn-danger" data-ng-click="deleteProduct($index)">Delete</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -34,6 +49,7 @@
             </fieldset>
         </form>
     </spinner-overlay>
+    <div ng-controller="productsSearchController" onload="name = 'Products'" data-ng-include="'app/modules/product/partials/productsSearchList.html'"></div>
 </div>
 <div class="modal-footer">
     <button class="btn btn-success" ladda="refreshTracker.active()" data-ng-click="save()">Save</button>

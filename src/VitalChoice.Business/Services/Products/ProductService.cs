@@ -903,28 +903,32 @@ namespace VitalChoice.Business.Services.Products
             return products;
         }
 
-        public async Task<ICollection<ProductCategoryOrderModel>> GetProductsOnCategoryOrderAsync(int idCategory)
+        public async Task<ICollection<ProductListItemModel>> GetProductsOnCategoryOrderAsync(int idCategory)
         {
-            List<ProductCategoryOrderModel> toReturn = new List<ProductCategoryOrderModel>();
-
+            List<ProductListItemModel> toReturn = new List<ProductListItemModel>();
+            
             var productsOnCategory = await _productToCategoryRepository.Query(p => p.IdCategory == idCategory &&
                                                                                    p.Product.StatusCode == (int) RecordStatusCode.Active &&
                                                                                    p.Product.IdVisibility != null).SelectAsync(false);
-            var products = await SelectAsync(productsOnCategory.Select(p => p.IdProduct).ToList());
+            var conditions =
+                new ProductQuery().NotDeleted().WithIds(productsOnCategory.Select(p => p.IdProduct).ToList());
+            var products =
+                await SelectAsync(conditions, query => query.Include(p => p.Skus).ThenInclude(p => p.OptionValues).Include(p => p.OptionValues));
+
+            foreach (var product in products)
+            {
+                foreach (var productSku in product.Skus)
+                {
+                    productSku.Product = product;
+                }
+            }
 
             foreach (var productOnCategory in productsOnCategory.OrderBy(p => p.Order))
             {
                 var productDynamic = products.FirstOrDefault(p => p.Id == productOnCategory.IdProduct);
                 if (productDynamic != null)
                 {
-                    ProductCategoryOrderModel item = new ProductCategoryOrderModel();
-                    item.Id = productDynamic.Id;
-                    item.DisplayName = productDynamic.Name;
-                    item.IdVisibility = productDynamic.IdVisibility;
-                    if (productDynamic.SafeData.SubTitle != null)
-                    {
-                        item.DisplayName += " " + productDynamic.SafeData.SubTitle;
-                    }
+                    var item = await Mapper.ToModelAsync<ProductListItemModel>(productDynamic);
                     toReturn.Add(item);
                 }
             }
@@ -932,25 +936,52 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
-        public async Task<bool> UpdateProductsOnCategoryOrderAsync(int idCategory, ICollection<ProductCategoryOrderModel> products)
+        public async Task<bool> UpdateProductsOnCategoryOrderAsync(int idCategory, ICollection<ProductListItemModel> products)
         {
             var dbProductsOnCategory = await _productToCategoryRepository.Query(p => p.IdCategory == idCategory &&
                                                                                      p.Product.StatusCode == (int) RecordStatusCode.Active &&
                                                                                      p.Product.IdVisibility.HasValue).SelectAsync(true);
 
             int order = 0;
+            var itemsForAdd = new List<ProductToCategory>();
             foreach (var productCategoryOrderModel in products)
             {
                 var dbProductOnCategory =
-                    dbProductsOnCategory.FirstOrDefault(p => p.IdProduct == productCategoryOrderModel.Id);
+                    dbProductsOnCategory.FirstOrDefault(p => p.IdProduct == productCategoryOrderModel.ProductId);
                 if (dbProductOnCategory != null)
                 {
                     dbProductOnCategory.Order = order;
                     order++;
                 }
+                else
+                {
+                    var item = new ProductToCategory()
+                    {
+                        IdCategory = idCategory,
+                        IdProduct = productCategoryOrderModel.ProductId,
+                        Order = order
+                    };
+                    order++;
+                    itemsForAdd.Add(item);
+                }
+            }
+            var itemsForDelete = new List<ProductToCategory>();
+            foreach (var dbProduct in dbProductsOnCategory)
+            {
+                var product =
+                    products.FirstOrDefault(p => p.ProductId == dbProduct.IdProduct);
+                if (product == null)
+                {
+                    itemsForDelete.Add(dbProduct);
+                }
             }
 
             await _productToCategoryRepository.UpdateRangeAsync(dbProductsOnCategory);
+            if (itemsForDelete.Count > 0)
+            {
+                await _productToCategoryRepository.DeleteAllAsync(itemsForDelete);
+            }
+            await _productToCategoryRepository.InsertRangeAsync(itemsForAdd);
 
             return true;
         }

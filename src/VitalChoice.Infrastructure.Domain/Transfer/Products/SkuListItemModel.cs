@@ -2,11 +2,10 @@
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
-using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Products
+namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 {
-    public class SkuListItemModel : BaseModel
+    public class SkuListItemModel
     {
         [Map]
         public int? Id { get; set; }

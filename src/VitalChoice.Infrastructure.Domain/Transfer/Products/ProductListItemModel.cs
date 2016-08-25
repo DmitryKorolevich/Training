@@ -6,11 +6,10 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
-using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Products
+namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 {
-    public class ProductListItemModel : BaseModel
+    public class ProductListItemModel
     {
         [Map("Id")]
         public int ProductId { get; set; }

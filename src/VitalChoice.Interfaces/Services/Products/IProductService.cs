@@ -29,11 +29,11 @@ namespace VitalChoice.Interfaces.Services.Products
 
 	    Task<PagedList<ProductDynamic>> GetProductsAsync2(VProductSkuFilter filter);
 
-        Task<ICollection<ProductCategoryOrderModel>> GetProductsOnCategoryOrderAsync(int idCategory);
+	    Task<ICollection<ProductListItemModel>> GetProductsOnCategoryOrderAsync(int idCategory);
 
-	    Task<bool> UpdateProductsOnCategoryOrderAsync(int idCategory, ICollection<ProductCategoryOrderModel> products);
+	    Task<bool> UpdateProductsOnCategoryOrderAsync(int idCategory, ICollection<ProductListItemModel> products);
 
-	    Task<IDictionary<int, int>> GetProductIdsBySkuIds(ICollection<int> skuIds);
+        Task<IDictionary<int, int>> GetProductIdsBySkuIds(ICollection<int> skuIds);
 
         #endregion
 

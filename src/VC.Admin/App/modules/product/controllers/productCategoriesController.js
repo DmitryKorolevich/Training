@@ -93,7 +93,7 @@
             {
                 
             }
-        }, { size: 'xs' });
+        }, { size: 'lg' });
     };
 
     $scope.delete = function (id) {

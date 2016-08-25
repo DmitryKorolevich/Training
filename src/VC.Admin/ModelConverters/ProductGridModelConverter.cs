@@ -7,6 +7,7 @@ using VC.Admin.Models.Products;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VC.Admin.ModelConverters
 {

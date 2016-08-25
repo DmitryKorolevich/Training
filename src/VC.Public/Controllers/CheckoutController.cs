@@ -613,8 +613,10 @@ namespace VC.Public.Controllers
             if (customer.IdObjectType == (int) CustomerType.Retail && order.ShippingAddress.IdCountry !=
                 ReferenceData.DefaultCountry.Id) //USA
             {
-                toReturn = order.Skus.Any(p => p.Sku.Product.IdObjectType == (int) ProductType.Perishable)
-                           || order.PromoSkus.Any(p => p.Enabled && p.Sku.Product.IdObjectType == (int) ProductType.Perishable);
+                //any product for now
+                toReturn = true;
+                //toReturn = order.Skus.Any(p => p.Sku.Product.IdObjectType == (int) ProductType.Perishable)
+                //           || order.PromoSkus.Any(p => p.Enabled && p.Sku.Product.IdObjectType == (int) ProductType.Perishable);
             }
             return toReturn;
         }

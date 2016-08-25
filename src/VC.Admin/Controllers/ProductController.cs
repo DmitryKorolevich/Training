@@ -169,13 +169,13 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<ICollection<ProductCategoryOrderModel>>> GetProductsOnCategoryOrder(int id)
+        public async Task<Result<ICollection<ProductListItemModel>>> GetProductsOnCategoryOrder(int id)
         {
             return (await productService.GetProductsOnCategoryOrderAsync(id)).ToList();
         }
 
         [HttpPost]
-        public async Task<Result<bool>> UpdateProductsOnCategoryOrder(int id, [FromBody]ICollection<ProductCategoryOrderModel> products)
+        public async Task<Result<bool>> UpdateProductsOnCategoryOrder(int id, [FromBody]ICollection<ProductListItemModel> products)
         {
             return await productService.UpdateProductsOnCategoryOrderAsync(id, products);
         }
