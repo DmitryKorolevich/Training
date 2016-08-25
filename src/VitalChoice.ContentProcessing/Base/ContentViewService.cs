@@ -64,7 +64,7 @@ namespace VitalChoice.ContentProcessing.Base
                 var mapper = _mapperFactory.CreateMapper(additionalParameters.GetType());
                 parameters = mapper.ToDictionary(additionalParameters);
             }
-            var viewContext = await GetData(GetParameters(context, parameters), user, context);
+            var viewContext = await GetData(await GetParameters(context, parameters), user, context);
             var contentEntity = viewContext.Entity;
 	        if (contentEntity == null)
 	        {
@@ -177,13 +177,13 @@ namespace VitalChoice.ContentProcessing.Base
             };
         }
 
-        protected virtual IDictionary<string, object> GetParameters(ControllerContext context, IDictionary<string, object> parameters = null)
+        protected virtual async Task<IDictionary<string, object>> GetParameters(ControllerContext context, IDictionary<string, object> parameters = null)
         {
             if (parameters == null)
                 parameters = new Dictionary<string, object>();
             foreach (var actionParam in context.ActionDescriptor.Parameters)
             {
-                var valueProvider = CompositeValueProvider.CreateAsync(context).GetAwaiter().GetResult();
+                var valueProvider = await CompositeValueProvider.CreateAsync(context);
                 var values = valueProvider.GetValue(actionParam.Name);
                 foreach (var stringValue in values.Where(v => v != null))
                 {

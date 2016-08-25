@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using VC.Public.Helpers;
 using VC.Public.Models.Cart;
 using VitalChoice.Core.Infrastructure;
+using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Core.Services;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Checkout;
@@ -66,192 +68,6 @@ namespace VC.Public.Controllers
             _discountService = discountService;
             _gcService = gcService;
             _contentCrossSellService = contentCrossSellService;
-        }
-
-        private async Task<Tuple<OrderDataContext, CustomerCartOrder>> AddToCartInternal(CartSkuModel skuModelToAdd,
-            int? autoshipFrequency = null)
-        {
-            var existingUid = Request.GetCartUid();
-            var sku = await _productService.GetSkuOrderedAsync(skuModelToAdd.Code);
-            if (sku == null)
-                throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
-            CustomerCartOrder cart;
-            var loggedIn = await CustomerLoggedIn();
-            if (loggedIn)
-            {
-                var id = GetInternalCustomerId();
-                cart = await _checkoutService.GetOrCreateCart(existingUid, id);
-            }
-            else
-            {
-                cart = await _checkoutService.GetOrCreateCart(existingUid, false);
-            }
-            SetCartUid(cart.CartUid);
-
-            if (sku.Sku.SafeData.AutoShipProduct == true && autoshipFrequency.HasValue)
-            {
-                cart.Order.PromoSkus.Clear();
-                cart.Order.Skus.Clear();
-                cart.Order.Discount = null;
-                cart.Order.GiftCertificates.Clear();
-
-                cart.Order.IdObjectType = (int) OrderType.AutoShip;
-                cart.Order.Data.AutoShipFrequency = autoshipFrequency;
-            }
-            else if (cart.Order.Skus.Count > 0 && cart.Order.IdObjectType == (int) OrderType.AutoShip)
-            {
-                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CartContainsAutoShip]);
-            }
-            else
-            {
-                cart.Order.IdObjectType = (int) OrderType.Normal;
-            }
-
-            cart.Order.Skus.AddUpdateKeyed(new[] {sku},
-                ordered => ordered.Sku.Code, skuModel => skuModel.Sku.Code, skuModel =>
-                {
-                    var targetQuantity = 1;
-                    if (skuModel.Sku.Code == skuModelToAdd.Code)
-                    {
-                        if (skuModelToAdd.Quantity > 0)
-                        {
-                            targetQuantity = skuModelToAdd.Quantity;
-                        }
-                    }
-                    skuModel.Quantity = targetQuantity;
-                    skuModel.Amount = HasRole(RoleType.Wholesale) ? skuModel.Sku.WholesalePrice : skuModel.Sku.Price;
-                    return skuModel;
-                },
-                (ordered, skuModel) =>
-                {
-                    var targetQuantity = 1;
-                    if (skuModel.Sku.Code == skuModelToAdd.Code)
-                    {
-                        if (skuModelToAdd.Quantity > 0)
-                        {
-                            targetQuantity = skuModelToAdd.Quantity;
-                        }
-                    }
-                    ordered.Quantity += targetQuantity;
-                });
-
-            var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
-            if (!await _checkoutService.UpdateCart(cart))
-                throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
-            return new Tuple<OrderDataContext, CustomerCartOrder>(context, cart);
-        }
-
-        private async Task<Tuple<OrderDataContext, CustomerCartOrder>> AddToCartInternal(Dictionary<string, CartSkuModel> skuModels, int? autoshipFrequency = null)
-        {
-            var existingUid = Request.GetCartUid();
-            var skus = await _productService.GetSkusOrderedAsync(skuModels.Values.Select(p => p.Code).ToList());
-            if (skus.Count == 0)
-                throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
-            CustomerCartOrder cart;
-            var loggedIn = await CustomerLoggedIn();
-            if (loggedIn)
-            {
-                var id = GetInternalCustomerId();
-                cart = await _checkoutService.GetOrCreateCart(existingUid, id);
-            }
-            else
-            {
-                cart = await _checkoutService.GetOrCreateCart(existingUid, false);
-            }
-            SetCartUid(cart.CartUid);
-
-            if (skus.Count == 1 && skus.First().Sku.SafeData.AutoShipProduct == true && autoshipFrequency.HasValue)
-            {
-                cart.Order.PromoSkus.Clear();
-                cart.Order.Skus.Clear();
-                cart.Order.Discount = null;
-                cart.Order.GiftCertificates.Clear();
-
-                cart.Order.IdObjectType = (int)OrderType.AutoShip;
-                cart.Order.Data.AutoShipFrequency = autoshipFrequency;
-            }
-            else if (cart.Order.Skus.Count > 0 && cart.Order.IdObjectType == (int)OrderType.AutoShip)
-            {
-                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CartContainsAutoShip]);
-            }
-            else
-            {
-                cart.Order.IdObjectType = (int)OrderType.Normal;
-            }
-
-            cart.Order.Skus.AddUpdateKeyed(skus,
-                ordered => ordered.Sku.Code, skuModel => skuModel.Sku.Code, skuModel =>
-                {
-                    CartSkuModel cartSkuModel;
-                    var targetQuantity = 1;
-                    if (skuModels.TryGetValue(skuModel.Sku.Code, out cartSkuModel))
-                    {
-                        if (cartSkuModel.Quantity > 0)
-                        {
-                            targetQuantity = cartSkuModel.Quantity;
-                        }
-                    }
-                    skuModel.Quantity = targetQuantity;
-                    skuModel.Amount = HasRole(RoleType.Wholesale) ? skuModel.Sku.WholesalePrice : skuModel.Sku.Price;
-                    return skuModel;
-                },
-                (ordered, skuModel) =>
-                {
-                    CartSkuModel cartSkuModel;
-                    var targetQuantity = 1;
-                    if (skuModels.TryGetValue(skuModel.Sku.Code, out cartSkuModel))
-                    {
-                        if (cartSkuModel.Quantity > 0)
-                        {
-                            targetQuantity = cartSkuModel.Quantity;
-                        }
-                    }
-                    ordered.Quantity += targetQuantity;
-                });
-
-            var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
-            if (!await _checkoutService.UpdateCart(cart))
-                throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
-            return new Tuple<OrderDataContext, CustomerCartOrder>(context, cart);
-        }
-
-        private async Task<IList<CartCrossSellModel>> PopulateCartCrossSells(ContentCrossSellType type)
-        {
-            var crossSellModels = new List<CartCrossSellModel>();
-
-            var crossSells = await _contentCrossSellService.GetContentCrossSellsAsync(type);
-            if (crossSells.Count > 0)
-            {
-                var skus =
-                    await
-                        _productService.GetSkusAsync(new VProductSkuFilter()
-                        {
-                            Ids = crossSells.Select(x => x.IdSku).ToList(),
-                            ActiveOnly = true,
-                            NotHiddenOnly = true
-                        });
-
-                if (skus.Count > 0)
-                {
-                    var skuIds = new HashSet<int>(skus.Select(y => y.Id));
-
-                    crossSells = crossSells.Where(x => skuIds.Contains(x.IdSku)).ToList();
-
-                    var wholesale = await CustomerLoggedIn() && HasRole(RoleType.Wholesale);
-
-                    crossSellModels.AddRange(from crossSell in crossSells
-                                             let targetSku = skus.Single(x => x.Id == crossSell.IdSku)
-                                             select new CartCrossSellModel()
-                                             {
-                                                 Title = crossSell.Title,
-                                                 ImageUrl = crossSell.ImageUrl,
-                                                 Price = wholesale ? targetSku.WholesalePrice : targetSku.Price,
-                                                 SkuCode = targetSku.Code
-                                             });
-                }
-            }
-
-            return crossSellModels;
         }
 
         [HttpGet]
@@ -312,7 +128,7 @@ namespace VC.Public.Controllers
                 var res = await AddToCartInternal(skus.ToDictionary(s => s.Code));
 
                 await FillModel(result, res.Item2.Order, res.Item1);
-                SetCartUid(res.Item2.CartUid);
+                HttpContext.SetCartUid(res.Item2.CartUid);
                 HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderId);
 
                 cartRes = result;
@@ -345,7 +161,7 @@ namespace VC.Public.Controllers
                 });
 
             await FillModel(result, res.Item2.Order, res.Item1);
-            SetCartUid(res.Item2.CartUid);
+            HttpContext.SetCartUid(res.Item2.CartUid);
             HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderId);
             return result;
         }
@@ -365,7 +181,7 @@ namespace VC.Public.Controllers
                 model.ShippingDate = null;
             }
 
-            var existingUid = Request.GetCartUid();
+            var existingUid = HttpContext.GetCartUid();
             CustomerCartOrder cart;
             if (await CustomerLoggedIn())
             {
@@ -376,14 +192,21 @@ namespace VC.Public.Controllers
             {
                 cart = await _checkoutService.GetOrCreateCart(existingUid, false);
             }
-            SetCartUid(cart.CartUid);
-            cart.Order.Skus?.MergeKeyed(model.Skus.Where(s => s.Quantity > 0).ToArray(), ordered => ordered.Sku.Code,
-                skuModel => skuModel.Code, skuModel =>
-                {
-                    var result = _productService.GetSkuOrderedAsync(skuModel.Code).GetAwaiter().GetResult();
-                    result.Quantity = skuModel.Quantity;
-                    return result;
-                }, (ordered, skuModel) => ordered.Quantity = skuModel.Quantity);
+            HttpContext.SetCartUid(cart.CartUid);
+            if (cart.Order.Skus != null)
+            {
+                await cart.Order.Skus.MergeKeyedAsync(model.Skus.Where(s => s.Quantity > 0).ToArray(), ordered => ordered.Sku.Code,
+                    skuModel => skuModel.Code, async skuModel =>
+                    {
+                        var result = await _productService.GetSkuOrderedAsync(skuModel.Code);
+                        result.Quantity = skuModel.Quantity;
+                        return result;
+                    }, (ordered, skuModel) =>
+                    {
+                        ordered.Quantity = skuModel.Quantity;
+                        return TaskCache.CompletedTask;
+                    });
+            }
             cart.Order.Discount = await _discountService.GetByCode(model.DiscountCode);
             var gcCodes = model.GiftCertificateCodes.Select(x => x.Value).ToList();
             cart.Order.GiftCertificates?.MergeKeyed(
@@ -486,6 +309,192 @@ namespace VC.Public.Controllers
             }, model.IdSchedule);
 
             return RedirectToAction("AddUpdateBillingAddress", "Checkout");
+        }
+
+        private async Task<Tuple<OrderDataContext, CustomerCartOrder>> AddToCartInternal(CartSkuModel skuModelToAdd,
+            int? autoshipFrequency = null)
+        {
+            var existingUid = HttpContext.GetCartUid();
+            var sku = await _productService.GetSkuOrderedAsync(skuModelToAdd.Code);
+            if (sku == null)
+                throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
+            CustomerCartOrder cart;
+            var loggedIn = await CustomerLoggedIn();
+            if (loggedIn)
+            {
+                var id = GetInternalCustomerId();
+                cart = await _checkoutService.GetOrCreateCart(existingUid, id);
+            }
+            else
+            {
+                cart = await _checkoutService.GetOrCreateCart(existingUid, false);
+            }
+            HttpContext.SetCartUid(cart.CartUid);
+
+            if (sku.Sku.SafeData.AutoShipProduct == true && autoshipFrequency.HasValue)
+            {
+                cart.Order.PromoSkus.Clear();
+                cart.Order.Skus.Clear();
+                cart.Order.Discount = null;
+                cart.Order.GiftCertificates.Clear();
+
+                cart.Order.IdObjectType = (int)OrderType.AutoShip;
+                cart.Order.Data.AutoShipFrequency = autoshipFrequency;
+            }
+            else if (cart.Order.Skus.Count > 0 && cart.Order.IdObjectType == (int)OrderType.AutoShip)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CartContainsAutoShip]);
+            }
+            else
+            {
+                cart.Order.IdObjectType = (int)OrderType.Normal;
+            }
+
+            cart.Order.Skus.AddUpdateKeyed(new[] { sku },
+                ordered => ordered.Sku.Code, skuModel => skuModel.Sku.Code, skuModel =>
+                {
+                    var targetQuantity = 1;
+                    if (skuModel.Sku.Code == skuModelToAdd.Code)
+                    {
+                        if (skuModelToAdd.Quantity > 0)
+                        {
+                            targetQuantity = skuModelToAdd.Quantity;
+                        }
+                    }
+                    skuModel.Quantity = targetQuantity;
+                    skuModel.Amount = HasRole(RoleType.Wholesale) ? skuModel.Sku.WholesalePrice : skuModel.Sku.Price;
+                    return skuModel;
+                },
+                (ordered, skuModel) =>
+                {
+                    var targetQuantity = 1;
+                    if (skuModel.Sku.Code == skuModelToAdd.Code)
+                    {
+                        if (skuModelToAdd.Quantity > 0)
+                        {
+                            targetQuantity = skuModelToAdd.Quantity;
+                        }
+                    }
+                    ordered.Quantity += targetQuantity;
+                });
+
+            var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
+            if (!await _checkoutService.UpdateCart(cart))
+                throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
+            return new Tuple<OrderDataContext, CustomerCartOrder>(context, cart);
+        }
+
+        private async Task<Tuple<OrderDataContext, CustomerCartOrder>> AddToCartInternal(Dictionary<string, CartSkuModel> skuModels, int? autoshipFrequency = null)
+        {
+            var existingUid = HttpContext.GetCartUid();
+            var skus = await _productService.GetSkusOrderedAsync(skuModels.Values.Select(p => p.Code).ToList());
+            if (skus.Count == 0)
+                throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
+            CustomerCartOrder cart;
+            var loggedIn = await CustomerLoggedIn();
+            if (loggedIn)
+            {
+                var id = GetInternalCustomerId();
+                cart = await _checkoutService.GetOrCreateCart(existingUid, id);
+            }
+            else
+            {
+                cart = await _checkoutService.GetOrCreateCart(existingUid, false);
+            }
+            HttpContext.SetCartUid(cart.CartUid);
+
+            if (skus.Count == 1 && skus.First().Sku.SafeData.AutoShipProduct == true && autoshipFrequency.HasValue)
+            {
+                cart.Order.PromoSkus.Clear();
+                cart.Order.Skus.Clear();
+                cart.Order.Discount = null;
+                cart.Order.GiftCertificates.Clear();
+
+                cart.Order.IdObjectType = (int)OrderType.AutoShip;
+                cart.Order.Data.AutoShipFrequency = autoshipFrequency;
+            }
+            else if (cart.Order.Skus.Count > 0 && cart.Order.IdObjectType == (int)OrderType.AutoShip)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CartContainsAutoShip]);
+            }
+            else
+            {
+                cart.Order.IdObjectType = (int)OrderType.Normal;
+            }
+
+            cart.Order.Skus.AddUpdateKeyed(skus,
+                ordered => ordered.Sku.Code, skuModel => skuModel.Sku.Code, skuModel =>
+                {
+                    CartSkuModel cartSkuModel;
+                    var targetQuantity = 1;
+                    if (skuModels.TryGetValue(skuModel.Sku.Code, out cartSkuModel))
+                    {
+                        if (cartSkuModel.Quantity > 0)
+                        {
+                            targetQuantity = cartSkuModel.Quantity;
+                        }
+                    }
+                    skuModel.Quantity = targetQuantity;
+                    skuModel.Amount = HasRole(RoleType.Wholesale) ? skuModel.Sku.WholesalePrice : skuModel.Sku.Price;
+                    return skuModel;
+                },
+                (ordered, skuModel) =>
+                {
+                    CartSkuModel cartSkuModel;
+                    var targetQuantity = 1;
+                    if (skuModels.TryGetValue(skuModel.Sku.Code, out cartSkuModel))
+                    {
+                        if (cartSkuModel.Quantity > 0)
+                        {
+                            targetQuantity = cartSkuModel.Quantity;
+                        }
+                    }
+                    ordered.Quantity += targetQuantity;
+                });
+
+            var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
+            if (!await _checkoutService.UpdateCart(cart))
+                throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
+            return new Tuple<OrderDataContext, CustomerCartOrder>(context, cart);
+        }
+
+        private async Task<IList<CartCrossSellModel>> PopulateCartCrossSells(ContentCrossSellType type)
+        {
+            var crossSellModels = new List<CartCrossSellModel>();
+
+            var crossSells = await _contentCrossSellService.GetContentCrossSellsAsync(type);
+            if (crossSells.Count > 0)
+            {
+                var skus =
+                    await
+                        _productService.GetSkusAsync(new VProductSkuFilter()
+                        {
+                            Ids = crossSells.Select(x => x.IdSku).ToList(),
+                            ActiveOnly = true,
+                            NotHiddenOnly = true
+                        });
+
+                if (skus.Count > 0)
+                {
+                    var skuIds = new HashSet<int>(skus.Select(y => y.Id));
+
+                    crossSells = crossSells.Where(x => skuIds.Contains(x.IdSku)).ToList();
+
+                    var wholesale = await CustomerLoggedIn() && HasRole(RoleType.Wholesale);
+
+                    crossSellModels.AddRange(from crossSell in crossSells
+                                             let targetSku = skus.Single(x => x.Id == crossSell.IdSku)
+                                             select new CartCrossSellModel()
+                                             {
+                                                 Title = crossSell.Title,
+                                                 ImageUrl = crossSell.ImageUrl,
+                                                 Price = wholesale ? targetSku.WholesalePrice : targetSku.Price,
+                                                 SkuCode = targetSku.Code
+                                             });
+                }
+            }
+
+            return crossSellModels;
         }
     }
 }

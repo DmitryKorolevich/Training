@@ -36,38 +36,62 @@ namespace VitalChoice.Business.Services.Settings
 
         public async Task<ICollection<Country>> GetCountriesAsync(CountryFilter filter = null)
         {
-            List<Country> toReturn = null;
-
-	        Expression<Func<Country, bool>> countryQuery = p => p.StatusCode != RecordStatusCode.Deleted;
-	        Expression<Func<State, bool>> stateQuery = p => p.StatusCode != RecordStatusCode.Deleted;
-            if (filter != null)
+            Expression<Func<Country, bool>> countryQuery = p => p.StatusCode != RecordStatusCode.Deleted;
+            Expression<Func<State, bool>> stateQuery = p => p.StatusCode != RecordStatusCode.Deleted;
+            if (filter?.ActiveOnly == true)
             {
-                if (filter.ActiveOnly)
-                {
-                    countryQuery = countryQuery.And(x => x.StatusCode == RecordStatusCode.Active);
-                    stateQuery = stateQuery.And(x => x.StatusCode == RecordStatusCode.Active);
-                }
-                if(!String.IsNullOrEmpty(filter.CountryCode))
-                {
-                    countryQuery = countryQuery.And(x => x.CountryCode == filter.CountryCode);
-                }
+                countryQuery = countryQuery.And(x => x.StatusCode == RecordStatusCode.Active);
+                stateQuery = stateQuery.And(x => x.StatusCode == RecordStatusCode.Active);
+            }
+            if (!string.IsNullOrEmpty(filter?.CountryCode))
+            {
+                countryQuery = countryQuery.And(x => x.CountryCode == filter.CountryCode);
             }
 
-            toReturn = await countryRepository.Query(countryQuery).SelectAsync(false);
-            var states = await stateRepository.Query(stateQuery).SelectAsync(false);
+            var countries = await countryRepository.Query(countryQuery).OrderBy(e => e.OrderBy(c => c.Order)).SelectAsync(false);
+            var states = (await stateRepository.Query(stateQuery)
+                .OrderBy(e => e.OrderBy(s => s.Order))
+                .SelectAsync(false))
+                .GroupBy(s => s.CountryCode)
+                .ToDictionary(s => s.Key, s => s.ToList());
 
-            toReturn = toReturn.OrderBy(p => p.Order).ToList();
-            foreach(var item in toReturn)
+            foreach (var item in countries)
             {
-                item.States = new List<State>();
-                var countryStates = states.Where(p => p.CountryCode == item.CountryCode).OrderBy(p => p.Order).ToList();
-                foreach (var countryState in countryStates)
-                {
-                    item.States.Add(countryState);
-                }
+                List<State> stateList;
+                item.States = states.TryGetValue(item.CountryCode, out stateList) ? stateList : new List<State>();
             }
 
-            return toReturn;
+            return countries;
+        }
+
+        public ICollection<Country> GetCountries(CountryFilter filter = null)
+        {
+            Expression<Func<Country, bool>> countryQuery = p => p.StatusCode != RecordStatusCode.Deleted;
+            Expression<Func<State, bool>> stateQuery = p => p.StatusCode != RecordStatusCode.Deleted;
+            if (filter?.ActiveOnly == true)
+            {
+                countryQuery = countryQuery.And(x => x.StatusCode == RecordStatusCode.Active);
+                stateQuery = stateQuery.And(x => x.StatusCode == RecordStatusCode.Active);
+            }
+            if (!string.IsNullOrEmpty(filter?.CountryCode))
+            {
+                countryQuery = countryQuery.And(x => x.CountryCode == filter.CountryCode);
+            }
+
+            var countries = countryRepository.Query(countryQuery).OrderBy(e => e.OrderBy(c => c.Order)).Select(false);
+            var states = stateRepository.Query(stateQuery)
+                .OrderBy(e => e.OrderBy(s => s.Order))
+                .Select(false)
+                .GroupBy(s => s.CountryCode)
+                .ToDictionary(s => s.Key, s => s.ToList());
+
+            foreach (var item in countries)
+            {
+                List<State> stateList;
+                item.States = states.TryGetValue(item.CountryCode, out stateList) ? stateList : new List<State>();
+            }
+
+            return countries;
         }
 
         public async Task<Country> GetCountryAsync(int id)

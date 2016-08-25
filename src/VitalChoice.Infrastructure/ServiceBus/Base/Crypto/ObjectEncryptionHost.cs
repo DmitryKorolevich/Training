@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
@@ -62,6 +63,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                 RootCert = GetCaCertificate(options.Value.ExportService.RootThumbprint);
                 if (RootCert == null)
                 {
+                    _localAes = GetLocalAes(true);
                     return;
                 }
                 _remoteSignCheckProviders = GetPublicSignCheckProviders(StoreName.My, RootCert);
@@ -76,10 +78,26 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             catch (Exception e)
             {
                 _logger.LogCritical(e.ToString());
+                _localAes = GetLocalAes(true);
             }
         }
 
         public X509Certificate2 RootCert { get; }
+
+        public byte[] HashBytes(byte[] data)
+        {
+            var sha = new SHA256Cng();
+            sha.Initialize();
+            return sha.ComputeHash(data, 0, data.Length);
+        }
+
+        public string HashString(string str)
+        {
+            var sha = new SHA256Cng();
+            sha.Initialize();
+            var data = Encoding.Unicode.GetBytes(str);
+            return sha.ComputeHash(data, 0, data.Length).ToHexString();
+        }
 
         public void UpdateLocalKey(KeyExchange key)
         {
@@ -516,49 +534,54 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             }
         }
 
-        private AesCng GetLocalAes()
+        private AesCng GetLocalAes(bool randomize = false)
         {
-            var aes = new AesCng();
-            if (!string.IsNullOrWhiteSpace(_localEncryptionPath))
+            var aes = new AesCng
             {
-                KeyExchange exchange;
-                if (!File.Exists(_localEncryptionPath))
+                KeySize = 256,
+                Padding = PaddingMode.PKCS7
+            };
+            if (!randomize)
+            {
+                if (!string.IsNullOrWhiteSpace(_localEncryptionPath))
                 {
-                    var directory = Path.GetDirectoryName(Path.GetFullPath(_localEncryptionPath));
-                    if (!string.IsNullOrEmpty(directory))
+                    KeyExchange exchange;
+                    if (!File.Exists(_localEncryptionPath))
                     {
-                        var security = new DirectorySecurity();
-                        var currentUser = WindowsIdentity.GetCurrent().User;
-                        if (currentUser == null)
-                            throw new AccessDeniedException("Cannot get current User");
-                        security.SetOwner(currentUser);
-                        security.AddAccessRule(new FileSystemAccessRule(currentUser, FileSystemRights.Modify,
-                            AccessControlType.Allow));
-                        Directory.CreateDirectory(directory, security);
+                        var directory = Path.GetDirectoryName(Path.GetFullPath(_localEncryptionPath));
+                        if (!string.IsNullOrEmpty(directory))
+                        {
+                            var security = new DirectorySecurity();
+                            var currentUser = WindowsIdentity.GetCurrent().User;
+                            if (currentUser == null)
+                                throw new AccessDeniedException("Cannot get current User");
+                            security.SetOwner(currentUser);
+                            security.AddAccessRule(new FileSystemAccessRule(currentUser, FileSystemRights.Modify,
+                                AccessControlType.Allow));
+                            Directory.CreateDirectory(directory, security);
+                        }
+                        exchange = new KeyExchange(GetPrivateKeyHash(), Take(GetPrivateKeyHash(), 16));
+                        var data = ProtectedData.Protect(exchange.ToCombined(), _signProvider?.GetPrivateKey(),
+                            DataProtectionScope.CurrentUser);
+                        File.WriteAllBytes(_localEncryptionPath, data);
                     }
-                    exchange = new KeyExchange(GetPrivateKeyHash(), Take(GetPrivateKeyHash(), 16));
-                    var data = ProtectedData.Protect(exchange.ToCombined(), _signProvider?.GetPrivateKey(),
-                        DataProtectionScope.CurrentUser);
-                    File.WriteAllBytes(_localEncryptionPath, data);
+                    else
+                    {
+                        var data = File.ReadAllBytes(_localEncryptionPath);
+                        var key = ProtectedData.Unprotect(data, _signProvider?.GetPrivateKey(), DataProtectionScope.CurrentUser);
+                        exchange = new KeyExchange(key);
+                    }
+                    aes.IV = exchange.IV;
+                    aes.Key = exchange.Key;
                 }
                 else
                 {
-                    var data = File.ReadAllBytes(_localEncryptionPath);
-                    var key = ProtectedData.Unprotect(data, _signProvider?.GetPrivateKey(), DataProtectionScope.CurrentUser);
-                    exchange = new KeyExchange(key);
+                    aes.IV = Take(GetPrivateKeyHash(), 16);
+                    aes.Key = GetPrivateKeyHash();
                 }
-                aes.KeySize = 256;
-                aes.IV = exchange.IV;
-                aes.Key = exchange.Key;
-                aes.Padding = PaddingMode.PKCS7;
             }
-            else
-            {
-                aes.KeySize = 256;
-                aes.IV = Take(GetPrivateKeyHash(), 16);
-                aes.Key = GetPrivateKeyHash();
-                aes.Padding = PaddingMode.PKCS7;
-            }
+            aes.GenerateKey();
+            aes.GenerateKey();
             return aes;
         }
 

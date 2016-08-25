@@ -76,9 +76,9 @@ namespace VitalChoice.Business.Services.Avatax
 
             taxGetType = CommitProtect(taxGetType);
 
-            Address origin;
-            Address destination;
-            FillAddresses(context.Order.ShippingAddress, out origin, out destination);
+            var addresses = await FillAddresses(context.Order.ShippingAddress);
+            var origin = addresses.Item1;
+            var destination = addresses.Item2;
 
             decimal discountAmount;
 
@@ -191,10 +191,9 @@ namespace VitalChoice.Business.Services.Avatax
             return getTaxRequest;
         }
 
-        private void FillAddresses(AddressDynamic shippingAddress, out Address originAddress,
-            out Address destinationAddress)
+        private async Task<Tuple<Address, Address>> FillAddresses(AddressDynamic shippingAddress)
         {
-            originAddress = new Address
+            var originAddress = new Address
             {
                 AddressCode = "01",
                 Line1 = "Vital Choice Wild Seafood & Organics",
@@ -204,10 +203,11 @@ namespace VitalChoice.Business.Services.Avatax
                 Country = "US",
                 PostalCode = "98248"
             };
-            destinationAddress = _mapper.ToModelAsync<Address>(shippingAddress).GetAwaiter().GetResult();
+            var destinationAddress = await _mapper.ToModelAsync<Address>(shippingAddress);
             destinationAddress.AddressCode = "02";
             destinationAddress.Country = _countryNameCode.GetCountryCode(shippingAddress);
             destinationAddress.Region = _countryNameCode.GetRegionOrStateCode(shippingAddress);
+            return new Tuple<Address, Address>(originAddress, destinationAddress);
         }
 
         private TaxGetType CommitProtect(TaxGetType taxGetType)

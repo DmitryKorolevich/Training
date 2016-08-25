@@ -22,7 +22,8 @@ namespace VitalChoice.Core.GlobalFilters
                         //var any = affiliateService.SelectAnyAsync(idAffiliate).Result;
                         //if (any)
                         //{
-                            context.HttpContext.Response.Cookies.Append(AffiliateConstants.AffiliatePublicIdParam, idAffiliate.ToString(), new CookieOptions()
+                        context.HttpContext.Response.Cookies.Append(AffiliateConstants.AffiliatePublicIdParam, idAffiliate.ToString(),
+                            new CookieOptions()
                             {
                                 Expires = DateTime.Now.AddDays(AffiliateConstants.AffiliatePublicIdParamExpiredDays),
                             });

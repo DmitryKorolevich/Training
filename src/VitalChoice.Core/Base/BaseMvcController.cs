@@ -9,6 +9,7 @@ namespace VitalChoice.Core.Base
 {
     [MvcExceptionFilter]
     [SetAffiliateCookieFilter]
+    [CustomerAutoReloginFilter]
     public abstract class BaseMvcController : BaseController
     {
         public virtual IActionResult BaseNotFoundView()

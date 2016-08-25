@@ -196,10 +196,10 @@ namespace VC.Public.Controllers
                 var creditCards = currentCustomer.CustomerPaymentMethods
                     .Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard).ToList();
 
-	            var firstCreditCard = creditCards.FirstOrDefault(x => (bool?) x.SafeData.Default == true) ??
-	                                  creditCards.FirstOrDefault();
-                
-	            if (firstCreditCard != null)
+                var firstCreditCard = creditCards.FirstOrDefault(x => (bool?) x.SafeData.Default == true) ??
+                                      creditCards.FirstOrDefault();
+
+                if (firstCreditCard != null)
                 {
                     if (cart.Order.PaymentMethod?.Address == null || cart.Order.PaymentMethod.Id == 0)
                     {
@@ -213,6 +213,8 @@ namespace VC.Public.Controllers
                     }
 
                     await PopulateCreditCardsLookup();
+
+                    addUpdateModel.Id = firstCreditCard.Id;
                 }
                 else
                 {
@@ -221,6 +223,7 @@ namespace VC.Public.Controllers
                         await _addressConverter.UpdateModelAsync(addUpdateModel, cart.Order.PaymentMethod.Address);
                         await _orderPaymentMethodConverter.UpdateModelAsync<BillingInfoModel>(addUpdateModel, cart.Order.PaymentMethod);
                     }
+                    addUpdateModel.Id = 0;
                 }
 
                 addUpdateModel.Email = currentCustomer.Email;
@@ -234,7 +237,8 @@ namespace VC.Public.Controllers
                     await _orderPaymentMethodConverter.UpdateModelAsync<BillingInfoModel>(addUpdateModel, cart.Order.PaymentMethod);
                 }
                 addUpdateModel.Email = cart.Order.Customer?.Email;
-                addUpdateModel.IdCustomerType=(int)CustomerType.Retail;
+                addUpdateModel.IdCustomerType = (int) CustomerType.Retail;
+                addUpdateModel.Id = 0;
             }
 
             return View(addUpdateModel);
@@ -330,7 +334,7 @@ namespace VC.Public.Controllers
                             ModelState.AddModelError(string.Empty,
                                 "For security reasons. Please enter all credit card details for this card or please select a new one to continue.");
 
-                            model.IdCustomerType = cart?.Order?.Customer?.IdObjectType ?? (int)CustomerType.Retail;
+                            model.IdCustomerType = cart.Order?.Customer?.IdObjectType ?? (int) CustomerType.Retail;
                             return View(model);
                         }
                         //BUG: SECURITY!!! do not use real ID here, look to rework synthetic generated id with matching from customer profile

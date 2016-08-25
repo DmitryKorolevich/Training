@@ -16,7 +16,7 @@ namespace VitalChoice.Business.Services
 
         public CountryNameCodeResolver(ICountryService countryService)
         {
-            _countrySource = new Lazy<ICollection<Country>>(() => countryService.GetCountriesAsync().GetAwaiter().GetResult());
+            _countrySource = new Lazy<ICollection<Country>>(() => countryService.GetCountries());
         }
 
         private Dictionary<string, Country> _countryNames;

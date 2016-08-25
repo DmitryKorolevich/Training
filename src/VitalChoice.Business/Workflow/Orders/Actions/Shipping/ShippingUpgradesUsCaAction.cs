@@ -19,8 +19,8 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
 
         public override Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
-            var upgradeP = (ShippingUpgradeOption?) context.Order.SafeData.ShippingUpgradeP ?? ShippingUpgradeOption.None;
-            var upgradeNp = (ShippingUpgradeOption?) context.Order.SafeData.ShippingUpgradeNP ?? ShippingUpgradeOption.None;
+            var upgradeP = (ShippingUpgradeOption?) (int?) context.Order.SafeData.ShippingUpgradeP ?? ShippingUpgradeOption.None;
+            var upgradeNp = (ShippingUpgradeOption?) (int?) context.Order.SafeData.ShippingUpgradeNP ?? ShippingUpgradeOption.None;
             switch (context.SplitInfo.ProductTypes)
             {
                 case POrderType.PNP:

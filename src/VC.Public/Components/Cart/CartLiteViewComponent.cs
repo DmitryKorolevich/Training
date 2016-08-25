@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using VC.Public.Helpers;
+using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Interfaces.Services.Checkout;
 
 namespace VC.Public.Components.Cart
@@ -20,7 +21,7 @@ namespace VC.Public.Components.Cart
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var uid = _actionContextAccessor.ActionContext.HttpContext.Request.GetCartUid();
+            var uid = _actionContextAccessor.ActionContext.HttpContext.GetCartUid();
             return Content(uid == null ? "0" : (await _checkoutService.GetCartItemsCount(uid.Value)).ToString());
         }
     }

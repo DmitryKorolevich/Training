@@ -176,6 +176,21 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             }
         }
 
+        public static async Task AddKeyedAsync<T1, T2, TKey>(this ICollection<T1> main, IEnumerable<T2> toAdd,
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, Task<T1>> projection)
+        {
+            if (main == null)
+                throw new ArgumentNullException(nameof(main));
+            if (toAdd != null)
+            {
+                main.AddRange(
+                    await
+                        toAdd.ExceptKeyedWith(main, rightKeySelector, leftKeySelector)
+                            .Select(projection)
+                            .ToListAsync());
+            }
+        }
+
         public static void UpdateKeyed<T1, T2, TKey>(this ICollection<T1> main, IEnumerable<T2> toSearchIn,
             Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Action<T1, T2> updateAction)
         {
@@ -190,6 +205,25 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                     if (searchIn.TryGetValue(leftKeySelector(m), out item))
                     {
                         updateAction(m, item);
+                    }
+                }
+            }
+        }
+
+        public static async Task UpdateKeyedAsync<T1, T2, TKey>(this ICollection<T1> main, IEnumerable<T2> toSearchIn,
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T1, T2, Task> updateAction)
+        {
+            if (main == null)
+                throw new ArgumentNullException(nameof(main));
+            if (toSearchIn != null)
+            {
+                Dictionary<TKey, T2> searchIn = toSearchIn.ToDictionary(rightKeySelector);
+                foreach (var m in main)
+                {
+                    T2 item;
+                    if (searchIn.TryGetValue(leftKeySelector(m), out item))
+                    {
+                        await updateAction(m, item);
                     }
                 }
             }
@@ -223,6 +257,18 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             {
                 main.UpdateKeyed(toAdd, leftKeySelector, rightKeySelector, updateAction);
                 main.AddKeyed(toAdd, leftKeySelector, rightKeySelector, projection);
+            }
+        }
+
+        public static async Task AddUpdateKeyedAsync<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, Task<T1>> projection, Func<T1, T2, Task> updateAction)
+        {
+            if (main == null)
+                throw new ArgumentNullException(nameof(main));
+            if (toAdd != null)
+            {
+                await main.UpdateKeyedAsync(toAdd, leftKeySelector, rightKeySelector, updateAction);
+                await main.AddKeyedAsync(toAdd, leftKeySelector, rightKeySelector, projection);
             }
         }
 
@@ -273,6 +319,24 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                 AddUpdateKeyed(main, toAdd, leftKeySelector, rightKeySelector, projection, updateAction);
                 var toRemove = main.ExceptKeyedWith(toAdd, leftKeySelector, rightKeySelector).ToArray();
                 removeAction?.Invoke(toRemove);
+                main.RemoveAll(toRemove);
+            }
+        }
+
+        public static async Task MergeKeyedAsync<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toAdd,
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T2, Task<T1>> projection, Func<T1, T2, Task> updateAction,
+            Func<ICollection<T1>, Task> removeAction = null)
+        {
+            if (main == null)
+                throw new ArgumentNullException(nameof(main));
+            if (toAdd != null)
+            {
+                await AddUpdateKeyedAsync(main, toAdd, leftKeySelector, rightKeySelector, projection, updateAction);
+                var toRemove = main.ExceptKeyedWith(toAdd, leftKeySelector, rightKeySelector).ToArray();
+                if (removeAction != null)
+                {
+                    await removeAction(toRemove);
+                }
                 main.RemoveAll(toRemove);
             }
         }

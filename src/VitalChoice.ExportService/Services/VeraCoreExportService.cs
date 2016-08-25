@@ -280,8 +280,8 @@ namespace VitalChoice.ExportService.Services
                               ((string) order.ShippingAddress.SafeData.LastName ?? string.Empty);
             exportOrder.ShipTo = new[] {shipTo};
 
-            var upgradeP = (ShippingUpgradeOption?) context.Order.SafeData.ShippingUpgradeP;
-            var upgradeNp = (ShippingUpgradeOption?) context.Order.SafeData.ShippingUpgradeNP;
+            var upgradeP = (ShippingUpgradeOption?)(int?) context.Order.SafeData.ShippingUpgradeP;
+            var upgradeNp = (ShippingUpgradeOption?)(int?)context.Order.SafeData.ShippingUpgradeNP;
 
             var prefferedShipMethod = (PreferredShipMethod?) order.ShippingAddress.SafeData.PreferredShipMethod ?? PreferredShipMethod.Best;
 

@@ -12,46 +12,46 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Core.Infrastructure
 {
-	public class SuperAdminAuthorizeAttribute : Attribute, IAuthorizationFilter
+    public class SuperAdminAuthorizeAttribute : Attribute, IAsyncAuthorizationFilter
     {
-		protected void Fail(AuthorizationFilterContext context)
-		{
-			if (context.HttpContext.User.Identity.IsAuthenticated)
-			{
-				context.Result = new ForbiddenResult();
-			}
-			else
-			{
-				context.Result = new UnauthorizedResult();
-			}
-		}
+        protected void Fail(AuthorizationFilterContext context)
+        {
+            if (context.HttpContext.User.Identity.IsAuthenticated)
+            {
+                context.Result = new ForbiddenResult();
+            }
+            else
+            {
+                context.Result = new UnauthorizedResult();
+            }
+        }
 
-		public void OnAuthorization(AuthorizationFilterContext context)
-		{
+        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
+        {
             //TODO: review together with Alex
-			//if (HasAllowAnonymous(context))
-			//{
-			//	return;
-			//}
+            //if (HasAllowAnonymous(context))
+            //{
+            //	return;
+            //}
 
-			var authorizationService = context.HttpContext.RequestServices.GetService<IAuthorizationService>();
+            var authorizationService = context.HttpContext.RequestServices.GetService<IAuthorizationService>();
 
-			var claimUser = context.HttpContext.User;
-			var result = authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile).GetAwaiter().GetResult();
-			if (result)
-			{
-			    var superAdmin =
-			        context.HttpContext.RequestServices.GetService<ReferenceData>()
-			            .AdminRoles.Single(x => x.Key == (int) RoleType.SuperAdminUser)
-			            .Text;
+            var claimUser = context.HttpContext.User;
+            var result = await authorizationService.AuthorizeAsync(claimUser, null, IdentityConstants.IdentityBasicProfile);
+            if (result)
+            {
+                var superAdmin =
+                    context.HttpContext.RequestServices.GetService<ReferenceData>()
+                        .AdminRoles.Single(x => x.Key == (int) RoleType.SuperAdminUser)
+                        .Text;
 
-				if (claimUser.IsInRole(superAdmin.Normalize()))
-				{
-					return;
-				}
-			}
+                if (claimUser.IsInRole(superAdmin.Normalize()))
+                {
+                    return;
+                }
+            }
 
-			Fail(context);
-		}
-	}
+            Fail(context);
+        }
+    }
 }
