@@ -19,14 +19,14 @@ namespace VitalChoice.SharedWeb.Helpers
         public static List<KeyValuePair<string, string>> PopulateBillingAddressDetails(this AddressDynamic billingAddress,
             ICountryNameCodeResolver nameCodeResolver, string email)
         {
-            return new List<KeyValuePair<string, string>>()
+            return new List<KeyValuePair<string, string>>
             {
-                new KeyValuePair<string, string>(string.Empty, $"{billingAddress.Data.FirstName} {billingAddress.Data.LastName}"),
+                new KeyValuePair<string, string>(string.Empty, $"{billingAddress.SafeData.FirstName} {billingAddress.SafeData.LastName}"),
                 new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Company),
-                new KeyValuePair<string, string>(string.Empty, billingAddress.Data.Address1),
+                new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Address1),
                 new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Address2),
                 new KeyValuePair<string, string>(string.Empty,
-                    $"{billingAddress.Data.City}, {nameCodeResolver.GetRegionOrStateCode(billingAddress)} {billingAddress.Data.Zip}"),
+                    $"{billingAddress.SafeData.City}, {nameCodeResolver.GetRegionOrStateCode(billingAddress)} {billingAddress.SafeData.Zip}"),
                 new KeyValuePair<string, string>("Phone",
                     billingAddress.SafeData.Phone != null
                         ? ((string) billingAddress.SafeData.Phone).FormatAsPhone(BaseAppConstants.BASE_PHONE_FORMAT)
@@ -45,39 +45,36 @@ namespace VitalChoice.SharedWeb.Helpers
 
             if (withLabels)
             {
-                return new List<KeyValuePair<string, string>>()
+                return new List<KeyValuePair<string, string>>
                 {
                     new KeyValuePair<string, string>("Credit Card",
-                        referenceData.CreditCardTypes.Single(z => z.Key == (int) paymentMethod.Data.CardType).Text),
-                    new KeyValuePair<string, string>("Number", paymentMethod.Data.CardNumber),
+                        referenceData.CreditCardTypes.FirstOrDefault(z => z.Key == (int?) paymentMethod.SafeData.CardType)?.Text),
+                    new KeyValuePair<string, string>("Number", paymentMethod.SafeData.CardNumber),
                     new KeyValuePair<string, string>("Expiration",
-                        $"{paymentMethod.Data.ExpDate.Month}/{paymentMethod.Data.ExpDate.Year%2000}"),
+                        $"{paymentMethod.SafeData.ExpDate?.Month}/{(paymentMethod.SafeData.ExpDate?.Year ?? 0)%2000}"),
                 };
             }
-            else
+            return new List<KeyValuePair<string, string>>
             {
-                return new List<KeyValuePair<string, string>>()
-                {
-                    new KeyValuePair<string, string>(string.Empty,
-                        referenceData.CreditCardTypes.Single(z => z.Key == (int) paymentMethod.Data.CardType).Text),
-                    new KeyValuePair<string, string>(string.Empty, paymentMethod.Data.CardNumber),
-                    new KeyValuePair<string, string>(string.Empty,
-                        $"{paymentMethod.Data.ExpDate.Month}/{paymentMethod.Data.ExpDate.Year%2000}"),
-                };
-            }
+                new KeyValuePair<string, string>(string.Empty,
+                    referenceData.CreditCardTypes.Single(z => z.Key == (int) paymentMethod.SafeData.CardType).Text),
+                new KeyValuePair<string, string>(string.Empty, paymentMethod.SafeData.CardNumber),
+                new KeyValuePair<string, string>(string.Empty,
+                    $"{paymentMethod.SafeData.ExpDate?.Month}/{(paymentMethod.SafeData.ExpDate?.Year ?? 0)%2000}"),
+            };
         }
 
         public static List<KeyValuePair<string, string>> PopulateShippingAddressDetails(this AddressDynamic shippingAddress,
             ICountryNameCodeResolver nameCodeResolver)
         {
-            return new List<KeyValuePair<string, string>>()
+            return new List<KeyValuePair<string, string>>
             {
-                new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.Data.FirstName} {shippingAddress.Data.LastName}"),
+                new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.SafeData.FirstName} {shippingAddress.SafeData.LastName}"),
                 new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Company),
-                new KeyValuePair<string, string>(string.Empty, shippingAddress.Data.Address1),
+                new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Address1),
                 new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Address2),
                 new KeyValuePair<string, string>(string.Empty,
-                    $"{shippingAddress.Data.City}, {nameCodeResolver.GetRegionOrStateCode(shippingAddress)} {shippingAddress.Data.Zip}")
+                    $"{shippingAddress.SafeData.City}, {nameCodeResolver.GetRegionOrStateCode(shippingAddress)} {shippingAddress.SafeData.Zip}")
             };
         }
     }
