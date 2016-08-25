@@ -87,7 +87,7 @@ else
         </div>
     </noscript>
 }
-@if (Model.OrderCompleteStep && Model.Order != null)
+@if (Model.OrderCompleteStep && Model.Order != null && Model.MyBuysEnabled)
 {
     <div class="mybuys" style="display: none">
         @foreach (var skuOrdered in Model.Order.Skus)

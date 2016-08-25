@@ -131,8 +131,13 @@ $(function () {
 function populateAddressesSelection(shippingAddresses, setDefault) {
 	$("#ddShippingAddressesSelection").html("");
 	if (shippingAddresses && shippingAddresses.length > 0) {
-		$.each(shippingAddresses, function (shippingAddressIndex, shippingAddress) {
-			var option = $('<option></option>').val(shippingAddress.Id).html(shippingAddress.FirstName + " " + shippingAddress.LastName + " " + shippingAddress.Address1 + " " + (shippingAddress.Default ? "(Default)" : ""));
+	    $.each(shippingAddresses, function (shippingAddressIndex, shippingAddress)
+	    {
+	        var data = (shippingAddress.FirstName ? shippingAddress.FirstName : "") + " " +
+                (shippingAddress.LastName ? shippingAddress.LastName : "") + " " +
+                (shippingAddress.Address1 ? shippingAddress.Address1 : "") + " " +
+                (shippingAddress.Default ? "(Default)" : "");
+			var option = $('<option></option>').val(shippingAddress.Id).html(data);
 			if ((setDefault && shippingAddress.Default) || (!setDefault && shippingAddress.Id == $("#hdShipping").val())) {
 				$(option).attr("selected", "selected")
 			}

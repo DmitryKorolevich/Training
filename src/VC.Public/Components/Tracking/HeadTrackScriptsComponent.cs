@@ -56,32 +56,34 @@ namespace VC.Public.Components.Tracking
 
             if (toReturn.OrderCompleteStep && toReturn.Order != null)
             {
-                MasterTmsUdoInfo info=new MasterTmsUdoInfo();
-                info.CID = "1531092";
-                info.DISCOUNT = toReturn.Order.DiscountTotal.ToString("F");
-                info.OID = toReturn.Order.Id.ToString();
-                info.CURRENCY = "USD";
-                info.COUPON = toReturn.Order.Discount?.Code ?? "";
-                info.FIRECJ = Request.Cookies.ContainsKey("source") && Request.Cookies["source"]== "CJ" ?
-                    "TRUE" : "FALSE";
+                //TODO: DISABLED FOR STAGING
+                //toReturn.EnableOrderCompleteTrack = true;
+                //MasterTmsUdoInfo info=new MasterTmsUdoInfo();
+                //info.CID = "1531092";
+                //info.DISCOUNT = toReturn.Order.DiscountTotal.ToString("F");
+                //info.OID = toReturn.Order.Id.ToString();
+                //info.CURRENCY = "USD";
+                //info.COUPON = toReturn.Order.Discount?.Code ?? "";
+                //info.FIRECJ = Request.Cookies.ContainsKey("source") && Request.Cookies["source"]== "CJ" ?
+                //    "TRUE" : "FALSE";
 
-                var count = await _customerService.Value.GetActiveOrderCount(toReturn.Order.Customer.Id);
-                info.TYPE = count > 1 ? "373119" : "373118";
+                //var count = await _customerService.Value.GetActiveOrderCount(toReturn.Order.Customer.Id);
+                //info.TYPE = count > 1 ? "373119" : "373118";
 
-                var skus = toReturn.Order.Skus;
-                skus.AddRange(toReturn.Order.PromoSkus.Where(p => p.Enabled));
-                foreach (var skuOrdered in skus)
-                {
-                    MasterTmsUdoItemInfo item=new MasterTmsUdoItemInfo();
-                    item.ITEM = skuOrdered.Sku.Code;
-                    item.AMT = skuOrdered.Amount.ToString("F");
-                    item.QTY = skuOrdered.Quantity.ToString();
+                //var skus = toReturn.Order.Skus;
+                //skus.AddRange(toReturn.Order.PromoSkus.Where(p => p.Enabled));
+                //foreach (var skuOrdered in skus)
+                //{
+                //    MasterTmsUdoItemInfo item=new MasterTmsUdoItemInfo();
+                //    item.ITEM = skuOrdered.Sku.Code;
+                //    item.AMT = skuOrdered.Amount.ToString("F");
+                //    item.QTY = skuOrdered.Quantity.ToString();
 
-                    info.PRODUCTLIST.Add(item);
-                }
+                //    info.PRODUCTLIST.Add(item);
+                //}
 
-                var data = JsonConvert.SerializeObject(info);
-                toReturn.MasterTmsUdo = $"var MasterTmsUdo = {{ 'CJ' : {data} }};";
+                //var data = JsonConvert.SerializeObject(info);
+                //toReturn.MasterTmsUdo = $"var MasterTmsUdo = {{ 'CJ' : {data} }};";
             }
 
             return View("~/Views/Shared/Components/Tracking/HeadTrackScripts.cshtml", toReturn);
