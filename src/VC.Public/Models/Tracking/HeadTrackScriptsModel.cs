@@ -8,5 +8,6 @@ namespace VC.Public.Models.Tracking
     public class HeadTrackScriptsModel : BaseTrackScriptsModel
     {
         public string MasterTmsUdo { get; set; }
+        public bool EnableOrderCompleteTrack { get; set; }
     }
 }

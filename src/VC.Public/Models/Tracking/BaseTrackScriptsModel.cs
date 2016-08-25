@@ -10,5 +10,6 @@ namespace VC.Public.Models.Tracking
     {
         public bool OrderCompleteStep { get; set; }
         public OrderDynamic Order { get; set; }
+        public bool MyBuysEnabled { get; set; }
     }
 }
