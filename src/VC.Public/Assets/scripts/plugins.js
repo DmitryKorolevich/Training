@@ -643,7 +643,7 @@ function notifyError(text) {
 
 function getLast4(str) {
 	if (str == null)
-		return undefined;
+		return '';
 	var start = str.length - 4;
 	if (start < 0)
 		start = 0;

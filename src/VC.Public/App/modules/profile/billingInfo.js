@@ -131,8 +131,16 @@ function populateCreditCardsSelection(creditCards, setDefault) {
 	$("#ddCreditCardsSelection").html("");
 
 	if (creditCards && creditCards.length > 0) {
-		$.each(creditCards, function (creditCardIndex, creditCard) {
-			var option = $('<option></option>').val(creditCard.Id).html($.grep(creditCardTypes, function (cardType) { return cardType.Key == creditCard.CardType })[0].Text + ', ending in ' + getLast4(creditCard.CardNumber) + " " + (creditCard.Default ? "(Default)" : ""));
+	    $.each(creditCards, function (creditCardIndex, creditCard)
+	    {
+	        var data = "";
+	        var cards = $.grep(creditCardTypes, function (cardType) { return cardType.Key == creditCard.CardType });
+	        if (cards.length > 0)
+	        {
+	            data += cards[0].Text;
+	        }
+	        data += ', ending in ' + getLast4(creditCard.CardNumber) + ' ' + (creditCard.Default ? '(Default)' : '');
+	        var option = $('<option></option>').val(creditCard.Id).html(data);
 			if ((setDefault && creditCard.Default) || (!setDefault && creditCard.Id == $("#hdCreditCard").val())) {
 				$(option).attr("selected", "selected")
 			}

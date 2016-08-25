@@ -492,7 +492,7 @@ namespace VC.Public.Controllers
                 var addresses = GetShippingAddresses(cart.Order, currentCustomer);
                 var i = 0;
                 ViewBag.ShippingAddresses = addresses.ToDictionary(x => i++,
-                    y => $"{y.Value.Data.FirstName} {y.Value.Data.LastName} {y.Value.Data.Address1} {y.Key}");
+                    y => $"{y.Value.SafeData.FirstName} {y.Value.SafeData.LastName} {y.Value.SafeData.Address1} {y.Key}");
             }
             else
             {
@@ -619,7 +619,7 @@ namespace VC.Public.Controllers
                 var addresses = GetShippingAddresses(cart.Order, currentCustomer);
                 var i = 0;
                 ViewBag.ShippingAddresses = addresses.ToDictionary(x => i++,
-                    y => $"{y.Value.Data.FirstName} {y.Value.Data.LastName} {y.Value.Data.Address1} {y.Key}");
+                    y => $"{y.Value.SafeData.FirstName} {y.Value.SafeData.LastName} {y.Value.SafeData.Address1} {y.Key}");
             }
             else
             {

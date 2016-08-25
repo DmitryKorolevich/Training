@@ -123,9 +123,19 @@ namespace VC.Public.Controllers
 
 		    ViewBag.CreditCards = creditCards.ToDictionary(x => x.Id,
 		        y =>
-                    ReferenceData.CreditCardTypes.Single(z => z.Key == (int) y.Data.CardType).Text + ", ending in " +
-		            ((string) y.Data.CardNumber).Substring(((string) y.Data.CardNumber).Length - 4) +
-		            (y.SafeData.Default == true ? " (Default)" : ""));
+		        {
+		            var cardType = ReferenceData.CreditCardTypes.FirstOrDefault(z => y.SafeData.CardType!=null &&
+                        z.Key == (int) y.Data.CardType)?.Text;
+		            var cardNumberPart = y.SafeData.CardNumber != null ? (string)y.Data.CardNumber : string.Empty;
+		            if (cardNumberPart.Length > 4)
+		            {
+		                cardNumberPart = cardNumberPart.Substring(cardNumberPart.Length - 4);
+		            }
+		            var defaultPart = y.SafeData.Default == true ? "(Default)" : string.Empty;
+		            var toReturn = $"{cardType}, ending in {cardNumberPart} {defaultPart}";
+
+                    return toReturn;
+		        });
 		}
 	}
 }
