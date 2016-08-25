@@ -95,3 +95,13 @@ IF NOT EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'Orders') A
 BEGIN
 	CREATE NONCLUSTERED INDEX [IX_ObjectType_StatusCode] ON [dbo].[Orders] ([IdObjectType], [StatusCode]) INCLUDE ([Id], [NPOrderStatus], [OrderStatus], [POrderStatus])
 END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'Carts') AND name = N'IX_IdOrder')
+BEGIN
+	CREATE NONCLUSTERED INDEX [IX_IdOrder] ON [dbo].[Carts]
+	(
+		[IdOrder] DESC
+	)
+END
