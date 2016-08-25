@@ -2198,6 +2198,48 @@ GO
 USE [vitalchoice2.0]
 GO
 
+DECLARE @contentType INT, @oldContentType INT, @masterName NVARCHAR(50), @categoryMasterName NVARCHAR(50)
+SET @contentType = 9
+SET @oldContentType = 0
+SET @categoryMasterName = N'Product sub categories'
+
+DECLARE @productCategoryMaster INT
+SELECT @productCategoryMaster = Id FROM [VitalChoice.Infrastructure].dbo.MasterContentItems WHERE Name = @categoryMasterName
+
+INSERT [VitalChoice.Infrastructure].dbo.ContentItems
+(Created, Description, MetaDescription, MetaKeywords, Title, Updated, TempCategoryId, Template)
+--OUTPUT inserted.Id, inserted.TempCategoryId INTO @insertedArticleCategories
+SELECT ISNULL(ca.pcCats_EditedDate, GETDATE()), N'', LEFT(CAST(ca.pcCats_MetaDesc AS NVARCHAR(MAX)), 250), ca.pcCats_MetaKeywords, ca.pcCats_MetaTitle, GETDATE(), ca.idCategory, N''
+FROM [vitalchoice2.0].dbo.categories AS ca 
+WHERE ca.type=@oldContentType AND ca.idCategory <> 1 AND ca.idCategory NOT IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.ProductCategories)
+ORDER BY ca.idParentCategory
+
+INSERT [VitalChoice.Infrastructure].dbo.ProductCategories
+(Id, ContentItemId, MasterContentItemId, IdOld, NavLabel, StatusCode, Url, NavIdVisible, FileImageLargeUrl, FileImageSmallUrl, HideLongDescription, HideLongDescriptionBottom, LongDescription, LongDescriptionBottom)
+SELECT ca.idCategory, c.Id, @productCategoryMaster, ca.idCategory, REPLACE(ca.categoryDesc, '&amp;', '&'),  
+	2/*Active*/, REPLACE(RTRIM(LTRIM(LOWER([vitalchoice2.0].[dbo].RegexReplace('[^a-zA-Z0-9]+', ca.categoryDesc, ' ')))) COLLATE SQL_Latin1_General_CP1_CI_AS,' ','-'),
+	CASE WHEN ISNULL(ca.iBTOhide, 0) <> 0 THEN NULL ELSE CASE WHEN ISNULL(ca.pcCats_RetailHide, 0) <> 0 THEN 2 ELSE 1 END END,
+	REPLACE(N'/files/catalog/' + ca.largeimage, '//', '/'), REPLACE(N'/files/catalog/' + ca.image, '//', '/'), CASE WHEN ISNULL(ca.HideDesc, 0) <> 0 THEN 1 ELSE 0 END, CASE WHEN ISNULL(ca.HideDesc, 0) <> 0 THEN 1 ELSE 0 END, ca.LDesc, ca.LDesc2
+FROM [vitalchoice2.0].dbo.categories AS ca
+INNER JOIN [VitalChoice.Infrastructure].dbo.ContentItems AS c ON c.TempCategoryId = ca.idCategory
+WHERE ca.type=@oldContentType AND ca.idCategory <> 1 AND ca.idCategory NOT IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.ProductCategories)
+ORDER BY ca.idParentCategory
+
+SET IDENTITY_INSERT [VitalChoice.Ecommerce].dbo.ProductCategories ON;
+
+INSERT [VitalChoice.Ecommerce].dbo.ProductCategories
+(Id, Name, StatusCode, [Order])
+SELECT ca.idCategory, REPLACE(ca.categoryDesc, '&amp;', '&'), 2/*Active*/, ISNULL(ca.[priority], 0)
+FROM [vitalchoice2.0].dbo.categories AS ca
+WHERE ca.type=@oldContentType AND ca.idCategory <> 1 AND ca.idCategory NOT IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.ProductCategories)
+ORDER BY ca.idParentCategory
+
+GO
+
+SET IDENTITY_INSERT [VitalChoice.Ecommerce].dbo.ProductCategories OFF;
+
+GO
+
 IF OBJECT_ID('dbo.TempProductsToMove') IS NOT NULL
 	DROP TABLE dbo.TempProductsToMove
 
@@ -2392,11 +2434,11 @@ GO
 	WHERE p.Id IN (SELECT Id FROM TempProductsToMove)
 
 	INSERT [VitalChoice.Ecommerce].dbo.ProductsToCategories
-	(IdProduct, IdCategory)
-	SELECT a.Id, c.Id FROM [VitalChoice.Infrastructure].dbo.Products AS a
+	(IdProduct, IdCategory, [Order])
+	SELECT a.Id, c.Id, ca.POrder FROM [VitalChoice.Infrastructure].dbo.Products AS a
 	INNER JOIN [vitalchoice2.0].dbo.categories_products AS ca ON ca.idProduct = a.Id AND ca.idCategory <> 1
 	INNER JOIN [VitalChoice.Infrastructure].dbo.ProductCategories AS c ON c.IdOld = ca.idCategory
-	WHERE a.Id IN (SELECT Id FROM TempProductsToMove)
+	--WHERE a.Id IN (SELECT Id FROM TempProductsToMove)
 	
 	UPDATE [VitalChoice.Infrastructure].dbo.Products
 	SET Url = r.Url + N'-' + CAST(j.Number AS NVARCHAR(10))

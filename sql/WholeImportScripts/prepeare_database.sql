@@ -128,6 +128,7 @@ DELETE FROM CustomerFiles
 DELETE FROM Customers
 TRUNCATE TABLE AddressOptionValues
 DELETE FROM Addresses
+TRUNCATE TABLE ProductsToCategories
 --remove customers from ecommerce DB
 DELETE FROM Users WHERE Id IN (SELECT id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE IdUserType = 2)
 GO
