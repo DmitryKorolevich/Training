@@ -48,12 +48,7 @@ namespace VC.Public.ModelConverters.Order
 
         public override async Task DynamicToModelAsync(OrderViewModel model, OrderDynamic dynamic)
         {
-            if (dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.NoCharge && dynamic.Customer.ProfileAddress != null)
-            {
-                model.BillToAddress = dynamic.Customer.ProfileAddress.PopulateBillingAddressDetails(_countryNameCodeResolver,
-                    dynamic.Customer.Email);
-            }
-            else if (dynamic.PaymentMethod?.Address != null)
+            if (dynamic.PaymentMethod?.Address != null)
             {
                 model.BillToAddress = dynamic.PaymentMethod.Address.PopulateBillingAddressDetails(_countryNameCodeResolver,
                     dynamic.Customer.Email);

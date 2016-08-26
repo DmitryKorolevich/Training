@@ -15,6 +15,7 @@
     "OrderShippingNotificationBcc": "",
     //cdbdf92c@trustpilotservice.com
 
+    "EnableOrderTrackScripts": false,
     "GenerateLowercaseUrls": true,
     "EnableBundlingAndMinification": true,
     "Versioning": {

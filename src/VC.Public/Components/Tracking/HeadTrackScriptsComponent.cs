@@ -21,7 +21,9 @@ using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using VitalChoice.Infrastructure.Domain.Options;
 
 namespace VC.Public.Components.Tracking
 {
@@ -35,6 +37,7 @@ namespace VC.Public.Components.Tracking
         private readonly Lazy<IAffiliateService> _affiliateService;
         private readonly Lazy<ReferenceData> _referenceData;
         private readonly BaseTrackScriptsComponentHelper _helper;
+        private readonly Lazy<IOptions<AppOptions>> _appOptions;
 
         public HeadTrackScriptsComponent()
         {
@@ -45,6 +48,7 @@ namespace VC.Public.Components.Tracking
             _customerService = new Lazy<ICustomerService>(() => HttpContext.RequestServices.GetService<ICustomerService>());
             _affiliateService = new Lazy<IAffiliateService>(() => HttpContext.RequestServices.GetService<IAffiliateService>());
             _referenceData = new Lazy<ReferenceData>(() => HttpContext.RequestServices.GetService<ReferenceData>());
+            _appOptions = new Lazy<IOptions<AppOptions>>(() => HttpContext.RequestServices.GetService<IOptions<AppOptions>>());
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
@@ -54,36 +58,35 @@ namespace VC.Public.Components.Tracking
             await _helper.SetBaseOptions(toReturn, HttpContext, _orderService, _authorizationService, _checkoutService, _customerService,
                 _referenceData);
 
-            if (toReturn.OrderCompleteStep && toReturn.Order != null)
+            if (toReturn.OrderCompleteStep && toReturn.Order != null && _appOptions.Value.Value.EnableOrderTrackScripts)
             {
-                //TODO: DISABLED FOR STAGING
-                //toReturn.EnableOrderCompleteTrack = true;
-                //MasterTmsUdoInfo info=new MasterTmsUdoInfo();
-                //info.CID = "1531092";
-                //info.DISCOUNT = toReturn.Order.DiscountTotal.ToString("F");
-                //info.OID = toReturn.Order.Id.ToString();
-                //info.CURRENCY = "USD";
-                //info.COUPON = toReturn.Order.Discount?.Code ?? "";
-                //info.FIRECJ = Request.Cookies.ContainsKey("source") && Request.Cookies["source"]== "CJ" ?
-                //    "TRUE" : "FALSE";
+                toReturn.EnableOrderCompleteTrack = true;
+                MasterTmsUdoInfo info = new MasterTmsUdoInfo();
+                info.CID = "1531092";
+                info.DISCOUNT = toReturn.Order.DiscountTotal.ToString("F");
+                info.OID = toReturn.Order.Id.ToString();
+                info.CURRENCY = "USD";
+                info.COUPON = toReturn.Order.Discount?.Code ?? "";
+                info.FIRECJ = Request.Cookies.ContainsKey("source") && Request.Cookies["source"] == "CJ" ?
+                    "TRUE" : "FALSE";
 
-                //var count = await _customerService.Value.GetActiveOrderCount(toReturn.Order.Customer.Id);
-                //info.TYPE = count > 1 ? "373119" : "373118";
+                var count = await _customerService.Value.GetActiveOrderCount(toReturn.Order.Customer.Id);
+                info.TYPE = count > 1 ? "373119" : "373118";
 
-                //var skus = toReturn.Order.Skus;
-                //skus.AddRange(toReturn.Order.PromoSkus.Where(p => p.Enabled));
-                //foreach (var skuOrdered in skus)
-                //{
-                //    MasterTmsUdoItemInfo item=new MasterTmsUdoItemInfo();
-                //    item.ITEM = skuOrdered.Sku.Code;
-                //    item.AMT = skuOrdered.Amount.ToString("F");
-                //    item.QTY = skuOrdered.Quantity.ToString();
+                var skus = toReturn.Order.Skus;
+                skus.AddRange(toReturn.Order.PromoSkus.Where(p => p.Enabled));
+                foreach (var skuOrdered in skus)
+                {
+                    MasterTmsUdoItemInfo item = new MasterTmsUdoItemInfo();
+                    item.ITEM = skuOrdered.Sku.Code;
+                    item.AMT = skuOrdered.Amount.ToString("F");
+                    item.QTY = skuOrdered.Quantity.ToString();
 
-                //    info.PRODUCTLIST.Add(item);
-                //}
+                    info.PRODUCTLIST.Add(item);
+                }
 
-                //var data = JsonConvert.SerializeObject(info);
-                //toReturn.MasterTmsUdo = $"var MasterTmsUdo = {{ 'CJ' : {data} }};";
+                var data = JsonConvert.SerializeObject(info);
+                toReturn.MasterTmsUdo = $"var MasterTmsUdo = {{ 'CJ' : {data} }};";
             }
 
             return View("~/Views/Shared/Components/Tracking/HeadTrackScripts.cshtml", toReturn);

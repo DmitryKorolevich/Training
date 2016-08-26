@@ -18,6 +18,7 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public string OrderShippingNotificationBcc { get; set; }
         public string FilesRelativePath { get; set; }
         public string FilesPath { get; set; }
+        public bool EnableOrderTrackScripts { get; set; }
         public EmailConfiguration EmailConfiguration { get; set; }
 		public Versioning Versioning { get; set; }
 		public AzureStorage AzureStorage { get; set; }

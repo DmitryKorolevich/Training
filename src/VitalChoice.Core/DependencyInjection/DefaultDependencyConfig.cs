@@ -345,6 +345,7 @@ namespace VitalChoice.Core.DependencyInjection
             options.OrderShippingNotificationBcc = configuration.GetSection("App:OrderShippingNotificationBcc").Value;
             options.FilesRelativePath = configuration.GetSection("App:FilesRelativePath").Value;
             options.FilesPath = configuration.GetSection("App:FilesPath").Value;
+            options.EnableOrderTrackScripts = Convert.ToBoolean(configuration.GetSection("App:EnableOrderTrackScripts").Value);
             options.EmailConfiguration = new EmailConfiguration
             {
                 From = configuration.GetSection("App:Email:From").Value,

@@ -9,6 +9,7 @@
     "OrderShippingNotificationBcc": "",
     //cdbdf92c@trustpilotservice.com
 
+    "EnableOrderTrackScripts": false,
     "Connection": {
       "UserName": "dev_vcdb_login",
       "Password": "CCQLaskw3pMFU9XqE6CHp28m",
