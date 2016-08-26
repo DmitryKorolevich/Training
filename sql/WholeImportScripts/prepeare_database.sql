@@ -128,6 +128,7 @@ DELETE FROM CustomerFiles
 DELETE FROM Customers
 TRUNCATE TABLE AddressOptionValues
 DELETE FROM Addresses
+TRUNCATE TABLE ProductsToCategories
 --remove customers from ecommerce DB
 DELETE FROM Users WHERE Id IN (SELECT id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE IdUserType = 2)
 GO
@@ -141,6 +142,9 @@ WHERE UserId IN (SELECT id FROM AspNetUsers WHERE IdUserType = 2)
 GO
 DELETE FROM AspNetUserRoles
 WHERE UserId IN (SELECT id FROM AspNetUsers WHERE IdUserType = 2)
+GO
+DELETE FROM AspNetUsers
+WHERE IdUserType = 2
 GO
 
 --wipe out affiliates
@@ -326,47 +330,18 @@ GO
 
 DELETE FROM SkuOptionValues
 WHERE IdSku IN (
-	SELECT Id FROM Skus WHERE IdProduct IN (2469,
-	2468,
-	2467,
-	2466,
-	2465,
-	2464,
-	2463,
-	2462) 
-) OR IdSku = 2512
+	SELECT Id FROM Skus WHERE IdProduct = 2635
+)
 
 DELETE FROM Skus
-WHERE IdProduct IN 
-	(2469,
-	2468,
-	2467,
-	2466,
-	2465,
-	2464,
-	2463,
-	2462) OR Id = 2512
+WHERE IdProduct = 2635
 
 
 DELETE FROM ProductOptionValues
-WHERE IdProduct IN (2469,
-	2468,
-	2467,
-	2466,
-	2465,
-	2464,
-	2463,
-	2462)
+WHERE IdProduct = 2635
 
 DELETE FROM Products
-WHERE Id IN (2469,
-	2468,
-	2467,
-	2466,
-	2465,
-	2464,
-	2463,
-	2462)
+WHERE Id = 2635
 
 GO
 
@@ -379,26 +354,12 @@ DECLARE @contentTodelete TABLE(Id INT NOT NULL PRIMARY KEY)
 INSERT INTO @contentTodelete
 (Id)
 SELECT ContentItemId FROM Products 
-WHERE Id IN (2469,
-	2468,
-	2467,
-	2466,
-	2465,
-	2464,
-	2463,
-	2462)
+WHERE Id = 2635
 
 DELETE FROM ContentItems
 WHERE Id IN (SELECT Id FROM @contentTodelete)
 
 DELETE FROM Products 
-WHERE Id IN (2469,
-	2468,
-	2467,
-	2466,
-	2465,
-	2464,
-	2463,
-	2462)
+WHERE Id = 2635
 GO
 PRINT '====Wipe out all data === END'

@@ -492,14 +492,9 @@ FROM [VitalChoice.Infrastructure].dbo.CustomPublicStyles AS b
 INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
 
 UPDATE [VitalChoice.Infrastructure].dbo.MasterContentItems
-SET UserId = u.Id
+SET IdEditedBy = u.Id
 FROM [VitalChoice.Infrastructure].dbo.MasterContentItems AS b
-INNER JOIN @aspnetUsers AS u ON u.IdOld = b.UserId
-
-UPDATE [VitalChoice.Infrastructure].dbo.MasterContentItems
-SET UserId = u.Id
-FROM [VitalChoice.Infrastructure].dbo.MasterContentItems AS b
-INNER JOIN @aspnetUsers AS u ON u.IdOld = b.UserId
+INNER JOIN @aspnetUsers AS u ON u.IdOld = b.IdEditedBy
 
 UPDATE [VitalChoice.Infrastructure].dbo.Articles
 SET UserId = u.Id
@@ -1902,7 +1897,7 @@ SET @categoryMasterName = N'Recipe Sub Category'
 	INSERT INTO @recipesToImport
 	(Id)
 	SELECT a.RecipeId FROM [vitalchoice2.0].[dbo].Recipes AS a
-	WHERE a.RecipeId NOT IN (SELECT IdOld FROM [VitalChoice.Infrastructure].dbo.Recipes)
+	WHERE a.RecipeId NOT IN (SELECT IdOld FROM [VitalChoice.Infrastructure].dbo.Recipes WHERE IdOld IS NOT NULL)
 
 	--============================= Recipes ===========================
 
@@ -2203,6 +2198,48 @@ GO
 USE [vitalchoice2.0]
 GO
 
+DECLARE @contentType INT, @oldContentType INT, @masterName NVARCHAR(50), @categoryMasterName NVARCHAR(50)
+SET @contentType = 9
+SET @oldContentType = 0
+SET @categoryMasterName = N'Product sub categories'
+
+DECLARE @productCategoryMaster INT
+SELECT @productCategoryMaster = Id FROM [VitalChoice.Infrastructure].dbo.MasterContentItems WHERE Name = @categoryMasterName
+
+INSERT [VitalChoice.Infrastructure].dbo.ContentItems
+(Created, Description, MetaDescription, MetaKeywords, Title, Updated, TempCategoryId, Template)
+--OUTPUT inserted.Id, inserted.TempCategoryId INTO @insertedArticleCategories
+SELECT ISNULL(ca.pcCats_EditedDate, GETDATE()), N'', LEFT(CAST(ca.pcCats_MetaDesc AS NVARCHAR(MAX)), 250), ca.pcCats_MetaKeywords, ca.pcCats_MetaTitle, GETDATE(), ca.idCategory, N''
+FROM [vitalchoice2.0].dbo.categories AS ca 
+WHERE ca.type=@oldContentType AND ca.idCategory <> 1 AND ca.idCategory NOT IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.ProductCategories)
+ORDER BY ca.idParentCategory
+
+INSERT [VitalChoice.Infrastructure].dbo.ProductCategories
+(Id, ContentItemId, MasterContentItemId, IdOld, NavLabel, StatusCode, Url, NavIdVisible, FileImageLargeUrl, FileImageSmallUrl, HideLongDescription, HideLongDescriptionBottom, LongDescription, LongDescriptionBottom)
+SELECT ca.idCategory, c.Id, @productCategoryMaster, ca.idCategory, REPLACE(ca.categoryDesc, '&amp;', '&'),  
+	2/*Active*/, REPLACE(RTRIM(LTRIM(LOWER([vitalchoice2.0].[dbo].RegexReplace('[^a-zA-Z0-9]+', ca.categoryDesc, ' ')))) COLLATE SQL_Latin1_General_CP1_CI_AS,' ','-'),
+	CASE WHEN ISNULL(ca.iBTOhide, 0) <> 0 THEN NULL ELSE CASE WHEN ISNULL(ca.pcCats_RetailHide, 0) <> 0 THEN 2 ELSE 1 END END,
+	REPLACE(N'/files/catalog/' + ca.largeimage, '//', '/'), REPLACE(N'/files/catalog/' + ca.image, '//', '/'), CASE WHEN ISNULL(ca.HideDesc, 0) <> 0 THEN 1 ELSE 0 END, CASE WHEN ISNULL(ca.HideDesc, 0) <> 0 THEN 1 ELSE 0 END, ca.LDesc, ca.LDesc2
+FROM [vitalchoice2.0].dbo.categories AS ca
+INNER JOIN [VitalChoice.Infrastructure].dbo.ContentItems AS c ON c.TempCategoryId = ca.idCategory
+WHERE ca.type=@oldContentType AND ca.idCategory <> 1 AND ca.idCategory NOT IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.ProductCategories)
+ORDER BY ca.idParentCategory
+
+SET IDENTITY_INSERT [VitalChoice.Ecommerce].dbo.ProductCategories ON;
+
+INSERT [VitalChoice.Ecommerce].dbo.ProductCategories
+(Id, Name, StatusCode, [Order])
+SELECT ca.idCategory, REPLACE(ca.categoryDesc, '&amp;', '&'), 2/*Active*/, ISNULL(ca.[priority], 0)
+FROM [vitalchoice2.0].dbo.categories AS ca
+WHERE ca.type=@oldContentType AND ca.idCategory <> 1 AND ca.idCategory NOT IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.ProductCategories)
+ORDER BY ca.idParentCategory
+
+GO
+
+SET IDENTITY_INSERT [VitalChoice.Ecommerce].dbo.ProductCategories OFF;
+
+GO
+
 IF OBJECT_ID('dbo.TempProductsToMove') IS NOT NULL
 	DROP TABLE dbo.TempProductsToMove
 
@@ -2397,11 +2434,11 @@ GO
 	WHERE p.Id IN (SELECT Id FROM TempProductsToMove)
 
 	INSERT [VitalChoice.Ecommerce].dbo.ProductsToCategories
-	(IdProduct, IdCategory)
-	SELECT a.Id, c.Id FROM [VitalChoice.Infrastructure].dbo.Products AS a
+	(IdProduct, IdCategory, [Order])
+	SELECT a.Id, c.Id, ca.POrder FROM [VitalChoice.Infrastructure].dbo.Products AS a
 	INNER JOIN [vitalchoice2.0].dbo.categories_products AS ca ON ca.idProduct = a.Id AND ca.idCategory <> 1
 	INNER JOIN [VitalChoice.Infrastructure].dbo.ProductCategories AS c ON c.IdOld = ca.idCategory
-	WHERE a.Id IN (SELECT Id FROM TempProductsToMove)
+	--WHERE a.Id IN (SELECT Id FROM TempProductsToMove)
 	
 	UPDATE [VitalChoice.Infrastructure].dbo.Products
 	SET Url = r.Url + N'-' + CAST(j.Number AS NVARCHAR(10))
@@ -4480,7 +4517,7 @@ INSERT INTO @articlesToImport
 (Id)
 SELECT a.ID 
 FROM [vitalchoice2.0].[dbo].Articles AS a 
-WHERE a.ID NOT IN (SELECT IdOld FROM [VitalChoice.Infrastructure].dbo.Articles)
+WHERE a.ID NOT IN (SELECT IdOld FROM [VitalChoice.Infrastructure].dbo.Articles WHERE idOld IS NOT NULL)
 
 DECLARE @articleMasterId INT
 SELECT @articleMasterId = Id FROM [VitalChoice.Infrastructure].dbo.MasterContentItems WHERE Name = @masterName
@@ -4532,5 +4569,118 @@ UPDATE [VitalChoice.Infrastructure].dbo.Articles
 SET FileUrl = REPLACE(REPLACE(REPLACE(c.FileUrl, 'http://www.vitalchoice.com/shop/pc/catalog/', '/files/catalog/'), '/shop/pc/catalog/', '/files/catalog/'), '../pc/catalog/', '/files/catalog/')
 FROM [VitalChoice.Infrastructure].dbo.Articles AS c
 WHERE c.FileUrl LIKE '%/catalog/%'
+
+GO
+
+USE [vitalchoice2.0]
+GO
+
+IF OBJECT_ID('dbo.ReplaceUrl') IS NOT NULL
+BEGIN
+DROP FUNCTION dbo.ReplaceUrl
+END
+GO
+CREATE FUNCTION dbo.ReplaceUrl
+(@text NVARCHAR(MAX))
+RETURNS NVARCHAR(MAX)
+AS
+BEGIN
+	RETURN REPLACE(REPLACE(REPLACE(ISNULL(@text, N''), 'http://www.vitalchoice.com/shop/pc/catalog/', '/files/catalog/'), '/shop/pc/catalog/', '/files/catalog/'), '../pc/catalog/', '/files/catalog/')
+END
+GO
+
+DECLARE @contentType INT, @masterName NVARCHAR(50), @categoryMasterName NVARCHAR(50)
+SET @contentType = 5
+SET @masterName = N'FAQ Individual'
+SET @categoryMasterName = N'FAQ Sub Category'
+
+--============================= Clean ===========================
+DECLARE @contentItemsToImport TABLE(Id INT)
+
+INSERT INTO @contentItemsToImport
+(Id)
+SELECT a.idFAQ
+FROM [vitalchoice2.0].[dbo].FAQ AS a 
+WHERE a.idFAQ NOT IN (SELECT IdOld FROM [VitalChoice.Infrastructure].dbo.FAQs WHERE idOld IS NOT NULL)
+
+DELETE FROM [VitalChoice.Infrastructure].dbo.Faqs
+
+DECLARE @masterId INT
+SELECT @masterId = Id FROM [VitalChoice.Infrastructure].dbo.MasterContentItems WHERE Name = @masterName
+
+--============================= Faqs ===========================
+
+INSERT [VitalChoice.Infrastructure].dbo.ContentItems
+(Created, Description, MetaDescription, MetaKeywords, Title, Updated, TempId, Template)
+SELECT GETDATE(), dbo.ReplaceUrl(content), N'', NULL, title, GETDATE(), idFAQ, N''
+FROM [vitalchoice2.0].[dbo].FAQ AS a
+WHERE a.idFAQ IN (SELECT Id FROM @contentItemsToImport)
+ORDER BY a.idFAQ
+
+INSERT INTO [VitalChoice.Infrastructure].dbo.Faqs
+(ContentItemId, MasterContentItemId, Name, StatusCode, Url, IdOld)
+SELECT i.Id, @masterId, a.title, 2/*Active*/, REPLACE(RTRIM(LTRIM(LOWER([vitalchoice2.0].[dbo].RegexReplace('[^a-zA-Z0-9]+', a.title, ' ')))) COLLATE SQL_Latin1_General_CP1_CI_AS,' ','-'), a.idFAQ 
+FROM [vitalchoice2.0].[dbo].FAQ AS a
+INNER JOIN [VitalChoice.Infrastructure].dbo.ContentItems AS i ON i.TempId = a.idFAQ
+WHERE a.idFAQ IN (SELECT Id FROM @contentItemsToImport)
+
+INSERT [VitalChoice.Infrastructure].dbo.FaqsToContentCategories
+(FAQId, ContentCategoryId)
+SELECT a.Id, c.Id FROM [VitalChoice.Infrastructure].dbo.Faqs AS a
+INNER JOIN [vitalchoice2.0].dbo.FAQtoSLC AS ca ON ca.idFAQ = a.IdOld
+INNER JOIN [VitalChoice.Infrastructure].dbo.ContentCategories AS c ON c.IdOld = ca.idSLC
+WHERE ca.idFAQ IN (SELECT Id FROM @contentItemsToImport)
+
+GO
+
+UPDATE [VitalChoice.Infrastructure].dbo.Faqs
+SET Url = r.Url + N'-' + CAST(j.Number AS NVARCHAR(10))
+FROM [VitalChoice.Infrastructure].dbo.Faqs AS r
+INNER JOIN 
+(
+	SELECT ROW_NUMBER() OVER (PARTITION BY r.Url ORDER BY r.Id) AS Number, r.Id
+	FROM [VitalChoice.Infrastructure].dbo.Faqs AS r
+	WHERE r.Url IN 
+	(
+		SELECT Url FROM [VitalChoice.Infrastructure].dbo.Faqs
+		GROUP BY Url
+		HAVING COUNT(Url) > 1
+	)
+) AS j ON j.Id = r.Id
+WHERE j.Number > 1
+
+UPDATE [VitalChoice.Infrastructure].dbo.ContentCategories
+SET Url = r.Url + N'-' + CAST(j.Number AS NVARCHAR(10))
+FROM [VitalChoice.Infrastructure].dbo.ContentCategories AS r
+INNER JOIN 
+(
+	SELECT ROW_NUMBER() OVER (PARTITION BY r.Url ORDER BY r.Id) AS Number, r.Id
+	FROM [VitalChoice.Infrastructure].dbo.ContentCategories AS r
+	WHERE r.Url IN 
+	(
+		SELECT Url FROM [VitalChoice.Infrastructure].dbo.ContentCategories
+		WHERE Type = 5
+		GROUP BY Url
+		HAVING COUNT(Url) > 1
+	) AND Type = 5
+) AS j ON j.Id = r.Id
+WHERE j.Number > 1 AND r.Type = 5
+
+GO
+
+SELECT Url FROM [VitalChoice.Infrastructure].dbo.Faqs
+GROUP BY Url
+HAVING COUNT(Url) > 1
+
+SELECT Url FROM [VitalChoice.Infrastructure].dbo.ContentCategories
+WHERE Type = 5
+GROUP BY Url
+HAVING COUNT(Url) > 1
+
+GO
+IF OBJECT_ID('dbo.ReplaceUrl') IS NOT NULL
+BEGIN
+DROP FUNCTION dbo.ReplaceUrl
+END
 
 GO

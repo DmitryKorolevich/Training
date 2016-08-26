@@ -54,6 +54,7 @@ using VitalChoice.Infrastructure.Domain.Exceptions;
 using VitalChoice.Infrastructure.Extensions;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Data.UOW;
+using VitalChoice.Infrastructure.Domain.Entities.Checkout;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 
@@ -91,7 +92,6 @@ namespace VitalChoice.Business.Services.Orders
         private readonly ReferenceData _referenceData;
         private readonly OrderRepository _orderRepository;
         private readonly AppSettings _appSettings;
-        private readonly IGoogleService _googleService;
         private readonly ILoggerFactory _loggerFactory;
 
         public OrderService(
@@ -122,8 +122,7 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository, IDiscountService discountService,
             IEcommerceRepositoryAsync<VAutoShip> vAutoShipRepository, IEcommerceRepositoryAsync<VAutoShipOrder> vAutoShipOrderRepository,
             AffiliateOrderPaymentRepository affiliateOrderPaymentRepository, ICountryNameCodeResolver codeResolver,
-            IDynamicEntityOrderingExtension<Order> orderingExtension, ReferenceData referenceData, AppSettings appSettings,
-            IGoogleService googleService)
+            IDynamicEntityOrderingExtension<Order> orderingExtension, ReferenceData referenceData, AppSettings appSettings)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension
@@ -155,7 +154,6 @@ namespace VitalChoice.Business.Services.Orders
             _addressMapper = addressMapper;
             _productService = productService;
             _notificationService = notificationService;
-            _googleService = googleService;
             _loggerFactory = loggerProvider;
         }
 
@@ -296,6 +294,12 @@ namespace VitalChoice.Business.Services.Orders
                     if (initial.IsAnyIncomplete() && model.IsAnyNotIncomplete())
                     {
                         entity.DateCreated = DateTime.Now;
+                        var cartRepository = uow.RepositoryAsync<CartExtended>();
+                        var carts = await cartRepository.Query(c => c.IdOrder == entity.Id).SelectAsync(true);
+                        foreach (var cart in carts)
+                        {
+                            cart.IdOrder = null;
+                        }
                         await uow.SaveChangesAsync();
                         if (model.Discount?.Id > 0)
                         {
@@ -654,7 +658,7 @@ namespace VitalChoice.Business.Services.Orders
             var order = (await _orderRepository.Query(orderQuery).OrderBy(p => p.OrderByDescending(x => x.Id)).SelectFirstOrDefaultAsync(false));
             if (order != null)
             {
-                toReturn = await this.SelectAsync(order.Id);
+                toReturn = await SelectAsync(order.Id);
             }
             return toReturn;
 
@@ -1560,7 +1564,6 @@ namespace VitalChoice.Business.Services.Orders
                 Include(c => c.OrderShippingPackages).Include(c=>c.HealthwiseOrder), orderBy: sortable, withDefaults: true);
 
             var resultList = new List<OrderInfoItem>(orders.Items.Count);
-            var shippingMethods = _referenceData.OrderPreferredShipMethod;
             foreach (var item in orders.Items)
             {
                 var newItem = new OrderInfoItem
@@ -2018,15 +2021,13 @@ namespace VitalChoice.Business.Services.Orders
             List<int> customerIds = new List<int>();
             toReturn.Count = result.Count;
             toReturn.Items = new List<AffiliateOrderListItemModel>();
-            string customerFirstName = null;
-            string customerLastName = null;
-            int customerOrdersCount = 0;
             foreach (var order in result.Items)
             {
-                customerFirstName = null;
-                customerLastName = null;
-                customerOrdersCount = 0;
-                if (order.PaymentMethod != null && order.PaymentMethod.Address != null && order.PaymentMethod.Address.DictionaryData.ContainsKey("FirstName") && order.PaymentMethod.Address.DictionaryData.ContainsKey("LastName"))
+                string customerFirstName = null;
+                string customerLastName = null;
+                var customerOrdersCount = 0;
+                if (order.PaymentMethod?.Address != null && order.PaymentMethod.Address.DictionaryData.ContainsKey("FirstName") &&
+                    order.PaymentMethod.Address.DictionaryData.ContainsKey("LastName"))
                 {
                     customerFirstName = order.PaymentMethod.Address.Data.FirstName;
                     customerLastName = order.PaymentMethod.Address.Data.LastName;
@@ -2171,26 +2172,6 @@ namespace VitalChoice.Business.Services.Orders
                 HealthwiseOrder healthwiseOrder = await healthwiseOrderRepositoryAsync.Query(p => p.Id == idOrder).SelectFirstOrDefaultAsync(false);
                 if (healthwiseOrder == null)
                 {
-                    //BUG: doesn't make any sense to delete not exists HW order
-                    //using (var transaction = uow.BeginTransaction())
-                    //{
-                    //    try
-                    //    {
-                    //        healthwiseOrderRepositoryAsync.Delete(idOrder);
-                    //        if (isFirstHealthwise)
-                    //        {
-                    //            var customer = await _customerService.SelectAsync(idCustomer, true);
-                    //            customer.Data.HasHealthwiseOrders = false;
-                    //            await _customerService.UpdateAsync(customer);
-                    //        }
-                    //        transaction.Commit();
-                    //    }
-                    //    catch
-                    //    {
-                    //        transaction.Rollback();
-                    //        throw;
-                    //    }
-                    //}
                     var maxCount = _appSettings.HealthwisePeriodMaxItemsCount;
                     var orderCreatedDate = orderDateCreated;
                     var periods =
