@@ -2117,13 +2117,27 @@ namespace VitalChoice.Business.Services.Orders
         {
             using (var uow = CreateUnitOfWork())
             {
-                await UpdateHealthwiseOrderInnerAsync(uow, order.Id, order.Customer.Id, order.DateCreated, isHealthwise, order.IsFirstHealthwise);
-                if (isHealthwise)
+                using (var transaction = uow.BeginTransaction())
                 {
-                    await MarkHealthwiseCustomerAsync(uow, order.Customer.Id);
+                    try
+                    { 
+                        await UpdateHealthwiseOrderInnerAsync(uow, order.Id, order.Customer.Id, order.DateCreated,
+                                isHealthwise, order.IsFirstHealthwise);
+                        if (isHealthwise)
+                        {
+                            await MarkHealthwiseCustomerAsync(uow, order.Customer.Id);
+                        }
+                        await uow.SaveChangesAsync();
+                        transaction.Commit();
+
+                        return true;
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
                 }
-                await uow.SaveChangesAsync();
-                return true;
             }
         }
 
@@ -2219,10 +2233,10 @@ namespace VitalChoice.Business.Services.Orders
                         {
                             new HealthwiseOrder() {Id = idOrder}
                         };
-                        using (var transaction = uow.BeginTransaction())
-                        {
-                            try
-                            {
+                        //using (var transaction = uow.BeginTransaction())
+                        //{
+                        //    try
+                        //    {
                                 healthwisePeriodRepositoryAsync.InsertGraph(period);
                                 if (isFirstHealthwise)
                                 {
@@ -2230,14 +2244,14 @@ namespace VitalChoice.Business.Services.Orders
                                     customer.Data.HasHealthwiseOrders = true;
                                     await _customerService.UpdateAsync(customer);
                                 }
-                                transaction.Commit();
-                            }
-                            catch
-                            {
-                                transaction.Rollback();
-                                throw;
-                            }
-                        }
+                        //        transaction.Commit();
+                        //    }
+                        //            catch
+                        //    {
+                        //        transaction.Rollback();
+                        //        throw;
+                        //    }
+                        //}
                     }
                     else
                     {
