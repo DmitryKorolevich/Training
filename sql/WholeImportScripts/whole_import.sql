@@ -4589,6 +4589,12 @@ BEGIN
 END
 GO
 
+GO
+ALTER TABLE [VitalChoice.Infrastructure].dbo.ContentItems
+ADD TempId INT NULL,
+	TempCategoryId INT NULL
+GO
+
 DECLARE @contentType INT, @masterName NVARCHAR(50), @categoryMasterName NVARCHAR(50)
 SET @contentType = 5
 SET @masterName = N'FAQ Individual'
@@ -4683,4 +4689,8 @@ BEGIN
 DROP FUNCTION dbo.ReplaceUrl
 END
 
+GO
+
+ALTER TABLE [VitalChoice.Infrastructure].dbo.ContentItems
+DROP COLUMN TempId, COLUMN TempCategoryId
 GO

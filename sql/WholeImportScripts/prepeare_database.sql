@@ -321,45 +321,46 @@ CLOSE ind;
 DEALLOCATE ind;
 
 
-GO
+--GO
 
 
-USE [VitalChoice.Ecommerce]
+--USE [VitalChoice.Ecommerce]
 
-GO
+--GO
 
-DELETE FROM SkuOptionValues
-WHERE IdSku IN (
-	SELECT Id FROM Skus WHERE IdProduct = 2635
-)
+--DELETE FROM SkuOptionValues
+--WHERE IdSku IN (
+--	SELECT Id FROM Skus WHERE IdProduct = 2635
+--)
 
-DELETE FROM Skus
-WHERE IdProduct = 2635
+--DELETE FROM Skus
+--WHERE IdProduct = 2635
 
 
-DELETE FROM ProductOptionValues
-WHERE IdProduct = 2635
+--DELETE FROM ProductOptionValues
+--WHERE IdProduct = 2635
 
-DELETE FROM Products
-WHERE Id = 2635
+--DELETE FROM Products
+--WHERE Id = 2635
 
-GO
+--GO
 
-USE [VitalChoice.Infrastructure]
+--USE [VitalChoice.Infrastructure]
 
-GO
+--GO
 
-DECLARE @contentTodelete TABLE(Id INT NOT NULL PRIMARY KEY)
+--DECLARE @contentTodelete TABLE(Id INT NOT NULL PRIMARY KEY)
 
-INSERT INTO @contentTodelete
-(Id)
-SELECT ContentItemId FROM Products 
-WHERE Id = 2635
+--INSERT INTO @contentTodelete
+--(Id)
+--SELECT ContentItemId FROM Products 
+--WHERE Id = 2635
 
-DELETE FROM ContentItems
-WHERE Id IN (SELECT Id FROM @contentTodelete)
+--DELETE FROM Products
+--WHERE Id = 2635
 
-DELETE FROM Products 
-WHERE Id = 2635
+--DELETE FROM ContentItems
+--WHERE Id IN (SELECT Id FROM @contentTodelete)
+
 GO
 PRINT '====Wipe out all data === END'
