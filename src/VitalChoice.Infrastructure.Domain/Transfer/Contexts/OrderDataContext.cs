@@ -88,7 +88,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 
         public SplitInfo<SkuOrdered> SplitInfo { get; set; }
 
-        public override IEnumerable<SkuOrdered> ItemsOrdered => SkuOrdereds.Union(PromoSkus);
+        public override IEnumerable<SkuOrdered> ItemsOrdered => SkuOrdereds.Union(PromoSkus.Where(p => p.Enabled));
 
         public override SplitInfoBase<SkuOrdered> BaseSplitInfo => SplitInfo;
 
