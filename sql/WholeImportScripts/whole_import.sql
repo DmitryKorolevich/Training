@@ -267,7 +267,7 @@ USE [VitalChoice.Ecommerce]
 --INSERT INTO States
 --(CountryCode, StateCode, StateName, StatusCode, [Order])
 --SELECT c.pcCountryCode, c.stateCode, c.stateName, 2, ROW_NUMBER() OVER(ORDER BY c.stateCode) FROM [vitalchoice2.0].dbo.states AS c
---INNER JOIN Countries AS cc ON cc.CountryCode = c.pcCountryCode COLLATE Cyrillic_General_CI_AS
+--INNER JOIN Countries AS cc ON cc.CountryCode = c.pcCountryCode
 
 --INSERT INTO Countries
 --(CountryCode, CountryName, [Order], StatusCode, IdVisibility)
@@ -277,7 +277,7 @@ USE [VitalChoice.Ecommerce]
 --INSERT INTO States
 --(CountryCode, StateCode, StateName, StatusCode, [Order])
 --SELECT c.pcCountryCode, c.stateCode, c.stateName, 2, ROW_NUMBER() OVER(ORDER BY c.stateCode) FROM [vitalchoice2.0].dbo.statesCSPortal AS c
---INNER JOIN Countries AS cc ON cc.CountryCode = c.pcCountryCode COLLATE Cyrillic_General_CI_AS
+--INNER JOIN Countries AS cc ON cc.CountryCode = c.pcCountryCode
 --WHERE c.pcCountryCode NOT IN (SELECT s.pcCountryCode FROM [vitalchoice2.0].dbo.states AS s)
 
 GO
@@ -858,8 +858,8 @@ SELECT
 	a.commission, 
 	a.commission2, 
 	a.affiliateEmail, 
-	ISNULL((SELECT TOP 1 c.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS c WHERE c.CountryCode COLLATE SQL_Latin1_General_CP1_CI_AS = a.affiliatecountryCode), (SELECT TOP 1 c.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS c WHERE c.CountryCode = 'US')), 
-	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode COLLATE SQL_Latin1_General_CP1_CI_AS = a.affiliatecountryCode AND s.StateCode COLLATE SQL_Latin1_General_CP1_CI_AS = a.affiliateState), 
+	ISNULL((SELECT TOP 1 c.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS c WHERE c.CountryCode = a.affiliatecountryCode), (SELECT TOP 1 c.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS c WHERE c.CountryCode = 'US')), 
+	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode = a.affiliatecountryCode AND s.StateCode = a.affiliateState), 
 	a.ComissionsAmount, 
 	a.affiliateName, 
 	CASE WHEN a.pcaff_Active <> 0 THEN 2 ELSE 1 END
@@ -941,10 +941,10 @@ SELECT
 	ISNULL(pcCust_DateCreated, GETDATE()), 
 	ISNULL(lastEditDate, ISNULL(pcCust_DateCreated, GETDATE())),
 	ISNULL (
-		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = ISNULL(c.countryCode COLLATE Cyrillic_General_CI_AS, 'US')), 
+		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = ISNULL(c.countryCode, 'US')), 
 		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = 'US')
 	),
-	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode = ISNULL(c.countryCode COLLATE Cyrillic_General_CI_AS, 'US') AND s.StateCode = c.stateCode COLLATE Cyrillic_General_CI_AS),
+	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode = ISNULL(c.countryCode, 'US') AND s.StateCode = c.stateCode),
 	2,
 	1,
 	c.[state],
@@ -1162,7 +1162,7 @@ INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerOptionValues
 SELECT c.idCustomer, @fieldType, CAST(l.Id AS NVARCHAR(3))
 FROM customers AS c
 INNER JOIN tradeCategories AS t ON t.id = c.tradeCategoryId
-INNER JOIN [VitalChoice.Ecommerce].dbo.LookupVariants AS l ON IdLookup = @lookupId AND ValueVariant = t.Name COLLATE Cyrillic_General_CI_AS
+INNER JOIN [VitalChoice.Ecommerce].dbo.LookupVariants AS l ON IdLookup = @lookupId AND ValueVariant = t.Name
 WHERE c.customerType = 1 AND l.Id <> 1
 
 GO
@@ -1176,7 +1176,7 @@ INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerOptionValues
 (IdCustomer, IdOptionType, Value)
 SELECT c.idCustomer, @fieldType, CAST(l.Id AS NVARCHAR(3))
 FROM customers AS c
-INNER JOIN [VitalChoice.Ecommerce].dbo.LookupVariants AS l ON IdLookup = @lookupId AND ValueVariant = c.source COLLATE Cyrillic_General_CI_AS
+INNER JOIN [VitalChoice.Ecommerce].dbo.LookupVariants AS l ON IdLookup = @lookupId AND ValueVariant = c.source
 WHERE c.source IS NOT NULL AND c.source <> ''
 
 GO
@@ -1215,7 +1215,7 @@ INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.Id = cc.IdProfileAddr
 UNPIVOT (Value FOR Name IN 
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax, Email)
 )AS unpvt
-INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 1)
+INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 1)
 PRINT '====address values (profile)'
 
 ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
@@ -1228,10 +1228,10 @@ SELECT
 	ISNULL(pcCust_DateCreated, GETDATE()), 
 	ISNULL(lastEditDate, ISNULL(pcCust_DateCreated, GETDATE())),
 	ISNULL (
-		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = ISNULL(c.shippingCountryCode COLLATE Cyrillic_General_CI_AS, 'US')), 
+		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = ISNULL(c.shippingCountryCode, 'US')), 
 		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = 'US')
 	),
-	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode = ISNULL(c.shippingCountryCode COLLATE Cyrillic_General_CI_AS, 'US') AND s.StateCode = c.shippingStateCode COLLATE Cyrillic_General_CI_AS),
+	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode = ISNULL(c.shippingCountryCode, 'US') AND s.StateCode = c.shippingStateCode),
 	2,
 	3,
 	c.[shippingState],
@@ -1267,7 +1267,7 @@ INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.idcust
 UNPIVOT (Value FOR Name IN 
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax, Email, [Default])
 )AS unpvt
-INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
+INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
 PRINT '====address values (shipping default)'
 
 GO
@@ -1289,10 +1289,10 @@ SELECT
 	ISNULL(pcCust_DateCreated, GETDATE()), 
 	ISNULL(lastEditDate, ISNULL(pcCust_DateCreated, GETDATE())),
 	ISNULL (
-		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = ISNULL(c.recipient_CountryCode COLLATE Cyrillic_General_CI_AS, 'US')), 
+		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = ISNULL(c.recipient_CountryCode, 'US')), 
 		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = 'US')
 	),
-	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode = ISNULL(c.recipient_CountryCode COLLATE Cyrillic_General_CI_AS, 'US') AND s.StateCode = c.recipient_StateCode COLLATE Cyrillic_General_CI_AS),
+	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode = ISNULL(c.recipient_CountryCode, 'US') AND s.StateCode = c.recipient_StateCode),
 	2,
 	3,
 	c.[recipient_State],
@@ -1329,7 +1329,7 @@ INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.idcust
 UNPIVOT (Value FOR Name IN 
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax, Email)
 )AS unpvt
-INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
+INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
 PRINT '====address values (shipping)'
 
 GO
@@ -1354,7 +1354,7 @@ INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerNoteOptionValues
 SELECT n.id, t.Id, CAST(lv.Id AS NVARCHAR(100)) FROM [vitalchoice2.0].dbo.Notes AS n
 INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS c ON c.Id = n.idCustomer
 INNER JOIN [VitalChoice.Ecommerce].dbo.CustomerNoteOptionTypes AS t ON t.Name = 'Priority'
-INNER JOIN [VitalChoice.Ecommerce].dbo.LookupVariants AS lv ON lv.IdLookup = t.IdLookup AND lv.ValueVariant = n.priority COLLATE Cyrillic_General_CI_AS
+INNER JOIN [VitalChoice.Ecommerce].dbo.LookupVariants AS lv ON lv.IdLookup = t.IdLookup AND lv.ValueVariant = n.priority
 PRINT '====customer notes values'
 
 GO
@@ -1443,10 +1443,10 @@ SELECT
 	ISNULL(pcCust_DateCreated, GETDATE()), 
 	ISNULL(lastEditDate, ISNULL(pcCust_DateCreated, GETDATE())),
 	ISNULL (
-		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = ISNULL(c.countryCode COLLATE Cyrillic_General_CI_AS, 'US')), 
+		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = ISNULL(c.countryCode, 'US')), 
 		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = 'US')
 	),
-	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode = ISNULL(c.countryCode COLLATE Cyrillic_General_CI_AS, 'US') AND s.StateCode = c.stateCode COLLATE Cyrillic_General_CI_AS),
+	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode = ISNULL(c.countryCode, 'US') AND s.StateCode = c.stateCode),
 	2,
 	2,
 	c.state,
@@ -1480,7 +1480,7 @@ INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.idcust
 UNPIVOT (Value FOR Name IN 
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax, Email)
 )AS unpvt
-INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
+INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====address values (cards)'
 
@@ -1523,7 +1523,7 @@ WHERE ISDATE(dbo.RC4Encode([Expiration])) = 1) p
 UNPIVOT (Value FOR Name IN 
 	(NameOnCard, CardNumber, CardType, ExpDate, [Default])
 )AS unpvt
-INNER JOIN [VitalChoice.Ecommerce].dbo.CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 1)
+INNER JOIN [VitalChoice.Ecommerce].dbo.CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 1)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====credit card values'
 
@@ -1572,10 +1572,10 @@ SELECT
 	ISNULL(pcCust_DateCreated, GETDATE()), 
 	ISNULL(lastEditDate, ISNULL(pcCust_DateCreated, GETDATE())),
 	ISNULL (
-		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = ISNULL(c.countryCode COLLATE Cyrillic_General_CI_AS, 'US')), 
+		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = ISNULL(c.countryCode, 'US')), 
 		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = 'US')
 	),
-	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode = ISNULL(c.countryCode COLLATE Cyrillic_General_CI_AS, 'US') AND s.StateCode = c.stateCode COLLATE Cyrillic_General_CI_AS),
+	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode = ISNULL(c.countryCode, 'US') AND s.StateCode = c.stateCode),
 	2,
 	2,
 	c.state,
@@ -1605,7 +1605,7 @@ INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.idcust
 UNPIVOT (Value FOR Name IN 
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax)
 )AS unpvt
-INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
+INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
 PRINT '====address values (checks)'
 
 INSERT INTO [VitalChoice.Ecommerce].dbo.CustomerPaymentMethods
@@ -1639,10 +1639,10 @@ SELECT
 	ISNULL(pcCust_DateCreated, GETDATE()), 
 	ISNULL(lastEditDate, ISNULL(pcCust_DateCreated, GETDATE())),
 	ISNULL (
-		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = ISNULL(c.countryCode COLLATE Cyrillic_General_CI_AS, 'US')), 
+		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = ISNULL(c.countryCode, 'US')), 
 		(SELECT TOP 1 cn.Id FROM [VitalChoice.Ecommerce].dbo.Countries AS cn WHERE cn.CountryCode = 'US')
 	),
-	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode = ISNULL(c.countryCode COLLATE Cyrillic_General_CI_AS, 'US') AND s.StateCode = c.stateCode COLLATE Cyrillic_General_CI_AS),
+	(SELECT TOP 1 s.Id FROM [VitalChoice.Ecommerce].dbo.States AS s WHERE s.CountryCode = ISNULL(c.countryCode, 'US') AND s.StateCode = c.stateCode),
 	2,
 	2,
 	c.state,
@@ -1674,7 +1674,7 @@ INNER JOIN [VitalChoice.Ecommerce].dbo.Addresses AS a ON a.IdCustomer = c.idcust
 UNPIVOT (Value FOR Name IN 
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax)
 )AS unpvt
-INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
+INNER JOIN [VitalChoice.Ecommerce].dbo.AddressOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
 PRINT '====address values (OAC)'
 
 GO
@@ -1702,7 +1702,7 @@ INSERT INTO [VitalChoice.Ecommerce].dbo.CustomersToOrderNotes
 SELECT c.idcustomer, n.Id
 FROM customers AS c
 CROSS APPLY [dbo].[DelimitedSplit8K](c.orderSpecificNotes, ',') AS d
-INNER JOIN [VitalChoice.Ecommerce].dbo.OrderNotes AS n ON n.Title = d.Item COLLATE Cyrillic_General_CI_AS
+INNER JOIN [VitalChoice.Ecommerce].dbo.OrderNotes AS n ON n.Title = d.Item
 PRINT '====customer to order notes'
 
 GO
@@ -1911,7 +1911,7 @@ SET @categoryMasterName = N'Recipe Sub Category'
 
 	INSERT INTO [VitalChoice.Infrastructure].dbo.Recipes
 	(AboutChef, ContentItemId, MasterContentItemId, Name, Directions, Ingredients, YoutubeVideo, YoutubeImage, StatusCode, SubTitle, Url, FileUrl, IdOld)
-	SELECT a.About, i.Id, @masterId, a.RecipeTitle, a.Directions, a.Ingredients, ISNULL(a.VideoUrl, N''), dbo.ReplaceUrl(a.VideoImage), 2/*Active*/, ISNULL(a.SubTitle, N''), REPLACE(RTRIM(LTRIM(LOWER([vitalchoice2.0].[dbo].RegexReplace('[^a-zA-Z0-9]+', a.RecipeTitle, ' ')))) COLLATE SQL_Latin1_General_CP1_CI_AS,' ','-'), N'/files/catalog/recipe-images/' + a.RecipeImage, a.RecipeId 
+	SELECT a.About, i.Id, @masterId, a.RecipeTitle, a.Directions, a.Ingredients, ISNULL(a.VideoUrl, N''), dbo.ReplaceUrl(a.VideoImage), 2/*Active*/, ISNULL(a.SubTitle, N''), REPLACE(RTRIM(LTRIM(LOWER([vitalchoice2.0].[dbo].RegexReplace('[^a-zA-Z0-9]+', a.RecipeTitle, ' ')))),' ','-'), N'/files/catalog/recipe-images/' + a.RecipeImage, a.RecipeId 
 	FROM [vitalchoice2.0].[dbo].Recipes AS a
 	INNER JOIN [VitalChoice.Infrastructure].dbo.ContentItems AS i ON i.TempId = a.RecipeId
 	WHERE a.RecipeId IN (SELECT Id FROM @recipesToImport)
@@ -2217,7 +2217,7 @@ ORDER BY ca.idParentCategory
 INSERT [VitalChoice.Infrastructure].dbo.ProductCategories
 (Id, ContentItemId, MasterContentItemId, IdOld, NavLabel, StatusCode, Url, NavIdVisible, FileImageLargeUrl, FileImageSmallUrl, HideLongDescription, HideLongDescriptionBottom, LongDescription, LongDescriptionBottom)
 SELECT ca.idCategory, c.Id, @productCategoryMaster, ca.idCategory, REPLACE(ca.categoryDesc, '&amp;', '&'),  
-	2/*Active*/, REPLACE(RTRIM(LTRIM(LOWER([vitalchoice2.0].[dbo].RegexReplace('[^a-zA-Z0-9]+', ca.categoryDesc, ' ')))) COLLATE SQL_Latin1_General_CP1_CI_AS,' ','-'),
+	2/*Active*/, REPLACE(RTRIM(LTRIM(LOWER([vitalchoice2.0].[dbo].RegexReplace('[^a-zA-Z0-9]+', ca.categoryDesc, ' ')))),' ','-'),
 	CASE WHEN ISNULL(ca.iBTOhide, 0) <> 0 THEN NULL ELSE CASE WHEN ISNULL(ca.pcCats_RetailHide, 0) <> 0 THEN 2 ELSE 1 END END,
 	REPLACE(N'/files/catalog/' + ca.largeimage, '//', '/'), REPLACE(N'/files/catalog/' + ca.image, '//', '/'), CASE WHEN ISNULL(ca.HideDesc, 0) <> 0 THEN 1 ELSE 0 END, CASE WHEN ISNULL(ca.HideDesc, 0) <> 0 THEN 1 ELSE 0 END, ca.LDesc, ca.LDesc2
 FROM [vitalchoice2.0].dbo.categories AS ca
@@ -2273,7 +2273,7 @@ GO
 
 	INSERT INTO [VitalChoice.Infrastructure].dbo.Products
 	(Id, ContentItemId, MasterContentItemId, StatusCode, Url, IdOld)
-	SELECT a.idProduct, i.Id, @articleMasterId, CASE WHEN ISNULL(a.removed, 0) <> 0 THEN 3 ELSE CASE WHEN ISNULL(a.active, 0) <> 0 THEN 2/*Active*/ ELSE 1 /*Not Active*/ END END, REPLACE(RTRIM(LTRIM(LOWER([vitalchoice2.0].[dbo].RegexReplace('[^a-zA-Z0-9]+', a.description, ' ')))) COLLATE SQL_Latin1_General_CP1_CI_AS,' ','-'), a.idProduct
+	SELECT a.idProduct, i.Id, @articleMasterId, CASE WHEN ISNULL(a.removed, 0) <> 0 THEN 3 ELSE CASE WHEN ISNULL(a.active, 0) <> 0 THEN 2/*Active*/ ELSE 1 /*Not Active*/ END END, REPLACE(RTRIM(LTRIM(LOWER([vitalchoice2.0].[dbo].RegexReplace('[^a-zA-Z0-9]+', a.description, ' ')))),' ','-'), a.idProduct
 	FROM [vitalchoice2.0].[dbo].Products AS a
 	INNER JOIN [VitalChoice.Infrastructure].dbo.ContentItems AS i ON i.TempId = a.idProduct
 	WHERE a.pcprod_ParentPrd = 0 AND a.idProduct IN (SELECT Id FROM TempProductsToMove)
@@ -2430,7 +2430,7 @@ GO
 	SELECT t.Id, p.Id, CAST(l.Id AS NVARCHAR(20)) FROM [VitalChoice.Ecommerce].dbo.Products AS p
 	INNER JOIN [vitalchoice2.0].dbo.products AS a ON a.idProduct = p.Id
 	INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON (t.IdObjectType = p.IdObjectType OR t.IdObjectType IS NULL) AND t.Name = N'GoogleCategory'
-	INNER JOIN [VitalChoice.Ecommerce].dbo.LookupVariants AS l ON l.IdLookup = t.IdLookup AND l.ValueVariant COLLATE SQL_Latin1_General_CP1_CI_AS = a.google_category
+	INNER JOIN [VitalChoice.Ecommerce].dbo.LookupVariants AS l ON l.IdLookup = t.IdLookup AND l.ValueVariant = a.google_category
 	WHERE p.Id IN (SELECT Id FROM TempProductsToMove)
 
 	INSERT [VitalChoice.Ecommerce].dbo.ProductsToCategories
@@ -2591,7 +2591,7 @@ GO
 	EXEC dbo.MoveSkuField @destFieldName = N'AutoShipFrequency3', @sourceFieldName = N'Schedules', @conversion = N'CASE WHEN ISNULL(a.autoShip, 0) <> 0 THEN CASE WHEN a.Schedules LIKE ''%3%'' THEN ''True'' ELSE ''False'' END ELSE NULL END'
 	EXEC dbo.MoveSkuField @destFieldName = N'AutoShipFrequency6', @sourceFieldName = N'Schedules', @conversion = N'CASE WHEN ISNULL(a.autoShip, 0) <> 0 THEN CASE WHEN a.Schedules LIKE ''%6%'' THEN ''True'' ELSE ''False'' END ELSE NULL END'
 	EXEC dbo.MoveSkuField @destFieldName = N'OffPercent', @sourceFieldName = N'autoShipDiscount', @conversion = N'CASE WHEN ISNULL(a.autoShip, 0) <> 0 THEN CAST(a.autoShipDiscount AS NVARCHAR(250)) ELSE NULL END'
-	EXEC dbo.MoveSkuField @destFieldName = N'Seller', @sourceFieldName = N'sellergoogle', @conversion = N'(SELECT v.Id FROM [VitalChoice.Ecommerce].[dbo].[Lookups] AS l INNER JOIN [VitalChoice.Ecommerce].dbo.LookupVariants AS v ON v.IdLookup = l.Id WHERE l.Name = N''ProductSellers'' AND v.ValueVariant = a.sellergoogle COLLATE Cyrillic_General_CI_AS)'
+	EXEC dbo.MoveSkuField @destFieldName = N'Seller', @sourceFieldName = N'sellergoogle', @conversion = N'(SELECT v.Id FROM [VitalChoice.Ecommerce].[dbo].[Lookups] AS l INNER JOIN [VitalChoice.Ecommerce].dbo.LookupVariants AS v ON v.IdLookup = l.Id WHERE l.Name = N''ProductSellers'' AND v.ValueVariant = a.sellergoogle)'
 	EXEC dbo.MoveSkuField @destFieldName = N'HideFromDataFeed', @sourceFieldName = N'excludegoogle', @conversion = N'CASE WHEN ISNULL(a.excludegoogle, 0) <> 0 THEN ''True'' ELSE ''False'' END'
 
 	DELETE FROM [VitalChoice.Ecommerce].dbo.SkuOptionValues
@@ -2971,7 +2971,7 @@ INSERT INTO [VitalChoice.Ecommerce].dbo.OneTimeDiscountToCustomerUsages
 SELECT DISTINCT ud.idcustomer, dd.Id, 1 FROM [vitalchoice2.0].dbo.used_discounts AS ud
 INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS c ON c.Id = ud.idcustomer
 INNER JOIN [vitalchoice2.0].dbo.discounts AS d ON d.iddiscount = ud.iddiscount
-INNER JOIN [VitalChoice.Ecommerce].dbo.Discounts AS dd ON dd.Code = d.discountcode COLLATE Cyrillic_General_CI_AS
+INNER JOIN [VitalChoice.Ecommerce].dbo.Discounts AS dd ON dd.Code = d.discountcode
 
 GO
 
@@ -3064,7 +3064,7 @@ SELECT
 FROM [vitalchoice2.0].dbo.autoshipOrders AS aso
 INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.IdOrder = aso.IdOrder
 LEFT JOIN [vitalchoice2.0].dbo.admins AS a ON a.idadmin = o.agentId
-LEFT JOIN [VitalChoice.Infrastructure].dbo.AdminProfiles AS p ON p.AgentId = a.AgentID COLLATE Cyrillic_General_CI_AS
+LEFT JOIN [VitalChoice.Infrastructure].dbo.AdminProfiles AS p ON p.AgentId = a.AgentID
 INNER JOIN [VitalChoice.Ecommerce].dbo.Customers AS c ON c.Id = o.idCustomer
 WHERE o.orderDate IS NOT NULL AND o.idCustomer IS NOT NULL AND EXISTS(SELECT * FROM [vitalchoice2.0].dbo.ProductsOrdered AS po WHERE po.idOrder = o.idOrder)
 
@@ -3092,7 +3092,7 @@ SELECT
 	ISNULL(o.pcOrd_Time, o.orderDate),
 	(
 		SELECT TOP 1 p.Id FROM [vitalchoice2.0].dbo.admins AS a 
-		LEFT JOIN [VitalChoice.Infrastructure].dbo.AdminProfiles AS p ON p.AgentId = a.AgentID COLLATE Cyrillic_General_CI_AS
+		LEFT JOIN [VitalChoice.Infrastructure].dbo.AdminProfiles AS p ON p.AgentId = a.AgentID
 		WHERE a.idadmin = o.agentId
 	),
 	CASE o.orderStatus
@@ -3122,7 +3122,7 @@ SELECT
 	0,
 	(
 		SELECT TOP 1 p.Id FROM [vitalchoice2.0].dbo.admins AS a 
-		LEFT JOIN [VitalChoice.Infrastructure].dbo.AdminProfiles AS p ON p.AgentId = a.AgentID COLLATE Cyrillic_General_CI_AS
+		LEFT JOIN [VitalChoice.Infrastructure].dbo.AdminProfiles AS p ON p.AgentId = a.AgentID
 		WHERE a.idadmin = o.agentId
 	)
 FROM [vitalchoice2.0].dbo.orders AS o
@@ -3190,14 +3190,14 @@ SELECT
 	o.IdOrder AS Id,
 	CAST(CAST(o.shippingSurcharge AS MONEY) AS NVARCHAR(250)) AS AlaskaHawaiiSurcharge,
 	CAST(CASE WHEN o.PostShipMailSent = 0 THEN N'False' ELSE N'True' END AS NVARCHAR(250)) AS ConfirmationEmailSent,
-	CAST(o.giftMessage AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS GiftMessage,
+	CAST(o.giftMessage AS NVARCHAR(250)) AS GiftMessage,
 	CAST(CASE WHEN ISNULL(o.giftOrder, 0) <> 0 THEN N'True' ELSE N'' END AS NVARCHAR(250)) AS GiftOrder,
 	CAST(CASE WHEN hw.id IS NOT NULL THEN N'True' ELSE N'' END AS NVARCHAR(250)) AS IsHealthwise,
-	CAST(o.keyCode AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS KeyCode,
+	CAST(o.keyCode AS NVARCHAR(250)) AS KeyCode,
 	CAST(CASE WHEN o.orderType = 2 THEN N'True' ELSE N'' END AS NVARCHAR(250)) AS MailOrder,
-	CAST(CASE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS OrderNotes,
+	CAST(CASE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) AS OrderNotes,
 	CAST(CASE ISNULL(o.orderType, 0) WHEN 0 THEN N'1' WHEN 1 THEN N'2' WHEN 2 THEN N'3' END AS NVARCHAR(250)) AS OrderType,
-	CAST(cc.PONum AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS PoNumber,
+	CAST(cc.PONum AS NVARCHAR(250)) AS PoNumber,
 	CASE WHEN o.shipDelayType > 0 THEN CONVERT(NVARCHAR(250), CAST(CASE o.shipDelayPart WHEN 2 THEN o.shipDelayNonperish ELSE o.shipDelay END AS DATETIME2), 126) ELSE N'' END AS ShipDelayDate,
 	CAST(CASE WHEN o.shipDelayType > 0 THEN N'1' ELSE N'' END AS NVARCHAR(250)) AS ShipDelayType,
 	CAST(CAST(o.shippingOverride AS MONEY) AS NVARCHAR(250)) AS ShippingOverride,
@@ -3236,7 +3236,7 @@ UNPIVOT (
 		StandardShippingCharges
 	)
 ) AS unpvt
-INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 1)
+INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name AND (t.IdObjectType IS NULL OR t.IdObjectType = 1)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====fields (Normal order)'
 
@@ -3249,11 +3249,11 @@ SELECT unpvt.Id, t.Id, unpvt.Value FROM
 SELECT 
 	o.IdOrder AS Id,
 	CAST(CASE WHEN o.PostShipMailSent = 0 THEN N'False' ELSE N'True' END AS NVARCHAR(250)) AS ConfirmationEmailSent,
-	CAST(o.giftMessage AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS GiftMessage,
-	CAST(o.keyCode AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS KeyCode,
-	CAST(CASE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS OrderNotes,
+	CAST(o.giftMessage AS NVARCHAR(250)) AS GiftMessage,
+	CAST(o.keyCode AS NVARCHAR(250)) AS KeyCode,
+	CAST(CASE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) AS OrderNotes,
 	CAST(CASE ISNULL(o.orderType, 0) WHEN 0 THEN N'1' WHEN 1 THEN N'2' WHEN 2 THEN N'3' END AS NVARCHAR(250)) AS OrderType,
-	CAST(cc.PONum AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS PoNumber,
+	CAST(cc.PONum AS NVARCHAR(250)) AS PoNumber,
 	CASE WHEN o.shipDelayType > 0 THEN CONVERT(NVARCHAR(250), CAST(CASE o.shipDelayPart WHEN 2 THEN o.shipDelayNonperish ELSE o.shipDelay END AS DATETIME2), 126) ELSE NULL END AS ShipDelayDate,
 	CAST(CASE WHEN o.shipDelayType > 0 THEN N'1' ELSE NULL END AS NVARCHAR(250)) AS ShipDelayType
 FROM [vitalchoice2.0].dbo.orders AS o
@@ -3274,7 +3274,7 @@ UNPIVOT (
 		ShipDelayType
 	)
 ) AS unpvt
-INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 3)
+INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name AND (t.IdObjectType IS NULL OR t.IdObjectType = 3)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====fields (Drop-Ship order)'
 
@@ -3288,14 +3288,14 @@ SELECT
 	o.IdOrder AS Id,
 	CAST(CAST(o.shippingSurcharge AS MONEY) AS NVARCHAR(250)) AS AlaskaHawaiiSurcharge,
 	CAST(CASE WHEN o.PostShipMailSent = 0 THEN N'False' ELSE N'True' END AS NVARCHAR(250)) AS ConfirmationEmailSent,
-	CAST(o.giftMessage AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS GiftMessage,
+	CAST(o.giftMessage AS NVARCHAR(250)) AS GiftMessage,
 	CAST(CASE WHEN ISNULL(o.giftOrder, 0) <> 0 THEN N'True' ELSE NULL END AS NVARCHAR(250)) AS GiftOrder,
 	CAST(CASE WHEN hw.id IS NOT NULL THEN N'True' ELSE NULL END AS NVARCHAR(250)) AS IsHealthwise,
-	CAST(o.keyCode AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS KeyCode,
+	CAST(o.keyCode AS NVARCHAR(250)) AS KeyCode,
 	CAST(CASE WHEN o.orderType = 2 THEN N'True' ELSE N'' END AS NVARCHAR(250)) AS MailOrder,
-	CAST(CASE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS OrderNotes,
+	CAST(CASE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) AS OrderNotes,
 	CAST(CASE ISNULL(o.orderType, 0) WHEN 0 THEN N'1' WHEN 1 THEN N'2' WHEN 2 THEN N'3' END AS NVARCHAR(250)) AS OrderType,
-	CAST(cc.PONum AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS PoNumber,
+	CAST(cc.PONum AS NVARCHAR(250)) AS PoNumber,
 	CAST(CASE WHEN o.shipDelayType > 0 THEN CONVERT(NVARCHAR(250), CAST(CASE o.shipDelayPart WHEN 2 THEN o.shipDelayNonperish ELSE o.shipDelay END AS DATETIME2), 126) ELSE NULL END AS NVARCHAR(250)) AS ShipDelayDate,
 	CAST(CASE WHEN o.shipDelayType > 0 THEN N'1' ELSE NULL END AS NVARCHAR(250)) AS ShipDelayType,
 	CAST(CAST(o.shippingOverride AS MONEY) AS NVARCHAR(250)) AS ShippingOverride,
@@ -3334,7 +3334,7 @@ UNPIVOT (
 		p.StandardShippingCharges
 	)
 ) AS unpvt
-INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 4)
+INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name AND (t.IdObjectType IS NULL OR t.IdObjectType = 4)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 
 PRINT '====fields (Gift-List order)'
@@ -3365,10 +3365,10 @@ SELECT unpvt.Id, t.Id, unpvt.Value FROM
 SELECT 
 	o.IdOrder AS Id,
 	CAST(CASE WHEN o.PostShipMailSent = 0 THEN N'False' ELSE N'True' END AS NVARCHAR(250)) AS ConfirmationEmailSent,
-	CAST(o.keyCode AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS KeyCode,
-	CAST(CASE LEFT(CAST(ISNULL(r.notes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS OrderNotes,
+	CAST(o.keyCode AS NVARCHAR(250)) AS KeyCode,
+	CAST(CASE LEFT(CAST(ISNULL(r.notes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) AS OrderNotes,
 	CAST(CASE ISNULL(o.orderType, 0) WHEN 0 THEN N'1' WHEN 1 THEN N'2' WHEN 2 THEN N'3' END AS NVARCHAR(250)) AS OrderType,
-	CAST(cc.PONum AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS PoNumber,
+	CAST(cc.PONum AS NVARCHAR(250)) AS PoNumber,
 	CAST(CASE WHEN o.shipDelayType > 0 THEN CONVERT(NVARCHAR(250), CAST(CASE o.shipDelayPart WHEN 2 THEN o.shipDelayNonperish ELSE o.shipDelay END AS DATETIME2), 126) ELSE NULL END AS NVARCHAR(250)) AS ShipDelayDate,
 	CAST(CASE WHEN o.shipDelayType > 0 THEN N'1' ELSE NULL END AS NVARCHAR(250)) AS ShipDelayType,
 	CAST(CAST(o.shippingOverride AS MONEY) AS NVARCHAR(250)) AS ShippingOverride,
@@ -3381,7 +3381,7 @@ SELECT
 FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON oo.Id = o.idOrder AND oo.IdObjectType = 5
 INNER JOIN [vitalchoice2.0].dbo.reship AS r ON r.IdOrder = o.IdOrder
-INNER JOIN LookupVariants AS lv ON lv.IdLookup = (SELECT Id FROM Lookups WHERE Name = 'ServiceCodes') AND lv.ValueVariant = r.serviceCode COLLATE Cyrillic_General_CI_AS
+INNER JOIN LookupVariants AS lv ON lv.IdLookup = (SELECT Id FROM Lookups WHERE Name = 'ServiceCodes') AND lv.ValueVariant = r.serviceCode
 LEFT JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = o.IdOrder
 ) p
 UNPIVOT (
@@ -3405,7 +3405,7 @@ UNPIVOT (
 		p.SurchargeOverride
 	)
 ) AS unpvt
-INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 5)
+INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name AND (t.IdObjectType IS NULL OR t.IdObjectType = 5)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====fields (Reship order)'
 
@@ -3418,8 +3418,8 @@ SELECT unpvt.Id, t.Id, unpvt.Value FROM
 SELECT 
 	o.IdOrder AS Id,
 	CAST(CASE WHEN o.PostShipMailSent = 0 THEN N'False' ELSE N'True' END AS NVARCHAR(250)) AS ConfirmationEmailSent,
-	CAST(o.keyCode AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS KeyCode,
-	CAST(CASE LEFT(CAST(ISNULL(r.notes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS OrderNotes,
+	CAST(o.keyCode AS NVARCHAR(250)) AS KeyCode,
+	CAST(CASE LEFT(CAST(ISNULL(r.notes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) AS OrderNotes,
 	CAST(CASE ISNULL(o.orderType, 0) WHEN 0 THEN N'1' WHEN 1 THEN N'2' WHEN 2 THEN N'3' END AS NVARCHAR(250)) AS OrderType,
 	CAST(CASE WHEN r.associated <> 0 THEN N'True' ELSE N'False' END AS NVARCHAR(250)) ReturnAssociated,
 	CAST(lv.Id AS NVARCHAR(250)) AS ServiceCode,
@@ -3430,7 +3430,7 @@ SELECT
 FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON oo.Id = o.idOrder AND oo.IdObjectType = 6
 INNER JOIN [vitalchoice2.0].dbo.refund AS r ON r.IdOrder = o.IdOrder
-INNER JOIN LookupVariants AS lv ON lv.IdLookup = (SELECT Id FROM Lookups WHERE Name = 'ServiceCodes') AND lv.ValueVariant = r.serviceCode COLLATE Cyrillic_General_CI_AS
+INNER JOIN LookupVariants AS lv ON lv.IdLookup = (SELECT Id FROM Lookups WHERE Name = 'ServiceCodes') AND lv.ValueVariant = r.serviceCode
 LEFT JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = o.IdOrder
 ) p
 UNPIVOT (
@@ -3448,7 +3448,7 @@ UNPIVOT (
 		ShippingRefunded
 	)
 ) AS unpvt
-INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 6)
+INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name AND (t.IdObjectType IS NULL OR t.IdObjectType = 6)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====fields (Refund order)'
 
@@ -3461,13 +3461,13 @@ SELECT unpvt.Id, t.Id, unpvt.Value FROM
 SELECT 
 	oo.Id AS Id,
 	CAST(CASE WHEN o.PostShipMailSent = 0 THEN N'False' ELSE N'True' END AS NVARCHAR(250)) AS ConfirmationEmailSent,
-	CAST(o.giftMessage AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS GiftMessage,
+	CAST(o.giftMessage AS NVARCHAR(250)) AS GiftMessage,
 	CAST(CASE WHEN ISNULL(o.giftOrder, 0) <> 0 THEN N'True' ELSE N'' END AS NVARCHAR(250)) AS GiftOrder,
-	CAST(o.keyCode AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS KeyCode,
+	CAST(o.keyCode AS NVARCHAR(250)) AS KeyCode,
 	CAST(CASE WHEN o.orderType = 2 THEN N'True' ELSE N'' END AS NVARCHAR(250)) AS MailOrder,
-	CAST(CASE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS OrderNotes,
+	CAST(CASE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) AS OrderNotes,
 	CAST(CASE ISNULL(o.orderType, 0) WHEN 0 THEN N'1' WHEN 1 THEN N'2' WHEN 2 THEN N'3' END AS NVARCHAR(250)) AS OrderType,
-	CAST(cc.PONum AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS PoNumber,
+	CAST(cc.PONum AS NVARCHAR(250)) AS PoNumber,
 	CAST(CASE WHEN o.shipDelayType > 0 THEN N'1' ELSE N'' END AS NVARCHAR(250)) AS ShipDelayType,
 	CAST(CAST(o.shippingOverride AS MONEY) AS NVARCHAR(250)) AS ShippingOverride,
 	CAST(CAST(o.surchargeOverride AS MONEY) AS NVARCHAR(250)) AS SurchargeOverride,
@@ -3503,7 +3503,7 @@ UNPIVOT (
 		SurchargeOverride
 	)
 ) AS unpvt
-INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 2)
+INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name AND (t.IdObjectType IS NULL OR t.IdObjectType = 2)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====fields (Source Order for Auto-Ship)'
 
@@ -3517,13 +3517,13 @@ SELECT
 	o.IdOrder AS Id,
 	CAST(CAST(o.shippingSurcharge AS MONEY) AS NVARCHAR(250)) AS AlaskaHawaiiSurcharge,
 	CAST(CASE WHEN o.PostShipMailSent = 0 THEN N'False' ELSE N'True' END AS NVARCHAR(250)) AS ConfirmationEmailSent,
-	CAST(o.giftMessage AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS GiftMessage,
+	CAST(o.giftMessage AS NVARCHAR(250)) AS GiftMessage,
 	CAST(CASE WHEN ISNULL(o.giftOrder, 0) <> 0 THEN N'True' ELSE N'' END AS NVARCHAR(250)) AS GiftOrder,
-	CAST(o.keyCode AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS KeyCode,
+	CAST(o.keyCode AS NVARCHAR(250)) AS KeyCode,
 	CAST(CASE WHEN o.orderType = 2 THEN N'True' ELSE N'' END AS NVARCHAR(250)) AS MailOrder,
-	CAST(CASE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS OrderNotes,
+	CAST(CASE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) AS OrderNotes,
 	CAST(CASE ISNULL(o.orderType, 0) WHEN 0 THEN N'1' WHEN 1 THEN N'2' WHEN 2 THEN N'3' END AS NVARCHAR(250)) AS OrderType,
-	CAST(cc.PONum AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS PoNumber,
+	CAST(cc.PONum AS NVARCHAR(250)) AS PoNumber,
 	CASE WHEN o.shipDelayType > 0 THEN CONVERT(NVARCHAR(250), CAST(CASE o.shipDelayPart WHEN 2 THEN o.shipDelayNonperish ELSE o.shipDelay END AS DATETIME2), 126) ELSE N'' END AS ShipDelayDate,
 	CAST(CASE WHEN o.shipDelayType > 0 THEN N'1' ELSE N'' END AS NVARCHAR(250)) AS ShipDelayType,
 	CAST(CAST(o.shippingOverride AS MONEY) AS NVARCHAR(250)) AS ShippingOverride,
@@ -3567,7 +3567,7 @@ UNPIVOT (
 		SurchargeOverride
 	)
 ) AS unpvt
-INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 7)
+INNER JOIN OrderOptionTypes AS t ON t.Name = unpvt.Name AND (t.IdObjectType IS NULL OR t.IdObjectType = 7)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====fields (Auto-Ship order)'
 
@@ -3585,10 +3585,10 @@ SELECT
 	o.orderDate, 
 	o.orderDate,
 	ISNULL (
-		(SELECT TOP 1 cn.Id FROM Countries AS cn WHERE cn.CountryCode = ISNULL(o.countryCode COLLATE Cyrillic_General_CI_AS, 'US')), 
+		(SELECT TOP 1 cn.Id FROM Countries AS cn WHERE cn.CountryCode = ISNULL(o.countryCode, 'US')), 
 		(SELECT TOP 1 cn.Id FROM Countries AS cn WHERE cn.CountryCode = 'US')
 	),
-	(SELECT TOP 1 s.Id FROM States AS s WHERE s.CountryCode = ISNULL(o.countryCode COLLATE Cyrillic_General_CI_AS, 'US') AND s.StateCode = o.stateCode COLLATE Cyrillic_General_CI_AS),
+	(SELECT TOP 1 s.Id FROM States AS s WHERE s.CountryCode = ISNULL(o.countryCode, 'US') AND s.StateCode = o.stateCode),
 	2,
 	2,
 	o.[state],
@@ -3606,10 +3606,10 @@ SELECT
 	o.orderDate, 
 	o.orderDate,
 	ISNULL (
-		(SELECT TOP 1 cn.Id FROM Countries AS cn WHERE cn.CountryCode = ISNULL(o.countryCode COLLATE Cyrillic_General_CI_AS, 'US')), 
+		(SELECT TOP 1 cn.Id FROM Countries AS cn WHERE cn.CountryCode = ISNULL(o.countryCode, 'US')), 
 		(SELECT TOP 1 cn.Id FROM Countries AS cn WHERE cn.CountryCode = 'US')
 	),
-	(SELECT TOP 1 s.Id FROM States AS s WHERE s.CountryCode = ISNULL(o.countryCode COLLATE Cyrillic_General_CI_AS, 'US') AND s.StateCode = o.stateCode COLLATE Cyrillic_General_CI_AS),
+	(SELECT TOP 1 s.Id FROM States AS s WHERE s.CountryCode = ISNULL(o.countryCode, 'US') AND s.StateCode = o.stateCode),
 	2,
 	2,
 	o.[state],
@@ -3634,12 +3634,12 @@ SELECT
 	a.Id, 
 	o.IdEditedBy, 
 	CASE [vitalchoice2.0].dbo.RegexReplace('([a-zA-Z\s.]+)\s+\|{2}', oo.paymentDetails, '$1')
-		WHEN 'Authorize.Net' COLLATE Cyrillic_General_CI_AS THEN 1
-		WHEN 'Credit Card' COLLATE Cyrillic_General_CI_AS THEN 1
-		WHEN 'OAC' COLLATE Cyrillic_General_CI_AS THEN 2
-		WHEN 'Check' COLLATE Cyrillic_General_CI_AS THEN 3
-		WHEN 'No Charge' COLLATE Cyrillic_General_CI_AS THEN 4
-		WHEN 'Prepaid' COLLATE Cyrillic_General_CI_AS THEN 6
+		WHEN 'Authorize.Net' THEN 1
+		WHEN 'Credit Card' THEN 1
+		WHEN 'OAC' THEN 2
+		WHEN 'Check' THEN 3
+		WHEN 'No Charge' THEN 4
+		WHEN 'Prepaid' THEN 6
 		ELSE 4
 	END,
 	2,
@@ -3660,12 +3660,12 @@ SELECT
 	a.Id, 
 	o.IdEditedBy, 
 	CASE [vitalchoice2.0].dbo.RegexReplace('([a-zA-Z\s.]+)\s+\|{2}', oo.paymentDetails, '$1')
-		WHEN 'Authorize.Net' COLLATE Cyrillic_General_CI_AS THEN 1
-		WHEN 'Credit Card' COLLATE Cyrillic_General_CI_AS THEN 1
-		WHEN 'OAC' COLLATE Cyrillic_General_CI_AS THEN 2
-		WHEN 'Check' COLLATE Cyrillic_General_CI_AS THEN 3
-		WHEN 'No Charge' COLLATE Cyrillic_General_CI_AS THEN 4
-		WHEN 'Prepaid' COLLATE Cyrillic_General_CI_AS THEN 6
+		WHEN 'Authorize.Net' THEN 1
+		WHEN 'Credit Card' THEN 1
+		WHEN 'OAC' THEN 2
+		WHEN 'Check' THEN 3
+		WHEN 'No Charge' THEN 4
+		WHEN 'Prepaid' THEN 6
 		ELSE 4
 	END,
 	2,
@@ -3693,8 +3693,8 @@ SELECT unpvt.Id, o.Id, unpvt.Value FROM
 (
 SELECT 
 	a.Id, 
-	CAST(cc.nameOnCard AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS NameOnCard, 
-	CAST('XXXXXXXXXXXX' + RIGHT([vitalchoice2.0].dbo.RC4Encode(cc.cardnumber), 4) AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS CardNumber, 
+	CAST(cc.nameOnCard AS NVARCHAR(250)) AS NameOnCard, 
+	CAST('XXXXXXXXXXXX' + RIGHT([vitalchoice2.0].dbo.RC4Encode(cc.cardnumber), 4) AS NVARCHAR(250)) AS CardNumber, 
 	CAST(
 		CASE cc.cardtype
 			WHEN 'V' THEN N'2'
@@ -3703,7 +3703,7 @@ SELECT
 			WHEN 'D' THEN N'4'
 			ELSE NULL
 		END
-	AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS CardType, 
+	AS NVARCHAR(250)) AS CardType, 
 	CONVERT(NVARCHAR(250), CAST(cc.expiration AS DATETIME2), 126) AS ExpDate
 FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON oo.Id = o.idOrder
@@ -3712,7 +3712,7 @@ INNER JOIN OrderPaymentMethods AS a ON a.IdOrder = oo.Id AND a.IdObjectType = 1)
 UNPIVOT (Value FOR Name IN 
 	(NameOnCard, CardNumber, CardType, ExpDate)
 )AS unpvt
-INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 1)
+INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 1)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====credit cards'
 
@@ -3724,8 +3724,8 @@ SELECT unpvt.Id, o.Id, unpvt.Value FROM
 (
 SELECT 
 	a.Id, 
-	CAST(cc.nameOnCard AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS NameOnCard, 
-	CAST('XXXXXXXXXXXX' + RIGHT([vitalchoice2.0].dbo.RC4Encode(cc.cardnumber), 4) AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS CardNumber, 
+	CAST(cc.nameOnCard AS NVARCHAR(250)) AS NameOnCard, 
+	CAST('XXXXXXXXXXXX' + RIGHT([vitalchoice2.0].dbo.RC4Encode(cc.cardnumber), 4) AS NVARCHAR(250)) AS CardNumber, 
 	CAST(
 		CASE cc.cardtype
 			WHEN 'V' THEN N'2'
@@ -3734,7 +3734,7 @@ SELECT
 			WHEN 'D' THEN N'4'
 			ELSE NULL
 		END
-	AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS CardType, 
+	AS NVARCHAR(250)) AS CardType, 
 	CONVERT(NVARCHAR(250), CAST(cc.expiration AS DATETIME2), 126) AS ExpDate
 FROM [vitalchoice2.0].dbo.autoshipOrders AS aso
 INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = aso.idOrder
@@ -3744,7 +3744,7 @@ INNER JOIN OrderPaymentMethods AS a ON a.IdOrder = oo.Id AND a.IdObjectType = 1)
 UNPIVOT (Value FOR Name IN 
 	(NameOnCard, CardNumber, CardType, ExpDate)
 )AS unpvt
-INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 1)
+INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 1)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====credit cards(auto-ship)'
 
@@ -3756,8 +3756,8 @@ SELECT unpvt.Id, t.Id, unpvt.Value FROM
 (
 SELECT 
 	a.Id, 
-	CAST(cc.fname + ' ' + cc.lname AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS NameOnCard, 
-	CAST('XXXXXXXXXXXX' + RIGHT([vitalchoice2.0].dbo.RC4Encode(cc.ccnum), 4) AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS CardNumber, 
+	CAST(cc.fname + ' ' + cc.lname AS NVARCHAR(250)) AS NameOnCard, 
+	CAST('XXXXXXXXXXXX' + RIGHT([vitalchoice2.0].dbo.RC4Encode(cc.ccnum), 4) AS NVARCHAR(250)) AS CardNumber, 
 	CAST(
 		CASE cc.cctype
 			WHEN 'V' THEN N'2'
@@ -3766,7 +3766,7 @@ SELECT
 			WHEN 'D' THEN N'4'
 			ELSE NULL
 		END
-	AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS CardType, 
+	AS NVARCHAR(250)) AS CardType, 
 	CONVERT(NVARCHAR(250), CAST(DATEFROMPARTS(CAST(SUBSTRING(cc.ccexp, 3, 2) AS INT) + 2000,CAST(SUBSTRING(cc.ccexp, 1, 2) AS INT), 1) AS DATETIME2), 126) AS ExpDate
 FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON oo.Id = o.idOrder
@@ -3777,7 +3777,7 @@ WHERE oc.idOrder IS NULL) p
 UNPIVOT (Value FOR Name IN 
 	(NameOnCard, CardNumber, CardType, ExpDate)
 )AS unpvt
-INNER JOIN CustomerPaymentMethodOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 1)
+INNER JOIN CustomerPaymentMethodOptionTypes AS t ON t.Name = unpvt.Name AND (t.IdObjectType IS NULL OR t.IdObjectType = 1)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====credit cards (old auth.net)'
 
@@ -3789,8 +3789,8 @@ SELECT unpvt.Id, t.Id, unpvt.Value FROM
 (
 SELECT 
 	a.Id, 
-	CAST(cc.fname + ' ' + cc.lname AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS NameOnCard, 
-	CAST('XXXXXXXXXXXX' + RIGHT([vitalchoice2.0].dbo.RC4Encode(cc.ccnum), 4) AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS CardNumber, 
+	CAST(cc.fname + ' ' + cc.lname AS NVARCHAR(250)) AS NameOnCard, 
+	CAST('XXXXXXXXXXXX' + RIGHT([vitalchoice2.0].dbo.RC4Encode(cc.ccnum), 4) AS NVARCHAR(250)) AS CardNumber, 
 	CAST(
 		CASE cc.cctype
 			WHEN 'V' THEN N'2'
@@ -3799,7 +3799,7 @@ SELECT
 			WHEN 'D' THEN N'4'
 			ELSE NULL
 		END
-	AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS CardType, 
+	AS NVARCHAR(250)) AS CardType, 
 	CONVERT(NVARCHAR(250), CAST(DATEFROMPARTS(CAST(SUBSTRING(cc.ccexp, 3, 2) AS INT) + 2000,CAST(SUBSTRING(cc.ccexp, 1, 2) AS INT), 1) AS DATETIME2), 126) AS ExpDate
 FROM [vitalchoice2.0].dbo.autoshipOrders AS aso
 INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = aso.idOrder
@@ -3811,7 +3811,7 @@ WHERE oc.idOrder IS NULL) p
 UNPIVOT (Value FOR Name IN 
 	(NameOnCard, CardNumber, CardType, ExpDate)
 )AS unpvt
-INNER JOIN CustomerPaymentMethodOptionTypes AS t ON t.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (t.IdObjectType IS NULL OR t.IdObjectType = 1)
+INNER JOIN CustomerPaymentMethodOptionTypes AS t ON t.Name = unpvt.Name AND (t.IdObjectType IS NULL OR t.IdObjectType = 1)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====credit cards (old auth.net) (auto-ship)'
 
@@ -3823,13 +3823,13 @@ SELECT unpvt.Id, o.Id, unpvt.Value FROM
 (
 SELECT 
 	a.Id, 
-	CAST([vitalchoice2.0].dbo.RC4Encode(cc.cardnumber) AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS CheckNumber, 
+	CAST([vitalchoice2.0].dbo.RC4Encode(cc.cardnumber) AS NVARCHAR(250)) AS CheckNumber, 
 	CAST(
 		CASE o.TaxIncluded
 			WHEN 0 THEN N'False'
 			WHEN 1 THEN N'True'
 		END
-	AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS PaidInFull
+	AS NVARCHAR(250)) AS PaidInFull
 FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON oo.Id = o.idOrder
 INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = o.IdOrder
@@ -3837,7 +3837,7 @@ INNER JOIN OrderPaymentMethods AS a ON a.IdOrder = oo.Id AND a.IdObjectType = 3)
 UNPIVOT (Value FOR Name IN 
 	(CheckNumber, PaidInFull)
 )AS unpvt
-INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
+INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====check'
 
@@ -3849,13 +3849,13 @@ SELECT unpvt.Id, o.Id, unpvt.Value FROM
 (
 SELECT 
 	a.Id, 
-	CAST([vitalchoice2.0].dbo.RC4Encode(cc.cardnumber) AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS CheckNumber, 
+	CAST([vitalchoice2.0].dbo.RC4Encode(cc.cardnumber) AS NVARCHAR(250)) AS CheckNumber, 
 	CAST(
 		CASE o.TaxIncluded
 			WHEN 0 THEN N'False'
 			WHEN 1 THEN N'True'
 		END
-	AS NVARCHAR(250)) COLLATE Cyrillic_General_CI_AS AS PaidInFull
+	AS NVARCHAR(250)) AS PaidInFull
 FROM [vitalchoice2.0].dbo.autoshipOrders AS aso
 INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = aso.idOrder
 INNER JOIN Orders AS oo ON oo.IdAutoShipOrder = aso.idAutoShipOrder
@@ -3864,7 +3864,7 @@ INNER JOIN OrderPaymentMethods AS a ON a.IdOrder = oo.Id AND a.IdObjectType = 3)
 UNPIVOT (Value FOR Name IN 
 	(CheckNumber, PaidInFull)
 )AS unpvt
-INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
+INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====check(auto-ship)'
 
@@ -3883,14 +3883,14 @@ INNER JOIN Orders AS oo ON oo.Id = o.idOrder
 INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = o.IdOrder
 INNER JOIN OrderPaymentMethods AS a ON a.IdOrder = oo.Id AND a.IdObjectType = 2
 INNER JOIN Lookups AS termsl ON termsl.Name = 'Terms'
-LEFT JOIN LookupVariants AS termslv ON termslv.IdLookup = termsl.Id AND termslv.ValueVariant = cc.Terms COLLATE Cyrillic_General_CI_AS
+LEFT JOIN LookupVariants AS termslv ON termslv.IdLookup = termsl.Id AND termslv.ValueVariant = cc.Terms
 INNER JOIN Lookups AS fobl ON fobl.Name = 'Fob'
-LEFT JOIN LookupVariants AS foblv ON foblv.IdLookup = fobl.Id AND foblv.ValueVariant = cc.FOB COLLATE Cyrillic_General_CI_AS
+LEFT JOIN LookupVariants AS foblv ON foblv.IdLookup = fobl.Id AND foblv.ValueVariant = cc.FOB
 ) p
 UNPIVOT (Value FOR Name IN 
 	(Terms, Fob)
 )AS unpvt
-INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
+INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====OAC'
 
@@ -3910,14 +3910,14 @@ INNER JOIN Orders AS oo ON oo.IdAutoShipOrder = aso.idAutoShipOrder
 INNER JOIN [vitalchoice2.0].dbo.creditCards AS cc ON cc.idOrder = o.IdOrder
 INNER JOIN OrderPaymentMethods AS a ON a.IdOrder = oo.Id AND a.IdObjectType = 2
 INNER JOIN Lookups AS termsl ON termsl.Name = 'Terms'
-LEFT JOIN LookupVariants AS termslv ON termslv.IdLookup = termsl.Id AND termslv.ValueVariant = cc.Terms COLLATE Cyrillic_General_CI_AS
+LEFT JOIN LookupVariants AS termslv ON termslv.IdLookup = termsl.Id AND termslv.ValueVariant = cc.Terms
 INNER JOIN Lookups AS fobl ON fobl.Name = 'Fob'
-LEFT JOIN LookupVariants AS foblv ON foblv.IdLookup = fobl.Id AND foblv.ValueVariant = cc.FOB COLLATE Cyrillic_General_CI_AS
+LEFT JOIN LookupVariants AS foblv ON foblv.IdLookup = fobl.Id AND foblv.ValueVariant = cc.FOB
 ) p
 UNPIVOT (Value FOR Name IN 
 	(Terms, Fob)
 )AS unpvt
-INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
+INNER JOIN CustomerPaymentMethodOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====OAC(auto-ship)'
 
@@ -3954,7 +3954,7 @@ INNER JOIN OrderAddresses AS a ON a.IdOrder = oo.Id) p
 UNPIVOT (Value FOR Name IN 
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax)
 )AS unpvt
-INNER JOIN AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
+INNER JOIN AddressOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====address options'
 
@@ -3982,7 +3982,7 @@ INNER JOIN OrderAddresses AS a ON a.IdOrder = oo.Id) p
 UNPIVOT (Value FOR Name IN 
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax)
 )AS unpvt
-INNER JOIN AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
+INNER JOIN AddressOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====address options(auto-ship)'
 
@@ -4010,10 +4010,10 @@ SELECT
 	o.orderDate, 
 	o.orderDate,
 	ISNULL (
-		(SELECT TOP 1 cn.Id FROM Countries AS cn WHERE cn.CountryCode = ISNULL(o.shippingCountryCode COLLATE Cyrillic_General_CI_AS, 'US')), 
+		(SELECT TOP 1 cn.Id FROM Countries AS cn WHERE cn.CountryCode = ISNULL(o.shippingCountryCode, 'US')), 
 		(SELECT TOP 1 cn.Id FROM Countries AS cn WHERE cn.CountryCode = 'US')
 	),
-	(SELECT TOP 1 s.Id FROM States AS s WHERE s.CountryCode = ISNULL(o.shippingCountryCode COLLATE Cyrillic_General_CI_AS, 'US') AND s.StateCode = o.shippingStateCode COLLATE Cyrillic_General_CI_AS),
+	(SELECT TOP 1 s.Id FROM States AS s WHERE s.CountryCode = ISNULL(o.shippingCountryCode, 'US') AND s.StateCode = o.shippingStateCode),
 	2,
 	3,
 	o.shippingState,
@@ -4030,10 +4030,10 @@ SELECT
 	o.orderDate, 
 	o.orderDate,
 	ISNULL (
-		(SELECT TOP 1 cn.Id FROM Countries AS cn WHERE cn.CountryCode = ISNULL(o.shippingCountryCode COLLATE Cyrillic_General_CI_AS, 'US')), 
+		(SELECT TOP 1 cn.Id FROM Countries AS cn WHERE cn.CountryCode = ISNULL(o.shippingCountryCode, 'US')), 
 		(SELECT TOP 1 cn.Id FROM Countries AS cn WHERE cn.CountryCode = 'US')
 	),
-	(SELECT TOP 1 s.Id FROM States AS s WHERE s.CountryCode = ISNULL(o.shippingCountryCode COLLATE Cyrillic_General_CI_AS, 'US') AND s.StateCode = o.shippingStateCode COLLATE Cyrillic_General_CI_AS),
+	(SELECT TOP 1 s.Id FROM States AS s WHERE s.CountryCode = ISNULL(o.shippingCountryCode, 'US') AND s.StateCode = o.shippingStateCode),
 	2,
 	3,
 	o.shippingState,
@@ -4076,7 +4076,7 @@ INNER JOIN OrderAddresses AS a ON a.IdOrder = oo.Id) p
 UNPIVOT (Value FOR Name IN 
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax, Email)
 )AS unpvt
-INNER JOIN AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
+INNER JOIN AddressOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====shipping addresses options'
 
@@ -4105,7 +4105,7 @@ INNER JOIN OrderAddresses AS a ON a.IdOrder = oo.Id) p
 UNPIVOT (Value FOR Name IN 
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax, Email)
 )AS unpvt
-INNER JOIN AddressOptionTypes AS o ON o.Name = unpvt.Name COLLATE Cyrillic_General_CI_AS AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
+INNER JOIN AddressOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 3)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====shipping addresses options(auto-ship)'
 
@@ -4122,10 +4122,10 @@ GO
 
 INSERT INTO OrderToGiftCertificates
 (IdOrder, IdGiftCertificate, Amount)
-SELECT o.Id, (SELECT TOP 1 g.Id FROM GiftCertificates AS g WHERE g.Code = [vitalchoice2.0].dbo.RegexReplace('(?<code>[^\|]+)(\|[sS]\|)(?<description>[^\|]*)(\|[sS]\|)(?<amount>[0-9]+(\.[0-9]*)?)', gc.Item, '${code}') COLLATE Cyrillic_General_CI_AS), CONVERT(MONEY, [vitalchoice2.0].dbo.RegexReplace('(?<code>[^\|]+)(\|[sS]\|)(?<description>[^\|]*)(\|[sS]\|)(?<amount>[0-9]+(\.[0-9]*)?)', gc.Item, '${amount}')) FROM Orders AS o
+SELECT o.Id, (SELECT TOP 1 g.Id FROM GiftCertificates AS g WHERE g.Code = [vitalchoice2.0].dbo.RegexReplace('(?<code>[^\|]+)(\|[sS]\|)(?<description>[^\|]*)(\|[sS]\|)(?<amount>[0-9]+(\.[0-9]*)?)', gc.Item, '${code}')), CONVERT(MONEY, [vitalchoice2.0].dbo.RegexReplace('(?<code>[^\|]+)(\|[sS]\|)(?<description>[^\|]*)(\|[sS]\|)(?<amount>[0-9]+(\.[0-9]*)?)', gc.Item, '${amount}')) FROM Orders AS o
 INNER JOIN [vitalchoice2.0].dbo.orders AS oo ON oo.idOrder = o.Id
 CROSS APPLY [vitalchoice2.0].[dbo].[DelimitedSplit8K](oo.pcOrd_GCDetails, '|g|') AS gc
-WHERE oo.pcOrd_GCDetails IS NOT NULL AND oo.pcOrd_GCDetails <> '' AND gc.Item IS NOT NULL AND gc.Item <> N'' AND (SELECT TOP 1 g.Id FROM GiftCertificates AS g WHERE g.Code = [vitalchoice2.0].dbo.RegexReplace('(?<code>[^\|]+)(\|[sS]\|)(?<description>[^\|]*)(\|[sS]\|)(?<amount>[0-9]+(\.[0-9]*)?)', gc.Item, '${code}') COLLATE Cyrillic_General_CI_AS) IS NOT NULL
+WHERE oo.pcOrd_GCDetails IS NOT NULL AND oo.pcOrd_GCDetails <> '' AND gc.Item IS NOT NULL AND gc.Item <> N'' AND (SELECT TOP 1 g.Id FROM GiftCertificates AS g WHERE g.Code = [vitalchoice2.0].dbo.RegexReplace('(?<code>[^\|]+)(\|[sS]\|)(?<description>[^\|]*)(\|[sS]\|)(?<amount>[0-9]+(\.[0-9]*)?)', gc.Item, '${code}')) IS NOT NULL
 PRINT '====gift certificates used in order'
 
 GO
@@ -4146,7 +4146,7 @@ INSERT INTO OrderToSkus
 SELECT po.IdOrder, s.Id, MAX(ISNULL(unitprice, 0)), SUM(quantity) FROM [vitalchoice2.0].[dbo].ProductsOrdered AS po
 INNER JOIN Orders AS o ON po.idOrder = o.Id
 INNER JOIN [vitalchoice2.0].dbo.products AS p ON p.IdProduct = po.idProduct
-INNER JOIN Skus AS s ON s.StatusCode <> 3 AND s.Code = p.sku COLLATE Cyrillic_General_CI_AS
+INNER JOIN Skus AS s ON s.StatusCode <> 3 AND s.Code = p.sku
 WHERE po.quantity > 0 AND po.IdProduct NOT IN (SELECT Id FROM SKus)
 GROUP BY po.IdOrder, s.Id
 PRINT '====products ordered (missed sku ids)'
@@ -4175,7 +4175,7 @@ INNER JOIN Orders AS o ON o.IdAutoShipOrder = aso.IdAutoShipOrder
 INNER JOIN [vitalchoice2.0].[dbo].orders AS oo ON oo.IdOrder = aso.IdOrder
 INNER JOIN [vitalchoice2.0].[dbo].ProductsOrdered AS po ON po.IdOrder = oo.IdOrder
 INNER JOIN [vitalchoice2.0].dbo.products AS p ON p.IdProduct = po.idProduct
-INNER JOIN Skus AS s ON s.StatusCode <> 3 AND s.Code = p.sku COLLATE Cyrillic_General_CI_AS
+INNER JOIN Skus AS s ON s.StatusCode <> 3 AND s.Code = p.sku
 WHERE po.quantity > 0 AND po.IdProduct NOT IN (SELECT Id FROM SKus)
 GROUP BY o.Id, s.Id
 PRINT '====products ordered (auto-ship) (missed skus)'
@@ -4247,7 +4247,7 @@ SELECT o.Id, s.Id, ri.Qty, 1, ri.ProductPercent, ri.Value / (ri.ProductPercent /
 INNER JOIN [vitalchoice2.0].dbo.refund AS r ON r.idOrder = o.Id
 INNER JOIN [vitalchoice2.0].dbo.RefundItems AS ri ON ri.ItemType = 1 AND ri.IdRefundOrder = o.Id
 INNER JOIN [vitalchoice2.0].dbo.products AS p ON p.IdProduct = ri.IdItem
-INNER JOIN Skus AS s ON s.StatusCode <> 3 AND s.Code = p.sku COLLATE Cyrillic_General_CI_AS
+INNER JOIN Skus AS s ON s.StatusCode <> 3 AND s.Code = p.sku
 WHERE o.IdObjectType = 6 AND ri.IdItem NOT IN (SELECT Id FROM SKus)
 PRINT '====refund skus(missed skus)'
 
@@ -4280,7 +4280,7 @@ INSERT INTO ReshipProblemSkus
 (IdOrder, IdSku)
 SELECT o.Id, s.Id FROM Orders AS o
 INNER JOIN [vitalchoice2.0].dbo.reship AS r ON r.idOrder = o.Id
-INNER JOIN Skus AS s ON s.Code = r.problemSku COLLATE Cyrillic_General_CI_AS AND s.StatusCode <> 3
+INNER JOIN Skus AS s ON s.Code = r.problemSku AND s.StatusCode <> 3
 WHERE r.problemSku <> 'All' AND s.Id NOT IN (SELECT IdSku FROM ReshipProblemSkus)
 PRINT '====reship problem skus (individual)'
 
@@ -4370,7 +4370,7 @@ GO
 UPDATE GiftCertificates
 SET IdOrder = o.Id
 FROM GiftCertificates AS g
-INNER JOIN [vitalchoice2.0].dbo.pcGCOrdered AS gc ON gc.pcGO_GcCode COLLATE Cyrillic_General_CI_AS = g.Code
+INNER JOIN [vitalchoice2.0].dbo.pcGCOrdered AS gc ON gc.pcGO_GcCode = g.Code
 INNER JOIN Orders AS o ON o.Id = gc.pcGO_IDOrder
 PRINT '====set up created gift certificates order ids'
 
@@ -4531,7 +4531,7 @@ ORDER BY a.ID
 
 INSERT INTO [VitalChoice.Infrastructure].dbo.Articles
 (Author, ContentItemId, MasterContentItemId, Name, PublishedDate, StatusCode, SubTitle, Url, FileUrl, IdOld)
-SELECT a.ArticlesAuthor, i.Id, @articleMasterId, a.ArticlesTitle, CAST(a.ArticlesDate AS DATE), 2/*Active*/, a.ArticlesSubTitle, REPLACE(RTRIM(LTRIM(LOWER([vitalchoice2.0].[dbo].RegexReplace('[^a-zA-Z0-9]+', a.ArticlesTitle, ' ')))) COLLATE SQL_Latin1_General_CP1_CI_AS,' ','-'), a.articlesImage, a.ID 
+SELECT a.ArticlesAuthor, i.Id, @articleMasterId, a.ArticlesTitle, CAST(a.ArticlesDate AS DATE), 2/*Active*/, a.ArticlesSubTitle, REPLACE(RTRIM(LTRIM(LOWER([vitalchoice2.0].[dbo].RegexReplace('[^a-zA-Z0-9]+', a.ArticlesTitle, ' ')))),' ','-'), a.articlesImage, a.ID 
 FROM [vitalchoice2.0].[dbo].Articles AS a
 INNER JOIN [VitalChoice.Infrastructure].dbo.ContentItems AS i ON i.TempId = a.ID
 WHERE a.ID IN (SELECT Id FROM @articlesToImport)
@@ -4625,7 +4625,7 @@ ORDER BY a.idFAQ
 
 INSERT INTO [VitalChoice.Infrastructure].dbo.Faqs
 (ContentItemId, MasterContentItemId, Name, StatusCode, Url, IdOld)
-SELECT i.Id, @masterId, a.title, 2/*Active*/, REPLACE(RTRIM(LTRIM(LOWER([vitalchoice2.0].[dbo].RegexReplace('[^a-zA-Z0-9]+', a.title, ' ')))) COLLATE SQL_Latin1_General_CP1_CI_AS,' ','-'), a.idFAQ 
+SELECT i.Id, @masterId, a.title, 2/*Active*/, REPLACE(RTRIM(LTRIM(LOWER([vitalchoice2.0].[dbo].RegexReplace('[^a-zA-Z0-9]+', a.title, ' ')))),' ','-'), a.idFAQ 
 FROM [vitalchoice2.0].[dbo].FAQ AS a
 INNER JOIN [VitalChoice.Infrastructure].dbo.ContentItems AS i ON i.TempId = a.idFAQ
 WHERE a.idFAQ IN (SELECT Id FROM @contentItemsToImport)

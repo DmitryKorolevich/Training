@@ -88,46 +88,75 @@ TRUNCATE TABLE [VitalChoice.ExportInfo].dbo.OrderPaymentMethods
 GO
 
 DELETE FROM AffiliateOrderPayments
+GO
 DELETE FROM AffiliatePayments
 GO
 TRUNCATE TABLE CartToSkus
 DELETE FROM Carts
+GO
 DELETE FROM OrderToSkus
+GO
 DELETE FROM RefundOrderToGiftCertificates
+GO
 DELETE FROM CartToGiftCertificates
+GO
 DELETE FROM OrderToGiftCertificates
+GO
 UPDATE GiftCertificates
 SET IdOrder = NULL
 WHERE IdOrder IS NOT NULL
+GO
 DELETE FROM HealthwiseOrders
+GO
 DELETE FROM HelpTicketComments
+GO
 DELETE FROM HelpTickets
+GO
 DELETE FROM RefundSkus
+GO
 DELETE FROM ReshipProblemSkus
+GO
 DELETE FROM OrderToPromos
+GO
 TRUNCATE TABLE OrderOptionValues
+GO
 DELETE FROM OrderShippingPackages
+GO
 DELETE FROM Orders
+GO
 TRUNCATE TABLE OrderPaymentMethodOptionValues
 DELETE FROM OrderPaymentMethods
+GO
 TRUNCATE TABLE OrderAddressOptionValues
 DELETE FROM OrderAddresses
+GO
 DELETE FROM CustomerToShippingAddresses
+GO
 DELETE FROM CustomersToPaymentMethods
+GO
 DELETE FROM CustomersToOrderNotes
+GO
 TRUNCATE TABLE CustomerPaymentMethodValues
 DELETE FROM CustomerPaymentMethods
+GO
 TRUNCATE TABLE CustomerNoteOptionValues
 DELETE FROM CustomerNotes
+GO
 DELETE FROM OneTimeDiscountToCustomerUsages
+GO
 DELETE FROM HealthwisePeriods
+GO
 DELETE FROM BigStringValues
 WHERE IdBigString IN (SELECT cv.IdBigString FROM CustomerOptionValues AS cv WHERE cv.IdBigString IS NOT NULL)
+GO
 TRUNCATE TABLE CustomerOptionValues
 DELETE FROM CustomerFiles
+GO
 DELETE FROM Customers
+GO
 TRUNCATE TABLE AddressOptionValues
 DELETE FROM Addresses
+GO
 TRUNCATE TABLE ProductsToCategories
 --remove customers from ecommerce DB
 DELETE FROM Users WHERE Id IN (SELECT id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE IdUserType = 2)
@@ -143,9 +172,6 @@ GO
 DELETE FROM AspNetUserRoles
 WHERE UserId IN (SELECT id FROM AspNetUsers WHERE IdUserType = 2)
 GO
-DELETE FROM AspNetUsers
-WHERE IdUserType = 2
-GO
 
 --wipe out affiliates
 
@@ -153,30 +179,39 @@ USE [VitalChoice.Ecommerce]
 GO
 
 DELETE FROM Users WHERE Id IN (SELECT id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE IdUserType = 3)
+GO
 
 DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUserClaims
 WHERE UserId IN (SELECT Id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE IdUserType = 3)
+GO
 
 DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUserLogins
 WHERE UserId IN (SELECT Id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE IdUserType = 3)
+GO
 
 DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUserRoles
 WHERE UserId IN (SELECT Id FROM [VitalChoice.Infrastructure].dbo.AspNetUsers WHERE IdUserType = 3)
+GO
 
 DELETE FROM [VitalChoice.Infrastructure].dbo.AspNetUsers
 WHERE IdUserType = 3
+GO
 
 DELETE FROM [VitalChoice.Ecommerce].dbo.Users
 WHERE Id IN (SELECT Id FROM [VitalChoice.Ecommerce].dbo.Affiliates)
+GO
 
 DELETE FROM [VitalChoice.Ecommerce].dbo.BigStringValues
 WHERE IdBigString IN (SELECT ao.IdBigString FROM [VitalChoice.Ecommerce].dbo.AffiliateOptionValues AS ao WHERE ao.IdBigString IS NOT NULL)
+GO
 
 DELETE FROM [VitalChoice.Ecommerce].dbo.AffiliateOptionValues
+GO
 
 UPDATE [VitalChoice.Ecommerce].dbo.Customers
 SET IdAffiliate = NULL
 WHERE IdAffiliate IS NOT NULL
+GO
 
 DELETE FROM [VitalChoice.Ecommerce].dbo.Affiliates
 
@@ -185,18 +220,31 @@ GO
 USE [VitalChoice.Ecommerce]
 
 DELETE FROM CatalogRequestAddressOptionValues
+GO
 DELETE FROM CatalogRequestAddresses
+GO
 DELETE FROM CartToGiftCertificates
+GO
 DELETE FROM RefundOrderToGiftCertificates
+GO
 DELETE FROM OrderToGiftCertificates
+GO
 DELETE FROM GiftCertificates
+GO
 DELETE FROM PromotionsToBuySkus
+GO
 DELETE FROM PromotionsToGetSkus
+GO
 DELETE FROM PromotionsToSelectedCategories
+GO
 DELETE FROM PromotionOptionValues
+GO
 DELETE FROM Promotions
+GO
 DELETE FROM ProductReviews
+GO
 DELETE FROM ObjectHistoryLogItems
+GO
 DELETE FROM ObjectHistoryLogDataItems
 
 GO
@@ -255,11 +303,16 @@ DELETE FROM OrderAddresses
 GO
 TRUNCATE TABLE DiscountOptionValues
 DELETE FROM DiscountsToCategories
+GO
 DELETE FROM DiscountsToSelectedSkus
+GO
 DELETE FROM DiscountsToSkus
+GO
 DELETE FROM DiscountTiers
+GO
 TRUNCATE TABLE DiscountToSelectedCategories
 DELETE FROM OneTimeDiscountToCustomerUsages
+GO
 DELETE FROM Discounts
 
 GO
