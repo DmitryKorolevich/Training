@@ -580,8 +580,11 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                     aes.Key = GetPrivateKeyHash();
                 }
             }
-            aes.GenerateKey();
-            aes.GenerateKey();
+            else
+            {
+                aes.GenerateKey();
+                aes.GenerateKey();
+            }
             return aes;
         }
 
