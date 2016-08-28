@@ -1,5 +1,6 @@
 {
   "App": {
+    "LocalEncryptionKeyPath": "C:\\ProgramData\\VitalChoice\\key.pk",
     "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
     "LogLevel": "Warning",
     "FilesPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\files",

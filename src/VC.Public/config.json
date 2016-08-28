@@ -1,5 +1,6 @@
 {
   "App": {
+    "LocalEncryptionKeyPath": "C:\\ProgramData\\VitalChoice\\key.pk",
     "LogPath": "c:\\inetpub\\wwwroot\\vitalchoice_new\\logs",
     "ActivationTokenExpirationTermDays": 3,
     "DefaultCacheExpirationTermMinutes": 1440,

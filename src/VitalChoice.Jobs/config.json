@@ -1,5 +1,6 @@
 ﻿{
   "App": {
+    "LocalEncryptionKeyPath": "C:\\ProgramData\\VitalChoice\\key.pk",
     "PublicHost": "staging.g2-dg.com",
     "AdminHost": "admin.staging.g2-dg.com",
     "DefaultCacheExpirationTermMinutes": 1440,
