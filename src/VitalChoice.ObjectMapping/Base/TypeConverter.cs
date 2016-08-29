@@ -203,7 +203,7 @@ namespace VitalChoice.ObjectMapping.Base
             var objectCache = DynamicTypeCache.GetTypeCacheNoMap(objectType);
             foreach (var pair in objectCache.Properties)
             {
-                Type propertyElementType = pair.Value.PropertyType.TryGetElementType(typeof(ICollection<>));
+                Type propertyElementType = pair.Value.CollectionItemType;
                 if (IsImplementBase(pair.Value.PropertyType, baseTypeToMemberwiseClone))
                 {
                     var value = CloneInternal(pair.Value.Get?.Invoke(obj), pair.Value.PropertyType, baseTypeToMemberwiseClone, objects);
@@ -232,7 +232,7 @@ namespace VitalChoice.ObjectMapping.Base
                 }
                 else
                 {
-                    pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(obj));
+                    SetValue(result, obj, pair);
                 }
             }
             return result;
@@ -266,7 +266,7 @@ namespace VitalChoice.ObjectMapping.Base
                     {
                         continue;
                     }
-                    pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(item));
+                    SetValue(result, item, pair);
                 }
                 resultList.Add(result);
             }
@@ -292,7 +292,7 @@ namespace VitalChoice.ObjectMapping.Base
                     {
                         continue;
                     }
-                    pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(item));
+                    SetValue(result, item, pair);
                 }
                 resultList.Add(result);
             }
@@ -324,7 +324,7 @@ namespace VitalChoice.ObjectMapping.Base
                 {
                     continue;
                 }
-                pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(obj));
+                SetValue(result, obj, pair);
             }
             return result;
         }
@@ -343,7 +343,7 @@ namespace VitalChoice.ObjectMapping.Base
                 {
                     continue;
                 }
-                pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(obj));
+                SetValue(result, obj, pair);
             }
             return result;
         }
@@ -372,7 +372,7 @@ namespace VitalChoice.ObjectMapping.Base
             var objectCache = DynamicTypeCache.GetTypeCacheNoMap(objectType);
             foreach (var pair in objectCache.Properties)
             {
-                Type propertyElementType = pair.Value.PropertyType.TryGetElementType(typeof(ICollection<>));
+                Type propertyElementType = pair.Value.CollectionItemType;
                 if (IsImplementBase(pair.Value.PropertyType, baseTypeToMemberwiseClone))
                 {
                     var value = cloneBase(pair.Value.Get?.Invoke(obj));
@@ -401,7 +401,7 @@ namespace VitalChoice.ObjectMapping.Base
                 }
                 else
                 {
-                    pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(obj));
+                    SetValue(result, obj, pair);
                 }
             }
             return result;
@@ -576,6 +576,28 @@ namespace VitalChoice.ObjectMapping.Base
                 return null;
             }
             return null;
+        }
+
+        private static void SetValue(object result, object obj, KeyValuePair<string, GenericProperty> pair)
+        {
+            if (pair.Value.Set == null && pair.Value.IsCollection)
+            {
+                var collectionSource = pair.Value.Get?.Invoke(obj) as IEnumerable<object>;
+                if (collectionSource != null)
+                {
+                    var collection =
+                        pair.Value.Get(result).AsGenericCollection(pair.Value.CollectionItemType);
+
+                    foreach (var item in collectionSource)
+                    {
+                        collection.Add(item);
+                    }
+                }
+            }
+            else
+            {
+                pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(obj));
+            }
         }
 
         private IObjectMapper GetMapper(Type objectType)

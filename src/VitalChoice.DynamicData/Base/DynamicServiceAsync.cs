@@ -326,20 +326,10 @@ namespace VitalChoice.DynamicData.Base
                 var cache = DynamicTypeCache.GetTypeCacheNoMap(entityType);
                 foreach (var property in cache.Properties)
                 {
-                    var itemType = property.Value.PropertyType.TryGetElementType(typeof(ICollection<>));
-                    bool isCollection;
-                    if (itemType == null)
-                    {
-                        isCollection = false;
-                        itemType = property.Value.PropertyType;
-                    }
-                    else
-                    {
-                        isCollection = true;
-                    }
+                    var itemType = property.Value.CollectionItemType ?? property.Value.PropertyType;
                     if (itemType.GetBaseTypes().Any(t => t == typeof(DynamicDataEntity)))
                     {
-                        if (isCollection)
+                        if (property.Value.IsCollection)
                         {
                             var collection = property.Value.Get(entity) as IEnumerable;
                             if (collection != null)

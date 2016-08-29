@@ -75,20 +75,37 @@ namespace VitalChoice.Caching.Services.Cache.Base
                         {
                             if (cloned)
                             {
-                                newValue =
-                                    typeof(List<>).CreateGenericCollection(relation.RelationType,
+                                if (!relation.CanSet)
+                                {
+                                    HashSet<object> itemList = new HashSet<object>((IEnumerable<object>) relation.GetRelatedObject(toTrack));
+                                    foreach (
+                                        var newItemToTrack in
                                         GetAttachedOrCloneCollection((IEnumerable<object>) value, relation, relation.EntityInfo,
                                             stateManager))
-                                        .CollectionObject;
-                                relation.SetOrUpdateRelatedObject(toTrack, newValue);
+                                    {
+                                        if (!itemList.Contains(newItemToTrack))
+                                        {
+                                            relation.AddItemToCollection(toTrack, newItemToTrack);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    newValue =
+                                        typeof(List<>).CreateGenericCollection(relation.RelationType,
+                                                GetAttachedOrCloneCollection((IEnumerable<object>) value, relation, relation.EntityInfo,
+                                                    stateManager))
+                                            .CollectionObject;
+                                    relation.SetOrUpdateRelatedObject(toTrack, newValue);
+                                }
                             }
                             else
                             {
                                 HashSet<object> itemList = new HashSet<object>((IEnumerable<object>) relation.GetRelatedObject(toTrack));
                                 foreach (
                                     var newItemToTrack in
-                                        GetAttachedOrCloneCollection((IEnumerable<object>) value, relation, relation.EntityInfo,
-                                            stateManager))
+                                    GetAttachedOrCloneCollection((IEnumerable<object>) value, relation, relation.EntityInfo,
+                                        stateManager))
                                 {
                                     if (!itemList.Contains(newItemToTrack))
                                     {
@@ -128,18 +145,37 @@ namespace VitalChoice.Caching.Services.Cache.Base
                     {
                         if (cloned)
                         {
-                            newValue =
-                                typeof(List<>).CreateGenericCollection(relation.RelationType,
-                                    GetAttachedOrCloneCollection((IEnumerable<object>) value, relation, relation.EntityInfo, stateManager))
-                                    .CollectionObject;
-                            relation.SetOrUpdateRelatedObject(toTrack, newValue);
+                            if (!relation.CanSet)
+                            {
+                                HashSet<object> itemList = new HashSet<object>((IEnumerable<object>)relation.GetRelatedObject(toTrack));
+                                foreach (
+                                    var newItemToTrack in
+                                    GetAttachedOrCloneCollection((IEnumerable<object>)value, relation, relation.EntityInfo,
+                                        stateManager))
+                                {
+                                    if (!itemList.Contains(newItemToTrack))
+                                    {
+                                        relation.AddItemToCollection(toTrack, newItemToTrack);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                newValue =
+                                    typeof(List<>).CreateGenericCollection(relation.RelationType,
+                                            GetAttachedOrCloneCollection((IEnumerable<object>)value, relation, relation.EntityInfo,
+                                                stateManager))
+                                        .CollectionObject;
+                                relation.SetOrUpdateRelatedObject(toTrack, newValue);
+                            }
                         }
                         else
                         {
-                            HashSet<object> itemList = new HashSet<object>((IEnumerable<object>) relation.GetRelatedObject(toTrack));
+                            HashSet<object> itemList = new HashSet<object>((IEnumerable<object>)relation.GetRelatedObject(toTrack));
                             foreach (
                                 var newItemToTrack in
-                                    GetAttachedOrCloneCollection((IEnumerable<object>) value, relation, relation.EntityInfo, stateManager))
+                                GetAttachedOrCloneCollection((IEnumerable<object>)value, relation, relation.EntityInfo,
+                                    stateManager))
                             {
                                 if (!itemList.Contains(newItemToTrack))
                                 {
