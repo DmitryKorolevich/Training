@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Data.Context;
@@ -162,7 +163,7 @@ namespace VitalChoice.Business.Services.Users
 		{
 			user.UpdatedDate = DateTime.Now;
 
-			var updateResult = await UserManager.UpdateAsync(user);
+            var updateResult = await UserManager.UpdateAsync(user);
 			if (updateResult.Succeeded)
 			{
 				if (password != null)

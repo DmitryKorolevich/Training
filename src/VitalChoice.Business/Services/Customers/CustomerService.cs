@@ -851,6 +851,11 @@ namespace VitalChoice.Business.Services.Customers
             return data?.Count ?? 0;
         }
 
+        public async Task<bool> MergeCustomersAsync(int idCustomerPrimary, ICollection<int> customerIds)
+        {
+            return true;
+        }
+
         #region Reports 
 
         public async Task<WholesaleSummaryReport> GetWholesaleSummaryReportAsync()

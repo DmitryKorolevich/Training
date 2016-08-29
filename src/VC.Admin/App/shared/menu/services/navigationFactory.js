@@ -165,6 +165,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'manageProductTaxCodes', stateName: 'index.oneCol.manageProductTaxCodes', stateLabel: 'Manage Product Tax Codes', access: 10 },
 				{ name: 'moveOrder', stateName: 'index.oneCol.moveOrder', stateLabel: 'Reassign Transaction', access: 10 },
 				{ name: 'changeOrderStatus', stateName: 'index.oneCol.changeOrderStatus', stateLabel: 'Change Order Status', access: 10 },
+				{ name: 'mergeCustomers', stateName: 'index.oneCol.mergeCustomers', stateLabel: 'Merge Customers', access: 10 },
 			]
 		},
 		{

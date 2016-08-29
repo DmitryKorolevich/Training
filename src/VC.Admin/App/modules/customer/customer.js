@@ -9,6 +9,8 @@ angular.module('app.modules.customer', [
 	'app.modules.customer.controllers.wholesaleSummaryReportController',
 	'app.modules.customer.controllers.wholesalesReportController',
 	'app.modules.customer.controllers.mailingReportController',
+	'app.modules.customer.controllers.searchCustomersController',
+	'app.modules.customer.controllers.mergeCustomersController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -43,6 +45,11 @@ angular.module('app.modules.customer', [
                     url: '/report/mailing-list',
                     templateUrl: 'app/modules/customer/partials/mailingReport.html',
                     controller: 'mailingReportController'
-                });
+                })
+		        .state('index.oneCol.mergeCustomers', {
+		            url: '/tools/merge-customers',
+		            templateUrl: 'app/modules/customer/partials/mergeCustomers.html',
+		            controller: 'mergeCustomersController'
+		        });
 		}
 	]);

@@ -259,6 +259,8 @@
     "app/modules/customer/controllers/wholesaleSummaryReportController.js",
     "app/modules/customer/controllers/wholesalesReportController.js",
     "app/modules/customer/controllers/mailingReportController.js",
+    "app/modules/customer/controllers/searchCustomersController.js",
+    "app/modules/customer/controllers/mergeCustomersController.js",
     "app/modules/customer/customer.js",
     "app/modules/help/controllers/helpTicketsController.js",
     "app/modules/help/controllers/helpTicketDetailController.js",

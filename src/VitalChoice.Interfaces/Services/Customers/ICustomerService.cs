@@ -53,6 +53,8 @@ namespace VitalChoice.Interfaces.Services.Customers
 
 	    Task<long> GetActiveOrderCount(int idCustomer);
 
+	    Task<bool> MergeCustomersAsync(int idCustomerPrimary, ICollection<int> customerIds);
+
         #region Reports 
 
         Task<WholesaleSummaryReport> GetWholesaleSummaryReportAsync();

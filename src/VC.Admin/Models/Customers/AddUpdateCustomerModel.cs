@@ -93,7 +93,10 @@ namespace VC.Admin.Models.Customer
 		[Map("SuspensionReason")]
 		public string Reason { get; set; }
 
-		public AddressModel ProfileAddress { get; set; }
+        [Map]
+        public bool HasHealthwiseOrders { get; set; }
+
+        public AddressModel ProfileAddress { get; set; }
 
         public IList<AddressModel> Shipping { get; set; }
 

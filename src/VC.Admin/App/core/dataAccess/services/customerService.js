@@ -98,6 +98,10 @@ angular.module('app.core.dataAccess.services.customerService', [])
 		{
 		    return $http.get(baseUrl + 'GetCustomerCardExist/{0}?idcustomer={1}'.format(idPaymentMethod, idCustomer), getConfig(tracker));
 		},
+		mergeCustomers: function (id, model, tracker)
+		{
+		    return $http.post(baseUrl + 'MergeCustomers/{0}'.format(id), model, getConfig(tracker));
+		},
 
 	    //reports
 		getWholesaleSummaryReport: function (tracker)

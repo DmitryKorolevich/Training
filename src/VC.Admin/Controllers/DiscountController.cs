@@ -19,6 +19,7 @@ using VitalChoice.Interfaces.Services.Settings;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.Products;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
@@ -87,8 +88,8 @@ namespace VC.Admin.Controllers
                 return new DiscountManageModel()
                 {
                     StatusCode = RecordStatusCode.Active,
-                    Assigned = null,//All
-                    DiscountType=DiscountType.PercentDiscount,
+                    Assigned = CustomerType.Retail,
+                    DiscountType =DiscountType.PercentDiscount,
                     StartDate = TimeZoneInfo.ConvertTime(now, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local),
                     ExpirationDate= TimeZoneInfo.ConvertTime(now.AddDays(30), TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local),
                     DiscountsToSelectedSkus = new List<DiscountToSelectedSku>(),

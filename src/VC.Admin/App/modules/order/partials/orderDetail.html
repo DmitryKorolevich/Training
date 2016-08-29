@@ -727,6 +727,19 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div data-ng-if="currentCustomer.CustomerType == 1">
+                                                <span class="legend">HealthWise Customer Status</span>
+                                                <div class="form-group">
+                                                    <label for="HasHealthwiseOrders" class="col-md-3 control-label">Enabled</label>
+                                                    <div class="col-md-9">
+                                                        <div class="checkbox">
+                                                            <label>
+                                                                <input type="checkbox" id="HasHealthwiseOrders" name="HasHealthwiseOrders" data-ng-model="currentCustomer.HasHealthwiseOrders">
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <span data-ng-if="currentCustomer.Id && currentCustomer.StatusCode!=5" class="legend">Suspend User Account</span>
                                             <div data-ng-if="currentCustomer.StatusCode!=5" class="form-group">
                                                 <label for="suspendUserAccount" class="col-md-3 control-label">Suspend User Account</label>
@@ -810,8 +823,8 @@
                                                                 data-ng-change="checkCustomerCreditCardStatus()"></select>
                                                         <span class="input-group-addon">
                                                             <i class="glyphicon glyphicon-alert"
-                                                                data-ng-show="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex] && paymentInfoTab.PaymentMethodType == 1 && currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].NotInStore"
-                                                                tooltip-placement="top-right" tooltip-animation="false" tooltip-popup-close-delay="1000" uib-tooltip="This credit card doesn't present in the remote store, please update info"></i>
+                                                               data-ng-show="currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex] && paymentInfoTab.PaymentMethodType == 1 && currentCustomer.CreditCards[paymentInfoTab.CreditCardIndex].NotInStore"
+                                                               tooltip-placement="top-right" tooltip-animation="false" tooltip-popup-close-delay="1000" uib-tooltip="This credit card doesn't present in the remote store, please update info"></i>
                                                         </span>
                                                     </div>
                                                 </div>

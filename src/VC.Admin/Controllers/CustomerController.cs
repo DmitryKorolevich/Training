@@ -658,6 +658,13 @@ namespace VC.Admin.Controllers
             return await _customerService.GetCustomerCardExist(idCustomer, id);
         }
 
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Settings)]
+        public async Task<Result<bool>> MergeCustomers(int id, [FromBody]ICollection<int> customerIds)
+        {
+            return await _customerService.MergeCustomersAsync(id, customerIds);
+        }
+        
         #region Reports
 
         [AdminAuthorize(PermissionType.Reports)]

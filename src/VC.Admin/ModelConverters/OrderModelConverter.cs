@@ -323,6 +323,14 @@ namespace VC.Admin.ModelConverters
                     {
                         dbCustomer.Data.InceptionDate = dynamic.Customer.Data.InceptionDate;
                     }
+                    if (dynamic.Customer.DictionaryData.ContainsKey("ProductReviewEmailEnabled"))
+                    {
+                        dbCustomer.Data.ProductReviewEmailEnabled = dynamic.Customer.Data.ProductReviewEmailEnabled;
+                    }
+                    if (dynamic.Customer.DictionaryData.ContainsKey("HasHealthwiseOrders"))
+                    {
+                        dbCustomer.Data.HasHealthwiseOrders = dynamic.Customer.Data.HasHealthwiseOrders;
+                    }
                     if (model.Id == 0)
                     {
                         dbCustomer.ApprovedPaymentMethods = dynamic.Customer.ApprovedPaymentMethods;

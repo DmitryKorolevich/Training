@@ -1,0 +1,174 @@
+﻿<div>
+    <form class="form-horizontal" name="forms.filterForm" data-ng-class="{submitted: submitted}" novalidate autocomplete="off">
+        <div style="display: none;">
+            <input type="text" id="PreventChromeAutocomplete"
+                   name="PreventChromeAutocomplete" autocomplete="address-level4" />
+        </div>
+        <div class="row form-group">
+            <div class="col-md-3">
+                <div class="input-group autocomplete">
+                    <input type="text" name="Id" class="form-control" placeholder="Email" data-ng-model="address.Email" autocomplete="off" autofocus
+                           typeahead-min-length="1"
+                           typeahead-wait-ms="200" uib-typeahead="item as item for item in getByStaticAutoComplete($viewValue,'Email')" typeahead-loading="loadingByEmail">
+                    <span class="input-group-addon">
+                        <i ng-show="loadingByEmail" class="glyphicon glyphicon-refresh"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="input-group autocomplete">
+                    <input type="text" name="Id" class="form-control" placeholder="Last Name" data-ng-model="address.LastName" autocomplete="off"
+                           typeahead-min-length="1"
+                           typeahead-wait-ms="200" uib-typeahead="item as item for item in getByProfileAddressAutoComplete($viewValue,'LastName')" typeahead-loading="loadingByLastName">
+                    <span class="input-group-addon">
+                        <i ng-show="loadingByLastName" class="glyphicon glyphicon-refresh"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="First Name" data-ng-model="address.FirstName" autocomplete="off">
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="Ship Address 1" data-ng-model="defaultShippingAddress.Address1" autocomplete="off">
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-3">
+                <div class="input-group autocomplete">
+                    <input type="text" name="Id" class="form-control" placeholder="Customer #" data-ng-model="address.SearchText" numbers-only autocomplete="off"
+                           typeahead-min-length="1"
+                           typeahead-wait-ms="200" uib-typeahead="item as item for item in getByStaticAutoComplete($viewValue,'Id')" typeahead-loading="loadingById">
+                    <span class="input-group-addon">
+                        <i ng-show="loadingById" class="glyphicon glyphicon-refresh"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="input-group autocomplete">
+                    <input type="text" name="Id" class="form-control" placeholder="Ship City" data-ng-model="defaultShippingAddress.City" autocomplete="off"
+                           typeahead-min-length="1"
+                           typeahead-wait-ms="200" uib-typeahead="item as item for item in getByDefaultShippingAddressAutoComplete($viewValue,'City')" typeahead-loading="loadingByCity">
+                    <span class="input-group-addon">
+                        <i ng-show="loadingByCity" class="glyphicon glyphicon-refresh"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="Ship Zip" data-ng-model="defaultShippingAddress.Zip" autocomplete="off">
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="Phone" data-ng-model="address.Phone" autocomplete="off">
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-3">
+                <div class="input-group autocomplete">
+                    <input type="text" name="Company" class="form-control" placeholder="Company" data-ng-model="address.Company" autocomplete="off"
+                           typeahead-min-length="1"
+                           typeahead-wait-ms="200" uib-typeahead="item as item for item in getByProfileAddressAutoComplete($viewValue,'Company')" typeahead-loading="loadingByCompany">
+                    <span class="input-group-addon">
+                        <i ng-show="loadingByCompany" class="glyphicon glyphicon-refresh"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="row form-group">
+        <div class="col-md-4">
+            <button class="btn btn-info" data-ng-click="filterCustomers();" type="button">Filter</button>
+        </div>
+    </div>
+    <hr />
+    <spinner-overlay data-loading="refreshTracker.active()">
+        <table id="{{name}}" class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th class="sortable-column" data-ng-click="applySort('Id')">
+                        <span>Customer #</span>
+                        <span data-ng-if="filter.Sorting.Path == 'Id'">
+                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                        </span>
+                    </th>
+                    <th class="sortable-column" data-ng-click="applySort('IdObjectType')">
+                        <span>Type</span>
+                        <span data-ng-if="filter.Sorting.Path == 'IdObjectType'">
+                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                        </span>
+                    </th>
+                    <th>Name</th>
+                    <th class="sortable-column" data-ng-click="applySort('Email')">
+                        <span>Email</span>
+                        <span data-ng-if="filter.Sorting.Path == 'Email'">
+                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                        </span>
+                    </th>
+                    <th>Ship State/Province</th>
+                    <th>Ship City</th>
+                    <th>Last Order Placed</th>
+                    <th>Total Orders</th>
+                    <th class="sortable-column" data-ng-click="applySort('Status')">
+                        <span>Status</span>
+                        <span data-ng-if="filter.Sorting.Path == 'Status'">
+                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                        </span>
+                    </th>
+                    <th class="sortable-column" data-ng-click="applySort('Updated')">
+                        <span>Updated</span>
+                        <span data-ng-if="filter.Sorting.Path == 'Updated'">
+                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                        </span>
+                    </th>
+                    <th class="actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="customer in customers">
+                    <td>
+                        <a target="_blank" ui-sref="index.oneCol.customerDetail({id:customer.Id})">{{::customer.Id}}</a>
+                    </td>
+                    <td>
+                        <span data-ng-if="customer.IdObjectType == 1" class="label label-retail font-default">{{getReferenceItem(ReferenceData.ShortCustomerTypes, customer.IdObjectType).Text}}</span>
+                        <span data-ng-if="customer.IdObjectType == 2" class="label label-wholesale font-default">{{getReferenceItem(ReferenceData.ShortCustomerTypes, customer.IdObjectType).Text}}</span>
+                    </td>
+                    <td>
+                        <a target="_blank" ui-sref="index.oneCol.customerDetail({id:customer.Id})">{{::customer.Name}}</a>
+                    </td>
+                    <td>{{::customer.Email}}</td>
+                    <td>{{::customer.State}}</td>
+                    <td>{{::customer.City}}</td>
+                    <td>{{::customer.LastOrderPlaced | date:"MM/dd/yy"}}<br />{{::customer.LastOrderPlaced | date:"h:mm a"}}</td>
+                    <td>{{::customer.TotalOrders}}</td>
+                    <td>
+                        <span data-ng-if="customer.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.CustomerStatuses, customer.StatusCode).Text}}</span>
+                        <span data-ng-if="customer.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.CustomerStatuses, customer.StatusCode).Text}}</span>
+                        <span data-ng-if="customer.StatusCode == 3" class="label label-danger font-default">{{getReferenceItem(ReferenceData.CustomerStatuses, customer.StatusCode).Text}}</span>
+                        <span data-ng-if="customer.StatusCode == 4" class="label label-danger font-default">{{getReferenceItem(ReferenceData.CustomerStatuses, customer.StatusCode).Text}}</span>
+                        <span data-ng-if="customer.StatusCode == 5" class="label label-danger font-default">{{getReferenceItem(ReferenceData.CustomerStatuses, customer.StatusCode).Text}}</span>
+                    </td>
+                    <td>{{::customer.DateEdited | date:"MM/dd/yy"}}<br />{{::customer.DateEdited | date:"h:mm a"}}<br />{{::customer.EditedBy}}</td>
+                    <td>
+                        <button title="Select" data-ng-click="select(customer)" class="btn btn-default btn-success btn-xs">
+                            Select
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </spinner-overlay>
+    <uib-pagination boundary-links="true"
+                    total-items="totalItems"
+                    items-per-page="filter.Paging.PageItemCount"
+                    data-ng-model="filter.Paging.PageIndex"
+                    previous-text="&lsaquo;"
+                    next-text="&rsaquo;"
+                    first-text="&laquo;"
+                    last-text="&raquo;"
+                    max-size="10"
+                    data-ng-change="pageChanged();scrollTo('{{name}}');">
+    </uib-pagination>
+</div>

@@ -18,6 +18,7 @@ using VitalChoice.Interfaces.Services.Settings;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.Products;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Promotions;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -83,7 +84,7 @@ namespace VC.Admin.Controllers
                 return new PromotionManageModel()
                 {
                     StatusCode = RecordStatusCode.Active,
-                    Assigned = null, //All
+                    Assigned = CustomerType.Retail,
                     IdObjectType = PromotionType.BuyXGetY,
                     PromotionBuyType = PromoBuyType.Any,
                     StartDate = TimeZoneInfo.ConvertTime(now, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local),
