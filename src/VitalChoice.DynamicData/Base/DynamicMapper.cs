@@ -49,7 +49,7 @@ namespace VitalChoice.DynamicData.Base
         where TOptionValue : OptionValue<TOptionType>, new()
         where TDynamic : MappedObject, new()
     {
-        private readonly ITypeConverter _typeConverter;
+        private readonly ITypeConverter _converter;
         private readonly Dictionary<int, ICollection<TOptionType>> _optionTypesByType;
         private readonly Lazy<ICollection<TOptionType>> _optionTypes;
 
@@ -61,12 +61,12 @@ namespace VitalChoice.DynamicData.Base
         protected abstract Task UpdateEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
         protected abstract Task ToEntityRangeInternalAsync(ICollection<DynamicEntityPair<TDynamic, TEntity>> items);
 
-        protected DynamicMapper(ITypeConverter typeConverter,
+        protected DynamicMapper(ITypeConverter converter,
             IModelConverterService converterService,
             IReadRepositoryAsync<TOptionType> optionTypeRepositoryAsync)
-            : base(typeConverter, converterService)
+            : base(converter, converterService)
         {
-            _typeConverter = typeConverter;
+            _converter = converter;
             _optionTypes =
                 new Lazy<ICollection<TOptionType>>(
                     () =>
@@ -430,7 +430,7 @@ namespace VitalChoice.DynamicData.Base
                         if (data.TryGetValue(mappingName, out dynamicValue))
                         {
                             var value =
-                                await _typeConverter.ConvertToModelAsync(dynamicValue?.GetType(), pair.Value.PropertyType, dynamicValue,
+                                await _converter.ConvertToModelAsync(dynamicValue?.GetType(), pair.Value.PropertyType, dynamicValue,
                                     pair.Value.Converter);
                             if (value != null)
                             {

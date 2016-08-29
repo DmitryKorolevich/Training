@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.ObjectMapping.Extensions;
 using VitalChoice.ObjectMapping.Interfaces;
 using VitalChoice.ObjectMapping.Services;
 
@@ -209,7 +210,7 @@ namespace VitalChoice.ObjectMapping.Base
                     var value = CloneInternal(pair.Value.Get?.Invoke(obj), pair.Value.PropertyType, baseTypeToMemberwiseClone, objects);
                     if (value != null)
                     {
-                        pair.Value.Set?.Invoke(result, value);
+                        pair.Value.SetValueDirect(result, value);
                     }
                 }
                 else if (propertyElementType != null && IsImplementBase(propertyElementType, baseTypeToMemberwiseClone))
@@ -223,7 +224,7 @@ namespace VitalChoice.ObjectMapping.Base
                             var value = CloneInternal(item, propertyElementType, baseTypeToMemberwiseClone, objects);
                             results.Add(value);
                         }
-                        pair.Value.Set?.Invoke(result, results);
+                        pair.Value.SetValueDirect(result, results);
                     }
                     else
                     {
@@ -232,7 +233,7 @@ namespace VitalChoice.ObjectMapping.Base
                 }
                 else
                 {
-                    SetValue(result, obj, pair);
+                    pair.Value.SetValue(result, obj);
                 }
             }
             return result;
@@ -266,7 +267,7 @@ namespace VitalChoice.ObjectMapping.Base
                     {
                         continue;
                     }
-                    SetValue(result, item, pair);
+                    pair.Value.SetValue(result, item);
                 }
                 resultList.Add(result);
             }
@@ -292,7 +293,7 @@ namespace VitalChoice.ObjectMapping.Base
                     {
                         continue;
                     }
-                    SetValue(result, item, pair);
+                    pair.Value.SetValue(result, item);
                 }
                 resultList.Add(result);
             }
@@ -324,7 +325,7 @@ namespace VitalChoice.ObjectMapping.Base
                 {
                     continue;
                 }
-                SetValue(result, obj, pair);
+                pair.Value.SetValue(result, obj);
             }
             return result;
         }
@@ -343,7 +344,7 @@ namespace VitalChoice.ObjectMapping.Base
                 {
                     continue;
                 }
-                SetValue(result, obj, pair);
+                pair.Value.SetValue(result, obj);
             }
             return result;
         }
@@ -378,7 +379,7 @@ namespace VitalChoice.ObjectMapping.Base
                     var value = cloneBase(pair.Value.Get?.Invoke(obj));
                     if (value != null)
                     {
-                        pair.Value.Set?.Invoke(result, value);
+                        pair.Value.SetValueDirect(result, value);
                     }
                 }
                 else if (propertyElementType != null && IsImplementBase(propertyElementType, baseTypeToMemberwiseClone))
@@ -392,7 +393,7 @@ namespace VitalChoice.ObjectMapping.Base
                             var value = cloneBase(item);
                             results.Add(value);
                         }
-                        pair.Value.Set?.Invoke(result, results);
+                        pair.Value.SetValueDirect(result, results);
                     }
                     else
                     {
@@ -401,7 +402,7 @@ namespace VitalChoice.ObjectMapping.Base
                 }
                 else
                 {
-                    SetValue(result, obj, pair);
+                    pair.Value.SetValue(result, obj);
                 }
             }
             return result;
@@ -442,7 +443,7 @@ namespace VitalChoice.ObjectMapping.Base
                 }
                 else
                 {
-                    pair.Value.Set?.Invoke(dest, srcProperty);
+                    pair.Value.SetValueDirect(dest, srcProperty);
                 }
             }
         }
@@ -483,7 +484,7 @@ namespace VitalChoice.ObjectMapping.Base
                     continue;
                 }
                 var srcProperty = src == null ? null : pair.Value.Get?.Invoke(src);
-                pair.Value.Set?.Invoke(dest, srcProperty);
+                pair.Value.SetValueDirect(dest, srcProperty);
             }
         }
 
@@ -499,7 +500,7 @@ namespace VitalChoice.ObjectMapping.Base
                     continue;
                 }
                 var srcProperty = src == null ? null : pair.Value.Get?.Invoke(src);
-                pair.Value.Set?.Invoke(dest, srcProperty);
+                pair.Value.SetValueDirect(dest, srcProperty);
             }
         }
 
@@ -576,28 +577,6 @@ namespace VitalChoice.ObjectMapping.Base
                 return null;
             }
             return null;
-        }
-
-        private static void SetValue(object result, object obj, KeyValuePair<string, GenericProperty> pair)
-        {
-            if (pair.Value.Set == null && pair.Value.IsCollection)
-            {
-                var collectionSource = pair.Value.Get?.Invoke(obj) as IEnumerable<object>;
-                if (collectionSource != null)
-                {
-                    var collection =
-                        pair.Value.Get(result).AsGenericCollection(pair.Value.CollectionItemType);
-
-                    foreach (var item in collectionSource)
-                    {
-                        collection.Add(item);
-                    }
-                }
-            }
-            else
-            {
-                pair.Value.Set?.Invoke(result, pair.Value.Get?.Invoke(obj));
-            }
         }
 
         private IObjectMapper GetMapper(Type objectType)
