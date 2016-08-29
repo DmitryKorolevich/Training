@@ -370,7 +370,7 @@ namespace VitalChoice.ObjectMapping.Base
                     if (value != null)
                     {
                         TypeValidator.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value, true);
-                        dynamicProperty.SetValueDirect(result, value);
+                        pair.Value.SetValueDirect(result, value);
                     }
                 }
             }
