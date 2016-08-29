@@ -192,3 +192,4 @@ artifacts
 internalLog.txt
 /src/VitalChoice.CustomerFiles/attachments
 /src/VitalChoice.ExportService/out
+/src/VitalChoice.CreditCards/out
