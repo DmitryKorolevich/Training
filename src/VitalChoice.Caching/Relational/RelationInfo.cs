@@ -267,7 +267,19 @@ namespace VitalChoice.Caching.Relational
                 }
                 else if (_genericCollectionType != null)
                 {
-                    AddToCollection(entity, relation);
+                    if (_genericCollectionType == null || !(relation is IEnumerable))
+                        return;
+
+                    var reference = _getFunc((TEntity) entity);
+                    if (reference != null)
+                    {
+                        var collection = reference.AsGenericCollection(_genericCollectionType);
+                        collection.Clear();
+                        foreach (var item in (IEnumerable) relation)
+                        {
+                            collection.Add(item);
+                        }
+                    }
                 }
                 else
                 {
@@ -283,7 +295,7 @@ namespace VitalChoice.Caching.Relational
                 var reference = _getFunc((TEntity) entity);
                 if (reference != null)
                 {
-                    var collection = (IGenericCollection) Activator.CreateInstance(_genericCollectionType, reference);
+                    var collection = reference.AsGenericCollection(_genericCollectionType);
                     foreach (var item in (IEnumerable) relatedCollection)
                     {
                         collection.Add(item);

@@ -15,16 +15,21 @@ namespace VitalChoice.ObjectMapping.Extensions
             if (property.Set == null && property.IsCollection)
             {
                 var collectionSource = value as IEnumerable<object>;
-                if (collectionSource != null)
+                var collection =
+                    property.Get?.Invoke(result)?.AsGenericCollection(property.CollectionItemType);
+                if (collection != null)
                 {
-                    var collection =
-                        property.Get?.Invoke(result)?.AsGenericCollection(property.CollectionItemType);
-                    if (collection != null)
+                    if (collectionSource != null)
                     {
+                        collection.Clear();
                         foreach (var item in collectionSource)
                         {
                             collection.Add(item);
                         }
+                    }
+                    else
+                    {
+                        collection.Clear();
                     }
                 }
             }
