@@ -26,12 +26,8 @@ namespace VitalChoice.ExportService
         {
             try
             {
-                Trace.Listeners.Add(new EventLogTraceListener(new EventLog("Application")
-                {
-                    Source = "ExportService"
-                }));
                 // Set the maximum number of concurrent connections 
-                ServicePointManager.DefaultConnectionLimit = 12;
+                ServicePointManager.DefaultConnectionLimit = 1000;
             }
             catch (Exception e)
             {

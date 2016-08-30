@@ -2,6 +2,8 @@
   "buildOptions": {
     "copyToOutput": {
       "include": [
+        "nlog.config",
+        "5083717e58d4513a8e8ca2992840b54ee728d674-privatekey.p12",
         "config.json",
         "config.local.json",
         "CSharpClassTemplate.tcs",
@@ -13,6 +15,8 @@
   },
   "publishOptions": {
     "include": [
+      "nlog.config",
+      "5083717e58d4513a8e8ca2992840b54ee728d674-privatekey.p12",
       "config.json",
       "CSharpClassTemplate.tcs",
       "CSharpPreparseTemplate.tcs"
