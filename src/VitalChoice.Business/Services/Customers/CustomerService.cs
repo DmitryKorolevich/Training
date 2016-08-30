@@ -32,6 +32,8 @@ using VitalChoice.DynamicData.Extensions;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Validation;
+using VitalChoice.Ecommerce.Domain;
+using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
@@ -59,12 +61,14 @@ using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.ObjectMapping.Base;
+using VitalChoice.ObjectMapping.Extensions;
 using VitalChoice.ObjectMapping.Interfaces;
 using Address = VitalChoice.Ecommerce.Domain.Entities.Addresses.Address;
 
 namespace VitalChoice.Business.Services.Customers
 {
-    public class CustomerService : ExtendedEcommerceDynamicService<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>,
+    public class CustomerService :
+        ExtendedEcommerceDynamicService<CustomerDynamic, Customer, CustomerOptionType, CustomerOptionValue>,
         ICustomerService
     {
         private readonly IEcommerceRepositoryAsync<OrderNote> _orderNoteRepositoryAsync;
@@ -86,6 +90,7 @@ namespace VitalChoice.Business.Services.Customers
         private readonly IEcommerceRepositoryAsync<VOrderCountOnCustomer> _vOrderCountOnCustomerRepositoryAsync;
         private readonly SpEcommerceRepository _sPEcommerceRepository;
         private readonly ReferenceData _referenceData;
+        private readonly CustomerPaymentMethodMapper _customerPaymentMethodMapper;
 
         private static string _customerContainerName;
 
@@ -108,10 +113,14 @@ namespace VitalChoice.Business.Services.Customers
             IEcommerceRepositoryAsync<VWholesaleSummaryInfo> vWholesaleSummaryInfoRepositoryAsync,
             IEcommerceRepositoryAsync<VOrderCountOnCustomer> vOrderCountOnCustomerRepositoryAsync,
             SpEcommerceRepository sPEcommerceRepository,
-            ITransactionAccessor<EcommerceContext> transactionAccessor, IDynamicEntityOrderingExtension<Customer> orderingExtension, ReferenceData referenceData, IEcommerceRepositoryAsync<CustomerPaymentMethod> customerPaymentMethodRepositoryAsync)
+            ITransactionAccessor<EcommerceContext> transactionAccessor,
+            IDynamicEntityOrderingExtension<Customer> orderingExtension, ReferenceData referenceData,
+            IEcommerceRepositoryAsync<CustomerPaymentMethod> customerPaymentMethodRepositoryAsync,
+            CustomerPaymentMethodMapper customerPaymentMethodMapper)
             : base(
                 customerMapper, customerRepositoryAsync,
-                customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService, loggerProvider, 
+                customerOptionValueRepositoryAsync, bigStringRepositoryAsync, objectLogItemExternalService,
+                loggerProvider,
                 queryVisitor, transactionAccessor, orderingExtension)
         {
             _orderNoteRepositoryAsync = orderNoteRepositoryAsync;
@@ -134,6 +143,7 @@ namespace VitalChoice.Business.Services.Customers
             _sPEcommerceRepository = sPEcommerceRepository;
             _referenceData = referenceData;
             _customerPaymentMethodRepositoryAsync = customerPaymentMethodRepositoryAsync;
+            _customerPaymentMethodMapper = customerPaymentMethodMapper;
         }
 
         protected override IQueryLite<Customer> BuildIncludes(IQueryLite<Customer> query)
@@ -167,25 +177,35 @@ namespace VitalChoice.Business.Services.Customers
                 var customerSameEmail =
                     await
                         _customerRepositoryAsync.Query(
-                            new CustomerQuery().Active().WithEmail(model.Email))
+                                new CustomerQuery().Active().WithEmail(model.Email))
                             .Include(c => c.OptionValues)
                             .SelectAsync(false);
 
                 if (customerSameEmail.Count > 0 && customerSameEmail.All(c => c.Id != model.Id))
                 {
                     throw new AppValidationException(
-                        string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready], model.Email));
+                        string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready],
+                            model.Email));
                 }
             }
 
-            if (model.ShippingAddresses.Where(x => x.StatusCode != (int)RecordStatusCode.Deleted).All(x => !x.Data.Default))
+            if (
+                model.ShippingAddresses.Where(x => x.StatusCode != (int) RecordStatusCode.Deleted)
+                    .All(x => !x.Data.Default))
             {
                 throw new AppValidationException(
                     ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AtLeastOneDefaultShipping]);
             }
 
-            if (model.CustomerPaymentMethods.Any(x => x.IdObjectType == (int)PaymentMethodType.CreditCard && x.StatusCode != (int)RecordStatusCode.Deleted) &&
-                model.CustomerPaymentMethods.Where(x => x.IdObjectType == (int)PaymentMethodType.CreditCard && x.StatusCode != (int)RecordStatusCode.Deleted).All(x => !x.Data.Default))
+            if (
+                model.CustomerPaymentMethods.Any(
+                    x =>
+                        x.IdObjectType == (int) PaymentMethodType.CreditCard &&
+                        x.StatusCode != (int) RecordStatusCode.Deleted) &&
+                model.CustomerPaymentMethods.Where(
+                    x =>
+                        x.IdObjectType == (int) PaymentMethodType.CreditCard &&
+                        x.StatusCode != (int) RecordStatusCode.Deleted).All(x => !x.Data.Default))
             {
                 throw new AppValidationException(
                     ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AtLeastOneDefaultCreditCard]);
@@ -197,7 +217,8 @@ namespace VitalChoice.Business.Services.Customers
                 var exist = await _affiliateRepositoryAsync.Query(conditions).SelectAnyAsync();
                 if (!exist)
                 {
-                    throw new AppValidationException("IdAffiliate", ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidIdAffiliate]);
+                    throw new AppValidationException("IdAffiliate",
+                        ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidIdAffiliate]);
                 }
             }
             //foreach (var paymentMethod in model.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard))
@@ -207,22 +228,25 @@ namespace VitalChoice.Business.Services.Customers
 
             //Don't allow to return a customer registered from the admin part(Not Active) to Not Active status from 
             //Active(by a store front activation)
-            if (model.StatusCode == (int)CustomerStatus.PhoneOnly && model.Id > 0)
+            if (model.StatusCode == (int) CustomerStatus.PhoneOnly && model.Id > 0)
             {
                 var exists =
-                await
-                    _customerRepositoryAsync.Query(
-                        new CustomerQuery().NotDeleted().WithId(model.Id).WithStatus(CustomerStatus.Active)).SelectAnyAsync();
+                    await
+                        _customerRepositoryAsync.Query(
+                                new CustomerQuery().NotDeleted().WithId(model.Id).WithStatus(CustomerStatus.Active))
+                            .SelectAnyAsync();
                 if (exists)
                 {
-                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CustomerWasModified]);
+                    throw new AppValidationException(
+                        ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CustomerWasModified]);
                 }
             }
 
             return errors;
         }
 
-        protected override async Task BeforeEntityChangesAsync(CustomerDynamic model, Customer entity, IUnitOfWorkAsync uow)
+        protected override async Task BeforeEntityChangesAsync(CustomerDynamic model, Customer entity,
+            IUnitOfWorkAsync uow)
         {
             var customerFileRepositoryAsync = uow.RepositoryAsync<CustomerFile>();
 
@@ -249,12 +273,14 @@ namespace VitalChoice.Business.Services.Customers
             }
         }
 
-        protected override async Task AfterEntityChangesAsync(CustomerDynamic model, Customer updated, 
+        protected override async Task AfterEntityChangesAsync(CustomerDynamic model, Customer updated,
             IUnitOfWorkAsync uow)
         {
             var customerToShippingRepository = uow.RepositoryAsync<CustomerToShippingAddress>();
 
-            await SyncDbCollections<Address, AddressOptionValue>(uow, updated.ShippingAddresses.Select(s => s.ShippingAddress), true);
+            await
+                SyncDbCollections<Address, AddressOptionValue>(uow,
+                    updated.ShippingAddresses.Select(s => s.ShippingAddress), true);
 
             await
                 customerToShippingRepository.DeleteAllAsync(
@@ -262,13 +288,18 @@ namespace VitalChoice.Business.Services.Customers
 
             await
                 customerToShippingRepository.InsertGraphRangeAsync(
-                    updated.ShippingAddresses.Where(s => s.ShippingAddress.StatusCode != (int) RecordStatusCode.Deleted && s.IdAddress == 0));
+                    updated.ShippingAddresses.Where(
+                        s => s.ShippingAddress.StatusCode != (int) RecordStatusCode.Deleted && s.IdAddress == 0));
 
             await SyncDbCollections<CustomerNote, CustomerNoteOptionValue>(uow, updated.CustomerNotes, true);
 
-            await SyncDbCollections<CustomerPaymentMethod, CustomerPaymentMethodOptionValue>(uow, updated.CustomerPaymentMethods, true);
+            await
+                SyncDbCollections<CustomerPaymentMethod, CustomerPaymentMethodOptionValue>(uow,
+                    updated.CustomerPaymentMethods, true);
 
-            await SyncDbCollections<Address, AddressOptionValue>(uow, updated.CustomerPaymentMethods.Select(p => p.BillingAddress), true);
+            await
+                SyncDbCollections<Address, AddressOptionValue>(uow,
+                    updated.CustomerPaymentMethods.Select(p => p.BillingAddress), true);
 
             List<string> fileNamesForDelete = new List<string>();
             foreach (var dbFile in updated.Files)
@@ -293,7 +324,8 @@ namespace VitalChoice.Business.Services.Customers
             if (fileNamesForDelete.Count != 0)
             {
                 var publicId = updated.PublicId;
-                await Task.WhenAll(fileNamesForDelete.Select(fileName => DeleteFileAsync(fileName, publicId.ToString())));
+                await
+                    Task.WhenAll(fileNamesForDelete.Select(fileName => DeleteFileAsync(fileName, publicId.ToString())));
             }
         }
 
@@ -317,7 +349,7 @@ namespace VitalChoice.Business.Services.Customers
                 var entity = await InsertAsync(model, uow, password);
                 int id = entity.Id;
                 entity = await SelectEntityFirstAsync(o => o.Id == id);
-                await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
+                await LogItemChanges(new[] {await DynamicMapper.FromEntityAsync(entity)});
                 return await DynamicMapper.FromEntityAsync(entity);
             }
         }
@@ -331,7 +363,7 @@ namespace VitalChoice.Business.Services.Customers
 
                 int id = entity.Id;
                 entity = await SelectEntityFirstAsync(o => o.Id == id);
-                await LogItemChanges(new[] { await DynamicMapper.FromEntityAsync(entity) });
+                await LogItemChanges(new[] {await DynamicMapper.FromEntityAsync(entity)});
                 return await DynamicMapper.FromEntityAsync(entity);
             }
         }
@@ -365,16 +397,17 @@ namespace VitalChoice.Business.Services.Customers
             if (excludeIdOrder.HasValue && excludeIdOrder.Value > 0)
             {
                 return await _orderRepository.Query(
-                    o =>
-                        o.IdCustomer == idCustomer && o.OrderStatus != OrderStatus.Incomplete &&
-                        o.OrderStatus != OrderStatus.Cancelled && o.IdObjectType == (int)OrderType.Normal &&
-                        o.AffiliateOrderPayment.Id != excludeIdOrder.Value && o.AffiliateOrderPayment.Id > 0)
+                        o =>
+                            o.IdCustomer == idCustomer && o.OrderStatus != OrderStatus.Incomplete &&
+                            o.OrderStatus != OrderStatus.Cancelled && o.IdObjectType == (int) OrderType.Normal &&
+                            o.AffiliateOrderPayment.Id != excludeIdOrder.Value && o.AffiliateOrderPayment.Id > 0)
                     .Include(o => o.AffiliateOrderPayment).SelectAnyAsync();
             }
             return await _orderRepository.Query(
-                o =>
-                    o.IdCustomer == idCustomer && o.OrderStatus != OrderStatus.Incomplete &&
-                    o.OrderStatus != OrderStatus.Cancelled && o.IdObjectType == (int)OrderType.Normal && o.AffiliateOrderPayment.Id > 0)
+                    o =>
+                        o.IdCustomer == idCustomer && o.OrderStatus != OrderStatus.Incomplete &&
+                        o.OrderStatus != OrderStatus.Cancelled && o.IdObjectType == (int) OrderType.Normal &&
+                        o.AffiliateOrderPayment.Id > 0)
                 .Include(o => o.AffiliateOrderPayment).SelectAnyAsync();
         }
 
@@ -395,14 +428,16 @@ namespace VitalChoice.Business.Services.Customers
         public async Task<CustomerStatus?> GetCustomerStatusAsync(int idCustomer)
         {
             var query = new CustomerQuery().NotDeleted().WithId(idCustomer);
-            var idStatus = (await this.ObjectRepository.Query(query).SelectAsync(p => p.StatusCode, false)).FirstOrDefault();
+            var idStatus =
+                (await this.ObjectRepository.Query(query).SelectAsync(p => p.StatusCode, false)).FirstOrDefault();
 
-            return idStatus != 0 ? (CustomerStatus?)idStatus : null;
+            return idStatus != 0 ? (CustomerStatus?) idStatus : null;
         }
 
         public async Task<PagedList<ExtendedVCustomer>> GetCustomersAsync(CustomerFilter filter)
         {
-            Func<IQueryable<Customer>, IOrderedQueryable<Customer>> sortable = x => x.OrderByDescending(y => y.DateEdited);
+            Func<IQueryable<Customer>, IOrderedQueryable<Customer>> sortable =
+                x => x.OrderByDescending(y => y.DateEdited);
             //Func<IEnumerable<CustomerDynamic>, IOrderedEnumerable<CustomerDynamic>> sortDynamic = null;
             var sortOrder = filter.Sorting.SortOrder;
             switch (filter.Sorting.Path)
@@ -456,9 +491,9 @@ namespace VitalChoice.Business.Services.Customers
                         includes =>
                             includes.Include(c => c.ProfileAddress)
                                 .ThenInclude(c => c.OptionValues)
-                                .Include(p=>p.ShippingAddresses)
-                                .ThenInclude(p=>p.ShippingAddress)
-                                .ThenInclude(p=>p.OptionValues), orderBy: sortable, withDefaults: true);
+                                .Include(p => p.ShippingAddresses)
+                                .ThenInclude(p => p.ShippingAddress)
+                                .ThenInclude(p => p.OptionValues), orderBy: sortable, withDefaults: true);
 
             var adminProfileCondition =
                 new AdminProfileQuery().IdInRange(
@@ -466,7 +501,7 @@ namespace VitalChoice.Business.Services.Customers
 
             var adminProfiles = await _adminProfileRepository.Query(adminProfileCondition).SelectAsync(false);
 
-            IEnumerable<CustomerDynamic> orderedCustomers= customers.Items;
+            IEnumerable<CustomerDynamic> orderedCustomers = customers.Items;
 
             var resultList = new List<ExtendedVCustomer>(customers.Items.Count);
 
@@ -496,8 +531,8 @@ namespace VitalChoice.Business.Services.Customers
                 if (defaultShippingAddress != null)
                 {
                     newItem.Address1 = defaultShippingAddress.SafeData.Address1;
-                    newItem.City= defaultShippingAddress.SafeData.City;
-                    newItem.Zip= defaultShippingAddress.SafeData.Zip;
+                    newItem.City = defaultShippingAddress.SafeData.City;
+                    newItem.Zip = defaultShippingAddress.SafeData.Zip;
                 }
                 resultList.Add(newItem);
             }
@@ -516,7 +551,8 @@ namespace VitalChoice.Business.Services.Customers
             return await _orderRepository.GetCustomerOrderStatistics(ids);
         }
 
-        public async Task<string> UploadFileAsync(byte[] file, string fileName, Guid customerPublicId, string contentType = null)
+        public async Task<string> UploadFileAsync(byte[] file, string fileName, Guid customerPublicId,
+            string contentType = null)
         {
             var i = 0;
             var customerId = customerPublicId.ToString("D");
@@ -528,7 +564,9 @@ namespace VitalChoice.Business.Services.Customers
                 i++;
             } while (items.Contains(generatedFileName));
 
-            await _storageClient.UploadBlobAsync(_customerContainerName, $"{customerId}/{generatedFileName}", file, contentType);
+            await
+                _storageClient.UploadBlobAsync(_customerContainerName, $"{customerId}/{generatedFileName}", file,
+                    contentType);
 
             return generatedFileName;
         }
@@ -565,14 +603,15 @@ namespace VitalChoice.Business.Services.Customers
             var roles = new List<RoleType>();
             switch (model.IdObjectType)
             {
-                case (int)CustomerType.Retail:
+                case (int) CustomerType.Retail:
                     roles.Add(RoleType.Retail);
                     break;
-                case (int)CustomerType.Wholesale:
+                case (int) CustomerType.Wholesale:
                     roles.Add(RoleType.Wholesale);
                     break;
                 default:
-                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.IncorrectCustomerRole]);
+                    throw new AppValidationException(
+                        ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.IncorrectCustomerRole]);
             }
 
             return roles;
@@ -638,7 +677,8 @@ namespace VitalChoice.Business.Services.Customers
                         var errors = await _paymentMethodService.AuthorizeCreditCard(method);
                         errors.Select(error => new MessageInfo
                         {
-                            Field = error.Field.FormatCollectionError("CreditCards", index[0]).FormatErrorWithForm("card"),
+                            Field =
+                                error.Field.FormatCollectionError("CreditCards", index[0]).FormatErrorWithForm("card"),
                             Message = error.Message,
                             MessageLevel = error.MessageLevel
                         }).ToList().Raise();
@@ -649,12 +689,15 @@ namespace VitalChoice.Business.Services.Customers
 
                     var roles = MapCustomerTypeToRole(model);
 
-                    if (!await _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies.Select(p => new CustomerCardData
-                    {
-                        CardNumber = p.CardNumber,
-                        IdPaymentMethod = p.Model.Id,
-                        IdCustomer = p.Model.IdCustomer
-                    }).ToArray()))
+                    if (
+                        !await
+                            _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(
+                                paymentCopies.Select(p => new CustomerCardData
+                                {
+                                    CardNumber = p.CardNumber,
+                                    IdPaymentMethod = p.Model.Id,
+                                    IdCustomer = p.Model.IdCustomer
+                                }).ToArray()))
                     {
                         throw new ApiException("Cannot update customer payment info on remote.");
                     }
@@ -682,8 +725,14 @@ namespace VitalChoice.Business.Services.Customers
             {
                 FirstName = profileAddress.Data.FirstName,
                 LastName = profileAddress.Data.LastName,
-                Email = string.IsNullOrEmpty(password) && string.IsNullOrEmpty(model.Email) ? BaseAppConstants.FAKE_CUSTOMER_EMAIL : model.Email,
-                UserName = string.IsNullOrEmpty(password) && string.IsNullOrEmpty(model.Email) ? BaseAppConstants.FAKE_CUSTOMER_EMAIL : model.Email,
+                Email =
+                    string.IsNullOrEmpty(password) && string.IsNullOrEmpty(model.Email)
+                        ? BaseAppConstants.FAKE_CUSTOMER_EMAIL
+                        : model.Email,
+                UserName =
+                    string.IsNullOrEmpty(password) && string.IsNullOrEmpty(model.Email)
+                        ? BaseAppConstants.FAKE_CUSTOMER_EMAIL
+                        : model.Email,
                 TokenExpirationDate = DateTime.Now.AddDays(_appOptions.Value.ActivationTokenExpirationTermDays),
                 IsConfirmed = false,
                 ConfirmationToken = Guid.NewGuid(),
@@ -692,7 +741,7 @@ namespace VitalChoice.Business.Services.Customers
                 Status = UserStatus.NotActive
             };
 
-            var suspendedCustomer = (int)CustomerStatus.Suspended;
+            var suspendedCustomer = (int) CustomerStatus.Suspended;
 
             Customer entity;
 
@@ -709,7 +758,9 @@ namespace VitalChoice.Business.Services.Customers
                     }
                     else
                     {
-                        appUser.Status = model.StatusCode == suspendedCustomer ? UserStatus.Disabled : UserStatus.NotActive;
+                        appUser.Status = model.StatusCode == suspendedCustomer
+                            ? UserStatus.Disabled
+                            : UserStatus.NotActive;
                     }
 
                     appUser = await _storefrontUserService.CreateAsync(appUser, roles, false, false, password);
@@ -717,18 +768,20 @@ namespace VitalChoice.Business.Services.Customers
                     model.Id = appUser.Id;
 
                     var paymentCopies =
-                        model.CustomerPaymentMethods.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard).Select(method => new
-                        {
-                            method.SafeData.CardNumber,
-                            Model = method
-                        }).ToArray();
+                        model.CustomerPaymentMethods.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard)
+                            .Select(method => new
+                            {
+                                method.SafeData.CardNumber,
+                                Model = method
+                            }).ToArray();
                     int[] index = {0};
                     await model.CustomerPaymentMethods.ForEachAsync(async method =>
                     {
                         var errors = await _paymentMethodService.AuthorizeCreditCard(method);
                         errors.Select(error => new MessageInfo
                         {
-                            Field = error.Field.FormatCollectionError("CreditCards", index[0]).FormatErrorWithForm("card"),
+                            Field =
+                                error.Field.FormatCollectionError("CreditCards", index[0]).FormatErrorWithForm("card"),
                             Message = error.Message,
                             MessageLevel = error.MessageLevel
                         }).ToList().Raise();
@@ -739,12 +792,14 @@ namespace VitalChoice.Business.Services.Customers
 
                     model.CustomerPaymentMethods.ForEach(p => p.IdCustomer = entity.Id);
 
-                    var updatePaymentsTask = _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(paymentCopies.Select(p => new CustomerCardData
-                    {
-                        CardNumber = p.CardNumber,
-                        IdPaymentMethod = p.Model.Id,
-                        IdCustomer = p.Model.IdCustomer
-                    }).ToArray());
+                    var updatePaymentsTask =
+                        _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(
+                            paymentCopies.Select(p => new CustomerCardData
+                            {
+                                CardNumber = p.CardNumber,
+                                IdPaymentMethod = p.Model.Id,
+                                IdCustomer = p.Model.IdCustomer
+                            }).ToArray());
 
                     if (!await updatePaymentsTask)
                     {
@@ -773,7 +828,7 @@ namespace VitalChoice.Business.Services.Customers
             var customer = await SelectAsync(idCustomer);
             if (customer != null)
             {
-                var avaliableOrderNotes = await GetAvailableOrderNotesAsync((CustomerType)customer.IdObjectType);
+                var avaliableOrderNotes = await GetAvailableOrderNotesAsync((CustomerType) customer.IdObjectType);
                 toReturn = String.Empty;
                 foreach (var IdCustomerOrderNote in customer.OrderNotes)
                 {
@@ -790,7 +845,8 @@ namespace VitalChoice.Business.Services.Customers
 
         public Task<CustomerDynamic> GetByEmailAsync(string email)
         {
-            return SelectFirstAsync(c => c.Email == email && c.StatusCode != (int)RecordStatusCode.Deleted, withDefaults: true);
+            return SelectFirstAsync(c => c.Email == email && c.StatusCode != (int) RecordStatusCode.Deleted,
+                withDefaults: true);
         }
 
         public async Task ActivateGuestAsync(string email, string token, string newPassword)
@@ -806,10 +862,11 @@ namespace VitalChoice.Business.Services.Customers
 
                     if (customer == null)
                     {
-                        throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+                        throw new AppValidationException(
+                            ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
                     }
 
-                    customer.StatusCode = (int)CustomerStatus.Active;
+                    customer.StatusCode = (int) CustomerStatus.Active;
                     await UpdateAsync(customer);
 
                     customerUpdated = true;
@@ -823,7 +880,7 @@ namespace VitalChoice.Business.Services.Customers
                 {
                     Logger.LogError(e.ToString());
                     if (customerUpdated) //this needs to be done since distributed transactions not supported yet
-                                         //todo: refactor this once distributed transactions arrive
+                        //todo: refactor this once distributed transactions arrive
                     {
                         applicationUser = await _storefrontUserService.FindAsync(email);
 
@@ -836,7 +893,9 @@ namespace VitalChoice.Business.Services.Customers
                 }
             }
 
-            await _storefrontUserService.SendSuccessfulRegistration(customer.Email, applicationUser.FirstName, applicationUser.LastName);
+            await
+                _storefrontUserService.SendSuccessfulRegistration(customer.Email, applicationUser.FirstName,
+                    applicationUser.LastName);
         }
 
         public async Task UpdateEcommerceOnlyAsync(CustomerDynamic model)
@@ -847,12 +906,166 @@ namespace VitalChoice.Business.Services.Customers
 
         public async Task<long> GetActiveOrderCount(int idCustomer)
         {
-            var data = await _vOrderCountOnCustomerRepositoryAsync.Query(p => p.IdCustomer == idCustomer).SelectFirstOrDefaultAsync(false);
+            var data =
+                await
+                    _vOrderCountOnCustomerRepositoryAsync.Query(p => p.IdCustomer == idCustomer)
+                        .SelectFirstOrDefaultAsync(false);
             return data?.Count ?? 0;
         }
 
         public async Task<bool> MergeCustomersAsync(int idCustomerPrimary, ICollection<int> customerIds)
         {
+            if (customerIds?.Count == 0)
+            {
+                throw new AppValidationException("At least one customer should be specififed for merge");
+            }
+
+            if (customerIds != null && customerIds.Contains(idCustomerPrimary))
+            {
+                throw new AppValidationException("Primary customer can't be in the list of customers for merge");
+            }
+
+            var newFileNames = new List<string>();
+            Guid? primaryCustomerPublicId = null;
+            using (var uow = CreateUnitOfWork())
+            {
+                using (var transaction = uow.BeginTransaction())
+                {
+                    try
+                    {
+                        var primaryCustomer = await SelectAsync(idCustomerPrimary);
+                        primaryCustomerPublicId = primaryCustomer.PublicId;
+                        var customers = await SelectAsync(customerIds);
+                        
+                        foreach (var customer in customers)
+                        {
+                            foreach (var customerFile in customer.Files)
+                            {
+                                try
+                                {
+
+                                    var file = await DownloadFileAsync(customerFile.FileName, customer.PublicId.ToString());
+
+                                    var newFileName = await UploadFileAsync(file.File, customerFile.FileName, primaryCustomer.PublicId,
+                                            file.ContentType);
+                                    newFileNames.Add(newFileName);
+                                    primaryCustomer.Files.Add(new CustomerFile()
+                                    {
+                                        Description = customerFile.Description,
+                                        FileName = newFileName,
+                                        IdCustomer = primaryCustomer.Id,
+                                        UploadDate =customerFile.UploadDate,
+                                    });
+                                }
+                                catch (Exception e)
+                                {
+                                    Logger.LogError("Merge customers - files moving");
+                                    Logger.LogError(e.ToString());
+                                }
+                            }
+
+                            var notes = customer.CustomerNotes.Select(p=> p.Clone<CustomerNoteDynamic, MappedObject>()
+                                            .Clone<CustomerNoteDynamic, Entity>()).ToList();
+                            foreach (var customerNoteDynamic in notes)
+                            {
+                                customerNoteDynamic.Id = 0;
+                            }
+                            primaryCustomer.CustomerNotes.AddRange(notes);
+
+                            foreach (var customerShippingAddress in customer.ShippingAddresses)
+                            {
+                                var add = true;
+                                foreach (var primaryCustomerShippingAddress in primaryCustomer.ShippingAddresses)
+                                {
+                                    if (IsTheSame(primaryCustomerShippingAddress, customerShippingAddress))
+                                    {
+                                        add = false;
+                                        break;
+                                    }
+                                }
+
+                                if (add)
+                                {
+                                    var shipping =
+                                        customerShippingAddress.Clone<AddressDynamic, MappedObject>()
+                                            .Clone<AddressDynamic, Entity>();
+                                    shipping.Id = 0;
+                                    shipping.Data.Default = false;
+                                    primaryCustomer.ShippingAddresses.Add(shipping);
+                                }
+                            }
+
+                            var customerPaymentMethodRepository = uow.RepositoryAsync<CustomerPaymentMethod>();
+                            var customerPaymentMethodOptionValueRepository = uow.RepositoryAsync<CustomerPaymentMethodOptionValue>();
+                            var cards = customer.CustomerPaymentMethods.Where(p=>p.IdObjectType==(int)PaymentMethodType.CreditCard).ToList();
+                            foreach (var customerPaymentMethodDynamic in cards)
+                            {
+                                var dbCard = await customerPaymentMethodRepository.Query(p=>p.Id== customerPaymentMethodDynamic.Id).SelectFirstOrDefaultAsync(true);
+                                if (dbCard!=null)
+                                {
+                                    dbCard.IdCustomer = primaryCustomer.Id;
+                                    dbCard.StatusCode = (int)RecordStatusCode.Active;
+                                }
+
+                                var defaultType = _customerPaymentMethodMapper.OptionTypes.FirstOrDefault(p => p.Name == "Default");
+                                var dbCardDefaultSetting = await customerPaymentMethodOptionValueRepository.Query(p=>p.IdCustomerPaymentMethod==dbCard.Id
+                                    && p.IdOptionType==defaultType.Id).SelectFirstOrDefaultAsync(false);
+                                if (dbCardDefaultSetting != null)
+                                {
+                                    await customerPaymentMethodOptionValueRepository.DeleteAsync(dbCardDefaultSetting);
+                                }
+                            }
+                        }
+
+                        await UpdateAsync(primaryCustomer);
+                        await DeleteAllAsync(customers);
+
+                        await uow.SaveChangesAsync();
+
+                        transaction.Commit();
+
+                        return true;
+                    }
+                    catch(Exception e)
+                    {
+                        transaction.Rollback();
+
+                        if (primaryCustomerPublicId.HasValue && newFileNames.Count > 0)
+                        {
+                            foreach (var newFileName in newFileNames)
+                            {
+                                try
+                                {
+                                    await DeleteFileAsync(newFileName, primaryCustomerPublicId.ToString());
+                                }
+                                catch (Exception ed)
+                                {
+                                    //Ignore delete issues
+                                }
+                            }
+                        }
+                        
+                        throw;
+                    }
+                }
+            }
+        }
+
+        private bool IsTheSame(AddressDynamic source, AddressDynamic target)
+        {
+            if (source.County != target.County || source.IdCountry != target.IdCountry ||
+                source.IdState != target.IdState)
+            {
+                return false;
+            }
+            foreach (var targerItem in target.DictionaryData.Where(p=>p.Key!="Default"))
+            {
+                if (!source.DictionaryData.ContainsKey(targerItem.Key) ||
+                    source.DictionaryData[targerItem.Key].ToString() != target.DictionaryData[targerItem.Key].ToString())
+                {
+                    return false;
+                }
+            }
             return true;
         }
 

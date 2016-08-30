@@ -560,7 +560,10 @@ namespace VitalChoice.Business.Services.Orders
                 .ThenInclude(p => p.Sku)
                 .Include(o => o.ShippingAddress)
                 .ThenInclude(s => s.OptionValues)
-                .Include(p => p.OrderShippingPackages));
+                .Include(p => p.OrderShippingPackages)
+                .Include(o => o.Customer)
+                .ThenInclude(s => s.ProfileAddress)
+                .ThenInclude(s => s.OptionValues));
 
             orders.ForEach(p =>
             {
@@ -574,7 +577,7 @@ namespace VitalChoice.Business.Services.Orders
                 item.Total = p.Total;
                 item.OrderNotes = p.SafeData.OrderNotes;
                 item.PoNumber = p.SafeData.PoNumber;
-                item.ShippingCompany = p.ShippingAddress?.SafeData.Company;
+                item.ShippingCompany = p?.Customer?.ProfileAddress?.SafeData.Company;
                 item.ShippingFirstName = p.ShippingAddress?.SafeData.FirstName;
                 item.ShippingLastName = p.ShippingAddress?.SafeData.LastName;
                 item.ShippingAddress1 = p.ShippingAddress?.SafeData.Address1;
