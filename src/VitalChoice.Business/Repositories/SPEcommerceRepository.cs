@@ -113,6 +113,8 @@ namespace VitalChoice.Business.Repositories
 
         public async Task<ICollection<int>> GetOrderIdsForWholesaleDropShipReportAsync(WholesaleDropShipReportFilter filter)
         {
+            if (string.IsNullOrEmpty(filter.CustomerCompany))
+                filter.CustomerCompany = null;
             if (string.IsNullOrEmpty(filter.CustomerFirstName))
                 filter.CustomerFirstName = null;
             if (string.IsNullOrEmpty(filter.CustomerLastName))
@@ -127,15 +129,18 @@ namespace VitalChoice.Business.Repositories
             var toReturn = await _context.Set<IdModel>().FromSql
                 ("[dbo].[SPGetOrderIdsForWholesaleDropShipReport] @from={0}, @to={1}, @shipfrom={2}, @shipto={3},"+
                 " @idcustomertype={4}, @idtradeclass={5}, @customerfirstname={6}, @customerlastname={7}, @shipfirstname={8},"+
-                " @shiplastname={9}, @shipidconfirm={10}, @idorder={11}, @ponumber={12}, @pageindex={13}, @pagesize={14}",
+                " @shiplastname={9}, @shipidconfirm={10}, @idorder={11}, @ponumber={12}, @customercompany={13}, @pageindex={14}, @pagesize={15}",
                 filter.From, filter.To, filter.ShipFrom, filter.ShipTo,
                 filter.IdCustomerType, filter.IdTradeClass, filter.CustomerFirstName, filter.CustomerLastName, filter.ShipFirstName,
-                filter.ShipLastName, filter.ShippingIdConfirmation, filter.IdOrder, filter.PoNumber, filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
+                filter.ShipLastName, filter.ShippingIdConfirmation, filter.IdOrder, filter.PoNumber, filter.CustomerCompany,
+                filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
             return toReturn.Select(p=>p.Id).ToList();
         }
 
         public async Task<int> GetCountOrderIdsForWholesaleDropShipReportAsync(WholesaleDropShipReportFilter filter)
         {
+            if (string.IsNullOrEmpty(filter.CustomerCompany))
+                filter.CustomerCompany = null;
             if (string.IsNullOrEmpty(filter.CustomerFirstName))
                 filter.CustomerFirstName = null;
             if (string.IsNullOrEmpty(filter.CustomerLastName))
@@ -150,15 +155,17 @@ namespace VitalChoice.Business.Repositories
             var toReturn = await _context.Set<CountModel>().FromSql
                 ("[dbo].[SPGetOrderIdsForWholesaleDropShipReport] @from={0}, @to={1}, @shipfrom={2}, @shipto={3}," +
                 " @idcustomertype={4}, @idtradeclass={5}, @customerfirstname={6}, @customerlastname={7}, @shipfirstname={8}," +
-                " @shiplastname={9}, @shipidconfirm={10}, @idorder={11}, @ponumber={12}, @getcount={13}",
+                " @shiplastname={9}, @shipidconfirm={10}, @idorder={11}, @ponumber={12}, @customercompany={13}, @getcount={14}",
                 filter.From, filter.To, filter.ShipFrom, filter.ShipTo,
                 filter.IdCustomerType, filter.IdTradeClass, filter.CustomerFirstName, filter.CustomerLastName, filter.ShipFirstName,
-                filter.ShipLastName, filter.ShippingIdConfirmation, filter.IdOrder, filter.PoNumber, true).FirstOrDefaultAsync();
+                filter.ShipLastName, filter.ShippingIdConfirmation, filter.IdOrder, filter.PoNumber, filter.CustomerCompany, true).FirstOrDefaultAsync();
             return toReturn?.Count ?? 0;
         }
 
         public async Task<ICollection<WholesaleDropShipReportSkuRawItem>> GetWholesaleDropShipReportSkusSummaryAsync(WholesaleDropShipReportFilter filter)
         {
+            if (string.IsNullOrEmpty(filter.CustomerCompany))
+                filter.CustomerCompany = null;
             if (string.IsNullOrEmpty(filter.CustomerFirstName))
                 filter.CustomerFirstName = null;
             if (string.IsNullOrEmpty(filter.CustomerLastName))
@@ -173,10 +180,10 @@ namespace VitalChoice.Business.Repositories
             var toReturn = await _context.Set<WholesaleDropShipReportSkuRawItem>().FromSql
                 ("[dbo].[SPGetWholesaleDropShipReportSkusSummary] @from={0}, @to={1}, @shipfrom={2}, @shipto={3}," +
                 " @idcustomertype={4}, @idtradeclass={5}, @customerfirstname={6}, @customerlastname={7}, @shipfirstname={8}," +
-                " @shiplastname={9}, @shipidconfirm={10}, @idorder={11}, @ponumber={12}",
+                " @shiplastname={9}, @shipidconfirm={10}, @idorder={11}, @ponumber={12}, @customercompany={13}",
                 filter.From, filter.To, filter.ShipFrom, filter.ShipTo,
                 filter.IdCustomerType, filter.IdTradeClass, filter.CustomerFirstName, filter.CustomerLastName, filter.ShipFirstName,
-                filter.ShipLastName, filter.ShippingIdConfirmation, filter.IdOrder, filter.PoNumber).ToListAsync();
+                filter.ShipLastName, filter.ShippingIdConfirmation, filter.IdOrder, filter.PoNumber, filter.CustomerCompany).ToListAsync();
             return toReturn;
         }
 

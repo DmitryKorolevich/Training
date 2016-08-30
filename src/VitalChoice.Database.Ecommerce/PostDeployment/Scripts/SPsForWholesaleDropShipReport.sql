@@ -14,6 +14,7 @@ CREATE PROCEDURE [dbo].[SPGetOrderIdsForWholesaleDropShipReport]
 	@shipto datetime2 = NULL, 
 	@idcustomertype int = NULL,
 	@idtradeclass int = NULL,
+	@customercompany nvarchar(250) = NULL,
 	@customerfirstname nvarchar(250) = NULL,
 	@customerlastname nvarchar(250) = NULL,
 	@shipfirstname nvarchar(250) = NULL,
@@ -29,6 +30,10 @@ BEGIN
 
 	SET NOCOUNT ON
 
+	IF(@customercompany IS NOT NULL)
+	BEGIN 
+		SET @customercompany='%'+@customercompany+'%'
+	END
 	IF(@customerfirstname IS NOT NULL)
 	BEGIN 
 		SET @customerfirstname='%'+@customerfirstname+'%'
@@ -66,6 +71,8 @@ BEGIN
 			LEFT JOIN OrderOptionValues AS pnval WITH(NOLOCK) ON pnval.IdOrder = temp.IdOrder AND pnval.IdOptionType = pnopt.Id
 			LEFT JOIN CustomerOptionTypes AS tcopt WITH(NOLOCK) ON tcopt.Name = N'TradeClass' AND tcopt.IdObjectType = temp.CustomerIdObjectType
 			LEFT JOIN CustomerOptionValues AS tcval WITH(NOLOCK) ON tcval.IdCustomer = temp.IdCustomer AND tcval.IdOptionType = tcopt.Id
+			LEFT JOIN AddressOptionTypes AS cadcopt WITH(NOLOCK) ON cadcopt.Name = N'Company'
+			LEFT JOIN AddressOptionValues AS cadcval WITH(NOLOCK) ON cadcval.IdAddress = temp.IdProfileAddress AND cadcval.IdOptionType = cadcopt.Id
 			LEFT JOIN AddressOptionTypes AS cadfopt WITH(NOLOCK) ON cadfopt.Name = N'FirstName'
 			LEFT JOIN AddressOptionValues AS cadfval WITH(NOLOCK) ON cadfval.IdAddress = temp.IdProfileAddress AND cadfval.IdOptionType = cadfopt.Id
 			LEFT JOIN AddressOptionTypes AS cadlopt WITH(NOLOCK) ON cadlopt.Name = N'LastName'
@@ -76,7 +83,8 @@ BEGIN
 			LEFT JOIN OrderAddressOptionValues AS sadlval WITH(NOLOCK) ON sadlval.IdOrderAddress = temp.IdShippingAddress AND sadlval.IdOptionType = sadlopt.Id
 			WHERE 
 				(@ponumber IS NULL OR pnval.Value = @ponumber) AND 
-				(@idtradeclass IS NULL OR tcval.Value = @idtradeclass) AND			
+				(@idtradeclass IS NULL OR tcval.Value = @idtradeclass) AND		
+				(@customercompany IS NULL OR cadcval.Value LIKE @customercompany) AND	
 				(@customerfirstname IS NULL OR cadfval.Value LIKE @customerfirstname) AND
 				(@customerlastname IS NULL OR cadlval.Value LIKE @customerlastname) AND
 				(@shipfirstname IS NULL OR sadfval.Value LIKE @shipfirstname) AND
@@ -105,6 +113,8 @@ BEGIN
 			LEFT JOIN OrderOptionValues AS pnval WITH(NOLOCK) ON pnval.IdOrder = temp.IdOrder AND pnval.IdOptionType = pnopt.Id
 			LEFT JOIN CustomerOptionTypes AS tcopt WITH(NOLOCK) ON tcopt.Name = N'TradeClass' AND tcopt.IdObjectType = temp.CustomerIdObjectType
 			LEFT JOIN CustomerOptionValues AS tcval WITH(NOLOCK) ON tcval.IdCustomer = temp.IdCustomer AND tcval.IdOptionType = tcopt.Id
+			LEFT JOIN AddressOptionTypes AS cadcopt WITH(NOLOCK) ON cadcopt.Name = N'Company'
+			LEFT JOIN AddressOptionValues AS cadcval WITH(NOLOCK) ON cadcval.IdAddress = temp.IdProfileAddress AND cadcval.IdOptionType = cadcopt.Id
 			LEFT JOIN AddressOptionTypes AS cadfopt WITH(NOLOCK) ON cadfopt.Name = N'FirstName'
 			LEFT JOIN AddressOptionValues AS cadfval WITH(NOLOCK) ON cadfval.IdAddress = temp.IdProfileAddress AND cadfval.IdOptionType = cadfopt.Id
 			LEFT JOIN AddressOptionTypes AS cadlopt WITH(NOLOCK) ON cadlopt.Name = N'LastName'
@@ -115,7 +125,8 @@ BEGIN
 			LEFT JOIN OrderAddressOptionValues AS sadlval WITH(NOLOCK) ON sadlval.IdOrderAddress = temp.IdShippingAddress AND sadlval.IdOptionType = sadlopt.Id
 			WHERE 
 				(@ponumber IS NULL OR pnval.Value = @ponumber) AND 
-				(@idtradeclass IS NULL OR tcval.Value = @idtradeclass) AND			
+				(@idtradeclass IS NULL OR tcval.Value = @idtradeclass) AND	
+				(@customercompany IS NULL OR cadcval.Value LIKE @customercompany) AND			
 				(@customerfirstname IS NULL OR cadfval.Value LIKE @customerfirstname) AND
 				(@customerlastname IS NULL OR cadlval.Value LIKE @customerlastname) AND
 				(@shipfirstname IS NULL OR sadfval.Value LIKE @shipfirstname) AND
@@ -148,6 +159,7 @@ CREATE PROCEDURE [dbo].[SPGetWholesaleDropShipReportSkusSummary]
 	@shipto datetime2 = NULL, 
 	@idcustomertype int = NULL,
 	@idtradeclass int = NULL,
+	@customercompany nvarchar(250) = NULL,
 	@customerfirstname nvarchar(250) = NULL,
 	@customerlastname nvarchar(250) = NULL,
 	@shipfirstname nvarchar(250) = NULL,
@@ -173,6 +185,7 @@ BEGIN
 		@shipto = @shipto,
 		@idcustomertype = @idcustomertype,
 		@idtradeclass = @idtradeclass,
+		@customercompany = @customercompany,
 		@customerfirstname = @customerfirstname,
 		@customerlastname = @customerlastname,
 		@shipfirstname = @shipfirstname,

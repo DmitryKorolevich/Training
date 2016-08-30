@@ -39,6 +39,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Users;
@@ -915,6 +916,7 @@ namespace VitalChoice.Business.Services.Customers
 
         public async Task<bool> MergeCustomersAsync(int idCustomerPrimary, ICollection<int> customerIds)
         {
+            var toReturn = false;
             if (customerIds?.Count == 0)
             {
                 throw new AppValidationException("At least one customer should be specififed for merge");
@@ -1017,14 +1019,27 @@ namespace VitalChoice.Business.Services.Customers
                             }
                         }
 
+                        var healthwisePeriodRepository = uow.RepositoryAsync<HealthwisePeriod>();
+                        var orderRepository = uow.RepositoryAsync<Order>();
+
+                        var periods = await healthwisePeriodRepository.Query(p=>customerIds.Contains(p.IdCustomer)).SelectAsync(true);
+                        foreach (var healthwisePeriod in periods)
+                        {
+                            healthwisePeriod.IdCustomer = primaryCustomer.Id;
+                        }
+                        var orders = await orderRepository.Query(p => customerIds.Contains(p.IdCustomer)).SelectAsync(true);
+                        foreach (var order in orders)
+                        {
+                            order.IdCustomer = primaryCustomer.Id;
+                        }
+
                         await UpdateAsync(primaryCustomer);
                         await DeleteAllAsync(customers);
 
                         await uow.SaveChangesAsync();
 
                         transaction.Commit();
-
-                        return true;
+                        toReturn = true;
                     }
                     catch(Exception e)
                     {
@@ -1049,6 +1064,23 @@ namespace VitalChoice.Business.Services.Customers
                     }
                 }
             }
+
+            //Delete from identity
+            if (toReturn)
+            {
+                foreach (var customerId in customerIds)
+                {
+                    var appUser = await _storefrontUserService.GetAsync(customerId);
+                    if (appUser != null)
+                    {
+                        appUser.Status = UserStatus.NotActive;
+                        appUser.DeletedDate = DateTime.Now;
+                        await _storefrontUserService.UpdateAsync(appUser);
+                    }
+                }
+            }
+
+            return toReturn;
         }
 
         private bool IsTheSame(AddressDynamic source, AddressDynamic target)

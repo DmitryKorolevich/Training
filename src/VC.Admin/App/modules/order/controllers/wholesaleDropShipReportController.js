@@ -87,6 +87,7 @@
                 From: currentDate.shiftDate('-1m'),
                 IdCustomerType: 2,//wholesale
                 IdTradeClass: 6,//Retail - Drop Ship
+                CustomerCompany: null,
                 CustomerFirstName: null,
                 CustomerLastName: null,
                 ShipFirstName: null,

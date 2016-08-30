@@ -192,10 +192,10 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return baseUrl + ('GetOrdersForWholesaleDropShipReportFile?from={0}&to={1}&shipfrom={2}&shipto={3}&idcustomertype={4}&idtradeclass={5}'+
                 '&customerfirstname={6}&customerlastname={7}&shipfirstname={8}&shiplastname={9}' +
-                '&shipidconfirm={10}&idorder={11}&ponumber={12}&buildNumber={13}')
+                '&shipidconfirm={10}&idorder={11}&ponumber={12}&customercompany={13}&buildNumber={14}')
                 .format(filter.From, filter.To, filter.ShipFrom, filter.ShipTo, filter.IdCustomerType, filter.IdTradeClass,
                 filter.CustomerFirstName, filter.CustomerLastName, filter.ShipFirstName, filter.ShipLastName,
-                filter.ShippingIdConfirmation, filter.IdOrder, filter.PoNumber, buildNumber);
+                filter.ShippingIdConfirmation, filter.IdOrder, filter.PoNumber, filter.CustomerCompany, buildNumber);
 	    },
 	    //transaction refund report
 	    getTransactionAndRefundReport: function (filter, tracker)

@@ -78,6 +78,12 @@
                 </div>
                 <div class="row form-group">
                     <div class="col-md-3">
+                        <input type="text" name="CustomerCompany" class="form-control" placeholder="Customer Company Name" data-ng-change="filterChanged();" data-ng-model="filter.CustomerCompany" autocomplete="off" data-ng-minlength="3">
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.CustomerCompany.$invalid">
+                            <small class="error" ng-show="forms.form.CustomerCompany.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer Customer Name")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <input type="text" name="CustomerFirstName" class="form-control" placeholder="Customer First Name" data-ng-change="filterChanged();" data-ng-model="filter.CustomerFirstName" autocomplete="off" data-ng-minlength="3">
                         <div class="error-container" ng-show="forms.form.submitted && forms.form.CustomerFirstName.$invalid">
                             <small class="error" ng-show="forms.form.CustomerFirstName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Customer First Name")}}</small>

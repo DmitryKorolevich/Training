@@ -1129,7 +1129,7 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
         public async Task<FileResult> GetOrdersForWholesaleDropShipReportFile([FromQuery]string from, [FromQuery]string to, [FromQuery]string shipfrom=null, [FromQuery]string shipto=null,
-            [FromQuery]int? idcustomertype = null, [FromQuery]int? idtradeclass = null, [FromQuery]string customerfirstname = null, [FromQuery]string customerlastname = null,
+            [FromQuery]int? idcustomertype = null, [FromQuery]int? idtradeclass = null, [FromQuery]string customercompany = null, [FromQuery]string customerfirstname = null, [FromQuery]string customerlastname = null,
             [FromQuery]string shipfirstname = null, [FromQuery]string shiplastname = null, [FromQuery]string shipidconfirm = null, [FromQuery]int? idorder = null,
             [FromQuery]string ponumber = null)
         {
@@ -1150,6 +1150,7 @@ namespace VC.Admin.Controllers
                 ShipTo = dShipTo?.AddDays(1) ?? dShipTo,
                 IdCustomerType = idcustomertype,
                 IdTradeClass = idtradeclass,
+                CustomerCompany = customercompany,
                 CustomerFirstName = customerfirstname,
                 CustomerLastName = customerlastname,
                 ShipFirstName = shipfirstname,

@@ -20,6 +20,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
 
         public int? IdTradeClass { get; set; }
 
+        public string CustomerCompany { get; set; }
+
         public string CustomerFirstName { get; set; }
 
         public string CustomerLastName { get; set; }
