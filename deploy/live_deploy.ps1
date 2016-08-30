@@ -22,6 +22,8 @@ if (test-path ".\packages\admin.7z")
 	cmd /c 7z x -r .\packages\admin.7z -o"C:\Temp\Deploy\admin"
 	if(-Not $?){exit $LASTEXITCODE}
 
+	cmd /c del .\packages\admin.7z
+
 	cmd /c "%windir%\system32\inetsrv\appcmd" stop apppool /apppool.name:admin
 	cmd /c rmdir "${RootDeploy}\admin\wwwroot\files"
 	cmd /c rmdir "${RootDeploy}\admin\wwwroot\design"
@@ -44,6 +46,8 @@ if (test-path ".\packages\public.7z")
 	cmd /c 7z x -r .\packages\public.7z -o"C:\Temp\Deploy\public"
 	if(-Not $?){exit $LASTEXITCODE}
 
+	cmd /c del .\packages\public.7z
+
 	cmd /c "%windir%\system32\inetsrv\appcmd" stop apppool /apppool.name:public
 	cmd /c rmdir "${RootDeploy}\public\wwwroot\files"
 	cmd /c rmdir "${RootDeploy}\public\wwwroot\design"
@@ -65,6 +69,8 @@ if (test-path ".\packages\jobs.7z")
 
 	cmd /c 7z x -r .\packages\jobs.7z -o"C:\Temp\Deploy\jobs"
 	if(-Not $?){exit $LASTEXITCODE}
+
+	cmd /c del .\packages\jobs.7z
 
 	net stop jobsService
 	
