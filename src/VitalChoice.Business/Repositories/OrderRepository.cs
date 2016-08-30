@@ -13,6 +13,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -78,15 +79,25 @@ namespace VitalChoice.Business.Repositories
             //                 OrderType =d
             //             }).ToListAsync();
 
-            return orders.Select(p => new OrderForAgentReport
+            try
             {
-                Order = p,
-                OrderType =
-                    (SourceOrderType?) (int?)
+
+                return orders.Select(p => new OrderForAgentReport
+                {
+                    Order = p,
+                    OrderType =
+                        (SourceOrderType?) (int?)
                         MapperTypeConverter.ConvertTo<OrderOptionValue, OrderOptionType>(
                             p.OptionValues.FirstOrDefault(v => v.IdOptionType == orderTypeOption.Id),
                             (FieldType) orderTypeOption.IdFieldType)
-            }).ToList();
+                }).ToList();
+            }
+            catch (Exception e) when (!(e is NotImplementedException))
+            {
+                throw new ObjectConvertException(
+                    $"{orderTypeOption.Name} column value cannot be converted to Type: {(FieldType) orderTypeOption.IdFieldType}",
+                    e);
+            }
         }
     }
 }

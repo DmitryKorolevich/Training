@@ -582,9 +582,18 @@ namespace VitalChoice.DynamicData.Base
                     TOptionValue value;
                     if (optionValues.TryGetValue(optionType.Id, out value))
                     {
-                        data.Add(optionType.Name,
-                            MapperTypeConverter.ConvertTo<TOptionValue, TOptionType>(value,
-                                (FieldType) optionType.IdFieldType));
+                        try
+                        {
+                            data.Add(optionType.Name,
+                                MapperTypeConverter.ConvertTo<TOptionValue, TOptionType>(value,
+                                    (FieldType) optionType.IdFieldType));
+                        }
+                        catch (Exception e) when (!(e is NotImplementedException))
+                        {
+                            throw new ObjectConvertException(
+                                $"{optionType.Name}: \"{value}\" Cannot be converted to Type: {(FieldType) optionType.IdFieldType}",
+                                e);
+                        }
                     }
                 }
             }
@@ -592,10 +601,19 @@ namespace VitalChoice.DynamicData.Base
             {
                 foreach (
                     var optionType in
-                        entity.OptionTypes.Where(optionType => optionType.DefaultValue != null && !data.ContainsKey(optionType.Name)))
+                    entity.OptionTypes.Where(optionType => optionType.DefaultValue != null && !data.ContainsKey(optionType.Name)))
                 {
-                    data.Add(optionType.Name,
-                        MapperTypeConverter.ConvertTo(optionType.DefaultValue, (FieldType) optionType.IdFieldType));
+                    try
+                    {
+                        data.Add(optionType.Name,
+                            MapperTypeConverter.ConvertTo(optionType.DefaultValue, (FieldType) optionType.IdFieldType));
+                    }
+                    catch (Exception e) when (!(e is NotImplementedException))
+                    {
+                        throw new ObjectConvertException(
+                            $"{optionType.Name}: \"{optionType.DefaultValue}\" Cannot be converted to Type: {(FieldType) optionType.IdFieldType}",
+                            e);
+                    }
                 }
             }
             result.Id = entity.Id;
@@ -748,8 +766,17 @@ namespace VitalChoice.DynamicData.Base
             var data = result.DictionaryData;
             foreach (var optionType in optionTypes.Where(optionType => optionType.DefaultValue != null))
             {
-                data.Add(optionType.Name,
-                    MapperTypeConverter.ConvertTo(optionType.DefaultValue, (FieldType) optionType.IdFieldType));
+                try
+                {
+                    data.Add(optionType.Name,
+                        MapperTypeConverter.ConvertTo(optionType.DefaultValue, (FieldType) optionType.IdFieldType));
+                }
+                catch (Exception e) when (!(e is NotImplementedException))
+                {
+                    throw new ObjectConvertException(
+                        $"{optionType.Name}: \"{optionType.DefaultValue}\" Cannot be converted to Type: {(FieldType) optionType.IdFieldType}",
+                        e);
+                }
             }
             return result;
         }
@@ -761,8 +788,17 @@ namespace VitalChoice.DynamicData.Base
             var data = result.DictionaryData;
             foreach (var optionType in optionTypes.Where(optionType => optionType.DefaultValue != null))
             {
-                data.Add(optionType.Name,
-                    MapperTypeConverter.ConvertTo(optionType.DefaultValue, (FieldType)optionType.IdFieldType));
+                try
+                {
+                    data.Add(optionType.Name,
+                        MapperTypeConverter.ConvertTo(optionType.DefaultValue, (FieldType) optionType.IdFieldType));
+                }
+                catch (Exception e) when (!(e is NotImplementedException))
+                {
+                    throw new ObjectConvertException(
+                        $"{optionType.Name}: \"{optionType.DefaultValue}\" Cannot be converted to Type: {(FieldType) optionType.IdFieldType}",
+                        e);
+                }
             }
             return result;
         }

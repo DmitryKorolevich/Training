@@ -1419,6 +1419,22 @@ CROSS APPLY [dbo].[DelimitedSplit8K](c.approvedPaymentMethods, ',') AS d
 
 GO
 
+INSERT INTO [VitalChoice.Ecommerce].dbo.CustomersToPaymentMethods
+(IdCustomer, IdPaymentMethod)
+SELECT c.Id, 6
+FROM [VitalChoice.Ecommerce].dbo.Customers AS c
+WHERE NOT EXISTS (SELECT * FROM [VitalChoice.Ecommerce].dbo.CustomersToPaymentMethods AS ps WHERE ps.IdCustomer = c.Id AND ps.IdPaymentMethod = 6)
+
+GO
+
+INSERT INTO [VitalChoice.Ecommerce].dbo.CustomersToPaymentMethods
+(IdCustomer, IdPaymentMethod)
+SELECT c.Id, 4
+FROM [VitalChoice.Ecommerce].dbo.Customers AS c
+WHERE NOT EXISTS (SELECT * FROM [VitalChoice.Ecommerce].dbo.CustomersToPaymentMethods AS ps WHERE ps.IdCustomer = c.Id AND ps.IdPaymentMethod = 4)
+
+GO
+
 ALTER TABLE [VitalChoice.Ecommerce].dbo.Addresses
 ADD IdCustomer INT NULL
 
@@ -3197,7 +3213,7 @@ SELECT
 	CAST(CASE WHEN o.orderType = 2 THEN N'True' ELSE N'' END AS NVARCHAR(250)) AS MailOrder,
 	CAST(CASE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) AS OrderNotes,
 	CAST(CASE ISNULL(o.orderType, 0) WHEN 0 THEN N'1' WHEN 1 THEN N'2' WHEN 2 THEN N'3' END AS NVARCHAR(250)) AS OrderType,
-	CAST(cc.PONum AS NVARCHAR(250)) AS PoNumber,
+	CAST(ISNULL(cc.PONum, o.wholesalePONumber) AS NVARCHAR(250)) AS PoNumber,
 	CASE WHEN o.shipDelayType > 0 THEN CONVERT(NVARCHAR(250), CAST(CASE o.shipDelayPart WHEN 2 THEN o.shipDelayNonperish ELSE o.shipDelay END AS DATETIME2), 126) ELSE N'' END AS ShipDelayDate,
 	CAST(CASE WHEN o.shipDelayType > 0 THEN N'1' ELSE N'' END AS NVARCHAR(250)) AS ShipDelayType,
 	CAST(CAST(o.shippingOverride AS MONEY) AS NVARCHAR(250)) AS ShippingOverride,
@@ -3253,7 +3269,7 @@ SELECT
 	CAST(o.keyCode AS NVARCHAR(250)) AS KeyCode,
 	CAST(CASE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) AS OrderNotes,
 	CAST(CASE ISNULL(o.orderType, 0) WHEN 0 THEN N'1' WHEN 1 THEN N'2' WHEN 2 THEN N'3' END AS NVARCHAR(250)) AS OrderType,
-	CAST(cc.PONum AS NVARCHAR(250)) AS PoNumber,
+	CAST(ISNULL(cc.PONum, o.wholesalePONumber) AS NVARCHAR(250)) AS PoNumber,
 	CASE WHEN o.shipDelayType > 0 THEN CONVERT(NVARCHAR(250), CAST(CASE o.shipDelayPart WHEN 2 THEN o.shipDelayNonperish ELSE o.shipDelay END AS DATETIME2), 126) ELSE NULL END AS ShipDelayDate,
 	CAST(CASE WHEN o.shipDelayType > 0 THEN N'1' ELSE NULL END AS NVARCHAR(250)) AS ShipDelayType
 FROM [vitalchoice2.0].dbo.orders AS o
@@ -3295,7 +3311,7 @@ SELECT
 	CAST(CASE WHEN o.orderType = 2 THEN N'True' ELSE N'' END AS NVARCHAR(250)) AS MailOrder,
 	CAST(CASE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) AS OrderNotes,
 	CAST(CASE ISNULL(o.orderType, 0) WHEN 0 THEN N'1' WHEN 1 THEN N'2' WHEN 2 THEN N'3' END AS NVARCHAR(250)) AS OrderType,
-	CAST(cc.PONum AS NVARCHAR(250)) AS PoNumber,
+	CAST(ISNULL(cc.PONum, o.wholesalePONumber) AS NVARCHAR(250)) AS PoNumber,
 	CAST(CASE WHEN o.shipDelayType > 0 THEN CONVERT(NVARCHAR(250), CAST(CASE o.shipDelayPart WHEN 2 THEN o.shipDelayNonperish ELSE o.shipDelay END AS DATETIME2), 126) ELSE NULL END AS NVARCHAR(250)) AS ShipDelayDate,
 	CAST(CASE WHEN o.shipDelayType > 0 THEN N'1' ELSE NULL END AS NVARCHAR(250)) AS ShipDelayType,
 	CAST(CAST(o.shippingOverride AS MONEY) AS NVARCHAR(250)) AS ShippingOverride,
@@ -3368,7 +3384,7 @@ SELECT
 	CAST(o.keyCode AS NVARCHAR(250)) AS KeyCode,
 	CAST(CASE LEFT(CAST(ISNULL(r.notes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) AS OrderNotes,
 	CAST(CASE ISNULL(o.orderType, 0) WHEN 0 THEN N'1' WHEN 1 THEN N'2' WHEN 2 THEN N'3' END AS NVARCHAR(250)) AS OrderType,
-	CAST(cc.PONum AS NVARCHAR(250)) AS PoNumber,
+	CAST(ISNULL(cc.PONum, o.wholesalePONumber) AS NVARCHAR(250)) AS PoNumber,
 	CAST(CASE WHEN o.shipDelayType > 0 THEN CONVERT(NVARCHAR(250), CAST(CASE o.shipDelayPart WHEN 2 THEN o.shipDelayNonperish ELSE o.shipDelay END AS DATETIME2), 126) ELSE NULL END AS NVARCHAR(250)) AS ShipDelayDate,
 	CAST(CASE WHEN o.shipDelayType > 0 THEN N'1' ELSE NULL END AS NVARCHAR(250)) AS ShipDelayType,
 	CAST(CAST(o.shippingOverride AS MONEY) AS NVARCHAR(250)) AS ShippingOverride,
@@ -3425,7 +3441,7 @@ SELECT
 	CAST(lv.Id AS NVARCHAR(250)) AS ServiceCode,
 	CAST(r.idOrderOriginal AS NVARCHAR(250)) AS IdOrderRefunded,
 	CAST((SELECT SUM(CAST(rr.Value AS MONEY)) FROM [vitalchoice2.0].[dbo].[RefundItems] AS rr WHERE rr.IdRefundOrder = r.idOrder AND rr.ItemType <> 0 AND rr.ItemType <> 3) AS NVARCHAR(250)) AS AutoTotal,
-	CAST((SELECT SUM(CAST(rr.Value AS MONEY)) FROM [vitalchoice2.0].[dbo].[RefundItems] AS rr WHERE rr.IdRefundOrder = r.idOrder AND rr.ItemType = 2) AS NVARCHAR(250)) AS ShippingRefunded,
+	CAST(CASE WHEN EXISTS(SELECT * FROM [vitalchoice2.0].[dbo].[RefundItems] AS rr WHERE rr.IdRefundOrder = r.idOrder AND rr.ItemType = 2) THEN N'True' ELSE N'False' END AS NVARCHAR(250)) AS ShippingRefunded,
 	CAST((SELECT SUM(CAST(rr.Value AS MONEY)) FROM [vitalchoice2.0].[dbo].[RefundItems] AS rr WHERE rr.IdRefundOrder = r.idOrder AND rr.ItemType = 3) AS NVARCHAR(250)) AS ManualRefundOverride
 FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON oo.Id = o.idOrder AND oo.IdObjectType = 6
@@ -3467,7 +3483,7 @@ SELECT
 	CAST(CASE WHEN o.orderType = 2 THEN N'True' ELSE N'' END AS NVARCHAR(250)) AS MailOrder,
 	CAST(CASE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) AS OrderNotes,
 	CAST(CASE ISNULL(o.orderType, 0) WHEN 0 THEN N'1' WHEN 1 THEN N'2' WHEN 2 THEN N'3' END AS NVARCHAR(250)) AS OrderType,
-	CAST(cc.PONum AS NVARCHAR(250)) AS PoNumber,
+	CAST(ISNULL(cc.PONum, o.wholesalePONumber) AS NVARCHAR(250)) AS PoNumber,
 	CAST(CASE WHEN o.shipDelayType > 0 THEN N'1' ELSE N'' END AS NVARCHAR(250)) AS ShipDelayType,
 	CAST(CAST(o.shippingOverride AS MONEY) AS NVARCHAR(250)) AS ShippingOverride,
 	CAST(CAST(o.surchargeOverride AS MONEY) AS NVARCHAR(250)) AS SurchargeOverride,
@@ -3523,7 +3539,7 @@ SELECT
 	CAST(CASE WHEN o.orderType = 2 THEN N'True' ELSE N'' END AS NVARCHAR(250)) AS MailOrder,
 	CAST(CASE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) WHEN N'Null' THEN N'' ELSE LEFT(CAST(ISNULL(o.specificNotes, N'') AS NVARCHAR(MAX)), 250) END AS NVARCHAR(250)) AS OrderNotes,
 	CAST(CASE ISNULL(o.orderType, 0) WHEN 0 THEN N'1' WHEN 1 THEN N'2' WHEN 2 THEN N'3' END AS NVARCHAR(250)) AS OrderType,
-	CAST(cc.PONum AS NVARCHAR(250)) AS PoNumber,
+	CAST(ISNULL(cc.PONum, o.wholesalePONumber) AS NVARCHAR(250)) AS PoNumber,
 	CASE WHEN o.shipDelayType > 0 THEN CONVERT(NVARCHAR(250), CAST(CASE o.shipDelayPart WHEN 2 THEN o.shipDelayNonperish ELSE o.shipDelay END AS DATETIME2), 126) ELSE N'' END AS ShipDelayDate,
 	CAST(CASE WHEN o.shipDelayType > 0 THEN N'1' ELSE N'' END AS NVARCHAR(250)) AS ShipDelayType,
 	CAST(CAST(o.shippingOverride AS MONEY) AS NVARCHAR(250)) AS ShippingOverride,
@@ -3950,7 +3966,9 @@ SELECT
 	CAST(o.Fax AS NVARCHAR(250)) AS Fax
 FROM [vitalchoice2.0].dbo.orders AS o
 INNER JOIN Orders AS oo ON oo.Id = o.idOrder
-INNER JOIN OrderAddresses AS a ON a.IdOrder = oo.Id) p
+INNER JOIN OrderAddresses AS a ON a.IdOrder = oo.Id
+INNER JOIN OrderPaymentMethods AS p ON p.Id = oo.IdPaymentMethod
+WHERE p.IdObjectType NOT IN (4, 6)) p
 UNPIVOT (Value FOR Name IN 
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax)
 )AS unpvt
@@ -3978,13 +3996,76 @@ SELECT
 FROM [vitalchoice2.0].dbo.autoshipOrders AS aso
 INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = aso.idOrder
 INNER JOIN Orders AS oo ON oo.IdAutoShipOrder = aso.idAutoShipOrder
-INNER JOIN OrderAddresses AS a ON a.IdOrder = oo.Id) p
+INNER JOIN OrderAddresses AS a ON a.IdOrder = oo.Id
+INNER JOIN OrderPaymentMethods AS p ON p.Id = oo.IdPaymentMethod
+WHERE p.IdObjectType NOT IN (4, 6)) p
 UNPIVOT (Value FOR Name IN 
 	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax)
 )AS unpvt
 INNER JOIN AddressOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
 WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
 PRINT '====address options(auto-ship)'
+
+GO
+
+INSERT INTO OrderAddressOptionValues
+(IdOrderAddress, IdOptionType, Value)
+SELECT unpvt.Id, o.Id, unpvt.Value FROM
+(
+SELECT 
+	a.Id, 
+	CAST(c.address AS NVARCHAR(250)) AS Address1, 
+	CAST(c.Address2 AS NVARCHAR(250)) AS Address2, 
+	CAST(c.name AS NVARCHAR(250)) AS FirstName, 
+	CAST(c.LastName AS NVARCHAR(250)) AS LastName, 
+	CAST(c.customerCompany AS NVARCHAR(250)) AS Company, 
+	CAST(c.City AS NVARCHAR(250)) AS City, 
+	CAST(c.Zip AS NVARCHAR(250)) AS Zip,
+	CAST(c.Phone AS NVARCHAR(250)) AS Phone,
+	CAST(c.Fax AS NVARCHAR(250)) AS Fax
+FROM [vitalchoice2.0].dbo.orders AS o
+INNER JOIN Orders AS oo ON oo.Id = o.idOrder
+INNER JOIN [vitalchoice2.0].dbo.customers AS c ON c.idcustomer = o.idCustomer
+INNER JOIN OrderAddresses AS a ON a.IdOrder = oo.Id
+INNER JOIN OrderPaymentMethods AS p ON p.Id = oo.IdPaymentMethod
+WHERE p.IdObjectType IN (4, 6)) p
+UNPIVOT (Value FOR Name IN 
+	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax)
+)AS unpvt
+INNER JOIN AddressOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
+WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====address options, no charge, prepaid'
+
+GO
+
+INSERT INTO OrderAddressOptionValues
+(IdOrderAddress, IdOptionType, Value)
+SELECT unpvt.Id, o.Id, unpvt.Value FROM
+(
+SELECT 
+	a.Id, 
+	CAST(c.address AS NVARCHAR(250)) AS Address1, 
+	CAST(c.Address2 AS NVARCHAR(250)) AS Address2, 
+	CAST(c.name AS NVARCHAR(250)) AS FirstName, 
+	CAST(c.LastName AS NVARCHAR(250)) AS LastName, 
+	CAST(c.customerCompany AS NVARCHAR(250)) AS Company, 
+	CAST(c.City AS NVARCHAR(250)) AS City, 
+	CAST(c.Zip AS NVARCHAR(250)) AS Zip,
+	CAST(c.Phone AS NVARCHAR(250)) AS Phone,
+	CAST(c.Fax AS NVARCHAR(250)) AS Fax
+FROM [vitalchoice2.0].dbo.autoshipOrders AS aso
+INNER JOIN [vitalchoice2.0].dbo.orders AS o ON o.idOrder = aso.idOrder
+INNER JOIN [vitalchoice2.0].dbo.customers AS c ON c.idcustomer = o.idCustomer
+INNER JOIN Orders AS oo ON oo.IdAutoShipOrder = aso.idAutoShipOrder
+INNER JOIN OrderAddresses AS a ON a.IdOrder = oo.Id
+INNER JOIN OrderPaymentMethods AS p ON p.Id = oo.IdPaymentMethod
+WHERE p.IdObjectType IN (4, 6)) p
+UNPIVOT (Value FOR Name IN 
+	(Address1, Address2, FirstName, LastName, Company, City, Zip, Phone, Fax)
+)AS unpvt
+INNER JOIN AddressOptionTypes AS o ON o.Name = unpvt.Name AND (o.IdObjectType IS NULL OR o.IdObjectType = 2)
+WHERE unpvt.Value IS NOT NULL AND unpvt.Value <> N''
+PRINT '====address options, no charge, prepaid (auto-ship)'
 
 GO
 
