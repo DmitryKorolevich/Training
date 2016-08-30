@@ -32,35 +32,26 @@ namespace VitalChoice.Jobs
 		private readonly IServiceProvider _container;
 	    private readonly IScheduler _scheduler;
 
-        public JobWindowsService()
-		{
-            try
-            {
-                Host = new WebHostBuilder()
-                    .UseContentRoot(Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]))
-                    .UseStartup<Startup>()
-                    .Build();
+	    public JobWindowsService()
+	    {
+	        Host = new WebHostBuilder()
+	            .UseContentRoot(Path.GetDirectoryName(Environment.GetCommandLineArgs()[0]))
+	            .UseStartup<Startup>()
+	            .Build();
 
-                Host.Start();
+	        Host.Start();
 
-                _container = Host.Services;
-                var factory = _container.GetRequiredService<ILoggerFactory>();
-                _logger = factory.CreateLogger<JobWindowsService>();
-                _scheduler = _container.GetRequiredService<IScheduler>();
-            }
-            catch (Exception e)
-            {
-                EventLog.WriteEntry(e.ToString(), EventLogEntryType.Error);
-                throw;
-            }
-            InitializeComponent();
-		}
+	        _container = Host.Services;
+	        var factory = _container.GetRequiredService<ILoggerFactory>();
+	        _logger = factory.CreateLogger<JobWindowsService>();
+	        _scheduler = _container.GetRequiredService<IScheduler>();
+	        InitializeComponent();
+	    }
 
 	    protected override void OnStart(string[] args)
 	    {
 	        base.OnStart(args);
 	        RequestAdditionalTime(30000);
-	        EventLog.WriteEntry("Jobs service started initialization", EventLogEntryType.Information);
 	        try
 	        {
                 _logger.LogWarning("Jobs init");
@@ -69,7 +60,6 @@ namespace VitalChoice.Jobs
 	            foreach (var impl in jobImpls)
 	            {
 	                var type = impl.GetType();
-	                EventLog.WriteEntry($"{type} init", EventLogEntryType.Information);
                     var job = JobBuilder.Create(type).WithIdentity(type.FullName).Build();
 
 	                var trigger = TriggerBuilder.Create()
@@ -82,12 +72,10 @@ namespace VitalChoice.Jobs
 	            }
 
 	            _scheduler.Start();
-	            EventLog.WriteEntry("Jobs service operating normally", EventLogEntryType.Information);
 	        }
 	        catch (Exception e)
 	        {
 	            _logger.LogError(e.ToString());
-	            EventLog.WriteEntry($"Jobs service started with errors:\n{e}", EventLogEntryType.Error);
 	        }
 	    }
 
@@ -98,7 +86,6 @@ namespace VitalChoice.Jobs
             {
                 _scheduler.Shutdown(true);
                 Host.Dispose();
-                EventLog.WriteEntry("Jobs service stopped", EventLogEntryType.Information);
             });
             RequestAdditionalTime(timeout);
             while (!task.Wait(timeout))

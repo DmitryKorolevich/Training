@@ -4,7 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain;
+using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.ObjectMapping.Extensions;
 using VitalChoice.ObjectMapping.Interfaces;
 using VitalChoice.ObjectMapping.Services;
 
@@ -53,7 +56,7 @@ namespace VitalChoice.ObjectMapping.Base
     public class ObjectMapper<T> : ObjectUpdater<T>, IObjectMapper<T>
         where T : class, new()
     {
-        public ObjectMapper(ITypeConverter typeConverter, IModelConverterService converterService): base(typeConverter, converterService)
+        public ObjectMapper(ITypeConverter converter, IModelConverterService converterService): base(converter, converterService)
         {
             
         }

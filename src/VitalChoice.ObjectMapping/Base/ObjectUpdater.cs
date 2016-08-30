@@ -4,7 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using VitalChoice.Ecommerce.Domain;
+using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.ObjectMapping.Extensions;
 using VitalChoice.ObjectMapping.Interfaces;
 using VitalChoice.ObjectMapping.Services;
 
@@ -12,12 +15,12 @@ namespace VitalChoice.ObjectMapping.Base
 {
     public class ObjectUpdater<T> : IObjectUpdater<T>
     {
-        protected readonly ITypeConverter TypeConverter;
+        protected readonly ITypeConverter Converter;
         protected readonly IModelConverterService ConverterService;
 
-        public ObjectUpdater(ITypeConverter typeConverter, IModelConverterService converterService)
+        public ObjectUpdater(ITypeConverter converter, IModelConverterService converterService)
         {
-            TypeConverter = typeConverter;
+            Converter = converter;
             ConverterService = converterService;
         }
 
@@ -282,12 +285,14 @@ namespace VitalChoice.ObjectMapping.Base
                 if (model.TryGetValue(pair.Key, out modelValue) && modelValue != null)
                 {
                     var valueType = modelValue.GetType();
-                    var value = await TypeConverter.ConvertFromModelAsync(valueType, dynamicProperty.PropertyType, modelValue, dynamicProperty.Converter);
+                    var value =
+                        await
+                            Converter.ConvertFromModelAsync(valueType, dynamicProperty.PropertyType, modelValue, dynamicProperty.Converter);
                     if (value != null)
                     {
                         TypeValidator.ThrowIfNotValid(model.GetType(), objectType, value, pair.Key, dynamicProperty,
                             false);
-                        dynamicProperty.Set?.Invoke(obj, value);
+                        dynamicProperty.SetValueDirect(obj, value);
                     }
                 }
             }
@@ -331,7 +336,7 @@ namespace VitalChoice.ObjectMapping.Base
                 GenericProperty dynamicProperty;
                 if (objectCache.Properties.TryGetValue(mappingName, out dynamicProperty))
                 {
-                    var value = await TypeConverter.ConvertFromModelAsync(pair.Value.PropertyType, dynamicProperty.PropertyType,
+                    var value = await Converter.ConvertFromModelAsync(pair.Value.PropertyType, dynamicProperty.PropertyType,
                         pair.Value.Get?.Invoke(model), dynamicProperty.Converter);
                     if (value != null)
                     {
@@ -360,12 +365,12 @@ namespace VitalChoice.ObjectMapping.Base
                 GenericProperty dynamicProperty;
                 if (objectCache.Properties.TryGetValue(mappingName, out dynamicProperty))
                 {
-                    var value = await TypeConverter.ConvertToModelAsync(dynamicProperty.PropertyType, pair.Value.PropertyType,
+                    var value = await Converter.ConvertToModelAsync(dynamicProperty.PropertyType, pair.Value.PropertyType,
                         dynamicProperty.Get?.Invoke(obj), dynamicProperty.Converter);
                     if (value != null)
                     {
                         TypeValidator.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value, true);
-                        pair.Value.Set?.Invoke(result, value);
+                        pair.Value.SetValueDirect(result, value);
                     }
                 }
             }

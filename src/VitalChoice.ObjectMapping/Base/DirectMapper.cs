@@ -7,8 +7,8 @@ namespace VitalChoice.ObjectMapping.Base
     {
         protected override bool UseMapAttribute => false;
 
-        public DirectMapper(ITypeConverter typeConverter, IModelConverterService converterService)
-            : base(typeConverter, converterService)
+        public DirectMapper(ITypeConverter converter, IModelConverterService converterService)
+            : base(converter, converterService)
         {
         }
     }

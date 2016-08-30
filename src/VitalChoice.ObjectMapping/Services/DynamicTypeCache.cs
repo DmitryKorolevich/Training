@@ -43,6 +43,7 @@ namespace VitalChoice.ObjectMapping.Services
                     var convertWithAttribute = property.GetCustomAttribute<ConvertWithAttribute>(true);
                     if (mapAttribute != null || ignoreMapAttribute)
                     {
+                        var itemType = property.PropertyType.TryGetElementType(typeof(ICollection<>));
                         typeCache.Properties.Add(property.Name, new GenericProperty
                         {
                             Get = property.GetMethod?.CompileAccessor<object, object>(),
@@ -50,6 +51,8 @@ namespace VitalChoice.ObjectMapping.Services
                             Map = mapAttribute,
                             PropertyType = property.PropertyType,
                             Converter = convertWithAttribute,
+                            IsCollection = itemType != null,
+                            CollectionItemType = itemType
                         });
                     }
                 }

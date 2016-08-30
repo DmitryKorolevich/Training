@@ -40,7 +40,11 @@ Push-Location "${RootBuild}\src\VitalChoice.Jobs\Jobs"
 BuildAll -deployPath "${RootDeploy}"
 Pop-Location
 
-sleep -s 60
+$process = Get-Process "VitalChoice.Jobs" -ErrorAction SilentlyContinue
+while ($process) {
+	Sleep 1
+	$process = Get-Process "VitalChoice.Jobs" -ErrorAction SilentlyContinue
+}
 
 echo "Clean jobs directory..."
 ls -Path ${JobsFolder} -Include * | remove-Item -recurse 
