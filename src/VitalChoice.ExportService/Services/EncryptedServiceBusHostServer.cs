@@ -35,16 +35,28 @@ namespace VitalChoice.ExportService.Services
             switch (command.CommandName)
             {
                 case ServiceBusCommandConstants.GetPublicKey:
+                    if (command.Data.Data is bool && !(bool) command.Data?.Data)
+                    {
+                        return false;
+                    }
                     var publicKey = _keyExchangeProvider.Key.Export(CngKeyBlobFormat.GenericPublicBlob);
                     SendPlainCommand(new ServiceBusCommandBase(command, publicKey));
                     break;
                 case ServiceBusCommandConstants.SetSessionKey:
+                    if (command.Data.Data is bool && !(bool)command.Data?.Data)
+                    {
+                        return false;
+                    }
                     var keyCombined = (byte[]) command.Data.Data;
                     var keyExchange = new KeyExchange(EncryptionHost.RsaDecrypt(keyCombined, _keyExchangeProvider));
                     SendPlainCommand(new ServiceBusCommandBase(command,
                         EncryptionHost.RegisterSession(command.SessionId, command.Source, keyExchange)));
                     break;
                 case ServiceBusCommandConstants.CheckSessionKey:
+                    if (command.Data?.Data is bool && !(bool)command.Data?.Data)
+                    {
+                        return false;
+                    }
                     SendPlainCommand(new ServiceBusCommandBase(command, EncryptionHost.SessionExist(command.SessionId)));
                     break;
 

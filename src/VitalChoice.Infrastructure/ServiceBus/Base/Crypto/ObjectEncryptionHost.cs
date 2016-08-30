@@ -452,11 +452,17 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                 Dictionary<string, ISignCheckProvider> result = new Dictionary<string, ISignCheckProvider>();
                 foreach (var localCert in localCerts)
                 {
-                    if (rootCa.Thumbprint != localCert.Thumbprint && !localCert.HasPrivateKey &&
-                        ValidateClientCertificate(localCert, rootCa))
+                    if (rootCa.Thumbprint != localCert.Thumbprint && !localCert.HasPrivateKey)
                     {
-                        // ReSharper disable once AssignNullToNotNullAttribute
-                        result.Add(localCert.Thumbprint, CreateSignCheckProvider(localCert));
+                        if (ValidateClientCertificate(localCert, rootCa))
+                        {
+                            // ReSharper disable once AssignNullToNotNullAttribute
+                            result.Add(localCert.Thumbprint, CreateSignCheckProvider(localCert));
+                        }
+                        else
+                        {
+                            _logger.LogWarning($"{localCert.Thumbprint} is invalid in whole chain with root: {rootCa.Thumbprint}");
+                        }
                     }
                 }
                 return result;
