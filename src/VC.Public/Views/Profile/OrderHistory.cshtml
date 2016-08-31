@@ -7,10 +7,6 @@
 	<title>Vital Choice | Full Order History</title>
 }
 
-@section PageScripts {
-    <script src="@Url.Content("/app/modules/profile/gccheckform.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
-}
-
 <div class="working-area-holder">
 	<div class="left-pane clean-border">
 		@await Component.InvokeAsync("ProfileSidebar")
