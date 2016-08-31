@@ -664,7 +664,14 @@ namespace VC.Admin.Controllers
         {
             return await _customerService.MergeCustomersAsync(id, customerIds);
         }
-        
+
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Settings)]
+        public async Task<Result<PagedList<VCustomerWithDublicateEmail>>> GetCustomersWithDublicateEmails([FromBody]FilterBase filter)
+        {
+            return await _customerService.GetCustomersWithDublicateEmailsAsync(filter);
+        }
+
         #region Reports
 
         [AdminAuthorize(PermissionType.Reports)]

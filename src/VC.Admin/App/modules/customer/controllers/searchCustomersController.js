@@ -43,9 +43,9 @@ angular.module('app.modules.customer.controllers.searchCustomersController', [])
 		        };
 
 		        $scope.autoCompleteFilter = {
-                    FieldName: null,
-                    FieldValue: null,
-                };
+		            FieldName: null,
+		            FieldValue: null,
+		        };
 		    }
 
 		    $scope.pageChanged = function ()
@@ -56,22 +56,22 @@ angular.module('app.modules.customer.controllers.searchCustomersController', [])
 		    $scope.filterCustomers = function (event)
 		    {
 		        if (!isCustomerFilterAllowSearch())
-		        {                    
-                    return;
+		        {
+		            return;
 		        }
 
 		        $scope.filter.Address = angular.copy($scope.address);
 		        $scope.filter.DefaultShippingAddress = angular.copy($scope.defaultShippingAddress);
 		        $scope.filter.Email = $scope.address.Email;
 		        $scope.filter.SearchText = $scope.address.SearchText;
-                $scope.filter.Paging.PageIndex = 1;
+		        $scope.filter.Paging.PageIndex = 1;
 
 		        refreshCustomers();
 		    };
 
 		    var isCustomerFilterAllowSearch = function ()
 		    {
-		        if ((!$scope.address.Email || $scope.address.Email.length < 3) &&
+		        if ((!$scope.address.Email) &&
                     (!$scope.address.LastName || $scope.address.LastName.length < 3) &&
                     (!$scope.address.FirstName || $scope.address.FirstName.length < 3) &&
                     (!$scope.defaultShippingAddress.Address1 || $scope.defaultShippingAddress.Address1.length < 3) &&
@@ -86,7 +86,7 @@ angular.module('app.modules.customer.controllers.searchCustomersController', [])
 		        }
 		        return true;
 		    };
-            
+
 		    $scope.getByStaticAutoComplete = function (val, field)
 		    {
 		        if (val)
@@ -136,7 +136,7 @@ angular.module('app.modules.customer.controllers.searchCustomersController', [])
                             });
                         });
 		        }
-		    };		    
+		    };
 
 		    $scope.applySort = function (columnName)
 		    {
@@ -157,7 +157,24 @@ angular.module('app.modules.customer.controllers.searchCustomersController', [])
 		        data.name = $scope.name;
 		        data.items = items;
 		        $scope.$emit('searchCustomers#out#addItems', data);
-		    };
+		    };            
+
+		    $scope.$on('searchCustomers#in#setFilter', function (event, args)
+		    {
+		        if (args.name == $scope.name)
+		        {
+		            $scope.address=args.filter.address;
+		            $scope.defaultShippingAddress=args.filter.defaultShippingAddress;
+		        };
+		    });
+
+		    $scope.$on('searchCustomers#in#search', function (event, args)
+		    {
+		        if (args.name == $scope.name)
+		        {
+		            $scope.filterCustomers();
+		        }
+		    });
 
 		    initialize();
 		}

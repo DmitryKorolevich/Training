@@ -421,6 +421,14 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(f => f.Id);
                 entity.ToTable("VOrderCountOnCustomers");
             });
+
+            builder.Entity<VCustomerWithDublicateEmail>(entity =>
+            {
+                entity.HasKey(f => f.Email);
+                entity.Ignore(f => f.Id);
+                entity.ToTable("VCustomersWithDublicateEmails");
+                entity.NonCached();
+            });
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 angular.module('app.shared.menu.services.navigationFactory', [])
-.factory('navigationFactory', ['$state', 'modalUtil', function ($state, modalUtil) {
+.factory('navigationFactory', ['$state', '$rootScope', 'modalUtil', function ($state, $rootScope, modalUtil) {
 	var menu = [
 		{
 			name: 'customer',
@@ -40,7 +40,12 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'outOfStocks', stateName: 'index.oneCol.outOfStocks', stateLabel: 'Out of Stock Requests', access: 4 },
 				{ name: 'manageInventorySkuCategories', stateName: 'index.oneCol.manageInventorySkuCategories', stateLabel: 'Manage Parts Categories', access: 17 },
 				{ name: 'manageInventorySkus', stateName: 'index.oneCol.manageInventorySkus', stateLabel: 'Manage Parts', access: 17 },
-				{ name: 'downloadGoogleFeed', href: 'https://staging.g2-dg.com/google/datafeed.csv', stateLabel: 'Download Google Data Feed', access: 4 },
+				{
+				    name: 'downloadGoogleFeed', 
+				    href: $rootScope.PublicHost != null ? 'https://{0}/google/datafeed.csv'.format($rootScope.PublicHost) : '',
+			        stateLabel: 'Download Google Data Feed',
+			        access: 4
+		        },
 				{ name: 'manageSkuPrices', stateName: 'index.oneCol.manageSkuPrices', stateLabel: 'Bulk Product Price Update', access: 4 },
 			]
 		},

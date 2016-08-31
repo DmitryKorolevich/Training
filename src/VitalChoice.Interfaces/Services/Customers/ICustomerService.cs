@@ -55,6 +55,8 @@ namespace VitalChoice.Interfaces.Services.Customers
 
 	    Task<bool> MergeCustomersAsync(int idCustomerPrimary, ICollection<int> customerIds);
 
+	    Task<PagedList<VCustomerWithDublicateEmail>> GetCustomersWithDublicateEmailsAsync(FilterBase filter);
+
         #region Reports 
 
         Task<WholesaleSummaryReport> GetWholesaleSummaryReportAsync();

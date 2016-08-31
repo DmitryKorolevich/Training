@@ -3,7 +3,7 @@
 @using Microsoft.Extensions.Options
 @inject IOptions<AppOptions> appOptions;
 <!DOCTYPE html>
-<html data-ng-app="mainApp" data-ng-strict-di data-ng-init="buildNumber='@appOptions.Value.Versioning.BuildNumber'">
+<html data-ng-app="mainApp" data-ng-strict-di data-ng-init="buildNumber='@appOptions.Value.Versioning.BuildNumber';PublicHost='@appOptions.Value.PublicHost'">
 <head>
     <base href="/">
     <title>Vital Choice Admin</title>
