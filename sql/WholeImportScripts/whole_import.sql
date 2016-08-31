@@ -2647,10 +2647,29 @@ GO
 	INNER JOIN [VitalChoice.Ecommerce].dbo.SkuOptionTypes AS t ON (t.IdObjectType = ep.IdObjectType OR t.IdObjectType IS NULL) AND t.Name = N'QTY'
 	WHERE ep.Id IN (SELECT Id FROM TempProductsToMove) OR pp.idProduct IN (SELECT Id FROM @additionalSkusToImport)
 
-	SELECT * FROM @additionalSkusToImport
+	DELETE v
+	FROM [VitalChoice.Ecommerce].dbo.SkuOptionValues AS v
+	INNER JOIN [VitalChoice.Ecommerce].dbo.SkuOptionTypes AS t ON t.Id = v.IdOptionType
+	WHERE t.Name IN (N'DisregardStock', N'Stock')
 
-	EXEC dbo.MoveSkuField @destFieldName = N'DisregardStock', @sourceFieldName = N'nostock', @conversion = N'CASE WHEN ISNULL(a.nostock, 0) <> 0 THEN ''True'' ELSE ''False'' END'
-	EXEC dbo.MoveSkuField @destFieldName = N'Stock', @sourceFieldName = N'stock', @conversion = N'CAST(ISNULL(a.stock, 0) AS NVARCHAR(250))'
+	INSERT INTO [VitalChoice.Ecommerce].dbo.SkuOptionValues
+	(IdOptionType, IdSku, Value)
+	SELECT t.Id, s.Id, CASE WHEN ISNULL(a.nostock, 0) <> 0 THEN N'True' ELSE N'False' END 
+	FROM [VitalChoice.Ecommerce].dbo.Skus AS s
+	INNER JOIN [VitalChoice.Ecommerce].dbo.Products AS p ON p.Id = s.IdProduct
+	INNER JOIN [vitalchoice2.0].dbo.products AS a ON a.idProduct = s.Id
+	INNER JOIN [VitalChoice.Ecommerce].dbo.SkuOptionTypes AS t ON (t.IdObjectType = p.IdObjectType OR t.IdObjectType IS NULL) AND t.Name = N'DisregardStock'
+
+	INSERT INTO [VitalChoice.Ecommerce].dbo.SkuOptionValues
+	(IdOptionType, IdSku, Value)
+	SELECT t.Id, s.Id, CAST(ISNULL(a.stock, 0) AS NVARCHAR(250)) 
+	FROM [VitalChoice.Ecommerce].dbo.Skus AS s
+	INNER JOIN [VitalChoice.Ecommerce].dbo.Products AS p ON p.Id = s.IdProduct
+	INNER JOIN [vitalchoice2.0].dbo.products AS a ON a.idProduct = s.Id
+	INNER JOIN [VitalChoice.Ecommerce].dbo.SkuOptionTypes AS t ON (t.IdObjectType = p.IdObjectType OR t.IdObjectType IS NULL) AND t.Name = N'Stock'
+
+	--EXEC dbo.MoveSkuField @destFieldName = N'DisregardStock', @sourceFieldName = N'nostock', @conversion = N'CASE WHEN ISNULL(a.nostock, 0) <> 0 THEN ''True'' ELSE ''False'' END'
+	--EXEC dbo.MoveSkuField @destFieldName = N'Stock', @sourceFieldName = N'stock', @conversion = N'CAST(ISNULL(a.stock, 0) AS NVARCHAR(250))'
 	EXEC dbo.MoveSkuField @destFieldName = N'DisallowSingle', @sourceFieldName = N'disallowSingle', @conversion = N'CASE WHEN ISNULL(a.disallowSingle, 0) <> 0 THEN ''True'' ELSE ''False'' END'
 	EXEC dbo.MoveSkuField @destFieldName = N'NonDiscountable', @sourceFieldName = N'NonDiscountable', @conversion = N'CASE WHEN ISNULL(a.NonDiscountable, 0) <> 0 THEN ''True'' ELSE ''False'' END'
 	EXEC dbo.MoveSkuField @destFieldName = N'OrphanType', @sourceFieldName = N'OrphanType', @conversion = N'CASE WHEN ISNULL(a.OrphanType, 0) <> 0 THEN ''True'' ELSE ''False'' END'
@@ -2784,8 +2803,6 @@ FROM [VitalChoice.Ecommerce].dbo.BigStringValues AS b
 INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionValues AS v ON b.IdBigString = v.IdBigString
 INNER JOIN [VitalChoice.Ecommerce].dbo.ProductOptionTypes AS t ON t.Name = 'Description' AND t.Id = v.IdOptionType
 WHERE v.IdProduct IN (SELECT Id FROM [vitalchoice2.0].dbo.TempProductsToMove)
-
-SELECT * FROM [vitalchoice2.0].dbo.TempProductsToMove
 
 GO
 
