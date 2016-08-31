@@ -49,6 +49,7 @@ Post-Deployment Script Template
 :r .\Scripts\SPGetKPISales.sql
 :r .\Scripts\SPGetShortOrders.sql
 :r .\Scripts\SPGetAAFESReport.sql
+:r .\Scripts\VCustomersWithDublicateEmails.sql
 :r .\Scripts\OrderIndexes.sql
 :r .\Scripts\SettingOptionTypesData.sql
 :r .\Scripts\Indexes.sql

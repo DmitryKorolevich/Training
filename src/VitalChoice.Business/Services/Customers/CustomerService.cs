@@ -89,6 +89,7 @@ namespace VitalChoice.Business.Services.Customers
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly IEcommerceRepositoryAsync<VWholesaleSummaryInfo> _vWholesaleSummaryInfoRepositoryAsync;
         private readonly IEcommerceRepositoryAsync<VOrderCountOnCustomer> _vOrderCountOnCustomerRepositoryAsync;
+        private readonly IEcommerceRepositoryAsync<VCustomerWithDublicateEmail> _vCustomerWithDublicateEmailRepositoryAsync;
         private readonly SpEcommerceRepository _sPEcommerceRepository;
         private readonly ReferenceData _referenceData;
         private readonly CustomerPaymentMethodMapper _customerPaymentMethodMapper;
@@ -113,6 +114,7 @@ namespace VitalChoice.Business.Services.Customers
             IPaymentMethodService paymentMethodService,
             IEcommerceRepositoryAsync<VWholesaleSummaryInfo> vWholesaleSummaryInfoRepositoryAsync,
             IEcommerceRepositoryAsync<VOrderCountOnCustomer> vOrderCountOnCustomerRepositoryAsync,
+            IEcommerceRepositoryAsync<VCustomerWithDublicateEmail> vCustomerWithDublicateEmailRepositoryAsync,
             SpEcommerceRepository sPEcommerceRepository,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
             IDynamicEntityOrderingExtension<Customer> orderingExtension, ReferenceData referenceData,
@@ -141,6 +143,7 @@ namespace VitalChoice.Business.Services.Customers
             _paymentMethodService = paymentMethodService;
             _vWholesaleSummaryInfoRepositoryAsync = vWholesaleSummaryInfoRepositoryAsync;
             _vOrderCountOnCustomerRepositoryAsync = vOrderCountOnCustomerRepositoryAsync;
+            _vCustomerWithDublicateEmailRepositoryAsync = vCustomerWithDublicateEmailRepositoryAsync;
             _sPEcommerceRepository = sPEcommerceRepository;
             _referenceData = referenceData;
             _customerPaymentMethodRepositoryAsync = customerPaymentMethodRepositoryAsync;
@@ -1099,6 +1102,15 @@ namespace VitalChoice.Business.Services.Customers
                 }
             }
             return true;
+        }
+
+        public async Task<PagedList<VCustomerWithDublicateEmail>> GetCustomersWithDublicateEmailsAsync(FilterBase filter)
+        {
+            Func<IQueryable<VCustomerWithDublicateEmail>, IOrderedQueryable<VCustomerWithDublicateEmail>> sortable =
+                x => x.OrderByDescending(y => y.Count);
+            var toReturn = await _vCustomerWithDublicateEmailRepositoryAsync.Query().OrderBy(sortable).
+                SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            return toReturn;
         }
 
         #region Reports 

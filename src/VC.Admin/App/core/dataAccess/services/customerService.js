@@ -102,6 +102,10 @@ angular.module('app.core.dataAccess.services.customerService', [])
 		{
 		    return $http.post(baseUrl + 'MergeCustomers/{0}'.format(id), model, getConfig(tracker));
 		},
+		getCustomersWithDublicateEmails: function (model, tracker)
+		{
+		    return $http.post(baseUrl + 'GetCustomersWithDublicateEmails', model, getConfig(tracker));
+		},
 
 	    //reports
 		getWholesaleSummaryReport: function (tracker)

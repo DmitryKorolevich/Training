@@ -1,5 +1,46 @@
 ﻿<div class="container-fluid merger-customers">
     <div class="well">
+        <div class="dublicate-emails-panel">
+            <uib-accordion>
+                <uib-accordion-group>
+                    <uib-accordion-heading>
+                        <span class="legend">Customers With Dublicate Emails</span>
+                    </uib-accordion-heading>
+                    <spinner-overlay data-loading="dublicateEmailsRefreshTracker.active()">
+                        <table id="dublicate-emails-data-grid" class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Count</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-ng-repeat="item in dublicateEmails">
+                                    <td>{{::item.Email}}</td>
+                                    <td>{{::item.Count}}</td>
+                                    <td>
+                                        <button title="Select" data-ng-click="selectDublicateEmail(item)" class="btn btn-default btn-success btn-xs">
+                                            Select
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </spinner-overlay>
+                    <uib-pagination boundary-links="true"
+                                    total-items="dublicateTotalItems"
+                                    items-per-page="filter.Paging.PageItemCount"
+                                    data-ng-model="filter.Paging.PageIndex"
+                                    previous-text="&lsaquo;"
+                                    next-text="&rsaquo;"
+                                    first-text="&laquo;"
+                                    last-text="&raquo;"
+                                    data-ng-change="pageChanged();scrollTo('dublicate-emails-data-grid');">
+                    </uib-pagination>
+                </uib-accordion-group>
+            </uib-accordion>
+        </div>
         <span class="legend">Merge Customers</span>
         <div data-ng-if="!primary">
             <span class="legend">Step 1 - Select Primary Customer</span>
@@ -9,11 +50,12 @@
             <span class="legend">Primary Customer</span>
             <div class="row">
                 <div class="col-md-6 checkbox">
-                    Customer #: <a target="_blank" ui-sref="index.oneCol.customerDetail({id:primary.Id})">{{primary.Id}}</a>, Name: {{primary.Name}}
+                    Customer #: <a target="_blank" ui-sref="index.oneCol.customerDetail({id:primary.Id})">{{primary.Id}}</a>, Email: {{primary.Email}}, Name: {{primary.Name}}
                 </div>
                 <div class="col-md-6 ">
                     <button class="btn btn-success pull-right " data-ng-click="mergeCustomers();" ladda="refreshTracker.active()" type="button">Merge Customers</button>
                     <button class="btn btn-info pull-right margin-right-15px" data-ng-click="selectAnotherPrimary();" ladda="refreshTracker.active()" type="button">Select Another Primary Customer</button>
+                    <button class="btn btn-info pull-right margin-right-15px" data-ng-click="userTheSameEmailStep2();" type="button">Use The Same Email On The Second Step</button>
                 </div>
             </div>
             <span class="legend">Customers For Merge</span>

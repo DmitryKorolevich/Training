@@ -88,10 +88,25 @@ BEGIN
 				(@customerfirstname IS NULL OR cadfval.Value LIKE @customerfirstname) AND
 				(@customerlastname IS NULL OR cadlval.Value LIKE @customerlastname) AND
 				(@shipfirstname IS NULL OR sadfval.Value LIKE @shipfirstname) AND
-				(@shiplastname IS NULL OR sadlval.Value LIKE @shiplastname)
+				(@shiplastname IS NULL OR sadlval.Value LIKE @shiplastname) AND
+				(@shipfrom IS NULL OR EXISTS
+					(SELECT
+					TOP 1 s.IdOrder
+					FROM OrderShippingPackages s
+					WHERE s.IdOrder=temp.IdOrder AND s.ShippedDate>=@shipfrom
+					)
+				) AND
+				(@shipto IS NULL OR EXISTS
+					(SELECT
+					TOP 1 s.IdOrder
+					FROM OrderShippingPackages s
+					WHERE s.IdOrder=temp.IdOrder AND s.ShippedDate<=@shipto
+					)
+				)
 		)		
 
-		SELECT 1 as Id, COUNT(*) as Count FROM orderids	
+		SELECT 1 as Id, COUNT(*) as Count FROM orderids			
+		OPTION(RECOMPILE)
 	END
 	ELSE
 	BEGIN
@@ -130,13 +145,28 @@ BEGIN
 				(@customerfirstname IS NULL OR cadfval.Value LIKE @customerfirstname) AND
 				(@customerlastname IS NULL OR cadlval.Value LIKE @customerlastname) AND
 				(@shipfirstname IS NULL OR sadfval.Value LIKE @shipfirstname) AND
-				(@shiplastname IS NULL OR sadlval.Value LIKE @shiplastname)
+				(@shiplastname IS NULL OR sadlval.Value LIKE @shiplastname) AND
+				(@shipfrom IS NULL OR EXISTS
+					(SELECT
+					TOP 1 s.IdOrder
+					FROM OrderShippingPackages s
+					WHERE s.IdOrder=temp.IdOrder AND s.ShippedDate>=@shipfrom
+					)
+				) AND
+				(@shipto IS NULL OR EXISTS
+					(SELECT
+					TOP 1 s.IdOrder
+					FROM OrderShippingPackages s
+					WHERE s.IdOrder=temp.IdOrder AND s.ShippedDate<=@shipto
+					)
+				)
 		)
 
 		SELECT Id FROM
 			(SELECT Id, ROW_NUMBER() OVER (ORDER BY Id DESC) AS RowNumber FROM orderids) temp
 		WHERE @pageindex is NULL OR (RowNumber>(@pageindex-1)*@pagesize AND RowNumber<=@pageindex*@pagesize)
-		ORDER BY Id DESC
+		ORDER BY Id DESC		
+		OPTION(RECOMPILE)
 	END	 
 
 END
