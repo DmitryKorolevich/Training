@@ -1874,6 +1874,60 @@ WHERE Value='empty' AND IdCustomer NOT IN
 (SELECT IdCustomer  FROM CustomerOptionValues
 WHERE IdOptionType=11))
 
+GO
+
+WITH duplicate_emails_active
+AS
+(
+	SELECT email FROM Customers AS c
+	INNER JOIN CustomerOptionTypes AS t ON t.Name = N'Guest'
+	LEFT JOIN CustomerOptionValues AS cv ON cv.IdCustomer = c.Id AND cv.IdOptionType = t.Id
+	WHERE StatusCode = 2 AND (cv.Value IS NULL OR cv.Value <> N'True')
+	GROUP BY email
+	HAVING COUNT(*) > 1
+)
+UPDATE cc
+SET Status = 
+	CASE WHEN cc.Id = 
+		(
+			SELECT TOP 1 Id FROM Customers AS c
+			INNER JOIN duplicate_emails_active AS d ON d.email = c.email
+			WHERE c.email = cc.email
+			ORDER BY c.DateEdited DESC, c.DateCreated DESC
+		)
+		THEN cc.Status
+		ELSE 0
+	END
+FROM [VitalChoice.Infrastructure].dbo.AspNetUsers AS cc
+WHERE cc.IdUserType = 2 AND email IN (SELECT email FROM duplicate_emails_active)
+
+GO
+
+WITH duplicate_emails_active
+AS
+(
+	SELECT email FROM Customers AS c
+	INNER JOIN CustomerOptionTypes AS t ON t.Name = N'Guest'
+	LEFT JOIN CustomerOptionValues AS cv ON cv.IdCustomer = c.Id AND cv.IdOptionType = t.Id
+	WHERE StatusCode = 2 AND (cv.Value IS NULL OR cv.Value <> N'True')
+	GROUP BY email
+	HAVING COUNT(*) > 1
+)
+UPDATE cc
+SET StatusCode = 
+	CASE WHEN cc.Id = 
+		(
+			SELECT TOP 1 Id FROM Customers AS c
+			INNER JOIN duplicate_emails_active AS d ON d.email = c.email
+			WHERE c.email = cc.email
+			ORDER BY c.DateEdited DESC, c.DateCreated DESC
+		)
+		THEN 2
+		ELSE 4
+	END
+FROM Customers AS cc
+WHERE email IN (SELECT email FROM duplicate_emails_active)
+
 
 GO
 USE [vitalchoice2.0]
