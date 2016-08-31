@@ -43,7 +43,7 @@
                                                 <div class="col-md-9">
                                                     <div class="input-group">
                                                         <span class="input-group-addon">$</span>
-                                                        <input type="text" name="Balance" class="form-control" placeholder="Amount" money max="100000" min="0.01" data-ng-model="gc.Balance" required>
+                                                        <input type="text" name="Balance" class="form-control" placeholder="Amount" money max="100000" min="0.00" data-ng-model="gc.Balance" required>
                                                     </div>
                                                     <div class="error-container" ng-show="forms.form.submitted && forms.form.Balance.$invalid">
                                                         <small class="error" ng-show="forms.form.Balance.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Amount")}}</small>
