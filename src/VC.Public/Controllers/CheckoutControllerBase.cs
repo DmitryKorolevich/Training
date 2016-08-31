@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -130,7 +131,8 @@ namespace VC.Public.Controllers
             int num = 0;
             foreach (var code in gcsInCart)
             {
-                if (!string.IsNullOrWhiteSpace(code.Value) && order.GiftCertificates.All(g => g.GiftCertificate.Code != code.Value))
+                if (!string.IsNullOrWhiteSpace(code.Value) &&
+                    order.GiftCertificates.All(g => !string.Equals(g.GiftCertificate.Code?.Trim(), code.Value.Trim(), StringComparison.CurrentCultureIgnoreCase)))
                 {
                     cartModel.GiftCertificateCodes.Add(code);
                     code.ErrorMessage = "Gift Certificate not found";

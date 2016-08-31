@@ -249,7 +249,7 @@ namespace VitalChoice.Business.Services.Products
         {
             if (string.IsNullOrWhiteSpace(code))
                 return Task.FromResult<GiftCertificate>(null);
-            var query = giftCertificateRepository.Query(new GcQuery().WithEqualCode(code).NotDeleted());
+            var query = giftCertificateRepository.Query(new GcQuery().WithEqualCode(code.Trim()).NotDeleted());
 
             return query.SelectFirstOrDefaultAsync(false);
         }
