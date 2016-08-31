@@ -20,6 +20,7 @@ using VitalChoice.Business.Helpers;
 using VitalChoice.SharedWeb.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Interfaces.Services;
 
 namespace VC.Admin.ModelConverters
