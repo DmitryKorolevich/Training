@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Extensions;
@@ -50,7 +51,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
                 }
                 var charge = Math.Min(orderSubTotal, totalGcAmount);
                 gc.GiftCertificate.Balance += gc.Amount - charge;
-                gc.Amount = context.Order.IsAnyNotIncomplete() ? charge : 0;
+                gc.Amount = context.CombinedStatus != OrderStatus.Incomplete ? charge : 0;
                 orderSubTotal -= charge;
                 context.GcMessageInfos.Add(new MessageInfo
                 {
@@ -62,9 +63,9 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
                 var perishableCharge = Math.Min(perishableSubtotal, totalGcAmount);
                 perishableSubtotal -= perishableCharge;
                 var nonPerishableCharge = Math.Min(nonPerishableSubtotal, totalGcAmount - perishableCharge);
-                gc.NPAmount = context.Order.IsAnyNotIncomplete() ? nonPerishableCharge : 0;
+                gc.NPAmount = context.CombinedStatus != OrderStatus.Incomplete ? nonPerishableCharge : 0;
                 nonPerishableSubtotal -= nonPerishableCharge;
-                gc.PAmount = context.Order.IsAnyNotIncomplete() ? perishableCharge : 0;
+                gc.PAmount = context.CombinedStatus != OrderStatus.Incomplete ? perishableCharge : 0;
             }
             context.GiftCertificatesSubtotal = orderSubTotal - (decimal) context.Data.PayableTotal;
             context.SplitInfo.PerishableGiftCertificateAmount = perishableSubtotal - context.SplitInfo.PerishableSubtotal;
