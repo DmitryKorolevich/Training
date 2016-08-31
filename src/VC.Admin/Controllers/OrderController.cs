@@ -330,7 +330,16 @@ namespace VC.Admin.Controllers
             }
             await _orderService.OrderTypeSetup(order);
             var orderContext = await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus);
-
+            if (!string.IsNullOrWhiteSpace(model.DiscountCode) && orderContext.Order.Discount == null)
+            {
+                orderContext.Messages.Add(new MessageInfo
+                {
+                    MessageLevel = MessageLevel.Error,
+                    MessageType = MessageType.FormField,
+                    Field = "DiscountCode",
+                    Message = "Discount not found"
+                });
+            }
             OrderCalculateModel toReturn = new OrderCalculateModel(orderContext);
 
             return toReturn;

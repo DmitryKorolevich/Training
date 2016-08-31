@@ -89,8 +89,7 @@ namespace VC.Public.Controllers
                 ModelState.AddModelError(string.Empty, cartModel.TopGlobalMessage);
             }
             var gcMessages = context.GcMessageInfos.ToDictionary(m => m.Field);
-            if (!string.IsNullOrWhiteSpace(cartModel.DiscountCode) && order.Discount == null &&
-                !((bool?) order.SafeData.IsHealthwise ?? false))
+            if (!string.IsNullOrWhiteSpace(cartModel.DiscountCode) && order.Discount == null)
             {
                 context.Messages.Add(new MessageInfo
                 {
