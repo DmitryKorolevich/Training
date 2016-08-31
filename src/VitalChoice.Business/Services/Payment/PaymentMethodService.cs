@@ -279,9 +279,21 @@ namespace VitalChoice.Business.Services.Payment
                 var results = controller.GetResults();
                 if (results?.Count > 0)
                 {
-                    throw new AppValidationException($"Credit Card authorization failed:\n{string.Join("\n", results)}");
+                    errors.Add(new MessageInfo
+                    {
+                        Message = $"Credit Card authorization failed:\n{string.Join("\n", results)}",
+                        MessageLevel = MessageLevel.Error,
+                        MessageType = MessageType.FormField
+                    });
+                    return errors;
                 }
-                throw new AppValidationException("Credit Card authorization failed.");
+                errors.Add(new MessageInfo
+                {
+                    Message = "Credit Card authorization failed.",
+                    MessageLevel = MessageLevel.Error,
+                    MessageType = MessageType.FormField
+                });
+                return errors;
             }
             ParseErrors(errors, response);
             if (response.messages.resultCode == messageTypeEnum.Ok && errors.Count == 0)
