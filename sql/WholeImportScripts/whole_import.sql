@@ -2668,6 +2668,12 @@ GO
 	INNER JOIN [vitalchoice2.0].dbo.products AS a ON a.idProduct = s.Id
 	INNER JOIN [VitalChoice.Ecommerce].dbo.SkuOptionTypes AS t ON (t.IdObjectType = p.IdObjectType OR t.IdObjectType IS NULL) AND t.Name = N'Stock'
 
+	UPDATE s
+		SET Price = p.price,
+			WholesalePrice = p.bToBPrice
+	FROM [VitalChoice.Ecommerce].dbo.Skus AS s
+	INNER JOIN [vitalchoice2.0].dbo.products AS p ON p.idProduct = s.Id
+
 	--EXEC dbo.MoveSkuField @destFieldName = N'DisregardStock', @sourceFieldName = N'nostock', @conversion = N'CASE WHEN ISNULL(a.nostock, 0) <> 0 THEN ''True'' ELSE ''False'' END'
 	--EXEC dbo.MoveSkuField @destFieldName = N'Stock', @sourceFieldName = N'stock', @conversion = N'CAST(ISNULL(a.stock, 0) AS NVARCHAR(250))'
 	EXEC dbo.MoveSkuField @destFieldName = N'DisallowSingle', @sourceFieldName = N'disallowSingle', @conversion = N'CASE WHEN ISNULL(a.disallowSingle, 0) <> 0 THEN ''True'' ELSE ''False'' END'
