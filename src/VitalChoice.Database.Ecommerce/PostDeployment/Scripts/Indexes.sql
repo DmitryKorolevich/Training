@@ -105,3 +105,23 @@ BEGIN
 		[IdOrder] DESC
 	)
 END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'GiftCertificates') AND name = N'IX_IdOrder')
+BEGIN
+	CREATE NONCLUSTERED INDEX [IX_IdOrder] ON [dbo].[GiftCertificates]
+	(
+		[IdOrder] DESC
+	)
+END
+
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'GiftCertificates') AND name = N'IX_IdSku')
+BEGIN
+	CREATE NONCLUSTERED INDEX IX_IdSku ON [dbo].[GiftCertificates]
+	(
+		IdSku
+	)
+END
