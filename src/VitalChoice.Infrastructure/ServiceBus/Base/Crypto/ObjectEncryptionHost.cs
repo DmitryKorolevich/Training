@@ -101,7 +101,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
 
         public void UpdateLocalKey(KeyExchange key)
         {
-            var data = ProtectedData.Protect(key.ToCombined(), _signProvider?.GetPrivateKey(), DataProtectionScope.CurrentUser);
+            var data = ProtectedData.Protect(key.ToCombined(), Encoding.Unicode.GetBytes(SignAlgorithmType),
+                DataProtectionScope.LocalMachine);
             File.WriteAllBytes(_localEncryptionPath, data);
             _localAes.Key = key.Key;
             _localAes.IV = key.IV;
@@ -552,7 +553,16 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                 if (!string.IsNullOrWhiteSpace(_localEncryptionPath))
                 {
                     KeyExchange exchange;
-                    if (!File.Exists(_localEncryptionPath))
+                    if (File.Exists(_localEncryptionPath))
+                    {
+                        var data = File.ReadAllBytes(_localEncryptionPath);
+                        var key = ProtectedData.Unprotect(data, Encoding.Unicode.GetBytes(SignAlgorithmType),
+                            DataProtectionScope.LocalMachine);
+                        exchange = new KeyExchange(key);
+                        aes.IV = exchange.IV;
+                        aes.Key = exchange.Key;
+                    }
+                    else
                     {
                         var directory = Path.GetDirectoryName(Path.GetFullPath(_localEncryptionPath));
                         if (!string.IsNullOrEmpty(directory))
@@ -566,28 +576,24 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                                 AccessControlType.Allow));
                             Directory.CreateDirectory(directory, security);
                         }
-                        exchange = new KeyExchange(GetPrivateKeyHash(), Take(GetPrivateKeyHash(), 16));
-                        var data = ProtectedData.Protect(exchange.ToCombined(), _signProvider?.GetPrivateKey(),
-                            DataProtectionScope.CurrentUser);
+                        aes.GenerateKey();
+                        aes.GenerateKey();
+                        exchange = new KeyExchange(aes.Key, aes.IV);
+                        var data = ProtectedData.Protect(exchange.ToCombined(), Encoding.Unicode.GetBytes(SignAlgorithmType),
+                            DataProtectionScope.LocalMachine);
                         File.WriteAllBytes(_localEncryptionPath, data);
                     }
-                    else
-                    {
-                        var data = File.ReadAllBytes(_localEncryptionPath);
-                        var key = ProtectedData.Unprotect(data, _signProvider?.GetPrivateKey(), DataProtectionScope.CurrentUser);
-                        exchange = new KeyExchange(key);
-                    }
-                    aes.IV = exchange.IV;
-                    aes.Key = exchange.Key;
                 }
                 else
                 {
-                    aes.IV = Take(GetPrivateKeyHash(), 16);
-                    aes.Key = GetPrivateKeyHash();
+                    _logger.LogWarning("No key path specified, using random local key");
+                    aes.GenerateKey();
+                    aes.GenerateKey();
                 }
             }
             else
             {
+                _logger.LogWarning("Initialization failed, using random local key");
                 aes.GenerateKey();
                 aes.GenerateKey();
             }
