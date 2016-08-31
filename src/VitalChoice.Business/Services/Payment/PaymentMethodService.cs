@@ -238,7 +238,7 @@ namespace VitalChoice.Business.Services.Payment
                 payment = paymentType,
                 order = new orderType
                 {
-                    invoiceNumber = $"{paymentMethod.Id}_{DateTime.Now.ToString("hmmss")}"
+                    invoiceNumber = $"{paymentMethod.Id}_{DateTime.Now:hmmss}"
                 },
                 billTo = new customerAddressType
                 {

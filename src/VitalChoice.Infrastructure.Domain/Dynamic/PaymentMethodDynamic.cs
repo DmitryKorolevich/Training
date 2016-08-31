@@ -10,6 +10,7 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
     [JsonObject(MemberSerialization.OptOut)]
     public abstract class PaymentMethodDynamic : MappedObject
     {
+        [DataMember]
         public AddressDynamic Address { get; set; }
     }
 }
