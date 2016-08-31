@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
+using VitalChoice.Infrastructure.Extensions;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
 
@@ -37,7 +38,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
                     });
                     continue;
                 }
-                var totalGcAmount = gc.Amount + gc.GiftCertificate.Balance;
+                var totalGcAmount = gc.GiftCertificate.Balance + gc.Amount;
                 if (totalGcAmount == 0)
                 {
                     context.GcMessageInfos.Add(new MessageInfo
@@ -49,7 +50,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
                 }
                 var charge = Math.Min(orderSubTotal, totalGcAmount);
                 gc.GiftCertificate.Balance += gc.Amount - charge;
-                gc.Amount = charge;
+                gc.Amount = context.Order.IsAnyNotIncomplete() ? charge : 0;
                 orderSubTotal -= charge;
                 context.GcMessageInfos.Add(new MessageInfo
                 {
@@ -61,9 +62,9 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
                 var perishableCharge = Math.Min(perishableSubtotal, totalGcAmount);
                 perishableSubtotal -= perishableCharge;
                 var nonPerishableCharge = Math.Min(nonPerishableSubtotal, totalGcAmount - perishableCharge);
-                gc.NPAmount = nonPerishableCharge;
+                gc.NPAmount = context.Order.IsAnyNotIncomplete() ? nonPerishableCharge : 0;
                 nonPerishableSubtotal -= nonPerishableCharge;
-                gc.PAmount = perishableCharge;
+                gc.PAmount = context.Order.IsAnyNotIncomplete() ? perishableCharge : 0;
             }
             context.GiftCertificatesSubtotal = orderSubTotal - (decimal) context.Data.PayableTotal;
             context.SplitInfo.PerishableGiftCertificateAmount = perishableSubtotal - context.SplitInfo.PerishableSubtotal;
