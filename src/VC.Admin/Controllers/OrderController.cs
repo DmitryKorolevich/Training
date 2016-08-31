@@ -1035,6 +1035,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<decimal>> GetOrderWithRegionInfoAmount([FromBody]OrderRegionFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
             var toReturn = await _orderService.GetOrderWithRegionInfoAmountAsync(filter);
             return toReturn;
         }
@@ -1114,6 +1115,8 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<WholesaleDropShipReport>> GetWholesaleDropShipReport([FromBody]WholesaleDropShipReportFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
+            filter.ShipTo = filter.ShipTo?.AddDays(1) ?? filter.ShipTo;
             var toReturn = await _orderReportService.GetWholesaleDropShipReportAsync(filter);
             return toReturn;
         }
@@ -1122,6 +1125,8 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedList<WholesaleDropShipReportOrderItem>>> GetOrdersForWholesaleDropShipReport([FromBody]WholesaleDropShipReportFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
+            filter.ShipTo = filter.ShipTo?.AddDays(1) ?? filter.ShipTo;
             var toReturn = await _orderReportService.GetOrdersForWholesaleDropShipReportAsync(filter);
             return toReturn;
         }
@@ -1178,6 +1183,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedList<TransactionAndRefundReportItem>>> GetTransactionAndRefundReport([FromBody]TransactionAndRefundReportFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
             var toReturn = await _orderReportService.GetTransactionAndRefundReportItemsAsync(filter);
             return toReturn;
         }
@@ -1228,6 +1234,8 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<ICollection<OrdersSummarySalesOrderTypeStatisticItem>>> GetOrdersSummarySalesOrderTypeStatisticItems([FromBody]OrdersSummarySalesReportFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
+            filter.ShipTo = filter.ShipTo?.AddDays(1) ?? filter.ShipTo;
             var toReturn = await _orderReportService.GetOrdersSummarySalesOrderTypeStatisticItemsAsync(filter);
             return toReturn.ToList();
         }
@@ -1236,6 +1244,9 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedList<OrdersSummarySalesOrderItem>>> GetOrdersSummarySalesOrderItems([FromBody]OrdersSummarySalesReportFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
+            filter.ShipTo = filter.ShipTo?.AddDays(1) ?? filter.ShipTo;
+            filter.FirstOrderTo = filter.FirstOrderTo?.AddDays(1) ?? filter.FirstOrderTo;
             var toReturn = await _orderReportService.GetOrdersSummarySalesOrderItemsAsync(filter);
             return toReturn;
         }
@@ -1268,7 +1279,7 @@ namespace VC.Admin.Controllers
                 ShipFrom = dShipFrom,
                 ShipTo = dShipTo?.AddDays(1) ?? dShipTo,
                 FirstOrderFrom = dFirstOrderFrom,
-                FirstOrderTo = dFirstOrderTo?.AddDays(1) ?? dShipTo,
+                FirstOrderTo = dFirstOrderTo?.AddDays(1) ?? dFirstOrderTo,
                 IdCustomerType = idcustomertype,
                 IdCustomerSource = idcustomersource,
                 CustomerSourceDetails = customersourcedetails,
@@ -1298,6 +1309,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedList<SkuAddressReportItem>>> GetSkuAddressReportItems([FromBody]SkuAddressReportFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
             var toReturn = await _orderReportService.GetSkuAddressReportItemsAsync(filter);
             return toReturn;
         }
@@ -1342,6 +1354,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedList<MatchbackReportItem>>> GetMatchbackReportItems([FromBody]MatchbackReportFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
             var toReturn = await _orderReportService.GetMatchbackReportItemsAsync(filter);
             return toReturn;
         }
@@ -1383,6 +1396,9 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedList<MailingReportItem>>> GetMailingReportItems([FromBody]MailingReportFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
+            filter.ToFirst = filter.ToFirst?.AddDays(1) ?? filter.ToFirst;
+            filter.ToLast = filter.ToLast?.AddDays(1) ?? filter.ToLast;
             var toReturn = await _orderReportService.GetMailingReportItemsAsync(filter);
             return toReturn;
         }
@@ -1414,9 +1430,9 @@ namespace VC.Admin.Controllers
                 FromOrderCount = fromordercount,
                 ToOrderCount = toordercount,
                 FromFirst = dFromFirst,
-                ToFirst = dToFirst,
+                ToFirst = dToFirst?.AddDays(1) ?? dToFirst,
                 FromLast = dFromLast,
-                ToLast = dToLast,
+                ToLast = dToLast?.AddDays(1) ?? dToLast,
                 LastFromTotal = lastfromtotal,
                 LastToTotal = lasttototal,
                 DNM = dnm,
@@ -1444,6 +1460,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<OrderSkuCountReport>> GetOrderSkuCountReport([FromBody]OrderSkuCountReportFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
             var toReturn = await _orderReportService.GetOrderSkuCountReportAsync(filter);
             return toReturn;
         }
@@ -1452,6 +1469,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<ShippedViaSummaryReport>> GetShippedViaSummaryReport([FromBody]ShippedViaReportFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
             var toReturn = await _orderReportService.GetShippedViaSummaryReportAsync(filter);
             return toReturn;
         }
@@ -1460,6 +1478,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<PagedList<ShippedViaReportRawOrderItem>>> GetShippedViaItemsReportOrderItems([FromBody]ShippedViaReportFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
             var toReturn = await _orderReportService.GetShippedViaItemsReportOrderItemsAsync(filter);
             return toReturn;
         }
@@ -1506,6 +1525,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<ICollection<ProductQualitySalesReportItem>>> GetProductQualitySalesReportItems([FromBody]ProductQualitySalesReportFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
             var toReturn = await _orderReportService.GetProductQualitySalesReportItemsAsync(filter);
             return toReturn.ToList();
         }
@@ -1514,6 +1534,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<ICollection<ProductQualitySkusReportItem>>> GetProductQualitySkusReportItems([FromBody]ProductQualitySkusReportFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
             var toReturn = await _orderReportService.GetProductQualitySkusReportItemsAsync(filter);
             return toReturn.ToList();
         }
@@ -1522,6 +1543,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<ICollection<AAFESReportItem>>> GetAAFESReportItems([FromBody]AAFESReportFilter filter)
         {
+            filter.ShipTo = filter.ShipTo.AddDays(1);
             var toReturn = await _orderReportService.GetAAFESReportItemsAsync(filter);
             return toReturn.ToList();
         }

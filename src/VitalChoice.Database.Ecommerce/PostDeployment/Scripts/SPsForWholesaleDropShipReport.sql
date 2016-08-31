@@ -60,7 +60,7 @@ BEGIN
 				FROM Orders o WITH(NOLOCK)
 				JOIN Customers c WITH(NOLOCK) ON o.IdCustomer=c.Id
 				WHERE
-					o.DateCreated>=@from AND o.DateCreated<=@to AND
+					o.DateCreated>=@from AND o.DateCreated<@to AND
 					o.StatusCode!=3 AND o.IdObjectType!=5 AND o.IdObjectType!=6 AND o.IdObjectType!=2 AND
 					((o.OrderStatus IS NOT NULL AND o.OrderStatus!=1 AND o.OrderStatus!=4) OR 
 					(o.OrderStatus IS NULL AND o.POrderStatus!=1 AND o.POrderStatus!=4 AND
@@ -100,7 +100,7 @@ BEGIN
 					(SELECT
 					TOP 1 s.IdOrder
 					FROM OrderShippingPackages s
-					WHERE s.IdOrder=temp.IdOrder AND s.ShippedDate<=@shipto
+					WHERE s.IdOrder=temp.IdOrder AND s.ShippedDate<@shipto
 					)
 				)
 		)		
@@ -117,7 +117,7 @@ BEGIN
 				FROM Orders o WITH(NOLOCK)
 				JOIN Customers c WITH(NOLOCK) ON o.IdCustomer=c.Id
 				WHERE
-					o.DateCreated>=@from AND o.DateCreated<=@to AND
+					o.DateCreated>=@from AND o.DateCreated<@to AND
 					o.StatusCode!=3 AND o.IdObjectType!=5 AND o.IdObjectType!=6 AND o.IdObjectType!=2 AND 
 					((o.OrderStatus IS NOT NULL AND o.OrderStatus!=1 AND o.OrderStatus!=4) OR 
 					(o.OrderStatus IS NULL AND o.POrderStatus!=1 AND o.POrderStatus!=4 AND
@@ -157,7 +157,7 @@ BEGIN
 					(SELECT
 					TOP 1 s.IdOrder
 					FROM OrderShippingPackages s
-					WHERE s.IdOrder=temp.IdOrder AND s.ShippedDate<=@shipto
+					WHERE s.IdOrder=temp.IdOrder AND s.ShippedDate<@shipto
 					)
 				)
 		)
