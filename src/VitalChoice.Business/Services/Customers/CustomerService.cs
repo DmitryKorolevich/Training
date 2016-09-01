@@ -176,12 +176,13 @@ namespace VitalChoice.Business.Services.Customers
         {
             var errors = new List<MessageInfo>();
 
-            if (!string.IsNullOrEmpty(model.Email) && model.StatusCode == (int) CustomerStatus.Active)
+            if (!string.IsNullOrEmpty(model.Email) &&
+                (model.StatusCode == (int) CustomerStatus.Active || model.StatusCode == (int) CustomerStatus.PhoneOnly))
             {
                 var customerSameEmail =
                     await
                         _customerRepositoryAsync.Query(
-                                new CustomerQuery().Active().WithEmail(model.Email))
+                                new CustomerQuery().ActiveOrPhoneOnly().WithEmail(model.Email))
                             .Include(c => c.OptionValues)
                             .SelectAsync(false);
 

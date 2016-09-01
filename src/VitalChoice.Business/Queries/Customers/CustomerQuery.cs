@@ -48,6 +48,13 @@ namespace VitalChoice.Business.Queries.Customers
 			return this;
 		}
 
+        public CustomerQuery ActiveOrPhoneOnly()
+        {
+            Add(x => x.StatusCode == (int) CustomerStatus.PhoneOnly || x.StatusCode == (int) CustomerStatus.Active);
+
+            return this;
+        }
+
         public CustomerQuery WithStatus(CustomerStatus? status)
         {
             if (status.HasValue)
