@@ -340,6 +340,7 @@ namespace VitalChoice.Core.DependencyInjection
             options.PublicHost = configuration.GetSection("App:PublicHost").Value;
             options.AdminHost = configuration.GetSection("App:AdminHost").Value;
             options.MainSuperAdminEmail = configuration.GetSection("App:MainSuperAdminEmail").Value;
+            options.GiftListUploadEmail = configuration.GetSection("App:GiftListUploadEmail").Value;
             options.CustomerServiceToEmail = configuration.GetSection("App:CustomerServiceToEmail").Value;
             options.CustomerFeedbackToEmail = configuration.GetSection("App:CustomerFeedbackToEmail").Value;
             options.OrderShippingNotificationBcc = configuration.GetSection("App:OrderShippingNotificationBcc").Value;

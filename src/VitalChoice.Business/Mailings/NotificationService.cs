@@ -17,6 +17,7 @@ namespace VitalChoice.Business.Mailings
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IEcommerceRepositoryAsync<NewsletterBlockedEmail> _newsletterBlockedEmailRepository;
         private static string _mainSuperAdminEmail;
+        private static string _giftListEmail;
         private static string _adminHost;
         private static string _publicHost;
         private static string _orderShippingNotificationBcc;
@@ -30,6 +31,7 @@ namespace VitalChoice.Business.Mailings
             _emailTemplateService = emailTemplateService;
             _newsletterBlockedEmailRepository = newsletterBlockedEmailRepository;
             _mainSuperAdminEmail = appOptions.Value.MainSuperAdminEmail;
+            _giftListEmail = appOptions.Value.GiftListUploadEmail;
             _adminHost = appOptions.Value.AdminHost;
             _publicHost = appOptions.Value.PublicHost;
             _orderShippingNotificationBcc = appOptions.Value.OrderShippingNotificationBcc;
@@ -251,7 +253,7 @@ namespace VitalChoice.Business.Mailings
 
             if (generatedEmail != null)
             {
-                await emailSender.SendEmailAsync(_mainSuperAdminEmail, generatedEmail.Subject, generatedEmail.Body);
+                await emailSender.SendEmailAsync(_giftListEmail, generatedEmail.Subject, generatedEmail.Body);
             }
         }
 

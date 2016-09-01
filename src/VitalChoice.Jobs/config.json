@@ -7,6 +7,8 @@
     "DefaultCultureId": "en-US",
     "CustomerServiceToEmail": "customercare@vitalchoice.com",
     "CustomerFeedbackToEmail": "feedback@vitalchoice.com",
+    "GiftListUploadEmail": "gary@g2designgroup.com",
+    "MainSuperAdminEmail": "gary@g2designgroup.com",
     "OrderShippingNotificationBcc": "",
     //cdbdf92c@trustpilotservice.com
 

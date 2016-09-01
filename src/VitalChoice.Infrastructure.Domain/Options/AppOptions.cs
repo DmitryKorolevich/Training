@@ -12,7 +12,8 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public string DefaultCultureId { get; set; }
         public string PublicHost { get; set; }
         public string AdminHost { get; set; }
-        public string MainSuperAdminEmail{get;set; }
+        public string MainSuperAdminEmail { get; set; }
+        public string GiftListUploadEmail { get; set; }
         public string CustomerServiceToEmail { get; set; }
         public string CustomerFeedbackToEmail { get; set; }
         public string OrderShippingNotificationBcc { get; set; }
@@ -20,11 +21,11 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public string FilesPath { get; set; }
         public bool EnableOrderTrackScripts { get; set; }
         public EmailConfiguration EmailConfiguration { get; set; }
-		public Versioning Versioning { get; set; }
-		public AzureStorage AzureStorage { get; set; }
+        public Versioning Versioning { get; set; }
+        public AzureStorage AzureStorage { get; set; }
         public FedExOptions FedExOptions { get; set; }
         public AvataxOptions Avatax { get; set; }
-	    public GoogleCaptcha GoogleCaptcha { get; set; }
+        public GoogleCaptcha GoogleCaptcha { get; set; }
         public ExportService ExportService { get; set; }
         public AuthorizeNet AuthorizeNet { get; set; }
         public PDFMyUrl PDFMyUrl { get; set; }

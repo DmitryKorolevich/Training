@@ -7,6 +7,7 @@
     "PublicHost": "staging.g2-dg.com",
     "AdminHost": "admin.staging.g2-dg.com",
     "MainSuperAdminEmail": "gary@g2designgroup.com",
+    "GiftListUploadEmail": "gary@g2designgroup.com",
     "CustomerServiceToEmail": "customercare@vitalchoice.com",
     "CustomerFeedbackToEmail": "feedback@vitalchoice.com",
     "OrderShippingNotificationBcc": "",
