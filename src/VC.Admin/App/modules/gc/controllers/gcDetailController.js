@@ -118,9 +118,18 @@ function ($scope, $rootScope, $state, $stateParams, gcService, orderService, toa
 
     $scope.send = function ()
     {
+        var name = '';
+        if ($scope.gc.FirstName)
+        {
+            name += $scope.gc.FirstName + ' ';
+        }
+        if ($scope.gc.LastName)
+        {
+            name += $scope.gc.LastName;
+        }
         var data =
             {
-                ToName: $scope.gc.FirstName || $scope.gc.LastName ? $scope.gc.FirstName + ' ' + $scope.gc.LastName : null,
+                ToName: name,
                 ToEmail: $scope.gc.Email,
                 FromName: 'Vital Choice',
                 Codes: [$scope.gc],

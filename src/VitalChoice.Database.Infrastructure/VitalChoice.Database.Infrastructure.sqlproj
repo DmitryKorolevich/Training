@@ -100,4 +100,7 @@
   <ItemGroup>
     <None Include="PreDeployment\Scripts\MasterItems.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\EmailTemplates.sql" />
+  </ItemGroup>
 </Project>

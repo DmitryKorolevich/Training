@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Business.Services;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Models;
@@ -21,7 +22,8 @@ namespace VC.Public.Models.Help
     {
 		[Display(Name = "Your Name")]
 		[Required, MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
-		public string YourName { get; set; }
+        [AllowXss]
+        public string YourName { get; set; }
 
 		[Display(Name = "Your Email")]
 		[Required, MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
@@ -30,6 +32,7 @@ namespace VC.Public.Models.Help
 
         [Display(Name = "Recipent Name")]
         [Required, MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [AllowXss]
         public string RecipentName { get; set; }
 
         [Display(Name = "Recipent Email")]
@@ -39,6 +42,7 @@ namespace VC.Public.Models.Help
 
         [Display(Name = "Message")]
         [Required, MaxLength(BaseAppConstants.DEFAULT_BIG_TEXT_FIELD_MAX_SIZE)]
+        [AllowXss]
         public string Message { get; set; }
 
         [Display(Name = "Url")]
@@ -47,6 +51,7 @@ namespace VC.Public.Models.Help
 
         [Display(Name = "Name")]
         [Required]
+        [AllowXss]
         public string Name { get; set; }
 
         [Display(Name = "Type")]
