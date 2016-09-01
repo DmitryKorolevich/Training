@@ -14,6 +14,7 @@
         public const string CustomerWholesaleRegistrationViaWeb = "CustomerWholesaleRegistrationViaWeb";
         public const string AffiliateRegistrationViaAdmin = "AffiliateRegistrationViaAdmin";
         public const string CustomerServiceRequestEmail = "CustomerServiceRequestEmail";
+        public const string HelpTicketUpdateCustomerServiceNotification = "HelpTicketUpdateCustomerServiceNotification";
         public const string HelpTicketUpdateCustomerNotification = "HelpTicketUpdateCustomerNotification";
         public const string BugTicketUpdateSuperAdminNotification = "BugTicketUpdateSuperAdminNotification";
         public const string BugTicketUpdateAuthorNotification = "BugTicketUpdateAuthorNotification";

@@ -235,6 +235,10 @@ namespace VitalChoice.Business.Services.HelpService
             {
                 await NotifyCustomer(item.Id);
             }
+            else
+            {
+                await NotifyCustomerService(item.Id);
+            }
 
             return item;
         }
@@ -344,6 +348,10 @@ namespace VitalChoice.Business.Services.HelpService
 
                 await NotifyCustomer(item.IdHelpTicket);
             }
+            else
+            {
+                await NotifyCustomerService(item.IdHelpTicket);
+            }
 
             return item;
         }
@@ -375,6 +383,10 @@ namespace VitalChoice.Business.Services.HelpService
                     {
                         await NotifyCustomer(item.IdHelpTicket);
                     }
+                    else
+                    {
+                        await NotifyCustomerService(item.IdHelpTicket);
+                    }
                     return true;
                 }
             }
@@ -392,6 +404,23 @@ namespace VitalChoice.Business.Services.HelpService
                     Id=helpTicket.Id,
                     IdOrder=helpTicket.IdOrder,
                     Customer=helpTicket.Customer,
+                });
+
+                return true;
+            }
+            return false;
+        }
+
+        private async Task<bool> NotifyCustomerService(int idHelpTicket)
+        {
+            var helpTicket = await GetHelpTicketAsync(idHelpTicket);
+            if (helpTicket != null)
+            {
+                await _notificationService.SendHelpTicketUpdatingEmailForCustomerServiceAsync(new HelpTicketEmail()
+                {
+                    Id = helpTicket.Id,
+                    IdOrder = helpTicket.IdOrder,
+                    Customer = helpTicket.Customer,
                 });
 
                 return true;

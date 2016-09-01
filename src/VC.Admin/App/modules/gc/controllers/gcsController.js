@@ -61,10 +61,20 @@ function ($scope, $rootScope, $state, gcService, toaster, modalUtil, confirmUtil
 	    $state.go('index.oneCol.gcDetail', { id: id });
 	};
 
-	$scope.send = function (item) {
+	$scope.send = function (item)
+	{
+	    var name = '';
+	    if (item.FirstName)
+	    {
+	        name += item.FirstName + ' ';
+	    }
+	    if (item.LastName)
+	    {
+	        name += item.LastName;
+	    }
 	    var data =
             {
-                ToName: item.FirstName || item.LastName ? item.FirstName + ' ' + item.LastName : null,
+                ToName: name,
                 ToEmail: item.Email,
                 FromName: 'Vital Choice',
                 Codes: [ item ],

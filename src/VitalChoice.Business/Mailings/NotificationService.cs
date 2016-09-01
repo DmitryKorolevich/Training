@@ -17,6 +17,7 @@ namespace VitalChoice.Business.Mailings
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IEcommerceRepositoryAsync<NewsletterBlockedEmail> _newsletterBlockedEmailRepository;
         private static string _mainSuperAdminEmail;
+        private static string _сustomerServiceToEmail;
         private static string _giftListEmail;
         private static string _adminHost;
         private static string _publicHost;
@@ -31,6 +32,7 @@ namespace VitalChoice.Business.Mailings
             _emailTemplateService = emailTemplateService;
             _newsletterBlockedEmailRepository = newsletterBlockedEmailRepository;
             _mainSuperAdminEmail = appOptions.Value.MainSuperAdminEmail;
+            _сustomerServiceToEmail = appOptions.Value.CustomerServiceToEmail;
             _giftListEmail = appOptions.Value.GiftListUploadEmail;
             _adminHost = appOptions.Value.AdminHost;
             _publicHost = appOptions.Value.PublicHost;
@@ -73,6 +75,18 @@ namespace VitalChoice.Business.Mailings
         {
             await emailSender.SendEmailAsync(email.ToEmail, email.Subject, email.Body, email.FromName, email.FromEmail, email.ToName, email.IsHTML);
             return true;
+        }
+
+        public async Task SendHelpTicketUpdatingEmailForCustomerServiceAsync(HelpTicketEmail helpTicketEmail)
+        {
+            helpTicketEmail.Url = $"https://{_publicHost}/profile/helpticket/{helpTicketEmail.Id}";
+
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.HelpTicketUpdateCustomerServiceNotification, helpTicketEmail);
+
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(_сustomerServiceToEmail, generatedEmail.Subject, generatedEmail.Body);
+            }
         }
 
         public async Task SendHelpTicketUpdatingEmailForCustomerAsync(string email, HelpTicketEmail helpTicketEmail)

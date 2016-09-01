@@ -7,7 +7,11 @@
             <div class="form-group">
                 <label class="col-md-3 control-label">To Name</label>
                 <div class="col-md-9">
-                    <input type="text" name="ToName" class="form-control" placeholder="To Name" data-ng-model="email.ToName">
+                    <input type="text" name="ToName" class="form-control" placeholder="To Name" data-ng-model="email.ToName" required>
+                    <div class="error-container" ng-show="forms.form.submitted && forms.form.ToName.$invalid">
+                        <small class="error" ng-show="forms.form.ToName.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Name")}}</small>
+                        <small class="error" ng-show="forms.form.ToName.$error.server">{{serverMessages.GetMessage('ToName')}}</small>
+                    </div>
                 </div>
             </div>
             <div class="form-group">
