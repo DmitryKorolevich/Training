@@ -78,7 +78,7 @@
                         </td>
                         <td>{{::item.DateCreated | date:"MM/dd/yy"}}</td>
                         <td>
-                            <a ui-sref="index.oneCol.orderDetail({id: item.IdOrderSource })">{{::item.IdOrderSource}}</a>
+                            <a data-ng-if="item.IdOrderSource" ui-sref="index.oneCol.orderDetail({id: item.IdOrderSource })">{{::item.IdOrderSource}}</a>
                         </td>
                         <td data-ng-if="item.Total>=0">{{::item.Total | currency}}</td>
                         <td data-ng-if="item.Total<0">({{::Math.abs(item.Total) | currency}})</td>
@@ -138,7 +138,7 @@
                         </td>
                         <td>{{::item.DateCreated | date:"MM/dd/yy"}}</td>
                         <td>
-                            <a ui-sref="index.oneCol.orderDetail({id: item.IdOrderSource })">{{::item.IdOrderSource}}</a>
+                            <a data-ng-if="item.IdOrderSource" ui-sref="index.oneCol.orderDetail({id: item.IdOrderSource })">{{::item.IdOrderSource}}</a>
                         </td>
                         <td>{{::item.ShipDate | date:"MM/dd/yy"}}</td>
                         <td>{{::item.Warehouse}}</td>

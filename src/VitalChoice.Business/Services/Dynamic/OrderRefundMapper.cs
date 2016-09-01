@@ -64,11 +64,8 @@ namespace VitalChoice.Business.Services.Dynamic
                 dynamic.ShippingTotal = entity.ShippingTotal;
                 dynamic.TaxTotal = entity.TaxTotal;
                 dynamic.Total = entity.Total;
-                if (!entity.IdOrderSource.HasValue)
-                {
-                    throw new ApiException("Cannot get original order id");
-                }
-                dynamic.IdOrderSource = entity.IdOrderSource.Value;
+
+                dynamic.IdOrderSource = entity.IdOrderSource ?? 0;
 
                 dynamic.Customer = new CustomerDynamic() { Id = entity.IdCustomer };
 
