@@ -288,5 +288,14 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	        return baseUrl + ('GetAffiliateOrdersInfoReportFile/{0}?buildNumber={1}')
                 .format(id, buildNumber);
 	    },
+	    getAAFESReportItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetAAFESReportItems', filter, getConfig(tracker));
+	    },
+	    getAAFESReportItemsReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + ('GetAAFESReportItemsReportFile?{0}buildNumber={1}')
+                .format(generateQueryParamsBasedOnFilter(filter), buildNumber);
+	    },
 	};
 }]);
