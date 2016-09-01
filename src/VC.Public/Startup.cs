@@ -83,7 +83,7 @@ namespace VC.Public
 
             app.UseIdentity();
 
-            app.InjectProfiler();
+            //app.InjectProfiler();
 
             app.UseSession();
             app.Use((context, next) =>

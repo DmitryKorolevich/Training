@@ -247,7 +247,7 @@ namespace VitalChoice.ExportService.Services
                 var orderedBy = await _addressMapper.ToModelAsync<OrderedBy>(address);
                 orderedBy.UID = customer.Id.ToString(CultureInfo.InvariantCulture);
                 orderedBy.Email = customer.Email;
-                orderedBy.FullName = ((string) address.SafeData.FirstName ?? string.Empty) +
+                orderedBy.FullName = ((string) address.SafeData.FirstName ?? string.Empty) + " " +
                                      ((string) address.SafeData.LastName ?? string.Empty);
 
                 veracoreOrder.OrderedBy = orderedBy;
@@ -255,7 +255,7 @@ namespace VitalChoice.ExportService.Services
                 var billTo = await _addressMapper.ToModelAsync<OrderBillTo>(address);
                 billTo.UID = customer.Id.ToString(CultureInfo.InvariantCulture);
                 billTo.Email = customer.Email;
-                billTo.FullName = ((string) address.SafeData.FirstName ?? string.Empty) +
+                billTo.FullName = ((string) address.SafeData.FirstName ?? string.Empty) + " " +
                                   ((string) address.SafeData.LastName ?? string.Empty);
 
                 veracoreOrder.BillTo = billTo;
@@ -266,7 +266,7 @@ namespace VitalChoice.ExportService.Services
         {
             var shipTo = await _addressMapper.ToModelAsync<OrderShipTo>(order.ShippingAddress);
             shipTo.Key = "1";
-            shipTo.FullName = ((string) order.ShippingAddress.SafeData.FirstName ?? string.Empty) +
+            shipTo.FullName = ((string) order.ShippingAddress.SafeData.FirstName ?? string.Empty) + " " +
                               ((string) order.ShippingAddress.SafeData.LastName ?? string.Empty);
             exportOrder.ShipTo = new[] {shipTo};
         }
@@ -276,7 +276,7 @@ namespace VitalChoice.ExportService.Services
         {
             var shipTo = await _addressMapper.ToModelAsync<OrderShipTo>(order.ShippingAddress);
             shipTo.Key = "1";
-            shipTo.FullName = ((string) order.ShippingAddress.SafeData.FirstName ?? string.Empty) +
+            shipTo.FullName = ((string) order.ShippingAddress.SafeData.FirstName ?? string.Empty) + " " +
                               ((string) order.ShippingAddress.SafeData.LastName ?? string.Empty);
             exportOrder.ShipTo = new[] {shipTo};
 
