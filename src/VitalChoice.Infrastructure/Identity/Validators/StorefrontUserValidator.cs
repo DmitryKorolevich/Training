@@ -58,15 +58,6 @@ namespace VitalChoice.Infrastructure.Identity.Validators
             {
                 errors.Add(Describer.InvalidUserName(userName));
             }
-            else
-            {
-                var owner = await manager.FindByNameAsync(userName);
-                if (owner != null &&
-                    !string.Equals(await manager.GetUserIdAsync(owner), await manager.GetUserIdAsync(user)))
-                {
-                    errors.Add(Describer.DuplicateUserName(userName));
-                }
-            }
         }
 
         // make sure email is not empty, valid, and unique
@@ -84,13 +75,6 @@ namespace VitalChoice.Infrastructure.Identity.Validators
                 errors.Add(Describer.InvalidEmail(email));
                 return;
             }
-
-            //var owner = await manager.FindByEmailAsync(email);
-            //if (owner != null &&
-            //    !string.Equals(await manager.GetUserIdAsync(owner), await manager.GetUserIdAsync(user)))
-            //{
-            //    errors.Add(Describer.DuplicateEmail(email));
-            //}
         }
     }
 }
