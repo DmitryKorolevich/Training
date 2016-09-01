@@ -22,7 +22,9 @@ namespace VitalChoice.Business.Workflow.Reships
 
             if (context.Order.ShippingAddress == null)
             {
-                context.Order.ShippingAddress = context.Order.Customer?.ShippingAddresses?.FirstOrDefault(s => (bool) s.Data.Default);
+                context.Order.ShippingAddress =
+                    context.Order.Customer?.ShippingAddresses?.FirstOrDefault(s => (bool?)s.SafeData.Default ?? false) ??
+                    context.Order.Customer?.ShippingAddresses?.FirstOrDefault();
             }
 
             var result = await ExecuteAsync<TotalAction>(context, treeContext);

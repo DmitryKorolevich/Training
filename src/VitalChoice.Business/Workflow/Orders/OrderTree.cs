@@ -16,7 +16,9 @@ namespace VitalChoice.Business.Workflow.Orders
 
             if (dataContext.Order.ShippingAddress == null)
             {
-                dataContext.Order.ShippingAddress = dataContext.Order.Customer?.ShippingAddresses?.FirstOrDefault(s => (bool) s.Data.Default);
+                dataContext.Order.ShippingAddress =
+                    dataContext.Order.Customer?.ShippingAddresses?.FirstOrDefault(s => (bool?) s.SafeData.Default ?? false) ??
+                    dataContext.Order.Customer?.ShippingAddresses?.FirstOrDefault();
             }
 
             var result = await ExecuteAsync<TotalAction>(dataContext, treeContext);

@@ -587,7 +587,7 @@ namespace VC.Public.Controllers
 
                             var index = shippingAddresses.IndexOf(shippingAddresses.Single(x => x.Id == customerAddressIdToUpdate.Value));
                             var originalId = shippingAddresses[index].Id;
-                            var defaultAddr = shippingAddresses[index].Data.Default;
+                            var defaultAddr = (bool?)shippingAddresses[index].SafeData.Default ?? false;
                             cart.Order.ShippingAddress.Id = originalId;
                             cart.Order.ShippingAddress.Data.Default = defaultAddr;
                             shippingAddresses[index] = cart.Order.ShippingAddress;

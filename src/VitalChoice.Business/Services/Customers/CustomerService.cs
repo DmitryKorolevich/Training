@@ -195,7 +195,7 @@ namespace VitalChoice.Business.Services.Customers
 
             if (
                 model.ShippingAddresses.Where(x => x.StatusCode != (int) RecordStatusCode.Deleted)
-                    .All(x => !x.Data.Default))
+                    .All(x => !((bool?) x.SafeData.Default ?? false)))
             {
                 throw new AppValidationException(
                     ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AtLeastOneDefaultShipping]);
@@ -209,7 +209,7 @@ namespace VitalChoice.Business.Services.Customers
                 model.CustomerPaymentMethods.Where(
                     x =>
                         x.IdObjectType == (int) PaymentMethodType.CreditCard &&
-                        x.StatusCode != (int) RecordStatusCode.Deleted).All(x => !x.Data.Default))
+                        x.StatusCode != (int) RecordStatusCode.Deleted).All(x => !((bool?)x.SafeData.Default ?? false)))
             {
                 throw new AppValidationException(
                     ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AtLeastOneDefaultCreditCard]);
