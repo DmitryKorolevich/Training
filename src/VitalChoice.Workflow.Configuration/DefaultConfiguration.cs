@@ -159,6 +159,7 @@ namespace VitalChoice.Workflow.Configuration
 
                 order.Action<ShippingSurchargeUsAkHiAction>("ShippingSurchargeUs", action =>
                 {
+                    action.Dependency<ProductsSplitAction>();
                     action.Dependency<DeliveredProductsAction>();
                 });
 

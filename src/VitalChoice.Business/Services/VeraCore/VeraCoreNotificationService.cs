@@ -391,17 +391,9 @@ namespace VitalChoice.Business.Services.VeraCore
                                 var skuCodes = orderInfo.ItemInformation.Select(p => p.VendorProductID).ToList();
                                 var skus = await skuRepository.Query(p => skuCodes.Contains(p.Code)).SelectAsync(false);
 
-                                var missedSku = false;
                                 foreach (var itemInformation in orderInfo.ItemInformation)
                                 {
                                     var sku = skus.FirstOrDefault(pp => pp.Code == itemInformation.VendorProductID);
-                                    if (sku == null)
-                                    {
-                                        if (itemInformation.VendorProductID == "REFUND")
-                                        {
-                                            break;
-                                        }
-                                    }
 
                                     OrderShippingPackage package = new OrderShippingPackage
                                     {
@@ -429,10 +421,6 @@ namespace VitalChoice.Business.Services.VeraCore
 
                                     packages.Add(package);
                                 }
-                                //if (missedSku)
-                                //{
-                                //    break;
-                                //}
                             }
 
                             //Parsed without exceptions
