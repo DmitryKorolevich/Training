@@ -45,61 +45,132 @@ namespace VitalChoice.CreditCards
                 //RecryptCustomers(encryptionHost);
                 //Console.WriteLine("Starting orders CCs Move");
                 //RecryptOrders(encryptionHost);
-
-                //Console.WriteLine("Done!");
+                int updated = 0;
                 using (var context = Host.Services.GetRequiredService<ExportInfoContext>())
                 {
                     var uow = new UnitOfWork(context, false);
                     var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
-                    var orderService = Host.Services.GetRequiredService<IExtendedDynamicReadServiceAsync<OrderDynamic, Order>>();
-                    PagedList<OrderDynamic> list;
-                    int seed = 0;
-                    int page = 3000;
+
+                    var seed = 0;
+                    const int size = 10000;
+
+                    List<OrderPaymentMethodExport> orderCards;
+
                     do
                     {
-                        list =
-                            orderService.SelectPage(seed, page,
-                                query:
-                                c =>
-                                    c.StatusCode != 3 &&
-                                    (c.IdObjectType == (int) OrderType.AutoShip || c.IdObjectType == (int) OrderType.AutoShipOrder ||
-                                     c.OrderStatus == OrderStatus.ShipDelayed || c.OrderStatus == OrderStatus.Processed ||
-                                     c.OrderStatus == OrderStatus.OnHold),
-                                includesOverride: q => q.Include(c => c.PaymentMethod).ThenInclude(p => p.OptionValues),
-                                orderBy: q => q.OrderByDescending(c => c.DateCreated));
-                        var failedList = new List<string>();
-                        var payments = list.Items.ToDictionary(p => p.Id);
-                        var orderIds = payments.Keys.ToList();
-                        var ccs = rep.Query(c => orderIds.Contains(c.IdOrder)).Select(true);
-                        foreach (var cc in ccs)
+                        int total;
+                        orderCards = rep.Query().SelectPage(seed, size, out total, true);
+                        foreach (var card in orderCards)
                         {
-                            var clearCc = encryptionHost.LocalDecrypt<string>(cc.CreditCardNumber);
-                            OrderDynamic order;
-                            if (clearCc.Length > 4 && payments.TryGetValue(cc.IdOrder, out order))
+                            var clearCard = encryptionHost.LocalDecrypt<string>(card.CreditCardNumber);
+                            if (clearCard.Length == 15)
                             {
-                                var card = (string) order.PaymentMethod.SafeData.CardNumber;
-                                if (!string.IsNullOrWhiteSpace(card) && card.Length > 4)
+                                char toAdd;
+                                if (!ValidateCardCheckSum(clearCard, out toAdd))
                                 {
-                                    var savedCard = clearCc.Substring(clearCc.Length - 3, 3);
-                                    var profileCard = card.Substring(card.Length - 4, 3);
-                                    if (savedCard == profileCard &&
-                                        clearCc.Substring(clearCc.Length - 4, 4) != card.Substring(card.Length - 4, 4))
-                                    {
-                                        cc.CreditCardNumber =
-                                            encryptionHost.LocalEncrypt(clearCc + card.Substring(card.Length - 1, 1));
-                                        failedList.Add($"{cc.IdOrder}, {clearCc + card.Substring(card.Length - 1, 1)}");
-                                    }
+                                    card.CreditCardNumber = encryptionHost.LocalEncrypt(clearCard + toAdd);
+                                    updated++;
                                 }
                             }
                         }
                         rep.SaveChanges();
-                        File.AppendAllLines("C:\\Temp\\failed_orders.txt", failedList);
                         seed++;
-                    } while (list.Items.Count > 0);
+                    } while (orderCards.Count == size);
                 }
+                Console.WriteLine($"Done Orders {updated}");
+                updated = 0;
+                using (var context = Host.Services.GetRequiredService<ExportInfoContext>())
+                {
+                    var uow = new UnitOfWork(context, false);
+                    var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
+
+                    var seed = 0;
+                    const int size = 10000;
+
+                    List<CustomerPaymentMethodExport> orderCards;
+
+                    do
+                    {
+                        int total;
+                        orderCards = rep.Query().SelectPage(seed, size, out total, true);
+                        foreach (var card in orderCards)
+                        {
+                            var clearCard = encryptionHost.LocalDecrypt<string>(card.CreditCardNumber);
+                            if (clearCard.Length == 15)
+                            {
+                                char toAdd;
+                                if (!ValidateCardCheckSum(clearCard, out toAdd))
+                                {
+                                    card.CreditCardNumber = encryptionHost.LocalEncrypt(clearCard + toAdd);
+                                    updated++;
+                                }
+                            }
+                        }
+                        rep.SaveChanges();
+                        seed++;
+                    } while (orderCards.Count == size);
+                }
+                Console.WriteLine($"Done Customers  {updated}");
                 Console.ReadKey();
+
+                //using (var context = Host.Services.GetRequiredService<ExportInfoContext>())
+                //{
+                //    var uow = new UnitOfWork(context, false);
+                //    var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
+                //    var orderIds = args.Select(int.Parse).Distinct().ToList();
+                //    var cards = rep.Query(q => orderIds.Contains(q.IdOrder)).Select(false);
+                //    foreach (var card in cards)
+                //    {
+                //        var clearTextCard = encryptionHost.LocalDecrypt<string>(card.CreditCardNumber);
+                //        Console.WriteLine(
+                //            $"Order: {card.IdOrder}, Card: {clearTextCard}, MC:{(PaymentValidationExpressions.MasterCardRegex.IsMatch(clearTextCard) ? "valid" : "no")}, VI: {(PaymentValidationExpressions.VisaRegex.IsMatch(clearTextCard) ? "valid" : "no")}, DC: {(PaymentValidationExpressions.DiscoverRegex.IsMatch(clearTextCard) ? "valid" : "no")}, AX: {(PaymentValidationExpressions.AmericanExpressRegex.IsMatch(clearTextCard) ? "valid" : "no")}");
+                //    }
+                //}
+
             }
             Host.Dispose();
+        }
+
+        private static bool ValidateCardCheckSum(string number, out char numberToAdd)
+        {
+            bool even = false;
+            int sum = 0;
+            foreach (var cardSymbol in number.Reverse())
+            {
+                if (even)
+                {
+                    var digit = (byte) cardSymbol - 48;
+                    sum += digit*2%9;
+                }
+                else
+                {
+                    sum += (byte) cardSymbol - 48;
+                }
+                even = !even;
+            }
+            if (sum%10 == 0)
+            {
+                numberToAdd = default(char);
+                return true;
+            }
+            even = true;
+            sum = 0;
+            foreach (var cardSymbol in number)
+            {
+                if (even)
+                {
+                    var digit = (byte) cardSymbol - 48;
+                    sum += digit*2%9;
+                }
+                else
+                {
+                    sum += (byte) cardSymbol - 48;
+                }
+                even = !even;
+            }
+
+            numberToAdd = (char) ((10 - sum%10) + 48);
+            return false;
         }
 
         private static void RecryptCustomers(IObjectEncryptionHost encryptionHost)
