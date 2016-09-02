@@ -31,7 +31,6 @@ using VitalChoice.Infrastructure.Services;
 
 namespace VC.Admin.Controllers
 {
-    [AdminAuthorize(PermissionType.Marketing)]
     public class DiscountController : BaseApiController
     {
         private readonly IDiscountService _discountService;
@@ -109,6 +108,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Marketing)]
         public async Task<Result<DiscountManageModel>> UpdateDiscount([FromBody]DiscountManageModel model)
         {
             if (!Validate(model))
@@ -135,6 +135,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Marketing)]
         public async Task<Result<bool>> DeleteDiscount(int id)
         {
             var superAdminName = _referenceData.AdminRoles.Single(x => x.Key == (int)RoleType.SuperAdminUser).Text;
@@ -145,6 +146,7 @@ namespace VC.Admin.Controllers
         #endregion
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Marketing)]
         public async Task<Result<ObjectHistoryReportModel>> GetHistoryReport([FromBody]ObjectHistoryLogItemsFilter filter)
         {
             var toReturn = await _objectHistoryLogService.GetObjectHistoryReport(filter);
