@@ -391,26 +391,14 @@ namespace VitalChoice.Business.Services.VeraCore
                                 var skuCodes = orderInfo.ItemInformation.Select(p => p.VendorProductID).ToList();
                                 var skus = await skuRepository.Query(p => skuCodes.Contains(p.Code)).SelectAsync(false);
 
-                                var missedSku = false;
                                 foreach (var itemInformation in orderInfo.ItemInformation)
                                 {
                                     var sku = skus.FirstOrDefault(pp => pp.Code == itemInformation.VendorProductID);
-                                    if (sku == null)
-                                    {
-                                        if (itemInformation.VendorProductID != "REFUND")
-                                        {
-                                            _logger.LogError(
-                                                $"Update notification - missed sku code {itemInformation.VendorProductID} in order {orderId.Value}");
-                                        }
-                                        missedSku = true;
-                                        parsed = false;
-                                        break;
-                                    }
 
                                     OrderShippingPackage package = new OrderShippingPackage
                                     {
                                         IdOrder = orderId.Value,
-                                        IdSku = sku.Id,
+                                        IdSku = sku?.Id ?? null,
                                         POrderType = pOrderType,
                                         DateCreated = now,
                                         ShipMethodFreightCarrier = shipNotice.FreightCarrier ?? string.Empty,
@@ -432,10 +420,6 @@ namespace VitalChoice.Business.Services.VeraCore
                                     }
 
                                     packages.Add(package);
-                                }
-                                if (missedSku)
-                                {
-                                    break;
                                 }
                             }
 

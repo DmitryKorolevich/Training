@@ -15,16 +15,32 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Shipping
         public override Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
             decimal result;
-            if (context.Data.DeliveredAmount > 200)
+            decimal calculateBase;
+            if (context.SplitInfo.ShouldSplit)
             {
-                result = context.Data.DeliveredAmount * 0.1m;
-                result = Math.Round(result, 2);
-                context.SplitInfo.PerishableSurchargeOverriden = context.SplitInfo.PerishableAmount*0.1m;
-                context.SplitInfo.NonPerishableSurchargeOverriden = context.SplitInfo.NonPerishableAmount*0.1m;
+                calculateBase = context.SplitInfo.PerishableAmount;
             }
             else
             {
-                result = 19.95m;
+                calculateBase = context.SplitInfo.PerishableCount > 0 ? context.Data.DeliveredAmount : 0;
+            }
+            if (calculateBase > 0)
+            {
+                if (calculateBase > 200)
+                {
+                    result = calculateBase*0.1m;
+                    result = Math.Round(result, 2);
+                    context.SplitInfo.PerishableSurchargeOverriden = result;
+                }
+                else
+                {
+                    result = 19.95m;
+                    context.SplitInfo.PerishableSurchargeOverriden = result;
+                }
+            }
+            else
+            {
+                result = 0;
             }
             context.AlaskaHawaiiSurcharge = result;
             return Task.FromResult(result);

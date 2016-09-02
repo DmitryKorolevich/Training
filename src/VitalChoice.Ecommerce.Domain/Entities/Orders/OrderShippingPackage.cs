@@ -11,7 +11,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Orders
 
         public Order Order { get; set; }
 
-        public int IdSku { get; set; }
+        public int? IdSku { get; set; }
 
         public DateTime DateCreated { get; set; }
 

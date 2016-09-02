@@ -11,7 +11,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
     {
 	    public int IdOrder { get; set; }
 
-        public int IdSku { get; set; }
+        public int? IdSku { get; set; }
 
         public DateTime DateCreated { get; set; }
 
