@@ -29,5 +29,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Affiliates
         public string EditedByAgentId { get; set; }
 
         public VAffiliateNotPaidCommission NotPaidCommission { get; set; }
+
+	    public int? PaymentType { get; set; }
     }
 }

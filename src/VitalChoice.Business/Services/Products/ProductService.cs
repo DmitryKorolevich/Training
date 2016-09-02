@@ -1528,6 +1528,7 @@ namespace VitalChoice.Business.Services.Products
         {
             List<SkuBreakDownReportItem> toReturn = new List<SkuBreakDownReportItem>();
             var dbItems = await _sPEcommerceRepository.GetSkuBreakDownReportRawItemsAsync(filter);
+            dbItems = dbItems.OrderBy(p => p.Code).ToList();
 
             foreach (var skuBreakDownReportRawItem in dbItems)
             {

@@ -96,6 +96,13 @@
                             </span>
                         </th>
                         <th>Commission Balance*</th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('PaymentType')">
+                            <span>Payment as</span>
+                            <span data-ng-if="filter.Sorting.Path == 'PaymentType'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('DateEdited')">
                             <span>Last Updated</span>
                             <span data-ng-if="filter.Sorting.Path == 'DateEdited'">
@@ -116,7 +123,8 @@
                         </td>
                         <td>{{::item.Company}}</td>
                         <td>{{::item.WebSite}}</td>
-                        <td>{{::item.CommissionFirst | number:2}}% / {{::item.CommissionAll | number:2}}%</td>                        <td>
+                        <td>{{::item.CommissionFirst | number:2}}% / {{::item.CommissionAll | number:2}}%</td>   
+                        <td>
                             <span data-ng-if="item.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.AffiliateStatuses, item.StatusCode).Text}}</span>
                             <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.AffiliateStatuses, item.StatusCode).Text}}</span>
                             <span data-ng-if="item.StatusCode == 3" class="label label-danger font-default">{{getReferenceItem(ReferenceData.AffiliateStatuses, item.StatusCode).Text}}</span>
@@ -130,6 +138,10 @@
                             <button data-ng-if="item.NotPaidCommissionsAmount && item.NotPaidCommissionsAmount>=50" title="Pay" class="btn btn-default btn-primary btn-xs ma" data-ng-click="pay(item.Id);">
                                 Pay
                             </button>
+                        </td>
+                        <td>
+                            <span data-ng-if="item.PaymentType == 1" class="label label-info font-default">Cash</span>
+                            <span data-ng-if="item.PaymentType == 2" class="label label-warning font-default">Credit</span>
                         </td>
                         <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedByAgentId}}</td>
                         <td>

@@ -11,5 +11,6 @@
         public const string CommissionAll = "CommissionAll";
         public const string DateEdited = "DateEdited";
         public const string Tier = "Tier";
+        public const string PaymentType = "PaymentType";
     }
 }

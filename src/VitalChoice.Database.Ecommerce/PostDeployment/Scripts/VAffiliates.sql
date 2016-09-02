@@ -16,7 +16,8 @@ SELECT
 	tval.Value as Tier,
 	ISNULL(cust.Count,0) as CustomersCount,
 	a.DateEdited,
-	a.IdEditedBy
+	a.IdEditedBy,
+	CAST(ptval.Value as INT) as PaymentType
 	FROM Affiliates AS a
 	LEFT JOIN AffiliateOptionTypes AS copt ON copt.Name = N'Company'
 	LEFT JOIN AffiliateOptionValues AS cval ON cval.IdAffiliate = a.Id AND cval.IdOptionType = copt.Id
@@ -24,10 +25,15 @@ SELECT
 	LEFT JOIN AffiliateOptionValues AS wval ON wval.IdAffiliate = a.Id AND wval.IdOptionType = wopt.Id
 	LEFT JOIN AffiliateOptionTypes AS topt ON topt.Name = N'Tier'
 	LEFT JOIN AffiliateOptionValues AS tval ON tval.IdAffiliate = a.Id AND tval.IdOptionType = topt.Id
-	LEFT JOIN (SELECT ca.Id, COUNT(*) AS Count
-	FROM dbo.Affiliates AS ca
-	INNER JOIN dbo.Customers AS c ON ca.Id = c.IdAffiliate
-	GROUP BY ca.Id) cust ON cust.Id = a.Id
+	LEFT JOIN AffiliateOptionTypes AS ptopt ON ptopt.Name = N'PaymentType'
+	LEFT JOIN AffiliateOptionValues AS ptval ON ptval.IdAffiliate = a.Id AND ptval.IdOptionType = ptopt.Id
+	LEFT JOIN 
+	(
+		SELECT ca.Id, COUNT(*) AS Count
+		FROM dbo.Affiliates AS ca
+		INNER JOIN dbo.Customers AS c ON ca.Id = c.IdAffiliate
+		GROUP BY ca.Id
+	) cust ON cust.Id = a.Id
 
 GO
 

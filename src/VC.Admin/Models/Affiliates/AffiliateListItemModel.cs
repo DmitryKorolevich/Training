@@ -34,6 +34,8 @@ namespace VC.Admin.Models.Affiliate
 
         public long? NotPaidCommissionsCount { get; set; }
 
+        public int? PaymentType { get; set; }
+
         public AffiliateListItemModel(VAffiliate item)
         {
             if(item!=null)
@@ -49,7 +51,8 @@ namespace VC.Admin.Models.Affiliate
                 CustomersCount = item.CustomersCount;
                 DateEdited = item.DateEdited;
                 EditedByAgentId = item.EditedByAgentId;
-                if(item.NotPaidCommission!=null)
+                PaymentType = item.PaymentType;
+                if (item.NotPaidCommission!=null)
                 {
                     NotPaidCommissionsAmount = item.NotPaidCommission.Amount;
                     NotPaidCommissionsCount = item.NotPaidCommission.Count;

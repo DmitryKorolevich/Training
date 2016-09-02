@@ -174,6 +174,13 @@ namespace VitalChoice.Business.Services.Affiliates
                                 ? x.OrderBy(y => y.CustomersCount)
                                 : x.OrderByDescending(y => y.CustomersCount);
                     break;
+                case VAffiliateSortPath.PaymentType:
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.PaymentType)
+                                : x.OrderByDescending(y => y.PaymentType);
+                    break;
             }
 
             var toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, false);
