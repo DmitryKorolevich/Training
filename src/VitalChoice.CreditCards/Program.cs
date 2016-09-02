@@ -12,7 +12,16 @@ using VitalChoice.CreditCards.Entities;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 using Microsoft.EntityFrameworkCore;
 using VitalChoice.Data.Extensions;
+using VitalChoice.Data.Helpers;
+using VitalChoice.Data.UOW;
+using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
+using VitalChoice.Interfaces.Services.Customers;
 
 namespace VitalChoice.CreditCards
 {
@@ -32,13 +41,63 @@ namespace VitalChoice.CreditCards
             using (var encryptionHost = Host.Services.GetRequiredService<IObjectEncryptionHost>())
             {
 
-                Console.WriteLine("Starting customer CCs Move");
-                RecryptCustomers(encryptionHost);
-                Console.WriteLine("Starting orders CCs Move");
-                RecryptOrders(encryptionHost);
+                //Console.WriteLine("Starting customer CCs Move");
+                //RecryptCustomers(encryptionHost);
+                //Console.WriteLine("Starting orders CCs Move");
+                //RecryptOrders(encryptionHost);
 
-                Console.WriteLine("Done!");
-
+                //Console.WriteLine("Done!");
+                using (var context = Host.Services.GetRequiredService<ExportInfoContext>())
+                {
+                    var uow = new UnitOfWork(context, false);
+                    var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
+                    var orderService = Host.Services.GetRequiredService<IExtendedDynamicReadServiceAsync<OrderDynamic, Order>>();
+                    PagedList<OrderDynamic> list;
+                    int seed = 0;
+                    int page = 3000;
+                    do
+                    {
+                        list =
+                            orderService.SelectPage(seed, page,
+                                query:
+                                c =>
+                                    c.StatusCode != 3 &&
+                                    (c.IdObjectType == (int) OrderType.AutoShip || c.IdObjectType == (int) OrderType.AutoShipOrder ||
+                                     c.OrderStatus == OrderStatus.ShipDelayed || c.OrderStatus == OrderStatus.Processed ||
+                                     c.OrderStatus == OrderStatus.OnHold),
+                                includesOverride: q => q.Include(c => c.PaymentMethod).ThenInclude(p => p.OptionValues),
+                                orderBy: q => q.OrderByDescending(c => c.DateCreated));
+                        var failedList = new List<string>();
+                        var payments = list.Items.ToDictionary(p => p.Id);
+                        var orderIds = payments.Keys.ToList();
+                        var ccs = rep.Query(c => orderIds.Contains(c.IdOrder)).Select(true);
+                        foreach (var cc in ccs)
+                        {
+                            var clearCc = encryptionHost.LocalDecrypt<string>(cc.CreditCardNumber);
+                            OrderDynamic order;
+                            if (clearCc.Length > 4 && payments.TryGetValue(cc.IdOrder, out order))
+                            {
+                                var card = (string) order.PaymentMethod.SafeData.CardNumber;
+                                if (!string.IsNullOrWhiteSpace(card) && card.Length > 4)
+                                {
+                                    var savedCard = clearCc.Substring(clearCc.Length - 3, 3);
+                                    var profileCard = card.Substring(card.Length - 4, 3);
+                                    if (savedCard == profileCard &&
+                                        clearCc.Substring(clearCc.Length - 4, 4) != card.Substring(card.Length - 4, 4))
+                                    {
+                                        cc.CreditCardNumber =
+                                            encryptionHost.LocalEncrypt(clearCc + card.Substring(card.Length - 1, 1));
+                                        failedList.Add($"{cc.IdOrder}, {clearCc + card.Substring(card.Length - 1, 1)}");
+                                    }
+                                }
+                            }
+                        }
+                        rep.SaveChanges();
+                        File.AppendAllLines("C:\\Temp\\failed_orders.txt", failedList);
+                        seed++;
+                    } while (list.Items.Count > 0);
+                }
+                Console.ReadKey();
             }
             Host.Dispose();
         }
