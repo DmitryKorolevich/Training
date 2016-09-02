@@ -151,7 +151,7 @@ namespace VitalChoice.Business.Queries.Orders
                 Add(c => c.WhenValues(new
                 {
                     ServiceCode = serviceCode.Value
-                }, (int)OrderType.Reship, ValuesFilterType.And, CompareBehaviour.StartsWith));
+                }, (int)OrderType.Reship, ValuesFilterType.And, CompareBehaviour.Equals));
             }
             return this;
         }
@@ -163,7 +163,7 @@ namespace VitalChoice.Business.Queries.Orders
                 Add(c => c.WhenValues(new
                 {
                     ServiceCode = serviceCode.Value
-                }, (int)OrderType.Refund, ValuesFilterType.And, CompareBehaviour.StartsWith));
+                }, (int)OrderType.Refund, ValuesFilterType.And, CompareBehaviour.Equals));
             }
             return this;
         }
