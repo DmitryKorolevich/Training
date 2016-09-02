@@ -254,9 +254,10 @@
                 </tbody>
             </table>
         </spinner-overlay>
+        <div><strong>{{totalItems}}</strong> Orders Found - Displaying <strong>{{filter.Paging.PageItemCount}}</strong> Orders Per Page</div>
         <uib-pagination boundary-links="true"
                         total-items="totalItems"
-                        items-per-page="filter.Paging.PageItemCount"
+                        items-per-page="filter.Paging.PageItemCount"{{}}
                         data-ng-model="filter.Paging.PageIndex"
                         previous-text="&lsaquo;"
                         next-text="&rsaquo;"
