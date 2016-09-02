@@ -397,20 +397,16 @@ namespace VitalChoice.Business.Services.VeraCore
                                     var sku = skus.FirstOrDefault(pp => pp.Code == itemInformation.VendorProductID);
                                     if (sku == null)
                                     {
-                                        if (itemInformation.VendorProductID != "REFUND")
+                                        if (itemInformation.VendorProductID == "REFUND")
                                         {
-                                            _logger.LogError(
-                                                $"Update notification - missed sku code {itemInformation.VendorProductID} in order {orderId.Value}");
+                                            break;
                                         }
-                                        missedSku = true;
-                                        parsed = false;
-                                        break;
                                     }
 
                                     OrderShippingPackage package = new OrderShippingPackage
                                     {
                                         IdOrder = orderId.Value,
-                                        IdSku = sku.Id,
+                                        IdSku = sku?.Id ?? null,
                                         POrderType = pOrderType,
                                         DateCreated = now,
                                         ShipMethodFreightCarrier = shipNotice.FreightCarrier ?? string.Empty,
@@ -433,10 +429,10 @@ namespace VitalChoice.Business.Services.VeraCore
 
                                     packages.Add(package);
                                 }
-                                if (missedSku)
-                                {
-                                    break;
-                                }
+                                //if (missedSku)
+                                //{
+                                //    break;
+                                //}
                             }
 
                             //Parsed without exceptions

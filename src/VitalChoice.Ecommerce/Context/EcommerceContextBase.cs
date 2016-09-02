@@ -940,8 +940,7 @@ namespace VitalChoice.Ecommerce.Context
 
             builder.Entity<OrderShippingPackage>(entity =>
             {
-                entity.HasKey(o => new { o.IdOrder, o.IdSku });
-                entity.Ignore(o => o.Id);
+                entity.HasKey(o => o.Id);
                 entity.ToTable("OrderShippingPackages");
             });
 
