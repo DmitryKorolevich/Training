@@ -29,7 +29,6 @@ using VitalChoice.Infrastructure.Services;
 
 namespace VC.Admin.Controllers
 {
-    [AdminAuthorize(PermissionType.Marketing)]
     public class PromotionController : BaseApiController
     {
         private readonly IPromotionService _promotionService;
@@ -105,6 +104,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Marketing)]
         public async Task<Result<PromotionManageModel>> UpdatePromotion([FromBody]PromotionManageModel model)
         {
             if (!Validate(model))
@@ -130,6 +130,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Marketing)]
         public async Task<Result<bool>> DeletePromotion(int id)
         {
             return await _promotionService.DeleteAsync(id);
@@ -138,6 +139,7 @@ namespace VC.Admin.Controllers
         #endregion
 
         [HttpPost]
+        [AdminAuthorize(PermissionType.Marketing)]
         public async Task<Result<ObjectHistoryReportModel>> GetHistoryReport([FromBody]ObjectHistoryLogItemsFilter filter)
         {
             var toReturn = await _objectHistoryLogService.GetObjectHistoryReport(filter);
