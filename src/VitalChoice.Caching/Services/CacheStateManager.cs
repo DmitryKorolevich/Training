@@ -51,7 +51,7 @@ namespace VitalChoice.Caching.Services
 
         public void RejectTrackData() => TemporaryContextualCacheDatas = null;
 
-        public bool IsTracked(EntityInfo info, EntityKey pk, object entity)
+        public bool IsTracked(EntityInfo info, EntityKey pk, object entity, bool keyOnly)
         {
             var trackData = ContextualCacheDatas.Value;
             var key = new TrackedEntityKey(info.EntityType, pk);
@@ -62,7 +62,7 @@ namespace VitalChoice.Caching.Services
             if (entity == null)
                 entity = info.CreateEntityFromKey(pk);
             var newEntry = TryGetEntry(info.EfPrimaryKey, entity);
-            return newEntry?.EntityState != EntityState.Detached && newEntry?.Entity == entity;
+            return newEntry != null && newEntry.EntityState != EntityState.Detached && (keyOnly || newEntry.Entity == entity);
         }
 
         public object GetOrAddTracked(EntityInfo info, object entity, out bool hasCloned)

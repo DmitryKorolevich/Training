@@ -252,11 +252,12 @@ namespace VitalChoice.Caching.Services.Cache
         {
 
             relationsToClone = _relationInfo.Relations.Where(r => cached.NeedUpdateRelated.Contains(r.Name)).ToArray();
-            return GetIsNormalized(entity, stateManager, relationsToClone, _entityInfo);
+            return GetIsNormalized(entity, stateManager, relationsToClone, _entityInfo, false) &&
+                   GetIsNormalized(cached.Entity, stateManager, relationsToClone, _entityInfo, true);
         }
 
         private bool GetIsNormalized(object entity, ICacheStateManager stateManager,
-            ICollection<RelationInfo> relationsToClone, EntityInfo entityInfo)
+            ICollection<RelationInfo> relationsToClone, EntityInfo entityInfo, bool trackKeyOnly)
         {
             foreach (var relation in relationsToClone)
             {
@@ -285,12 +286,12 @@ namespace VitalChoice.Caching.Services.Cache
                         }
                         if (stateManager != null)
                         {
-                            if (!stateManager.IsTracked(relation.EntityInfo, pk, newItem))
+                            if (!stateManager.IsTracked(relation.EntityInfo, pk, newItem, trackKeyOnly))
                             {
                                 return false;
                             }
                         }
-                        if (!GetIsNormalized(newItem, stateManager, relation.Relations, relation.EntityInfo))
+                        if (!GetIsNormalized(newItem, stateManager, relation.Relations, relation.EntityInfo, trackKeyOnly))
                         {
                             return false;
                         }
@@ -307,7 +308,7 @@ namespace VitalChoice.Caching.Services.Cache
                             {
                                 return false;
                             }
-                            if (stateManager?.IsTracked(relation.EntityInfo, newRelatedKey, null) ?? true)
+                            if (stateManager?.IsTracked(relation.EntityInfo, newRelatedKey, null, trackKeyOnly) ?? true)
                             {
                                 return false;
                             }
@@ -323,12 +324,12 @@ namespace VitalChoice.Caching.Services.Cache
                         }
                         if (stateManager != null)
                         {
-                            if (!stateManager.IsTracked(relation.EntityInfo, newRelatedKey, newRelated))
+                            if (!stateManager.IsTracked(relation.EntityInfo, newRelatedKey, newRelated, trackKeyOnly))
                             {
                                 return false;
                             }
                         }
-                        if (!GetIsNormalized(newRelated, stateManager, relation.Relations, relation.EntityInfo))
+                        if (!GetIsNormalized(newRelated, stateManager, relation.Relations, relation.EntityInfo, trackKeyOnly))
                         {
                             return false;
                         }
