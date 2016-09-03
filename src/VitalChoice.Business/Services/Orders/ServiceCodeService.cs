@@ -23,6 +23,8 @@ using VitalChoice.Interfaces.Services.Settings;
 using System.Collections.Generic;
 using VitalChoice.Data.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -33,6 +35,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly IEcommerceRepositoryAsync<Order> _orderRepository;
         private readonly ISettingService _settingService;
         private readonly ICountryService _countryService;
+        private readonly ReferenceData _referenceData;
         private readonly ILogger _logger;
 
         public ServiceCodeService(
@@ -41,6 +44,7 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<Order> orderRepository,
             ISettingService settingService,
             ICountryService countryService,
+            ReferenceData referenceData,
             ILoggerFactory loggerProvider)
         {
             _orderService = orderService;
@@ -48,6 +52,7 @@ namespace VitalChoice.Business.Services.Orders
             _orderRepository = orderRepository;
             _settingService = settingService;
             _countryService = countryService;
+            _referenceData = referenceData;
             _logger = loggerProvider.CreateLogger<ServiceCodeService>();
         }
 
@@ -224,37 +229,130 @@ namespace VitalChoice.Business.Services.Orders
                 .WithToDate(filter.To)
                 .WithReshipServiceCode(filter.ServiceCode).WithOrderType(OrderType.Reship);
 
-            Func<IQueryLite<Order>, IQueryLite<Order>> include = x => x.Include(p => p.Skus).
+            Func<IQueryLite<Order>, IQueryLite<Order>> include = x =>
+                x.Include(p => p.Skus).
                 ThenInclude(p => p.Sku).
-                Include(p => p.OptionValues).
                 Include(p=>p.Customer).
-                Include(p=>p.ShippingAddress).
                 Include(p=>p.ReshipProblemSkus).
                 ThenInclude(p=>p.Sku);
             Func<IQueryable<Order>, IOrderedQueryable<Order>> orderBy = p => p.OrderByDescending(pp => pp.Id);
 
             var countries = await _countryService.GetCountriesAsync();
-
+            
             if (filter.Paging != null)
             {
-                var refunds =
+                var items =
                     await
                         _orderService.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, conditions,
                             include, orderBy);
                 toReturn = new PagedList<ServiceCodeReshipItem>()
                 {
-                    Count = refunds.Count,
-                    Items = refunds.Items.Select(p => new ServiceCodeReshipItem(p, countries)).ToList(),
+                    Count = items.Count,
+                    Items = items.Items.Select(p => new ServiceCodeReshipItem(p, countries)).ToList(),
                 };
             }
             else
             {
-                var refunds = await _orderService.SelectAsync(conditions, include, orderBy: orderBy);
+                var items = await _orderService.SelectAsync(conditions, include, orderBy: orderBy);
                 toReturn = new PagedList<ServiceCodeReshipItem>()
                 {
-                    Count = refunds.Count,
-                    Items = refunds.Select(p => new ServiceCodeReshipItem(p, countries)).ToList(),
+                    Count = items.Count,
+                    Items = items.Select(p => new ServiceCodeReshipItem(p, countries)).ToList(),
                 };
+            }
+            var map = toReturn.Items.Where(p=>p.IdOrderSource.HasValue).
+                GroupBy(p => p.IdOrderSource).ToDictionary(p => p.Key, x => x.ToList());
+
+            //load order source info
+            int i = 0;
+            var groups = toReturn.Items.GroupBy(x => i++ / SqlConstants.MAX_CONTAINS_COUNT).ToList();
+            include = x => x.Include(p => p.OrderShippingPackages).
+                Include(p => p.ShippingAddress);
+            foreach (var group in groups)
+            {
+                var ids = group.Select(p => p.IdOrderSource).Where(p=>p.HasValue).Select(p=>p.Value).Distinct().ToList();
+                conditions = new OrderQuery().NotDeleted().WithIds(ids);
+                var orderSources = await _orderService.SelectAsync(conditions,include);
+                foreach (var orderSource in orderSources)
+                {
+                    List<ServiceCodeReshipItem> reships;
+                    if (map.TryGetValue(orderSource.Id, out reships))
+                    {
+                        string shippingStateCode = null;
+                        DateTime? shipDate = null;
+                        string warehouse = null;
+                        string carrier = null;
+                        string shipService = null;
+
+                        DateTime? pShipDate = null;
+                        string pWarehouse = null;
+                        string pCarrier = null;
+                        string pShipService = null;
+
+                        DateTime? npShipDate = null;
+                        string npWarehouse = null;
+                        string npCarrier = null;
+                        string npShipService = null;
+                        if (orderSource.ShippingAddress?.IdState.HasValue == true)
+                        {
+                            shippingStateCode = countries.SelectMany(p => p.States)
+                                .FirstOrDefault(p => p.Id == orderSource.ShippingAddress?.IdState.Value)?
+                                .StateCode;
+                        }
+
+                        if (orderSource.OrderShippingPackages != null && orderSource.OrderShippingPackages.Count > 0)
+                        {
+                            var package = orderSource.OrderShippingPackages.FirstOrDefault(p => !p.POrderType.HasValue);
+                            if (package != null)
+                            {
+                                shipDate = package.ShippedDate;
+                                warehouse = Enum.GetName(typeof(Warehouse), package.IdWarehouse);
+                                carrier = package.ShipMethodFreightCarrier;
+                                shipService = package.ShipMethodFreightService;
+                            }
+
+                            package = orderSource.OrderShippingPackages.FirstOrDefault(p => p.POrderType == (int)POrderType.P);
+                            if (package != null)
+                            {
+                                pShipDate = package.ShippedDate;
+                                pWarehouse = Enum.GetName(typeof(Warehouse), package.IdWarehouse);
+                                pCarrier = package.ShipMethodFreightCarrier;
+                                pShipService = package.ShipMethodFreightService;
+                            }
+
+                            package = orderSource.OrderShippingPackages.FirstOrDefault(p => p.POrderType == (int)POrderType.NP);
+                            if (package != null)
+                            {
+                                npShipDate = package.ShippedDate;
+                                npWarehouse = Enum.GetName(typeof(Warehouse), package.IdWarehouse);
+                                npCarrier = package.ShipMethodFreightCarrier;
+                                npShipService = package.ShipMethodFreightService;
+                            }
+                        }
+                        foreach (var reship in reships)
+                        {
+                            if (orderSource.ShippingAddress?.IdState.HasValue == true)
+                            {
+                                reship.ShippingStateCode = shippingStateCode;
+
+                                reship.ShipDate = shipDate;
+                                reship.Warehouse = warehouse;
+                                reship.Carrier = carrier;
+                                reship.ShipService = shipService;
+
+                                reship.PShipDate = pShipDate;
+                                reship.PWarehouse = pWarehouse;
+                                reship.PCarrier = pCarrier;
+                                reship.PShipService = pShipService;
+
+                                reship.NPShipDate = npShipDate;
+                                reship.NPWarehouse = npWarehouse;
+                                reship.NPCarrier = npCarrier;
+                                reship.NPShipService = npShipService;
+                            }
+                        }
+                    }
+                }
             }
 
             return toReturn;

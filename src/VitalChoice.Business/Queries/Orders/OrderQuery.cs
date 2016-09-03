@@ -65,6 +65,15 @@ namespace VitalChoice.Business.Queries.Orders
             return this;
         }
 
+        public OrderQuery WithIds(ICollection<int> ids)
+        {
+            if (ids!=null && ids.Count>0)
+            {
+                Add(x => ids.Contains(x.Id));
+            }
+            return this;
+        }
+
         public OrderQuery WithCreatedDate(DateTime? from, DateTime? to)
         {
             if (from.HasValue && to.HasValue)

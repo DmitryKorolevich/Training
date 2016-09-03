@@ -200,7 +200,7 @@
                         <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
                         <td>
                             <span data-ng-if="::item.DateShipped">{{::item.DateShipped | date:"MM/dd/yy"}}</span>
-                            <div data-ng-if="::!(item.DateShipped && (item.PDateShipped || item.NPDateShipped))">
+                            <div data-ng-if="::(!item.DateShipped && (item.PDateShipped || item.NPDateShipped))">
                                 <span data-ng-if="::item.PDateShipped">{{::item.PDateShipped | date:"MM/dd/yy"}} - P</span><br />
                                 <span data-ng-if="::item.NPDateShipped">{{::item.NPDateShipped | date:"MM/dd/yy"}} - NP</span>
                             </div>
