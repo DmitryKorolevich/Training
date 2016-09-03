@@ -2,29 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using VitalChoice.Business.Repositories;
+using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.DynamicData.TypeConverters;
-using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.Products;
-using VitalChoice.Infrastructure.Domain.Entities.Roles;
-using VitalChoice.Infrastructure.Domain.Entities.Users;
-using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Infrastructure.Identity.UserManagers;
-using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.ObjectMapping.Interfaces;
@@ -42,10 +36,11 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
     {
         private readonly IProductCategoryService _productCategoryService;
         private readonly IProductService _productService;
+        private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
+        private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
         private readonly IRepositoryAsync<ProductCategoryContent> _productCategoryRepository;
         private readonly IRepositoryAsync<ProductContent> _productContentRepository;
         private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoryEcommerceRepository;
-        private readonly VProductSkuRepository _productRepository;
         private readonly ICustomerService _customerService;
         private readonly ExtendedUserManager _userManager;
 
@@ -55,17 +50,17 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             IRepositoryAsync<ProductCategoryContent> productCategoryRepository,
             IRepositoryAsync<ProductContent> productContentRepository,
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoryEcommerceRepository,
-            VProductSkuRepository productRepository,
-            ICustomerService customerService, ExtendedUserManager userManager) : base(mapper)
+            ICustomerService customerService, ExtendedUserManager userManager, IDynamicMapper<ProductDynamic, Product> productMapper, IDynamicMapper<SkuDynamic, Sku> skuMapper) : base(mapper)
         {
             _productCategoryService = productCategoryService;
             _productService = productService;
             _productCategoryRepository = productCategoryRepository;
             _productContentRepository = productContentRepository;
             _productToCategoryEcommerceRepository = productToCategoryEcommerceRepository;
-            _productRepository = productRepository;
             _customerService = customerService;
             _userManager = userManager;
+            _productMapper = productMapper;
+            _skuMapper = skuMapper;
         }
 
         private IList<CustomerTypeCode> GetCustomerVisibility(ProcessorViewContext viewContext)
@@ -117,7 +112,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 throw new ApiException("Invalid category");
             }
 
-            var targetStatuses = new List<RecordStatusCode>() { RecordStatusCode.Active };
+            var targetStatuses = new HashSet<RecordStatusCode> {RecordStatusCode.Active};
             if (viewContext.Entity.StatusCode == RecordStatusCode.NotActive)
             {
                 if (!viewContext.Parameters.Preview)
@@ -152,7 +147,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 {
                     var subCategoryContent = await
                         _productCategoryRepository.Query(
-                            p => p.Id == subCategory.Id && p.NavIdVisible != null && visibleForCustomerTypes.Contains(p.NavIdVisible))
+                                p => p.Id == subCategory.Id && p.NavIdVisible != null && visibleForCustomerTypes.Contains(p.NavIdVisible))
                             .SelectFirstOrDefaultAsync(false);
                     if (subCategoryContent != null)
                     {
@@ -164,31 +159,19 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             }
 
             var productIds =
-                (await
-                    _productToCategoryEcommerceRepository.Query(x => x.IdCategory == viewContext.Entity.Id).SelectAsync(false))
-                    .OrderBy(p=>p.Order)
-                    .Select(x => x.IdProduct).ToList();
+            (await
+                _productToCategoryEcommerceRepository.Query(x => x.IdCategory == viewContext.Entity.Id)
+                    .OrderBy(q => q.OrderBy(p => p.Order))
+                    .SelectAsync(false)).Select(x => x.IdProduct).ToList();
 
-            IList<VProductSku> products = new List<VProductSku>();
-            IList<ProductContent> productContents = null;
+            ICollection<ProductDynamic> products = null;
+            ICollection<ProductContent> productContents = null;
             if (productIds.Count > 0)
             {
-                var dbProducts =
-                    (await _productRepository.GetProductsAsync(new VProductSkuFilter() { IdProducts = productIds }, false)).Items;
-                dbProducts = dbProducts.Where(x => targetStatuses.Contains(x.StatusCode)).ToList();
-
-                //order products
-                foreach (var productId in productIds)
-                {
-                    var dbProductGroup = dbProducts.Where(p => p.IdProduct == productId).ToList();
-                    dbProductGroup = dbProductGroup.OrderBy(p => p.SkuOrder).ToList();
-                    if (dbProductGroup.Any())
-                    {
-                        products.AddRange(dbProductGroup);
-                    }
-                }
-
-                productContents = (await _productContentRepository.Query(p => productIds.Contains(p.Id)).SelectAsync(false)).ToList();
+                products =
+                    (await _productService.SelectAsync(productIds, true)).Where(
+                        x => targetStatuses.Contains((RecordStatusCode) x.StatusCode)).ToList();
+                productContents = await _productContentRepository.Query(p => productIds.Contains(p.Id)).SelectAsync(false);
             }
 
             var allRootCategory =
@@ -200,7 +183,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 
             var rootNavCategory = GetFilteredByVisibilityCategories(allRootCategory, customerVisibility);
 
-            var toReturn = PopulateCategoryTemplateModel(viewContext.Entity, customerVisibility, 
+            var toReturn = await PopulateCategoryTemplateModel(viewContext.Entity, customerVisibility,
                 subCategoriesContent, products, productContents, rootNavCategory, allRootCategory, wholesaleCustomer, targetStatuses);
 
             if (toReturn.SubCategories.Count == 0 && toReturn.Products.Count == 1)
@@ -216,13 +199,15 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             if (navCategory != null && (!navCategory.ProductCategory.ParentId.HasValue ||
                 (navCategory.NavIdVisible.HasValue && visibility.Contains(navCategory.NavIdVisible.Value))))
             {
-                ProductNavCategoryLite toReturn = new ProductNavCategoryLite();
-                toReturn.Id = navCategory.Id;
-                toReturn.ProductCategory = navCategory.ProductCategory;
-                toReturn.NavLabel = navCategory.NavLabel;
-                toReturn.NavIdVisible = navCategory.NavIdVisible;
-                toReturn.Url = navCategory.Url;
-                toReturn.SubItems = new List<ProductNavCategoryLite>();
+                ProductNavCategoryLite toReturn = new ProductNavCategoryLite
+                {
+                    Id = navCategory.Id,
+                    ProductCategory = navCategory.ProductCategory,
+                    NavLabel = navCategory.NavLabel,
+                    NavIdVisible = navCategory.NavIdVisible,
+                    Url = navCategory.Url,
+                    SubItems = new List<ProductNavCategoryLite>()
+                };
                 foreach (var productNavCategoryLite in navCategory.SubItems)
                 {
                     var item = GetFilteredByVisibilityCategories(productNavCategoryLite, visibility);
@@ -298,29 +283,38 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             }).ToList();
         }
 
-        private TtlCategoryModel PopulateCategoryTemplateModel(ProductCategoryContent productCategoryContent, IList<CustomerTypeCode> customerVisibility,
-            IList<ProductCategoryContent> subProductCategoryContent = null, IList<VProductSku> skuProducts = null, IList<ProductContent> productContents = null,
+        private async Task<TtlCategoryModel> PopulateCategoryTemplateModel(ProductCategoryContent productCategoryContent,
+            ICollection<CustomerTypeCode> customerVisibility,
+            ICollection<ProductCategoryContent> subProductCategoryContent = null, ICollection<ProductDynamic> sourceProducts = null,
+            ICollection<ProductContent> productContents = null,
             ProductNavCategoryLite rootNavCategory = null, ProductNavCategoryLite rootAllCategory = null, bool? wholesaleCustomer = null,
-            List<RecordStatusCode> targetStatuses=null)
+            HashSet<RecordStatusCode> targetStatuses = null)
         {
             IList<TtlBreadcrumbItemModel> breadcrumbItems = new List<TtlBreadcrumbItemModel>();
             BuildBreadcrumb(rootAllCategory, rootAllCategory, productCategoryContent.Id, breadcrumbItems);
             breadcrumbItems = breadcrumbItems.Reverse().ToList();
 
-            var products = skuProducts?.GroupBy(p => p.IdProduct).Select(g => new VProductSku()
-            {
-                IdProduct = g.Key,
-                Name = g.Min(p => p.Name),
-                SubTitle = g.Min(p => p.SubTitle),
-                Thumbnail = g.Min(p => p.Thumbnail),
-                TaxCode = g.Min(p => p.TaxCode),
-                StatusCode = g.Min(p => p.StatusCode),
-                IdVisibility = g.Min(p => p.IdVisibility),
-                DateEdited = g.Min(p => p.DateEdited),
-                IdEditedBy = g.Min(p => p.IdEditedBy),
-                IdProductType = g.Min(p => p.IdProductType)
-            }).ToList();
-            
+            var skus = await (sourceProducts?.Where(x =>
+                                          x.IdVisibility.HasValue && customerVisibility.Contains(x.IdVisibility.Value))
+                                  .SelectMany(
+                                      p =>
+                                          p.Skus.Where(x => !x.Hidden && (targetStatuses?.Contains((RecordStatusCode) x.StatusCode) ?? true))
+                                              .Select(
+                                                  async s =>
+                                                  {
+                                                      var item = await _skuMapper.ToModelAsync<TtlCategorySkuModel>(s);
+                                                      item.Name = p.Name;
+                                                      item.Thumbnail = p.SafeData.Thumbnail;
+                                                      item.SubTitle = p.SafeData.SubTitle;
+                                                      item.ShortDescription = p.SafeData.ShortDescription;
+                                                      item.Price = wholesaleCustomer == true ? s.WholesalePrice : s.Price;
+                                                      item.InStock = s.IdObjectType == (int) ProductType.EGс ||
+                                                                     s.IdObjectType == (int) ProductType.Gc ||
+                                                                     ((bool?) s.SafeData.DisregardStock ?? false) ||
+                                                                     ((int?) s.SafeData.Stock ?? 0) > 0;
+                                                      return item;
+                                                  })).ToListAsync() ?? TaskCache<List<TtlCategorySkuModel>>.DefaultCompletedTask);
+
             var toReturn = new TtlCategoryModel
             {
                 Name = productCategoryContent.ProductCategory.Name,
@@ -332,31 +326,16 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 HideLongDescription = productCategoryContent.HideLongDescription,
                 LongDescriptionBottom = productCategoryContent.LongDescriptionBottom,
                 HideLongDescriptionBottom = productCategoryContent.HideLongDescriptionBottom,
-                ViewType = (int)productCategoryContent.ViewType,
-                SubCategories = subProductCategoryContent?.Select(x => PopulateCategoryTemplateModel(x, customerVisibility)).ToList(),
-                Products = products?.Where(x => x.IdVisibility.HasValue && customerVisibility.Contains(x.IdVisibility.Value)).Select(x => new TtlCategoryProductModel
-                {
-                    Id = x.IdProduct,
-                    Name = x.Name,
-                    Thumbnail = x.Thumbnail,
-                    SubTitle = x.SubTitle,
-                }).ToList(),
-                Skus = skuProducts?.Where(x => 
-                    x.IdVisibility.HasValue && customerVisibility.Contains(x.IdVisibility.Value) && x.SkuId.HasValue && x.SkuHidden.HasValue
-                    && !x.SkuHidden.Value && targetStatuses.Contains((RecordStatusCode)x.SkuStatusCode)
-                    ).Select(x => new TtlCategorySkuModel
-                {
-                    IdProduct = x.IdProduct,
-                    IdSku = x.SkuId.Value,
-                    Code = x.Code,
-                    Name = x.Name,
-                    Thumbnail = x.Thumbnail,
-                    SubTitle = x.SubTitle,
-                    ShortDescription = x.ShortDescription,
-                    Price = wholesaleCustomer==true ? x.WholesalePrice ?? 0 : x.Price ?? 0,
-                    InStock = x.IdProductType == ProductType.EGс || x.IdProductType == ProductType.Gc ||
-                            (x.DisregardStock ?? false) || (x.Stock ?? 0) > 0
-                }).ToList(),
+                ViewType = (int) productCategoryContent.ViewType,
+                SubCategories =
+                    await
+                    (subProductCategoryContent?.Select(x => PopulateCategoryTemplateModel(x, customerVisibility)).ToListAsync() ??
+                     TaskCache<List<TtlCategoryModel>>.DefaultCompletedTask),
+                Products =
+                    await (sourceProducts?.Where(x => x.IdVisibility.HasValue && customerVisibility.Contains(x.IdVisibility.Value)).Select(
+                               product => _productMapper.ToModelAsync<TtlCategoryProductModel>(product)).ToListAsync() ??
+                           TaskCache<List<TtlCategoryProductModel>>.DefaultCompletedTask),
+                Skus = skus,
                 SideMenuItems = ConvertToSideMenuModelLevel(rootNavCategory?.SubItems),
                 BreadcrumbOrderedItems = breadcrumbItems
             };

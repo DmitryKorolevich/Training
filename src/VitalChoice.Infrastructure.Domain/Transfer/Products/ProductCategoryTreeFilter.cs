@@ -5,6 +5,6 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 {
     public class ProductCategoryTreeFilter : FilterBase
     {
-        public IList<RecordStatusCode> Statuses { get; set; }
+        public ICollection<RecordStatusCode> Statuses { get; set; }
     }
 }

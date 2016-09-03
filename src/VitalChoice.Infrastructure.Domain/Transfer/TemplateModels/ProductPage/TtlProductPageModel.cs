@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using VitalChoice.Ecommerce.Domain.Attributes;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
 {
@@ -13,20 +14,28 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
 		    Skus = new List<TtlProductPageSkuModel>();
 	    }
 
+        [Map("PublicId")]
 	    public Guid ProductPublicId { get; set; }
 
+        [Map]
 	    public string Name { get; set; }
 
-	    public string SubTitle { get; set; }
+        [Map]
+        public string SubTitle { get; set; }
 
-		public string Url { get; set; }
+        [Map]
+        public string Url { get; set; }
 
-	    public string Image { get; set; }
+        [Map("MainProductImage")]
+        public string Image { get; set; }
 
+        [Map]
 	    public string ShortDescription { get; set; }
 
-	    public int? SpecialIcon { get; set; }
+        [Map]
+        public int? SpecialIcon { get; set; }
 
+        [Map]
 	    public string SubProductGroupName { get; set; }
 
         public bool ShowDiscountMessage { get; set; }
