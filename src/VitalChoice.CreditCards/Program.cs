@@ -45,7 +45,31 @@ namespace VitalChoice.CreditCards
                 //RecryptCustomers(encryptionHost);
                 //Console.WriteLine("Starting orders CCs Move");
                 //RecryptOrders(encryptionHost);
-                int updated = 0;
+
+                //Console.WriteLine("Done!");
+
+                char test;
+                var number = "62601302";
+                if (number.Length == 16)
+                {
+                    if (!ValidateCardCheckSum(number))
+                    {
+                        var correctDigits = number.Substring(0, number.Length - 1);
+                        //update
+                        Console.WriteLine(correctDigits + GetNext(correctDigits));
+                    }
+                }
+                else
+                {
+                    if (!ValidateCardCheckSum(number))
+                    {
+                        //add up
+                        Console.WriteLine(number + GetNext(number));
+                    }
+                }
+                Console.WriteLine(number + GetNext(number));
+                Console.ReadKey();
+                return;
                 using (var context = Host.Services.GetRequiredService<ExportInfoContext>())
                 {
                     var uow = new UnitOfWork(context, false);
@@ -66,10 +90,9 @@ namespace VitalChoice.CreditCards
                             if (clearCard.Length == 15)
                             {
                                 char toAdd;
-                                if (!ValidateCardCheckSum(clearCard, out toAdd))
+                                //if (!ValidateCardCheckSum(clearCard))
                                 {
                                     card.CreditCardNumber = encryptionHost.LocalEncrypt(clearCard + toAdd);
-                                    updated++;
                                 }
                             }
                         }
@@ -77,41 +100,7 @@ namespace VitalChoice.CreditCards
                         seed++;
                     } while (orderCards.Count == size);
                 }
-                Console.WriteLine($"Done Orders {updated}");
-                updated = 0;
-                using (var context = Host.Services.GetRequiredService<ExportInfoContext>())
-                {
-                    var uow = new UnitOfWork(context, false);
-                    var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
 
-                    var seed = 0;
-                    const int size = 10000;
-
-                    List<CustomerPaymentMethodExport> orderCards;
-
-                    do
-                    {
-                        int total;
-                        orderCards = rep.Query().SelectPage(seed, size, out total, true);
-                        foreach (var card in orderCards)
-                        {
-                            var clearCard = encryptionHost.LocalDecrypt<string>(card.CreditCardNumber);
-                            if (clearCard.Length == 15)
-                            {
-                                char toAdd;
-                                if (!ValidateCardCheckSum(clearCard, out toAdd))
-                                {
-                                    card.CreditCardNumber = encryptionHost.LocalEncrypt(clearCard + toAdd);
-                                    updated++;
-                                }
-                            }
-                        }
-                        rep.SaveChanges();
-                        seed++;
-                    } while (orderCards.Count == size);
-                }
-                Console.WriteLine($"Done Customers  {updated}");
-                Console.ReadKey();
 
                 //using (var context = Host.Services.GetRequiredService<ExportInfoContext>())
                 //{
@@ -126,51 +115,47 @@ namespace VitalChoice.CreditCards
                 //            $"Order: {card.IdOrder}, Card: {clearTextCard}, MC:{(PaymentValidationExpressions.MasterCardRegex.IsMatch(clearTextCard) ? "valid" : "no")}, VI: {(PaymentValidationExpressions.VisaRegex.IsMatch(clearTextCard) ? "valid" : "no")}, DC: {(PaymentValidationExpressions.DiscoverRegex.IsMatch(clearTextCard) ? "valid" : "no")}, AX: {(PaymentValidationExpressions.AmericanExpressRegex.IsMatch(clearTextCard) ? "valid" : "no")}");
                 //    }
                 //}
-
+                //Console.ReadKey();
             }
             Host.Dispose();
         }
 
-        private static bool ValidateCardCheckSum(string number, out char numberToAdd)
+        private static char GetNext(string number)
         {
-            bool even = false;
             int sum = 0;
-            foreach (var cardSymbol in number.Reverse())
+            for (int i = 1; i <= number.Length; i++)
             {
-                if (even)
+                var index = number.Length - i;
+                if (i % 2 != 0)
                 {
-                    var digit = (byte) cardSymbol - 48;
-                    sum += digit*2%9;
+                    var mul = (number[index] - 48) * 2;
+                    sum += mul > 9 ? mul - 9 : mul;
                 }
                 else
                 {
-                    sum += (byte) cardSymbol - 48;
+                    sum += (number[index] - 48);
                 }
-                even = !even;
             }
-            if (sum%10 == 0)
-            {
-                numberToAdd = default(char);
-                return true;
-            }
-            even = true;
-            sum = 0;
-            foreach (var cardSymbol in number)
-            {
-                if (even)
-                {
-                    var digit = (byte) cardSymbol - 48;
-                    sum += digit*2%9;
-                }
-                else
-                {
-                    sum += (byte) cardSymbol - 48;
-                }
-                even = !even;
-            }
+            return (char) ((10 - sum%10)%10 + 48);
+        }
 
-            numberToAdd = (char) ((10 - sum%10) + 48);
-            return false;
+        private static bool ValidateCardCheckSum(string number)
+        {
+            int sum = 0;
+            for (int i = 1; i <= number.Length; i++)
+            {
+                var index = number.Length - i;
+                if (i%2 == 0)
+                {
+                    var mul = (number[index] - 48)*2;
+                    sum += mul > 9 ? mul - 9 : mul;
+                }
+                else
+                {
+                    sum += number[index] - 48;
+                }
+            }
+            return sum%10 == 0;
         }
 
         private static void RecryptCustomers(IObjectEncryptionHost encryptionHost)
