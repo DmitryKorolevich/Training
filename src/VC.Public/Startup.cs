@@ -26,6 +26,9 @@ namespace VC.Public
 
         public Startup(IHostingEnvironment hostingEnvironment)
         {
+            // Set the maximum number of concurrent connections 
+            ServicePointManager.DefaultConnectionLimit = 1000;
+
             _hostingEnvironment = hostingEnvironment;
             var builder = new ConfigurationBuilder()
                 .SetBasePath(hostingEnvironment.ContentRootPath)
