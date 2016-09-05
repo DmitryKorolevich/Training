@@ -20,6 +20,7 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Options;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.ObjectMapping.Interfaces;
 
@@ -66,10 +67,10 @@ namespace VitalChoice.ContentProcessing.Base
             }
             var viewContext = await GetData(await GetParameters(context, parameters), user, context);
             var contentEntity = viewContext.Entity;
-	        if (contentEntity == null)
-	        {
-		        return null;
-	        }
+            if (contentEntity == null)
+            {
+                return null;
+            }
 
             ITtlTemplate template;
             try
@@ -101,13 +102,20 @@ namespace VitalChoice.ContentProcessing.Base
                 {ViewContextName, viewContext},
                 {AppOptionsName, _appOptions},
             };
-            foreach (var p in contentEntity.MasterContentItem.MasterContentItemToContentProcessors)
+            try
             {
-                await _processorService.ExecuteAsync(p.ContentProcessor.Type, viewContext, model);
+                foreach (var p in contentEntity.MasterContentItem.MasterContentItemToContentProcessors)
+                {
+                    await _processorService.ExecuteAsync(p.ContentProcessor.Type, viewContext, model);
+                }
+                foreach (var p in contentEntity.ContentItem.ContentItemToContentProcessors)
+                {
+                    await _processorService.ExecuteAsync(p.ContentProcessor.Type, viewContext, model);
+                }
             }
-            foreach (var p in contentEntity.ContentItem.ContentItemToContentProcessors)
+            catch (NotFoundException e)
             {
-                await _processorService.ExecuteAsync(p.ContentProcessor.Type, viewContext, model);
+                return null;
             }
 
             var templatingModel = new ExpandoObject();
