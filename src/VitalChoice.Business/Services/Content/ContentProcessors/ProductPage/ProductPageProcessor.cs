@@ -212,6 +212,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             //Map
 
             var toReturn = await _productMapper.ToModelAsync<TtlProductPageModel>(eProduct);
+            toReturn.Url = productContent.Url;
             toReturn.BreadcrumbOrderedItems = breadcrumbItems;
             toReturn.Skus = await eProduct.Skus.Where(x => !x.Hidden && targetStatusCodes.Contains((RecordStatusCode) x.StatusCode))
                 .OrderBy(x => x.Order)
