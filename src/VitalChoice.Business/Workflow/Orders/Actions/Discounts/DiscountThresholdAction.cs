@@ -29,10 +29,13 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
                 return TaskCache<decimal>.DefaultCompletedTask;
             }
             dataContext.DiscountMessage = dataContext.Order.Discount.GetDiscountMessage();
-            var item = (SkuOrdered) dataContext.Order.Discount.Data.ThresholdSku;
-            item.Quantity = 1;
-            item.Amount = 0;
-            dataContext.PromoSkus.Add(new PromoOrdered(item, null, true));
+            var item = (SkuOrdered) dataContext.Order.Discount.SafeData.ThresholdSku;
+            if (item != null)
+            {
+                item.Quantity = 1;
+                item.Amount = 0;
+                dataContext.PromoSkus.Add(new PromoOrdered(item, null, true));
+            }
             return TaskCache<decimal>.DefaultCompletedTask;
         }
     }
