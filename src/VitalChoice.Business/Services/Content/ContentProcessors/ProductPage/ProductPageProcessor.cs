@@ -27,6 +27,7 @@ using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.ObjectMapping.Interfaces;
 using ApiException = VitalChoice.Ecommerce.Domain.Exceptions.ApiException;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 {
@@ -52,18 +53,23 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
         private readonly IProductReviewService _productReviewService;
         private readonly IRecipeService _recipeService;
         private readonly IOptions<AppOptions> _appOptions;
+        private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
+        private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
 
         public ProductPageProcessor(IObjectMapper<ProductPageParameters> mapper,
             IProductCategoryService productCategoryService,
             IProductReviewService productReviewService,
             IRecipeService recipeService,
-            IOptions<AppOptions> appOptions)
+            IOptions<AppOptions> appOptions, IDynamicMapper<ProductDynamic, Product> productMapper,
+            IDynamicMapper<SkuDynamic, Sku> skuMapper)
             : base(mapper)
         {
             _productCategoryService = productCategoryService;
             _productReviewService = productReviewService;
             _recipeService = recipeService;
             _appOptions = appOptions;
+            _productMapper = productMapper;
+            _skuMapper = skuMapper;
         }
 
         private IList<CustomerTypeCode> GetCustomerVisibility(ProcessorViewContext viewContext)
@@ -203,30 +209,22 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                 }
             }
 
-            var toReturn = new TtlProductPageModel();
-            toReturn.ProductPublicId = eProduct.PublicId;
-            toReturn.Name = eProduct.Name;
-            toReturn.SubTitle = eProduct.SafeData.SubTitle;
+            //Map
+
+            var toReturn = await _productMapper.ToModelAsync<TtlProductPageModel>(eProduct);
             toReturn.Url = productContent.Url;
-            toReturn.Image = eProduct.SafeData.MainProductImage;
-            toReturn.ShortDescription = eProduct.SafeData.ShortDescription;
-            toReturn.SpecialIcon = eProduct.SafeData.SpecialIcon;
-            toReturn.SubProductGroupName = eProduct.SafeData.SubProductGroupName;
             toReturn.BreadcrumbOrderedItems = breadcrumbItems;
-            toReturn.Skus =
-                eProduct.Skus.Where(x => !x.Hidden && targetStatusCodes.Contains((RecordStatusCode)x.StatusCode))
-                    .OrderBy(x => x.Order)
-                    .Select(x => new TtlProductPageSkuModel()
-                    {
-                        Code = x.Code,
-                        SalesText = x.SafeData.SalesText,
-                        Price = viewContext.Parameters.Role == RoleType.Wholesale ? x.WholesalePrice : x.Price,
-                        PortionsCount = (int?)x.SafeData.QTY ?? 0,
-                        InStock =
-                            (x.SafeData.DisregardStock != null && x.SafeData.DisregardStock == true) || x.SafeData.DisregardStock == null
-                            || ((int?)x.SafeData.Stock ?? 0) > 0,
-                        AutoShip = x.SafeData.AutoShipProduct != null ? x.Data.AutoShipProduct : false,
-                    }).ToList();
+            toReturn.Skus = await eProduct.Skus.Where(x => !x.Hidden && targetStatusCodes.Contains((RecordStatusCode) x.StatusCode))
+                .OrderBy(x => x.Order)
+                .Select(async x =>
+                {
+                    var item = await _skuMapper.ToModelAsync<TtlProductPageSkuModel>(x);
+                    item.Price = viewContext.Parameters.Role == RoleType.Wholesale ? x.WholesalePrice : x.Price;
+                    item.InStock =
+                        (x.SafeData.DisregardStock != null && x.SafeData.DisregardStock == true) || x.SafeData.DisregardStock == null
+                        || ((int?) x.SafeData.Stock ?? 0) > 0;
+                    return item;
+                }).ToListAsync();
             toReturn.YoutubeVideos = new List<TtlRelatedYoutubeVideoModel>()
             {
                 new TtlRelatedYoutubeVideoModel()
@@ -258,24 +256,24 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                     VideoId = eProduct.SafeData.YouTubeVideo4
                 }
             };
-            toReturn.CrossSells = new List<TtlCrossSellProductModel>()
+            toReturn.CrossSells = new List<TtlCrossSellProductModel>
             {
-                new TtlCrossSellProductModel()
+                new TtlCrossSellProductModel
                 {
                     Image = eProduct.SafeData.CrossSellImage1,
                     Url = eProduct.SafeData.CrossSellUrl1,
                 },
-                new TtlCrossSellProductModel()
+                new TtlCrossSellProductModel
                 {
                     Image = eProduct.SafeData.CrossSellImage2,
                     Url = eProduct.SafeData.CrossSellUrl2,
                 },
-                new TtlCrossSellProductModel()
+                new TtlCrossSellProductModel
                 {
                     Image = eProduct.SafeData.CrossSellImage3,
                     Url = eProduct.SafeData.CrossSellUrl3,
                 },
-                new TtlCrossSellProductModel()
+                new TtlCrossSellProductModel
                 {
                     Image = eProduct.SafeData.CrossSellImage4,
                     Url = eProduct.SafeData.CrossSellUrl4,
@@ -285,7 +283,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 TitleOverride = eProduct.SafeData.DescriptionTitleOverride,
                 Content = productContent.ContentItem.Description,
-                Hidden = (bool?)eProduct.SafeData.DescriptionHide ?? true
+                Hidden = (bool?) eProduct.SafeData.DescriptionHide ?? true
             };
             toReturn.ReviewsTab = new TtlProductReviewsTabModel()
             {
@@ -300,38 +298,8 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                     Rating = x.Rating
                 }).ToList()
             };
-
-            toReturn.IngredientsTab = new TtlProductIngredientsTabModel()
-            {
-                TitleOverride = eProduct.SafeData.IngredientsTitleOverride,
-                Content = eProduct.SafeData.Ingredients,
-                Hidden = (bool?)eProduct.SafeData.IngredientsHide ?? true,
-                NutritionalTitle = eProduct.SafeData.NutritionalTitle,
-                IngredientsTitle = eProduct.SafeData.IngredientsTitle,
-                ServingSize = eProduct.SafeData.ServingSize,
-                Servings = eProduct.SafeData.Servings,
-                Calories = eProduct.SafeData.Calories,
-                CaloriesFromFat = eProduct.SafeData.CaloriesFromFat,
-                TotalFat = eProduct.SafeData.TotalFat,
-                TotalFatPercent = eProduct.SafeData.TotalFatPercent,
-                SaturatedFat = eProduct.SafeData.SaturatedFat,
-                SaturatedFatPercent = eProduct.SafeData.SaturatedFatPercent,
-                TransFat = eProduct.SafeData.TransFat,
-                TransFatPercent = eProduct.SafeData.TransFatPercent,
-                Cholesterol = eProduct.SafeData.Cholesterol,
-                CholesterolPercent = eProduct.SafeData.CholesterolPercent,
-                Sodium = eProduct.SafeData.Sodium,
-                SodiumPercent = eProduct.SafeData.SodiumPercent,
-                TotalCarbohydrate = eProduct.SafeData.TotalCarbohydrate,
-                TotalCarbohydratePercent = eProduct.SafeData.TotalCarbohydratePercent,
-                DietaryFiber = eProduct.SafeData.DietaryFiber,
-                DietaryFiberPercent = eProduct.SafeData.DietaryFiberPercent,
-                Sugars = eProduct.SafeData.Sugars,
-                SugarsPercent = eProduct.SafeData.SugarsPercent,
-                Protein = eProduct.SafeData.Protein,
-                ProteinPercent = eProduct.SafeData.ProteinPercent,
-                AdditionalNotes = eProduct.SafeData.AdditionalNotes?.Replace("\n", "<br/>")
-            };
+            toReturn.IngredientsTab = await _productMapper.ToModelAsync<TtlProductIngredientsTabModel>(eProduct);
+            toReturn.IngredientsTab.AdditionalNotes = toReturn.IngredientsTab.AdditionalNotes?.Replace("\n", "<br/>");
 
             var recipes = await _recipeService.GetRecipesAsync(new RecipeListFilter() { ProductId = eProduct.Id });
 

@@ -90,17 +90,27 @@ BEGIN
 				(@shipfirstname IS NULL OR sadfval.Value LIKE @shipfirstname) AND
 				(@shiplastname IS NULL OR sadlval.Value LIKE @shiplastname) AND
 				(@shipfrom IS NULL OR EXISTS
-					(SELECT
+				(
+					SELECT
 					TOP 1 s.IdOrder
 					FROM OrderShippingPackages s
 					WHERE s.IdOrder=temp.IdOrder AND s.ShippedDate>=@shipfrom
 					)
 				) AND
 				(@shipto IS NULL OR EXISTS
-					(SELECT
+				(
+					SELECT
 					TOP 1 s.IdOrder
 					FROM OrderShippingPackages s
 					WHERE s.IdOrder=temp.IdOrder AND s.ShippedDate<@shipto
+					)
+				) AND
+				(@shipidconfirm IS NULL OR EXISTS
+				(
+					SELECT
+					TOP 1 s.IdOrder
+					FROM OrderShippingPackages s
+					WHERE s.IdOrder=temp.IdOrder AND s.TrackingNumber=@shipidconfirm
 					)
 				)
 		)		
@@ -147,17 +157,27 @@ BEGIN
 				(@shipfirstname IS NULL OR sadfval.Value LIKE @shipfirstname) AND
 				(@shiplastname IS NULL OR sadlval.Value LIKE @shiplastname) AND
 				(@shipfrom IS NULL OR EXISTS
-					(SELECT
+				(
+					SELECT
 					TOP 1 s.IdOrder
 					FROM OrderShippingPackages s
 					WHERE s.IdOrder=temp.IdOrder AND s.ShippedDate>=@shipfrom
 					)
 				) AND
 				(@shipto IS NULL OR EXISTS
-					(SELECT
+				(
+					SELECT
 					TOP 1 s.IdOrder
 					FROM OrderShippingPackages s
 					WHERE s.IdOrder=temp.IdOrder AND s.ShippedDate<@shipto
+					)
+				) AND
+				(@shipidconfirm IS NULL OR EXISTS
+				(
+					SELECT
+					TOP 1 s.IdOrder
+					FROM OrderShippingPackages s
+					WHERE s.IdOrder=temp.IdOrder AND s.TrackingNumber=@shipidconfirm
 					)
 				)
 		)

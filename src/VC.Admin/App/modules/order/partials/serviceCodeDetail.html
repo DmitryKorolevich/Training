@@ -140,11 +140,35 @@
                         <td>
                             <a data-ng-if="item.IdOrderSource" ui-sref="index.oneCol.orderDetail({id: item.IdOrderSource })">{{::item.IdOrderSource}}</a>
                         </td>
-                        <td>{{::item.ShipDate | date:"MM/dd/yy"}}</td>
-                        <td>{{::item.Warehouse}}</td>
+                        <td>
+                            <span data-ng-if="::item.ShipDate">{{::item.ShipDate | date:"MM/dd/yy"}}</span>
+                            <div data-ng-if="::(!item.ShipDate && (item.PShipDate || item.NPShipDate))">
+                                <span data-ng-if="::item.PShipDate">{{::item.PShipDate | date:"MM/dd/yy"}} - P</span><br />
+                                <span data-ng-if="::item.NPShipDate">{{::item.NPShipDate | date:"MM/dd/yy"}} - NP</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span data-ng-if="::item.Warehouse">{{::item.Warehouse}}</span>
+                            <div data-ng-if="::(!item.Warehouse && (item.PWarehouse || item.NPWarehouse))">
+                                <span data-ng-if="::item.PWarehouse">{{::item.PWarehouse}} - P</span><br />
+                                <span data-ng-if="::item.NPWarehouse">{{::item.NPWarehouse}} - NP</span>
+                            </div>
+                        </td>
                         <td>{{::item.ShippingStateCode}}</td>
-                        <td>{{::item.Carrier}}</td>
-                        <td>{{::item.ShipService}}</td>
+                        <td>
+                            <span data-ng-if="::item.Carrier">{{::item.Carrier}}</span>
+                            <div data-ng-if="::(!item.Carrier && (item.PCarrier || item.NPCarrier))">
+                                <span data-ng-if="::item.PCarrier">{{::item.PCarrier}} - P</span><br />
+                                <span data-ng-if="::item.NPCarrier">{{::item.NPCarrier}} - NP</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span data-ng-if="::item.ShipService">{{::item.ShipService}}</span>
+                            <div data-ng-if="::(!item.ShipService && (item.PShipService || item.NPShipService))">
+                                <span data-ng-if="::item.PShipService">{{::item.PShipService}} - P</span><br />
+                                <span data-ng-if="::item.NPShipService">{{::item.NPShipService}} - NP</span>
+                            </div>
+                        </td>
                         <td data-ng-if="item.Total>=0">{{::item.Total | currency}}</td>
                         <td data-ng-if="item.Total<0">({{::Math.abs(item.Total) | currency}})</td>
                         <td>

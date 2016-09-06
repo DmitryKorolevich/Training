@@ -13,14 +13,30 @@ namespace VitalChoice.Business.Queries.Orders
 {
     public class OrderQuery : QueryObject<Order>
     {
+        private static readonly List<OrderStatus?> ActiveStatues = new List<OrderStatus?>()
+        {
+            OrderStatus.Exported,
+            OrderStatus.Processed,
+            OrderStatus.Shipped,
+            OrderStatus.ShipDelayed,
+            OrderStatus.OnHold
+        };
+
+        private static readonly List<OrderStatus?> AffiliateActiveStatues = new List<OrderStatus?>()
+        {
+            OrderStatus.Exported,
+            OrderStatus.Processed,
+            OrderStatus.Shipped
+        };
+
         public OrderQuery WithCustomerId(int? idCustomer)
-		{
-			if (idCustomer.HasValue)
-			{
-				Add(x => x.IdCustomer == idCustomer.Value);
-			}
-			return this;
-		}
+        {
+            if (idCustomer.HasValue)
+            {
+                Add(x => x.IdCustomer == idCustomer.Value);
+            }
+            return this;
+        }
 
         public OrderQuery WithCustomerIds(ICollection<int> ids)
         {
@@ -32,42 +48,43 @@ namespace VitalChoice.Business.Queries.Orders
         }
 
         public OrderQuery WithActualStatusOnly()
-        {
-            var activeStatuses = new List<OrderStatus?>()
-            {
-                OrderStatus.Exported,
-                OrderStatus.Processed,
-                OrderStatus.Shipped,
-                OrderStatus.ShipDelayed,
-                OrderStatus.OnHold
-            };
-            Add(x => activeStatuses.Contains(x.OrderStatus) || activeStatuses.Contains(x.POrderStatus) ||
-                     activeStatuses.Contains(x.NPOrderStatus));
+		{
+            Add(x => ActiveStatues.Contains(x.OrderStatus) || ActiveStatues.Contains(x.POrderStatus) ||
+                     ActiveStatues.Contains(x.NPOrderStatus));
 
+			return this;
+		}
+
+		public OrderQuery FilterById(string id)
+        {
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                Add(p => p.Id.ToString().Contains(id));
+            }
             return this;
         }
 
-        public OrderQuery FilterById(string id)
-		{
-			if (!string.IsNullOrWhiteSpace(id))
-			{
-				Add(p => p.Id.ToString().Contains(id));
-			}
-			return this;
-		}
+        public OrderQuery NotDeleted()
+        {
+            Add(x => x.StatusCode != (int) RecordStatusCode.Deleted);
 
-		public OrderQuery NotDeleted()
-		{
-			Add(x => x.StatusCode != (int)RecordStatusCode.Deleted);
-
-			return this;
-		}
+            return this;
+        }
 
         public OrderQuery WithId(int? id)
         {
             if (id.HasValue)
             {
                 Add(x => x.Id == id.Value);
+            }
+            return this;
+        }
+
+        public OrderQuery WithIds(ICollection<int> ids)
+        {
+            if (ids!=null && ids.Count>0)
+            {
+                Add(x => ids.Contains(x.Id));
             }
             return this;
         }
@@ -85,7 +102,7 @@ namespace VitalChoice.Business.Queries.Orders
         {
             if (from.HasValue && to.HasValue)
             {
-                Add(x => x.OrderShippingPackages.Any(p=>p.ShippedDate>=from.Value && p.ShippedDate <= to.Value));
+                Add(x => x.OrderShippingPackages.Any(p => p.ShippedDate >= from.Value && p.ShippedDate <= to.Value));
             }
             return this;
         }
@@ -102,7 +119,7 @@ namespace VitalChoice.Business.Queries.Orders
 
         public OrderQuery WithOrderTypes(ICollection<OrderType> idObjectTypes)
         {
-            if (idObjectTypes!=null && idObjectTypes.Count>0)
+            if (idObjectTypes != null && idObjectTypes.Count > 0)
             {
                 var ids = idObjectTypes.Select(p => (int) p).ToArray();
                 Add(x => ids.Contains(x.IdObjectType));
@@ -121,12 +138,12 @@ namespace VitalChoice.Business.Queries.Orders
 
         public OrderQuery WithOrderStatuses(ICollection<OrderStatus> orderStatuses)
         {
-            var items = orderStatuses.Select(p => (OrderStatus?) p).ToList();
-            if (orderStatuses!=null && orderStatuses.Count>0)
+            var items = orderStatuses?.Select(p => (OrderStatus?) p).ToList();
+            if (items != null && items.Count > 0)
             {
                 Add(x => items.Contains(x.OrderStatus) ||
-                    items.Contains(x.POrderStatus) ||
-                    items.Contains(x.NPOrderStatus));
+                         items.Contains(x.POrderStatus) ||
+                         items.Contains(x.NPOrderStatus));
             }
             return this;
         }
@@ -138,18 +155,20 @@ namespace VitalChoice.Business.Queries.Orders
                 if (!orderStatus.HasValue || orderStatus != OrderStatus.Incomplete)
                 {
                     Add(x => (x.OrderStatus != OrderStatus.Incomplete && !x.POrderStatus.HasValue && !x.NPOrderStatus.HasValue)
-                            || (!x.OrderStatus.HasValue && (x.POrderStatus != OrderStatus.Incomplete || x.NPOrderStatus != OrderStatus.Incomplete)));
+                             ||
+                             (!x.OrderStatus.HasValue &&
+                              (x.POrderStatus != OrderStatus.Incomplete || x.NPOrderStatus != OrderStatus.Incomplete)));
                 }
             }
             return this;
         }
 
-		public OrderQuery NotAutoShip()
-		{
-		    var typeInt = (int) OrderType.AutoShip;
-		    Add(x => x.IdObjectType != typeInt);
-			return this;
-		}
+        public OrderQuery NotAutoShip()
+        {
+            var typeInt = (int) OrderType.AutoShip;
+            Add(x => x.IdObjectType != typeInt);
+            return this;
+        }
 
         public OrderQuery WithReshipServiceCode(int? serviceCode)
         {
@@ -158,7 +177,7 @@ namespace VitalChoice.Business.Queries.Orders
                 Add(c => c.WhenValues(new
                 {
                     ServiceCode = serviceCode.Value
-                }, (int)OrderType.Reship, ValuesFilterType.And, CompareBehaviour.Equals));
+                }, (int) OrderType.Reship, ValuesFilterType.And, CompareBehaviour.Equals));
             }
             return this;
         }
@@ -170,7 +189,7 @@ namespace VitalChoice.Business.Queries.Orders
                 Add(c => c.WhenValues(new
                 {
                     ServiceCode = serviceCode.Value
-                }, (int)OrderType.Refund, ValuesFilterType.And, CompareBehaviour.Equals));
+                }, (int) OrderType.Refund, ValuesFilterType.And, CompareBehaviour.Equals));
             }
             return this;
         }
@@ -194,9 +213,9 @@ namespace VitalChoice.Business.Queries.Orders
             if (idShippingMethod.HasValue && idShippingMethod.Value == 1) //upgraded
             {
                 Add(c => c.WhenValues(new
-                {
-                    ShippingUpgradeP = 1
-                }, ValuesFilterType.Or, CompareBehaviour.Equals) ||
+                         {
+                             ShippingUpgradeP = 1
+                         }, ValuesFilterType.Or, CompareBehaviour.Equals) ||
                          c.WhenValues(new
                          {
                              ShippingUpgradeP = 2
@@ -244,7 +263,7 @@ namespace VitalChoice.Business.Queries.Orders
         {
             if (idSku.HasValue)
             {
-                Add(c => c.Skus.Any(p => p.IdSku==idSku.Value) || c.PromoSkus.Any(p => p.IdSku == idSku.Value && !p.Disabled));
+                Add(c => c.Skus.Any(p => p.IdSku == idSku.Value) || c.PromoSkus.Any(p => p.IdSku == idSku.Value && !p.Disabled));
             }
 
             return this;
@@ -268,7 +287,7 @@ namespace VitalChoice.Business.Queries.Orders
         {
             if (idShipState.HasValue)
             {
-                Add(x => x.ShippingAddress.IdState== idShipState.Value);
+                Add(x => x.ShippingAddress.IdState == idShipState.Value);
             }
             return this;
         }
@@ -323,12 +342,9 @@ namespace VitalChoice.Business.Queries.Orders
 
         public OrderQuery Active()
         {
-            Add(a => a.StatusCode != (int)RecordStatusCode.Deleted &&
-                    (a.OrderStatus == OrderStatus.Processed || a.OrderStatus == OrderStatus.Shipped ||
-                     a.OrderStatus == OrderStatus.Exported || a.POrderStatus == OrderStatus.Processed ||
-                     a.POrderStatus == OrderStatus.Shipped || a.POrderStatus == OrderStatus.Exported ||
-                     a.NPOrderStatus == OrderStatus.Processed || a.NPOrderStatus == OrderStatus.Shipped ||
-                     a.NPOrderStatus == OrderStatus.Exported));
+            Add(a => a.StatusCode != (int) RecordStatusCode.Deleted &&
+                     (AffiliateActiveStatues.Contains(a.OrderStatus) || AffiliateActiveStatues.Contains(a.POrderStatus) ||
+                      AffiliateActiveStatues.Contains(a.NPOrderStatus)));
             return this;
         }
 

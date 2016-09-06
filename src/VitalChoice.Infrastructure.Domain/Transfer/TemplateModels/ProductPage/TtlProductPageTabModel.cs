@@ -1,11 +1,13 @@
-﻿namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
+﻿using VitalChoice.Ecommerce.Domain.Attributes;
+
+namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
 {
     public class TtlProductPageTabModel
     {
-	    public string TitleOverride { get; set; }
+        public virtual string TitleOverride { get; set; }
 
-	    public string Content { get; set; }
+	    public virtual string Content { get; set; }
 
-	    public bool Hidden { get; set; }
+	    public virtual bool Hidden { get; set; }
     }
 }

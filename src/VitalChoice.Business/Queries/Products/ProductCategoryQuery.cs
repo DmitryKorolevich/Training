@@ -29,7 +29,7 @@ namespace VitalChoice.Business.Queries.Product
             return this;
         }
 
-        public ProductCategoryQuery WithStatus(IList<RecordStatusCode> statuses)
+        public ProductCategoryQuery WithStatus(ICollection<RecordStatusCode> statuses)
         {
             if (statuses != null && statuses.Count > 0)
             {

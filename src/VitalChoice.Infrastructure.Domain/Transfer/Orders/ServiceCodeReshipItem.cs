@@ -15,16 +15,6 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public int? IdOrderSource { get; set; }
 
-        public DateTime? ShipDate { get; set; }
-
-        public string Warehouse { get; set; }
-
-        public string ShippingStateCode { get; set; }
-
-        public string Carrier { get; set; }
-
-        public string ShipService { get; set; }
-
         public decimal Total { get; set; }
 
         public IList<string> SkuCodes { get; set; }
@@ -46,6 +36,33 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public string OrderNotes { get; set; }
 
+        //All Fields below from original order
+        public string ShippingStateCode { get; set; }
+
+        public DateTime? ShipDate { get; set; }
+        
+        public string Warehouse { get; set; }
+        
+        public string Carrier { get; set; }
+
+        public string ShipService { get; set; }
+
+        public DateTime? PShipDate { get; set; }
+
+        public string PWarehouse { get; set; }
+        
+        public string PCarrier { get; set; }
+
+        public string PShipService { get; set; }
+
+        public DateTime? NPShipDate { get; set; }
+
+        public string NPWarehouse { get; set; }
+
+        public string NPCarrier { get; set; }
+
+        public string NPShipService { get; set; }
+
         public ServiceCodeReshipItem(OrderDynamic reship, ICollection<VitalChoice.Ecommerce.Domain.Entities.Addresses.Country> countries)
         {
             if (reship != null)
@@ -60,13 +77,6 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
                 Total -= listAmount;
                 SkuCodes = reship.ReshipProblemSkus?.Select(pp => pp.Code).ToList() ?? new List<string>();
                 OrderNotes = reship.SafeData.OrderNotes;
-                if (reship.ShippingAddress?.IdState.HasValue==true)
-                {
-                    ShippingStateCode =
-                        countries.SelectMany(p => p.States)
-                            .FirstOrDefault(p => p.Id == reship.ShippingAddress.IdState.Value)?
-                            .StateCode;
-                }
             }
         }
     }
