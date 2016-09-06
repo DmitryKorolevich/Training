@@ -67,7 +67,7 @@ namespace VitalChoice.ExportService.Services
             var pStatus = order.POrderStatus;
 
             var context = await _orderService.CalculateOrder(order, OrderStatus.Processed);
-            
+
             //restore order statuses
             order.OrderStatus = status;
             order.NPOrderStatus = npStatus;
@@ -207,10 +207,6 @@ namespace VitalChoice.ExportService.Services
             else
             {
                 order.OrderStatus = OrderStatus.Exported;
-            }
-            if (order.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
-            {
-                _paymentMapper.SecureObject(order.PaymentMethod);
             }
         }
 
