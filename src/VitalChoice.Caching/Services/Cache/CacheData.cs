@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -5,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
@@ -31,8 +33,9 @@ namespace VitalChoice.Caching.Services.Cache
             _nonUniqueIndexedDictionary;
 
         private volatile bool _needUpdate;
+        private readonly ILogger<CacheData<T>> _logger;
 
-        public CacheData(IInternalEntityCacheFactory cacheFactory, EntityInfo entityInfo, RelationInfo relationInfo)
+        public CacheData(IInternalEntityCacheFactory cacheFactory, EntityInfo entityInfo, RelationInfo relationInfo, ILoggerFactory loggerFactory)
         {
             _mainCluster = new CacheCluster<EntityKey, T>();
             _indexedCluster = new CacheCluster<EntityIndex, T>();
@@ -50,6 +53,7 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 _nonUniqueIndexedDictionary.Add(nonUniqueIndex, new ConcurrentDictionary<EntityIndex, CacheCluster<EntityKey, T>>());
             }
+            _logger = loggerFactory.CreateLogger<CacheData<T>>();
         }
 
         public CacheCluster<EntityKey, T> Get(EntityCacheableIndexInfo nonUniqueIndexInfo, EntityIndex index)
@@ -134,7 +138,7 @@ namespace VitalChoice.Caching.Services.Cache
 
         public bool ItemExist(EntityKey key)
         {
-                return _mainCluster.Exist(key);
+            return _mainCluster.Exist(key);
         }
 
         public bool GetHasRelation(string name)
@@ -250,10 +254,18 @@ namespace VitalChoice.Caching.Services.Cache
             ICacheStateManager stateManager, out ICollection<RelationInfo> relationsToClone,
             CachedEntity<T> cached)
         {
-
             relationsToClone = _relationInfo.Relations.Where(r => cached.NeedUpdateRelated.Contains(r.Name)).ToArray();
-            return GetIsNormalized(entity, stateManager, relationsToClone, _entityInfo, false) &&
-                   GetIsNormalized(cached.Entity, stateManager, relationsToClone, _entityInfo, true);
+            try
+            {
+                return GetIsNormalized(entity, stateManager, relationsToClone, _entityInfo, false)
+                       && (cached.EntityUntyped == null ||
+                           GetIsNormalized(cached.Entity, stateManager, relationsToClone, _entityInfo, true));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.ToString());
+                return false;
+            }
         }
 
         private bool GetIsNormalized(object entity, ICacheStateManager stateManager,

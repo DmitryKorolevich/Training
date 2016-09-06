@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Services.Cache.Base;
@@ -10,11 +11,13 @@ namespace VitalChoice.Caching.Services.Cache
     public sealed class CacheStorage<T> : IDisposable
     {
         private readonly IInternalEntityCacheFactory _cacheFactory;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly EntityInfo _entityInfo;
 
-        public CacheStorage(EntityInfo entityInfo, IInternalEntityCacheFactory cacheFactory)
+        public CacheStorage(EntityInfo entityInfo, IInternalEntityCacheFactory cacheFactory, ILoggerFactory loggerFactory)
         {
             _cacheFactory = cacheFactory;
+            _loggerFactory = loggerFactory;
             _entityInfo = entityInfo;
         }
 
@@ -24,7 +27,7 @@ namespace VitalChoice.Caching.Services.Cache
         public ICacheData<T> GetCacheData(RelationInfo relationInfo)
         {
             return _cacheData.GetOrAdd(relationInfo,
-                r => new CacheData<T>(_cacheFactory, _entityInfo, relationInfo));
+                r => new CacheData<T>(_cacheFactory, _entityInfo, relationInfo, _loggerFactory));
         }
 
         public ICollection<ICacheData<T>> AllCacheDatas => _cacheData.Values;
