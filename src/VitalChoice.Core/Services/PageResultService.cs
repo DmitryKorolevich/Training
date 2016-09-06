@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Net;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
@@ -35,6 +36,32 @@ namespace VitalChoice.Core.Services
                     {
                         context.HttpContext.Request.Path = originalPath;
                         context.HttpContext.Features.Set((IStatusCodeReExecuteFeature) null);
+                    }
+                }
+                else
+                {
+                    await context.Next(context.HttpContext);
+                }
+            });
+        }
+
+        public static IApplicationBuilder UseStatusCodeExecuteHandler(this IApplicationBuilder app, Action<StatusCodeContext> handler,
+            HttpStatusCode statusCode)
+        {
+            return app.UseStatusCodePages(async context =>
+            {
+                if (context.HttpContext.Response.StatusCode == (int)statusCode && context.HttpContext.Request.Headers["Accept"].Any(h => h.ToLower().Contains("text/html")))
+                {
+                    handler(context);
+                    PathString originalPath = context.HttpContext.Request.Path;
+                    try
+                    {
+                        await context.Next(context.HttpContext);
+                    }
+                    finally
+                    {
+                        context.HttpContext.Request.Path = originalPath;
+                        context.HttpContext.Features.Set((IStatusCodeReExecuteFeature)null);
                     }
                 }
                 else
