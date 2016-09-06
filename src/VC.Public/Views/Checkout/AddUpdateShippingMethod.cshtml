@@ -33,11 +33,15 @@
         @using (Html.BeginForm("AddUpdateShippingMethod", "Checkout", null, FormMethod.Post, null, new { @class = "form-regular medium-small", role = "form" }))
         {
             @Html.AntiForgeryToken()
+            <div style="display: none;">
+                <input type="text" id="PreventChromeAutocomplete"
+                       name="PreventChromeAutocomplete" autocomplete="address-level4" />
+            </div>
             <span class="checkout-notification-important margin-top-small margin-bottom-small">OR</span>
             <div class="form-group">
                 <div class="input-group">
                     <label class="multiline-checkbox-container">
-                        @Html.CheckBoxFor(m => m.UseBillingAddress, new { @class = "form-control" })
+                        @Html.CheckBoxFor(m => m.UseBillingAddress, new { @class = "form-control", autocomplete = "off" })
                         Use my Billing address as my Shipping address.<br />
                         <span class="shopping-notice-note">NOTE:</span> Frozen goods cannot be sent to PO boxes.
                     </label>
@@ -47,14 +51,14 @@
                 <div class="form-group" @*style="display: none;" *@>
                     @Html.Label("SavedAddresses", "Saved Addresses", new { @class = "control-label" })
                     <div class="input-group">
-                        @Html.DropDownListFor(x => x.Id, new SelectList(ViewBag.ShippingAddresses, "Key", "Value"), new { id = "ddShippingAddressesSelection", @class = "form-control auto" })
+                        @Html.DropDownListFor(x => x.Id, new SelectList(ViewBag.ShippingAddresses, "Key", "Value"), new { id = "ddShippingAddressesSelection", @class = "form-control auto", autocomplete = "off" })
                     </div>
                 </div>
                 <div class="form-group" style="display:none;" id="updateSaved">
                     <label class="control-label"></label>
                     <div class="input-group">
                         <label class="multiline-checkbox-container bold">
-                            @Html.CheckBoxFor(m => m.SaveToProfile, new { @class = "form-control" })
+                            @Html.CheckBoxFor(m => m.SaveToProfile, new { @class = "form-control", autocomplete = "off" })
                             Update saved shipping address
                         </label>
                     </div>
@@ -72,7 +76,7 @@
                     <label class="control-label"></label>
                     <div class="input-group">
                         <label class="multiline-checkbox-container bold">
-                            @Html.CheckBoxFor(m => m.IsGiftOrder, new { @class = "form-control" })
+                            @Html.CheckBoxFor(m => m.IsGiftOrder, new { @class = "form-control", autocomplete = "off" })
                             Check here if this order is a gift
                         </label>
                     </div>
@@ -84,7 +88,7 @@
                             <span class="shopping-notice-note">NOTE:</span> If this is an e-Gift Certificate, enter the recipient’s email address where indicated AFTER you place your order,<br />
                             using the form on the Thank You page. (This is a security requirement.)
                         </div>
-                        @Html.TextAreaFor(m => m.GiftMessage, new { @class = "form-control checkout-huge", rows = "5", maxlength = 255, charcount = "true" })
+                        @Html.TextAreaFor(m => m.GiftMessage, new { @class = "form-control checkout-huge", rows = "5", maxlength = 255, charcount = "true", autocomplete = "off" })
                         <span class="checkout-charcount"><b>255</b> characters remaining</span>
                         @Html.ValidationMessageFor(m => m.GiftMessage)
                     </div>

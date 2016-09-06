@@ -15,30 +15,30 @@
 <div class="form-group">
 	@Html.LabelFor(m => m.NameOnCard, new { @class = "control-label" })
 	<div class="input-group">
-		@Html.TextBoxFor(m => m.NameOnCard, new { @class = "form-control" })
+		@Html.TextBoxFor(m => m.NameOnCard, new { @class = "form-control", autocomplete = "off" })
 		@Html.ValidationMessageFor(m => m.NameOnCard)
 	</div>
 </div>
 <div class="form-group">
 	@Html.LabelFor(m => m.CardType, new { @class = "control-label" })
 	<div class="input-group">
-		@Html.DropDownListFor(m => m.CardType, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCardType" })
+		@Html.DropDownListFor(m => m.CardType, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCardType", autocomplete = "off" })
 		@Html.ValidationMessageFor(m => m.CardType)
 	</div>
 </div>
 <div class="form-group">
 	@Html.LabelFor(m => m.CardNumber, new { @class = "control-label" })
 	<div class="input-group">
-		@Html.TextBoxFor(m => m.CardNumber, new { @class = "form-control", maxlength = "16" })
+		@Html.TextBoxFor(m => m.CardNumber, new { @class = "form-control", maxlength = "16", autocomplete = "off" })
 		@Html.ValidationMessageFor(m => m.CardNumber)
 	</div>
 </div>
 <div class="form-group form-control-container">
 	@Html.Label("ExpirationDate", "Expiration Date", new { @class = "control-label" })
 	<div class="input-group">
-		@Html.TextBoxFor(m => m.ExpirationDateMonth, new { @class = "form-control small-form-control", maxlength = "2" })
+		@Html.TextBoxFor(m => m.ExpirationDateMonth, new { @class = "form-control small-form-control", maxlength = "2", autocomplete = "off" })
 		<span>/</span>
-		@Html.TextBoxFor(m => m.ExpirationDateYear, new { @class = "form-control small-form-control", maxlength = "2" })
+		@Html.TextBoxFor(m => m.ExpirationDateYear, new { @class = "form-control small-form-control", maxlength = "2", autocomplete = "off" })
 		@Html.ValidationMessageFor(m => m.ExpirationDateMonth)
 		@Html.ValidationMessageFor(m => m.ExpirationDateYear)
 	</div>
@@ -46,7 +46,7 @@
 <div class="form-group">
 	@Html.LabelFor(m => m.SecurityCode, new { @class = "control-label" })
 	<div class="input-group">
-		@Html.TextBoxFor(m => m.SecurityCode, new { @class = "form-control small-form-control", maxlength = "4" })
+		@Html.TextBoxFor(m => m.SecurityCode, new { @class = "form-control small-form-control", maxlength = "4", autocomplete = "off" })
 		<i class="tooltip-v glyphicon glyphicon-question-sign on-input-box" data-tooltip-title="What is a security code?" data-tooltip-body="Credit card security codes provide an additional measure of security when you make purchases online. <br>They may be called a card security code (CSC), card verification value (CVV or CV2), card verification code (CVC) or a card code verification (CCV).<br><br><strong>How to find your card's code</strong><br>Visa, MasterCard, or Discover cards:<ul><li>Turn the card over. </li><li>In the signature box or just to the right of it, you will see a series of numbers. </li><li>If you have only 3 numbers, those are the security code. </li><li>If you have 7 numbers, the last three are the security code.</li><li>If you have 19 numbers, the last three are the security code.</li></ul>American Express cards:<ul><li>The four-digit security code is shown on the front side.</li><li>The code appears to the left or right of the embossed 16-digit card number. </li><li>The four-digit security code is printed in black, and is not embossed.</li></ul>"></i>
 		@Html.ValidationMessageFor(m => m.SecurityCode)
 	</div>
@@ -64,7 +64,7 @@
 			}
 			else
 			{
-				@Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+				@Html.TextBoxFor(m => m.Email, new { @class = "form-control", autocomplete = "off" })
 				@Html.ValidationMessageFor(m => m.Email)
 			}
 		</div>
@@ -72,42 +72,42 @@
 	<div class="form-group">
 		@Html.LabelFor(m => m.FirstName, new { @class = "control-label" })
 		<div class="input-group">
-			@Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+			@Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", autocomplete = "off" })
 			@Html.ValidationMessageFor(m => m.FirstName)
 		</div>
 	</div>
 	<div class="form-group">
 		@Html.LabelFor(m => m.LastName, new { @class = "control-label" })
 		<div class="input-group">
-			@Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+			@Html.TextBoxFor(m => m.LastName, new { @class = "form-control", autocomplete = "off" })
 			@Html.ValidationMessageFor(m => m.LastName)
 		</div>
 	</div>
 	<div class="form-group">
 		@Html.LabelFor(m => m.Company, new { @class = "control-label" })
 		<div class="input-group">
-			@Html.TextBoxFor(m => m.Company, new { @class = "form-control" })
+			@Html.TextBoxFor(m => m.Company, new { @class = "form-control", autocomplete = "off" })
 			@Html.ValidationMessageFor(m => m.Company)
 		</div>
 	</div>
 	<div class="form-group">
 		@Html.LabelFor(m => m.IdCountry, new { @class = "control-label" })
 		<div class="input-group">
-			@Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCountry" })
+			@Html.DropDownListFor(m => m.IdCountry, new List<SelectListItem>(), new { @class = "form-control", @id = "ddCountry", autocomplete = "off" })
 			@Html.ValidationMessageFor(m => m.IdCountry)
 		</div>
 	</div>
 	<div class="form-group">
 		@Html.LabelFor(m => m.Address1, new { @class = "control-label" })
 		<div class="input-group">
-			@Html.TextBoxFor(m => m.Address1, new { @class = "form-control" })
+			@Html.TextBoxFor(m => m.Address1, new { @class = "form-control", autocomplete = "off" })
 			@Html.ValidationMessageFor(m => m.Address1)
 		</div>
 	</div>
 	<div class="form-group">
 		<label class="control-label"></label>
 		<div class="input-group">
-			@Html.TextBoxFor(m => m.Address2, new { @class = "form-control" })
+			@Html.TextBoxFor(m => m.Address2, new { @class = "form-control", autocomplete = "off" })
 			@Html.ValidationMessageFor(m => m.Address2)
 		</div>
 	</div>
@@ -116,7 +116,7 @@
 	<div class="form-group">
 		@Html.LabelFor(m => m.City, new { @class = "control-label" })
 		<div class="input-group">
-			@Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+			@Html.TextBoxFor(m => m.City, new { @class = "form-control", autocomplete = "off" })
 			@Html.ValidationMessageFor(m => m.City)
 		</div>
 	</div>
@@ -124,7 +124,7 @@
 		<!--todo-->
 		@Html.LabelFor(m => m.IdState, new { @class = "control-label" })
 		<div class="input-group">
-			@Html.DropDownListFor(m => m.IdState, new List<SelectListItem>(), new { @class = "form-control", @id = "ddState" })
+			@Html.DropDownListFor(m => m.IdState, new List<SelectListItem>(), new { @class = "form-control", @id = "ddState", autocomplete = "off" })
 			@Html.ValidationMessageFor(m => m.IdState)
 		</div>
 	</div>
@@ -132,28 +132,28 @@
 		<!--todo-->
 		@Html.LabelFor(m => m.County, new { @class = "control-label" })
 		<div class="input-group">
-			@Html.TextBoxFor(m => m.County, new { @class = "form-control", @id = "txtState" })
+			@Html.TextBoxFor(m => m.County, new { @class = "form-control", @id = "txtState", autocomplete = "off" })
 			@Html.ValidationMessageFor(m => m.County)
 		</div>
 	</div>
 	<div class="form-group">
 		@Html.LabelFor(m => m.PostalCode, new { @class = "control-label" })
 		<div class="input-group">
-			@Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control" })
+			@Html.TextBoxFor(m => m.PostalCode, new { @class = "form-control", autocomplete = "off" })
 			@Html.ValidationMessageFor(m => m.PostalCode)
 		</div>
 	</div>
 	<div class="form-group">
 		@Html.LabelFor(m => m.Phone, new { @class = "control-label" })
 		<div class="input-group">
-			@Html.TextBoxFor(m => m.Phone, new { @class = "form-control phone-mask" })
+			@Html.TextBoxFor(m => m.Phone, new { @class = "form-control phone-mask", autocomplete = "off" })
 			@Html.ValidationMessageFor(m => m.Phone)
 		</div>
 	</div>
 	<div class="form-group">
 		@Html.LabelFor(m => m.Fax, new { @class = "control-label" })
 		<div class="input-group">
-			@Html.TextBoxFor(m => m.Fax, new { @class = "form-control phone-mask" })
+			@Html.TextBoxFor(m => m.Fax, new { @class = "form-control phone-mask", autocomplete = "off" })
 			@Html.ValidationMessageFor(m => m.Fax)
 		</div>
 	</div>
