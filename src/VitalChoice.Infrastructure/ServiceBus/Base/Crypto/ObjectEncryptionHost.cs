@@ -656,6 +656,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
         {
             if (clientCert == null)
                 throw new ArgumentNullException(nameof(clientCert));
+            if (clientCert == null)
+                throw new ArgumentNullException(nameof(rootCa));
 
             X509Chain validationChain = new X509Chain
             {
@@ -674,6 +676,11 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
 
         private byte[] Encrypt(AesCng aes, byte[] data)
         {
+            if (aes == null || data == null)
+            {
+                return new byte[0];
+            }
+
             using (var encryptor = aes.CreateEncryptor())
             {
                 return TransformBlocks(data, encryptor);
@@ -682,6 +689,11 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
 
         private byte[] Decrypt(AesCng aes, byte[] encryptedData)
         {
+            if (aes == null || encryptedData == null)
+            {
+                return new byte[0];
+            }
+
             using (var decryptor = aes.CreateDecryptor())
             {
                 return TransformBlocks(encryptedData, decryptor);

@@ -35,7 +35,7 @@ namespace VitalChoice.ExportService.Services
             switch (command.CommandName)
             {
                 case ServiceBusCommandConstants.GetPublicKey:
-                    if (command.Data.Data is bool && !(bool) command.Data?.Data)
+                    if (command.Data?.Data == null || command.Data.Data is bool && !(bool) command.Data.Data)
                     {
                         return false;
                     }
@@ -43,7 +43,7 @@ namespace VitalChoice.ExportService.Services
                     SendPlainCommand(new ServiceBusCommandBase(command, publicKey));
                     break;
                 case ServiceBusCommandConstants.SetSessionKey:
-                    if (command.Data.Data is bool && !(bool)command.Data?.Data)
+                    if (command.Data?.Data == null || command.Data.Data is bool && !(bool) command.Data.Data)
                     {
                         return false;
                     }
@@ -53,7 +53,7 @@ namespace VitalChoice.ExportService.Services
                         EncryptionHost.RegisterSession(command.SessionId, command.Source, keyExchange)));
                     break;
                 case ServiceBusCommandConstants.CheckSessionKey:
-                    if (command.Data?.Data is bool && !(bool)command.Data?.Data)
+                    if (command.Data?.Data is bool && !(bool) command.Data.Data)
                     {
                         return false;
                     }
