@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.UOW;
+using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.VeraCore;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -52,12 +53,15 @@ namespace VitalChoice.ExportService.Services
         private static readonly AsyncManualResetEvent LockCustomersEvent = new AsyncManualResetEvent(true);
         private static readonly AsyncManualResetEvent LockOrdersEvent = new AsyncManualResetEvent(true);
         private readonly ILogger _logger;
+        private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _paymentMapper;
 
         public OrderExportService(IOptions<ExportOptions> options, IObjectEncryptionHost encryptionHost,
             DbContextOptions<ExportInfoContext> contextOptions, ILoggerFactory loggerFactory,
             IVeraCoreExportService veraCoreExportService, IOrderService orderService, ExportInfoContext infoContext,
             IOrderRefundService refundService, ICustomerService customerService, ILifetimeScope scope,
-            IPaymentMethodService paymentMethodService, IVeraCoreSFTPService sftpService, IGiftListCreditCardExportFileGenerator giftListFileGenerator)
+            IPaymentMethodService paymentMethodService, IVeraCoreSFTPService sftpService,
+            IGiftListCreditCardExportFileGenerator giftListFileGenerator,
+            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> paymentMapper)
         {
             _options = options;
             _encryptionHost = encryptionHost;
@@ -71,6 +75,7 @@ namespace VitalChoice.ExportService.Services
             _paymentMethodService = paymentMethodService;
             _sftpService = sftpService;
             _giftListFileGenerator = giftListFileGenerator;
+            _paymentMapper = paymentMapper;
             _logger = loggerFactory.CreateLogger<OrderExportService>();
         }
 
@@ -471,6 +476,13 @@ namespace VitalChoice.ExportService.Services
                     }
                 }
             });
+            foreach (var order in orderList)
+            {
+                if (order.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
+                {
+                    _paymentMapper.SecureObject(order.PaymentMethod);
+                }
+            }
             await _orderService.UpdateRangeAsync(orderList);
             exportCallBack(new OrderExportItemResult
             {

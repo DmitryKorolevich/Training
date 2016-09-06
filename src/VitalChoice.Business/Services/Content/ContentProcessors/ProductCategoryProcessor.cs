@@ -135,7 +135,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 
             var customerVisibility = GetCustomerVisibility(viewContext);
 
-            var wholesaleCustomer = viewContext.User.IsInRole(IdentityConstants.WholesaleCustomer);
+            var wholesaleCustomer = viewContext.User?.IsInRole(IdentityConstants.WholesaleCustomer) ?? false;
             if (category != null)
             {
                 await DenyAccessIfWholesaleRuleApplied(category, viewContext, wholesaleCustomer);
@@ -188,7 +188,10 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
 
             if (toReturn.SubCategories.Count == 0 && toReturn.Products.Count == 1)
             {
-                viewContext.CommandOptions.RedirectUrl = "/product/" + toReturn.Products.First().Url;
+                if (viewContext.CommandOptions != null)
+                {
+                    viewContext.CommandOptions.RedirectUrl = "/product/" + toReturn.Products.First().Url;
+                }
             }
 
             return toReturn;
