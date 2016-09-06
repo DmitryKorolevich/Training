@@ -4,24 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.CreditCards.Entities;
-using VitalChoice.Infrastructure.ServiceBus.Base;
 using Microsoft.EntityFrameworkCore;
-using VitalChoice.Data.Extensions;
-using VitalChoice.Data.Helpers;
-using VitalChoice.Data.UOW;
-using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Ecommerce.Domain.Entities.Customers;
-using VitalChoice.Ecommerce.Domain.Entities.Orders;
-using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.Ecommerce.Domain.Transfer;
-using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.CreditCards.Services;
+using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
-using VitalChoice.Interfaces.Services.Customers;
 
 namespace VitalChoice.CreditCards
 {
@@ -38,85 +29,31 @@ namespace VitalChoice.CreditCards
 
             Host.Start();
 
-            using (var encryptionHost = Host.Services.GetRequiredService<IObjectEncryptionHost>())
+            Console.WriteLine("Press any key to start exporting...");
+            Console.ReadKey();
+
+            var exportService = Host.Services.GetRequiredService<IOrderExportService>();
+            var orders = File.ReadAllText("fck_list.txt")
+                .Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+                .Select(int.Parse);
+            var sync = new object();
+            exportService.ExportOrders(orders.Select(o => new OrderExportItem
             {
+                OrderType = ExportSide.All,
+                IsRefund = false,
+                Id = o
+            }).ToList(), done =>
+            {
+                if (done.Success)
+                    return;
 
-                //Console.WriteLine("Starting customer CCs Move");
-                //RecryptCustomers(encryptionHost);
-                //Console.WriteLine("Starting orders CCs Move");
-                //RecryptOrders(encryptionHost);
-
-                //Console.WriteLine("Done!");
-
-                char test;
-                var number = "62601302";
-                if (number.Length == 16)
+                lock (sync)
                 {
-                    if (!ValidateCardCheckSum(number))
-                    {
-                        var correctDigits = number.Substring(0, number.Length - 1);
-                        //update
-                        Console.WriteLine(correctDigits + GetNext(correctDigits));
-                    }
+                    Console.WriteLine($"order: {done.Id} filed:\n{done.Error}\n\n");
                 }
-                else
-                {
-                    if (!ValidateCardCheckSum(number))
-                    {
-                        //add up
-                        Console.WriteLine(number + GetNext(number));
-                    }
-                }
-                Console.WriteLine(number + GetNext(number));
-                Console.ReadKey();
-                return;
-                using (var context = Host.Services.GetRequiredService<ExportInfoContext>())
-                {
-                    var uow = new UnitOfWork(context, false);
-                    var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
-
-                    var seed = 0;
-                    const int size = 10000;
-
-                    List<OrderPaymentMethodExport> orderCards;
-
-                    do
-                    {
-                        int total;
-                        orderCards = rep.Query().SelectPage(seed, size, out total, true);
-                        foreach (var card in orderCards)
-                        {
-                            var clearCard = encryptionHost.LocalDecrypt<string>(card.CreditCardNumber);
-                            if (clearCard.Length == 15)
-                            {
-                                char toAdd;
-                                //if (!ValidateCardCheckSum(clearCard))
-                                {
-                                    card.CreditCardNumber = encryptionHost.LocalEncrypt(clearCard + toAdd);
-                                }
-                            }
-                        }
-                        rep.SaveChanges();
-                        seed++;
-                    } while (orderCards.Count == size);
-                }
-
-
-                //using (var context = Host.Services.GetRequiredService<ExportInfoContext>())
-                //{
-                //    var uow = new UnitOfWork(context, false);
-                //    var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
-                //    var orderIds = args.Select(int.Parse).Distinct().ToList();
-                //    var cards = rep.Query(q => orderIds.Contains(q.IdOrder)).Select(false);
-                //    foreach (var card in cards)
-                //    {
-                //        var clearTextCard = encryptionHost.LocalDecrypt<string>(card.CreditCardNumber);
-                //        Console.WriteLine(
-                //            $"Order: {card.IdOrder}, Card: {clearTextCard}, MC:{(PaymentValidationExpressions.MasterCardRegex.IsMatch(clearTextCard) ? "valid" : "no")}, VI: {(PaymentValidationExpressions.VisaRegex.IsMatch(clearTextCard) ? "valid" : "no")}, DC: {(PaymentValidationExpressions.DiscoverRegex.IsMatch(clearTextCard) ? "valid" : "no")}, AX: {(PaymentValidationExpressions.AmericanExpressRegex.IsMatch(clearTextCard) ? "valid" : "no")}");
-                //    }
-                //}
-                //Console.ReadKey();
-            }
+            }).GetAwaiter().GetResult();
+            Console.WriteLine("Done!");
+            Console.ReadKey();
             Host.Dispose();
         }
 
@@ -126,9 +63,9 @@ namespace VitalChoice.CreditCards
             for (int i = 1; i <= number.Length; i++)
             {
                 var index = number.Length - i;
-                if (i % 2 != 0)
+                if (i%2 != 0)
                 {
-                    var mul = (number[index] - 48) * 2;
+                    var mul = (number[index] - 48)*2;
                     sum += mul > 9 ? mul - 9 : mul;
                 }
                 else
