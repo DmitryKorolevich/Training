@@ -149,10 +149,6 @@ namespace VitalChoice.ExportService.Services
                 await _avalaraTax.GetTax(context, TaxGetType.SavePermanent | TaxGetType.UseBoth);
                 UpdateOrderStatus(order, context, ExportSide.All);
             }
-            if (order.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
-            {
-                _paymentMapper.SecureObject(order.PaymentMethod);
-            }
         }
 
         public async Task ExportRefund(OrderRefundDynamic order)
