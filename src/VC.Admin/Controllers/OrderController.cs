@@ -1250,6 +1250,7 @@ namespace VC.Admin.Controllers
         {
             filter.To = filter.To.AddDays(1);
             filter.ShipTo = filter.ShipTo?.AddDays(1) ?? filter.ShipTo;
+            filter.FirstOrderTo = filter.FirstOrderTo?.AddDays(1) ?? filter.FirstOrderTo;
             var toReturn = await _orderReportService.GetOrdersSummarySalesOrderTypeStatisticItemsAsync(filter);
             return toReturn.ToList();
         }
@@ -1282,8 +1283,8 @@ namespace VC.Admin.Controllers
             }
             DateTime? dShipFrom = !string.IsNullOrEmpty(shipfrom) ? shipfrom.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
             DateTime? dShipTo = !string.IsNullOrEmpty(shipto) ? shipto.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
-            DateTime? dFirstOrderFrom = !string.IsNullOrEmpty(firstorderfrom) ? shipfrom.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
-            DateTime? dFirstOrderTo = !string.IsNullOrEmpty(firstorderto) ? shipto.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
+            DateTime? dFirstOrderFrom = !string.IsNullOrEmpty(firstorderfrom) ? firstorderfrom.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
+            DateTime? dFirstOrderTo = !string.IsNullOrEmpty(firstorderto) ? firstorderto.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
 
 
             OrdersSummarySalesReportFilter filter = new OrdersSummarySalesReportFilter()

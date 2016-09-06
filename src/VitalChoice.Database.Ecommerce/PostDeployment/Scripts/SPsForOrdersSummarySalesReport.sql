@@ -72,13 +72,27 @@ BEGIN
 	FROM Orders o WITH(NOLOCK)
 	JOIN Customers c WITH(NOLOCK) ON o.IdCustomer=c.Id
 	WHERE
-		o.DateCreated>=@from AND o.DateCreated<=@to AND
+		o.DateCreated>=@from AND o.DateCreated<@to AND
 		o.StatusCode!=3 AND o.IdObjectType NOT IN (2,5,6) AND 
 		((o.OrderStatus IS NOT NULL AND o.OrderStatus !=1 AND o.OrderStatus !=4 AND o.OrderStatus !=6 ) OR 
 		(o.OrderStatus IS NULL AND o.POrderStatus !=1 AND o.POrderStatus !=4 AND o.POrderStatus !=6 AND 
 		o.NPOrderStatus !=1 AND o.NPOrderStatus !=4 AND o.NPOrderStatus !=6)) AND
 		(@idcustomertype IS NULL OR c.IdObjectType = @idcustomertype) AND
-		(@idcustomer IS NULL OR o.IdCustomer = @idcustomer)
+		(@idcustomer IS NULL OR o.IdCustomer = @idcustomer) AND
+		(@shipfrom IS NULL OR EXISTS
+			(SELECT
+			TOP 1 s.IdOrder
+			FROM OrderShippingPackages s
+			WHERE s.IdOrder=o.Id AND s.ShippedDate>=@shipfrom
+			)
+		) AND
+		(@shipto IS NULL OR EXISTS
+			(SELECT
+			TOP 1 s.IdOrder
+			FROM OrderShippingPackages s
+			WHERE s.IdOrder=o.Id AND s.ShippedDate<@shipto
+			)
+		)
 	),
 
 	tempOrders(
@@ -118,8 +132,8 @@ BEGIN
 			(@tocount IS NULL OR @tocount>=occ.Count) AND	
 			(@firstorderfrom IS NULL OR (foc.DateCreated IS NOT NULL AND @firstorderfrom<=foc.DateCreated) 
 			OR (foc.DateCreated IS NULL AND @firstorderfrom<=temp.CustomerDateCreated)) AND		
-			(@firstorderto IS NULL OR (foc.DateCreated IS NOT NULL AND @firstorderto>=foc.DateCreated) 
-			OR (foc.DateCreated IS NULL AND @firstorderto>=temp.CustomerDateCreated)) AND		
+			(@firstorderto IS NULL OR (foc.DateCreated IS NOT NULL AND @firstorderto>foc.DateCreated) 
+			OR (foc.DateCreated IS NULL AND @firstorderto>temp.CustomerDateCreated)) AND		
 			(@discountcode IS NULL OR @discountcode=d.Code) AND
 			(@isaffiliate IS NULL OR @isaffiliate=0 OR (@isaffiliate=1 AND aop.IdAffiliate IS NOT NULL))
 	)
@@ -218,7 +232,7 @@ BEGIN
 			LEFT JOIN Discounts As d WITH(NOLOCK) ON d.Id = o.IdDiscount
 			LEFT JOIN AffiliateOrderPayments As aop WITH(NOLOCK) ON aop.Id = o.Id
 		WHERE 
-			o.DateCreated>=@from AND o.DateCreated<=@to 
+			o.DateCreated>=@from AND o.DateCreated<@to 
 			AND
 			o.StatusCode!=3 
 			AND 
@@ -237,18 +251,19 @@ BEGIN
 			(@idcustomer IS NULL OR o.IdCustomer = @idcustomer) AND 
 			(@idcustomertype IS NULL OR c.IdObjectType = @idcustomertype) AND
 			(@shipfrom IS NULL OR EXISTS
-			(SELECT
-			TOP 1 s.IdOrder
-			FROM OrderShippingPackages s
-			WHERE s.IdOrder=o.Id AND s.ShippedDate>=@shipfrom
-			)) AND
+				(SELECT
+				TOP 1 s.IdOrder
+				FROM OrderShippingPackages s
+				WHERE s.IdOrder=o.Id AND s.ShippedDate>=@shipfrom
+				)
+			) AND
 			(@shipto IS NULL OR EXISTS
-			(SELECT
-			TOP 1 s.IdOrder
-			FROM OrderShippingPackages s
-			WHERE s.IdOrder=o.Id AND s.ShippedDate<=@shipto
-			))
-			AND
+				(SELECT
+				TOP 1 s.IdOrder
+				FROM OrderShippingPackages s
+				WHERE s.IdOrder=o.Id AND s.ShippedDate<@shipto
+				)
+			) AND
 			(@keycode IS NULL OR kcval.Value = @keycode) AND 
 			(@idcustomersource IS NULL OR sval.Value = @idcustomersource) AND
 			(@customersourcedetails IS NULL OR sdval.Value = @customersourcedetails) AND   
@@ -256,8 +271,8 @@ BEGIN
 			(@tocount IS NULL OR @tocount>=occ.Count) AND 
 			(@firstorderfrom IS NULL OR (foc.DateCreated IS NOT NULL AND @firstorderfrom<=foc.DateCreated) 
 			OR (foc.DateCreated IS NULL AND @firstorderfrom<=c.DateCreated)) AND  
-			(@firstorderto IS NULL OR (foc.DateCreated IS NOT NULL AND @firstorderto>=foc.DateCreated) 
-			OR (foc.DateCreated IS NULL AND @firstorderto>=c.DateCreated)) AND  
+			(@firstorderto IS NULL OR (foc.DateCreated IS NOT NULL AND @firstorderto>foc.DateCreated) 
+			OR (foc.DateCreated IS NULL AND @firstorderto>c.DateCreated)) AND  
 			(@discountcode IS NULL OR @discountcode=d.Code) AND
 			(@isaffiliate IS NULL OR @isaffiliate=0 OR (@isaffiliate=1 AND aop.IdAffiliate IS NOT NULL))
 		GROUP BY otval.Value
