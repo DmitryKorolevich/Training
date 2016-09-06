@@ -41,16 +41,25 @@ namespace VitalChoice.Business.Services
             if (!context.Request.Path.HasValue)
                 return false;
 
-            var path = context.Request.Path.ToUriComponent() + context.Request.QueryString.ToUriComponent();
-            path = path.ToLower();
+            var pagePath = context.Request.Path.ToUriComponent();
+            if (pagePath == "/shop/pc/home.asp" &&
+                context.Request.Query.ContainsKey("idaffiliate"))
+            {
+                context.Response.Redirect($"/?idaffiliate={context.Request.Query["idaffiliate"]}", true);
+                return true;
+            }
+            else
+            {
+                var path = pagePath + context.Request.QueryString.ToUriComponent();
+                path = path.ToLower();
+                string redirect;
 
-            string redirect;
-            
-            if (!Map.TryGetValue(path, out redirect))
-                return false;
+                if (!Map.TryGetValue(path, out redirect))
+                    return false;
 
-            context.Response.Redirect(redirect, true);
-            return true;
+                context.Response.Redirect(redirect, true);
+                return true;
+            }
         }
     }
 }
