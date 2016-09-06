@@ -41,81 +41,17 @@ namespace VitalChoice.CreditCards
             using (var encryptionHost = Host.Services.GetRequiredService<IObjectEncryptionHost>())
             {
 
-                //Console.WriteLine("Starting customer CCs Move");
-                //RecryptCustomers(encryptionHost);
-                //Console.WriteLine("Starting orders CCs Move");
-                //RecryptOrders(encryptionHost);
-
-                //Console.WriteLine("Done!");
-
-                char test;
-                var number = "62601302";
-                if (number.Length == 16)
-                {
-                    if (!ValidateCardCheckSum(number))
-                    {
-                        var correctDigits = number.Substring(0, number.Length - 1);
-                        //update
-                        Console.WriteLine(correctDigits + GetNext(correctDigits));
-                    }
-                }
-                else
-                {
-                    if (!ValidateCardCheckSum(number))
-                    {
-                        //add up
-                        Console.WriteLine(number + GetNext(number));
-                    }
-                }
-                Console.WriteLine(number + GetNext(number));
-                Console.ReadKey();
-                return;
                 using (var context = Host.Services.GetRequiredService<ExportInfoContext>())
                 {
                     var uow = new UnitOfWork(context, false);
                     var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
 
-                    var seed = 0;
-                    const int size = 10000;
-
-                    List<OrderPaymentMethodExport> orderCards;
-
-                    do
-                    {
-                        int total;
-                        orderCards = rep.Query().SelectPage(seed, size, out total, true);
-                        foreach (var card in orderCards)
-                        {
-                            var clearCard = encryptionHost.LocalDecrypt<string>(card.CreditCardNumber);
-                            if (clearCard.Length == 15)
-                            {
-                                char toAdd;
-                                //if (!ValidateCardCheckSum(clearCard))
-                                {
-                                    card.CreditCardNumber = encryptionHost.LocalEncrypt(clearCard + toAdd);
-                                }
-                            }
-                        }
-                        rep.SaveChanges();
-                        seed++;
-                    } while (orderCards.Count == size);
+                    var idList = args.Select(int.Parse).Distinct().ToList();
+                    var orderCards = rep.Query(o => idList.Contains(o.IdOrder)).Select(false);
+                    File.WriteAllLines("cards.txt",
+                        // ReSharper disable once AccessToDisposedClosure
+                        orderCards.Select(card => $"{card.IdOrder}: {encryptionHost.LocalDecrypt<string>(card.CreditCardNumber)}"));
                 }
-
-
-                //using (var context = Host.Services.GetRequiredService<ExportInfoContext>())
-                //{
-                //    var uow = new UnitOfWork(context, false);
-                //    var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
-                //    var orderIds = args.Select(int.Parse).Distinct().ToList();
-                //    var cards = rep.Query(q => orderIds.Contains(q.IdOrder)).Select(false);
-                //    foreach (var card in cards)
-                //    {
-                //        var clearTextCard = encryptionHost.LocalDecrypt<string>(card.CreditCardNumber);
-                //        Console.WriteLine(
-                //            $"Order: {card.IdOrder}, Card: {clearTextCard}, MC:{(PaymentValidationExpressions.MasterCardRegex.IsMatch(clearTextCard) ? "valid" : "no")}, VI: {(PaymentValidationExpressions.VisaRegex.IsMatch(clearTextCard) ? "valid" : "no")}, DC: {(PaymentValidationExpressions.DiscoverRegex.IsMatch(clearTextCard) ? "valid" : "no")}, AX: {(PaymentValidationExpressions.AmericanExpressRegex.IsMatch(clearTextCard) ? "valid" : "no")}");
-                //    }
-                //}
-                //Console.ReadKey();
             }
             Host.Dispose();
         }

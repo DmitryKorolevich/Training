@@ -33,10 +33,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
         bool RegisterSession(Guid session, string hostName, KeyExchange keyCombined);
         KeyExchange GetSessionKeys(Guid session);
 
-        Task LockSession(Guid session);
-
-        void UnlockSession(Guid session);
-
         event SessionExpiredEventHandler OnSessionExpired;
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using Autofac;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
@@ -26,7 +25,6 @@ namespace VitalChoice.ExportService.Services
             : base(appOptions, loggerFactory.CreateLogger<EncryptedServiceBusHostServer>(), encryptionHost, env)
         {
             _rootScope = rootScope;
-            EncryptionHost.OnSessionExpired += OnSessionRemoved;
             _keyExchangeProvider = new RSACng();
         }
 
@@ -212,15 +210,6 @@ namespace VitalChoice.ExportService.Services
                     .GetResult();
             }
             return true;
-        }
-
-        private void OnSessionRemoved(Guid session, string hostName)
-        {
-            ExecutePlainCommand<bool>(new ServiceBusCommandWithResult(session, ServiceBusCommandConstants.SessionExpired, hostName,
-                LocalHostName)
-            {
-                TimeToLeave = TimeSpan.FromMinutes(6)
-            }).GetAwaiter().GetResult();
         }
 
         public override void Dispose()

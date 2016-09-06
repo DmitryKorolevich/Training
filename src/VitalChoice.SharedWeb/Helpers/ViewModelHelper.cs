@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using VitalChoice.Business.Helpers;
-using VitalChoice.Ecommerce.Domain.Entities.Addresses;
-using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
-using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -21,14 +17,14 @@ namespace VitalChoice.SharedWeb.Helpers
         {
             return new List<KeyValuePair<string, string>>
             {
-                new KeyValuePair<string, string>(string.Empty, $"{billingAddress.SafeData.FirstName} {billingAddress.SafeData.LastName}"),
-                new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Company),
-                new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Address1),
-                new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Address2),
+                new KeyValuePair<string, string>(string.Empty, $"{billingAddress?.SafeData.FirstName} {billingAddress?.SafeData.LastName}"),
+                new KeyValuePair<string, string>(string.Empty, billingAddress?.SafeData.Company),
+                new KeyValuePair<string, string>(string.Empty, billingAddress?.SafeData.Address1),
+                new KeyValuePair<string, string>(string.Empty, billingAddress?.SafeData.Address2),
                 new KeyValuePair<string, string>(string.Empty,
-                    $"{billingAddress.SafeData.City}, {nameCodeResolver.GetRegionOrStateCode(billingAddress)} {billingAddress.SafeData.Zip}"),
+                    $"{billingAddress?.SafeData.City}, {nameCodeResolver.GetRegionOrStateCode(billingAddress)} {billingAddress?.SafeData.Zip}"),
                 new KeyValuePair<string, string>("Phone",
-                    billingAddress.SafeData.Phone != null
+                    billingAddress?.SafeData.Phone != null
                         ? ((string) billingAddress.SafeData.Phone).FormatAsPhone(BaseAppConstants.BASE_PHONE_FORMAT)
                         : String.Empty),
                 new KeyValuePair<string, string>("Email", email),
@@ -38,7 +34,7 @@ namespace VitalChoice.SharedWeb.Helpers
         public static List<KeyValuePair<string, string>> PopulateCreditCardDetails(this OrderPaymentMethodDynamic paymentMethod,
             ReferenceData referenceData, bool withLabels = false)
         {
-            if (paymentMethod.IdObjectType != (int) PaymentMethodType.CreditCard)
+            if (paymentMethod == null || paymentMethod.IdObjectType != (int) PaymentMethodType.CreditCard)
             {
                 return new List<KeyValuePair<string, string>>();
             }
@@ -69,12 +65,12 @@ namespace VitalChoice.SharedWeb.Helpers
         {
             return new List<KeyValuePair<string, string>>
             {
-                new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.SafeData.FirstName} {shippingAddress.SafeData.LastName}"),
-                new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Company),
-                new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Address1),
-                new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Address2),
+                new KeyValuePair<string, string>(string.Empty, $"{shippingAddress?.SafeData.FirstName} {shippingAddress?.SafeData.LastName}"),
+                new KeyValuePair<string, string>(string.Empty, shippingAddress?.SafeData.Company),
+                new KeyValuePair<string, string>(string.Empty, shippingAddress?.SafeData.Address1),
+                new KeyValuePair<string, string>(string.Empty, shippingAddress?.SafeData.Address2),
                 new KeyValuePair<string, string>(string.Empty,
-                    $"{shippingAddress.SafeData.City}, {nameCodeResolver.GetRegionOrStateCode(shippingAddress)} {shippingAddress.SafeData.Zip}")
+                    $"{shippingAddress?.SafeData.City}, {nameCodeResolver.GetRegionOrStateCode(shippingAddress)} {shippingAddress?.SafeData.Zip}")
             };
         }
     }

@@ -21,6 +21,5 @@ namespace VitalChoice.Infrastructure.Domain.Constants
         public const string GetPublicKey = "session/get-public-key";
         public const string SetSessionKey = "session/set-session-key";
         public const string CheckSessionKey = "session/check-session-key";
-        public const string SessionExpired = "session/session-key-expired";
     }
 }

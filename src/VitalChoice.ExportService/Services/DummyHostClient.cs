@@ -31,7 +31,7 @@ namespace VitalChoice.ExportService.Services
 
         public string LocalHostName => string.Empty;
         public string ServerHostName => string.Empty;
-        public Task<Guid> AuthenticateClientWithLock(Guid sessionId)
+        public Task<Guid> AuthenticateClient(Guid sessionId)
         {
             return TaskCache<Guid>.DefaultCompletedTask;
         }

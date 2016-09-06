@@ -273,7 +273,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         private void CommandComplete(ServiceBusCommandBase command)
         {
-            EncryptionHost.UnlockSession(command.SessionId);
             CommandItem commandItem = command;
             WeakReference<ServiceBusCommandBase> reference;
             _commands.TryRemove(commandItem, out reference);

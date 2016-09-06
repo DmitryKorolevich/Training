@@ -34,21 +34,20 @@ namespace VitalChoice.Business.Services
         {
             try
             {
-                await EnsureAuthenticatedWithLock();
+                await EnsureAuthenticated();
             }
             catch (Exception e)
             {
                 Logger.LogError(e.ToString());
-                EncryptionHost.UnlockSession(_sessionId);
                 throw;
             }
             command.SessionId = _sessionId;
             return await EncryptedBusHost.ExecuteCommand<T>(command);
         }
 
-        private async Task EnsureAuthenticatedWithLock()
+        private async Task EnsureAuthenticated()
         {
-            _sessionId = await EncryptedBusHost.AuthenticateClientWithLock(_sessionId);
+            _sessionId = await EncryptedBusHost.AuthenticateClient(_sessionId);
         }
 
         protected async Task SendCommand(ServiceBusCommandBase command,
@@ -56,11 +55,10 @@ namespace VitalChoice.Business.Services
         {
             try
             {
-                await EnsureAuthenticatedWithLock();
+                await EnsureAuthenticated();
             }
             catch (Exception e)
             {
-                EncryptionHost.UnlockSession(_sessionId);
                 Logger.LogError(e.ToString());
                 requestAcqureAction?.Invoke(command, new ServiceBusCommandData
                 {
@@ -78,6 +76,7 @@ namespace VitalChoice.Business.Services
             {
                 GC.SuppressFinalize(this);
             }
+            EncryptionHost.RemoveSession(_sessionId);
         }
 
         public void Dispose()
