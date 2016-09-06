@@ -1,26 +1,26 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Debuging;
-using VitalChoice.Caching.GC;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Services.Cache;
 using VitalChoice.Caching.Services.Cache.Base;
-using VitalChoice.ObjectMapping.Interfaces;
 
 namespace VitalChoice.Caching.Services
 {
     internal class InternalEntityCacheFactory : IInternalEntityCacheFactory
     {
         private readonly IEntityInfoStorage _keyStorage;
+        private readonly ILoggerFactory _loggerFactory;
 
         private readonly ConcurrentDictionary<Type, IInternalEntityCache> _entityCaches =
             new ConcurrentDictionary<Type, IInternalEntityCache>();
 
-        public InternalEntityCacheFactory(IEntityInfoStorage keyStorage)
+        public InternalEntityCacheFactory(IEntityInfoStorage keyStorage, ILoggerFactory loggerFactory)
         {
             CacheDebugger.CacheFactory = this;
             _keyStorage = keyStorage;
+            _loggerFactory = loggerFactory;
         }
 
         public bool CanCache(Type entityType)
@@ -41,7 +41,7 @@ namespace VitalChoice.Caching.Services
             return _entityCaches.GetOrAdd(entityType,
                 cache =>
                     (IInternalEntityCache)
-                        Activator.CreateInstance(typeof (InternalCache<>).MakeGenericType(entityType), info, _keyStorage, this));
+                    Activator.CreateInstance(typeof(InternalCache<>).MakeGenericType(entityType), info, this, _loggerFactory));
         }
 
         public IInternalCache<T> GetCache<T>()
@@ -49,7 +49,7 @@ namespace VitalChoice.Caching.Services
             EntityInfo info;
             if (!_keyStorage.GetEntityInfo<T>(out info))
                 return null;
-            return (IInternalCache<T>) _entityCaches.GetOrAdd(typeof (T), cache => new InternalCache<T>(info, _keyStorage, this));
+            return (IInternalCache<T>) _entityCaches.GetOrAdd(typeof(T), cache => new InternalCache<T>(info, this, _loggerFactory));
         }
 
         public bool CanAddUpCache()

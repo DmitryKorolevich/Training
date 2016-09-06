@@ -93,7 +93,6 @@ namespace VitalChoice.Business.Services.Orders
                             {
                                 if (!string.IsNullOrEmpty(o.Error))
                                 {
-                                    EncryptionHost.UnlockSession(cmd.SessionId);
                                     sentItems.Clear();
                                     results.Add(new OrderExportItemResult
                                     {
@@ -108,7 +107,6 @@ namespace VitalChoice.Business.Services.Orders
                                     var exportResult = (OrderExportItemResult) o.Data;
                                     if (exportResult.Id == -1)
                                     {
-                                        EncryptionHost.UnlockSession(cmd.SessionId);
                                         doneAllEvent.Set();
                                         return;
                                     }
@@ -121,13 +119,11 @@ namespace VitalChoice.Business.Services.Orders
             catch (Exception e)
             {
                 Logger.LogError(e.ToString());
-                EncryptionHost.UnlockSession(command.SessionId);
                 doneAllEvent.Set();
                 throw;
             }
             if (!await doneAllEvent.WaitAsync(TimeSpan.FromMinutes(5)))
             {
-                EncryptionHost.UnlockSession(command.SessionId);
                 // ReSharper disable once InconsistentlySynchronizedField
                 Logger.LogError($"Export timeout, items left: {sentItems.Count}");
                 throw new ApiException("Export timeout");

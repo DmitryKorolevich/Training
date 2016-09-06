@@ -4,7 +4,7 @@
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseName>VitalChoice.ExportInfo</TargetDatabaseName>
     <DeployScriptFileName>VitalChoice.Database.ExportInfo.sql</DeployScriptFileName>
-    <TargetConnectionString>Data Source=tcp:dad4lghbj.database.windows.net,1433;User ID=multiarc@dad4lghbj;Pooling=False</TargetConnectionString>
+    <TargetConnectionString>Data Source=(local);Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=True</TargetConnectionString>
     <ProfileVersionNumber>1</ProfileVersionNumber>
   </PropertyGroup>
 </Project>

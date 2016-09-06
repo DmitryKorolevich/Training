@@ -86,6 +86,8 @@ namespace VC.Admin.Models.Customers
 
         public int? IdCustomerPaymentMethod { get; set; }
 
+        public int? IdOrderSource { get; set; }
+
         [Map]
         public bool Default { get; set; }
     }

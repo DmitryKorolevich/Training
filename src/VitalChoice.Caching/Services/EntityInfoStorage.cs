@@ -25,6 +25,7 @@ namespace VitalChoice.Caching.Services
     public class EntityInfoStorage : IEntityInfoStorage
     {
         protected readonly IOptions<AppOptionsBase> Options;
+        private readonly ILoggerFactory _loggerFactory;
         protected readonly ILogger Logger;
         private readonly IContextTypeContainer _contextTypeContainer;
         private Dictionary<Type, EntityInfo> _entityInfos;
@@ -32,10 +33,11 @@ namespace VitalChoice.Caching.Services
         private static readonly object SyncRoot = new object();
         private IEntityCollectorInfo _gcCollector;
 
-        public EntityInfoStorage(IOptions<AppOptionsBase> options, ILoggerFactory logger, IContextTypeContainer contextTypeContainer)
+        public EntityInfoStorage(IOptions<AppOptionsBase> options, ILoggerFactory loggerFactory, IContextTypeContainer contextTypeContainer)
         {
             Options = options;
-            Logger = logger.CreateLogger<EntityInfoStorage>();
+            _loggerFactory = loggerFactory;
+            Logger = loggerFactory.CreateLogger<EntityInfoStorage>();
             _contextTypeContainer = contextTypeContainer;
         }
 
@@ -112,7 +114,7 @@ namespace VitalChoice.Caching.Services
                 if (_entityInfos == null)
                 {
                     _entityInfos = entityInfos;
-                    _gcCollector = new EntityCollector(this, new InternalEntityCacheFactory(this), Options, Logger);
+                    _gcCollector = new EntityCollector(this, new InternalEntityCacheFactory(this, _loggerFactory), Options, Logger);
                 }
                 else
                 {

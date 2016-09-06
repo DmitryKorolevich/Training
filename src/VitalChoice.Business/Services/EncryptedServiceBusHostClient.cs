@@ -57,13 +57,11 @@ namespace VitalChoice.Business.Services
             }
         }
 
-        public async Task<Guid> AuthenticateClientWithLock(Guid sessionId)
+        public async Task<Guid> AuthenticateClient(Guid sessionId)
         {
             var keyExchangeProvider = await TryGetKeyProvider();
             if (keyExchangeProvider == null)
                 throw new ApiException("Cannot get public key from server");
-
-            await EncryptionHost.LockSession(sessionId);
 
             if (EncryptionHost.SessionExist(sessionId))
             {
@@ -80,9 +78,7 @@ namespace VitalChoice.Business.Services
                     var existingKeys = EncryptionHost.GetSessionKeys(sessionId);
                     while (existingKeys == null)
                     {
-                        EncryptionHost.UnlockSession(sessionId);
                         sessionId = EncryptionHost.GetSession();
-                        await EncryptionHost.LockSession(sessionId);
                         existingKeys = EncryptionHost.GetSessionKeys(sessionId);
                     }
 
@@ -108,13 +104,11 @@ namespace VitalChoice.Business.Services
                     {
                         _publicKeyLock.Release();
                     }
-                    EncryptionHost.UnlockSession(sessionId);
-                    return await AuthenticateClientWithLock(sessionId);
+                    return await AuthenticateClient(sessionId);
                 }
                 throw new ApiException("Session keys couldn't be set on remote");
             }
-            EncryptionHost.UnlockSession(sessionId);
-            return await AuthenticateClientWithLock(EncryptionHost.GetSession());
+            return await AuthenticateClient(EncryptionHost.GetSession());
         }
 
         private async Task<RSACng> TryGetKeyProvider()
@@ -137,20 +131,6 @@ namespace VitalChoice.Business.Services
 
         protected override bool ProcessPlainCommand(ServiceBusCommandBase command)
         {
-            if (command.CommandName == ServiceBusCommandConstants.SessionExpired)
-            {
-                EncryptionHost.LockSession(command.SessionId);
-                try
-                {
-                    EncryptionHost.RemoveSession(command.SessionId);
-                }
-                finally
-                {
-                    EncryptionHost.UnlockSession(command.SessionId);
-                }
-                SendPlainCommand(new ServiceBusCommandBase(command, true));
-                return true;
-            }
             return false;
         }
 
@@ -161,4 +141,5 @@ namespace VitalChoice.Business.Services
         }
     }
 }
+
 #endif

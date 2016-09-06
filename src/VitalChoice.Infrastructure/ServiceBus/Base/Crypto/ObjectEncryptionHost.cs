@@ -9,7 +9,6 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -26,10 +25,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
     {
         protected static string SignAlgorithmType => "ECDsaCng";
 
-        protected virtual int MaxSessions => 10;
         private readonly string _localEncryptionPath;
         private readonly ILogger _logger;
-        private readonly Random _rnd;
 
         private readonly ISignProvider _signProvider;
         private readonly AesCng _localAes;
@@ -43,7 +40,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
         /// </summary>
         public ObjectEncryptionHost(IOptions<AppOptions> options, ILoggerFactory logger)
         {
-            _rnd = new Random();
             _localEncryptionPath = options.Value.LocalEncryptionKeyPath;
             _logger = logger.CreateLogger<ObjectEncryptionHost>();
             try
@@ -298,15 +294,10 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
         {
             lock (_sessions)
             {
-                var chooseSession = _rnd.Next(0, MaxSessions);
-                if (_sessions.Count < chooseSession + 1)
-                {
-                    var newSession = Guid.NewGuid();
-                    var keys = CreateSession(newSession);
-                    RegisterSession(newSession, keys);
-                    return newSession;
-                }
-                return _sessions.Keys.Skip(chooseSession).FirstOrDefault();
+                var newSession = Guid.NewGuid();
+                var keys = CreateSession(newSession);
+                RegisterSession(newSession, keys);
+                return newSession;
             }
         }
 
@@ -320,32 +311,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                     return new KeyExchange(sessionInfo.Aes.Key, sessionInfo.Aes.IV);
                 }
                 return null;
-            }
-        }
-
-        public async Task LockSession(Guid session)
-        {
-            SessionInfo sessionInfo;
-            bool getResult;
-            lock (_sessions)
-            {
-                getResult = _sessions.TryGetValue(session, out sessionInfo);
-            }
-            if (getResult)
-            {
-                await sessionInfo.SemaphoreSlim.WaitAsync();
-            }
-        }
-
-        public void UnlockSession(Guid session)
-        {
-            lock (_sessions)
-            {
-                SessionInfo sessionInfo;
-                if (_sessions.TryGetValue(session, out sessionInfo))
-                {
-                    sessionInfo.SemaphoreSlim.Release();
-                }
             }
         }
 
@@ -523,20 +488,15 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
         {
             while (!_disposeEvent.WaitOne(new TimeSpan(0, 10, 0)))
             {
-                KeyValuePair<Guid, SessionInfo>[] expiredSessions;
                 lock (_sessions)
                 {
-                    expiredSessions =
+                    var expiredSessions =
                         _sessions.Where(session => session.Value.Expiration <= DateTime.Now).ToArray();
-                }
-                foreach (var expiredSession in expiredSessions)
-                {
-                    Task.Factory.StartNew(session =>
+                    foreach (var expiredSession in expiredSessions)
                     {
-                        var sessionPair = (KeyValuePair<Guid, SessionInfo>) session;
-                        OnSessionExpired?.Invoke(sessionPair.Key, sessionPair.Value.HostName);
-                        RemoveSession(sessionPair.Key);
-                    }, expiredSession).ConfigureAwait(false);
+                        OnSessionExpired?.Invoke(expiredSession.Key, expiredSession.Value.HostName);
+                        RemoveSession(expiredSession.Key);
+                    }
                 }
             }
         }
@@ -637,25 +597,12 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             commandData.CertThumbprint = LocalCert.Thumbprint;
         }
 
-        private byte[] Take(byte[] data, int length)
-        {
-            var result = new byte[length];
-            Array.Copy(data, result, length);
-            return result;
-        }
-
-        private byte[] GetPrivateKeyHash()
-        {
-            var sha = new SHA256Cng();
-            sha.Initialize();
-            var pk = _signProvider.GetPrivateKey();
-            return sha.ComputeHash(pk);
-        }
-
         private static bool ValidateClientCertificate(X509Certificate2 clientCert, X509Certificate2 rootCa)
         {
             if (clientCert == null)
                 throw new ArgumentNullException(nameof(clientCert));
+            if (clientCert == null)
+                throw new ArgumentNullException(nameof(rootCa));
 
             X509Chain validationChain = new X509Chain
             {
@@ -674,6 +621,11 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
 
         private byte[] Encrypt(AesCng aes, byte[] data)
         {
+            if (aes == null || data == null)
+            {
+                return new byte[0];
+            }
+
             using (var encryptor = aes.CreateEncryptor())
             {
                 return TransformBlocks(data, encryptor);
@@ -682,6 +634,11 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
 
         private byte[] Decrypt(AesCng aes, byte[] encryptedData)
         {
+            if (aes == null || encryptedData == null)
+            {
+                return new byte[0];
+            }
+
             using (var decryptor = aes.CreateDecryptor())
             {
                 return TransformBlocks(encryptedData, decryptor);
@@ -697,20 +654,18 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
         {
             public SessionInfo(AesCng aes, string hostName = null)
             {
+                if (aes == null)
+                    throw new ArgumentNullException(nameof(aes));
+
                 Aes = aes;
                 HostName = hostName;
             }
 
-            public SemaphoreSlim SemaphoreSlim { get; } = new SemaphoreSlim(1);
             public AesCng Aes { get; }
             public DateTime Expiration { get; } = DateTime.Now.AddHours(1);
             public string HostName { get; }
 
-            public void Dispose()
-            {
-                SemaphoreSlim.Dispose();
-                Aes?.Dispose();
-            }
+            public void Dispose() => Aes.Dispose();
         }
     }
 }

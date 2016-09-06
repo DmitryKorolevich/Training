@@ -635,6 +635,11 @@ namespace VC.Admin.Controllers
                                 Used = true,
                             }).ToList();
                         toReturn.Id = 0;
+
+                        if (toReturn.CreditCard != null)
+                        {
+                            toReturn.CreditCard.IdOrderSource = order.Id;
+                        }
                     }
                 }
             }

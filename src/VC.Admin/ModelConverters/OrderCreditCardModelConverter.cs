@@ -29,6 +29,7 @@ namespace VC.Admin.ModelConverters
                 dynamic.Data.ExpDate = exp;
             }
             dynamic.IdCustomerPaymentMethod = model.IdCustomerPaymentMethod;
+            dynamic.IdOrderSource = model.IdOrderSource;
             return TaskCache.CompletedTask;
         }
     }

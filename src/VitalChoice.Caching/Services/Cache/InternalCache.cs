@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
@@ -19,17 +20,15 @@ namespace VitalChoice.Caching.Services.Cache
         }
 
         public EntityInfo EntityInfo { get; }
-        private readonly IEntityInfoStorage _infoStorage;
         protected readonly IInternalEntityCacheFactory CacheFactory;
 
         protected readonly CacheStorage<T> CacheStorage;
 
-        public InternalCache(EntityInfo entityInfo, IEntityInfoStorage infoStorage, IInternalEntityCacheFactory cacheFactory)
+        public InternalCache(EntityInfo entityInfo, IInternalEntityCacheFactory cacheFactory, ILoggerFactory loggerFactory)
         {
             EntityInfo = entityInfo;
-            _infoStorage = infoStorage;
             CacheFactory = cacheFactory;
-            CacheStorage = new CacheStorage<T>(entityInfo, cacheFactory);
+            CacheStorage = new CacheStorage<T>(entityInfo, cacheFactory, loggerFactory);
         }
 
         public CacheResult<T> TryGetEntity(EntityKey key, RelationInfo relations, ICacheStateManager stateManager, bool tracked)
