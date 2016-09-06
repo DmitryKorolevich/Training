@@ -28,7 +28,6 @@ namespace VitalChoice.ExportService.Services
         private readonly IOrderService _orderService;
         private readonly IAvalaraTax _avalaraTax;
         private readonly IDynamicMapper<AddressDynamic, OrderAddress> _addressMapper;
-        private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _paymentMapper;
         private readonly VeraCoreOrderSoapClient _client;
         private const string OacDescription = "On Approved Credit";
         private const string MarketingDonationDescription = "Marketing-Donation";
@@ -43,12 +42,11 @@ namespace VitalChoice.ExportService.Services
 
 
         public VeraCoreExportService(IOptions<ExportOptions> options, IOrderService orderService, IAvalaraTax avalaraTax,
-            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper, IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> paymentMapper)
+            IDynamicMapper<AddressDynamic, OrderAddress> addressMapper)
         {
             _orderService = orderService;
             _avalaraTax = avalaraTax;
             _addressMapper = addressMapper;
-            _paymentMapper = paymentMapper;
             _client = new VeraCoreOrderSoapClient
             {
                 DebugHeaderValue = new DebugHeader(),
