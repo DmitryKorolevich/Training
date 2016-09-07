@@ -48,7 +48,7 @@ namespace VitalChoice.CreditCards
             var reg = new CreditCardsImportDependencyConfig();
 
             var container = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly, _hostingEnvironment,
-                false);
+                true);
             return container.Resolve<IServiceProvider>();
         }
     }

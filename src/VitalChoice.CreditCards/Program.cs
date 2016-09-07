@@ -4,24 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.CreditCards.Entities;
-using VitalChoice.Infrastructure.ServiceBus.Base;
 using Microsoft.EntityFrameworkCore;
-using VitalChoice.Data.Extensions;
-using VitalChoice.Data.Helpers;
-using VitalChoice.Data.UOW;
-using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Ecommerce.Domain.Entities.Customers;
-using VitalChoice.Ecommerce.Domain.Entities.Orders;
-using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.Ecommerce.Domain.Transfer;
-using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.CreditCards.Services;
+using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
-using VitalChoice.Interfaces.Services.Customers;
 
 namespace VitalChoice.CreditCards
 {
@@ -38,21 +29,31 @@ namespace VitalChoice.CreditCards
 
             Host.Start();
 
-            using (var encryptionHost = Host.Services.GetRequiredService<IObjectEncryptionHost>())
+            Console.WriteLine("Press any key to start exporting...");
+            Console.ReadKey();
+
+            var exportService = Host.Services.GetRequiredService<IOrderExportService>();
+            var orders = File.ReadAllText("fck_list.txt")
+                .Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+                .Select(int.Parse);
+            var sync = new object();
+            exportService.ExportOrders(orders.Select(o => new OrderExportItem
             {
+                OrderType = ExportSide.All,
+                IsRefund = false,
+                Id = o
+            }).ToList(), done =>
+            {
+                if (done.Success)
+                    return;
 
-                using (var context = Host.Services.GetRequiredService<ExportInfoContext>())
+                lock (sync)
                 {
-                    var uow = new UnitOfWork(context, false);
-                    var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
-
-                    var idList = args.Select(int.Parse).Distinct().ToList();
-                    var orderCards = rep.Query(o => idList.Contains(o.IdOrder)).Select(false);
-                    File.WriteAllLines("cards.txt",
-                        // ReSharper disable once AccessToDisposedClosure
-                        orderCards.Select(card => $"{card.IdOrder}: {encryptionHost.LocalDecrypt<string>(card.CreditCardNumber)}"));
+                    Console.WriteLine($"order: {done.Id} filed:\n{done.Error}\n\n");
                 }
-            }
+            }).GetAwaiter().GetResult();
+            Console.WriteLine("Done!");
+            Console.ReadKey();
             Host.Dispose();
         }
 
@@ -62,9 +63,9 @@ namespace VitalChoice.CreditCards
             for (int i = 1; i <= number.Length; i++)
             {
                 var index = number.Length - i;
-                if (i % 2 != 0)
+                if (i%2 != 0)
                 {
-                    var mul = (number[index] - 48) * 2;
+                    var mul = (number[index] - 48)*2;
                     sum += mul > 9 ? mul - 9 : mul;
                 }
                 else
