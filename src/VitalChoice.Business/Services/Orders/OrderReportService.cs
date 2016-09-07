@@ -1495,6 +1495,7 @@ namespace VitalChoice.Business.Services.Orders
             toReturn.ForEach(p =>
             {
                 p.ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber);
+                p.ShipMethodFreightCarrier = "FEDEX";
             });
             return toReturn;
         }
