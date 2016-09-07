@@ -154,14 +154,6 @@ namespace VC.Admin.Validators.Customer
                 .WithMessage(model => model.Zip, ValidationMessages.FieldLength,
                     BaseAppConstants.ZIP_MAX_SIZE);
 
-            RuleFor(model => model.Email)
-                .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
-                .WithMessage(model => model.Email, ValidationMessages.FieldLength,
-                    BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
-                .EmailAddress()
-                .When(x => !string.IsNullOrWhiteSpace(x.Email))
-                .WithMessage(model => model.Email, ValidationMessages.EmailFormat);
-
             RuleFor(model => model.DeliveryInstructions)
                 .Length(0, BaseAppConstants.DELIVERY_INSTRUCTIONS_MAX_SIZE)
                 .WithMessage(model => model.DeliveryInstructions, ValidationMessages.FieldLength, BaseAppConstants.DELIVERY_INSTRUCTIONS_MAX_SIZE);

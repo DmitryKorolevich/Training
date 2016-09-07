@@ -250,7 +250,7 @@ namespace VC.Admin.Controllers
             {
                 filter.To = filter.To.Value.AddDays(1);
             }
-            
+
             var result = await _orderService.GetOrdersAsync(filter);
 
             var toReturn = new PagedList<OrderListItemModel>
@@ -267,7 +267,7 @@ namespace VC.Admin.Controllers
         public async Task<Result<OrderManageModel>> GetOrder(string id, int? idcustomer = null, bool refreshprices = false)
         {
             int idOrder = 0;
-            if (id!=null && !Int32.TryParse(id, out idOrder))
+            if (id != null && !Int32.TryParse(id, out idOrder))
                 throw new NotFoundException();
 
             if (idOrder == 0)
@@ -294,7 +294,7 @@ namespace VC.Admin.Controllers
             }
 
             var item = await _orderService.SelectAsync(idOrder);
-            if (item==null ||
+            if (item == null ||
                 (item.IdObjectType != (int)OrderType.Normal && item.IdObjectType != (int)OrderType.AutoShipOrder && item.IdObjectType != (int)OrderType.AutoShip &&
                 item.IdObjectType != (int)OrderType.DropShip && item.IdObjectType != (int)OrderType.GiftList))
             {
@@ -416,7 +416,7 @@ namespace VC.Admin.Controllers
                 _brontoService.PushSubscribe(model.Customer.Email, model.SignUpNewsletter.Value);
             }
 
-            if (!string.IsNullOrEmpty(order.Customer.Email) && model.Id==0)
+            if (!string.IsNullOrEmpty(order.Customer.Email) && model.Id == 0)
             {
                 var dbProductReviewEmailEnabled = !await _notificationService.IsEmailUnsubscribedAsync(EmailConstants.ProductReviewIdNewsletter, order.Customer.Email);
                 if (model.Customer.ProductReviewEmailEnabled && !dbProductReviewEmailEnabled)
@@ -448,7 +448,7 @@ namespace VC.Admin.Controllers
                 throw new AppValidationException("This operation isn't allowed for the order in the given status");
             }
 
-            var toReturn =  await _orderService.CancelOrderAsync(id);
+            var toReturn = await _orderService.CancelOrderAsync(id);
             if (toReturn)
             {
                 if (order.OrderStatus.HasValue)
@@ -539,7 +539,7 @@ namespace VC.Admin.Controllers
             await _orderPaymentMethodMapper.UpdateObjectAsync(model, order.PaymentMethod,
                                (int)PaymentMethodType.CreditCard);
             await _addressMapper.UpdateObjectAsync(model, order.PaymentMethod.Address, (int)AddressType.Billing, false);
-             
+
             order.PaymentMethod.Address.Id = addressId;
             order.PaymentMethod.Address.IdObjectType = (int)AddressType.Billing;
 
@@ -588,7 +588,7 @@ namespace VC.Admin.Controllers
                         order.Discount = null;
                         if (order.OrderStatus.HasValue)
                         {
-                            order.OrderStatus=OrderStatus.Processed;
+                            order.OrderStatus = OrderStatus.Processed;
                         }
                         if (order.POrderStatus.HasValue)
                         {
@@ -1086,7 +1086,7 @@ namespace VC.Admin.Controllers
                 From = dFrom.Value,
                 To = dTo.Value.AddDays(1),
                 FrequencyType = frequencytype,
-                IdAdminTeams = !string.IsNullOrEmpty(idadminteams) ? idadminteams.Split(',').Where(p => !string.IsNullOrEmpty(p)).Select(p=>Int32.Parse(p)).ToList()
+                IdAdminTeams = !string.IsNullOrEmpty(idadminteams) ? idadminteams.Split(',').Where(p => !string.IsNullOrEmpty(p)).Select(p => Int32.Parse(p)).ToList()
                     : new List<int>(),
                 IdAdmin = idadmin,
             };
@@ -1147,7 +1147,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
-        public async Task<FileResult> GetOrdersForWholesaleDropShipReportFile([FromQuery]string from, [FromQuery]string to, [FromQuery]string shipfrom=null, [FromQuery]string shipto=null,
+        public async Task<FileResult> GetOrdersForWholesaleDropShipReportFile([FromQuery]string from, [FromQuery]string to, [FromQuery]string shipfrom = null, [FromQuery]string shipto = null,
             [FromQuery]int? idcustomertype = null, [FromQuery]int? idtradeclass = null, [FromQuery]string customercompany = null, [FromQuery]string customerfirstname = null, [FromQuery]string customerlastname = null,
             [FromQuery]string shipfirstname = null, [FromQuery]string shiplastname = null, [FromQuery]string shipidconfirm = null, [FromQuery]int? idorder = null,
             [FromQuery]string ponumber = null)
@@ -1250,6 +1250,7 @@ namespace VC.Admin.Controllers
         {
             filter.To = filter.To.AddDays(1);
             filter.ShipTo = filter.ShipTo?.AddDays(1) ?? filter.ShipTo;
+            filter.FirstOrderTo = filter.FirstOrderTo?.AddDays(1) ?? filter.FirstOrderTo;
             var toReturn = await _orderReportService.GetOrdersSummarySalesOrderTypeStatisticItemsAsync(filter);
             return toReturn.ToList();
         }
@@ -1282,8 +1283,8 @@ namespace VC.Admin.Controllers
             }
             DateTime? dShipFrom = !string.IsNullOrEmpty(shipfrom) ? shipfrom.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
             DateTime? dShipTo = !string.IsNullOrEmpty(shipto) ? shipto.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
-            DateTime? dFirstOrderFrom = !string.IsNullOrEmpty(firstorderfrom) ? shipfrom.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
-            DateTime? dFirstOrderTo = !string.IsNullOrEmpty(firstorderto) ? shipto.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
+            DateTime? dFirstOrderFrom = !string.IsNullOrEmpty(firstorderfrom) ? firstorderfrom.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
+            DateTime? dFirstOrderTo = !string.IsNullOrEmpty(firstorderto) ? firstorderto.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
 
 
             OrdersSummarySalesReportFilter filter = new OrdersSummarySalesReportFilter()
@@ -1727,7 +1728,7 @@ namespace VC.Admin.Controllers
                     return false;
 
                 emailModel.ToEmail = model.Email;
-                await _notificationService.SendOrderShippingConfirmationEmailsAsync(new [] {emailModel});
+                await _notificationService.SendOrderShippingConfirmationEmailsAsync(new[] { emailModel });
             }
             else
             {

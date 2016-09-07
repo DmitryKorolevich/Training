@@ -11,6 +11,7 @@ using VitalChoice.DynamicData.TypeConverters;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
@@ -93,7 +94,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 if (!viewContext.Parameters.Preview)
                 {
-                    throw new ApiException("Product not found", HttpStatusCode.NotFound);
+                    throw new NotFoundException("Product not found");
                 }
                 targetStatuses.Add(RecordStatusCode.NotActive);
             }
@@ -107,7 +108,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             {
                 if (!viewContext.Parameters.Preview)
                 {
-                    throw new ApiException("Product not found", HttpStatusCode.NotFound);
+                    throw new NotFoundException("Product not found");
                 }
             }
 

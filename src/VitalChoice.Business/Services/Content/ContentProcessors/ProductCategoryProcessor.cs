@@ -117,7 +117,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             {
                 if (!viewContext.Parameters.Preview)
                 {
-                    throw new ApiException("Category not found", HttpStatusCode.NotFound);
+                    throw new NotFoundException("Category not found");
                 }
                 targetStatuses.Add(RecordStatusCode.NotActive);
             }

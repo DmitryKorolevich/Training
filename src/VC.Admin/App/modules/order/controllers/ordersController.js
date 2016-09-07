@@ -101,7 +101,7 @@
                 CustomerFirstName: null,
                 CustomerLastName: null,
                 CustomerCompany: null,
-                Paging: { PageIndex: 1, PageItemCount: 100 },
+                Paging: { PageIndex: 1, PageItemCount: 200 },
                 Sorting: gridSorterUtil.resolve(refreshOrders, "DateCreated", "Desc"),
                 IsActive: true,
             };
@@ -116,7 +116,7 @@
                 POrderType: null,
                 IdCustomerType: null,
                 IdShippingMethod: null,
-                Paging: { PageIndex: 1, PageItemCount: 100 },
+                Paging: { PageIndex: 1, PageItemCount: 200 },
                 Sorting: gridSorterUtil.resolve(refreshOrders, "DateCreated", "Desc"),
             };
 
