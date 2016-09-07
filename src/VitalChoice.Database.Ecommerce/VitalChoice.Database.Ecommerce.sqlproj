@@ -80,6 +80,7 @@
     <None Include="Azure.publish.xml" />
     <None Include="PostDeployment\Scripts\VTopProducts.sql" />
     <None Include="VitalChoice_1.Database.Ecommerce.publish.xml" />
+    <None Include="PreDeployment\Scripts\LocalCardStorage.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="PreDeployment\Script.PreDeployment.sql" />

@@ -103,19 +103,26 @@ namespace VitalChoice.Core.Infrastructure.Helpers
         {
             if (currentToken == null)
             {
-                var encryptedCookie = context.Request.Cookies[CheckoutConstants.CustomerAuthToken].FromHexString();
-                if (encryptedCookie != null && encryptedCookie.Length > 0)
+                try
                 {
-                    var authData = encryptionHost.LocalDecrypt<ClientAuthorization>(encryptedCookie);
-                    if (authData != null)
+                    var encryptedCookie = context.Request.Cookies[CheckoutConstants.CustomerAuthToken].FromHexString();
+                    if (encryptedCookie != null && encryptedCookie.Length > 0)
                     {
-                        currentToken =
-                            await tokenService.GetValidToken(authData.AuthToken, TokenType.CustomerAutoReLoginToken);
-                        if (currentToken != null)
+                        var authData = encryptionHost.LocalDecrypt<ClientAuthorization>(encryptedCookie);
+                        if (authData != null)
                         {
-                            await tokenService.ExpireToken(currentToken.IdToken);
+                            currentToken =
+                                await tokenService.GetValidToken(authData.AuthToken, TokenType.CustomerAutoReLoginToken);
+                            if (currentToken != null)
+                            {
+                                await tokenService.ExpireToken(currentToken.IdToken);
+                            }
                         }
                     }
+                }
+                catch
+                {
+                    currentToken = null;
                 }
             }
             else

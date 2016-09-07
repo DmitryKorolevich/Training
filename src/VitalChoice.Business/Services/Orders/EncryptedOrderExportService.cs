@@ -112,6 +112,10 @@ namespace VitalChoice.Business.Services.Orders
                                     }
                                     results.Add(exportResult);
                                     sentItems.Remove(exportResult.Id);
+                                    if (sentItems.Count == 0)
+                                    {
+                                        doneAllEvent.Set();
+                                    }
                                 }
                             }
                         });

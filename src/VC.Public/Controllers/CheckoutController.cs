@@ -33,6 +33,7 @@ using VC.Public.Models.Tracking;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Business.Services.Bronto;
+using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Core.Services;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -49,6 +50,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Cart;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Infrastructure.Identity.UserManagers;
+using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.ObjectMapping.Base;
@@ -72,6 +74,8 @@ namespace VC.Public.Controllers
         private readonly ILogger _logger;
         private readonly ICountryNameCodeResolver _countryNameCodeResolver;
         private readonly IEncryptedOrderExportService _exportService;
+        private readonly ITokenService _tokenService;
+        private readonly IObjectEncryptionHost _encryptionHost;
 
         public CheckoutController(IStorefrontUserService storefrontUserService,
             ICustomerService customerService,
@@ -86,7 +90,8 @@ namespace VC.Public.Controllers
             BrontoService brontoService,
             ITransactionAccessor<EcommerceContext> transactionAccessor, ISettingService settingService, ILoggerFactory loggerProvider,
             ExtendedUserManager userManager, ICountryNameCodeResolver countryNameCodeResolver, ReferenceData referenceData,
-            AppSettings appSettings, IEncryptedOrderExportService exportService)
+            AppSettings appSettings, IEncryptedOrderExportService exportService, ITokenService tokenService,
+            IObjectEncryptionHost encryptionHost)
             : base(
                 customerService, referenceData, authorizationService, checkoutService, orderService,
                 skuMapper, productMapper, settingService, userManager, appSettings)
@@ -100,6 +105,8 @@ namespace VC.Public.Controllers
             _transactionAccessor = transactionAccessor;
             _countryNameCodeResolver = countryNameCodeResolver;
             _exportService = exportService;
+            _tokenService = tokenService;
+            _encryptionHost = encryptionHost;
             _affiliateService = affiliateService;
             _notificationService = notificationService;
             _logger = loggerProvider.CreateLogger<CheckoutController>();
@@ -142,6 +149,7 @@ namespace VC.Public.Controllers
             try
             {
                 user = await _storefrontUserService.SignInAsync(model.Email, model.Password);
+                await HttpContext.SpinAuthorizationToken(_tokenService, null, user, _encryptionHost);
             }
             catch (WholesalePendingException)
             {
@@ -587,7 +595,7 @@ namespace VC.Public.Controllers
 
                             var index = shippingAddresses.IndexOf(shippingAddresses.Single(x => x.Id == customerAddressIdToUpdate.Value));
                             var originalId = shippingAddresses[index].Id;
-                            var defaultAddr = (bool?)shippingAddresses[index].SafeData.Default ?? false;
+                            var defaultAddr = (bool?) shippingAddresses[index].SafeData.Default ?? false;
                             cart.Order.ShippingAddress.Id = originalId;
                             cart.Order.ShippingAddress.Data.Default = defaultAddr;
                             shippingAddresses[index] = cart.Order.ShippingAddress;
