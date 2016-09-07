@@ -10,6 +10,7 @@ if ($RootDeploy.Equals("")) {
 
 $filesLinkSource = "c:\inetpub\wwwroot\content\files"
 $designLinkSource = "c:\inetpub\wwwroot\content\design"
+$imagesLinkSource = "c:\inetpub\wwwroot\content\images"
 cmd /c mkdir "C:\Temp\Backup\public"
 cmd /c mkdir "C:\Temp\Backup\admin"
 cmd /c mkdir "C:\Temp\Backup\jobs"
@@ -57,6 +58,8 @@ if (test-path ".\packages\public.7z")
 	cmd /c mklink /D $destinationPath "${filesLinkSource}"
 	$destinationPath = $RootDeploy + "\public\wwwroot\design"
 	cmd /c mklink /D $destinationPath "${designLinkSource}"
+	$destinationPath = $RootDeploy + "\public\wwwroot\images"
+	cmd /c mklink /D $destinationPath "${imagesLinkSource}"
 	cp libuv.dll "c:\inetpub\wwwroot\public\" -Force
 	cp ".\${ConfigFolder}\public.config.json" "c:\inetpub\wwwroot\public\config.json" -Force
 	cmd /c "%windir%\system32\inetsrv\appcmd" start apppool /apppool.name:public
