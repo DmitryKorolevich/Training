@@ -33,6 +33,7 @@ using VC.Public.Models.Tracking;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Business.Services.Bronto;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Core.Services;
 using VitalChoice.Data.Transaction;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -260,7 +261,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> AddUpdateBillingAddress(AddUpdateBillingAddressModel model)
         {
             if (await IsCartEmpty())
@@ -503,7 +504,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> AddUpdateShippingMethod(AddUpdateShippingMethodModel model)
         {
             if (await IsCartEmpty())

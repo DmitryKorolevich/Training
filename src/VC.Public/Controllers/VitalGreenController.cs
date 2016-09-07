@@ -17,6 +17,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 
@@ -42,7 +43,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public Task<IActionResult> Step1(VitalGreenRequestModel model)
         {
             string cookies;

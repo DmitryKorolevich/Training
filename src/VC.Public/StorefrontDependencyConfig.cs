@@ -17,6 +17,7 @@ namespace VC.Public
     {
         protected override void AddMvc(IServiceCollection services)
         {
+            services.TryAddSingleton<CustomValidateAntiforgeryTokenAuthorizationFilter>();
             services.AddMvc().AddMvcOptions(options => options.ModelBinderProviders.Insert(0, new AntiXssModelBinderProvider()));
         }
 
@@ -27,7 +28,6 @@ namespace VC.Public
             services.Replace(new ServiceDescriptor(typeof(IHtmlGenerator), typeof(StoreFrontHtmlGenerator), ServiceLifetime.Scoped));
             services.Replace(new ServiceDescriptor(typeof(IValidationAttributeAdapterProvider),
                 typeof(CustomValidationAttributeAdapterProvider), ServiceLifetime.Singleton));
-
         }
 
         protected override void FinishCustomRegistrations(ContainerBuilder builder)
