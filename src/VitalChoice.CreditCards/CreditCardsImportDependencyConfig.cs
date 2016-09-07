@@ -5,16 +5,19 @@ using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Core.DependencyInjection;
+using VitalChoice.CreditCards.Services;
 
 namespace VitalChoice.CreditCards
 {
-    public class CreditCardsImportDependencyConfig: DefaultDependencyConfig
+    public class CreditCardsImportDependencyConfig : DefaultDependencyConfig
     {
         protected override void StartCustomServicesRegistration(IServiceCollection services)
         {
             base.StartCustomServicesRegistration(services);
             services.AddSingleton<IServer, DummyServer>();
             services.AddDbContext<ExportInfoContext>();
+            services.AddScoped<IOrderExportService, OrderExportService>();
+            services.AddScoped<IVeraCoreExportService, VeraCoreExportService>();
         }
 
         protected override void FinishCustomRegistrations(ContainerBuilder builder)
