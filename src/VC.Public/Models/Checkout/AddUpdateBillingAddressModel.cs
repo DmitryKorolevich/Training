@@ -14,7 +14,7 @@ namespace VC.Public.Models.Checkout
 	    public AddUpdateBillingAddressModel()
 	    {
 		    SendNews = true;
-		    SendCatalog = true;
+		    SendCatalog = false;
 	    }
 
 	    [EmailAddress]
