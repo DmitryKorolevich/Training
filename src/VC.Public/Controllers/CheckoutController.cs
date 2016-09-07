@@ -131,7 +131,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> Welcome(LoginModel model)
         {
             if (!ModelState.IsValid)

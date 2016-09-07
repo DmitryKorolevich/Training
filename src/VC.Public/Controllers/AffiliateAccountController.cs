@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
@@ -67,7 +68,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginModel model, string returnUrl)
         {
             if (!ModelState.IsValid)
@@ -151,7 +152,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> Activate(CreateAccountModel model)
         {
             if (!ModelState.IsValid)
@@ -210,7 +211,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
         {
             if (!ModelState.IsValid)
@@ -236,7 +237,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordEmailModel model)
         {
             if (!ModelState.IsValid)
@@ -262,7 +263,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> Register(AffiliateManageModel model)
         {
             InitRegisterModel(model, true);

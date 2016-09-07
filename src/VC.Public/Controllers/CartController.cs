@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using VC.Public.Helpers;
 using VC.Public.Models.Cart;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Core.Services;
@@ -292,7 +293,7 @@ namespace VC.Public.Controllers
 
         [HttpPost]
         [CustomerAuthorize]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> AutoShip(AutoShipModel model)
         {
             var options = ReferenceData.AutoShipOptions;
