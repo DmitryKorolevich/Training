@@ -33,6 +33,7 @@ using VC.Public.Models.Tracking;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Business.Services.Bronto;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Core.Services;
 using VitalChoice.Data.Transaction;
@@ -62,6 +63,8 @@ namespace VC.Public.Controllers
 {
     public class CheckoutController : CheckoutControllerBase
     {
+        private const string CATALOG_PRODUCT_NAME = "pnc";
+
         private readonly IStorefrontUserService _storefrontUserService;
         private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
         private readonly IProductService _productService;
@@ -137,7 +140,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> Welcome(LoginModel model)
         {
             if (!ModelState.IsValid)
@@ -248,6 +251,14 @@ namespace VC.Public.Controllers
                 addUpdateModel.IdCustomerType = (int) CustomerType.Retail;
                 addUpdateModel.Id = 0;
             }
+            
+            var pnc = await _productService.GetSkuAsync(CATALOG_PRODUCT_NAME);
+            if (pnc != null)
+            {
+                var pncModel = await SkuMapper.ToModelAsync<CartSkuModel>(pnc);
+                addUpdateModel.ShowSendCatalog = pncModel.InStock;
+                addUpdateModel.SendCatalog = pncModel.InStock;
+            }
 
             return View(addUpdateModel);
         }
@@ -268,7 +279,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> AddUpdateBillingAddress(AddUpdateBillingAddressModel model)
         {
             if (await IsCartEmpty())
@@ -304,7 +315,7 @@ namespace VC.Public.Controllers
                     }
                     if (model.SendCatalog)
                     {
-                        var pnc = await _productService.GetSkuOrderedAsync("pnc");
+                        var pnc = await _productService.GetSkuOrderedAsync(CATALOG_PRODUCT_NAME);
                         if (pnc != null)
                         {
                             pnc.Quantity = 1;
@@ -314,7 +325,7 @@ namespace VC.Public.Controllers
                     }
                     else
                     {
-                        cart.Order.Skus.RemoveAll(s => s.Sku.Code.ToLower() == "pnc");
+                        cart.Order.Skus.RemoveAll(s => s.Sku.Code.ToLower() == CATALOG_PRODUCT_NAME);
                     }
                     if (cart.Order.PaymentMethod?.Address == null || cart.Order.PaymentMethod.Id == 0)
                     {
@@ -511,7 +522,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> AddUpdateShippingMethod(AddUpdateShippingMethodModel model)
         {
             if (await IsCartEmpty())

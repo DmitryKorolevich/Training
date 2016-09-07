@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using VC.Public.Models.Profile;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Services;
 using VitalChoice.DynamicData.Interfaces;
@@ -269,7 +270,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
             if (!ModelState.IsValid)
@@ -302,12 +303,11 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> ChangeProfile(ChangeProfileModel model)
         {
             if (!ModelState.IsValid)
             {
-                CleanProfileEmailFields(model);
                 return View(model);
             }
 
@@ -353,7 +353,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> ChangeBillingInfo(BillingInfoModel model)
         {
             var currentCustomer = await GetCurrentCustomerDynamic();
@@ -469,7 +469,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> ChangeShippingInfo([FromForm] ShippingInfoModel model)
         {
             var currentCustomer = await GetCurrentCustomerDynamic();

@@ -37,7 +37,9 @@ namespace VC.Public.Models.Checkout
 
 	    public bool SendNews { get; set; }
 
-	    public bool SendCatalog { get; set; }
+        public bool ShowSendCatalog { get; set; }
+
+        public bool SendCatalog { get; set; }
 
         public int IdCustomerType { get; set; }
 	}

@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VC.Public.Helpers;
 using VitalChoice.Business.Mailings;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Core.Services;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -94,7 +95,7 @@ namespace VC.Public.Controllers
         }
 
 	    [HttpPost]
-		[ValidateAntiForgeryToken]
+		[CustomValidateAntiForgeryToken]
 		public async Task<IActionResult> Login(LoginModel model, [FromQuery]string returnUrl)
 	    {
 			ViewBag.ReturnUrl = returnUrl;
@@ -203,7 +204,7 @@ namespace VC.Public.Controllers
 		}
 
 		[HttpPost]
-		[ValidateAntiForgeryToken]
+		[CustomValidateAntiForgeryToken]
 		public async Task<IActionResult> Activate(CreateAccountModel model)
 		{
 			if (!ModelState.IsValid)
@@ -244,7 +245,7 @@ namespace VC.Public.Controllers
 		}
 
 		[HttpPost]
-		[ValidateAntiForgeryToken]
+		[CustomValidateAntiForgeryToken]
 		public async Task<IActionResult> RegisterEmail(RegisterEmailModel model, string returnUrl)
 		{
 			ViewBag.ReturnUrl = returnUrl;
@@ -272,7 +273,7 @@ namespace VC.Public.Controllers
 		}
 
 		[HttpPost]
-		[ValidateAntiForgeryToken]
+		[CustomValidateAntiForgeryToken]
 		public async Task<IActionResult> RegisterAccount(RegisterAccountModel model, string returnUrl)
 		{
 			ViewBag.ReturnUrl = returnUrl;
@@ -324,7 +325,7 @@ namespace VC.Public.Controllers
 		}
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> RegisterWholesaleAccount(RegisterWholesaleAccountModel model)
         {
             if (!model.IsAllowAgreement)
@@ -401,7 +402,7 @@ namespace VC.Public.Controllers
 		}
 
 		[HttpPost]
-		[ValidateAntiForgeryToken]
+		[CustomValidateAntiForgeryToken]
 		public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
 		{
 			if (!ModelState.IsValid)
@@ -437,7 +438,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordEmailModel model, string returnUrl)
         {
 			ViewBag.ReturnUrl = returnUrl;

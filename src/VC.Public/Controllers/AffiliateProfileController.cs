@@ -22,6 +22,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using System.Collections.Generic;
 using Microsoft.Extensions.Options;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Core.Services;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Identity.UserManagers;
@@ -105,7 +106,7 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
             if (!ModelState.IsValid)
@@ -146,12 +147,11 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> ChangeProfile(AffiliateManageModel model)
         {
             if (!Validate(model))
             {
-                CleanProfileEmailFields(model);
                 return View(model);
             }
 
