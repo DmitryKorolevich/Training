@@ -382,8 +382,9 @@
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Phone</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" name="Phone" class="form-control" placeholder="Phone" data-ng-model="affiliate.Phone" data-mask="(999) 999-9999? x99999" data-clean="true" autocomplete="off">
+                                                    <input type="text" name="Phone" class="form-control" placeholder="Phone" data-ng-model="affiliate.Phone" data-mask="(999) 999-9999? x99999" required data-clean="true" autocomplete="off">
                                                     <div class="error-container" ng-show="forms.submitted && forms.mainForm.Phone.$invalid">
+                                                        <small class="error" ng-show="forms.mainForm.Phone.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Phone")}}</small>
                                                         <small class="error" ng-show="forms.mainForm.Phone.$error.server">{{serverMessages.GetMessage('Phone')}}</small>
                                                     </div>
                                                 </div>
