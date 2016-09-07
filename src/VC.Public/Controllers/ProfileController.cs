@@ -307,7 +307,6 @@ namespace VC.Public.Controllers
         {
             if (!ModelState.IsValid)
             {
-                CleanProfileEmailFields(model);
                 return View(model);
             }
 

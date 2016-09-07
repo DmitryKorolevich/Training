@@ -151,7 +151,6 @@ namespace VC.Public.Controllers
         {
             if (!Validate(model))
             {
-                CleanProfileEmailFields(model);
                 return View(model);
             }
 
