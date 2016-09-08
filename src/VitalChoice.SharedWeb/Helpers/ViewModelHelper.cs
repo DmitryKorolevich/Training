@@ -17,22 +17,25 @@ namespace VitalChoice.SharedWeb.Helpers
     public static class ViewModelHelper
     {
         public static List<KeyValuePair<string, string>> PopulateBillingAddressDetails(this AddressDynamic billingAddress,
-            ICountryNameCodeResolver nameCodeResolver, string email)
+            ICountryNameCodeResolver nameCodeResolver, string email, bool withCountry=false)
         {
-            return new List<KeyValuePair<string, string>>
+            var toReturn = new List<KeyValuePair<string, string>>();
+            toReturn.Add(new KeyValuePair<string, string>(string.Empty, $"{billingAddress.SafeData.FirstName} {billingAddress.SafeData.LastName}"));
+            toReturn.Add(new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Company));
+            toReturn.Add(new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Address1));
+            toReturn.Add(new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Address2));
+            toReturn.Add(new KeyValuePair<string, string>(string.Empty,
+                    $"{billingAddress.SafeData.City}, {nameCodeResolver.GetRegionOrStateCode(billingAddress)} {billingAddress.SafeData.Zip}"));
+            if (withCountry)
             {
-                new KeyValuePair<string, string>(string.Empty, $"{billingAddress.SafeData.FirstName} {billingAddress.SafeData.LastName}"),
-                new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Company),
-                new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Address1),
-                new KeyValuePair<string, string>(string.Empty, billingAddress.SafeData.Address2),
-                new KeyValuePair<string, string>(string.Empty,
-                    $"{billingAddress.SafeData.City}, {nameCodeResolver.GetRegionOrStateCode(billingAddress)} {billingAddress.SafeData.Zip}"),
-                new KeyValuePair<string, string>("Phone",
+                toReturn.Add(new KeyValuePair<string, string>(string.Empty, nameCodeResolver.GetCountryCode(billingAddress)));
+            }
+            toReturn.Add(new KeyValuePair<string, string>("Phone",
                     billingAddress.SafeData.Phone != null
                         ? ((string) billingAddress.SafeData.Phone).FormatAsPhone(BaseAppConstants.BASE_PHONE_FORMAT)
-                        : String.Empty),
-                new KeyValuePair<string, string>("Email", email),
-            };
+                        : String.Empty));
+            toReturn.Add(new KeyValuePair<string, string>("Email", email));
+            return toReturn;
         }
 
         public static List<KeyValuePair<string, string>> PopulateCreditCardDetails(this OrderPaymentMethodDynamic paymentMethod,
@@ -65,17 +68,20 @@ namespace VitalChoice.SharedWeb.Helpers
         }
 
         public static List<KeyValuePair<string, string>> PopulateShippingAddressDetails(this AddressDynamic shippingAddress,
-            ICountryNameCodeResolver nameCodeResolver)
+            ICountryNameCodeResolver nameCodeResolver,bool withCountry = false)
         {
-            return new List<KeyValuePair<string, string>>
+            var toReturn = new List<KeyValuePair<string, string>>();
+            toReturn.Add(new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.SafeData.FirstName} {shippingAddress.SafeData.LastName}"));
+            toReturn.Add(new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Company));
+            toReturn.Add(new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Address1));
+            toReturn.Add(new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Address2));
+            toReturn.Add(new KeyValuePair<string, string>(string.Empty,
+                    $"{shippingAddress.SafeData.City}, {nameCodeResolver.GetRegionOrStateCode(shippingAddress)} {shippingAddress.SafeData.Zip}"));
+            if (withCountry)
             {
-                new KeyValuePair<string, string>(string.Empty, $"{shippingAddress.SafeData.FirstName} {shippingAddress.SafeData.LastName}"),
-                new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Company),
-                new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Address1),
-                new KeyValuePair<string, string>(string.Empty, shippingAddress.SafeData.Address2),
-                new KeyValuePair<string, string>(string.Empty,
-                    $"{shippingAddress.SafeData.City}, {nameCodeResolver.GetRegionOrStateCode(shippingAddress)} {shippingAddress.SafeData.Zip}")
-            };
+                toReturn.Add(new KeyValuePair<string, string>(string.Empty, nameCodeResolver.GetCountryCode(shippingAddress)));
+            }
+            return toReturn;
         }
     }
 }
