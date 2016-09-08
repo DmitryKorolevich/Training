@@ -112,10 +112,6 @@ namespace VitalChoice.Business.Services.Orders
                                     }
                                     results.Add(exportResult);
                                     sentItems.Remove(exportResult.Id);
-                                    if (sentItems.Count == 0)
-                                    {
-                                        doneAllEvent.Set();
-                                    }
                                 }
                             }
                         });
@@ -128,6 +124,10 @@ namespace VitalChoice.Business.Services.Orders
             }
             if (!await doneAllEvent.WaitAsync(TimeSpan.FromMinutes(5)))
             {
+                if (sentItems.Count == 0)
+                {
+                    return results;
+                }
                 // ReSharper disable once InconsistentlySynchronizedField
                 Logger.LogError($"Export timeout, items left: {sentItems.Count}");
                 throw new ApiException("Export timeout");

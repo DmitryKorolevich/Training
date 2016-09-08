@@ -322,13 +322,13 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
 
         private void RegisterSession(Guid session, KeyExchange keyCombined)
         {
-            var aes = new AesCng();
-            if (aes == null)
-                throw new InvalidOperationException("Cannot initialize AES encryption");
-            aes.KeySize = 256;
-            aes.Key = keyCombined.Key;
-            aes.IV = keyCombined.IV;
-            aes.Padding = PaddingMode.PKCS7;
+            var aes = new AesCng
+            {
+                KeySize = 256,
+                Key = keyCombined.Key,
+                IV = keyCombined.IV,
+                Padding = PaddingMode.PKCS7
+            };
             SessionInfo encryption = new SessionInfo(aes);
             lock (_sessions)
             {
