@@ -163,12 +163,18 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             if (command == null)
                 throw new ArgumentNullException(nameof(command));
             if (command.Data == null)
+            {
+                _logger.LogWarning("Empty command data");
                 return default(T);
+            }
             SessionInfo encryption;
             lock (_sessions)
             {
                 if (!_sessions.TryGetValue(session, out encryption))
+                {
+                    _logger.LogWarning($"Session does not exist: {session}");
                     return default(T);
+                }
             }
             if (VerifyCommandSign(command))
             {
@@ -578,6 +584,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
             }
             if (commandData.Sign == null && (commandData.Data?.Length ?? 0) == 0)
             {
+                _logger.LogWarning("Empty command without data and sign, processing as normal.");
                 return true;
             }
 
