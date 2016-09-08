@@ -181,10 +181,17 @@ namespace VC.Admin.Controllers
                 throw new AppValidationException("Please select orders to export first");
             }
 
-            return await _exportService.ExportOrdersAsync(new OrderExportData
+            var sUserId = _userManager.GetUserId(Request.HttpContext.User);
+            int userId;
+            if (int.TryParse(sUserId, out userId))
             {
-                ExportInfo = itemsToExport
-            });
+                return await _exportService.ExportOrdersAsync(new OrderExportData
+                {
+                    ExportInfo = itemsToExport,
+                    UserId = userId
+                });
+            }
+            return new Result<List<OrderExportItemResult>>(false);
         }
 
         [HttpPost]

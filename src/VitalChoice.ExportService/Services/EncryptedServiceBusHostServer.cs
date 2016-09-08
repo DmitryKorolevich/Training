@@ -204,7 +204,8 @@ namespace VitalChoice.ExportService.Services
             using (var scope = _rootScope.BeginLifetimeScope())
             {
                 var orderExportService = scope.Resolve<IOrderExportService>();
-                orderExportService.ExportOrders(exportData.ExportInfo, result => SendCommand(new ServiceBusCommandBase(command, result)))
+                orderExportService.ExportOrders(exportData.ExportInfo, result => SendCommand(new ServiceBusCommandBase(command, result)),
+                        exportData.UserId)
                     .ConfigureAwait(false)
                     .GetAwaiter()
                     .GetResult();

@@ -390,18 +390,18 @@ namespace VitalChoice.ExportService.Services
         }
 
         public async Task ExportOrders(ICollection<OrderExportItem> exportItems,
-            Action<OrderExportItemResult> exportCallBack)
+            Action<OrderExportItemResult> exportCallBack, int userId)
         {
             if (_writeQueue)
             {
                 throw new ApiException("Orders cannot be exported while encrypted database update is in progress");
             }
 
-            await DoExportOrders(exportItems, exportCallBack);
-            await DoExportRefunds(exportItems, exportCallBack);
+            await DoExportOrders(exportItems, exportCallBack, userId);
+            await DoExportRefunds(exportItems, exportCallBack, userId);
         }
 
-        private async Task DoExportOrders(ICollection<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack)
+        private async Task DoExportOrders(ICollection<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack, int userId)
         {
             var orders = exportItems.Where(i => !i.IsRefund).ToDictionary(o => o.Id);
 
@@ -410,8 +410,8 @@ namespace VitalChoice.ExportService.Services
                     await _orderService.SelectAsync(exportItems.Where(i => !i.IsRefund).Select(o => o.Id).ToList(), true));
             var customerList =
                 (await
-                    _customerService.SelectAsync(
-                        orderList.Select(o => o.Customer.Id).Distinct().ToList(), true))
+                        _customerService.SelectAsync(
+                            orderList.Select(o => o.Customer.Id).Distinct().ToList(), true))
                     .ToDictionary(c => c.Id);
 
             foreach (var order in orderList)
@@ -482,6 +482,7 @@ namespace VitalChoice.ExportService.Services
                 {
                     _paymentMapper.SecureObject(order.PaymentMethod);
                 }
+                order.IdEditedBy = userId;
             }
             await _orderService.UpdateRangeAsync(orderList);
             exportCallBack(new OrderExportItemResult
@@ -491,15 +492,16 @@ namespace VitalChoice.ExportService.Services
             });
         }
 
-        private async Task DoExportRefunds(ICollection<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack)
+        private async Task DoExportRefunds(ICollection<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack,
+            int userId)
         {
             var refundList =
                 new HashSet<OrderRefundDynamic>(
                     await _refundService.SelectAsync(exportItems.Where(i => i.IsRefund).Select(o => o.Id).ToList(), true));
             var refundCustomerList =
                 (await
-                    _customerService.SelectAsync(
-                        refundList.Select(o => o.Customer.Id).Distinct().ToList(), true))
+                        _customerService.SelectAsync(
+                            refundList.Select(o => o.Customer.Id).Distinct().ToList(), true))
                     .ToDictionary(c => c.Id);
 
             foreach (var refund in refundList)
@@ -529,7 +531,10 @@ namespace VitalChoice.ExportService.Services
                     });
                 }
             });
-
+            foreach (var refund in refundList)
+            {
+                refund.IdEditedBy = userId;
+            }
             await _refundService.UpdateRangeAsync(refundList);
         }
 
