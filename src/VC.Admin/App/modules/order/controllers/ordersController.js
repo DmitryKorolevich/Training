@@ -7,7 +7,19 @@
 
         function errorHandler(result)
         {
-            toaster.pop('error', "Error!", "Server error occured");
+            if (result.Messages)
+            {
+                var messages = "";
+                $.each(result.Messages, function (index, value)
+                {
+                    messages += value.Message + "<br />";
+                });
+                toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+            }
+            else
+            {
+                toaster.pop('error', "Error!", "Server error occured");
+            }
         };
 
         function refreshOrders()
