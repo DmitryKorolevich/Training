@@ -37,6 +37,8 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                     $scope.customerFilter.IdAffiliate = result.Data.Id;
                     $scope.affiliate.DateEdited = result.Data.DateEdited;
                     $scope.affiliate.Email = result.Data.Email;
+                    $scope.affiliate.newEmail = '';
+                    $scope.affiliate.emailConfirm = '';
                     $scope.affiliate.StatusCode = result.Data.StatusCode;
                     $scope.affiliate.ActivatePending = false;
                     $scope.options.LoginAsAffiliateUrl = affiliateService.getLoginAsAffiliateUrl($scope.affiliate.Id, $rootScope.buildNumber);
