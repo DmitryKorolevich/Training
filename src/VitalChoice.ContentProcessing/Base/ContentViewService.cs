@@ -112,7 +112,7 @@ namespace VitalChoice.ContentProcessing.Base
                     await _processorService.ExecuteAsync(p.ContentProcessor.Type, viewContext, model);
                 }
             }
-            catch (NotFoundException e)
+            catch (NotFoundException)
             {
                 return null;
             }

@@ -78,8 +78,7 @@ namespace VitalChoice.Business.Services
                     var existingKeys = EncryptionHost.GetSessionKeys(sessionId);
                     while (existingKeys == null)
                     {
-                        sessionId = EncryptionHost.GetSession();
-                        existingKeys = EncryptionHost.GetSessionKeys(sessionId);
+                        throw new ApiException("Cannot get session keys");
                     }
 
                     if (await
@@ -104,10 +103,12 @@ namespace VitalChoice.Business.Services
                     {
                         _publicKeyLock.Release();
                     }
+                    Logger.LogWarning("Initial authentication failed, re-trying. Possible service restart");
                     return await AuthenticateClient(sessionId);
                 }
                 throw new ApiException("Session keys couldn't be set on remote");
             }
+            Logger.LogWarning("Session keys were destroyed before actual usage");
             return await AuthenticateClient(EncryptionHost.GetSession());
         }
 
