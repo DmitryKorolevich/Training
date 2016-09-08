@@ -1045,7 +1045,7 @@ namespace VitalChoice.Business.Services.Customers
                         transaction.Commit();
                         toReturn = true;
                     }
-                    catch(Exception e)
+                    catch
                     {
                         transaction.Rollback();
 
@@ -1057,7 +1057,7 @@ namespace VitalChoice.Business.Services.Customers
                                 {
                                     await DeleteFileAsync(newFileName, primaryCustomerPublicId.ToString());
                                 }
-                                catch (Exception ed)
+                                catch
                                 {
                                     //Ignore delete issues
                                 }

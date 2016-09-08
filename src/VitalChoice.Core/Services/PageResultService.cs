@@ -18,7 +18,8 @@ namespace VitalChoice.Core.Services
         {
             return app.UseStatusCodePages(async context =>
             {
-                if (context.HttpContext.Response.StatusCode == (int) statusCode && context.HttpContext.Request.Headers["Accept"].Any(h => h.ToLower().Contains("text/html")))
+                if (context.HttpContext.Response.StatusCode == (int) statusCode &&
+                    context.HttpContext.Request.Headers["Accept"].Any(h => h.ToLower().Contains("text/html")))
                 {
                     PathString pathString = new PathString(path);
                     PathString originalPath = context.HttpContext.Request.Path;

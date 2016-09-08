@@ -13,12 +13,12 @@ using VitalChoice.Interfaces.Services;
 using Autofac;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.Extensions.Primitives;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Core.Services;
 using VitalChoice.Profiling;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace VC.Public
 {
@@ -92,6 +92,7 @@ namespace VC.Public
             //app.InjectProfiler();
 
             app.UseSession();
+
             app.Use((context, next) =>
             {
                 context.Response.Headers["Pragma"] = "no-cache";
@@ -112,16 +113,17 @@ namespace VC.Public
                 PathString pathString = new PathString("/content/" + ContentConstants.NOT_FOUND_PAGE_URL);
                 PathString originalPath = p.HttpContext.Request.Path;
                 var originalFullPath = p.HttpContext.Request.GetDisplayUrl();
-                p.HttpContext.Features.Set((IStatusCodeReExecuteFeature)new StatusCodeReExecuteFeature
+                p.HttpContext.Features.Set((IStatusCodeReExecuteFeature) new StatusCodeReExecuteFeature
                 {
                     OriginalPathBase = p.HttpContext.Request.PathBase.Value,
                     OriginalPath = originalPath.Value
                 });
                 p.HttpContext.Request.Path = pathString;
                 var loggerProvider = p.HttpContext.RequestServices.GetService<ILoggerFactory>();
-                var logger = loggerProvider.CreateLogger<Startup>();
+                var logger = loggerProvider.CreateLogger<PageResultService>();
                 logger.LogWarning($"URL not found - {originalFullPath}");
             }, HttpStatusCode.NotFound);
+
             app.UseStatusCodeExecutePath("/content/" + ContentConstants.ACESS_DENIED_PAGE_URL, HttpStatusCode.Forbidden);
 
             app.UseMvc(RouteConfig.RegisterRoutes);

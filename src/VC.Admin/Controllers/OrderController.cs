@@ -250,7 +250,7 @@ namespace VC.Admin.Controllers
             {
                 filter.To = filter.To.Value.AddDays(1);
             }
-            
+
             var result = await _orderService.GetOrdersAsync(filter);
 
             var toReturn = new PagedList<OrderListItemModel>
@@ -267,7 +267,7 @@ namespace VC.Admin.Controllers
         public async Task<Result<OrderManageModel>> GetOrder(string id, int? idcustomer = null, bool refreshprices = false)
         {
             int idOrder = 0;
-            if (id!=null && !Int32.TryParse(id, out idOrder))
+            if (id != null && !Int32.TryParse(id, out idOrder))
                 throw new NotFoundException();
 
             if (idOrder == 0)
@@ -294,7 +294,7 @@ namespace VC.Admin.Controllers
             }
 
             var item = await _orderService.SelectAsync(idOrder);
-            if (item==null ||
+            if (item == null ||
                 (item.IdObjectType != (int)OrderType.Normal && item.IdObjectType != (int)OrderType.AutoShipOrder && item.IdObjectType != (int)OrderType.AutoShip &&
                 item.IdObjectType != (int)OrderType.DropShip && item.IdObjectType != (int)OrderType.GiftList))
             {
@@ -372,6 +372,11 @@ namespace VC.Admin.Controllers
             var sendOrderConfirm = false;
             if (model.CombinedEditOrderStatus != OrderStatus.Cancelled && model.CombinedEditOrderStatus != OrderStatus.Exported && model.CombinedEditOrderStatus != OrderStatus.Shipped)
             {
+                if (model.Id > 0)
+                {
+                    await CheckDBOrderStatusForAdminUpdate(model.Id);
+                }
+
                 await _orderService.OrderTypeSetup(order);
                 await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus);
 
@@ -416,7 +421,7 @@ namespace VC.Admin.Controllers
                 _brontoService.PushSubscribe(model.Customer.Email, model.SignUpNewsletter.Value);
             }
 
-            if (!string.IsNullOrEmpty(order.Customer.Email) && model.Id==0)
+            if (!string.IsNullOrEmpty(order.Customer.Email) && model.Id == 0)
             {
                 var dbProductReviewEmailEnabled = !await _notificationService.IsEmailUnsubscribedAsync(EmailConstants.ProductReviewIdNewsletter, order.Customer.Email);
                 if (model.Customer.ProductReviewEmailEnabled && !dbProductReviewEmailEnabled)
@@ -430,6 +435,48 @@ namespace VC.Admin.Controllers
             }
 
             return toReturn;
+        }
+
+        private async Task CheckDBOrderStatusForAdminUpdate(int id)
+        {
+            var dbOrder = await _orderService.SelectAsync(id);
+            var notValidStatuses = new List<OrderStatus?>()
+            {
+                OrderStatus.Cancelled,
+                OrderStatus.Exported,
+                OrderStatus.Shipped
+            };
+            if (dbOrder != null &&
+                (notValidStatuses.Contains(dbOrder?.OrderStatus) ||
+                 notValidStatuses.Contains(dbOrder?.POrderStatus) ||
+                 notValidStatuses.Contains(dbOrder?.NPOrderStatus)))
+            {
+                var statusMessage = String.Empty;
+                if (dbOrder.OrderStatus.HasValue)
+                {
+                    statusMessage +=
+                        $"status - {_referenceData.OrderStatuses.FirstOrDefault(p => p.Key == (int) dbOrder.OrderStatus.Value)?.Text}";
+                }
+                else
+                {
+                    if (dbOrder.POrderStatus.HasValue)
+                    {
+                        statusMessage +=
+                            $"P part status - {_referenceData.OrderStatuses.FirstOrDefault(p => p.Key == (int) dbOrder.POrderStatus.Value)?.Text}";
+                    }
+                    if (!string.IsNullOrEmpty(statusMessage))
+                    {
+                        statusMessage += ", ";
+                    }
+                    if (dbOrder.NPOrderStatus.HasValue)
+                    {
+                        statusMessage +=
+                            $"NP part status - {_referenceData.OrderStatuses.FirstOrDefault(p => p.Key == (int) dbOrder.NPOrderStatus.Value)?.Text}";
+                    }
+                }
+                var message = $"The given order was updated({statusMessage}). Please refresh this order.";
+                throw new AppValidationException(message);
+            }
         }
 
         [AdminAuthorize(PermissionType.Orders)]
@@ -448,7 +495,7 @@ namespace VC.Admin.Controllers
                 throw new AppValidationException("This operation isn't allowed for the order in the given status");
             }
 
-            var toReturn =  await _orderService.CancelOrderAsync(id);
+            var toReturn = await _orderService.CancelOrderAsync(id);
             if (toReturn)
             {
                 if (order.OrderStatus.HasValue)
@@ -539,7 +586,7 @@ namespace VC.Admin.Controllers
             await _orderPaymentMethodMapper.UpdateObjectAsync(model, order.PaymentMethod,
                                (int)PaymentMethodType.CreditCard);
             await _addressMapper.UpdateObjectAsync(model, order.PaymentMethod.Address, (int)AddressType.Billing, false);
-             
+
             order.PaymentMethod.Address.Id = addressId;
             order.PaymentMethod.Address.IdObjectType = (int)AddressType.Billing;
 
@@ -588,7 +635,7 @@ namespace VC.Admin.Controllers
                         order.Discount = null;
                         if (order.OrderStatus.HasValue)
                         {
-                            order.OrderStatus=OrderStatus.Processed;
+                            order.OrderStatus = OrderStatus.Processed;
                         }
                         if (order.POrderStatus.HasValue)
                         {
@@ -676,6 +723,11 @@ namespace VC.Admin.Controllers
             var sendOrderConfirm = false;
             if (model.CombinedEditOrderStatus != OrderStatus.Cancelled && model.CombinedEditOrderStatus != OrderStatus.Exported && model.CombinedEditOrderStatus != OrderStatus.Shipped)
             {
+                if (model.Id > 0)
+                {
+                    await CheckDBOrderStatusForAdminUpdate(model.Id);
+                }
+
                 await _orderService.OrderTypeSetup(order);
                 await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus);
 
@@ -1086,7 +1138,7 @@ namespace VC.Admin.Controllers
                 From = dFrom.Value,
                 To = dTo.Value.AddDays(1),
                 FrequencyType = frequencytype,
-                IdAdminTeams = !string.IsNullOrEmpty(idadminteams) ? idadminteams.Split(',').Where(p => !string.IsNullOrEmpty(p)).Select(p=>Int32.Parse(p)).ToList()
+                IdAdminTeams = !string.IsNullOrEmpty(idadminteams) ? idadminteams.Split(',').Where(p => !string.IsNullOrEmpty(p)).Select(p => Int32.Parse(p)).ToList()
                     : new List<int>(),
                 IdAdmin = idadmin,
             };
@@ -1147,7 +1199,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
-        public async Task<FileResult> GetOrdersForWholesaleDropShipReportFile([FromQuery]string from, [FromQuery]string to, [FromQuery]string shipfrom=null, [FromQuery]string shipto=null,
+        public async Task<FileResult> GetOrdersForWholesaleDropShipReportFile([FromQuery]string from, [FromQuery]string to, [FromQuery]string shipfrom = null, [FromQuery]string shipto = null,
             [FromQuery]int? idcustomertype = null, [FromQuery]int? idtradeclass = null, [FromQuery]string customercompany = null, [FromQuery]string customerfirstname = null, [FromQuery]string customerlastname = null,
             [FromQuery]string shipfirstname = null, [FromQuery]string shiplastname = null, [FromQuery]string shipidconfirm = null, [FromQuery]int? idorder = null,
             [FromQuery]string ponumber = null)
@@ -1728,7 +1780,7 @@ namespace VC.Admin.Controllers
                     return false;
 
                 emailModel.ToEmail = model.Email;
-                await _notificationService.SendOrderShippingConfirmationEmailsAsync(new [] {emailModel});
+                await _notificationService.SendOrderShippingConfirmationEmailsAsync(new[] { emailModel });
             }
             else
             {
