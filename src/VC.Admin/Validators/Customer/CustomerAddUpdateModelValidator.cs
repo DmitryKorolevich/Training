@@ -12,7 +12,7 @@ namespace VC.Admin.Validators.Customer
 {
 	public class CustomerAddUpdateModelValidator : ModelValidator<AddUpdateCustomerModel>
 	{
-	    public override void Validate(AddUpdateCustomerModel value)
+        public override void Validate(AddUpdateCustomerModel value)
 	    {
 	        ValidationErrors.Clear();
 

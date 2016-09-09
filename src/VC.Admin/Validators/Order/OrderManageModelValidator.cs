@@ -36,7 +36,7 @@ namespace VC.Admin.Validators.Order
                     int index = 0;
                     foreach (var shipping in value.Customer.Shipping)
                     {
-                        if (value.UpdateShippingAddressForCustomer || (shipping.IsSelected && value.OrderStatus != OrderStatus.OnHold))
+                        if (value.UpdateShippingAddressForCustomer && shipping.IsSelected && value.OrderStatus != OrderStatus.OnHold)
                         {
                             ParseResults(addressValidator.Validate(shipping), "Shipping", index, "shipping");
                         }
@@ -47,7 +47,7 @@ namespace VC.Admin.Validators.Order
                         index = 0;
                         foreach (var card in value.Customer.CreditCards)
                         {
-                            if (value.UpdateCardForCustomer || (card.IsSelected && value.OrderStatus != OrderStatus.OnHold))
+                            if (value.UpdateCardForCustomer && card.IsSelected && value.OrderStatus != OrderStatus.OnHold)
                             {
                                 ParseResults(creditCardValidator.Validate(card), "CreditCards", index, "card");
                                 ParseResults(addressValidator.Validate(card.Address), "CreditCards", index, "card");

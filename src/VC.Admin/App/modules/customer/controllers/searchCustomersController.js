@@ -2,7 +2,8 @@
 
 angular.module('app.modules.customer.controllers.searchCustomersController', [])
 	.controller('searchCustomersController', [
-		'$scope', 'customerService', 'toaster', 'promiseTracker', '$rootScope', 'gridSorterUtil', function ($scope, customerService, toaster, promiseTracker, $rootScope, gridSorterUtil)
+		'$scope', 'customerService', 'toaster', 'promiseTracker', '$rootScope', 'gridSorterUtil', '$timeout',
+        function ($scope, customerService, toaster, promiseTracker, $rootScope, gridSorterUtil, $timeout)
 		{
 		    $scope.refreshTracker = promiseTracker("refresh");
 		    $scope.editTracker = promiseTracker("edit");
@@ -16,6 +17,7 @@ angular.module('app.modules.customer.controllers.searchCustomersController', [])
 					    {
 					        $scope.customers = result.Data.Items;
 					        $scope.totalItems = result.Data.Count;
+					        refresViewItems();
 					    } else
 					    {
 					        toaster.pop('error', 'Error!', "Can't get access to the customers");
@@ -33,6 +35,8 @@ angular.module('app.modules.customer.controllers.searchCustomersController', [])
 
 		        $scope.address = {};
 		        $scope.defaultShippingAddress = {};
+		        $scope.blockIds = [];
+		        $scope.viewCustomers = [];
 
 		        $scope.filter = {
 		            Address: null,
@@ -46,6 +50,11 @@ angular.module('app.modules.customer.controllers.searchCustomersController', [])
 		            FieldName: null,
 		            FieldValue: null,
 		        };
+
+		        $timeout(function ()
+		        {
+		            notifyLoaded();
+		        }, 200);
 		    }
 
 		    $scope.pageChanged = function ()
@@ -157,7 +166,14 @@ angular.module('app.modules.customer.controllers.searchCustomersController', [])
 		        data.name = $scope.name;
 		        data.items = items;
 		        $scope.$emit('searchCustomers#out#addItems', data);
-		    };            
+		    };
+
+		    function notifyLoaded()
+		    {
+		        var data = {};
+		        data.name = $scope.name;
+		        $scope.$emit('searchCustomers#out#loaded', data);
+		    };
 
 		    $scope.$on('searchCustomers#in#setFilter', function (event, args)
 		    {
@@ -175,6 +191,41 @@ angular.module('app.modules.customer.controllers.searchCustomersController', [])
 		            $scope.filterCustomers();
 		        }
 		    });
+
+		    $scope.$on('searchCustomers#in#setBlockIds', function (event, args)
+		    {
+		        if (args.name == $scope.name)
+		        {
+		            var blockIds = args.blockIds;
+		            if (blockIds)
+		            {
+		                $scope.blockIds = blockIds;
+		                refresViewItems();
+		            }
+		        };
+		    });
+
+		    function refresViewItems()
+		    {
+		        var items = [];
+		        $.each($scope.customers, function (index, customer)
+		        {
+		            var add = true;
+		            $.each($scope.blockIds, function (index, blockId)
+		            {
+		                if (customer.Id == blockId)
+		                {
+		                    add = false;
+		                    return;
+		                }
+		            });
+		            if (add)
+		            {
+		                items.push(customer);
+		            };
+		        });
+		        $scope.viewCustomers = items;
+		    };
 
 		    initialize();
 		}

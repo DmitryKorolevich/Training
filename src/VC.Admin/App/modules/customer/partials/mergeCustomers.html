@@ -1,7 +1,7 @@
 ﻿<div class="container-fluid merger-customers">
     <div class="well">
         <div class="dublicate-emails-panel">
-            <uib-accordion>
+            <uib-accordion class="collapsible-header-blue-link">
                 <uib-accordion-group>
                     <uib-accordion-heading>
                         <span class="legend">Customers With Dublicate Emails</span>
@@ -55,7 +55,7 @@
                 <div class="col-md-6 ">
                     <button class="btn btn-success pull-right " data-ng-click="mergeCustomers();" ladda="refreshTracker.active()" type="button">Merge Customers</button>
                     <button class="btn btn-info pull-right margin-right-15px" data-ng-click="selectAnotherPrimary();" ladda="refreshTracker.active()" type="button">Select Another Primary Customer</button>
-                    <button class="btn btn-info pull-right margin-right-15px" data-ng-click="userTheSameEmailStep2();" type="button">Use The Same Email On The Second Step</button>
+                    <button class="btn btn-info pull-right margin-right-15px" data-ng-click="userTheSameEmailStep2();" ladda="refreshTracker.active()" type="button">Use The Same Email On The Second Step</button>
                 </div>
             </div>
             <span class="legend">Customers For Merge</span>

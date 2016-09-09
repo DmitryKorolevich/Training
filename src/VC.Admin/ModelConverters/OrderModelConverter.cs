@@ -341,22 +341,41 @@ namespace VC.Admin.ModelConverters
 
                         if (model.UpdateShippingAddressForCustomer)
                         {
-                            dbCustomer.ShippingAddresses = dynamic.Customer.ShippingAddresses;
-                        }
-
-                        if (model.UpdateCardForCustomer && dynamic.PaymentMethod != null)
-                        {
-                            RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType,
-                                PaymentMethodType.CreditCard);
-                            foreach (
-                                var method in
-                                    dynamic.Customer.CustomerPaymentMethods.Where(
-                                        p => p.IdObjectType == (int) PaymentMethodType.CreditCard))
+                            var selectedAddress = dynamic.Customer.ShippingAddresses.FirstOrDefault(p=>p.Id ==
+                                dynamic.ShippingAddress.Id);
+                            var dbSelectedAddress = dbCustomer.ShippingAddresses.FirstOrDefault(p => p.Id ==
+                                dynamic.ShippingAddress.Id);
+                            if (dbSelectedAddress != null)
                             {
-                                dbCustomer.CustomerPaymentMethods.Add(method);
+                                dbCustomer.ShippingAddresses.Remove(dbSelectedAddress);
+                            }
+                            if (selectedAddress != null)
+                            {
+                                dbCustomer.ShippingAddresses.Add(selectedAddress);
                             }
                         }
-                        if (model.UpdateOACForCustomer && dynamic.PaymentMethod != null)
+
+                        if (model.UpdateCardForCustomer && dynamic.PaymentMethod != null &&
+                            dynamic.PaymentMethod.IdObjectType==(int)PaymentMethodType.CreditCard)
+                        {
+                            var dbCard = dbCustomer.CustomerPaymentMethods.FirstOrDefault(p =>
+                                p.Id == dynamic.PaymentMethod.Id &&
+                                p.IdObjectType == (int)PaymentMethodType.CreditCard);
+                            if (dbCard != null)
+                            {
+                                dbCustomer.CustomerPaymentMethods.Remove(dbCard);
+                            }
+
+                            var card = dynamic.Customer.CustomerPaymentMethods.FirstOrDefault(p =>
+                                p.Id==dynamic.PaymentMethod.Id &&
+                                p.IdObjectType == (int) PaymentMethodType.CreditCard);
+                            if (card != null)
+                            {
+                                dbCustomer.CustomerPaymentMethods.Add(card);
+                            }
+                        }
+                        if (model.UpdateOACForCustomer && dynamic.PaymentMethod != null &&
+                            dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.Oac)
                         {
                             RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType,
                                 PaymentMethodType.Oac);
@@ -368,7 +387,8 @@ namespace VC.Admin.ModelConverters
                                 dbCustomer.CustomerPaymentMethods.Add(method);
                             }
                         }
-                        if (model.UpdateCheckForCustomer && dynamic.PaymentMethod != null)
+                        if (model.UpdateCheckForCustomer && dynamic.PaymentMethod != null &&
+                            dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.Check)
                         {
                             RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType,
                                 PaymentMethodType.Check);
@@ -388,7 +408,8 @@ namespace VC.Admin.ModelConverters
                                 dbCustomer.CustomerPaymentMethods.Add(method);
                             }
                         }
-                        if (model.UpdateWireTransferForCustomer && dynamic.PaymentMethod != null)
+                        if (model.UpdateWireTransferForCustomer && dynamic.PaymentMethod != null &&
+                            dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.WireTransfer)
                         {
                             RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType,
                                 PaymentMethodType.WireTransfer);
@@ -404,7 +425,8 @@ namespace VC.Admin.ModelConverters
                                 dbCustomer.CustomerPaymentMethods.Add(method);
                             }
                         }
-                        if (model.UpdateMarketingForCustomer && dynamic.PaymentMethod != null)
+                        if (model.UpdateMarketingForCustomer && dynamic.PaymentMethod != null &&
+                            dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.Marketing)
                         {
                             RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType,
                                 PaymentMethodType.Marketing);
@@ -424,7 +446,8 @@ namespace VC.Admin.ModelConverters
                                 dbCustomer.CustomerPaymentMethods.Add(method);
                             }
                         }
-                        if (model.UpdateVCWellnessForCustomer && dynamic.PaymentMethod != null)
+                        if (model.UpdateVCWellnessForCustomer && dynamic.PaymentMethod != null &&
+                            dynamic.PaymentMethod.IdObjectType == (int)PaymentMethodType.VCWellnessEmployeeProgram)
                         {
                             RemovePaymentMethodsFromDBCustomer(dbCustomer, dynamic.PaymentMethod.IdObjectType,
                                 PaymentMethodType.VCWellnessEmployeeProgram);

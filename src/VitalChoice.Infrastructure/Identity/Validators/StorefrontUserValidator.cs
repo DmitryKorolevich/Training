@@ -35,7 +35,8 @@ namespace VitalChoice.Infrastructure.Identity.Validators
                 throw new ArgumentNullException(nameof(user));
             }
             var errors = new List<IdentityError>();
-            if (user.UserName != BaseAppConstants.FAKE_CUSTOMER_EMAIL)
+            if (user.UserName != BaseAppConstants.FAKE_CUSTOMER_EMAIL &&
+                !(user.Status==UserStatus.NotActive && user.DeletedDate.HasValue))
             {
                 await ValidateUserName(manager, user, errors);
                 if (_options.User.RequireUniqueEmail)

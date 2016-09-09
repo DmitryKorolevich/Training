@@ -1038,7 +1038,12 @@ namespace VitalChoice.Business.Services.Customers
                         }
 
                         await UpdateAsync(primaryCustomer);
-                        await DeleteAllAsync(customers);
+                        var customerRepository = uow.RepositoryAsync<Customer>();
+                        var directCustomers = await customerRepository.Query(p => customerIds.Contains(p.Id)).SelectAsync(true);
+                        foreach (var directCustomer in directCustomers)
+                        {
+                            directCustomer.StatusCode = (int)RecordStatusCode.Deleted;
+                        }
 
                         await uow.SaveChangesAsync();
 

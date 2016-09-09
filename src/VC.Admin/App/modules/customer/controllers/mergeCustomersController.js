@@ -3,14 +3,32 @@
 angular.module('app.modules.customer.controllers.mergeCustomersController', [])
 	.controller('mergeCustomersController', [
 		'$scope', 'customerService', 'toaster', 'promiseTracker',
-        '$timeout', '$rootScope', 'gridSorterUtil', function ($scope, customerService, toaster, promiseTracker,
-         $timeout, $rootScope, gridSorterUtil)
+        '$timeout', '$rootScope', 'gridSorterUtil', 'modalUtil',
+        function ($scope, customerService, toaster, promiseTracker,
+        $timeout, $rootScope, gridSorterUtil, modalUtil)
 		{
 		    const step1Name = 'Step1SearchCustomers';
 		    const step2Name = 'Step2SearchCustomers';
 
 		    $scope.refreshTracker = promiseTracker("refresh");
 		    $scope.dublicateEmailsRefreshTracker = promiseTracker("dublicateEmailsRefresh");
+
+		    function errorHandler(result)
+		    {
+		        if (result.Messages)
+		        {
+		            var messages = "";
+		            $.each(result.Messages, function (index, value)
+		            {
+		                messages += value.Message + "<br />";
+		            });
+		            toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+		        }
+		        else
+		        {
+		            toaster.pop('error', "Error!", "Server error occured");
+		        }
+		    };
 
 		    function initialize()
 		    {
@@ -100,18 +118,21 @@ angular.module('app.modules.customer.controllers.mergeCustomersController', [])
 		                    }
 		                }
 		            });
+		            notifyStep2BlockIds();
 		        }
 		    });
 
 		    $scope.unselectCustomer = function (index)
 		    {
 		        $scope.selectedCustomers.splice(index, 1);
+		        notifyStep2BlockIds();
 		    };
 
 		    $scope.selectAnotherPrimary = function ()
 		    {
 		        $scope.primary = null;
 		        $scope.selectedCustomers = [];
+		        notifyStep2BlockIds();
 		    };
 
 		    $scope.mergeCustomers = function ()
@@ -129,7 +150,18 @@ angular.module('app.modules.customer.controllers.mergeCustomersController', [])
                             {
                                 $scope.primary = null;
                                 $scope.selectedCustomers = [];
-                                toaster.pop('success', "Success!", "Successfully merged");
+                                modalUtil.open('app/modules/setting/partials/infoDetailsPopup.html', 'infoDetailsPopupController', {
+                                    Header: "Success!",
+                                    Messages: [{ Message: "Successfully merged" }],
+                                    OkButton: {
+                                        Label: 'Ok',
+                                        Handler: function ()
+                                        {
+                                        }
+                                    },
+                                }, { size: 'xs' });
+                                $scope.filter.Paging.PageIndex = 1;
+                                refreshDublicateEmails();
                             } else
                             {
                                 errorHandler(result);
@@ -159,6 +191,33 @@ angular.module('app.modules.customer.controllers.mergeCustomersController', [])
 		        $scope.$broadcast('searchCustomers#in#setFilter', data);
 		        $scope.$broadcast('searchCustomers#in#search', data);
 		        $rootScope.scrollTo(step1Name);
+		    };
+
+		    $scope.$on('searchCustomers#out#loaded', function (event, args)
+		    {
+		        if (args.name == step2Name)
+		        {
+		            notifyStep2BlockIds();
+		        }
+		    });
+
+		    function notifyStep2BlockIds()
+		    {
+		        var data = {};
+		        data.name = step2Name;
+		        data.blockIds = [];
+		        if ($scope.primary)
+		        {
+		            data.blockIds.push($scope.primary.Id);
+		        }
+		        if ($scope.selectedCustomers && $scope.selectedCustomers.length > 0)
+		        {
+		            $.each($scope.selectedCustomers, function (index, selectedCustomer)
+		            {
+		                data.blockIds.push(selectedCustomer.Id);
+		            });
+		        }
+		        $scope.$broadcast('searchCustomers#in#setBlockIds', data);
 		    };
 
 		    initialize();
