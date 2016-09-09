@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Core.Services;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 
@@ -114,7 +115,12 @@ namespace VC.Public.Controllers
                 return View(model);
             }
 
-            var user = await _affiliateUserService.FindAsync(_userManager.GetUserName(User));
+            ApplicationUser user = null;
+            int id;
+            if (int.TryParse(_userManager.GetUserId(User), out id))
+            {
+                user = await _affiliateUserService.FindAsync(id);
+            }
             if (user == null)
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);

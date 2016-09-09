@@ -58,6 +58,8 @@ using VitalChoice.ObjectMapping.Base;
 using VitalChoice.SharedWeb.Helpers;
 using VitalChoice.Validation.Models;
 using ApiException = VitalChoice.Ecommerce.Domain.Exceptions.ApiException;
+using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 
 namespace VC.Public.Controllers
 {
@@ -77,10 +79,11 @@ namespace VC.Public.Controllers
         private readonly ILogger _logger;
         private readonly ICountryNameCodeResolver _countryNameCodeResolver;
         private readonly IEncryptedOrderExportService _exportService;
+        private readonly ICustomerService _customerService;
         private readonly ITokenService _tokenService;
         private readonly IObjectEncryptionHost _encryptionHost;
 
-        public CheckoutController(IStorefrontUserService storefrontUserService,
+        public CheckoutController(IStorefrontUserService userService,
             ICustomerService customerService,
             IAffiliateService affiliateService,
             INotificationService notificationService,
@@ -93,13 +96,12 @@ namespace VC.Public.Controllers
             BrontoService brontoService,
             ITransactionAccessor<EcommerceContext> transactionAccessor, ISettingService settingService, ILoggerFactory loggerProvider,
             ExtendedUserManager userManager, ICountryNameCodeResolver countryNameCodeResolver, ReferenceData referenceData,
-            AppSettings appSettings, IEncryptedOrderExportService exportService, ITokenService tokenService,
-            IObjectEncryptionHost encryptionHost)
+            AppSettings appSettings, IEncryptedOrderExportService exportService, ICustomerService customerService1, IObjectEncryptionHost encryptionHost, ITokenService tokenService)
             : base(
                 customerService, referenceData, authorizationService, checkoutService, orderService,
                 skuMapper, productMapper, settingService, userManager, appSettings)
         {
-            _storefrontUserService = storefrontUserService;
+            _userService = userService;
             _paymentMethodConverter = paymentMethodConverter;
             _productService = productService;
             _addressConverter = addressConverter;
@@ -108,8 +110,9 @@ namespace VC.Public.Controllers
             _transactionAccessor = transactionAccessor;
             _countryNameCodeResolver = countryNameCodeResolver;
             _exportService = exportService;
-            _tokenService = tokenService;
+            _customerService = customerService1;
             _encryptionHost = encryptionHost;
+            _tokenService = tokenService;
             _affiliateService = affiliateService;
             _notificationService = notificationService;
             _logger = loggerProvider.CreateLogger<CheckoutController>();
@@ -151,7 +154,7 @@ namespace VC.Public.Controllers
             ApplicationUser user = null;
             try
             {
-                user = await _storefrontUserService.SignInAsync(model.Email, model.Password);
+                user = await CustomerPasswordLogin(model);
                 await HttpContext.SpinAuthorizationToken(_tokenService, null, user, _encryptionHost);
             }
             catch (WholesalePendingException)
@@ -399,7 +402,7 @@ namespace VC.Public.Controllers
                         {
                             if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
                             {
-                                await _storefrontUserService.RemoveAsync(cart.Order.Customer.Id);
+                                await _userService.RemoveAsync(cart.Order.Customer.Id);
                             }
                         }
                         transaction.Rollback();
@@ -431,7 +434,7 @@ namespace VC.Public.Controllers
                     {
                         if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
                         {
-                            await _storefrontUserService.RemoveAsync(cart.Order.Customer.Id);
+                            await _userService.RemoveAsync(cart.Order.Customer.Id);
                         }
                     }
                     throw new AppValidationException(newMessages);
@@ -443,7 +446,7 @@ namespace VC.Public.Controllers
                     {
                         if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
                         {
-                            await _storefrontUserService.RemoveAsync(cart.Order.Customer.Id);
+                            await _userService.RemoveAsync(cart.Order.Customer.Id);
                         }
                     }
                     throw;
@@ -896,7 +899,7 @@ namespace VC.Public.Controllers
                         throw new ApiException("Customer couldn't be created");
                     }
                 }
-                loginTask = CreateLoginForNewActive(model);
+                loginTask = CreateLoginForNewActive(model, newCustomer.Id);
             }
             return new CreateResult
             {
@@ -909,8 +912,8 @@ namespace VC.Public.Controllers
         {
             return async () =>
             {
-                var user = await _storefrontUserService.GetAsync(newCustomer.Id);
-                user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
+                var user = await _userService.GetAsync(newCustomer.Id);
+                user = await _userService.SignInNoStatusCheckingAsync(user);
                 if (user == null)
                 {
                     throw new AppValidationException(
@@ -924,9 +927,9 @@ namespace VC.Public.Controllers
         {
             return async () =>
             {
-                await _storefrontUserService.SendActivationAsync(newCustomer.Email);
-                var user = await _storefrontUserService.GetAsync(newCustomer.Id);
-                user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
+                await _userService.SendActivationAsync(newCustomer.Id);
+                var user = await _userService.GetAsync(newCustomer.Id);
+                user = await _userService.SignInNoStatusCheckingAsync(user);
                 if (user == null)
                 {
                     throw new AppValidationException(
@@ -936,18 +939,35 @@ namespace VC.Public.Controllers
             };
         }
 
-        private Func<Task<ApplicationUser>> CreateLoginForNewActive(AddUpdateBillingAddressModel model)
+        private Func<Task<ApplicationUser>> CreateLoginForNewActive(AddUpdateBillingAddressModel model, int id)
         {
             return async () =>
             {
-                await _storefrontUserService.SendSuccessfulRegistration(model.Email, model.FirstName, model.LastName);
-                var user = await _storefrontUserService.SignInAsync(model.Email, model.Password);
+                await _userService.SendSuccessfulRegistration(model.Email, model.FirstName, model.LastName);
+                var user = await _userService.SignInAsync(id, model.Password);
                 if (user == null)
                 {
                     throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
                 }
                 return user;
             };
+        }
+
+        private async Task<ApplicationUser> CustomerPasswordLogin(LoginModel model)
+        {
+            var id = await _customerService.TryGetActiveIdByEmailAsync(model.Email);
+            if (!id.HasValue)
+            {
+                id = await _customerService.TryGetNotActiveIdByEmailAsync(model.Email);
+            }
+            if (!id.HasValue)
+            {
+                throw new AppValidationException(
+                    ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.IncorrectUserPassword]);
+            }
+            var user = await _userService.SignInAsync(id.Value, model.Password);
+            await HttpContext.SpinAuthorizationToken(_tokenService, null, user, _encryptionHost);
+            return user;
         }
 
         private async Task<bool?> EnsureLoggedIn(CustomerCartOrder cart)
@@ -959,8 +979,8 @@ namespace VC.Public.Controllers
 
             if ((bool?) cart.Order.Customer?.SafeData.Guest ?? false)
             {
-                var user = await _storefrontUserService.GetAsync(cart.Order.Customer.Id);
-                user = await _storefrontUserService.SignInNoStatusCheckingAsync(user);
+                var user = await _userService.GetAsync(cart.Order.Customer.Id);
+                user = await _userService.SignInNoStatusCheckingAsync(user);
                 if (user == null)
                 {
                     throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);

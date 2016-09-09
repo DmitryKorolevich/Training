@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.Account;
 using VitalChoice.Core.Base;
@@ -18,12 +16,12 @@ namespace VC.Admin.Controllers
 	[AllowAnonymous]
     public class AccountController : BaseApiController
     {
-	    private readonly IAdminUserService userService;
+	    private readonly IAdminUserService _userService;
 	    private readonly ExtendedUserManager _userManager;
 
 	    public AccountController(IAdminUserService userService, ExtendedUserManager userManager)
 	    {
-	        this.userService = userService;
+	        this._userService = userService;
 	        _userManager = userManager;
 	    }
 
@@ -35,15 +33,15 @@ namespace VC.Admin.Controllers
 				Email = user.Email,
 				FirstName = user.FirstName,
 				LastName = user.LastName,
-				IsSuperAdmin = await userService.IsSuperAdmin(user),
-				Permissions = await userService.GetUserPermissions(user)
+				IsSuperAdmin = await _userService.IsSuperAdmin(user),
+				Permissions = await _userService.GetUserPermissions(user)
 			};
 		}
 
 		[HttpGet]
 	    public async Task<Result<ActivateUserModel>> GetUser(Guid id)
 		{
-			var result = await userService.GetByTokenAsync(id);
+			var result = await _userService.GetByTokenAsync(id);
 			if (result == null)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserByActivationToken]);
@@ -69,7 +67,7 @@ namespace VC.Admin.Controllers
 			if (!Validate(model))
 				return null;
 
-			var user = await userService.GetAsync(model.PublicId);
+			var user = await _userService.GetAsync(model.PublicId);
 			if (user == null)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
@@ -81,9 +79,9 @@ namespace VC.Admin.Controllers
 			user.Status = UserStatus.Active;
 			user.ConfirmationToken = Guid.Empty;
 
-			await userService.UpdateAsync(user, null, model.Password);
+			await _userService.UpdateAsync(user, null, model.Password);
 
-			await userService.SignInAsync(user);
+			await _userService.SignInAsync(user);
 
 			return await PopulateUserInfoModel(user);
 		}
@@ -94,15 +92,19 @@ namespace VC.Admin.Controllers
 			if (!Validate(model))
 				return null;
 
-			await userService.ResetPasswordAsync(model.Email, model.Token, model.Password);
+		    var id = await _userService.GetIdByEmailAsync(model.Email);
+            ApplicationUser user = null;
 
-			var user = await userService.FindAsync(model.Email);
-			if (user == null)
+            if (id.HasValue)
+		    {
+		        user = await _userService.ResetPasswordAsync(id.Value, model.Token, model.Password);
+		    }
+		    if (user == null)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 			}
 
-			await userService.SignInAsync(user);
+			await _userService.SignInAsync(user);
 
 			return await PopulateUserInfoModel(user);
 		}
@@ -113,10 +115,16 @@ namespace VC.Admin.Controllers
 			if (!Validate(model))
 				return null;
 
-			var user = await userService.SignInAsync(model.Email, model.Password);
-			if (user == null)
+            var id = await _userService.GetIdByEmailAsync(model.Email);
+            ApplicationUser user = null;
+
+		    if (id.HasValue)
+		    {
+		        user = await _userService.SignInAsync(id.Value, model.Password);
+		    }
+		    if (user == null)
 			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.IncorrectUserPassword]);
 			}
 
 			return await PopulateUserInfoModel(user);
@@ -125,12 +133,15 @@ namespace VC.Admin.Controllers
 		[HttpGet]
 		public async Task<Result<UserInfoModel>> GetCurrentUser()
 		{
-			var context = HttpContext;
-
-			if (context.User.Identity.IsAuthenticated)
+			if (User.Identity.IsAuthenticated)
 			{
-			    var user = await userService.FindAsync(_userManager.GetUserName(context.User));
-				if (user == null)
+			    int id;
+                ApplicationUser user = null;
+                if (int.TryParse(_userManager.GetUserId(User), out id))
+			    {
+			        user = await _userService.FindAsync(id);
+			    }
+			    if (user == null)
 				{
 					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 				}
@@ -148,13 +159,19 @@ namespace VC.Admin.Controllers
 
 			if (context.User.Identity.IsAuthenticated)
 			{
-			    var user = await userService.FindAsync(_userManager.GetUserName(context.User));
-				if (user == null)
+                int id;
+                ApplicationUser user = null;
+
+                if (int.TryParse(_userManager.GetUserId(User), out id))
+                {
+                    user = await _userService.FindAsync(id);
+                }
+                if (user == null)
 				{
 					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 				}
 
-				await userService.SignOutAsync(user);
+				await _userService.SignOutAsync(user);
 			}
 
 			return true;

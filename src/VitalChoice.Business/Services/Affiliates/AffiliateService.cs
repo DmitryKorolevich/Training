@@ -94,7 +94,16 @@ namespace VitalChoice.Business.Services.Affiliates
 
         #region Affiliate
 
-        protected override bool LogObjectFullData { get { return true; } }
+        protected override bool LogObjectFullData => true;
+
+        public async Task<int?> GetAffiliateId(string email)
+        {
+            var id =
+                (await ObjectRepository.Query(a => a.Email == email).SelectAsync(a => a.Id, false)).FirstOrDefault();
+            if (id == 0)
+                return null;
+            return id;
+        }
 
         public async Task<PagedList<VAffiliate>> GetAffiliatesAsync(VAffiliateFilter filter)
         {
@@ -346,7 +355,7 @@ namespace VitalChoice.Business.Services.Affiliates
 
                     if (string.IsNullOrWhiteSpace(password) && model.StatusCode != suspendedCustomer)
                     {
-                        await _affiliateUserService.SendActivationAsync(model.Email);
+                        await _affiliateUserService.SendActivationAsync(model.Id);
                     }
 
                     transaction.Commit();

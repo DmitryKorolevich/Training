@@ -47,7 +47,11 @@ namespace VitalChoice.Interfaces.Services.Customers
 
 	    Task<CustomerDynamic> GetByEmailAsync(string email);
 
-		Task ActivateGuestAsync(string email, string token, string newPassword);
+	    Task<int?> TryGetActiveIdByEmailAsync(string email);
+
+	    Task<int?> TryGetNotActiveIdByEmailAsync(string email);
+
+        Task ActivateGuestAsync(int internalId, string token, string newPassword);
 
 	    Task UpdateEcommerceOnlyAsync(CustomerDynamic customer);
 
