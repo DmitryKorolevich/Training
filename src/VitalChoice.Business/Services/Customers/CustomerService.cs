@@ -873,7 +873,27 @@ namespace VitalChoice.Business.Services.Customers
                 withDefaults: true);
         }
 
-        public async Task ActivateGuestAsync(string email, string token, string newPassword)
+        public async Task<int?> TryGetActiveIdByEmailAsync(string email)
+        {
+            var id = (await
+                ObjectRepository.Query(c => c.Email == email && c.StatusCode == (int) CustomerStatus.Active)
+                    .SelectAsync(c => c.Id, false)).FirstOrDefault();
+            if (id == 0)
+                return null;
+            return id;
+        }
+
+        public async Task<int?> TryGetNotActiveIdByEmailAsync(string email)
+        {
+            var id = (await
+                ObjectRepository.Query(c => c.Email == email && c.StatusCode != (int) CustomerStatus.Active)
+                    .SelectAsync(c => c.Id, false)).FirstOrDefault();
+            if (id == 0)
+                return null;
+            return id;
+        }
+
+        public async Task ActivateGuestAsync(int internalId, string token, string newPassword)
         {
             CustomerDynamic customer = null;
             ApplicationUser applicationUser;
@@ -882,7 +902,7 @@ namespace VitalChoice.Business.Services.Customers
                 var customerUpdated = false;
                 try
                 {
-                    customer = await SelectFirstAsync(x => x.Email.Equals(email));
+                    customer = await SelectFirstAsync(x => x.Id == internalId);
 
                     if (customer == null)
                     {
@@ -895,7 +915,7 @@ namespace VitalChoice.Business.Services.Customers
 
                     customerUpdated = true;
 
-                    applicationUser = await _storefrontUserService.ResetPasswordAsync(email, token, newPassword);
+                    applicationUser = await _storefrontUserService.ResetPasswordAsync(customer.Id, token, newPassword);
 
                     tran.Commit();
 
@@ -906,7 +926,7 @@ namespace VitalChoice.Business.Services.Customers
                     if (customerUpdated) //this needs to be done since distributed transactions not supported yet
                         //todo: refactor this once distributed transactions arrive
                     {
-                        applicationUser = await _storefrontUserService.FindAsync(email);
+                        applicationUser = await _storefrontUserService.FindAsync(customer.Id);
 
                         applicationUser.Status = UserStatus.NotActive;
 

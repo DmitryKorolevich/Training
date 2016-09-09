@@ -104,24 +104,26 @@ namespace VitalChoice.Business.Services.Users
 			return base.ValidateUserInternalAsync(user);
 		}
 
-        protected override async Task ValidateUserOnSignIn(string login)
-        {
-            var appUser = await UserManager.Users.FirstOrDefaultAsync(x => x.Email.Equals(login));
+	    protected override async Task<ApplicationUser> ValidateUserOnSignIn(int internalId)
+	    {
+	        var appUser = await UserManager.Users.FirstOrDefaultAsync(x => x.Id == internalId);
 
-            if (appUser != null)
-            {
-                var customer = await _customerRepositoryAsync.Query(p => p.Id == appUser.Id).SelectFirstOrDefaultAsync(false);
-                if (customer != null && customer.StatusCode == (int) CustomerStatus.Pending &&
-                    customer.IdObjectType == (int) CustomerType.Wholesale)
-                {
-                    throw new WholesalePendingException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
-                }
-            }
+	        if (appUser != null)
+	        {
+	            var customer =
+	                await _customerRepositoryAsync.Query(p => p.Id == appUser.Id).SelectFirstOrDefaultAsync(false);
+	            if (customer != null && customer.StatusCode == (int) CustomerStatus.Pending &&
+	                customer.IdObjectType == (int) CustomerType.Wholesale)
+	            {
+	                throw new WholesalePendingException(
+	                    ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
+	            }
+	        }
 
-            await base.ValidateUserOnSignIn(login);
-        }
+	        return await base.ValidateUserOnSignIn(internalId);
+	    }
 
-        public async Task SendSuccessfulRegistration(string email, string firstName, string lastName)
+	    public async Task SendSuccessfulRegistration(string email, string firstName, string lastName)
 		{
 			await NotificationService.SendCustomerRegistrationSuccess(email, new SuccessfulUserRegistration()
 			{
@@ -131,7 +133,7 @@ namespace VitalChoice.Business.Services.Users
 			});
 		}
 
-        public async Task SendWholesaleSuccessfulRegistration(string email, string firstName, string lastName)
+	    public async Task SendWholesaleSuccessfulRegistration(string email, string firstName, string lastName)
         {
             await NotificationService.SendWholesaleCustomerRegistrationSuccess(email, new SuccessfulUserRegistration()
             {

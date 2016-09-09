@@ -15,6 +15,8 @@ namespace VitalChoice.Interfaces.Services.Affiliates
     {
         #region Affiliates
 
+        Task<int?> GetAffiliateId(string email);
+
         Task<PagedList<VAffiliate>> GetAffiliatesAsync(VAffiliateFilter filter);
 
         Task<bool> SendAffiliateEmailAsync(BasicEmail model);

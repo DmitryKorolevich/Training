@@ -75,7 +75,12 @@ namespace VC.Public.Controllers
 
             try
             {
-                var user = await _userService.SignInAsync(model.Email, model.Password);
+                ApplicationUser user = null;
+                var id = await _affiliateService.GetAffiliateId(model.Email);
+                if (id.HasValue)
+                {
+                    user = await _userService.SignInAsync(id.Value, model.Password);
+                }
                 if (user == null)
                 {
                     throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
@@ -96,11 +101,14 @@ namespace VC.Public.Controllers
 
         public async Task<IActionResult> Logout()
         {
-            var context = HttpContext;
-
-            if (context.User.Identity.IsAuthenticated)
+            if (HttpContext.User.Identity.IsAuthenticated)
             {
-                var user = await _userService.FindAsync(_userManager.GetUserName(context.User));
+                int id;
+                ApplicationUser user = null;
+                if (int.TryParse(_userManager.GetUserId(User), out id))
+                {
+                    user = await _userService.FindAsync(id);
+                }
                 if (user == null)
                 {
                     throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser])
@@ -216,9 +224,12 @@ namespace VC.Public.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            await _userService.ResetPasswordAsync(model.Email, model.Token, model.Password);
-
-            var user = await _userService.FindAsync(model.Email);
+            ApplicationUser user = null;
+            var id = await _affiliateService.GetAffiliateId(model.Email);
+            if (id.HasValue)
+            {
+                user = await _userService.ResetPasswordAsync(id.Value, model.Token, model.Password);
+            }
             if (user == null)
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
@@ -242,7 +253,12 @@ namespace VC.Public.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var user = await _userService.FindAsync(model.Email);
+            ApplicationUser user = null;
+            var id = await _affiliateService.GetAffiliateId(model.Email);
+            if (id.HasValue)
+            {
+                user = await _userService.FindAsync(id.Value);
+            }
             if (user == null)
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
