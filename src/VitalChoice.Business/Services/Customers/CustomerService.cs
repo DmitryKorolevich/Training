@@ -176,21 +176,40 @@ namespace VitalChoice.Business.Services.Customers
         {
             var errors = new List<MessageInfo>();
 
-            if (!string.IsNullOrEmpty(model.Email) &&
-                (model.StatusCode == (int) CustomerStatus.Active || model.StatusCode == (int) CustomerStatus.PhoneOnly))
+            if (!string.IsNullOrEmpty(model.Email))
             {
-                var customerSameEmail =
-                    await
-                        _customerRepositoryAsync.Query(
-                                new CustomerQuery().ActiveOrPhoneOnly().WithEmail(model.Email))
-                            .Include(c => c.OptionValues)
-                            .SelectAsync(false);
-
-                if (customerSameEmail.Count > 0 && customerSameEmail.All(c => c.Id != model.Id))
+                var currentCustomer = await _customerRepositoryAsync.Query(c => c.Id == model.Id).SelectFirstOrDefaultAsync(false);
+                if (model.StatusCode == (int)CustomerStatus.Active &&
+                    (currentCustomer == null || currentCustomer.StatusCode != (int)CustomerStatus.Active))
                 {
-                    throw new AppValidationException(
-                        string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready],
-                            model.Email));
+                    var customerSameEmail =
+                        await
+                            _customerRepositoryAsync.Query(
+                                    new CustomerQuery().Active().WithEmail(model.Email))
+                                .SelectAsync(false);
+
+                    if (customerSameEmail.Count > 0 && customerSameEmail.All(c => c.Id != model.Id))
+                    {
+                        throw new AppValidationException(
+                            string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready],
+                                model.Email));
+                    }
+                }
+                else if ((model.StatusCode == (int)CustomerStatus.Active || model.StatusCode == (int)CustomerStatus.PhoneOnly) &&
+                         !string.Equals(currentCustomer?.Email, model.Email, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    var customerSameEmail =
+                        await
+                            _customerRepositoryAsync.Query(
+                                    new CustomerQuery().ActiveOrPhoneOnly().WithEmail(model.Email))
+                                .SelectAsync(false);
+
+                    if (customerSameEmail.Count > 0 && customerSameEmail.All(c => c.Id != model.Id))
+                    {
+                        throw new AppValidationException(
+                            string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.EmailIsTakenAlready],
+                                model.Email));
+                    }
                 }
             }
 
