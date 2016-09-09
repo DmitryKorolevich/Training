@@ -1,7 +1,6 @@
 ﻿using System.Net;
-using System.Text;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
-using VitalChoice.Core.Services;
 using VitalChoice.Validation.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -11,9 +10,6 @@ using Newtonsoft.Json;
 using Templates.Strings;
 using Templates.Strings.Core;
 using VitalChoice.Caching.Debuging;
-using VitalChoice.Caching.Extensions;
-using VitalChoice.Caching.Interfaces;
-using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 
@@ -48,7 +44,7 @@ namespace VitalChoice.Core.GlobalFilters
                             {
                                 StatusCode = (int) HttpStatusCode.OK
                             };
-                        logger.LogError(0, FormatUpdateException(context, dbUpdateException));
+                        logger.LogError(FormatUpdateException(context, dbUpdateException));
                     }
                     else
                     {
@@ -56,7 +52,7 @@ namespace VitalChoice.Core.GlobalFilters
                         {
                             StatusCode = (int) HttpStatusCode.InternalServerError
                         };
-                        logger.LogError(0, context.Exception.ToString());
+                        logger.LogError($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
                     }
                 }
             }
@@ -64,7 +60,7 @@ namespace VitalChoice.Core.GlobalFilters
             {
                 var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
                 var logger = loggerFactory.CreateLogger<ApiExceptionFilterAttribute>();
-                logger.LogError(context.Exception.ToString());
+                logger.LogError($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
                 var exception = context.Exception as AccessDeniedException;
                 if (exception != null)
                 {
@@ -92,7 +88,7 @@ namespace VitalChoice.Core.GlobalFilters
         internal static string FormatUpdateException(ExceptionContext context, DbUpdateException dbUpdateException)
         {
             var updateIssues = CacheDebugger.ProcessDbUpdateException(dbUpdateException);
-            ExStringBuilder builder = new ExStringBuilder(context.Exception.ToString());
+            ExStringBuilder builder = new ExStringBuilder($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
             builder += "\nTrace Data:";
             var jsonSerializer = JsonSerializer.Create(new JsonSerializerSettings
             {

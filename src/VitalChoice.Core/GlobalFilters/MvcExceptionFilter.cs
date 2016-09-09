@@ -22,6 +22,7 @@ using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Exceptions;
 using VitalChoice.Profiling.Base;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace VitalChoice.Core.GlobalFilters
 {
@@ -105,7 +106,7 @@ namespace VitalChoice.Core.GlobalFilters
 				            SetDataChangedError(context, result);
                             var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
                             var logger = loggerFactory.CreateLogger<MvcExceptionFilter>();
-				            logger.LogError(0, ApiExceptionFilterAttribute.FormatUpdateException(context, dbUpdateException));
+				            logger.LogError(ApiExceptionFilterAttribute.FormatUpdateException(context, dbUpdateException));
 				        }
 				        else
 				        {
@@ -113,7 +114,7 @@ namespace VitalChoice.Core.GlobalFilters
 				            result.StatusCode = (int) HttpStatusCode.InternalServerError;
                             var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
                             var logger = loggerFactory.CreateLogger<MvcExceptionFilter>();
-                            logger.LogError(0, context.Exception.ToString());
+				            logger.LogError($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
 				        }
 				    }
 				}
@@ -121,7 +122,7 @@ namespace VitalChoice.Core.GlobalFilters
 				{
                     var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
                     var logger = loggerFactory.CreateLogger<MvcExceptionFilter>();
-                    logger.LogError(context.Exception.ToString());
+				    logger.LogError($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
 
                     if (apiException.Status == HttpStatusCode.NotFound)
 					{

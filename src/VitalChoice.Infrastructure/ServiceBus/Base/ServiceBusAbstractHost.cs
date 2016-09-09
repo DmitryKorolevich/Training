@@ -130,7 +130,25 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 try
                 {
                     BrokeredMessage message;
-                    if (batchSize >= 196608 || !_sendQue.TryDequeue(out message))
+                    if (batchSize < 196608 && _sendQue.TryDequeue(out message))
+                    {
+                        _readyToDisposeReceive.Reset();
+                        if (message.Size >= 196608)
+                        {
+                            Logger.LogError($"Message {message.MessageId} too big: {message.Size} bytes");
+                            continue;
+                        }
+                        batchSize += message.Size;
+                        if (batchSize >= 196608)
+                        {
+                            _sendQue.Enqueue(message);
+                        }
+                        else
+                        {
+                            messages.Add(message);
+                        }
+                    }
+                    else
                     {
                         if (messages.Count > 0)
                         {
@@ -149,32 +167,17 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                             batchSize = 0;
                             if (_sendQue.Count == 0)
                             {
+                                _readyToDisposeReceive.Set();
                                 _newMessageSignal.WaitOne();
                                 _newMessageSignal.Reset();
                             }
                         }
                         else
                         {
+                            _readyToDisposeReceive.Set();
                             _newMessageSignal.WaitOne();
                             _newMessageSignal.Reset();
                         }
-                        _readyToDisposeReceive.Set();
-                        continue;
-                    }
-                    _readyToDisposeReceive.Reset();
-                    if (message.Size >= 196608)
-                    {
-                        Logger.LogError($"Message {message.MessageId} too big: {message.Size} bytes");
-                        continue;
-                    }
-                    batchSize += message.Size;
-                    if (batchSize >= 196608)
-                    {
-                        _sendQue.Enqueue(message);
-                    }
-                    else
-                    {
-                        messages.Add(message);
                     }
                 }
                 catch (Exception e)
