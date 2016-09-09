@@ -661,8 +661,12 @@ namespace VitalChoice.Business.Services.Customers
             appUser.UserName = email;
 
             var profileAddress = model.ProfileAddress;
-            appUser.FirstName = profileAddress.Data.FirstName;
-            appUser.LastName = profileAddress.Data.LastName;
+            appUser.FirstName = profileAddress.SafeData.FirstName;
+            if (appUser.FirstName == null)
+                appUser.FirstName = string.Empty;
+            appUser.LastName = profileAddress.SafeData.LastName;
+            if (appUser.LastName == null)
+                appUser.LastName = string.Empty;
 
             Customer entity;
             var paymentCopies =
