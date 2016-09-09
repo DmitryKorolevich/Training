@@ -131,8 +131,7 @@ function ($scope, $rootScope, $state, $stateParams, gcService, orderService, toa
             {
                 ToName: name,
                 ToEmail: $scope.gc.Email,
-                FromName: 'Vital Choice',
-                Codes: [$scope.gc],
+                Gifts: [{ Code: $scope.gc.Code, Amount: $scope.gc.Balance }],
             };
         modalUtil.open('app/modules/gc/partials/sendEmail.html', 'sendEmailController', data);
     };

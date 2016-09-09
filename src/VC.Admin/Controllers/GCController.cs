@@ -174,7 +174,7 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return false;
             var item = model.Convert();
-            return await GCService.SendGiftCertificateEmailAsync(item);
+            return await GCService.SendAdminGiftCertificateEmailAsync(item);
         }
 
         [AdminAuthorize(PermissionType.Marketing)]

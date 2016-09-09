@@ -298,9 +298,9 @@ namespace VitalChoice.Business.Services.Products
             return items;
         }
 
-        public async Task<bool> SendGiftCertificateEmailAsync(BasicEmail model)
+        public async Task<bool> SendAdminGiftCertificateEmailAsync(GiftAdminNotificationEmail model)
         {
-            await notificationService.SendBasicEmailAsync(model);
+            await notificationService.SendGiftAdminNotificationEmailAsync(model.Email, model);
             return true;
         }
 

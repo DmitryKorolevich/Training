@@ -69,13 +69,31 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, gcService, toaster
         }
     };
 
-    $scope.send = function () {
+    $scope.send = function ()
+    {
+        var items = [];
+        $.each($scope.codes, function (index, gc)
+        {
+            var item = {
+                Code: gc.Code,
+                Amount: gc.Balance
+            };
+            items.push(item);
+        });
+        var name = '';
+        if ($scope.gc.FirstName)
+        {
+            name += $scope.gc.FirstName + ' ';
+        }
+        if ($scope.gc.LastName)
+        {
+            name += $scope.gc.LastName;
+        }
         var data =
             {
-                ToName: $scope.gc.FirstName || $scope.gc.LastName ? $scope.gc.FirstName + ' ' + $scope.gc.LastName: null,
+                ToName: name,
                 ToEmail: $scope.gc.Email,
-                FromName: 'Vital Choice',
-                Codes: $scope.codes,
+                Gifts: items,
             };
         modalUtil.open('app/modules/gc/partials/sendEmail.html', 'sendEmailController', data);
     };

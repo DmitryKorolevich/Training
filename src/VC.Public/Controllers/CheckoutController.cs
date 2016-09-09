@@ -759,7 +759,7 @@ namespace VC.Public.Controllers
             emailModel.EGifts = order.Skus.Where(p => p.Sku.Product.IdObjectType == (int) ProductType.EGс).
                 SelectMany(p => p.GcsGenerated)
                 .Where(p => model.All || model.SelectedCodes.Contains(p.Code))
-                .Select(p => new EGiftEmailModel()
+                .Select(p => new GiftEmailModel()
                 {
                     Code = p.Code,
                     Amount = p.Balance
