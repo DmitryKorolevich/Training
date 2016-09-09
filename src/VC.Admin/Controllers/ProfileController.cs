@@ -19,12 +19,12 @@ namespace VC.Admin.Controllers
 	[AdminAuthorize]
     public class ProfileController : BaseApiController
     {
-	    private readonly IAdminUserService userService;
+	    private readonly IAdminUserService _userService;
 	    private readonly ExtendedUserManager _userManager;
 
 	    public ProfileController(IAdminUserService userService, ExtendedUserManager userManager)
 	    {
-	        this.userService = userService;
+	        this._userService = userService;
 	        _userManager = userManager;
 	    }
 
@@ -49,7 +49,7 @@ namespace VC.Admin.Controllers
 
                 if (int.TryParse(_userManager.GetUserId(User), out id))
 		        {
-		            user = await userService.FindAsync(id);
+		            user = await _userService.FindAsync(id);
 		        }
 		        if (user == null)
 				{
@@ -63,12 +63,12 @@ namespace VC.Admin.Controllers
 				user.Email = profileModel.Email;
 			    user.UserName = profileModel.Email;
 
-			    user = profileModel.Mode.Mode == UpdateProfileMode.WithPassword ? await userService.UpdateWithPasswordChangeAsync(user, profileModel.OldPassword, profileModel.NewPassword)
-				    : await userService.UpdateAsync(user);
+			    user = profileModel.Mode.Mode == UpdateProfileMode.WithPassword ? await _userService.UpdateWithPasswordChangeAsync(user, profileModel.OldPassword, profileModel.NewPassword)
+				    : await _userService.UpdateAsync(user);
 
 			    if (oldEmail != user.Email)
 			    {
-				    await userService.RefreshSignInAsync(user);
+				    await _userService.RefreshSignInAsync(user);
 			    }
 
 			    return new GetProfileModel()
@@ -95,7 +95,7 @@ namespace VC.Admin.Controllers
 
                 if (int.TryParse(_userManager.GetUserId(User), out id))
                 {
-                    user = await userService.FindAsync(id);
+                    user = await _userService.FindAsync(id);
                 }
                 if (user == null)
 				{

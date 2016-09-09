@@ -58,8 +58,6 @@ using VitalChoice.ObjectMapping.Base;
 using VitalChoice.SharedWeb.Helpers;
 using VitalChoice.Validation.Models;
 using ApiException = VitalChoice.Ecommerce.Domain.Exceptions.ApiException;
-using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 
 namespace VC.Public.Controllers
 {
@@ -67,7 +65,7 @@ namespace VC.Public.Controllers
     {
         private const string CATALOG_PRODUCT_NAME = "pnc";
 
-        private readonly IStorefrontUserService _storefrontUserService;
+        private readonly IStorefrontUserService _userService;
         private readonly IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> _paymentMethodConverter;
         private readonly IProductService _productService;
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodConverter;
@@ -79,7 +77,6 @@ namespace VC.Public.Controllers
         private readonly ILogger _logger;
         private readonly ICountryNameCodeResolver _countryNameCodeResolver;
         private readonly IEncryptedOrderExportService _exportService;
-        private readonly ICustomerService _customerService;
         private readonly ITokenService _tokenService;
         private readonly IObjectEncryptionHost _encryptionHost;
 
@@ -96,7 +93,7 @@ namespace VC.Public.Controllers
             BrontoService brontoService,
             ITransactionAccessor<EcommerceContext> transactionAccessor, ISettingService settingService, ILoggerFactory loggerProvider,
             ExtendedUserManager userManager, ICountryNameCodeResolver countryNameCodeResolver, ReferenceData referenceData,
-            AppSettings appSettings, IEncryptedOrderExportService exportService, ICustomerService customerService1, IObjectEncryptionHost encryptionHost, ITokenService tokenService)
+            AppSettings appSettings, IEncryptedOrderExportService exportService, IObjectEncryptionHost encryptionHost, ITokenService tokenService)
             : base(
                 customerService, referenceData, authorizationService, checkoutService, orderService,
                 skuMapper, productMapper, settingService, userManager, appSettings)
@@ -110,7 +107,6 @@ namespace VC.Public.Controllers
             _transactionAccessor = transactionAccessor;
             _countryNameCodeResolver = countryNameCodeResolver;
             _exportService = exportService;
-            _customerService = customerService1;
             _encryptionHost = encryptionHost;
             _tokenService = tokenService;
             _affiliateService = affiliateService;
@@ -955,10 +951,10 @@ namespace VC.Public.Controllers
 
         private async Task<ApplicationUser> CustomerPasswordLogin(LoginModel model)
         {
-            var id = await _customerService.TryGetActiveIdByEmailAsync(model.Email);
+            var id = await CustomerService.TryGetActiveIdByEmailAsync(model.Email);
             if (!id.HasValue)
             {
-                id = await _customerService.TryGetNotActiveIdByEmailAsync(model.Email);
+                id = await CustomerService.TryGetNotActiveIdByEmailAsync(model.Email);
             }
             if (!id.HasValue)
             {
