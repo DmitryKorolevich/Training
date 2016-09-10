@@ -2,7 +2,7 @@
 
 namespace VitalChoice.Ecommerce.Domain.Mail
 {
-    public class EGiftEmailModel
+    public class GiftEmailModel
     {
         public string Code { get; set; }
         public decimal Amount { get; set; }
@@ -16,6 +16,6 @@ namespace VitalChoice.Ecommerce.Domain.Mail
         public string Email { get; set; }
         public string Message { get; set; }
         public string PublicHost { get; set; }
-        public IList<EGiftEmailModel> EGifts { get; set; }
+        public IList<GiftEmailModel> EGifts { get; set; }
     }
 }

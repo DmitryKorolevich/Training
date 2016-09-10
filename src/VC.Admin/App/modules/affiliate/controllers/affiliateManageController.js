@@ -38,7 +38,7 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                     $scope.affiliate.DateEdited = result.Data.DateEdited;
                     $scope.affiliate.Email = result.Data.Email;
                     $scope.affiliate.newEmail = '';
-                    $scope.affiliate.emailConfirm = '';
+                    $scope.affiliate.emailUIConfirm = '';
                     $scope.affiliate.StatusCode = result.Data.StatusCode;
                     $scope.affiliate.ActivatePending = false;
                     $scope.options.LoginAsAffiliateUrl = affiliateService.getLoginAsAffiliateUrl($scope.affiliate.Id, $rootScope.buildNumber);
@@ -188,10 +188,10 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
             if ($scope.forms.mainForm.$valid)
             {
                 var data = angular.copy($scope.affiliate);
-                if (data.newEmail || data.emailConfirm)
+                if (data.newEmail || data.emailUIConfirm)
                 {
                     data.Email = data.newEmail;
-                    data.EmailConfirm = data.emailConfirm;
+                    data.EmailConfirm = data.emailUIConfirm;
                 } else
                 {
                     data.EmailConfirm = data.Email;

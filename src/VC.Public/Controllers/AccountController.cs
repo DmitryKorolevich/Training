@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using VC.Public.Models.Auth;
-using VitalChoice.Core.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Payments;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Interfaces.Services.Affiliates;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using VC.Public.Helpers;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Core.Services;
@@ -104,16 +100,15 @@ namespace VC.Public.Controllers
 				return View("Login", model);
 			}
 
-            ApplicationUser user = null;
+            ApplicationUser user;
 	        try
 	        {
-	            user = await _userService.SignInAsync(model.Email, model.Password);
-                await HttpContext.SpinAuthorizationToken(_tokenService, null, user, _encryptionHost);
+	            user = await CustomerPasswordLogin(model);
 	            var cartUid = HttpContext.GetCartUid();
 	            if (cartUid == null || await CheckoutService.GetCartItemsCount(cartUid.Value) == 0)
 	            {
 	                var cart = await CheckoutService.GetOrCreateCart(null, user.Id);
-                    HttpContext.SetCartUid(cart.CartUid);
+	                HttpContext.SetCartUid(cart.CartUid);
 	            }
 	        }
 	        catch (WholesalePendingException)
@@ -139,12 +134,34 @@ namespace VC.Public.Controllers
 			return RedirectToAction("Index", "Profile");
 	    }
 
-        [HttpPost]
-        public async Task<Result<string>> CheckEmail(object model, string email)
-        {
-            var user = await _userService.FindAsync(email);
-            return user != null ? $"/account/login?alreadytakenemail={email}&type=2" : null;//2 - wholesale
-        }
+	    private async Task<ApplicationUser> CustomerPasswordLogin(LoginModel model)
+	    {
+	        var id = await _customerService.TryGetActiveIdByEmailAsync(model.Email);
+	        if (!id.HasValue)
+	        {
+	            id = await _customerService.TryGetNotActiveIdByEmailAsync(model.Email);
+	        }
+	        if (!id.HasValue)
+	        {
+	            throw new AppValidationException(
+	                ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.IncorrectUserPassword]);
+	        }
+	        var user = await _userService.SignInAsync(id.Value, model.Password);
+	        await HttpContext.SpinAuthorizationToken(_tokenService, null, user, _encryptionHost);
+	        return user;
+	    }
+
+	    [HttpPost]
+	    public async Task<Result<string>> CheckEmail(object model, string email)
+	    {
+	        var id = await _customerService.TryGetActiveIdByEmailAsync(email);
+	        if (id.HasValue)
+	        {
+	            var user = await _userService.FindAsync(id.Value);
+	            return user != null ? $"/account/login?alreadytakenemail={email}&type=2" : null; //2 - wholesale
+	        }
+	        return null;
+	    }
 
 	    public async Task<IActionResult> Logout()
 	    {
@@ -152,7 +169,12 @@ namespace VC.Public.Controllers
 
 	        if (context.User.Identity.IsAuthenticated)
 	        {
-	            var user = await _userService.FindAsync(_userManager.GetUserName(context.User));
+                int id;
+                ApplicationUser user = null;
+                if (int.TryParse(_userManager.GetUserId(context.User), out id))
+	            {
+	                user = await _userService.FindAsync(id);
+	            }
 	            if (user == null)
 	            {
 	                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser])
@@ -319,7 +341,7 @@ namespace VC.Public.Controllers
 				return View(model);
 			}
 
-			await _userService.SendSuccessfulRegistration(model.Email, model.FirstName, model.LastName);
+			await _userService.SendSuccessfulRegistration(customer.Email, model.FirstName, model.LastName);
 
 			return await Login(new LoginModel() { Email = model.Email, Password = model.Password }, returnUrl);
 		}
@@ -407,9 +429,17 @@ namespace VC.Public.Controllers
 		{
 			if (!ModelState.IsValid)
 				return View(model);
-
-			var user = await _userService.FindAsync(model.Email);
-			if (user == null)
+		    var id = await _customerService.TryGetActiveIdByEmailAsync(model.Email);
+            ApplicationUser user = null;
+		    if (!id.HasValue)
+		    {
+		        id = await _customerService.TryGetNotActiveIdByEmailAsync(model.Email);
+		    }
+            if (id.HasValue)
+		    {
+		        user = await _userService.FindAsync(id.Value);
+		    }
+		    if (user == null)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUserResetPassword]);
 			}
@@ -417,14 +447,14 @@ namespace VC.Public.Controllers
 			if (!user.IsConfirmed && user.Status == UserStatus.NotActive)
 				// the case when guest checkout user wants to activate himself
 			{
-				await _customerService.ActivateGuestAsync(model.Email, model.Token, model.Password);
+				await _customerService.ActivateGuestAsync(id.Value, model.Token, model.Password);
             }
 			else
 			{
-				await _userService.ResetPasswordAsync(model.Email, model.Token, model.Password);
+				await _userService.ResetPasswordAsync(id.Value, model.Token, model.Password);
             }
 
-            await _userService.SignInAsync(await _userService.FindAsync(model.Email));
+            user = await _userService.SignInAsync(await _userService.FindAsync(id.Value));
             await HttpContext.SpinAuthorizationToken(_tokenService, null, user, _encryptionHost);
 
             return await Login(new LoginModel() { Email = model.Email, Password = model.Password }, string.Empty);
@@ -446,7 +476,12 @@ namespace VC.Public.Controllers
 			if (!ModelState.IsValid)
                 return View(model);
 
-            var user = await _userService.FindAsync(model.Email);
+            var id = await _customerService.TryGetActiveIdByEmailAsync(model.Email);
+            ApplicationUser user = null;
+            if (id.HasValue)
+            {
+                user = await _userService.FindAsync(id.Value);
+            }
             if (user == null)
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);

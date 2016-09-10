@@ -370,7 +370,7 @@ namespace VC.Admin.Controllers
 
                 if (customer.StatusCode != (int)CustomerStatus.Suspended && !String.IsNullOrEmpty(customer.Email))
                 {
-                    await _storefrontUserService.SendActivationAsync(customer.Email);
+                    await _storefrontUserService.SendActivationAsync(customer.Id);
                 }
             }
             var toReturn = await _customerMapper.ToModelAsync<AddUpdateCustomerModel>(customer);

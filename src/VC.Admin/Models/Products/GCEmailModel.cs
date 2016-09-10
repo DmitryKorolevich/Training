@@ -1,4 +1,5 @@
-﻿using VC.Admin.Validators.Product;
+﻿using System.Collections.Generic;
+using VC.Admin.Validators.Product;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Attributes;
@@ -14,23 +15,19 @@ namespace VC.Admin.Models.Products
         [Localized(GeneralFieldNames.Email)]
         public string ToEmail { get; set; }
 
-        public string FromName { get; set; }
-        
-        public string Subject { get; set; }
-
         [Localized(GeneralFieldNames.Message)]
         public string Message { get; set; }
 
-        public BasicEmail Convert()
+        public IList<GiftEmailModel> Gifts { get; set; }
+
+        public GiftAdminNotificationEmail Convert()
         {
-            BasicEmail toReturn = new BasicEmail
+            GiftAdminNotificationEmail toReturn = new GiftAdminNotificationEmail
             {
-                ToName = ToName,
-                ToEmail = ToEmail,
-                FromName = FromName,
-                Subject = Subject,
-                Body = Message,
-                IsHTML=false,
+                Recipient = ToName,
+                Email = ToEmail,
+                Message = Message,
+                Gifts = Gifts
             };
 
             return toReturn;

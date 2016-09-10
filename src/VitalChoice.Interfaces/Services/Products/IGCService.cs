@@ -24,7 +24,7 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<ICollection<GiftCertificate>> AddManualGiftCertificatesAsync(int quantity,GiftCertificate model);
 
-        Task<bool> SendGiftCertificateEmailAsync(BasicEmail model);
+        Task<bool> SendAdminGiftCertificateEmailAsync(GiftAdminNotificationEmail model);
 
         Task<bool> DeleteGiftCertificateAsync(int id);
 

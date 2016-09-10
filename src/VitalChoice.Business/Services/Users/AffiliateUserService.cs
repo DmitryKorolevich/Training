@@ -3,10 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using VitalChoice.Data.Context;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.Transaction;
-using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Users;
@@ -110,23 +108,25 @@ namespace VitalChoice.Business.Services.Users
 		}
 
 
-	    protected override async Task ValidateUserOnSignIn(string login)
-	    {
-	        var appUser = await UserManager.Users.FirstOrDefaultAsync(x => x.Email.Equals(login));
+        protected override async Task<ApplicationUser> ValidateUserOnSignIn(int internalId)
+        {
+            var appUser = await UserManager.Users.FirstOrDefaultAsync(x => x.Id == internalId);
 
-	        if (appUser != null)
-	        {
-	            var affiliate = await _affiliateRepositoryAsync.Query(p => p.Id == appUser.Id).SelectFirstOrDefaultAsync(false);
-	            if (affiliate != null && affiliate.StatusCode == (int) AffiliateStatus.Pending)
-	            {
-	                throw new AffiliatePendingException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
-	            }
-	        }
+            if (appUser != null)
+            {
+                var affiliate =
+                    await _affiliateRepositoryAsync.Query(p => p.Id == appUser.Id).SelectFirstOrDefaultAsync(false);
+                if (affiliate != null && affiliate.StatusCode == (int) AffiliateStatus.Pending)
+                {
+                    throw new AffiliatePendingException(
+                        ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
+                }
+            }
 
-	        await base.ValidateUserOnSignIn(login);
-	    }
+            return await base.ValidateUserOnSignIn(internalId);
+        }
 
-	    public async Task SendSuccessfulRegistration(string email, string firstName, string lastName)
+        public async Task SendSuccessfulRegistration(string email, string firstName, string lastName)
 		{
 			await NotificationService.SendAffiliateRegistrationSuccess(email, new SuccessfulUserRegistration()
 			{

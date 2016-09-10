@@ -46,6 +46,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.ContentCrossSells;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Content;
@@ -277,8 +278,12 @@ namespace VC.Public.Controllers
             {
                 return View(model);
             }
-
-            var user = await _storefrontUserService.FindAsync(_userManager.GetUserName(User));
+            ApplicationUser user = null;
+            int id;
+            if (int.TryParse(_userManager.GetUserId(User), out id))
+            {
+                user = await _storefrontUserService.FindAsync(id);
+            }
             if (user == null)
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);

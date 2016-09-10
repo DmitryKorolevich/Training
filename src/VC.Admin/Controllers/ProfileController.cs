@@ -9,6 +9,7 @@ using VC.Admin.Validators.Profile;
 using VitalChoice.Core.Base;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Users;
 using VitalChoice.Validation.Attributes;
@@ -18,12 +19,12 @@ namespace VC.Admin.Controllers
 	[AdminAuthorize]
     public class ProfileController : BaseApiController
     {
-	    private readonly IAdminUserService userService;
+	    private readonly IAdminUserService _userService;
 	    private readonly ExtendedUserManager _userManager;
 
 	    public ProfileController(IAdminUserService userService, ExtendedUserManager userManager)
 	    {
-	        this.userService = userService;
+	        this._userService = userService;
 	        _userManager = userManager;
 	    }
 
@@ -31,9 +32,7 @@ namespace VC.Admin.Controllers
 		[ControlMode(UpdateProfileMode.Default, typeof(UpdateProfileSettings))]
 		public async Task<Result<GetProfileModel>> UpdateProfile([FromBody]UpdateProfileModel profileModel)
 		{
-			var context = HttpContext;
-
-		    if (context.User.Identity.IsAuthenticated)
+		    if (User.Identity.IsAuthenticated)
 		    {
 		        var settings = new UpdateProfileSettings
 		        {
@@ -45,9 +44,14 @@ namespace VC.Admin.Controllers
 		        };
 		        if (!Validate(profileModel, settings))
 					return null;
+		        int id;
+                ApplicationUser user = null;
 
-				var user = await userService.FindAsync(_userManager.GetUserName(context.User));
-				if (user == null)
+                if (int.TryParse(_userManager.GetUserId(User), out id))
+		        {
+		            user = await _userService.FindAsync(id);
+		        }
+		        if (user == null)
 				{
 					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 				}
@@ -59,12 +63,12 @@ namespace VC.Admin.Controllers
 				user.Email = profileModel.Email;
 			    user.UserName = profileModel.Email;
 
-			    user = profileModel.Mode.Mode == UpdateProfileMode.WithPassword ? await userService.UpdateWithPasswordChangeAsync(user, profileModel.OldPassword, profileModel.NewPassword)
-				    : await userService.UpdateAsync(user);
+			    user = profileModel.Mode.Mode == UpdateProfileMode.WithPassword ? await _userService.UpdateWithPasswordChangeAsync(user, profileModel.OldPassword, profileModel.NewPassword)
+				    : await _userService.UpdateAsync(user);
 
 			    if (oldEmail != user.Email)
 			    {
-				    await userService.RefreshSignInAsync(user);
+				    await _userService.RefreshSignInAsync(user);
 			    }
 
 			    return new GetProfileModel()
@@ -86,8 +90,14 @@ namespace VC.Admin.Controllers
 
 			if (context.User.Identity.IsAuthenticated)
 			{
-				var user = await userService.FindAsync(_userManager.GetUserName(context.User));
-				if (user == null)
+                int id;
+                ApplicationUser user = null;
+
+                if (int.TryParse(_userManager.GetUserId(User), out id))
+                {
+                    user = await _userService.FindAsync(id);
+                }
+                if (user == null)
 				{
 					throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
 				}

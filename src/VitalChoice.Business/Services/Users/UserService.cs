@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Data.Context;
@@ -23,7 +21,6 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Identity;
-using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Users;
 using Microsoft.EntityFrameworkCore;
 using VitalChoice.Business.Mailings;
@@ -205,25 +202,30 @@ namespace VitalChoice.Business.Services.Users
 
         protected virtual void DisabledValidateUserOnSignIn(ApplicationUser user)
         {
-            if (user ==null || user.Status == UserStatus.Disabled)
+            if (user == null)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+            }
+            if (user.Status == UserStatus.Disabled)
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsDisabled]);
             }
         }
 
-        protected virtual async Task ValidateUserOnSignIn(string login)
-        {
-            var user = await UserManager.Users.FirstOrDefaultAsync(x => x.Status == UserStatus.Active && x.Email.Equals(login));
+	    protected virtual async Task<ApplicationUser> ValidateUserOnSignIn(int internalId)
+	    {
+	        var user = await UserManager.Users.FirstOrDefaultAsync(x => x.Id == internalId);
 
-            DisabledValidateUserOnSignIn(user);
+	        DisabledValidateUserOnSignIn(user);
 
-            if (user!=null && !user.IsConfirmed)
-			{
-				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
-			}
-		}
+	        if (user != null && !user.IsConfirmed)
+	        {
+	            throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserIsNotConfirmed]);
+	        }
+	        return user;
+	    }
 
-		public async Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles, bool sendActivation = true, bool createEcommerceUser = true, string password = null)
+	    public async Task<ApplicationUser> CreateAsync(ApplicationUser user, IList<RoleType> roles, bool sendActivation = true, bool createEcommerceUser = true, string password = null)
 		{
 			await PrepareForAdd(user, roles);
 
@@ -263,7 +265,7 @@ namespace VitalChoice.Business.Services.Users
 
 						if (sendActivation)
 						{
-							await SendActivationAsync(user.Email);
+							await SendActivationAsync(user.Id);
 						}
 
 						return user;
@@ -282,9 +284,9 @@ namespace VitalChoice.Business.Services.Users
 			}
 		}
 
-		public async Task SendActivationAsync(string email)
+		public async Task SendActivationAsync(int internalId)
 		{
-			var dbUser = await FindAsync(email);
+			var dbUser = await FindAsync(internalId);
 			await SendActivationAsync(dbUser);
 		}
 
@@ -364,7 +366,7 @@ namespace VitalChoice.Business.Services.Users
 
 		public async Task<ApplicationUser> SignInAsync(ApplicationUser user)
 		{
-			await ValidateUserOnSignIn(user.UserName);
+			await ValidateUserOnSignIn(user.Id);
 
 			await _signInManager.SignInAsync(user, false);
 
@@ -386,25 +388,25 @@ namespace VitalChoice.Business.Services.Users
             return user;
         }
 
-	    public async Task<ApplicationUser> SignInAsync(string login, string password)
-		{
-			await ValidateUserOnSignIn(login);
+	    public async Task<ApplicationUser> SignInAsync(int internalId, string password)
+	    {
+	        var user = await ValidateUserOnSignIn(internalId);
 
-			var result = await _signInManager.PasswordSignInAsync(login,password, false, true);
-			if (!result.Succeeded)
-			{
-				throw new AppValidationException(result.IsLockedOut ? ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserLockedOut] : ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.IncorrectUserPassword]);
-			}
+	        var result = await _signInManager.PasswordSignInAsync(user, password, false, true);
+	        if (!result.Succeeded)
+	        {
+	            throw new AppValidationException(result.IsLockedOut
+	                ? ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.UserLockedOut]
+	                : ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.IncorrectUserPassword]);
+	        }
 
-			var user = await FindAsync(login);
+	        user.LastLoginDate = DateTime.Now;
+	        user = await UpdateAsync(user);
 
-			user.LastLoginDate = DateTime.Now;
-			user = await UpdateAsync(user);
+	        return user;
+	    }
 
-			return user;
-		}
-
-		public async Task<ApplicationUser> RefreshSignInAsync(ApplicationUser user)
+	    public async Task<ApplicationUser> RefreshSignInAsync(ApplicationUser user)
 		{
 			await _signInManager.SignInAsync(user, false);
 
@@ -445,7 +447,12 @@ namespace VitalChoice.Business.Services.Users
 			await SendActivationAsync(dbUser);
 		}
 
-		public async Task<ApplicationUser> ChangePasswordAsync(ApplicationUser user, string oldPassword, string newPassword)
+	    public async Task<int?> GetIdByEmailAsync(string email)
+	    {
+	        return (await UserManager.FindByEmailAsync(email))?.Id;
+	    }
+
+	    public async Task<ApplicationUser> ChangePasswordAsync(ApplicationUser user, string oldPassword, string newPassword)
 		{
 			var result = await UserManager.ChangePasswordAsync(user, oldPassword, newPassword);
 			if (!result.Succeeded)
@@ -483,9 +490,9 @@ namespace VitalChoice.Business.Services.Users
 			}
 		}
 
-		public async Task<ApplicationUser> FindAsync(string login)
+		public async Task<ApplicationUser> FindAsync(int internalId)
 		{
-			return await UserManager.FindByEmailAsync(login);
+			return await UserManager.FindByIdAsync(internalId.ToString());
 		}
 
 		public async Task<PagedList<ApplicationUser>> GetAsync(FilterBase filter)
@@ -553,9 +560,9 @@ namespace VitalChoice.Business.Services.Users
 		    return new PagedList<ApplicationUser>(items, overallCount);
 		}
 
-		public async Task<ApplicationUser> ResetPasswordAsync(string email, string token, string newPassword)
+		public async Task<ApplicationUser> ResetPasswordAsync(int internalId, string token, string newPassword)
 		{
-			var user = await FindAsync(email);
+			var user = await FindAsync(internalId);
 			if (user == null)
 			{
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);

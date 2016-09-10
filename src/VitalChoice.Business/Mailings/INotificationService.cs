@@ -43,6 +43,8 @@ namespace VitalChoice.Business.Mailings
 
         Task SendEGiftNotificationEmailAsync(string email, EGiftNotificationEmail model);
 
+        Task SendGiftAdminNotificationEmailAsync(string email, GiftAdminNotificationEmail model);
+
         Task SendContentUrlNotificationForArticleAsync(string email, ContentUrlNotificationEmail model);
 
         Task SendContentUrlNotificationForRecipeAsync(string email, ContentUrlNotificationEmail model);

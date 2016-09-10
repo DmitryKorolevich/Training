@@ -50,8 +50,136 @@ INSERT INTO [dbo].[EmailTemplates]
            ,(SELECT Id FROM MasterContentItems WHERE Name='Admin Email Template')
            ,2
            ,NULL
-           ,'HelpTicketEmail'
+           ,'VitalChoice.Ecommerce.Domain.Mail.HelpTicketEmail'
            ,'Help ticket add/update customer service notification')
+
+END
+
+GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[EmailTemplates] WHERE [Name] = 'GiftAdminNotificationEmail')
+BEGIN
+
+DECLARE @contentItemId int
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,'<%
+<body:body>
+{{
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Vital Choice E-Gift Certificate</title>
+</head>
+<body>
+    <div style="font-size:14px;">
+        <div align="left">
+            <div style="margin:20px 0px 20px 0px;">
+                Hi <strong>@(Recipient)</strong>, you''ve been given an e-gift certificate from Vital Choice! <br /><br />
+                Lucky you! You can use it toward any of the healthy and delicious products found at <a href="https://@(PublicHost)/">@(PublicHost)</a> or in the Vital Choice catalog.<br /><br />
+                <em>@(Message)</em>
+            </div>
+        </div>
+        @list(Gifts){{
+        <div align="center">
+            <table width="850" border="0" cellspacing="0" cellpadding="0" style="font-family: ''Times New Roman'';">
+              <tr>
+                <td height="379" valign="top" style="background:url(https://@(@root.Model.PublicHost)/assets/images/egift/ecertificate.jpg);background-repeat:no-repeat;min-height:379px;">
+                    <table width="850" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td width="504" valign="top" style="min-height:379px;">
+                                <div style="margin-top:220px;margin-left:100px;">
+                                    <table width="400" border="0" cellspacing="0" cellpadding="0">
+                                        <tr>
+                                            <td height="30" style="font-size:13px;font-style:italic;font-weight:bold;">
+                                                <div align="left">From: Vital Choice</div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size:13px;font-style:italic;font-weight:bold;"><div align="left">To: @(@root.Model.Recipient)</div></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </td>
+                            <td width="346" valign="top">
+                                <div style="margin-top:115px;margin-left:30px;">
+                                    <table width="200" border="0" cellspacing="0" cellpadding="0">
+                                        <tr>
+                                            <td width="150" style="font-size:48px;font-weight:bold;font-style:italic;">
+                                                <div align="left">@money(Amount)
+                                                    <div style="vertical-align:text-top;">
+                                                        <div style="font-size:20px;font-weight:bold;font-style:italic;">@(Code)</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+              </tr>
+            </table>
+            @if(ShowDots){{
+            <div align="center">
+                <div style="margin:30px 0px 30px 0px;">
+                    <img src="https://@(@root.Model.PublicHost)/assets/images/egift/dots.jpg" />
+                </div>
+            </div>
+            }}
+        </div>
+        }}
+        </div>
+        <div align="center">
+            <div style="margin:20px 0px 20px 0px;font-size:13px;">
+                Vital Choice is a trusted source for fast home delivery of the world''s finest wild Alaskan seafood and organic fare. 
+                Our foods are among the purest available, and are sustainably harvested from healthy, well-managed wild fisheries and organic farms. 
+                They are recognized for their superior taste and health benefits, and are endorsed by leading health and wellness experts.
+                <br />
+                <br /> 
+                Redeem your e-gift certificate online at <a href="https://@(PublicHost)/">@(PublicHost)</a> or by phone at 1-800-608-4825.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+}} :: VitalChoice.Ecommerce.Domain.Mail.GiftAdminNotificationEmail
+%>'
+           ,''
+           ,'A Gift Certificate for you!'
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[EmailTemplates]
+           ([Name]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[UserId]
+           ,[ModelType]
+           ,[EmailDescription])
+     VALUES
+           ('GiftAdminNotificationEmail'
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='StoreFront Email Template')
+           ,2
+           ,NULL
+           ,'VitalChoice.Ecommerce.Domain.Mail.GiftAdminNotificationEmail'
+           ,'Gift Admin Notification Email')
 
 END
 

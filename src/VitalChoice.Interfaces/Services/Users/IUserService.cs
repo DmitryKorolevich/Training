@@ -30,9 +30,7 @@ namespace VitalChoice.Interfaces.Services.Users
 
         Task<ApplicationUser> SignInNoStatusCheckingAsync(ApplicationUser user);
 
-        Task<ApplicationUser> FindAsync(string login);
-
-		Task<ApplicationUser> SignInAsync(string login, string password);
+		Task<ApplicationUser> SignInAsync(int internalId, string password);
 
 	    Task<IList<PermissionType>> GetUserPermissions(ApplicationUser user);
 
@@ -40,7 +38,11 @@ namespace VitalChoice.Interfaces.Services.Users
 
 	    Task ResendActivationAsync(Guid id);
 
-	    Task<ApplicationUser> ChangePasswordAsync(ApplicationUser user, string oldPassword, string newPassword);
+        Task<ApplicationUser> FindAsync(int internalId);
+
+        Task<int?> GetIdByEmailAsync(string email);
+
+        Task<ApplicationUser> ChangePasswordAsync(ApplicationUser user, string oldPassword, string newPassword);
 
 	    Task<ApplicationUser> UpdateWithPasswordChangeAsync(ApplicationUser user, string oldPassword,
 		    string newPassword, IList<RoleType> roleIds = null);
@@ -51,9 +53,9 @@ namespace VitalChoice.Interfaces.Services.Users
 
         Task SendForgotPasswordAsync(Guid publicId);
 
-		Task<ApplicationUser> ResetPasswordAsync(string email, string token, string newPassword);
+		Task<ApplicationUser> ResetPasswordAsync(int internalId, string token, string newPassword);
 
-	    Task SendActivationAsync(string email);
+	    Task SendActivationAsync(int internalId);
 
 	    Task<bool> ValidateEmailUniquenessAsync(string email);
 
