@@ -516,6 +516,7 @@ namespace VitalChoice.ExportService.Services
                         order.POrderStatus = updatedOrder.POrderStatus;
                         order.NPOrderStatus = updatedOrder.NPOrderStatus;
                         order.IdEditedBy = updatedOrder.IdEditedBy;
+                        order.DateEdited = DateTime.Now;
                     }
                 }
                 await _orderRepositoryAsync.SaveChangesAsync();
