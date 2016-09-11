@@ -12,8 +12,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Data.Extensions;
+using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Data.UOW;
 using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.VeraCore;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -54,6 +56,7 @@ namespace VitalChoice.ExportService.Services
         private static readonly AsyncManualResetEvent LockOrdersEvent = new AsyncManualResetEvent(true);
         private readonly ILogger _logger;
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _paymentMapper;
+        private readonly IEcommerceRepositoryAsync<Order> _orderRepositoryAsync;
 
         public OrderExportService(IOptions<ExportOptions> options, IObjectEncryptionHost encryptionHost,
             DbContextOptions<ExportInfoContext> contextOptions, ILoggerFactory loggerFactory,
@@ -396,9 +399,19 @@ namespace VitalChoice.ExportService.Services
             {
                 throw new ApiException("Orders cannot be exported while encrypted database update is in progress");
             }
-
-            await DoExportOrders(exportItems, exportCallBack, userId);
-            await DoExportRefunds(exportItems, exportCallBack, userId);
+            try
+            {
+                await DoExportOrders(exportItems, exportCallBack, userId);
+                await DoExportRefunds(exportItems, exportCallBack, userId);
+            }
+            finally
+            {
+                exportCallBack(new OrderExportItemResult
+                {
+                    Id = -1,
+                    Success = true
+                });
+            }
         }
 
         private async Task DoExportOrders(ICollection<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack, int userId)
@@ -484,12 +497,29 @@ namespace VitalChoice.ExportService.Services
                 }
                 order.IdEditedBy = userId;
             }
-            await _orderService.UpdateRangeAsync(orderList);
-            exportCallBack(new OrderExportItemResult
+            try
             {
-                Id = -1,
-                Success = true
-            });
+                await _orderService.UpdateRangeAsync(orderList);
+            }
+            //Temp solution to bypass validation fuckups
+            catch
+            {
+                var updatedOrders = orderList.ToDictionary(l => l.Id);
+                var ids = orderList.ToDictionary(l => l.Id).Keys.ToList();
+                var dbOrders = await _orderRepositoryAsync.Query(o => ids.Contains(o.Id)).SelectAsync(true);
+                foreach (var order in dbOrders)
+                {
+                    OrderDynamic updatedOrder;
+                    if (updatedOrders.TryGetValue(order.Id, out updatedOrder))
+                    {
+                        order.OrderStatus = updatedOrder.OrderStatus;
+                        order.POrderStatus = updatedOrder.POrderStatus;
+                        order.NPOrderStatus = updatedOrder.NPOrderStatus;
+                        order.IdEditedBy = updatedOrder.IdEditedBy;
+                    }
+                }
+                await _orderRepositoryAsync.SaveChangesAsync();
+            }
         }
 
         private async Task DoExportRefunds(ICollection<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack,

@@ -811,7 +811,7 @@ namespace VitalChoice.Business.Services.Orders
 
         protected override Task<List<MessageInfo>> ValidateAsync(OrderDynamic dynamic)
         {
-            if (dynamic.Customer.StatusCode == (int) CustomerStatus.Suspended)
+            if (dynamic.Id == 0 && dynamic.Customer.StatusCode == (int) CustomerStatus.Suspended)
             {
                 throw new CustomerSuspendException();
             }

@@ -9,7 +9,7 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
     [DataContract]
     public class ServiceBusCommandData
     {
-        public ServiceBusCommandData(string error)
+        public ServiceBusCommandData(string error) : this()
         {
             Error = error;
         }
@@ -17,7 +17,7 @@ namespace VitalChoice.Infrastructure.Domain.ServiceBus
         public ServiceBusCommandData()
         {
             Random rnd = new Random();
-            byte[] elements = new byte[32];
+            byte[] elements = new byte[8];
             rnd.NextBytes(elements);
             Data = elements;
         }
