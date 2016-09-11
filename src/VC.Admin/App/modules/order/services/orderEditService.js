@@ -692,6 +692,55 @@ angular.module('app.modules.order.services.orderEditService', [])
             }
         };
 
+        uiScope.makeShippingAsBillingAddressOrder = function ()
+        {
+            var address;
+            switch (String(uiScope.paymentInfoTab.PaymentMethodType))
+            {
+                case "1":
+                    address = uiScope.order.CreditCard.Address;
+                    break;
+                case "2":
+                    address = uiScope.order.Oac.Address;
+                    break;
+                case "3":
+                    address = uiScope.order.Check.Address;
+                    break;
+                case "4":
+                    address = uiScope.order.NC.Address;
+                    break;
+                case "6":
+                    address = uiScope.order.WireTransfer.Address;
+                    break;
+                case "7":
+                    address = uiScope.order.Marketing.Address;
+                    break;
+                case "8":
+                    address = uiScope.order.VCWellness.Address;
+                    break;
+            }
+            if (address)
+            {
+                var activeShipping = uiScope.buildOrderShippingAddressForPartial(uiScope.order.OnHold && !uiScope.order.UpdateShippingAddressForCustomer);
+                if (activeShipping)
+                {
+                    var defaultField = activeShipping.Address.Default;
+                    var shippingAddressType = activeShipping.Address.ShippingAddressType;
+                    var preferredShipMethod = activeShipping.Address.PreferredShipMethod;
+                    var deliveryInstructions = activeShipping.Address.DeliveryInstructions;
+                    for (var key in address)
+                    {
+                        activeShipping.Address[key] = address[key];
+                    }
+                    address.AddressType = 3;
+                    activeShipping.Address.Default = defaultField;
+                    activeShipping.Address.ShippingAddressType = shippingAddressType;
+                    activeShipping.Address.PreferredShipMethod = preferredShipMethod;
+                    activeShipping.Address.DeliveryInstructions = deliveryInstructions;
+                }
+            }
+        };
+
         uiScope.checkCustomerCreditCardStatus = function ()
         {
             var card = uiScope.currentCustomer.CreditCards[uiScope.paymentInfoTab.CreditCardIndex];
