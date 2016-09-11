@@ -50,11 +50,14 @@ namespace VitalChoice.Business.Queries.Product
                 var items = name.Split(' ');
                 if (items.Length > 1)
                 {
-                    Add(x => x.FirstName.Contains(items[0]) && x.LastName.Contains(items[1]));
+                    var fPart = items[0];
+                    var lPart = items[1];
+                    Add(x => x.FirstName.Contains(fPart) && x.LastName.Contains(lPart));
                 }
                 else if (items.Length > 0)
                 {
-                    Add(x => x.FirstName.Contains(items[0]) || x.LastName.Contains(items[0]));
+                    var part = items[0];
+                    Add(x => x.FirstName.Contains(part) || x.LastName.Contains(part));
                 }
             }
 
