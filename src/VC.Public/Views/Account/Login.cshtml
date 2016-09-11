@@ -6,7 +6,7 @@
 @inject IOptions<AppOptions> appOptions
 
 @section Meta {
-	<title>Vital Choice | Login</title>
+    <title>Vital Choice | Login</title>
 }
 
 @section PageScripts {
@@ -14,49 +14,60 @@
 }
 
 <div class="working-area-holder login" data-forgot-pass-success="@(ViewBag.ForgotPassSuccess!=null && ViewBag.ForgotPassSuccess ? "Instructions on resetting your password have been emailed to your email address" : "")">
-	@using (Html.BeginForm("Login", "Account", new { returnUrl = ViewBag.ReturnUrl }, FormMethod.Post, null, new { @class = "form-regular small", role = "form" }))
-	{
-		@Html.AntiForgeryToken()
-		<h4>Account Login</h4>
-		if (!string.IsNullOrWhiteSpace(ViewBag.AlreadyTakenEmail))
-		{
-			<span class="form-control-important-info">The e-mail address you provided already exists in our database. Please use another e-mail address to 
-            @if (ViewBag.Type == 2)
+    @using (Html.BeginForm("Login", "Account", new { returnUrl = ViewBag.ReturnUrl }, FormMethod.Post, null, new { @class = "form-regular small", role = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        <h4>Account Login</h4>
+        if (ViewBag.ForgotPassSuccess != null && ViewBag.ForgotPassSuccess)
+        {
+            <span class="form-control-important-info">
+                Instructions on resetting your password have been emailed to your email address.
+            </span>
+        }
+        else
+        {
+            if (!string.IsNullOrWhiteSpace(ViewBag.AlreadyTakenEmail))
             {
-                <a href='/content/wholesale-registration'>register</a>
+                <span class="form-control-important-info">
+                    The e-mail address you provided already exists in our database. Please use another e-mail address to
+                    @if (ViewBag.Type == 2)
+                    {
+                        <a href='/content/wholesale-registration'>register</a>
+                    }
+                    else
+                    {
+                        @Html.ActionLink("register", "RegisterEmail")
+                    } or use @Html.ActionLink("the password reminder tool", "ForgotPassword") to retrieve the password associated with this email account.
+                </span>
             }
-            else
-            {
-                @Html.ActionLink("register", "RegisterEmail")
-            } or use @Html.ActionLink("the password reminder tool", "ForgotPassword") to retrieve the password associated with this email account.</span>
-		}
-		@Html.ValidationSummary(true, "")
-		<div class="form-group">
-			@Html.LabelFor(m => m.Email, new { @class = "control-label" })
-			<div class="input-group">
-				@Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
-				@Html.ValidationMessageFor(m => m.Email, "")
-			</div>
-		</div>
-		<div class="form-group">
-			@Html.LabelFor(m => m.Password, new { @class = "control-label" })
-			<div class="input-group">
-				@Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-				@Html.ValidationMessageFor(m => m.Password, "")
-			</div>
-		</div>
-		<div class="form-buttons-group">
-			<input type="submit" value="Login"/>
-		</div>
-		<div class="form-group">
-            Forgot your password? @Html.ActionLink("Click here to reset it.", "ForgotPassword", new { returnUrl = ViewBag.ReturnUrl })
-		</div>
-	}
-	<div class="form-group">
-		<hr />
-	</div>
-	<div class="form-group">
-		@Html.ActionLink("Would you like to Register a New Account? Click Here", "RegisterEmail", new { returnUrl = ViewBag.ReturnUrl })
-	</div>
+        }
+        @Html.ValidationSummary(true, "")
+        <div class="form-group">
+            @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Email, "")
+            </div>
+        </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+                    <div class="input-group">
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Password, "")
+                    </div>
+                </div>
+                <div class="form-buttons-group">
+                    <input type="submit" value="Login" />
+                </div>
+                <div class="form-group">
+                    Forgot your password? @Html.ActionLink("Click here to reset it.", "ForgotPassword", new { returnUrl = ViewBag.ReturnUrl })
+                </div>
+    }
+    <div class="form-group">
+        <hr />
+    </div>
+    <div class="form-group">
+        @Html.ActionLink("Would you like to Register a New Account? Click Here", "RegisterEmail", new { returnUrl = ViewBag.ReturnUrl })
+    </div>
 
 </div>
