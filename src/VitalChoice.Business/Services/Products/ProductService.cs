@@ -908,8 +908,7 @@ namespace VitalChoice.Business.Services.Products
             List<ProductListItemModel> toReturn = new List<ProductListItemModel>();
             
             var productsOnCategory = await _productToCategoryRepository.Query(p => p.IdCategory == idCategory &&
-                                                                                   p.Product.StatusCode == (int) RecordStatusCode.Active &&
-                                                                                   p.Product.IdVisibility != null).SelectAsync(false);
+                                                                                   p.Product.StatusCode != (int) RecordStatusCode.Deleted).SelectAsync(false);
             var conditions =
                 new ProductQuery().NotDeleted().WithIds(productsOnCategory.Select(p => p.IdProduct).ToList());
             var products =
@@ -939,8 +938,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<bool> UpdateProductsOnCategoryOrderAsync(int idCategory, ICollection<ProductListItemModel> products)
         {
             var dbProductsOnCategory = await _productToCategoryRepository.Query(p => p.IdCategory == idCategory &&
-                                                                                     p.Product.StatusCode == (int) RecordStatusCode.Active &&
-                                                                                     p.Product.IdVisibility.HasValue).SelectAsync(true);
+                                                                                   p.Product.StatusCode != (int)RecordStatusCode.Deleted).SelectAsync(false);
 
             int order = 0;
             var itemsForAdd = new List<ProductToCategory>();

@@ -163,9 +163,10 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 _productToCategoryEcommerceRepository.Query(x => x.IdCategory == viewContext.Entity.Id)
                     .OrderBy(q => q.OrderBy(p => p.Order))
                     .SelectAsync(false)).Select(x => x.IdProduct).ToList();
+            
 
-            ICollection<ProductDynamic> products = null;
-            ICollection<ProductContent> productContents = null;
+            ICollection<ProductDynamic> products = new List<ProductDynamic>();
+            ICollection<ProductContent> productContents = new List<ProductContent>();
             if (productIds.Count > 0)
             {
                 products =
