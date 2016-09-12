@@ -130,7 +130,14 @@ namespace VitalChoice.Business.Services.Orders
                 }
                 // ReSharper disable once InconsistentlySynchronizedField
                 Logger.LogError($"Export timeout, items left: {sentItems.Count}");
-                throw new ApiException("Export timeout");
+                return new List<OrderExportItemResult>
+                {
+                    new OrderExportItemResult
+                    {
+                        Error = $"Export timeout, items left: {sentItems.Count}",
+                        Success = false
+                    }
+                };
             }
             return results;
         }
