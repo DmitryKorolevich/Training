@@ -16,6 +16,7 @@ using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace VitalChoice.Core.GlobalFilters
 {
@@ -48,7 +49,7 @@ namespace VitalChoice.Core.GlobalFilters
                             {
                                 StatusCode = (int) HttpStatusCode.OK
                             };
-                        logger.LogError(0, FormatUpdateException(context, dbUpdateException));
+                        logger.LogError(FormatUpdateException(context, dbUpdateException));
                     }
                     else
                     {
@@ -56,7 +57,7 @@ namespace VitalChoice.Core.GlobalFilters
                         {
                             StatusCode = (int) HttpStatusCode.InternalServerError
                         };
-                        logger.LogError(0, context.Exception.ToString());
+                        logger.LogError($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
                     }
                 }
             }
@@ -64,7 +65,7 @@ namespace VitalChoice.Core.GlobalFilters
             {
                 var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
                 var logger = loggerFactory.CreateLogger<ApiExceptionFilterAttribute>();
-                logger.LogError(context.Exception.ToString());
+                logger.LogError($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
                 var exception = context.Exception as AccessDeniedException;
                 if (exception != null)
                 {
@@ -92,7 +93,7 @@ namespace VitalChoice.Core.GlobalFilters
         internal static string FormatUpdateException(ExceptionContext context, DbUpdateException dbUpdateException)
         {
             var updateIssues = CacheDebugger.ProcessDbUpdateException(dbUpdateException);
-            ExStringBuilder builder = new ExStringBuilder(context.Exception.ToString());
+            ExStringBuilder builder = new ExStringBuilder($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
             builder += "\nTrace Data:";
             var jsonSerializer = JsonSerializer.Create(new JsonSerializerSettings
             {
