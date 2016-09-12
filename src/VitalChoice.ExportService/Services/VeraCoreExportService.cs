@@ -33,7 +33,6 @@ namespace VitalChoice.ExportService.Services
         private const string MarketingDonationDescription = "Marketing-Donation";
         private const string MarketingPromoDescription = "Marketing-Promo";
         private const string VcWellnessDescription = "VC Wellness";
-        //private const string ManualCcDescription = "Manual Credit Card Process";
         private const string CheckDescription = "Check Payment";
         private const string NoChargeDescription = "No Charge";
         private const string PrepaidDescription = "Prepaid";
@@ -324,8 +323,16 @@ namespace VitalChoice.ExportService.Services
                 case ExportSide.All:
                     exportOrder.Money.ShippingHandlingCharge = context.StandardShippingOverriden;
                     exportOrder.Money.SpecialHandlingCharge = context.SurchargeShippingOverriden;
-                    exportOrder.Shipping.FreightCode = context.SplitInfo.GetSwsCode(context.ShippingCostGroup, upgradeP, prefferedShipMethod);
-                    exportOrder.Shipping.FreightCodeDescription = context.SplitInfo.GetCarrierDescription(upgradeP, prefferedShipMethod);
+                    if (context.SplitInfo.PerishableCount > 0)
+                    {
+                        upgradeP = (upgradeP ?? ShippingUpgradeOption.None) != ShippingUpgradeOption.Overnight
+                            ? ShippingUpgradeOption.SecondDay
+                            : upgradeP;
+                    }
+                    exportOrder.Shipping.FreightCode = context.SplitInfo.GetSwsCode(context.ShippingCostGroup, upgradeP,
+                            prefferedShipMethod);
+                    exportOrder.Shipping.FreightCodeDescription =
+                        context.SplitInfo.GetCarrierDescription(upgradeP, prefferedShipMethod);
 
                     if (upgradeP != null)
                     {
@@ -343,6 +350,14 @@ namespace VitalChoice.ExportService.Services
                 case ExportSide.Perishable:
                     exportOrder.Money.ShippingHandlingCharge = context.SplitInfo.PerishableShippingOveridden;
                     exportOrder.Money.SpecialHandlingCharge = context.SplitInfo.PerishableSurchargeOverriden;
+
+                    if (context.SplitInfo.PerishableCount > 0)
+                    {
+                        upgradeP = (upgradeP ?? ShippingUpgradeOption.None) != ShippingUpgradeOption.Overnight
+                            ? ShippingUpgradeOption.SecondDay
+                            : upgradeP;
+                    }
+
                     exportOrder.Shipping.FreightCode = context.SplitInfo.GetSwsCode(context.SplitInfo.PerishableCostGroup, upgradeP,
                         prefferedShipMethod);
                     exportOrder.Shipping.FreightCodeDescription = context.SplitInfo.GetCarrierDescription(upgradeP, prefferedShipMethod);

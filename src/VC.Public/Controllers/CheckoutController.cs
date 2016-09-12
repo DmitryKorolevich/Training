@@ -430,7 +430,9 @@ namespace VC.Public.Controllers
                     {
                         if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
                         {
-                            await _userService.RemoveAsync(cart.Order.Customer.Id);
+                            var user = await _userService.GetAsync(cart.Order.Customer.Id);
+                            user.Status = UserStatus.NotActive;
+                            await _userService.UpdateAsync(user);
                         }
                     }
                     throw new AppValidationException(newMessages);
@@ -442,7 +444,9 @@ namespace VC.Public.Controllers
                     {
                         if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
                         {
-                            await _userService.RemoveAsync(cart.Order.Customer.Id);
+                            var user = await _userService.GetAsync(cart.Order.Customer.Id);
+                            user.Status = UserStatus.NotActive;
+                            await _userService.UpdateAsync(user);
                         }
                     }
                     throw;
