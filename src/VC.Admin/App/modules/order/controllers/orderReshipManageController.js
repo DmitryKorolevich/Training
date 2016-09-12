@@ -96,6 +96,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         if (result.Success)
         {
             $scope.order = result.Data;
+            if (!$scope.order.Id)
+            {
+                $scope.options.showCopyButtonsOnOrder = true;
+            }
             orderEditService.baseProcessLoadingOrder($scope);
 
             if (!$scope.options.inited)

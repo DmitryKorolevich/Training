@@ -28,6 +28,9 @@ namespace Avalara.Avatax.Rest.Utility
 
         internal static T ProcessResponse<T>(this JsonSerializer serializer, WebResponse response)
         {
+            if (response == null)
+                return default(T);
+
             using (var responseStream = response.GetResponseStream())
             {
                 if (responseStream != null)

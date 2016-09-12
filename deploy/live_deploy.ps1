@@ -15,6 +15,35 @@ cmd /c mkdir "C:\Temp\Backup\public"
 cmd /c mkdir "C:\Temp\Backup\admin"
 cmd /c mkdir "C:\Temp\Backup\jobs"
 
+if (test-path ".\packages\public.7z")
+{
+	robocopy "empty\" "C:\Temp\Backup\public\" /mir /nfl /ndl /njh >> clean.log
+	robocopy "empty\" "C:\Temp\Deploy\public\" /mir /nfl /ndl /njh >> clean.log
+
+	cmd /c 7z x -r .\packages\public.7z -o"C:\Temp\Deploy\public"
+	if(-Not $?){exit $LASTEXITCODE}
+
+	cmd /c del .\packages\public.7z
+
+	cmd /c "%windir%\system32\inetsrv\appcmd" stop apppool /apppool.name:public
+	cmd /c rmdir "${RootDeploy}\public\wwwroot\files"
+	cmd /c rmdir "${RootDeploy}\public\wwwroot\design"
+	cmd /c rmdir "${RootDeploy}\public\wwwroot\images"
+	robocopy "empty\" "C:\Temp\Deploy\public\wwwroot\images" /mir /nfl /ndl /njh >> clean.log
+	cmd /c rmdir "C:\Temp\Deploy\public\wwwroot\images"
+	robocopy "${RootDeploy}\public\" "C:\Temp\Backup\public\" /xf "nlog.config" /e /move /nfl /ndl /njh >> backup.log
+	robocopy "C:\Temp\Deploy\public\" "${RootDeploy}\public\" /e /move /nfl /ndl /njh >> deploy.log
+	$destinationPath = $RootDeploy + "\public\wwwroot\files"
+	cmd /c mklink /D $destinationPath "${filesLinkSource}"
+	$destinationPath = $RootDeploy + "\public\wwwroot\design"
+	cmd /c mklink /D $destinationPath "${designLinkSource}"
+	$destinationPath = $RootDeploy + "\public\wwwroot\images"
+	cmd /c mklink /D $destinationPath "${imagesLinkSource}"
+	cp libuv.dll "c:\inetpub\wwwroot\public\" -Force
+	cp ".\${ConfigFolder}\public.config.json" "c:\inetpub\wwwroot\public\config.json" -Force
+	cmd /c "%windir%\system32\inetsrv\appcmd" start apppool /apppool.name:public
+}
+
 if (test-path ".\packages\admin.7z")
 {
 	robocopy "empty\" "C:\Temp\Backup\admin\" /mir /nfl /ndl /njh >> clean.log
@@ -37,32 +66,6 @@ if (test-path ".\packages\admin.7z")
 	cp libuv.dll "c:\inetpub\wwwroot\admin\" -Force
 	cp ".\${ConfigFolder}\admin.config.json" "c:\inetpub\wwwroot\admin\config.json" -Force
 	cmd /c "%windir%\system32\inetsrv\appcmd" start apppool /apppool.name:admin
-}
-
-if (test-path ".\packages\public.7z")
-{
-	robocopy "empty\" "C:\Temp\Backup\public\" /mir /nfl /ndl /njh >> clean.log
-	robocopy "empty\" "C:\Temp\Deploy\public\" /mir /nfl /ndl /njh >> clean.log
-
-	cmd /c 7z x -r .\packages\public.7z -o"C:\Temp\Deploy\public"
-	if(-Not $?){exit $LASTEXITCODE}
-
-	cmd /c del .\packages\public.7z
-
-	cmd /c "%windir%\system32\inetsrv\appcmd" stop apppool /apppool.name:public
-	cmd /c rmdir "${RootDeploy}\public\wwwroot\files"
-	cmd /c rmdir "${RootDeploy}\public\wwwroot\design"
-	robocopy "${RootDeploy}\public\" "C:\Temp\Backup\public\" /xf "nlog.config" /e /move /nfl /ndl /njh >> backup.log
-	robocopy "C:\Temp\Deploy\public\" "${RootDeploy}\public\" /e /move /nfl /ndl /njh >> deploy.log
-	$destinationPath = $RootDeploy + "\public\wwwroot\files"
-	cmd /c mklink /D $destinationPath "${filesLinkSource}"
-	$destinationPath = $RootDeploy + "\public\wwwroot\design"
-	cmd /c mklink /D $destinationPath "${designLinkSource}"
-	$destinationPath = $RootDeploy + "\public\wwwroot\images"
-	cmd /c mklink /D $destinationPath "${imagesLinkSource}"
-	cp libuv.dll "c:\inetpub\wwwroot\public\" -Force
-	cp ".\${ConfigFolder}\public.config.json" "c:\inetpub\wwwroot\public\config.json" -Force
-	cmd /c "%windir%\system32\inetsrv\appcmd" start apppool /apppool.name:public
 }
 
 if (test-path ".\packages\jobs.7z")

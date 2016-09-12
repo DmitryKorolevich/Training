@@ -47,7 +47,7 @@ namespace VitalChoice.Core.Infrastructure.Helpers
                         {
                             var userService = context.RequestServices.GetRequiredService<IStorefrontUserService>();
                             var user = await userService.GetAsync(idCustomer);
-                            if (user != null)
+                            if (user != null && user.IsConfirmed && user.Status == UserStatus.Active)
                             {
                                 var wholeHashCandidate =
                                     encryptionHost.HashBytes(

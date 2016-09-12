@@ -314,6 +314,10 @@ namespace VitalChoice.Infrastructure.ServiceBus
                     Logger.LogInfo(cmd => $"{cmd.CommandName} answer received ({cmd.CommandId})", command);
                     command.RequestAcqureAction?.Invoke(command, remoteCommand.Data);
                 }
+                else
+                {
+                    Logger.LogWarn(cmd => $"{cmd.CommandName} ({cmd.CommandId}) Reference Removed before answer received", remoteCommand);
+                }
             }
             else
             {

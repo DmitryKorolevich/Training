@@ -80,7 +80,10 @@ namespace VitalChoice.Core.GlobalFilters
 				            if (message.Field == "ConcurrencyFailure")
 				            {
 				                SetDataChangedError(context, result);
-				            }
+                                var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
+                                var logger = loggerFactory.CreateLogger<MvcExceptionFilter>();
+                                logger.LogError($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
+                            }
 				            else
 				            {
 				                context.ModelState.AddModelError(string.Empty, message.Message);
@@ -106,23 +109,23 @@ namespace VitalChoice.Core.GlobalFilters
 				            SetDataChangedError(context, result);
                             var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
                             var logger = loggerFactory.CreateLogger<MvcExceptionFilter>();
-				            logger.LogError(ApiExceptionFilterAttribute.FormatUpdateException(context, dbUpdateException));
-				        }
-				        else
+                            logger.LogError(ApiExceptionFilterAttribute.FormatUpdateException(context, dbUpdateException));
+                        }
+                        else
 				        {
 				            result.ViewName = "Error";
 				            result.StatusCode = (int) HttpStatusCode.InternalServerError;
                             var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
                             var logger = loggerFactory.CreateLogger<MvcExceptionFilter>();
-				            logger.LogError($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
-				        }
-				    }
+                            logger.LogError($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
+                        }
+                    }
 				}
 				else
 				{
                     var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
                     var logger = loggerFactory.CreateLogger<MvcExceptionFilter>();
-				    logger.LogError($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
+                    logger.LogError($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
 
                     if (apiException.Status == HttpStatusCode.NotFound)
 					{

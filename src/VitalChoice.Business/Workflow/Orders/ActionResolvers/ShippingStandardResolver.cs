@@ -21,14 +21,14 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
             if (dataContext.Order.ShippingAddress == null)
                 return TaskCache<int>.DefaultCompletedTask;
             var countryNameCode = executionContext.Resolve<ICountryNameCodeResolver>();
-            if (dataContext.Order.Customer.IdObjectType == (int) CustomerType.Wholesale)
+            if (dataContext.Order.Customer?.IdObjectType == (int) CustomerType.Wholesale)
             {
                 if (countryNameCode.IsCountry(dataContext.Order.ShippingAddress, "us"))
                 {
                     return Task.FromResult((int) CustomerType.Wholesale);
                 }
             }
-            if (dataContext.Order.Customer.IdObjectType == (int) CustomerType.Retail)
+            else
             {
                 if (countryNameCode.IsCountry(dataContext.Order.ShippingAddress, "us") ||
                     countryNameCode.IsCountry(dataContext.Order.ShippingAddress, "ca"))

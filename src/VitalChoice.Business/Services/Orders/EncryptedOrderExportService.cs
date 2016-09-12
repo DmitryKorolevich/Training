@@ -120,6 +120,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 Logger.LogError(e.ToString());
                 doneAllEvent.Set();
+                command.OnComplete?.Invoke(command);
                 throw;
             }
             if (!await doneAllEvent.WaitAsync(TimeSpan.FromMinutes(5)))
@@ -130,8 +131,17 @@ namespace VitalChoice.Business.Services.Orders
                 }
                 // ReSharper disable once InconsistentlySynchronizedField
                 Logger.LogError($"Export timeout, items left: {sentItems.Count}");
-                throw new ApiException("Export timeout");
+                command.OnComplete?.Invoke(command);
+                return new List<OrderExportItemResult>
+                {
+                    new OrderExportItemResult
+                    {
+                        Error = $"Export timeout, items left: {sentItems.Count}",
+                        Success = false
+                    }
+                };
             }
+            command.OnComplete?.Invoke(command);
             return results;
         }
 
