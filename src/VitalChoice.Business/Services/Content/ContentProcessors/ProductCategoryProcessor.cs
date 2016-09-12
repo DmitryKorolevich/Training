@@ -316,7 +316,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                                                                      ((bool?) s.SafeData.DisregardStock ?? false) ||
                                                                      ((int?) s.SafeData.Stock ?? 0) > 0;
                                                       return item;
-                                                  })).ToListAsync() ?? TaskCache<List<TtlCategorySkuModel>>.DefaultCompletedTask);
+                                                  })).ToListAsync() ?? Task.FromResult(new List<TtlCategorySkuModel>()));
 
             var toReturn = new TtlCategoryModel
             {
@@ -333,11 +333,11 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 SubCategories =
                     await
                     (subProductCategoryContent?.Select(x => PopulateCategoryTemplateModel(x, customerVisibility)).ToListAsync() ??
-                     TaskCache<List<TtlCategoryModel>>.DefaultCompletedTask),
+                     Task.FromResult(new List<TtlCategoryModel>())),
                 Products =
                     await (sourceProducts?.Where(x => x.IdVisibility.HasValue && customerVisibility.Contains(x.IdVisibility.Value)).Select(
                                product => _productMapper.ToModelAsync<TtlCategoryProductModel>(product)).ToListAsync() ??
-                           TaskCache<List<TtlCategoryProductModel>>.DefaultCompletedTask),
+                           Task.FromResult(new List<TtlCategoryProductModel>())),
                 Skus = skus,
                 SideMenuItems = ConvertToSideMenuModelLevel(rootNavCategory?.SubItems),
                 BreadcrumbOrderedItems = breadcrumbItems
