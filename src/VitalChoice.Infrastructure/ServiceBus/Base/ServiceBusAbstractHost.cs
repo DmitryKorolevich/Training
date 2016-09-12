@@ -149,18 +149,14 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                             batchSize = 0;
                             if (_sendQue.Count == 0)
                             {
-                                if (_newMessageSignal.WaitOne(TimeSpan.FromMilliseconds(100)))
-                                {
-                                    _newMessageSignal.Reset();
-                                }
+                                _newMessageSignal.WaitOne();
+                                _newMessageSignal.Reset();
                             }
                         }
                         else
                         {
-                            if (_newMessageSignal.WaitOne(TimeSpan.FromMilliseconds(100)))
-                            {
-                                _newMessageSignal.Reset();
-                            }
+                            _newMessageSignal.WaitOne();
+                            _newMessageSignal.Reset();
                         }
                         _readyToDisposeReceive.Set();
                         continue;
