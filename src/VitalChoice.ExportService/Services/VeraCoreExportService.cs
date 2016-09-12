@@ -273,8 +273,8 @@ namespace VitalChoice.ExportService.Services
                               ((string) order.ShippingAddress.SafeData.LastName ?? string.Empty);
             exportOrder.ShipTo = new[] {shipTo};
 
-            var upgradeP = (ShippingUpgradeOption?)(int?) context.Order.SafeData.ShippingUpgradeP;
-            var upgradeNp = (ShippingUpgradeOption?)(int?)context.Order.SafeData.ShippingUpgradeNP;
+            var upgradeP = (ShippingUpgradeOption?) (int?) context.Order.SafeData.ShippingUpgradeP;
+            var upgradeNp = (ShippingUpgradeOption?) (int?) context.Order.SafeData.ShippingUpgradeNP;
 
             var prefferedShipMethod = (PreferredShipMethod?) order.ShippingAddress.SafeData.PreferredShipMethod ?? PreferredShipMethod.Best;
 
@@ -323,18 +323,8 @@ namespace VitalChoice.ExportService.Services
                 case ExportSide.All:
                     exportOrder.Money.ShippingHandlingCharge = context.StandardShippingOverriden;
                     exportOrder.Money.SpecialHandlingCharge = context.SurchargeShippingOverriden;
-                    if (context.SplitInfo.PerishableCount > 0)
-                    {
-                        upgradeP = (upgradeP ?? ShippingUpgradeOption.None) != ShippingUpgradeOption.Overnight
-                            ? ShippingUpgradeOption.SecondDay
-                            : upgradeP;
-                    }
-                    exportOrder.Shipping.FreightCode = context.SplitInfo.GetSwsCode(context.ShippingCostGroup, upgradeP,
-                            prefferedShipMethod);
-                    exportOrder.Shipping.FreightCodeDescription =
-                        context.SplitInfo.GetCarrierDescription(upgradeP, prefferedShipMethod);
 
-                    if (upgradeP != null)
+                    if (upgradeP != null && upgradeP.Value != ShippingUpgradeOption.None)
                     {
                         orderVariables.Add(new OrderVariable
                         {
@@ -346,10 +336,34 @@ namespace VitalChoice.ExportService.Services
                             SeqID = varCounter
                         });
                     }
+
+                    if (context.SplitInfo.PerishableCount > 0)
+                    {
+                        upgradeP = (upgradeP ?? ShippingUpgradeOption.None) != ShippingUpgradeOption.Overnight
+                            ? ShippingUpgradeOption.SecondDay
+                            : upgradeP;
+                    }
+                    exportOrder.Shipping.FreightCode = context.SplitInfo.GetSwsCode(context.ShippingCostGroup, upgradeP,
+                        prefferedShipMethod);
+                    exportOrder.Shipping.FreightCodeDescription =
+                        context.SplitInfo.GetCarrierDescription(upgradeP, prefferedShipMethod);
                     break;
                 case ExportSide.Perishable:
                     exportOrder.Money.ShippingHandlingCharge = context.SplitInfo.PerishableShippingOveridden;
                     exportOrder.Money.SpecialHandlingCharge = context.SplitInfo.PerishableSurchargeOverriden;
+
+                    if (upgradeP != null && upgradeP.Value != ShippingUpgradeOption.None)
+                    {
+                        orderVariables.Add(new OrderVariable
+                        {
+                            VariableField = new VariableField
+                            {
+                                FieldName = "Upgrade"
+                            },
+                            Value = "Yes",
+                            SeqID = varCounter
+                        });
+                    }
 
                     if (context.SplitInfo.PerishableCount > 0)
                     {
@@ -361,19 +375,6 @@ namespace VitalChoice.ExportService.Services
                     exportOrder.Shipping.FreightCode = context.SplitInfo.GetSwsCode(context.SplitInfo.PerishableCostGroup, upgradeP,
                         prefferedShipMethod);
                     exportOrder.Shipping.FreightCodeDescription = context.SplitInfo.GetCarrierDescription(upgradeP, prefferedShipMethod);
-
-                    if (upgradeP != null)
-                    {
-                        orderVariables.Add(new OrderVariable
-                        {
-                            VariableField = new VariableField
-                            {
-                                FieldName = "Upgrade"
-                            },
-                            Value = "Yes",
-                            SeqID = varCounter
-                        });
-                    }
                     break;
                 case ExportSide.NonPerishable:
                     exportOrder.Money.ShippingHandlingCharge = context.SplitInfo.NonPerishableShippingOverriden;
@@ -382,7 +383,7 @@ namespace VitalChoice.ExportService.Services
                         prefferedShipMethod);
                     exportOrder.Shipping.FreightCodeDescription = context.SplitInfo.GetCarrierDescription(upgradeNp, prefferedShipMethod);
 
-                    if (upgradeNp != null)
+                    if (upgradeNp != null && upgradeNp.Value != ShippingUpgradeOption.None)
                     {
                         orderVariables.Add(new OrderVariable
                         {
