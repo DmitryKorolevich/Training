@@ -64,7 +64,7 @@ namespace VitalChoice.ExportService.Services
             IOrderRefundService refundService, ICustomerService customerService, ILifetimeScope scope,
             IPaymentMethodService paymentMethodService, IVeraCoreSFTPService sftpService,
             IGiftListCreditCardExportFileGenerator giftListFileGenerator,
-            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> paymentMapper)
+            IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> paymentMapper, IEcommerceRepositoryAsync<Order> orderRepositoryAsync)
         {
             _options = options;
             _encryptionHost = encryptionHost;
@@ -79,6 +79,7 @@ namespace VitalChoice.ExportService.Services
             _sftpService = sftpService;
             _giftListFileGenerator = giftListFileGenerator;
             _paymentMapper = paymentMapper;
+            _orderRepositoryAsync = orderRepositoryAsync;
             _logger = loggerFactory.CreateLogger<OrderExportService>();
         }
 
