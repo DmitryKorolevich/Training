@@ -35,7 +35,7 @@ namespace VitalChoice.CustomerFiles
             //MoveCustomerFiles();
 
             FixCustomerStatuses();
-
+            Console.WriteLine("Done");
             Host.Dispose();
         }
 
