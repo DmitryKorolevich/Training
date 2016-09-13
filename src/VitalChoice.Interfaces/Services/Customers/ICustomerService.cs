@@ -49,7 +49,9 @@ namespace VitalChoice.Interfaces.Services.Customers
 
 	    Task<int?> TryGetActiveIdByEmailAsync(string email);
 
-	    Task<int?> TryGetNotActiveIdByEmailAsync(string email);
+	    Task<int?> TryGetPhoneOnlyIdByEmailAsync(string email);
+
+        Task<int?> TryGetNotActiveIdByEmailAsync(string email);
 
         Task ActivateGuestAsync(int internalId, string token, string newPassword);
 

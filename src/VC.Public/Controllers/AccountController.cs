@@ -433,7 +433,7 @@ namespace VC.Public.Controllers
             ApplicationUser user = null;
 		    if (!id.HasValue)
 		    {
-		        id = await _customerService.TryGetNotActiveIdByEmailAsync(model.Email);
+		        id = await _customerService.TryGetPhoneOnlyIdByEmailAsync(model.Email);
 		    }
             if (id.HasValue)
 		    {

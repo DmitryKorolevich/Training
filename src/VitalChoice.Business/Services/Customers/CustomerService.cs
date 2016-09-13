@@ -877,6 +877,7 @@ namespace VitalChoice.Business.Services.Customers
                 withDefaults: true);
         }
 
+        
         public async Task<int?> TryGetActiveIdByEmailAsync(string email)
         {
             var id = (await
@@ -887,10 +888,21 @@ namespace VitalChoice.Business.Services.Customers
             return id;
         }
 
+        public async Task<int?> TryGetPhoneOnlyIdByEmailAsync(string email)
+        {
+            var id = (await
+                ObjectRepository.Query(c => c.Email == email && c.StatusCode == (int)CustomerStatus.PhoneOnly)
+                    .SelectAsync(c => c.Id, false)).FirstOrDefault();
+            if (id == 0)
+                return null;
+            return id;
+        }
+
         public async Task<int?> TryGetNotActiveIdByEmailAsync(string email)
         {
             var id = (await
-                ObjectRepository.Query(c => c.Email == email && c.StatusCode != (int) CustomerStatus.Active)
+                ObjectRepository.Query(
+                        c => c.Email == email && c.StatusCode != (int) CustomerStatus.Active && c.StatusCode != (int) CustomerStatus.Deleted)
                     .SelectAsync(c => c.Id, false)).FirstOrDefault();
             if (id == 0)
                 return null;
