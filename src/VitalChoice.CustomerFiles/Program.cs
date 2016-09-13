@@ -13,6 +13,8 @@ using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Interfaces.Services.Customers;
 using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Context;
+using VitalChoice.Infrastructure.Domain.Entities.Users;
 
 namespace VitalChoice.CustomerFiles
 {
@@ -30,6 +32,51 @@ namespace VitalChoice.CustomerFiles
 
             Host.Start();
 
+            //MoveCustomerFiles();
+
+            FixCustomerStatuses();
+
+            Host.Dispose();
+        }
+
+        private static void FixCustomerStatuses()
+        {
+            try
+            {
+                var identityContext = Host.Services.GetRequiredService<VitalChoiceContext>();
+                var userSet = identityContext.Set<ApplicationUser>();
+                var ecommerceContext = Host.Services.GetRequiredService<EcommerceContext>();
+                var customersSet = ecommerceContext.Set<Customer>();
+                var toUpdate =
+                    customersSet.Where(customer => customer.StatusCode == (int) CustomerStatus.PhoneOnly)
+                        .Select(customer => customer.Id)
+                        .ToList();
+                var seed = 0;
+                var idList = toUpdate.Skip(seed).Take(1000).ToList();
+                while (idList.Count > 0)
+                {
+                    var list = idList;
+                    foreach (var user in userSet.Where(u => list.Contains(u.Id)))
+                    {
+                        user.Status = UserStatus.NotActive;
+                        user.IsConfirmed = false;
+                        user.PasswordHash = null;
+                    }
+                    seed += 1000;
+                    idList = toUpdate.Skip(seed).Take(1000).ToList();
+                    identityContext.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine($"[{e.Source}] Update Failed!\r\n{e}");
+                Console.ResetColor();
+            }
+        }
+
+        private static void MoveCustomerFiles()
+        {
             try
             {
                 var lifetimeScope = Program.Host.Services.GetRequiredService<ILifetimeScope>();
@@ -118,14 +165,12 @@ namespace VitalChoice.CustomerFiles
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
                 Console.WriteLine($"[{DateTime.Now:O}] Import Success!");
                 Console.ResetColor();
-                Program.Host.Dispose();
             }
             catch (Exception e)
             {
                 Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine($"[{e.Source}] Import Failed!\r\n{e}");
                 Console.ResetColor();
-                Program.Host.Dispose();
             }
         }
     }

@@ -343,6 +343,10 @@ namespace VitalChoice.ExportService.Services
                             ? ShippingUpgradeOption.SecondDay
                             : upgradeP;
                     }
+                    else
+                    {
+                        upgradeP = upgradeNp;
+                    }
                     exportOrder.Shipping.FreightCode = context.SplitInfo.GetSwsCode(context.ShippingCostGroup, upgradeP,
                         prefferedShipMethod);
                     exportOrder.Shipping.FreightCodeDescription =
