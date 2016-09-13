@@ -37,7 +37,7 @@ namespace VitalChoice.CustomerFiles.Context
             builder.Entity<VCustomerOldFile>(entity =>
             {
                 entity.HasKey(e => e.Id);
-                entity.ToTable("VCustomerOldFiles");
+                entity.ToTable("CustomerFiles");
             });
         }
     }

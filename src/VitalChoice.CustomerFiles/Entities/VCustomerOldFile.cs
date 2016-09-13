@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VitalChoice.Ecommerce.Domain;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 
 namespace VitalChoice.CustomerFiles.Entities
 {
@@ -12,7 +10,10 @@ namespace VitalChoice.CustomerFiles.Entities
 
         public string Description { get; set; }
 
-        public string Name { get; set; }
+        [NotMapped]
+        public string FilePath =>
+            $"./attachments/{UploadDate.Year.ToString(CultureInfo.InvariantCulture)}/{UploadDate.Month.ToString(CultureInfo.InvariantCulture)}/{UploadDate.Day.ToString(CultureInfo.InvariantCulture)}/{Id}.dat"
+            ;
 
         public string OriginalFileName { get; set; }
 
