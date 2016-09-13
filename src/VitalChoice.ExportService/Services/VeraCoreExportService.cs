@@ -207,29 +207,29 @@ namespace VitalChoice.ExportService.Services
             }
         }
 
-        private void ParseGeneralInfo(MappedObject order, VeraCoreExportOrder promailOrder, ExportSide exportSide)
+        private void ParseGeneralInfo(MappedObject order, VeraCoreExportOrder veraCoreOrder, ExportSide exportSide)
         {
-            promailOrder.Header.EntryDate = order.DateCreated;
-            promailOrder.Header.PONumber = order.SafeData.PoNumber;
+            veraCoreOrder.Header.EntryDate = order.DateCreated;
+            veraCoreOrder.Header.PONumber = order.SafeData.PoNumber;
             switch (exportSide)
             {
                 case ExportSide.All:
-                    promailOrder.Header.ID = order.Id.ToString(CultureInfo.InvariantCulture);
-                    promailOrder.Header.Comments = order.SafeData.OrderNotes;
+                    veraCoreOrder.Header.ID = order.Id.ToString(CultureInfo.InvariantCulture);
+                    veraCoreOrder.Header.Comments = order.SafeData.OrderNotes;
                     break;
                 case ExportSide.Perishable:
-                    promailOrder.Header.ID = order.Id.ToString(CultureInfo.InvariantCulture) + "-P";
-                    promailOrder.Header.Comments = "Perishable Items\n" + (string) order.SafeData.OrderNotes;
+                    veraCoreOrder.Header.ID = order.Id.ToString(CultureInfo.InvariantCulture) + "-P";
+                    veraCoreOrder.Header.Comments = $"Perishable Items\n{(string) order.SafeData.OrderNotes}";
                     break;
                 case ExportSide.NonPerishable:
-                    promailOrder.Header.ID = order.Id.ToString(CultureInfo.InvariantCulture) + "-NP";
-                    promailOrder.Header.Comments = "Non-Perishable Items\n" + (string) order.SafeData.OrderNotes;
+                    veraCoreOrder.Header.ID = order.Id.ToString(CultureInfo.InvariantCulture) + "-NP";
+                    veraCoreOrder.Header.Comments = $"Non-Perishable Items\n{(string) order.SafeData.OrderNotes}";
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(exportSide), exportSide, null);
             }
 
-            promailOrder.Header.InsertDate = DateTime.Now;
+            veraCoreOrder.Header.InsertDate = DateTime.Now;
         }
 
         private async Task ParseBillingInfo(OrderPaymentMethodDynamic paymentMethod, CustomerDynamic customer, VeraCoreExportOrder veracoreOrder)
@@ -753,6 +753,13 @@ namespace VitalChoice.ExportService.Services
                 }
             };
             ParseGeneralInfo(order, result, exportSide);
+
+            if ((exportSide == ExportSide.All || exportSide == ExportSide.NonPerishable) && order.Skus.Any(s => s.GcsGenerated?.Count > 0))
+            {
+                result.Header.Comments =
+                    $"{result.Header.Comments}\n{string.Join("\n", order.Skus.SelectMany(g => g.GcsGenerated).Select(g => $"{g.Sku.Amount:C} #{g.Code}"))}";
+            }
+
             ParsePaymentInfo(order, context, result, exportSide);
             await ParseBillingInfo(order.PaymentMethod, order.Customer, result);
             await ParseShippingInfo(order, context, result, exportSide);
