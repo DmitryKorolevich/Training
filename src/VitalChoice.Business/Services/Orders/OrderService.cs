@@ -42,6 +42,7 @@ using VitalChoice.Workflow.Core;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using Microsoft.AspNetCore.Mvc.Internal;
+using VitalChoice.Business.Helpers;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Data.Extensions;
@@ -1768,7 +1769,7 @@ namespace VitalChoice.Business.Services.Orders
 
             await LoadSkusDynamic(map, customer);
             //not found SKU errors
-            var messages = processor.FormatRowsRecordErrorMessages(map.SelectMany(p => p.OrderImportItems));
+            var messages = BusinessHelper.FormatRowsRecordErrorMessages(map.SelectMany(p => p.OrderImportItems));
             if (messages.Count > 0)
             {
                 throw new AppValidationException(messages);
@@ -1887,7 +1888,7 @@ namespace VitalChoice.Business.Services.Orders
                 toReturn.AddRange(item.Value.Select(p => new MessageInfo()
                 {
                     Field = p.Field,
-                    Message = String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.OrderImportRowError], rowNumbers, p.Message),
+                    Message = String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ImportRowError], rowNumbers, p.Message),
                 }));
             }
             return toReturn;

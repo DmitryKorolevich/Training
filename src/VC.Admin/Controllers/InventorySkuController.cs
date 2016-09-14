@@ -52,6 +52,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Infrastructure.Domain;
+using VitalChoice.Core.Infrastructure.Helpers;
 
 namespace VC.Admin.Controllers
 {
@@ -177,6 +178,31 @@ namespace VC.Admin.Controllers
         public async Task<Result<bool>> DeleteInventorySku(int id)
         {
             return await _inventorySkuService.DeleteAsync(id);
+        }
+
+        [HttpPost]
+        [AdminAuthorize(PermissionType.InventorySkus)]
+        public async Task<Result<bool>> ImportInventorySkus()
+        {
+            var form = await Request.ReadFormAsync();
+
+            var parsedContentDisposition = ContentDispositionHeaderValue.Parse(form.Files[0].ContentDisposition);
+
+            var contentType = form.Files[0].ContentType;
+            using (var stream = form.Files[0].OpenReadStream())
+            {
+                var fileContent = stream.ReadFully();
+
+                var sUserId = _userManager.GetUserId(Request.HttpContext.User);
+                int userId;
+                var toReturn = false;
+                if (int.TryParse(sUserId, out userId))
+                {
+                    toReturn = await _inventorySkuService.ImportInventorySkusAsync(fileContent, userId);
+                }
+
+                return toReturn;
+            }
         }
 
         #endregion

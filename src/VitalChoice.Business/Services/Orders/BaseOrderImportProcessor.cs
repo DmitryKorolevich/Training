@@ -13,6 +13,7 @@ using CsvHelper.Configuration;
 using FluentValidation.Validators;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.CsvImportMaps;
+using VitalChoice.Business.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -24,6 +25,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Infrastructure.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Transfer;
 
 namespace VitalChoice.Business.Services.Orders
@@ -69,7 +71,7 @@ namespace VitalChoice.Business.Services.Orders
             List<OrderImportItemOrderDynamic> toReturn = null;
 
             List<OrderBaseImportItem> records = new List<OrderBaseImportItem>();
-            Dictionary<string, OrderValidationGenericProperty> validationSettings = null;
+            Dictionary<string, ImportItemValidationGenericProperty> validationSettings = null;
             using (var memoryStream = new MemoryStream(file))
             {
                 using (var streamReader = new StreamReader(memoryStream))
@@ -82,7 +84,7 @@ namespace VitalChoice.Business.Services.Orders
                     using (var csv = new CsvReader(streamReader, configuration))
                     {
                         PropertyInfo[] modelProperties = RecordType.GetProperties();
-                        validationSettings = GetOrderImportValidationSettings(modelProperties);
+                        validationSettings = BusinessHelper.GetAttrBaseImportValidationSettings(modelProperties);
 
                         int rowNumber = 1;
                         try
@@ -111,11 +113,11 @@ namespace VitalChoice.Business.Services.Orders
 
             if (validationSettings != null)
             {
-                ValidateOrderImportItems(records, validationSettings);
+                BusinessHelper.ValidateAttrBaseImportItems(records, validationSettings);
             }
 
             //throw parsing and validation errors
-            Messages = FormatRowsRecordErrorMessages(records);
+            Messages = BusinessHelper.FormatRowsRecordErrorMessages(records);
             if (Messages.Count > 0)
             {
                 throw new AppValidationException(Messages);
@@ -123,20 +125,6 @@ namespace VitalChoice.Business.Services.Orders
 
             toReturn = await OrdersForImportBaseConvert(records, orderType, customer, paymentMethod, idAddedBy);
 
-            return toReturn;
-        }
-
-        public ICollection<MessageInfo> FormatRowsRecordErrorMessages(IEnumerable<OrderBaseImportItem> items)
-        {
-            List<MessageInfo> toReturn = new List<MessageInfo>();
-            foreach (var item in items)
-            {
-                toReturn.AddRange(item.ErrorMessages.Select(p => new MessageInfo()
-                {
-                    Field = p.Field,
-                    Message = String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.OrderImportRowError], item.RowNumber, p.Message),
-                }));
-            }
             return toReturn;
         }
 
@@ -203,79 +191,6 @@ namespace VitalChoice.Business.Services.Orders
                 Field = field ?? "Base",
                 Message = message,
             };
-        }
-
-        private Dictionary<string, OrderValidationGenericProperty> GetOrderImportValidationSettings(ICollection<PropertyInfo> modelProperties)
-        {
-            Dictionary<string, OrderValidationGenericProperty> toReturn = new Dictionary<string, OrderValidationGenericProperty>();
-            foreach (var modelProperty in modelProperties)
-            {
-                var displayAttribute = modelProperty.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault();
-                if (displayAttribute != null)
-                {
-                    OrderValidationGenericProperty item = new OrderValidationGenericProperty();
-                    item.DisplayName = displayAttribute.Name;
-                    item.PropertyInfo = modelProperty;
-                    item.PropertyType = modelProperty.PropertyType;
-                    item.Get = modelProperty.GetMethod?.CompileAccessor<object, object>();
-                    var requiredAttribute = modelProperty.GetCustomAttributes<RequiredAttribute>(true).FirstOrDefault();
-                    if (requiredAttribute != null)
-                    {
-                        item.IsRequired = true;
-                    }
-                    var emailAddressAttribute = modelProperty.GetCustomAttributes<EmailAddressAttribute>(true).FirstOrDefault();
-                    if (emailAddressAttribute != null)
-                    {
-                        item.IsEmail = true;
-                    }
-                    var maxLengthAttribute = modelProperty.GetCustomAttributes<MaxLengthAttribute>(true).FirstOrDefault();
-                    if (maxLengthAttribute != null)
-                    {
-                        item.MaxLength = maxLengthAttribute.Length;
-                    }
-                    toReturn.Add(modelProperty.Name, item);
-                }
-            }
-
-            return toReturn;
-        }
-
-        private void ValidateOrderImportItems(ICollection<OrderBaseImportItem> models, Dictionary<string, OrderValidationGenericProperty> settings)
-        {
-            EmailValidator emailValidator = new EmailValidator();
-            var emailRegex = new Regex(emailValidator.Expression, RegexOptions.IgnoreCase);
-            foreach (var model in models)
-            {
-                foreach (var pair in settings)
-                {
-                    var setting = pair.Value;
-
-                    bool valid = true;
-                    if (typeof(string) == setting.PropertyType)
-                    {
-                        string value = (string)setting.Get(model);
-                        if (setting.IsRequired && String.IsNullOrEmpty(value))
-                        {
-                            model.ErrorMessages.Add(AddErrorMessage(setting.DisplayName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsRequired], setting.DisplayName)));
-                            valid = false;
-                        }
-
-                        if (valid && setting.MaxLength.HasValue && !String.IsNullOrEmpty(value) && value.Length > setting.MaxLength.Value)
-                        {
-                            model.ErrorMessages.Add(AddErrorMessage(setting.DisplayName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldMaxLength], setting.DisplayName, setting.MaxLength.Value)));
-                            valid = false;
-                        }
-
-                        if (valid && setting.IsEmail && !String.IsNullOrEmpty(value))
-                        {
-                            if (!emailRegex.IsMatch(value))
-                            {
-                                model.ErrorMessages.Add(AddErrorMessage(setting.DisplayName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsInvalidEmail], setting.DisplayName)));
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 }

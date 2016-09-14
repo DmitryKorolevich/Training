@@ -42,7 +42,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             public const string WrongCaptcha = "WrongCaptcha";
             public const string CustomerWasModified = "CustomerWasModified";
             public const string SkuNotFound = "SkuNotFound";
-            public const string OrderImportRowError = "OrderImportRowError";
+            public const string ImportRowError = "ImportRowError";
             public const string ParseDateError = "ParseDateError";
             public const string ParseIntError = "ParseIntError";
             public const string ZeroSkusForOrderInImport = "ZeroSkusForOrderInImport";
@@ -63,7 +63,10 @@ namespace VitalChoice.Infrastructure.Domain.Constants
 		    public const string AutoShipAlreadyStarted = "AutoShipAlreadyStarted";
 		    public const string AutoShipAlreadyPaused = "AutoShipAlreadyPaused";
 		    public const string AutoShipOrderShouldContainAutoShip = "AutoShipOrderShouldContainAutoShip";
-		}
+            public const string InventorySkuImportCodeDublicate = "InventorySkuImportCodeDublicate";
+            public const string InventorySkuLookupValueMissed = "InventorySkuLookupValueMissed";
+            public const string InventorySkuCategoryMissed = "InventorySkuCategoryMissed";
+        }
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
 	    {
@@ -103,7 +106,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             {Keys.WrongCaptcha, "The reCAPTCHA wasn't entered correctly"},
             {Keys.CustomerWasModified, "The customer has been activated by a store front user. Please refresh this page before making changes"},
             {Keys.SkuNotFound, "Product SKU has not been found in the database"},
-            {Keys.OrderImportRowError, "Row number(s) {0} error: {1}"},
+            {Keys.ImportRowError, "Row number(s) {0} error: {1}"},
             {Keys.ParseDateError, "{0} can't be parsed(format 'MM/dd/yyyy')"},
             {Keys.ParseIntError, "{0} can't be parsed"},
             {Keys.ZeroSkusForOrderInImport, "Order should have at least one sku with specified qty"},
@@ -123,7 +126,10 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             {Keys.AccessDenied,  "Access denied"},
             {Keys.AutoShipAlreadyStarted,  "Auto-Ship has been started already. Please refresh page to check changes"},
             {Keys.AutoShipAlreadyPaused,  "Auto-Ship has been paused already. Please refresh page to check changes"},
-            {Keys.AutoShipOrderShouldContainAutoShip,  "Your Auto-Ship order should contain Auto-Ship product"}
+            {Keys.AutoShipOrderShouldContainAutoShip,  "Your Auto-Ship order should contain Auto-Ship product"},
+            {Keys.InventorySkuImportCodeDublicate,  "Part with the same code is already exist"},
+            {Keys.InventorySkuLookupValueMissed,  "{0} lookup value wasn't found"},
+            {Keys.InventorySkuCategoryMissed,  "Category wasn't found"},
         };
     }
 }

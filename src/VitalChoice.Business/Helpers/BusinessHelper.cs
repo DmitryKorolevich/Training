@@ -1,11 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using FluentValidation.Validators;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Entities.Orders;
 
 namespace VitalChoice.Business.Helpers
 {
@@ -66,5 +74,101 @@ namespace VitalChoice.Business.Helpers
 			}
 			return toReturn;
 		}
-	}
+
+        public static Dictionary<string, ImportItemValidationGenericProperty> GetAttrBaseImportValidationSettings(ICollection<PropertyInfo> modelProperties)
+        {
+            Dictionary<string, ImportItemValidationGenericProperty> toReturn = new Dictionary<string, ImportItemValidationGenericProperty>();
+            foreach (var modelProperty in modelProperties)
+            {
+                var displayAttribute = modelProperty.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault();
+                if (displayAttribute != null)
+                {
+                    ImportItemValidationGenericProperty item = new ImportItemValidationGenericProperty();
+                    item.DisplayName = displayAttribute.Name;
+                    item.PropertyInfo = modelProperty;
+                    item.PropertyType = modelProperty.PropertyType;
+                    item.Get = modelProperty.GetMethod?.CompileAccessor<object, object>();
+                    var requiredAttribute = modelProperty.GetCustomAttributes<RequiredAttribute>(true).FirstOrDefault();
+                    if (requiredAttribute != null)
+                    {
+                        item.IsRequired = true;
+                    }
+                    var emailAddressAttribute = modelProperty.GetCustomAttributes<EmailAddressAttribute>(true).FirstOrDefault();
+                    if (emailAddressAttribute != null)
+                    {
+                        item.IsEmail = true;
+                    }
+                    var maxLengthAttribute = modelProperty.GetCustomAttributes<MaxLengthAttribute>(true).FirstOrDefault();
+                    if (maxLengthAttribute != null)
+                    {
+                        item.MaxLength = maxLengthAttribute.Length;
+                    }
+                    toReturn.Add(modelProperty.Name, item);
+                }
+            }
+
+            return toReturn;
+        }
+
+        public static void ValidateAttrBaseImportItems(IEnumerable<BaseImportItem> models, Dictionary<string, ImportItemValidationGenericProperty> settings)
+        {
+            EmailValidator emailValidator = new EmailValidator();
+            var emailRegex = new Regex(emailValidator.Expression, RegexOptions.IgnoreCase);
+            foreach (var model in models)
+            {
+                foreach (var pair in settings)
+                {
+                    var setting = pair.Value;
+
+                    bool valid = true;
+                    if (typeof(string) == setting.PropertyType)
+                    {
+                        string value = (string)setting.Get(model);
+                        if (setting.IsRequired && String.IsNullOrEmpty(value))
+                        {
+                            model.ErrorMessages.Add(AddErrorMessage(setting.DisplayName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsRequired], setting.DisplayName)));
+                            valid = false;
+                        }
+
+                        if (valid && setting.MaxLength.HasValue && !String.IsNullOrEmpty(value) && value.Length > setting.MaxLength.Value)
+                        {
+                            model.ErrorMessages.Add(AddErrorMessage(setting.DisplayName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldMaxLength], setting.DisplayName, setting.MaxLength.Value)));
+                            valid = false;
+                        }
+
+                        if (valid && setting.IsEmail && !String.IsNullOrEmpty(value))
+                        {
+                            if (!emailRegex.IsMatch(value))
+                            {
+                                model.ErrorMessages.Add(AddErrorMessage(setting.DisplayName, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsInvalidEmail], setting.DisplayName)));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public static ICollection<MessageInfo> FormatRowsRecordErrorMessages(IEnumerable<BaseImportItem> items)
+        {
+            List<MessageInfo> toReturn = new List<MessageInfo>();
+            foreach (var item in items)
+            {
+                toReturn.AddRange(item.ErrorMessages.Select(p => new MessageInfo()
+                {
+                    Field = p.Field,
+                    Message = String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ImportRowError], item.RowNumber, p.Message),
+                }));
+            }
+            return toReturn;
+        }
+
+        public static MessageInfo AddErrorMessage(string field, string message)
+        {
+            return new MessageInfo()
+            {
+                Field = field ?? "Base",
+                Message = message,
+            };
+        }
+    }
 }
