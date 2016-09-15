@@ -962,7 +962,7 @@ namespace VitalChoice.Business.Services.Orders
                         }
                         catch (Exception e)
                         {
-                            Logger.LogError($"AutoShip {autoShip.Id} skipped due to error ocurred. Error: {e.Message}", e);
+                            Logger.LogError($"AutoShip {autoShip.Id}(Customer Id - {autoShip.Customer?.Id}) skipped due to error ocurred. Error: {e.Message}", e);
                             transaction.Rollback();
 
                             success = false;
