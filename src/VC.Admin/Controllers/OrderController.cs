@@ -750,6 +750,15 @@ namespace VC.Admin.Controllers
                 order.IdEditedBy = userId;
             }
 
+            var customer =await _customerService.SelectAsync(order.Customer.Id);
+            if (customer.SafeData.Source == null)
+            {
+                customer.Data.Source = model.Customer.Source;
+                customer.Data.SourceDetails = model.Customer.SourceDetails;
+                customer.IdEditedBy = userId;
+                await _customerService.UpdateAsync(customer);
+            }
+
             var sendOrderConfirm = false;
             if (model.CombinedEditOrderStatus != OrderStatus.Cancelled && model.CombinedEditOrderStatus != OrderStatus.Exported && model.CombinedEditOrderStatus != OrderStatus.Shipped)
             {

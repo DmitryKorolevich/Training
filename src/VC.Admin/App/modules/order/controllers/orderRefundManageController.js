@@ -76,6 +76,13 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         if (result.Success)
         {
             $scope.order = result.Data;
+            if ($scope.order.RefundSkus)
+            {
+                angular.forEach($scope.order.RefundSkus, function (item)
+                {
+                    item.InitQuantity = item.Quantity;
+                });
+            }
             orderEditService.baseProcessLoadingOrder($scope);
 
             if (!$scope.options.inited)
@@ -176,6 +183,18 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         {
             return;
         }
+
+        if ($scope.order.RefundSkus)
+        {
+            angular.forEach($scope.order.RefundSkus, function (item)
+            {
+                if (item.Quantity < 1 || item.Quantity > item.InitQuantity)
+                {
+                    item.Quantity = item.InitQuantity;
+                }
+            });
+        }
+
         if (!$scope.forms.mainForm.$valid || !$scope.forms.mainForm2.$valid)
         {
             $scope.forms.mainForm.submitted = true;
