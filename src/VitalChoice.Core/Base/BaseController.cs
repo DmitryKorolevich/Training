@@ -63,6 +63,7 @@ namespace VitalChoice.Core.Base
             {
                 return ModelState.IsValid;
             }
+            ModelState.MaxAllowedErrors = 1000;
             foreach (var validationError in model.Errors)
             {
                 ModelState.AddModelError(validationError.Key, validationError.Value);
