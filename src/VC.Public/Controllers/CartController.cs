@@ -211,7 +211,7 @@ namespace VC.Public.Controllers
             cart.Order.Discount = await _discountService.GetByCode(model.DiscountCode);
             var gcCodes = model.GiftCertificateCodes.Select(x => x.Value?.Trim().ToUpper()).ToList();
             cart.Order.GiftCertificates?.MergeKeyed(
-                gcCodes.Select(code => _gcService.GetGiftCertificateAsync(code).Result).Where(g => g != null).ToArray(),
+                await gcCodes.Select(code => _gcService.GetGiftCertificateAsync(code)).Where(g => g != null).ToListAsync(),
                 gc => gc.GiftCertificate?.Code?.Trim().ToUpper(), code => code.Code?.Trim().ToUpper(),
                 code => new GiftCertificateInOrder
                 {
