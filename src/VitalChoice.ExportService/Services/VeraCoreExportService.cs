@@ -83,7 +83,7 @@ namespace VitalChoice.ExportService.Services
                         }
                         if (order.NPOrderStatus != OrderStatus.Processed)
                         {
-                            throw new ApiException($"Cannot export order {order.Id}. Invalid NP status: {order.POrderStatus}");
+                            throw new ApiException($"Cannot export order {order.Id}. Invalid NP status: {order.NPOrderStatus}");
                         }
 
                         perishablePart = await CreateExportFromOrder(order, context, ExportSide.Perishable);

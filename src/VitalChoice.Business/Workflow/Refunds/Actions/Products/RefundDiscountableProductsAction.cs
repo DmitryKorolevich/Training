@@ -194,12 +194,12 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
             var discountableProducts = skus.Where(s => !((bool?)s.Sku.SafeData.NonDiscountable ?? false)).ToArray();
 
             dataContext.SplitInfo.DiscountablePerishable =
-                discountableProducts.Where(p => p.Sku.IdObjectType == (int)ProductType.Perishable).Sum(p => p.Amount * p.Quantity);
+                discountableProducts.Where(p => p.Sku.IdObjectType == (int)ProductType.Perishable).Sum(p => p.Amount);
 
             dataContext.SplitInfo.DiscountableNonPerishable =
-                discountableProducts.Where(p => p.Sku.IdObjectType == (int)ProductType.NonPerishable).Sum(p => p.Amount * p.Quantity);
+                discountableProducts.Where(p => p.Sku.IdObjectType == (int)ProductType.NonPerishable).Sum(p => p.Amount);
 
-            return Task.FromResult(discountableProducts.Sum(s => s.Amount*s.Quantity));
+            return Task.FromResult(discountableProducts.Sum(s => s.Amount));
         }
     }
 }
