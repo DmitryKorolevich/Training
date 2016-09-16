@@ -61,8 +61,12 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<PagedList<GiftCertificate>> GetGiftCertificatesAsync(GCFilter filter)
         {
-            var conditions = new GcQuery().NotDeleted().WithType(filter.Type).WidthStatus(filter.StatusCode).WithCode(filter.Code)
-                .WithEqualCode(filter.ExactCode).WithEmail(filter.Email).WithName(filter.Name);
+            var conditions = new GcQuery().NotDeleted().WithType(filter.Type).WidthStatus(filter.StatusCode).WithCode(filter.Code);
+            if (!string.IsNullOrWhiteSpace(filter.ExactCode))
+            {
+                conditions = conditions.WithEqualCode(filter.ExactCode);
+            }
+            conditions = conditions.WithEmail(filter.Email).WithName(filter.Name);
             var query = giftCertificateRepository.Query(conditions);
 
             Func<IQueryable<GiftCertificate>, IOrderedQueryable<GiftCertificate>> sortable = x => x.OrderByDescending(y => y.Created);

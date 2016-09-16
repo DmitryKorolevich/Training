@@ -29,10 +29,7 @@ namespace VitalChoice.Business.Queries.Product
 
         public GcQuery WithEqualCode(string code)
         {
-            if (!String.IsNullOrEmpty(code))
-            {
-                Add(x => x.Code == code);
-            }
+            Add(x => x.Code == code);
             return this;
         }
 
