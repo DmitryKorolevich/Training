@@ -20,6 +20,8 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<GiftCertificate> GetGiftCertificateAsync(string code);
 
+        Task<List<GiftCertificate>> TryGetGiftCertificatesAsync(ICollection<string> codes);
+
         Task<GiftCertificate> UpdateGiftCertificateAsync(GiftCertificate model);
 
         Task<ICollection<GiftCertificate>> AddManualGiftCertificatesAsync(int quantity,GiftCertificate model);

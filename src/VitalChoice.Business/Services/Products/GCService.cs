@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.Data.Repositories.Specifics;
@@ -257,6 +258,17 @@ namespace VitalChoice.Business.Services.Products
             var query = giftCertificateRepository.Query(new GcQuery().WithEqualCode(code.Trim()).NotDeleted());
 
             return query.SelectFirstOrDefaultAsync(false);
+        }
+
+        public Task<List<GiftCertificate>> TryGetGiftCertificatesAsync(ICollection<string> codes)
+        {
+            if (codes == null || codes.Count == 0)
+            {
+                return TaskCache<List<GiftCertificate>>.DefaultCompletedTask;
+            }
+
+            var query = giftCertificateRepository.Query(new GcQuery().WithEqualCodes(codes).NotDeleted());
+            return query.SelectAsync(false);
         }
 
         public async Task<GiftCertificate> UpdateGiftCertificateAsync(GiftCertificate model)

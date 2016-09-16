@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using VitalChoice.Data.Helpers;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -30,6 +31,12 @@ namespace VitalChoice.Business.Queries.Product
         public GcQuery WithEqualCode(string code)
         {
             Add(x => x.Code == code);
+            return this;
+        }
+
+        public GcQuery WithEqualCodes(ICollection<string> codes)
+        {
+            Add(x => codes.Contains(x.Code));
             return this;
         }
 
