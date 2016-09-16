@@ -29,7 +29,7 @@ namespace VC.Public.Controllers
             if (!String.IsNullOrEmpty(id))
             {
                 GCFilter filter = new GCFilter();
-                filter.Code = id;
+                filter.ExactCode = id;
                 filter.Paging.PageItemCount = 1;
                 var gc = (await _gcService.GetGiftCertificatesAsync(filter)).Items.FirstOrDefault();
                 if(gc!=null)
