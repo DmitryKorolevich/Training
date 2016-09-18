@@ -16,6 +16,7 @@ using VitalChoice.Core.Services;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Checkout;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -209,9 +210,12 @@ namespace VC.Public.Controllers
                     });
             }
             cart.Order.Discount = await _discountService.GetByCode(model.DiscountCode);
-            var gcCodes = model.GiftCertificateCodes.Select(x => x.Value?.Trim().ToUpper()).ToList();
-            cart.Order.GiftCertificates?.MergeKeyed(
-                gcCodes.Select(code => _gcService.GetGiftCertificateAsync(code).Result).Where(g => g != null).ToArray(),
+            var gcCodes =
+                model.GiftCertificateCodes.Select(x => x.Value?.Trim().ToUpper())
+                    .Where(v => !string.IsNullOrWhiteSpace(v))
+                    .Distinct()
+                    .ToList();
+            cart.Order.GiftCertificates?.MergeKeyed(await _gcService.TryGetGiftCertificatesAsync(gcCodes),
                 gc => gc.GiftCertificate?.Code?.Trim().ToUpper(), code => code.Code?.Trim().ToUpper(),
                 code => new GiftCertificateInOrder
                 {

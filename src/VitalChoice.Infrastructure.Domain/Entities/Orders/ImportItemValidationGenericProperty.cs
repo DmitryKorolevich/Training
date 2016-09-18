@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace VitalChoice.Infrastructure.Domain.Entities.Orders
 {
-    public class OrderValidationGenericProperty
+    public class ImportItemValidationGenericProperty
     {
         public PropertyInfo PropertyInfo { get; set; }
         public Func<object, object> Get { get; set; }

@@ -1,9 +1,10 @@
 ﻿angular.module('app.modules.order.controllers.ordersController', [])
-.controller('ordersController', ['$scope', '$rootScope', '$state', '$stateParams', 'orderService', 'settingService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
-    function ($scope, $rootScope, $state, $stateParams, orderService, settingService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
+.controller('ordersController', ['$scope', '$rootScope', '$state', '$stateParams', 'orderService', 'settingService', 'gcService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
+    function ($scope, $rootScope, $state, $stateParams, orderService, settingService, gcService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
     {
         $scope.refreshTracker = promiseTracker("refresh");
         $scope.deleteTracker = promiseTracker("delete");
+        $scope.gcRefreshTracker = promiseTracker("gcRefresh");
 
         function errorHandler(result)
         {
@@ -92,6 +93,7 @@
 
             $scope.items = [];
             $scope.states = [];
+            $scope.options = {};
 
             var currentDate = new Date();
             currentDate.setHours(0, 0, 0, 0);
@@ -130,6 +132,11 @@
                 IdShippingMethod: null,
                 Paging: { PageIndex: 1, PageItemCount: 200 },
                 Sorting: gridSorterUtil.resolve(refreshOrders, "DateCreated", "Desc"),
+            };
+
+            $scope.gcfilter = {
+                ExactCode: null,
+                Paging: { PageIndex: 1, PageItemCount: 1 },
             };
 
             $scope.$watch("filter.ShipDate", function (newValue, oldValue)
@@ -171,6 +178,38 @@
                     errorHandler(result);
                 });
         }
+
+        $scope.filterGCs = function ()
+        {
+            if ($scope.gcfilter.ExactCode)
+            {
+                $scope.gc = null;
+                $scope.options.gcSearchUsed = false;
+                gcService.getGiftCertificates($scope.gcfilter, $scope.gcRefreshTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            if (result.Data.Items && result.Data.Items.length > 0)
+                            {
+                                $scope.gc = result.Data.Items[0];
+                            }
+                            else
+                            {
+                                $scope.gc = null;
+                            }
+                            $scope.options.gcSearchUsed = true;
+                        } else
+                        {
+                            errorHandler(result);
+                        }
+                    })
+                    .error(function (result)
+                    {
+                        errorHandler(result);
+                    });
+            }
+        };
 
         $scope.filterOrders = function ()
         {

@@ -6,7 +6,7 @@
     "Autofac.Extensions.DependencyInjection": "4.0.0-*",
     "Microsoft.EntityFrameworkCore": "1.0.0.*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*",
-    "Microsoft.AspNetCore.Mvc.Core": "1.0.0-*"
+    "Microsoft.AspNetCore.Mvc.Core": "1.0.1"
   },
 
   "frameworks": {

@@ -430,7 +430,9 @@ namespace VC.Public.Controllers
                     {
                         if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
                         {
-                            await _userService.RemoveAsync(cart.Order.Customer.Id);
+                            var user = await _userService.GetAsync(cart.Order.Customer.Id);
+                            user.Status = UserStatus.NotActive;
+                            await _userService.UpdateAsync(user);
                         }
                     }
                     throw new AppValidationException(newMessages);
@@ -442,7 +444,9 @@ namespace VC.Public.Controllers
                     {
                         if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
                         {
-                            await _userService.RemoveAsync(cart.Order.Customer.Id);
+                            var user = await _userService.GetAsync(cart.Order.Customer.Id);
+                            user.Status = UserStatus.NotActive;
+                            await _userService.UpdateAsync(user);
                         }
                     }
                     throw;
@@ -864,7 +868,12 @@ namespace VC.Public.Controllers
             CustomerDynamic newCustomer;
             if (model.GuestCheckout)
             {
-                existing = await CustomerService.GetByEmailAsync(model.Email);
+                var existingId = await CustomerService.TryGetActiveIdByEmailAsync(model.Email) ??
+                                 await CustomerService.TryGetPhoneOnlyIdByEmailAsync(model.Email);
+                if (existingId.HasValue)
+                {
+                    existing = await CustomerService.SelectAsync(existingId.Value, true);
+                }
                 if (existing == null || existing.StatusCode != (int) CustomerStatus.PhoneOnly)
                 {
                     newCustomer = await CreateAccount(model);
@@ -882,7 +891,12 @@ namespace VC.Public.Controllers
             }
             else
             {
-                existing = await CustomerService.GetByEmailAsync(model.Email);
+                var existingId = await CustomerService.TryGetActiveIdByEmailAsync(model.Email) ??
+                                 await CustomerService.TryGetPhoneOnlyIdByEmailAsync(model.Email);
+                if (existingId.HasValue)
+                {
+                    existing = await CustomerService.SelectAsync(existingId.Value, true);
+                }
                 if (existing == null || existing.StatusCode != (int) CustomerStatus.PhoneOnly)
                 {
                     newCustomer = await CreateAccount(model);
@@ -904,50 +918,41 @@ namespace VC.Public.Controllers
             };
         }
 
-        private Func<Task<ApplicationUser>> CreateLoginForExistingGuest(CustomerDynamic newCustomer)
+        private Func<Task<ApplicationUser>> CreateLoginForExistingGuest(CustomerDynamic newCustomer) => async () =>
         {
-            return async () =>
+            var user = await _userService.GetAsync(newCustomer.Id);
+            user = await _userService.SignInNoStatusCheckingAsync(user);
+            if (user == null)
             {
-                var user = await _userService.GetAsync(newCustomer.Id);
-                user = await _userService.SignInNoStatusCheckingAsync(user);
-                if (user == null)
-                {
-                    throw new AppValidationException(
-                        ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
-                }
-                return user;
-            };
-        }
+                throw new AppValidationException(
+                    ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+            }
+            return user;
+        };
 
-        private Func<Task<ApplicationUser>> CreateLoginForNewGuest(CustomerDynamic newCustomer)
+        private Func<Task<ApplicationUser>> CreateLoginForNewGuest(CustomerDynamic newCustomer) => async () =>
         {
-            return async () =>
+            await _userService.SendActivationAsync(newCustomer.Id);
+            var user = await _userService.GetAsync(newCustomer.Id);
+            user = await _userService.SignInNoStatusCheckingAsync(user);
+            if (user == null)
             {
-                await _userService.SendActivationAsync(newCustomer.Id);
-                var user = await _userService.GetAsync(newCustomer.Id);
-                user = await _userService.SignInNoStatusCheckingAsync(user);
-                if (user == null)
-                {
-                    throw new AppValidationException(
-                        ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
-                }
-                return user;
-            };
-        }
+                throw new AppValidationException(
+                    ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+            }
+            return user;
+        };
 
-        private Func<Task<ApplicationUser>> CreateLoginForNewActive(AddUpdateBillingAddressModel model, int id)
+        private Func<Task<ApplicationUser>> CreateLoginForNewActive(AddUpdateBillingAddressModel model, int id) => async () =>
         {
-            return async () =>
+            await _userService.SendSuccessfulRegistration(model.Email, model.FirstName, model.LastName);
+            var user = await _userService.SignInAsync(id, model.Password);
+            if (user == null)
             {
-                await _userService.SendSuccessfulRegistration(model.Email, model.FirstName, model.LastName);
-                var user = await _userService.SignInAsync(id, model.Password);
-                if (user == null)
-                {
-                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
-                }
-                return user;
-            };
-        }
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantSignIn]);
+            }
+            return user;
+        };
 
         private async Task<ApplicationUser> CustomerPasswordLogin(LoginModel model)
         {

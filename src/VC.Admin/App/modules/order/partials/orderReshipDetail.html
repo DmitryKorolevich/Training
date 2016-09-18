@@ -282,6 +282,12 @@
                                                     </div>
 
                                                     <span class="legend">Notes</span>
+                                                    <div data-ng-if="order.GiftOrder" class="form-group">
+                                                        <label class="col-md-12 control-label left">Gift Message (*Will appear on invoice)</label>
+                                                        <div class="col-md-12">
+                                                            <textarea type="text" name="GiftMessage" class="form-control" placeholder="Gift Message" rows="5" data-ng-model="order.GiftMessage" data-ng-disabled="orderEditDisabled"></textarea>
+                                                        </div>
+                                                    </div>
                                                     <div class="form-group">
                                                         <label class="col-md-12 control-label left">Delivery Instructions (*Prints to Shipping Label):</label>
                                                         <div class="col-md-12">

@@ -3,7 +3,7 @@
   "description": "VitalChoice.Profiling Class Library",
   "authors": [ "multi_000" ],
   "dependencies": {
-    "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.0-*",
+    "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.1",
     "Microsoft.EntityFrameworkCore.Relational": "1.0.0.*",
     "Microsoft.EntityFrameworkCore.SqlServer": "1.0.0.*",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*"

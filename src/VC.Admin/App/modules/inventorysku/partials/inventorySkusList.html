@@ -17,6 +17,7 @@
         <hr />
         <div class="form-group">
             <button data-ng-click="open();" class="btn btn-primary">Add New Part</button>
+            <button class="btn btn-primary pull-right" ngf-select ngf-change="upload($files)" accept=".csv,">Import Parts</button>
         </div>
         <spinner-overlay data-loading="refreshTracker.active()">
             <table id="data-grid" class="table table-striped table-hover ">

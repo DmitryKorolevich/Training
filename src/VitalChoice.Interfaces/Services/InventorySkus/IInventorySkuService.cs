@@ -25,5 +25,7 @@ namespace VitalChoice.Interfaces.Services.InventorySkus
 
 	    void ConvertInventoriesSummaryUsageReportForExport(InventoriesSummaryUsageReport report,
 	        out IList<DynamicExportColumn> columns, out IList<ExpandoObject> items);
+
+        Task<bool> ImportInventorySkusAsync(byte[] file, int userId);
     }
 }

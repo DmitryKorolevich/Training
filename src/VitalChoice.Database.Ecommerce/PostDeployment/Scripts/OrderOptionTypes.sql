@@ -11,3 +11,15 @@ BEGIN
 
 END
 GO
+
+IF NOT EXISTS(SELECT * FROM OrderOptionTypes WHERE IdObjectType=5 AND Name='GiftMessage')
+BEGIN
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'GiftMessage', 4, NULL, 5, NULL),
+	(N'GiftOrder', 5, NULL, 5, NULL)
+
+END
+GO

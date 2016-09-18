@@ -11,8 +11,16 @@
                             <small class="error" ng-show="forms.form.Id.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Order #")}}</small>
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-4">
                         <button class="btn btn-info" data-ng-click="directFilterOrders();" type="button">Locate Order</button>
+                    </div> 
+                    <div class="col-md-6">
+                        <div class="pull-right padding-left-15px">
+                            <button class="btn btn-info" data-ng-click="filterGCs();" type="button" ladda="gcRefreshTracker.active()">Check GC Balance</button>
+                        </div>
+                        <div class="col-md-4 pull-right">
+                            <input type="text" name="ExactCode" class="form-control" placeholder="GC Code" data-ng-model="gcfilter.ExactCode" autocomplete="off">
+                        </div>
                     </div>
                 </div>
                 <hr />
@@ -49,6 +57,36 @@
                                 <input type="checkbox" name="ShipDate" data-ng-model="filter.ShipDate" />
                                 Ship Date
                             </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div data-ng-if="gc && gc.StatusCode==2">
+                            <div class="pull-right form-control-static padding-left-15px">
+                                <span>
+                                    <strong>Active</strong> Code: <strong>{{gc.Code}}</strong> Available Amount: <strong>{{gc.Balance | currency}}</strong>
+                                </span>
+                            </div>
+                            <span class="icon success pull-right">
+                                <i class="fa fa-check-circle"></i>
+                            </span>
+                        </div>
+                        <div data-ng-if="gc && gc.StatusCode==1">
+                            <div class="pull-right form-control-static padding-left-15px">
+                                <span>
+                                    <strong>Inactive</strong> Code: <strong>{{gc.Code}}</strong> Available Amount: <strong>{{gc.Balance | currency}}</strong>
+                                </span>
+                            </div>
+                            <span class="icon warning pull-right">
+                                <i class="fa fa-exclamation-triangle"></i>
+                            </span>
+                        </div>
+                        <div data-ng-if="!gc && options.gcSearchUsed">
+                            <div class="pull-right form-control-static padding-left-15px">
+                                <strong>Gift Certificate Not Found</strong>
+                            </div>
+                            <span class="icon warning pull-right">
+                                <i class="fa fa-exclamation-triangle"></i>
+                            </span>
                         </div>
                     </div>
                 </div>

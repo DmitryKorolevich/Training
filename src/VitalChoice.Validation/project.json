@@ -4,7 +4,7 @@
   "description": "",
   "authors": [ "" ],
   "dependencies": {
-    "Microsoft.AspNetCore.Mvc": "1.0.0-*",
+    "Microsoft.AspNetCore.Mvc": "1.0.1",
     "FluentValidation": "6.4.0-beta1",
     "VitalChoice.Ecommerce.Domain": "1.0.0-*"
   },
