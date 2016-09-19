@@ -7,34 +7,26 @@ namespace VitalChoice.Infrastructure.LoadBalancing
     public abstract class RoundRobinAbstractPool<T> : IDisposable
     {
         private readonly byte _maxThreads;
-        private readonly Action<T> _processingAction;
         private volatile bool _terminated;
         private byte _nextToUse;
         private readonly object _lock = new object();
-        private readonly ManualResetEvent[] _dataReadyEvents;
-        private readonly ConcurrentQueue<T>[] _dataQueues;
+        private readonly ThreadStartData[] _threadData;
 
-        protected RoundRobinAbstractPool(byte maxThreads, Action<T> processingAction)
+        protected RoundRobinAbstractPool(byte maxThreads)
         {
-            if (processingAction == null)
-                throw new ArgumentNullException(nameof(processingAction));
-
             _maxThreads = maxThreads;
-            _processingAction = processingAction;
             var pool = new Thread[maxThreads];
-            _dataReadyEvents = new ManualResetEvent[maxThreads];
-            _dataQueues = new ConcurrentQueue<T>[maxThreads];
-
+            _threadData = new ThreadStartData[maxThreads];
             for (var i = 0; i < maxThreads; i++)
             {
-                _dataQueues[i] = new ConcurrentQueue<T>();
-                _dataReadyEvents[i] = new ManualResetEvent(false);
+                _threadData[i] =
+                    new ThreadStartData
+                    {
+                        DataQueue = new ConcurrentQueue<T>(),
+                        DataReadyEvent = new ManualResetEvent(false)
+                    };
                 pool[i] = new Thread(ProcessThread);
-                pool[i].Start(new ThreadStartData
-                {
-                    DataQueue = _dataQueues[i],
-                    DataReadyEvent = _dataReadyEvents[i]
-                });
+                pool[i].Start(_threadData[i]);
             }
         }
 
@@ -42,11 +34,13 @@ namespace VitalChoice.Infrastructure.LoadBalancing
         {
             lock (_lock)
             {
-                _dataQueues[_nextToUse].Enqueue(data);
-                _dataReadyEvents[_nextToUse].Set();
+                _threadData[_nextToUse].DataQueue.Enqueue(data);
+                _threadData[_nextToUse].DataReadyEvent.Set();
                 _nextToUse = (byte) ((_nextToUse + 1)%_maxThreads);
             }
         }
+
+        protected abstract void ProcessingAction(T data);
 
         private void ProcessThread(object poolParameter)
         {
@@ -59,7 +53,7 @@ namespace VitalChoice.Infrastructure.LoadBalancing
                 T data;
                 while (parameters.DataQueue.TryDequeue(out data))
                 {
-                    _processingAction(data);
+                    ProcessingAction(data);
                 }
             }
         }
@@ -69,7 +63,7 @@ namespace VitalChoice.Infrastructure.LoadBalancing
             _terminated = true;
             for (var i = 0; i < _maxThreads; i++)
             {
-                _dataReadyEvents[i].Set();
+                _threadData[i].DataReadyEvent.Set();
             }
         }
 
