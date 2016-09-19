@@ -23,7 +23,7 @@ namespace VitalChoice.ExportService
             services.AddDbContext<ExportInfoContext>().AddDbContext<ExportInfoCopyContext>();
             services.AddScoped<IOrderExportService, OrderExportService>();
             services.AddScoped<IVeraCoreExportService, VeraCoreExportService>();
-            services.AddScoped<EncryptionKeyUpdater>();
+            //services.AddScoped<EncryptionKeyUpdater>();
             services.AddSingleton<EncryptedServiceBusHostServer>();
             services.AddSingleton<IGiftListCreditCardExportFileGenerator, GiftListCreditCardExportFileGenerator>();
         }
