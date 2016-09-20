@@ -49,6 +49,9 @@
                 To: currentDate.shiftDate('+1y'),
                 From: currentDate.shiftDate('-1y'),
                 NotBilledOnly: false,
+                IdCustomer: null,
+                CustomerFirstName: null,
+                CustomerLastName: null,
                 Paging: { PageIndex: 1, PageItemCount: 100 },
             };
 

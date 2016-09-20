@@ -55,7 +55,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
         	subMenu: [
                 { name: 'manageDCs', stateName: 'index.oneCol.manageDiscounts', stateLabel: 'Manage Discount Codes', access: 14 },
                 { name: 'managePromotions', stateName: 'index.oneCol.managePromotions', stateLabel: 'Manage Promotions', access: 14 },
-                { name: 'manageGCs', stateName: 'index.oneCol.manageGCs', stateLabel: 'Manage Gift Certificates', access: 14 },
+                { name: 'manageGCs', stateName: 'index.oneCol.manageGCs', stateLabel: 'Manage Gift Certificates', access: [14,18] },
                 { name: 'manageRedirect', stateName: 'index.oneCol.manageRedirect', stateLabel: 'Custom URL Redirects', access: 14 },
         	]
         },

@@ -15,6 +15,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             toaster.pop('success', "Success!", "Successfully saved.");
             if (!$scope.id)
             {
+                if (result.Data.EGiftNewOrderEmail)
+                {
+                    modalUtil.open('app/modules/gc/partials/sendEmail.html', 'sendEmailController', result.Data.EGiftNewOrderEmail);
+                }
                 $state.go('index.oneCol.orderReshipDetail', { id: result.Data.Id });
             }
             else

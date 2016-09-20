@@ -28,6 +28,17 @@
             </div>
         </div>
         <div class="row form-group">
+            <div class="col-md-2">
+                <input type="text" name="IdCustomer" class="form-control" placeholder="Customer #" data-ng-model="filter.IdCustomer">
+            </div>
+            <div class="col-md-2">
+                <input type="text" name="CustomerFirstName" class="form-control" placeholder="Customer First Name" data-ng-model="filter.CustomerFirstName">
+            </div>
+            <div class="col-md-2">
+                <input type="text" name="CustomerLastName" class="form-control" placeholder="Customer Last Name" data-ng-model="filter.CustomerLastName">
+            </div>
+        </div>
+        <div class="row form-group">
             <div class="col-md-12">
                 <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
                 <button data-ng-click="flagCustomer();" class="btn btn-primary pull-right">Flag Customer</button>
@@ -85,14 +96,14 @@
             </table>
         </spinner-overlay>
         <uib-pagination boundary-links="true"
-                    total-items="totalItems"
-                    items-per-page="filter.Paging.PageItemCount"
-                    data-ng-model="filter.Paging.PageIndex"
-                    previous-text="&lsaquo;"
-                    next-text="&rsaquo;"
-                    first-text="&laquo;"
-                    last-text="&raquo;"
-                    data-ng-change="pageChanged();scrollTo('data-grid');">
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        previous-text="&lsaquo;"
+                        next-text="&rsaquo;"
+                        first-text="&laquo;"
+                        last-text="&raquo;"
+                        data-ng-change="pageChanged();scrollTo('data-grid');">
         </uib-pagination>
     </div>
 </div>

@@ -217,6 +217,58 @@ namespace VitalChoice.Business.Services.Orders
                 };
             }
 
+            var map = toReturn.Items.Where(p => p.IdOrderSource.HasValue).
+                GroupBy(p => p.IdOrderSource).ToDictionary(p => p.Key, x => x.ToList());
+
+            //load order source info
+            int i = 0;
+            var groups = toReturn.Items.GroupBy(x => i++ / SqlConstants.MAX_CONTAINS_COUNT).ToList();
+            include = x => x.Include(p => p.OrderShippingPackages);
+            foreach (var group in groups)
+            {
+                var ids = group.Select(p => p.IdOrderSource).Where(p => p.HasValue).Select(p => p.Value).Distinct().ToList();
+                conditions = new OrderQuery().NotDeleted().WithIds(ids);
+                var orderSources = await _orderService.SelectAsync(conditions, include);
+                foreach (var orderSource in orderSources)
+                {
+                    List<ServiceCodeRefundItem> refunds;
+                    if (map.TryGetValue(orderSource.Id, out refunds))
+                    {
+                        string warehouse = null;
+                        string pWarehouse = null;
+                        string npWarehouse = null;
+
+                        if (orderSource.OrderShippingPackages != null && orderSource.OrderShippingPackages.Count > 0)
+                        {
+                            var package = orderSource.OrderShippingPackages.FirstOrDefault(p => !p.POrderType.HasValue);
+                            if (package != null)
+                            {
+                                warehouse = Enum.GetName(typeof(Warehouse), package.IdWarehouse);
+                            }
+
+                            package = orderSource.OrderShippingPackages.FirstOrDefault(p => p.POrderType == (int)POrderType.P);
+                            if (package != null)
+                            {
+                                pWarehouse = Enum.GetName(typeof(Warehouse), package.IdWarehouse);
+                            }
+
+                            package = orderSource.OrderShippingPackages.FirstOrDefault(p => p.POrderType == (int)POrderType.NP);
+                            if (package != null)
+                            {
+                                npWarehouse = Enum.GetName(typeof(Warehouse), package.IdWarehouse);
+                            }
+                        }
+                        foreach (var refund in refunds)
+                        {
+                            refund.OrderSourceDateCreated = orderSource.DateCreated;
+                            refund.Warehouse = warehouse;
+                            refund.PWarehouse = pWarehouse;
+                            refund.NPWarehouse = npWarehouse;
+                        }
+                    }
+                }
+            }
+
             return toReturn;
         }
 

@@ -103,4 +103,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\EmailTemplates.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\Roles.sql" />
+  </ItemGroup>
 </Project>

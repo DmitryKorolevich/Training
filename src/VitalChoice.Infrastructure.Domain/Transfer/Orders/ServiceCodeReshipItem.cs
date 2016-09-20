@@ -76,7 +76,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
                     : reship.Skus.Sum(p => p.Quantity * p.Sku.WholesalePrice);
                 Total -= listAmount;
                 SkuCodes = reship.ReshipProblemSkus?.Select(pp => pp.Code).ToList() ?? new List<string>();
-                OrderNotes = reship.SafeData.OrderNotes;
+                OrderNotes = reship.SafeData.ServiceCodeNotes;
             }
         }
     }

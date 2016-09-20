@@ -44,7 +44,7 @@ angular.module('app.modules.gc.controllers.sendEmailController', [])
 	        var balanceData = code.Amount;
 	        if (code.Amount.toFixed)
 	        {
-	            balanceData = balanceData.toFixed(2);
+	            code.Amount = balanceData.toFixed(2);
 	        }
 	    });
         

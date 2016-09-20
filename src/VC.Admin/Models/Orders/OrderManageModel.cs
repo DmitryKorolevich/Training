@@ -11,6 +11,7 @@ using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
@@ -259,6 +260,9 @@ namespace VC.Admin.Models.Orders
         public string OrderNotes { get; set; }
 
         [Map]
+        public string ServiceCodeNotes { get; set; }
+
+        [Map]
         public string GiftMessage { get; set; }
         
         [Map]
@@ -349,6 +353,8 @@ namespace VC.Admin.Models.Orders
         public ICollection<TrackingInvoiceItemModel> PTrackingEntities { get; set; }
 
         public ICollection<TrackingInvoiceItemModel> NPTrackingEntities { get; set; }
+
+        public GCEmailModel EGiftNewOrderEmail { get; set; }
 
         public OrderManageModel()
         {

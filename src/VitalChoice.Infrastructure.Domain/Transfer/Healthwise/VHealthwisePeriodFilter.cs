@@ -15,5 +15,9 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Healthwise
         public int? IdCustomer { get; set; }
 
         public bool NotPaid { get; set; }
+
+        public string CustomerFirstName { get; set; }
+
+        public string CustomerLastName { get; set; }
     }
 }
