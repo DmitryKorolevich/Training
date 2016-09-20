@@ -16,7 +16,12 @@ FROM            dbo.Orders AS o
 		) AS source 
 		PIVOT (MIN([Value]) FOR [Name] IN ([AutoShipFrequency], [LastAutoShipDate])) AS piv
 	) AS orderOptions ON o.Id = orderOptions.IdOrder
-WHERE o.IdObjectType = 2 AND o.StatusCode = 2 AND (o.OrderStatus IS NOT NULL AND o.OrderStatus <> 1 OR o.POrderStatus IS NOT NULL AND o.POrderStatus <> 1 OR o.NPOrderStatus IS NOT NULL AND o.NPOrderStatus <> 1)
+WHERE o.IdObjectType = 2 AND o.StatusCode = 2 AND 
+(
+	o.OrderStatus IS NOT NULL AND o.OrderStatus <> 1 OR 
+	o.POrderStatus IS NOT NULL AND o.POrderStatus <> 1 OR
+	 o.NPOrderStatus IS NOT NULL AND o.NPOrderStatus <> 1
+)
 GO
 
 
