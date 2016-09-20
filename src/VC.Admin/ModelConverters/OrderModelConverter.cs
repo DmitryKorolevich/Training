@@ -21,6 +21,7 @@ using VitalChoice.SharedWeb.Helpers;
 using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Interfaces.Services;
 
 namespace VC.Admin.ModelConverters
@@ -613,18 +614,18 @@ namespace VC.Admin.ModelConverters
                     // ReSharper disable once PossibleInvalidOperationException
                     model.SkuOrdereds.Where(s => s.Id.HasValue).ToDictionary(s => s.Id.Value, s => s);
                 Dictionary<string, SkuOrderedManageModel> notValid =
-                    model.SkuOrdereds.Where(s => !s.Id.HasValue && s.Code!=null).ToDictionary(s => s.Code, s => s);
+                    model.SkuOrdereds.Where(s => !s.Id.HasValue && s.Code != null).ToDictionary(s => s.Code, s => s);
                 foreach (var sku in validSkus)
                 {
-                    var item = valid[sku.Sku.Id];
-                    sku.Amount = item.Price ?? 0;
-                    sku.Quantity = item.QTY ?? 0;
+                    var item = valid.GetValueOrDefault(sku.Sku.Id);
+                    sku.Amount = item?.Price ?? 0;
+                    sku.Quantity = item?.QTY ?? 0;
                 }
                 foreach (var sku in notValidSkus)
                 {
-                    var item = notValid[sku.Sku.Code];
-                    sku.Amount = item.Price ?? 0;
-                    sku.Quantity = item.QTY ?? 0;
+                    var item = notValid.GetValueOrDefault(sku.Sku.Code);
+                    sku.Amount = item?.Price ?? 0;
+                    sku.Quantity = item?.QTY ?? 0;
                 }
                 dynamic.Skus = new List<SkuOrdered>(validSkus.Union(notValidSkus));
             }
