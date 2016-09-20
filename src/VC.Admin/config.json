@@ -16,6 +16,7 @@
     "GiftListUploadEmail": "gary@g2designgroup.com",
     "OrderShippingNotificationBcc": "",
     //cdbdf92c@trustpilotservice.com
+    "AffiliateEmailBcc": "affiliatesupport@vitalchoice.com",
 
     "EnableOrderTrackScripts": false,
     "GenerateLowercaseUrls": true,
