@@ -21,6 +21,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     Id: result.Data.Id,
                     Value: $scope.options.BrontoSubscribedStatus,
                 };
+                if (result.Data.EGiftNewOrderEmail)
+                {
+                    modalUtil.open('app/modules/gc/partials/sendEmail.html', 'sendEmailController', result.Data.EGiftNewOrderEmail);
+                }
                 $state.go('index.oneCol.orderDetail', { id: result.Data.Id });
             }
             else

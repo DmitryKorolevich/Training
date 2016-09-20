@@ -292,10 +292,14 @@
                 </tbody>
             </table>
         </spinner-overlay>
-        <div><strong>{{totalItems}}</strong> Orders Found - Displaying <strong>{{filter.Paging.PageItemCount}}</strong> Orders Per Page</div>
+        <div>
+            <strong>{{totalItems}}</strong> Orders Found - Displaying <strong>
+            <select data-ng-change="filterOrders();scrollTo('data-grid');" data-ng-model="filter.Paging.PageItemCount" data-ng-options="item.Key as item.Key for item in pageSizeOptions"></select>
+            </strong> Orders Per Page
+        </div>
         <uib-pagination boundary-links="true"
                         total-items="totalItems"
-                        items-per-page="filter.Paging.PageItemCount"{{}}
+                        items-per-page="filter.Paging.PageItemCountUsed"
                         data-ng-model="filter.Paging.PageIndex"
                         previous-text="&lsaquo;"
                         next-text="&rsaquo;"

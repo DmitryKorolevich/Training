@@ -1,8 +1,10 @@
 ﻿'use strict';
 
 angular.module('app.modules.order.services.orderEditService', [])
-.factory('orderEditService', ['$q', '$filter', '$injector', '$state', '$rootScope', '$timeout', 'customerEditService', 'customerService', 'orderService', 'productService', 'gcService', 'discountService', 'toaster', 'modalUtil',
-    function ($q, $filter, $injector, $state, $rootScope, $timeout, customerEditService, customerService, orderService, productService, gcService, discountService, toaster, modalUtil)
+.factory('orderEditService', ['$q', '$filter', '$injector', '$state', '$rootScope', '$timeout',
+        'customerEditService', 'customerService', 'orderService', 'productService', 'gcService', 'discountService', 'toaster', 'modalUtil',
+    function ($q, $filter, $injector, $state, $rootScope, $timeout,
+        customerEditService, customerService, orderService, productService, gcService, discountService, toaster, modalUtil)
 {
     var initBase = function (uiScope)
     {

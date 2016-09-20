@@ -127,7 +127,7 @@ namespace VC.Admin.Controllers
             return new GCManageModel(item);
         }
 
-        [AdminAuthorize(PermissionType.Marketing)]
+        [AdminAuthorize(PermissionType.Marketing, PermissionType.GC)]
         [HttpPost]
         public async Task<Result<GCAddingModel>> GetGiftCertificatesAdding()
         {
@@ -138,7 +138,7 @@ namespace VC.Admin.Controllers
             return await Task.FromResult<GCAddingModel>(item);
         }
 
-        [AdminAuthorize(PermissionType.Marketing)]
+        [AdminAuthorize(PermissionType.Marketing, PermissionType.GC)]
         [HttpPost]
         public async Task<Result<ICollection<GCListItemModel>>> AddGiftCertificates(int quantity, [FromBody]GCManageModel model)
         {
@@ -155,7 +155,7 @@ namespace VC.Admin.Controllers
             return (await GCService.AddManualGiftCertificatesAsync(quantity, item)).Select(p => new GCListItemModel(p)).ToList();
         }
 
-        [AdminAuthorize(PermissionType.Marketing)]
+        [AdminAuthorize(PermissionType.Marketing, PermissionType.GC)]
         [HttpPost]
         public async Task<Result<GCManageModel>> UpdateGiftCertificate([FromBody]GCManageModel model)
         {
@@ -167,7 +167,7 @@ namespace VC.Admin.Controllers
             return new GCManageModel(item);
         }
 
-        [AdminAuthorize(PermissionType.Marketing)]
+        [AdminAuthorize(PermissionType.Marketing, PermissionType.GC)]
         [HttpPost]
         public async Task<Result<bool>> SendGiftCertificateEmail([FromBody]GCEmailModel model)
         {
@@ -177,7 +177,7 @@ namespace VC.Admin.Controllers
             return await GCService.SendAdminGiftCertificateEmailAsync(item);
         }
 
-        [AdminAuthorize(PermissionType.Marketing)]
+        [AdminAuthorize(PermissionType.Marketing, PermissionType.GC)]
         [HttpPost]
         public async Task<Result<bool>> DeleteGiftCertificate(int id)
         {
