@@ -18,9 +18,9 @@ FROM            dbo.Orders AS o
 	) AS orderOptions ON o.Id = orderOptions.IdOrder
 WHERE o.IdObjectType = 2 AND o.StatusCode = 2 AND 
 (
-	o.OrderStatus IS NOT NULL AND o.OrderStatus <> 1 OR 
-	o.POrderStatus IS NOT NULL AND o.POrderStatus <> 1 OR
-	 o.NPOrderStatus IS NOT NULL AND o.NPOrderStatus <> 1
+	o.OrderStatus IS NOT NULL AND o.OrderStatus NOT IN (1, 6) OR 
+	o.POrderStatus IS NOT NULL AND o.POrderStatus NOT IN (1, 6) OR
+	o.NPOrderStatus IS NOT NULL AND o.NPOrderStatus NOT IN (1, 6)
 )
 GO
 

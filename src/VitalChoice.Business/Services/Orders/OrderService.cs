@@ -898,10 +898,9 @@ namespace VitalChoice.Business.Services.Orders
                 var vAutoShips =
                     await
                         _vAutoShipRepository.Query(
-                            x =>
+                            x => 
                                 x.AutoShipFrequency == frequency && x.LastAutoShipDate.HasValue &&
-                                x.LastAutoShipDate.Value.Day <= tempDate.Day && x.LastAutoShipDate.Value.Year <= tempDate.Year &&
-                                x.LastAutoShipDate.Value.Month <= tempDate.Month).SelectAsync(x => x.Id, false);
+                                x.LastAutoShipDate.Value <= tempDate).SelectAsync(x => x.Id, false);
 
                 if (vAutoShips.Count > 0)
                 {
@@ -1133,14 +1132,15 @@ namespace VitalChoice.Business.Services.Orders
                     try
                     {
                         var anyNotIncomplete = model.IsAnyNotIncomplete();
-                        if (anyNotIncomplete)
+                        var anyNotShipDelayed = model.IsAnyNotShipDelayed();
+                        if (anyNotIncomplete && anyNotShipDelayed)
                         {
                             model.Data.LastAutoShipDate = DateTime.Now;
                         }
 
                         res = await InsertAsyncInternal(model, uow);
 
-                        if (anyNotIncomplete)
+                        if (anyNotIncomplete && anyNotShipDelayed)
                         {
                             model.PaymentMethod.IdOrderSource = res.Id;
                             model.IdObjectType = (int) OrderType.AutoShipOrder;

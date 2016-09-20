@@ -220,7 +220,4 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VCustomersWithDublicateEmails.sql" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="PostDeployment\Scripts\TempShipDelayAutoShipRebuilding.sql" />
-  </ItemGroup>
 </Project>

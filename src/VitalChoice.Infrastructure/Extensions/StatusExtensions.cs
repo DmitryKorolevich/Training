@@ -31,5 +31,16 @@ namespace VitalChoice.Infrastructure.Extensions
         {
             return !order.IsAnyIncomplete();
         }
+
+        public static bool IsAnyShipDelayed(this OrderDynamic order)
+        {
+            return order.OrderStatus == OrderStatus.ShipDelayed || order.POrderStatus == OrderStatus.ShipDelayed ||
+                   order.NPOrderStatus == OrderStatus.ShipDelayed;
+        }
+
+        public static bool IsAnyNotShipDelayed(this OrderDynamic order)
+        {
+            return !order.IsAnyShipDelayed();
+        }
     }
 }

@@ -53,3 +53,14 @@ BEGIN
 
 END
 GO
+
+IF NOT EXISTS(SELECT * FROM OrderOptionTypes WHERE IdObjectType=2 AND Name='ShipDelayDate')
+BEGIN
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'ShipDelayDate', 6, NULL, 2, NULL)
+
+END
+GO

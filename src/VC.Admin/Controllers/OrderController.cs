@@ -57,6 +57,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Services;
 using VitalChoice.Infrastructure.Domain;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
+using VitalChoice.Infrastructure.Extensions;
 
 namespace VC.Admin.Controllers
 {
@@ -302,7 +303,7 @@ namespace VC.Admin.Controllers
 
             var item = await _orderService.SelectAsync(idOrder);
             if (item == null ||
-                (item.IdObjectType != (int)OrderType.Normal && item.IdObjectType != (int)OrderType.AutoShipOrder && item.IdObjectType != (int)OrderType.AutoShip &&
+                (item.IdObjectType != (int)OrderType.Normal && item.IdObjectType != (int)OrderType.AutoShipOrder &&
                 item.IdObjectType != (int)OrderType.DropShip && item.IdObjectType != (int)OrderType.GiftList))
             {
                 throw new NotFoundException();
@@ -405,9 +406,17 @@ namespace VC.Admin.Controllers
                     order = await _orderService.InsertAsync(order);
                     if (order.IdObjectType == (int)OrderType.AutoShip)
                     {
-                        var ids = await _orderService.SelectAutoShipOrdersAsync(order.Id);
+                        if (order.IsAnyNotShipDelayed())
+                        {
+                            var ids = await _orderService.SelectAutoShipOrdersAsync(order.Id);
 
-                        order = await _orderService.SelectAsync(ids.First());
+                            order = await _orderService.SelectAsync(ids.First());
+                        }
+                        else
+                        {
+                            //don't send confirmation for init autoship order(in ship delayed)
+                            sendOrderConfirm = false;
+                        }
                     }
                 }
             }
