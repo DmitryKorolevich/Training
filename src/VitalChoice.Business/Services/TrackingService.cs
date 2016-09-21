@@ -20,23 +20,26 @@ namespace VitalChoice.Business.Services
 
         public string GetServiceUrl(string carrier, string trackingNumber)
         {
-            switch (carrier.ToLower())
+            var lCarrier = carrier.ToLower();
+            if (lCarrier.StartsWith("fedex"))
             {
-                case "fedex":
-                    return "http://www.fedex.com/Tracking?language=english&tracknumbers=" + trackingNumber;
-                case "ups":
-                    return
-                        "http://wwwapps.ups.com/WebTracking/processInputRequest?TypeOfInquiryNumber=T&InquiryNumber1=" +
-                        trackingNumber;
-                case "usps":
-                    return
-                        "http://trkcnfrm1.smi.usps.com/PTSInternetWeb/InterLabelInquiry.do?CAMEFROM=OK&strOrigTrackNum=" +
-                        trackingNumber;
-                case "ontrac":
-                    return "http://www.ontrac.com/tracking.asp?trackingres=submit&tracking_number=" + trackingNumber;
-                default:
-                    return string.Empty;
+                return "http://www.fedex.com/Tracking?language=english&tracknumbers=" + trackingNumber;
             }
+            if (lCarrier.StartsWith("ups"))
+            {
+                return "http://wwwapps.ups.com/WebTracking/processInputRequest?TypeOfInquiryNumber=T&InquiryNumber1=" + trackingNumber;
+            }
+            if (lCarrier.StartsWith("usps"))
+            {
+                return "http://trkcnfrm1.smi.usps.com/PTSInternetWeb/InterLabelInquiry.do?CAMEFROM=OK&strOrigTrackNum=" + trackingNumber;
+
+            }
+            if (lCarrier.StartsWith("ontrac"))
+            {
+                return "http://www.ontrac.com/tracking.asp?trackingres=submit&tracking_number=" + trackingNumber;
+            }
+
+            return string.Empty;
         }
     }
 }
