@@ -238,24 +238,31 @@ namespace VitalChoice.Business.Services.Orders
                         string pWarehouse = null;
                         string npWarehouse = null;
 
+                        string carrier = null;
+                        string pCarrier = null;
+                        string npCarrier = null;
+
                         if (orderSource.OrderShippingPackages != null && orderSource.OrderShippingPackages.Count > 0)
                         {
                             var package = orderSource.OrderShippingPackages.FirstOrDefault(p => !p.POrderType.HasValue);
                             if (package != null)
                             {
                                 warehouse = Enum.GetName(typeof(Warehouse), package.IdWarehouse);
+                                carrier = package.ShipMethodFreightCarrier;
                             }
 
                             package = orderSource.OrderShippingPackages.FirstOrDefault(p => p.POrderType == (int)POrderType.P);
                             if (package != null)
                             {
                                 pWarehouse = Enum.GetName(typeof(Warehouse), package.IdWarehouse);
+                                pCarrier = package.ShipMethodFreightCarrier;
                             }
 
                             package = orderSource.OrderShippingPackages.FirstOrDefault(p => p.POrderType == (int)POrderType.NP);
                             if (package != null)
                             {
                                 npWarehouse = Enum.GetName(typeof(Warehouse), package.IdWarehouse);
+                                npCarrier = package.ShipMethodFreightCarrier;
                             }
                         }
                         foreach (var refund in refunds)
@@ -264,6 +271,10 @@ namespace VitalChoice.Business.Services.Orders
                             refund.Warehouse = warehouse;
                             refund.PWarehouse = pWarehouse;
                             refund.NPWarehouse = npWarehouse;
+
+                            refund.Carrier = carrier;
+                            refund.PCarrier = pCarrier;
+                            refund.NPCarrier = npCarrier;
                         }
                     }
                 }

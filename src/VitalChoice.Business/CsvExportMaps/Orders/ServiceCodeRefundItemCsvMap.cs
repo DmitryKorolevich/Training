@@ -22,9 +22,12 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
             Map(m => m.Warehouse).Name("Warehouse").Index(4);
             Map(m => m.PWarehouse).Name("P Warehouse").Index(5);
             Map(m => m.NPWarehouse).Name("NP Warehouse").Index(6);
-            Map(m => m.Total).Name("Amount").Index(7).TypeConverterOption("c");
-            Map(m => m.SkuCodesLine).Name("Issue Skus").Index(8);
-            Map(m => m.OrderNotes).Name("Comments").Index(9);
+            Map(m => m.Carrier).Name("Carrier").Index(7);
+            Map(m => m.PCarrier).Name("P Carrier").Index(8);
+            Map(m => m.NPCarrier).Name("NP Carrier").Index(9);
+            Map(m => m.Total).Name("Amount").Index(10).TypeConverterOption("c");
+            Map(m => m.SkuCodesLine).Name("Issue Skus").Index(11);
+            Map(m => m.OrderNotes).Name("Comments").Index(12);
         }
     }
 }

@@ -40,6 +40,12 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public string NPWarehouse { get; set; }
 
+        public string Carrier { get; set; }
+
+        public string PCarrier { get; set; }
+
+        public string NPCarrier { get; set; }
+
         public DateTime? OrderSourceDateCreated { get; set; }
 
         public ServiceCodeRefundItem(OrderRefundDynamic refund)
