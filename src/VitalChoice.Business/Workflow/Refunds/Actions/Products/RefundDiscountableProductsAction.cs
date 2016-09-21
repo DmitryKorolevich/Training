@@ -191,15 +191,15 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Products
                     skus = selectedSkus;
                 }
             }
-            var discountableProducts = skus.Where(s => !((bool?)s.Sku.SafeData.NonDiscountable ?? false)).ToArray();
+            var discountableProducts = skus.Where(s => !((bool?) s.Sku.SafeData.NonDiscountable ?? false)).ToArray();
 
             dataContext.SplitInfo.DiscountablePerishable =
-                discountableProducts.Where(p => p.Sku.IdObjectType == (int)ProductType.Perishable).Sum(p => p.Amount);
+                discountableProducts.Where(p => p.Sku.IdObjectType == (int) ProductType.Perishable).Sum(p => p.Amount*p.Quantity);
 
             dataContext.SplitInfo.DiscountableNonPerishable =
-                discountableProducts.Where(p => p.Sku.IdObjectType == (int)ProductType.NonPerishable).Sum(p => p.Amount);
+                discountableProducts.Where(p => p.Sku.IdObjectType == (int) ProductType.NonPerishable).Sum(p => p.Amount*p.Quantity);
 
-            return Task.FromResult(discountableProducts.Sum(s => s.Amount));
+            return Task.FromResult(discountableProducts.Sum(s => s.Amount*s.Quantity));
         }
     }
 }
