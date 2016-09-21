@@ -27,7 +27,7 @@ namespace VitalChoice.Business.Mailings
         }
 
         public async Task SendEmailAsync(string toEmail, string subject, string message, string fromDisplayName = null,
-            string fromEmail = null, string toDisplayName = "", bool isBodyHtml = true, string bccEmail=null)
+            string fromEmail = null, string toDisplayName = "", bool isBodyHtml = true, string bccEmail=null, string replyToEmail=null)
         {
             if (_configuration.Disabled)
                 return;
@@ -47,6 +47,10 @@ namespace VitalChoice.Business.Mailings
                 mail.MailSettings.BccSettings = new BccSettings();
                 mail.MailSettings.BccSettings.Email = bccEmail;
                 mail.MailSettings.BccSettings.Enable = true;
+            }
+            if (!string.IsNullOrEmpty(replyToEmail))
+            {
+                mail.ReplyTo=new Email(replyToEmail);
             }
 
             try

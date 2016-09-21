@@ -191,7 +191,7 @@ namespace VitalChoice.Business.Mailings
 
             if (generatedEmail != null)
             {
-                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body, replyToEmail: model.Email);
             }
         }
 

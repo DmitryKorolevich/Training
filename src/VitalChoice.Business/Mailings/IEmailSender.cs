@@ -5,6 +5,6 @@ namespace VitalChoice.Business.Mailings
     public interface IEmailSender
     {
         Task SendEmailAsync(string toEmail, string subject, string message, string fromDisplayName = "Vital Choice", string fromEmail = null, string toDisplayName = "",
-            bool isBodyHtml = true, string bccEmail = null);
+            bool isBodyHtml = true, string bccEmail = null, string replyToEmail = null);
     }
 }
