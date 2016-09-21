@@ -11,9 +11,9 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
 {
     public enum StandardShippingType
     {
-        Retail,
-        Wholesale,
-        Dropship
+        Retail = 1,
+        Wholesale = 2,
+        Dropship = 3
     }
 
     public class ShippingStandardResolver : ComputableActionResolver<OrderDataContext>
