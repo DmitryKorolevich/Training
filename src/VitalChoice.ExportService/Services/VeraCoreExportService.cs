@@ -345,6 +345,19 @@ namespace VitalChoice.ExportService.Services
                     }
                     else
                     {
+                        if (upgradeNp != null && upgradeNp.Value != ShippingUpgradeOption.None)
+                        {
+                            orderVariables.Add(new OrderVariable
+                            {
+                                VariableField = new VariableField
+                                {
+                                    FieldName = "Upgrade"
+                                },
+                                Value = "Yes",
+                                SeqID = varCounter
+                            });
+                        }
+
                         upgradeP = upgradeNp;
                     }
                     exportOrder.Shipping.FreightCode = context.SplitInfo.GetSwsCode(context.ShippingCostGroup, upgradeP,
