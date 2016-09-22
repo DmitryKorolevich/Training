@@ -1091,7 +1091,7 @@ body {
     font-size: 13px;
     color: #000000;
     background-image: url(/assets/images/bodybg2-low.jpg);
-    background-position: center top;
+    background-position: center 120px;
     background-repeat: no-repeat;
     background-color: #FFFFFF;
     margin: 0;
@@ -1167,15 +1167,34 @@ body {
 
 .header-top-left {
     float: left;
+
+    h4{
+        float: left;
+        width: 309px;
+        font-style: italic;
+        margin: 8px 0;
+        color: #fb5d30;
+        font-size: 17px;
+    }
 }
 
 .header-top-middle {
     float: left;
-    margin: 7px 0px 0px 140px;
     position: relative;
     font-family: Helvetica Neue,Arial,Helvetica,sans-serif;
     font-size: 14px;
     text-align: center;
+
+    .customer-service-chart{
+        display: inline-block;
+        width: 100px;
+        vertical-align: top;
+    }
+
+    .trustpilot-widget{
+        display: inline-block;
+        margin: 7px 0px 0px 0px;
+    }
 }
 
 header {
@@ -1417,6 +1436,42 @@ a.see-reviews-link:active {
 
 .header-top-right {
     float: right;
+    margin-top: 12px;
+    font-family: Helvetica Neue,Arial,Helvetica,sans-serif;
+
+    a {
+        color: #4C4C4C;
+        text-decoration: none;
+        font-size: 12px;
+    }
+
+    a:hover,
+    a:active {
+        color: #F34D20;
+    }
+
+    .actions-top-nav {
+        font-size: 12px;
+        font-family: Helvetica Neue,Arial,Helvetica,sans-serif;
+
+        a {
+            margin-right: 17px;
+        }
+
+        a.wholesale-home {
+            color: #f34d20;
+        }
+
+        a:last-child,
+        a.last-child {
+            margin-right: 0px;
+        }
+    }
+}
+
+a.block-link{
+    text-decoration: none;
+    color: black;
 }
 
 .header-main {
@@ -1426,6 +1481,37 @@ a.see-reviews-link:active {
     .logo-holder {
         float: left;
         padding: 10px 0 0px 0;
+    }
+
+    .middle-area{
+        float: left;
+        width: 185px;
+        margin-left: 3px;
+        text-align: right;
+        background: url(/assets/images/randy-home-page.png) no-repeat;  
+        cursor: pointer;
+        background-position: 15px -104px;
+        padding: 8px 0 24px 117px;
+        color: #000;
+
+        p{
+            float: right;
+            width: 174px;
+            margin: 2px 0 5px;
+            font-size: 11px;
+        }
+
+        b{
+            clear: both;
+            display: block;
+            font-size: 11px;
+        }
+
+        i{
+            display: block;
+            clear: right;
+            font-size: 10px;
+        }
     }
 }
 
@@ -1439,13 +1525,12 @@ a.see-reviews-link:active {
     }
 
     .header-actions-holder {
-        float: left;
-        margin-top: 8px;
+        float: right;
 
         a {
             color: #4C4C4C;
             text-decoration: none;
-            font-size: 11px;
+            font-size: 12px;
         }
 
         a:hover,
@@ -1472,17 +1557,31 @@ a.see-reviews-link:active {
         }
 
         .cart-work-area {
-            margin-top: 12px;
+            margin-top: 5px;
             float: right;
 
             .checkout-button {
                 float: right;
+
+                button{
+                    padding: 6px 26px;
+                    color: #fff;
+                    border-radius: 2px;
+                    font-size: 12px;
+                    margin-top: 1px;
+                    border: none;
+                    cursor: pointer;
+                    box-shadow: 0 0 0 1px #dc2e17;
+                    background: #e07222;
+                    background: -webkit-linear-gradient(#e07222,#e8531d);
+                    background: linear-gradient(#e07222,#e8531d);
+                }
             }
 
             .view-cart {
                 border: 1px solid #c8c9c8;
                 height: 26px;
-                padding: 1px 3px 0 3px;
+                padding: 1px 3px 0 5px;
                 float: left;
                 margin-right: 7px;
             }
@@ -1490,7 +1589,8 @@ a.see-reviews-link:active {
             .item-total {
                 float: left;
                 padding-top: 5px;
-                padding-left: 5px;
+                padding-left: 6px;
+                padding-right: 4px;
                 vertical-align: top;
             }
 
@@ -1562,9 +1662,7 @@ a.see-reviews-link:active {
 }
 
 header .search-area {
-    float: right;
-    margin-right: 10px;
-    margin-top: 37px;
+    padding: 12px 0;
     position: relative;
 
     form {
@@ -1581,7 +1679,6 @@ header .search-area {
             font-size: 13px;
             font-style: italic;
             height: 24px;
-            margin-right: -1px;
             padding-left: 5px;
             width: 285px;
             display: table-cell;
@@ -1598,6 +1695,7 @@ header .search-area {
             white-space: nowrap;
             vertical-align: middle;
             display: table-cell;
+            height: 28px;
         }
     }
 }

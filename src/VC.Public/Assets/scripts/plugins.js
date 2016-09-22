@@ -182,6 +182,16 @@ var Google = {
                 }
             }
         });
+
+        $('#search-area-form input[type=text]').focusout(function (){
+            $('#search-area-form .active').hide();
+            $('#search-area-form .not-active').show();
+        });
+
+        $('#search-area-form input[type=text]').focusin(function (){
+            $('#search-area-form .active').show();
+            $('#search-area-form .not-active').hide();            
+        });
     });
 })(jQuery);
 

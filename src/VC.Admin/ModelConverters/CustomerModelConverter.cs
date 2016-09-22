@@ -72,7 +72,7 @@ namespace VC.Admin.ModelConverters
 
             if (dynamic.Files!=null && dynamic.Files.Count > 0)
 			{
-				foreach (var fileDynamic in dynamic.Files.Select(x => new CustomerFileModel()
+				foreach (var fileDynamic in dynamic.Files.OrderByDescending(p=>p.UploadDate).Select(x => new CustomerFileModel()
 				{
 					Id = x.Id,
 					Description = x.Description,
