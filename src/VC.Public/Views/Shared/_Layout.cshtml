@@ -66,14 +66,42 @@
     <div>
         <div class="header-top main">
             <div class="header-top-left">
-                <img alt="Call Anytime" src="/assets/images/callanytime13.png" />
+                @if (User.Identity.IsAuthenticated && User.IsInRole(IdentityConstants.WholesaleCustomer))
+                {
+                    <img alt="Call Anytime" src="/assets/images/callanytime13.png" />
+                }
+                else
+                {
+                    <a class="block-link" href="/content/shipping-information">
+                        <h4>Free shipping on orders over $99</h4>
+                    </a>
+                }
             </div>
             <div class="header-top-middle">
                 <div class="trustpilot-widget" data-locale="en-US" data-template-id="5418052cfbfb950d88702476" data-businessunit-id="51975a73000064000533c457" data-style-height="30px" data-style-width="100%" data-theme="light" data-stars="4,5,3"></div>
+                <div class="customer-service-chart" id="lhnContainer">
+                    <div id="lhnChatButton"></div>
+                </div>
             </div>
             <div class="header-top-right">
-                <div id="lhnContainer">
-                    <div id="lhnChatButton"></div>
+                <div class="actions-top-nav">
+                    <a href="@Url.Action("Index", "Profile")">Your Account</a>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        if (User.HasClaim(IdentityConstants.AffiliateRole, "true"))
+                        {
+                            <a href="@Url.Action("Logout", "AffiliateAccount")">Log Out</a>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Logout", "Account")">Log Out</a>
+                        }
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("RegisterEmail", "Account")">Register</a>
+                    }
+                    <a class="last-child" href="/content/contact-customer-service">Contact Us</a>
                 </div>
             </div>
         </div>
@@ -85,60 +113,51 @@
 	<div class="main">
 		<header>
 			<div class="header-main">
-				<div class="logo-holder">
-					<a href="/">
-						<img alt="Vital Choice" src="/Assets/images/VCwso.png" />
-					</a>
-				</div>
-				<div class="header-right-sidebar">
-				    <div class="side-icon-holder">
-				        @if (!User.Identity.IsAuthenticated || User.IsInRole(IdentityConstants.RetailCustomer))
-				        {
-				            <a href="/content/shipping-information">
-				                <img alt="Free Shipping" src="/Assets/images/freeshiptop.png">
-				            </a>
-				        }
-				    </div>
-					<div class="header-actions-holder">
-					    <div class="actions-top-nav">
-					        @if (User.Identity.IsAuthenticated && User.IsInRole(IdentityConstants.WholesaleCustomer))
+			    <div class="logo-holder">
+			        <a href="/">
+			            <img alt="Vital Choice" src="/Assets/images/VCwso.png" />
+			        </a>
+			    </div>
+                <a class="block-link" href="javascript:function(){return false;}" data-video-class="youtube-dialog-size-home-popup" data-video-id="Zznd8BxKyx0" data-video-modal="true" data-video-autoplay="true" data-video-autoclose="true">
+                    <div class="middle-area">
+                        <p>"Few decisions have as great an impact on your life as the foods you choose to eat. Take a quick look at our new video to learn more."</p>
+                        <b>Randy Hartnell</b> <i>Founder/President</i>
+                    </div>
+                </a>
+			    <div class="header-right-sidebar">
+			        <div class="search-area">
+			            <form id="search-area-form" action="/help/search" method="get">
+			                <input type="text" name="q" value="What can we help you find?" onclick="this.value = ( this.value == this.defaultValue ) ? '' : this.value;return true;" dir="ltr" autocomplete="off" spellcheck="false" style="outline: none;">
+			                <input type="image" class="active" style="display: none;" src="/Assets/images/mag.jpg"/>
+			                <input type="image" class="not-active" src="/Assets/images/mag-off.png"/>
+			            </form>
+			        </div>
+			        <div class="header-actions-holder">
+			            <div class="cart-work-area">
+			                <a class="view-cart" href="@Url.Action("ViewCart", "Cart")">
+			                    <div class="cart-icon"></div>
+			                    <div class="item-total">
+			                        <span id="cart-lite-component">@await Component.InvokeAsync("CartLite")</span>
+			                        <span>Item(s)</span>
+			                    </div>
+			                </a>
+			                <a class="checkout-button" href="@Url.Action("ViewCart", "Cart")">
+			                    <button>CHECKOUT</button>
+			                </a>
+			            </div>
+			        </div>
+			        <div class="clear"></div>
+                    <div class="header-top-right">
+                        <div class="actions-top-nav">
+                            @if (User.Identity.IsAuthenticated && User.IsInRole(IdentityConstants.WholesaleCustomer))
                             {
                                 <a class="wholesale-home" href="/products/wholesale">Wholesale Home</a>
                             }
-					        <a href="@Url.Action("Index", "Profile")">Your Account</a>
-					        @if (User.Identity.IsAuthenticated)
-					        {
-					            if (User.HasClaim(IdentityConstants.AffiliateRole, "true"))
-					            {
-					                <a href="@Url.Action("Logout", "AffiliateAccount")">Log Out</a>
-					            }
-					            else
-					            {
-					                <a href="@Url.Action("Logout", "Account")">Log Out</a>
-					            }
-					        }
-					        else
-					        {
-					            <a href="@Url.Action("RegisterEmail", "Account")">Register</a>
-					        }
-					        <a class="last-child" href="/content/contact-customer-service">Contact Us</a>
-					    </div>
-						<div class="cart-work-area">
-							<a class="view-cart" href="@Url.Action("ViewCart", "Cart")">
-								<div class="cart-icon"></div>
-								<div class="item-total">
-									<span id="cart-lite-component">@await Component.InvokeAsync("CartLite")</span>
-									<span>Item(s)</span>
-								</div>
-							</a>
-							<a class="checkout-button" href="@Url.Action("ViewCart", "Cart")">
-								<img alt="Checkout" src="/Assets/images/checkout13.png" />
-							</a>
-						</div>
-					</div>
-				</div>
+                        </div>
+                    </div>
+			    </div>
 			</div>
-			<nav class="top-nav secondary-nav">
+			<nav class="hide top-nav secondary-nav">
 				@if (User.Identity.IsAuthenticated && User.IsInRole(IdentityConstants.WholesaleCustomer))
 				{
 					<text>@await Component.InvokeAsync("Area", new { name = "Secondary Wholesale Menu" })</text>
@@ -148,12 +167,6 @@
 					<text>@await Component.InvokeAsync("Area", new { name = "Secondary Retail Menu" })</text>
 				}
 			</nav>
-			<div class="search-area">
-				<form id="search-area-form" action="/help/search" method="get">
-					<input type="text" name="q" placeholder="What can we help you find?" value="" />
-					<input type="image" src="/Assets/images/mag.jpg" />
-				</form>
-			</div>
 			@if (User.Identity.IsAuthenticated && User.IsInRole(IdentityConstants.WholesaleCustomer))
             {
                 <text>@await Component.InvokeAsync("Area", new { name = "Wholesale Top Mega Menu" })</text>

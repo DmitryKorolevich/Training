@@ -52,7 +52,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-ng-repeat="(fileIndex, file) in files | orderBy:'FileName'">
+                    <tr data-ng-repeat="file in files">
                         <td><a target="_blank" data-ng-href="/api/Customer/GetFile?fileName={{file.FileName}}&publicId={{publicId}}&viewMode=true&buildNumber={{buildNumber}}">{{file.FileName}}</a></td>
                         <td>{{file.UploadDate | date:"MM/dd/yy"}}</td>
                         <td>{{file.Description}}</td>

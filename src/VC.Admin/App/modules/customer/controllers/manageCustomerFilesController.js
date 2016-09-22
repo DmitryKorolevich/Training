@@ -44,8 +44,6 @@
                 {
                     var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
                     logRequest.progress = progressPercentage;
-
-                    console.log('progress: ' + progressPercentage + '% ' + evt.config.file.name);
                 }).success(function (result, status, headers, config)
                 {
                     if (result.Success)
@@ -55,9 +53,7 @@
 
                         var resFile = result.Data;
                         resFile.Description = $scope.options.currentFileDescription;
-                        $scope.files.push(resFile);
-
-                        console.log('file ' + config.file.name + 'uploaded. Response: ' + result);
+                        $scope.files.splice(0, 0, resFile);
                     } else
                     {
                         logRequest.progress = 100;
