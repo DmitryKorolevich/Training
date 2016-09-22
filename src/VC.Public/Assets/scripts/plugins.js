@@ -406,6 +406,23 @@ $(function () {
 	            events: events,
 	        });
 
+	        $("#up").parent().removeClass(function (index, css)
+	        {
+	            return $.grep(css.split(' '), function (item)
+	            {
+	                return item.startsWith('youtube-dialog-size');
+	            }).join(' ');
+	        });
+	        var customClass = $(this).attr("data-video-class");
+	        if (customClass)
+	        {
+	            $("#up").parent().addClass(customClass);
+	        }
+	        else
+	        {
+	            $("#up").parent().addClass('youtube-dialog-size-standart');
+	        }
+
 	        $('#' + $("#up").parent().attr('aria-describedby')).dialog('open');
 
 	        var jCloseButton = $("<a id='btnVideoClose' class='youtube-popup-close' href='#'>" +

@@ -66,9 +66,16 @@
     <div>
         <div class="header-top main">
             <div class="header-top-left">
-                <a href="/content/shipping-information">
-                    <h4>Free shipping on orders over $99</h4>
-                </a>
+                @if (User.Identity.IsAuthenticated && User.IsInRole(IdentityConstants.WholesaleCustomer))
+                {
+                    <img alt="Call Anytime" src="/assets/images/callanytime13.png" />
+                }
+                else
+                {
+                    <a class="block-link" href="/content/shipping-information">
+                        <h4>Free shipping on orders over $99</h4>
+                    </a>
+                }
             </div>
             <div class="header-top-middle">
                 <div class="trustpilot-widget" data-locale="en-US" data-template-id="5418052cfbfb950d88702476" data-businessunit-id="51975a73000064000533c457" data-style-height="30px" data-style-width="100%" data-theme="light" data-stars="4,5,3"></div>
@@ -78,10 +85,6 @@
             </div>
             <div class="header-top-right">
                 <div class="actions-top-nav">
-                    @if (User.Identity.IsAuthenticated && User.IsInRole(IdentityConstants.WholesaleCustomer))
-                    {
-                        <a class="wholesale-home" href="/products/wholesale">Wholesale Home</a>
-                    }
                     <a href="@Url.Action("Index", "Profile")">Your Account</a>
                     @if (User.Identity.IsAuthenticated)
                     {
@@ -115,7 +118,7 @@
 			            <img alt="Vital Choice" src="/Assets/images/VCwso.png" />
 			        </a>
 			    </div>
-                <a class="block-link" href="javascript:function(){return false;}" data-video-id="Zznd8BxKyx0" data-video-modal="true" data-video-autoplay="true" data-video-autoclose="true">
+                <a class="block-link" href="javascript:function(){return false;}" data-video-class="youtube-dialog-size-home-popup" data-video-id="Zznd8BxKyx0" data-video-modal="true" data-video-autoplay="true" data-video-autoclose="true">
                     <div class="middle-area">
                         <p>"Few decisions have as great an impact on your life as the foods you choose to eat. Take a quick look at our new video to learn more."</p>
                         <b>Randy Hartnell</b> <i>Founder/President</i>
@@ -143,6 +146,15 @@
 			                </a>
 			            </div>
 			        </div>
+			        <div class="clear"></div>
+                    <div class="header-top-right">
+                        <div class="actions-top-nav">
+                            @if (User.Identity.IsAuthenticated && User.IsInRole(IdentityConstants.WholesaleCustomer))
+                            {
+                                <a class="wholesale-home" href="/products/wholesale">Wholesale Home</a>
+                            }
+                        </div>
+                    </div>
 			    </div>
 			</div>
 			<nav class="top-nav secondary-nav">

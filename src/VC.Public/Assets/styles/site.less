@@ -1187,8 +1187,9 @@ body {
 
     .customer-service-chart{
         display: inline-block;
-        width: 100px;
+        width: 125px;
         vertical-align: top;
+        overflow-x: hidden;
     }
 
     .trustpilot-widget{
@@ -4691,8 +4692,6 @@ footer {
 
 .ui-dialog .ui-dialog-content .youtube-popup-container {
     padding: 0px;
-    width: 485px !important;
-    height: 350px !important;
     display: block;
 }
 
@@ -4739,14 +4738,32 @@ footer {
     background-color: #000;
     border-radius: 20px;
     box-shadow: 0 0 20px #000;
-    height: 350px !important;
     padding: 20px;
     border: none;
-    width: 485px !important;
     position: fixed !important;
 
     .ui-dialog-titlebar {
         display: none;
+    }
+}
+
+.ui-dialog.youtube-dialog-size-standart {
+    height: 350px !important;
+    width: 485px !important;
+
+    .youtube-popup-container {
+        width: 485px !important;
+        height: 350px !important;
+    }
+}
+
+.ui-dialog.youtube-dialog-size-home-popup{    
+    height: 430px !important;
+    width: 640px !important;
+
+    .youtube-popup-container {
+        width: 640px !important;
+        height: 430px !important;
     }
 }
 
