@@ -157,7 +157,7 @@
                     </div>
 			    </div>
 			</div>
-			<nav class="top-nav secondary-nav">
+			<nav class="hide top-nav secondary-nav">
 				@if (User.Identity.IsAuthenticated && User.IsInRole(IdentityConstants.WholesaleCustomer))
 				{
 					<text>@await Component.InvokeAsync("Area", new { name = "Secondary Wholesale Menu" })</text>
