@@ -1123,7 +1123,7 @@ angular.module('app.modules.order.services.orderEditService', [])
     };
 
     var baseReferencedDataInit = function(uiScope){
-        if (uiScope.currentCustomer.SourceDetails)
+        if (uiScope.currentCustomer.Source && uiScope.currentCustomer.SourceDetails)
         {
             uiScope.currentCustomer.SourceValue = uiScope.currentCustomer.SourceDetails;
         } else if (uiScope.currentCustomer.Source)
@@ -1141,6 +1141,9 @@ angular.module('app.modules.order.services.orderEditService', [])
                 });
             }
             uiScope.currentCustomer.SourceValue = sourceName;
+        } else
+        {
+            uiScope.currentCustomer.SourceDetails = null;
         }
 
         if (uiScope.options.ShippingAddressIndexWatch)
