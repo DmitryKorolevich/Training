@@ -22,36 +22,39 @@ namespace VitalChoice.DynamicData.Validation
 
         public static void Raise(this ICollection<MessageInfo> errors)
         {
-            if (errors.Count > 0)
+            if (errors?.Count > 0)
                 throw new AppValidationException(errors);
         }
         public static void Raise(this MessageInfo error)
         {
-            throw new AppValidationException(error);
+            if (error != null)
+                throw new AppValidationException(error);
         }
 
         public static void Raise<T>(this ICollection<IErrorResult> results)
         {
-            if (results.Count > 0)
+            if (results?.Count > 0)
                 throw new AppValidationException(results.Aggregate(Enumerable.Empty<MessageInfo>(),
                     (current, next) => current.Union(next.Build())));
         }
 
         public static void Raise<T>(this IErrorResult result)
         {
-            throw new AppValidationException(result.Build());
+            if (result != null)
+                throw new AppValidationException(result.Build());
         }
 
         public static void Raise<T>(this ICollection<IErrorResult> results, string error)
         {
-            if (results.Count > 0)
+            if (results?.Count > 0)
                 throw new AppValidationException(results.Aggregate(Enumerable.Empty<MessageInfo>(),
                     (current, next) => current.Union(next.Error(error).Build())));
         }
 
         public static void Raise<T>(this IErrorResult result, string error)
         {
-            throw new AppValidationException(result.Error(error).Build());
+            if (result != null)
+                throw new AppValidationException(result.Error(error).Build());
         }
     }
 }

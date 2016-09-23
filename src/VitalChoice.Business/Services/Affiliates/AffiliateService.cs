@@ -228,6 +228,7 @@ namespace VitalChoice.Business.Services.Affiliates
 
         public async Task<bool> SendAffiliateEmailAsync(BasicEmail model)
         {
+            model.BCCEmail = _appOptions.Value.AffiliateEmailBcc;
             await _notificationService.SendBasicEmailAsync(model);
             return true;
         }

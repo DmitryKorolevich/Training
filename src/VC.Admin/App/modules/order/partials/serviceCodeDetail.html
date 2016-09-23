@@ -61,6 +61,9 @@
                         <th>Order Number</th>
                         <th>Order Date</th>
                         <th>Original Order Number</th>
+                        <th>Original Order Date</th>
+                        <th>Warehouse</th>
+                        <th>Carrier</th>
                         <th>Amount</th>
                         <th>Issues Sku</th>
                         <th>Comments</th>
@@ -79,6 +82,21 @@
                         <td>{{::item.DateCreated | date:"MM/dd/yy"}}</td>
                         <td>
                             <a data-ng-if="item.IdOrderSource" ui-sref="index.oneCol.orderDetail({id: item.IdOrderSource })">{{::item.IdOrderSource}}</a>
+                        </td>
+                        <td>{{::item.OrderSourceDateCreated | date:"MM/dd/yy"}}</td>
+                        <td>
+                            <span data-ng-if="::item.Warehouse">{{::item.Warehouse}}</span>
+                            <div data-ng-if="::(!item.Warehouse && (item.PWarehouse || item.NPWarehouse))">
+                                <span data-ng-if="::item.PWarehouse">{{::item.PWarehouse}} - P</span><br />
+                                <span data-ng-if="::item.NPWarehouse">{{::item.NPWarehouse}} - NP</span>
+                            </div>
+                        </td>       
+                        <td>
+                            <span data-ng-if="::item.Carrier">{{::item.Carrier}}</span>
+                            <div data-ng-if="::(!item.Carrier && (item.PCarrier || item.NPCarrier))">
+                                <span data-ng-if="::item.PCarrier">{{::item.PCarrier}} - P</span><br />
+                                <span data-ng-if="::item.NPCarrier">{{::item.NPCarrier}} - NP</span>
+                            </div>
                         </td>
                         <td data-ng-if="item.Total>=0">{{::item.Total | currency}}</td>
                         <td data-ng-if="item.Total<0">({{::Math.abs(item.Total) | currency}})</td>

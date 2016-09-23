@@ -72,8 +72,7 @@ namespace VitalChoice.Business.Services.Orders
                 order.Customer = customer;
                 order.ShippingAddress = await AddressMapper.FromModelAsync(record, (int)AddressType.Shipping);
                 record.SetFields(order, paymentMethod);
-                var item = new OrderImportItemOrderDynamic();
-                item.Order = order;
+                var item = new OrderImportItemOrderDynamic {Order = order};
                 item.OrderImportItems.Add(record);
                 toReturn.Add(item);
             }

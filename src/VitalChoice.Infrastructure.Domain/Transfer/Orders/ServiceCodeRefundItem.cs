@@ -34,6 +34,20 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public string OrderNotes { get; set; }
 
+        public string Warehouse { get; set; }
+
+        public string PWarehouse { get; set; }
+
+        public string NPWarehouse { get; set; }
+
+        public string Carrier { get; set; }
+
+        public string PCarrier { get; set; }
+
+        public string NPCarrier { get; set; }
+
+        public DateTime? OrderSourceDateCreated { get; set; }
+
         public ServiceCodeRefundItem(OrderRefundDynamic refund)
         {
             if (refund != null)
@@ -43,7 +57,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
                 IdOrderSource = refund.IdOrderSource;
                 Total = -refund.Total;
                 SkuCodes = refund.RefundSkus?.Select(pp => pp.Sku?.Code).ToList() ?? new List<string>();
-                OrderNotes = refund.SafeData.OrderNotes;
+                OrderNotes = refund.SafeData.ServiceCodeNotes;
             }
         }
     }

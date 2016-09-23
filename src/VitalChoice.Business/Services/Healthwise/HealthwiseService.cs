@@ -97,11 +97,13 @@ namespace VitalChoice.Business.Services.Healthwise
 
         public async Task<ICollection<VHealthwisePeriod>> GetVHealthwisePeriodsAsync(VHealthwisePeriodFilter filter)
         {
-            VHealthwisePeriodQuery conditions = new VHealthwisePeriodQuery().WithCustomerId(filter.IdCustomer)
+            VHealthwisePeriodQuery conditions = new VHealthwisePeriodQuery()
+                .WithCustomerId(filter.IdCustomer)
+                .WithCustomerFirstName(filter.CustomerFirstName)
+                .WithCustomerLastName(filter.CustomerLastName)
                 .WithDateTo(filter.To)
                 .WithDateFrom(filter.From)
-                .
-                WithAllowPaymentOnly(filter.NotBilledOnly, _appSettings.HealthwisePeriodMaxItemsCount)
+                .WithAllowPaymentOnly(filter.NotBilledOnly, _appSettings.HealthwisePeriodMaxItemsCount)
                 .WithNotPaid(filter.NotPaid);
 
             var toReturn = await _vHealthwisePeriodRepository.Query(conditions).SelectAsync(false);

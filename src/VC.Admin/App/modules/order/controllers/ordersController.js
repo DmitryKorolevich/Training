@@ -39,6 +39,7 @@
                 data.To = data.To.toServerDateTime();
             }
 
+            $scope.filter.Paging.PageItemCountUsed = $scope.filter.Paging.PageItemCount;
             orderService.getOrders(data, $scope.refreshTracker)
                 .success(function (result)
                 {
@@ -80,6 +81,13 @@
 
             $scope.orderSourceTypes = angular.copy($rootScope.ReferenceData.OrderSourceTypes);
             $scope.orderSourceTypes.splice(0, 0, { Key: null, Text: 'All Order Sources' });
+
+            $scope.pageSizeOptions = [
+                { Key: 50 },
+                { Key: 75 },
+                { Key: 100 },
+                { Key: 200 }
+            ];
 
             $scope.shippingMethods = [
                 { Key: null, Text: 'All Shipping Methods' },

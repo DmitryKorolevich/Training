@@ -42,14 +42,14 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="options-row form-horizontal">
-                                                <label class="checkbox-inline">
+                                                <label data-ng-if="order.IdObjectType!=2" class="checkbox-inline">
                                                     <input type="checkbox" data-ng-model="order.OnHold" data-ng-disabled="orderEditDisabled">Hold Order
                                                     <i class="fa fa-pause"></i>
                                                 </label>
                                                 <div data-ng-if="order.IdObjectType==1 || order.IdObjectType==2" class="inline-block">
                                                     <form class="form-horizontal" name="forms.topForm" data-ng-submit="save()" data-ng-class="{submitted: forms.topForm.submitted}" novalidate unsaved-warning-form>
                                                         <label data-ng-if="autoShipOrderOptionShow" class="checkbox-inline">
-                                                            <input type="checkbox" data-ng-model="order.IdObjectType" data-ng-change="requestRecalculate()" ng-true-value="2" ng-false-value="1" data-ng-disabled="orderEditDisabled">Auto-Ship Order
+                                                            <input type="checkbox" data-ng-model="order.IdObjectType" data-ng-change="order.OnHold=false;requestRecalculate();" ng-true-value="2" ng-false-value="1" data-ng-disabled="orderEditDisabled">Auto-Ship Order
                                                             <i class="fa fa-history"></i>
                                                         </label>
                                                         <div data-ng-if="autoShipOrderOptionShow" class="auto-ship-frequency">
@@ -245,7 +245,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div data-ng-hide="order.IdObjectType==2">
+                                                    <div>
                                                         <span class="legend">Ship Delay</span>
                                                         <div class="form-group">
                                                             <label class="col-md-12 control-label left">Ship Delay Order?</label>

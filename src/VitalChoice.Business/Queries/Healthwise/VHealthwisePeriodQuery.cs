@@ -45,6 +45,24 @@ namespace VitalChoice.Business.Queries.Healthwise
             return this;
         }
 
+        public VHealthwisePeriodQuery WithCustomerFirstName(string firstName)
+        {
+            if (!string.IsNullOrEmpty(firstName))
+            {
+                Add(x => x.CustomerFirstName.StartsWith(firstName));
+            }
+            return this;
+        }
+
+        public VHealthwisePeriodQuery WithCustomerLastName(string lastName)
+        {
+            if (!string.IsNullOrEmpty(lastName))
+            {
+                Add(x => x.CustomerLastName.StartsWith(lastName));
+            }
+            return this;
+        }
+
         public VHealthwisePeriodQuery WithNotPaid(bool notPaid)
         {
             if (notPaid)

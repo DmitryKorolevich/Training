@@ -85,9 +85,9 @@ angular.module('app.core.utils.appBootstrap', [])
                 {
                     return false;
                 }
-
+                
                 return $rootScope.currentUser.IsSuperAdmin ||
-                    $rootScope.currentUser.Permissions.indexOf(permission) > -1;
+                    isAnyPermission(permission);
             };
 
             function validatePermissionMenuItem(menuItem)
@@ -107,7 +107,7 @@ angular.module('app.core.utils.appBootstrap', [])
                         function (index, subMenuItem)
                         {
                             if (subMenuItem.access == null ||
-                                $rootScope.currentUser.Permissions.indexOf(subMenuItem.access) > -1)
+                                isAnyPermission(subMenuItem.access))
                             {
                                 result = true;
                                 return false;
@@ -116,6 +116,28 @@ angular.module('app.core.utils.appBootstrap', [])
                 }
 
                 return result;
+            };
+
+            function isAnyPermission(permissions)
+            {
+                if (Array.isArray(permissions))
+                {
+                    var toReturn = false;
+                    $.each(permissions, function (index, permission)
+                    {
+                        if ($rootScope.currentUser.Permissions.indexOf(permission) > -1)
+                        {
+                            toReturn = true;
+                            return false;
+                        }
+                    });
+
+                    return toReturn;
+                }
+                else
+                {
+                    return $rootScope.currentUser.Permissions.indexOf(permissions) > -1;
+                }
             };
 
             function logout()

@@ -216,11 +216,18 @@ namespace VitalChoice.Workflow.Configuration
                     action.ResolvePath<DiscountThresholdAction>((int) DiscountType.Threshold, "ThresholdDiscount");
                 });
 
+                order.Action<StandardShippingDropship>("StandardShippingDropship", action =>
+                {
+                    action.Dependency<ProductsWithPromoAction>();
+                    action.Dependency<DeliveredProductsAction>();
+                });
+
                 order.ActionResolver<ShippingStandardResolver>("StandardShipping", action =>
                 {
                     action.Dependency<ReductionTypeActionResolver>();
-                    action.ResolvePath<StandardShippingUsWholesaleAction>((int) CustomerType.Wholesale, "StandardWholesaleShipping");
-                    action.ResolvePath<StandardShippingUsCaRetailAction>((int) CustomerType.Retail, "StandardRetailShipping");
+                    action.ResolvePath<StandardShippingDropship>((int)StandardShippingType.Dropship, "StandardDropshipShipping");
+                    action.ResolvePath<StandardShippingUsWholesaleAction>((int) StandardShippingType.Wholesale, "StandardWholesaleShipping");
+                    action.ResolvePath<StandardShippingUsCaRetailAction>((int) StandardShippingType.Retail, "StandardRetailShipping");
                 });
 
                 order.Action<ShippingOverrideAction>("ShippingOverride", action =>

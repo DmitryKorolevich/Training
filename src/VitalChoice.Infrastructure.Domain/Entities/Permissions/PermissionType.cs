@@ -16,5 +16,6 @@
         Marketing = 14,
         SuperAdminSettings = 15,
         InventorySkus = 17,
+        GC = 18,
     }
 }

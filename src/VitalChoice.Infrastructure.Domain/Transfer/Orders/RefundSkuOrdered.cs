@@ -15,7 +15,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public RedeemType Redeem { get; set; }
 
-        public override decimal Amount => RefundValue*(decimal) RefundPercent/100;
+        public override decimal Amount => RefundPrice*(decimal) RefundPercent/100;
 
         public decimal RefundPrice { get; set; }
 

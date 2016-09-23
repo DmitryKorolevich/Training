@@ -57,6 +57,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Services;
 using VitalChoice.Infrastructure.Domain;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
+using VitalChoice.Infrastructure.Extensions;
 
 namespace VC.Admin.Controllers
 {
@@ -302,7 +303,7 @@ namespace VC.Admin.Controllers
 
             var item = await _orderService.SelectAsync(idOrder);
             if (item == null ||
-                (item.IdObjectType != (int)OrderType.Normal && item.IdObjectType != (int)OrderType.AutoShipOrder && item.IdObjectType != (int)OrderType.AutoShip &&
+                (item.IdObjectType != (int)OrderType.Normal && item.IdObjectType != (int)OrderType.AutoShipOrder &&
                 item.IdObjectType != (int)OrderType.DropShip && item.IdObjectType != (int)OrderType.GiftList))
             {
                 throw new NotFoundException();
@@ -405,9 +406,17 @@ namespace VC.Admin.Controllers
                     order = await _orderService.InsertAsync(order);
                     if (order.IdObjectType == (int)OrderType.AutoShip)
                     {
-                        var ids = await _orderService.SelectAutoShipOrdersAsync(order.Id);
+                        if (order.IsAnyNotShipDelayed())
+                        {
+                            var ids = await _orderService.SelectAutoShipOrdersAsync(order.Id);
 
-                        order = await _orderService.SelectAsync(ids.First());
+                            order = await _orderService.SelectAsync(ids.First());
+                        }
+                        else
+                        {
+                            //don't send confirmation for init autoship order(in ship delayed)
+                            sendOrderConfirm = false;
+                        }
                     }
                 }
             }
@@ -422,6 +431,11 @@ namespace VC.Admin.Controllers
             }
 
             OrderManageModel toReturn = await _mapper.ToModelAsync<OrderManageModel>(order);
+            //Create egift send email data
+            if (toReturn!=null && model.Id == 0)
+            {
+                CreateEGiftNewOrderEmail(order, toReturn);
+            }
 
             if (!string.IsNullOrEmpty(model.Customer.Email) && model.SignUpNewsletter.HasValue)
             {
@@ -442,6 +456,24 @@ namespace VC.Admin.Controllers
             }
 
             return toReturn;
+        }
+
+        private static void CreateEGiftNewOrderEmail(OrderDynamic order, OrderManageModel toReturn)
+        {
+            if (order.Skus.Where(p => p.Sku.Product.IdObjectType == (int) ProductType.EGс).
+                SelectMany(p => p.GcsGenerated).Any())
+            {
+                toReturn.EGiftNewOrderEmail = new GCEmailModel();
+                toReturn.EGiftNewOrderEmail.ToEmail = order.Customer.Email;
+                toReturn.EGiftNewOrderEmail.ToName =
+                    $"{order.Customer.ProfileAddress.SafeData.FirstName} {order.Customer.ProfileAddress.SafeData.LastName}";
+                toReturn.EGiftNewOrderEmail.Gifts = order.Skus.Where(p => p.Sku.Product.IdObjectType == (int) ProductType.EGс).
+                    SelectMany(p => p.GcsGenerated).Select(p => new GiftEmailModel()
+                    {
+                        Amount = p.Balance,
+                        Code = p.Code,
+                    }).ToList();
+            }
         }
 
         private async Task CheckDBOrderStatusForAdminUpdate(int id)
@@ -762,6 +794,10 @@ namespace VC.Admin.Controllers
                 }
                 else
                 {
+                    if (order.SafeData.OrderNotes != null)
+                    {
+                        order.Data.ServiceCodeNotes = order.SafeData.OrderNotes;
+                    }
                     order = await _orderService.InsertAsync(order);
                 }
             }
@@ -775,7 +811,13 @@ namespace VC.Admin.Controllers
                 }
             }
 
-            OrderReshipManageModel toReturn = await _mapper.ToModelAsync<OrderReshipManageModel>(order);
+            OrderReshipManageModel toReturn = await _mapper.ToModelAsync<OrderReshipManageModel>(order);   
+            
+            //Create egift send email data
+            if (toReturn != null && model.Id == 0)
+            {
+                CreateEGiftNewOrderEmail(order, toReturn);
+            }
 
             return toReturn;
         }
@@ -886,6 +928,10 @@ namespace VC.Admin.Controllers
 
                 if (model.Id == 0)
                 {
+                    if (order.SafeData.OrderNotes != null)
+                    {
+                        order.Data.ServiceCodeNotes = order.SafeData.OrderNotes;
+                    }
                     order = await _orderRefundService.InsertAsync(order);
                 }
             }

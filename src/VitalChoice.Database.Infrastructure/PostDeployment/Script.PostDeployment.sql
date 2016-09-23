@@ -14,3 +14,4 @@ set dateformat mdy
 :r .\Scripts\ContentAreas.sql
 :r .\Scripts\Indexes.sql
 :r .\Scripts\EmailTemplates.sql
+:r .\Scripts\Roles.sql

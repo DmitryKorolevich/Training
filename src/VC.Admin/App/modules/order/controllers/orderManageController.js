@@ -17,11 +17,22 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             toaster.pop('success', "Success!", "Successfully saved.");
             if (!$scope.id)
             {
-                $rootScope.BrontoSubscribedStatus = {
-                    Id: result.Data.Id,
-                    Value: $scope.options.BrontoSubscribedStatus,
-                };
-                $state.go('index.oneCol.orderDetail', { id: result.Data.Id });
+                if (result.Data.IdObjectType == 2)//init autoship with ship delayed
+                {
+                    $state.go('index.oneCol.manageOrders');
+                }
+                else
+                {
+                    $rootScope.BrontoSubscribedStatus = {
+                        Id: result.Data.Id,
+                        Value: $scope.options.BrontoSubscribedStatus,
+                    };
+                    if (result.Data.EGiftNewOrderEmail)
+                    {
+                        modalUtil.open('app/modules/gc/partials/sendEmail.html', 'sendEmailController', result.Data.EGiftNewOrderEmail);
+                    }
+                    $state.go('index.oneCol.orderDetail', { id: result.Data.Id });
+                }
             }
             else
             {

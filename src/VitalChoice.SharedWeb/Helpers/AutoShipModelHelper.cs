@@ -61,6 +61,13 @@ namespace VitalChoice.SharedWeb.Helpers
 	        {
 	            result.NextDate = orderDynamic.Data.LastAutoShipDate.AddMonths(result.Frequency);
 	        }
+	        else
+	        {
+	            if (orderDynamic.SafeData.ShipDelayDate != null && orderDynamic.OrderStatus == OrderStatus.ShipDelayed)
+	            {
+	                result.NextDate = orderDynamic.Data.ShipDelayDate;
+	            }
+	        }
 	        result.Id = orderDynamic.Id;
 
 		    return result;

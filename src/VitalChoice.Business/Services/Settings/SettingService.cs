@@ -10,6 +10,7 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Interfaces.Services.Settings;
 using Microsoft.EntityFrameworkCore;
 using VitalChoice.Business.Services.Dynamic;
+using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Ecommerce.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
@@ -21,15 +22,18 @@ namespace VitalChoice.Business.Services.Settings
         private readonly IEcommerceRepositoryAsync<Lookup> _lookupRepository;
         private readonly IEcommerceRepositoryAsync<SettingOptionType> _settingOptionTypeRepository;
         private readonly SettingMapper _settingMapper;
+        private readonly ICacheProvider _cache;
 
         public SettingService(
             IEcommerceRepositoryAsync<Lookup> lookupRepository,
             IEcommerceRepositoryAsync<SettingOptionType> settingOptionTypeRepository,
-            SettingMapper settingMapper)
+            SettingMapper settingMapper,
+            ICacheProvider cache)
         {
             _lookupRepository = lookupRepository;
             _settingOptionTypeRepository = settingOptionTypeRepository;
             _settingMapper = settingMapper;
+            _cache = cache;
         }
 
         public Task<AppSettings> GetSettingsInstanceAsync() => _settingMapper.CreatePrototypeForAsync<AppSettings>();
@@ -98,6 +102,7 @@ namespace VitalChoice.Business.Services.Settings
                 try
                 {
                     await _lookupRepository.UpdateAsync(dbLookup);
+                    _cache.Remove(CacheKeys.AppInfrastructure);
                 }
                 catch (DbUpdateException e)
                 {

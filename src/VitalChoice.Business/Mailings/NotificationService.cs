@@ -73,7 +73,7 @@ namespace VitalChoice.Business.Mailings
 
         public async Task<bool> SendBasicEmailAsync(BasicEmail email)
         {
-            await emailSender.SendEmailAsync(email.ToEmail, email.Subject, email.Body, email.FromName, email.FromEmail, email.ToName, email.IsHTML);
+            await emailSender.SendEmailAsync(email.ToEmail, email.Subject, email.Body, email.FromName, email.FromEmail, email.ToName, email.IsHTML, email.BCCEmail);
             return true;
         }
 
@@ -191,7 +191,7 @@ namespace VitalChoice.Business.Mailings
 
             if (generatedEmail != null)
             {
-                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body, replyToEmail: model.Email);
             }
         }
 
