@@ -14,6 +14,9 @@ namespace VitalChoice.Infrastructure.LoadBalancing
 
         protected RoundRobinAbstractPool(byte maxThreads)
         {
+            if (maxThreads == 0)
+                throw new ArgumentException("Max Thread should be > 0", nameof(maxThreads));
+
             _maxThreads = maxThreads;
             var pool = new Thread[maxThreads];
             _threadData = new ThreadStartData[maxThreads];
