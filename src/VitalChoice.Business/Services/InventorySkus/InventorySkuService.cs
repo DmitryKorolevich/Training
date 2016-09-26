@@ -42,17 +42,26 @@ using VitalChoice.Infrastructure.Domain.Transfer.InventorySkus;
 using VitalChoice.Interfaces.Services.InventorySkus;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.ObjectMapping.Base;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Interfaces.Services.Products;
+using System.Text.RegularExpressions;
 
 namespace VitalChoice.Business.Services.InventorySkus
 {
     public class InventorySkuService : ExtendedEcommerceDynamicService<InventorySkuDynamic, InventorySku, InventorySkuOptionType, InventorySkuOptionValue>,
         IInventorySkuService
     {
+        private static readonly Regex QTYRegex = new Regex(@"\([0-9]+\)", RegexOptions.Compiled | RegexOptions.RightToLeft);
+
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly IEcommerceRepositoryAsync<SkuToInventorySku> _skuToInventorySkuRepository;
         private readonly IInventorySkuCategoryService _inventorySkuCategoryService;
         private readonly SpEcommerceRepository _sPEcommerceRepository;
         private readonly ISettingService _settingService;
+        private readonly IEcommerceRepositoryAsync<Sku> _skuRepository;
+        private readonly IProductService _productService;
         private readonly ReferenceData _referenceData;
 
         public InventorySkuService(InventorySkuMapper mapper,
@@ -61,6 +70,8 @@ namespace VitalChoice.Business.Services.InventorySkus
             IInventorySkuCategoryService inventorySkuCategoryService,
             SpEcommerceRepository sPEcommerceRepository,
             ISettingService settingService,
+            IEcommerceRepositoryAsync<Sku> skuRepository,
+            IProductService productService,
             ReferenceData referenceData,
             IEcommerceRepositoryAsync<BigStringValue> bigStringValueRepository,
             IObjectLogItemExternalService objectLogItemExternalService,
@@ -77,6 +88,8 @@ namespace VitalChoice.Business.Services.InventorySkus
             _inventorySkuCategoryService = inventorySkuCategoryService;
             _sPEcommerceRepository = sPEcommerceRepository;
             _settingService = settingService;
+            _skuRepository = skuRepository;
+            _productService = productService;
             _referenceData = referenceData;
         }
 
@@ -188,6 +201,8 @@ namespace VitalChoice.Business.Services.InventorySkus
             //return toReturn;
             return items.GroupBy(inv => inv.IdSku).ToDictionary(inv => inv.Key, g => g.ToList());
         }
+
+        #region Reports
 
         public async Task<ICollection<InventorySkuUsageReportItem>> GetInventorySkuUsageReportAsync(InventorySkuUsageReportFilter filter)
         {
@@ -519,6 +534,10 @@ namespace VitalChoice.Business.Services.InventorySkus
             items.Add((ExpandoObject)item);
         }
 
+        #endregion
+
+        #region Import
+
         public async Task<bool> ImportInventorySkusAsync(byte[] file,int userId)
         {
             List<InventorySkuImportItem> records = new List<InventorySkuImportItem>();
@@ -737,5 +756,255 @@ namespace VitalChoice.Business.Services.InventorySkus
 
             return true;
         }
+        
+        public async Task<bool> ImportSkuInventoryInfoAsync(byte[] file, int userId)
+        {
+            List<SkuInventoryInfoImportItem> records = new List<SkuInventoryInfoImportItem>();
+            Dictionary<string, ImportItemValidationGenericProperty> validationSettings = null;
+            var recordType = typeof(SkuInventoryInfoImportItem);
+            using (var memoryStream = new MemoryStream(file))
+            {
+                using (var streamReader = new StreamReader(memoryStream))
+                {
+                    CsvConfiguration configuration = new CsvConfiguration();
+                    configuration.TrimFields = true;
+                    configuration.TrimHeaders = true;
+                    configuration.WillThrowOnMissingField = false;
+                    configuration.RegisterClassMap<SkuInventoryInfoImportItemCsvMap>();
+                    using (var csv = new CsvReader(streamReader, configuration))
+                    {
+                        PropertyInfo[] modelProperties = recordType.GetProperties();
+                        validationSettings = BusinessHelper.GetAttrBaseImportValidationSettings(modelProperties);
+
+                        int rowNumber = 1;
+                        try
+                        {
+                            while (csv.Read())
+                            {
+                                SkuInventoryInfoImportItem item = (SkuInventoryInfoImportItem)csv.GetRecord(recordType);
+                                item.RowNumber = rowNumber;
+                                item.ErrorMessages = new List<MessageInfo>();
+
+                                var dateProperty = modelProperties.FirstOrDefault(p => p.Name == nameof(SkuInventoryInfoImportItem.BornDate));
+                                var dateHeader = dateProperty?.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault()?.Name;
+
+                                DateTime tDate;
+                                var sDate = csv.GetField<string>(dateHeader);
+                                if (!String.IsNullOrEmpty(sDate))
+                                {
+                                    if (DateTime.TryParse(sDate, CultureInfo.InvariantCulture, DateTimeStyles.None, out tDate))
+                                    {
+                                        item.BornDate = TimeZoneInfo.ConvertTime(tDate, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local);
+                                    }
+                                    else
+                                    {
+                                        item.ErrorMessages.Add(BusinessHelper.AddErrorMessage(dateHeader, 
+                                            String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ParseDateError], dateHeader)));
+                                    }
+                                }
+                                
+                                rowNumber++;
+                                records.Add(item);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.LogError(e.ToString());
+                            throw new AppValidationException(e.Message);
+                        }
+                    }
+                }
+            }
+
+            if (validationSettings != null)
+            {
+                BusinessHelper.ValidateAttrBaseImportItems(records, validationSettings);
+            }
+
+            //throw parsing and validation errors
+            var messages = BusinessHelper.FormatRowsRecordErrorMessages(records);
+            if (messages.Count > 0)
+            {
+                throw new AppValidationException(messages);
+            }
+
+            var channelLookup = (await _settingService.GetLookupsAsync(new []{ SettingConstants.INVENTORY_SKU_LOOKUP_CHANNEL_NAME})).FirstOrDefault();
+
+            List<string> codes = new List<string>();
+            List<string> inventoryCodes = new List<string>();
+            List<int> productIds = new List<int>();
+            foreach (var inventorySkuImportItem in records)
+            {
+                bool assemble;
+                if (!bool.TryParse(inventorySkuImportItem.Assemble, out assemble))
+                {
+                    inventorySkuImportItem.ErrorMessages.Add(BusinessHelper.AddErrorMessage("Assemble",
+                        string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InvalidFieldValue], "Assemble")));
+                }
+                else
+                {
+                    inventorySkuImportItem.AssembleBool = assemble;
+                }
+
+                var idLookupVariant = channelLookup.LookupVariants.FirstOrDefault(p =>
+                    string.Equals(p.ValueVariant, inventorySkuImportItem.Channel, StringComparison.InvariantCultureIgnoreCase))?.Id;
+                if (!idLookupVariant.HasValue)
+                {
+                    inventorySkuImportItem.ErrorMessages.Add(BusinessHelper.AddErrorMessage("Channel",
+                        string.Format(
+                            ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InventorySkuLookupValueMissed], "Channel")));
+                }
+                else
+                {
+                    inventorySkuImportItem.IdChannel = idLookupVariant.Value;
+                }
+
+                if (!codes.Contains(inventorySkuImportItem.SKU))
+                {
+                    codes.Add(inventorySkuImportItem.SKU);
+                }
+                else
+                {
+                    inventorySkuImportItem.ErrorMessages.Add(BusinessHelper.AddErrorMessage("SKU", 
+                        ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuImportCodeDublicate]));
+                }
+
+                if (!string.IsNullOrEmpty(inventorySkuImportItem.Parts))
+                {
+                    var invCodes = inventorySkuImportItem.Parts.Split(',');
+                    foreach (var invCode in invCodes)
+                    {
+                        var tInvCode = invCode.Trim();
+                        tInvCode = QTYRegex.Replace(tInvCode, "");
+                        if (!inventoryCodes.Contains(tInvCode))
+                        {
+                            inventoryCodes.Add(tInvCode);
+                        }
+                    }
+                }
+            }
+
+            //throw parsing and validation errors
+            messages = BusinessHelper.FormatRowsRecordErrorMessages(records);
+            if (messages.Count > 0)
+            {
+                throw new AppValidationException(messages);
+            }
+            
+            //get skus
+            int i = 0;
+            var groups = codes.GroupBy(x => i++ / SqlConstants.MAX_CONTAINS_COUNT).ToList();
+            var skus = new Dictionary<string, Sku>(StringComparer.OrdinalIgnoreCase);
+            foreach (var group in groups)
+            {
+                var tSkus = await _skuRepository.Query(p => p.StatusCode != (int)RecordStatusCode.Deleted && 
+                    p.Product.StatusCode != (int)RecordStatusCode.Deleted &&
+                    group.Contains(p.Code)).SelectAsync(false);
+                skus.AddRange(tSkus.ToDictionary(p=>p.Code,pp=>pp, StringComparer.OrdinalIgnoreCase));
+            }
+
+            //get inv skus
+            i = 0;
+            var invGroups = inventoryCodes.GroupBy(x => i++ / SqlConstants.MAX_CONTAINS_COUNT).ToList();
+            var invSkus = new Dictionary<string, InventorySku>(StringComparer.OrdinalIgnoreCase);
+            foreach (var group in invGroups)
+            {
+                var tInvSkus = await ObjectRepository.Query(p => p.StatusCode != (int)RecordStatusCode.Deleted &&
+                    group.Contains(p.Code)).SelectAsync(false);
+
+                invSkus.AddRange(tInvSkus.ToDictionary(p => p.Code, pp => pp, StringComparer.OrdinalIgnoreCase));
+            }
+
+            foreach (var skuInventoryInfoImportItem in records)
+            {
+                Sku sku = null;
+                if (skus.TryGetValue(skuInventoryInfoImportItem.SKU, out sku))
+                {
+                    skuInventoryInfoImportItem.IdSku = sku.Id;
+                    skuInventoryInfoImportItem.IdProduct = sku.IdProduct;
+                    if (productIds.All(p => p != skuInventoryInfoImportItem.IdProduct))
+                    {
+                        productIds.Add(skuInventoryInfoImportItem.IdProduct);
+                    }
+                }
+                else
+                {
+                    skuInventoryInfoImportItem.ErrorMessages.Add(BusinessHelper.AddErrorMessage("SKU",
+                        String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.SkuNotFoundOrderImport], "SKU", skuInventoryInfoImportItem.SKU)));
+                }
+
+                if (!string.IsNullOrEmpty(skuInventoryInfoImportItem.Parts))
+                {
+                    var invCodes = skuInventoryInfoImportItem.Parts.Split(',');
+                    foreach (var invCode in invCodes)
+                    {
+                        var tInvCode = invCode.Trim();
+                        tInvCode = QTYRegex.Replace(tInvCode, "");
+                        InventorySku invSku = null;
+                        if (invSkus.TryGetValue(tInvCode, out invSku))
+                        {
+                            if (skuInventoryInfoImportItem.SkuToInventorySkus.All(p => p.IdInventorySku != invSku.Id))
+                            {
+                                int qty = 1;
+                                var match = QTYRegex.Match(invCode);
+                                if (match.Success)
+                                {
+                                    if (!Int32.TryParse(match.Value.Replace("(", "").Replace(")", ""),out qty))
+                                    {
+                                        skuInventoryInfoImportItem.ErrorMessages.Add(BusinessHelper.AddErrorMessage("Parts",
+                                            ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ParseIntError]));
+                                    }
+                                }
+                                skuInventoryInfoImportItem.SkuToInventorySkus.Add(new SkuToInventorySku()
+                                {
+                                    IdInventorySku = invSku.Id,
+                                    Quantity = qty
+                                });
+                            }
+                        }
+                        else
+                        {
+                            skuInventoryInfoImportItem.ErrorMessages.Add(BusinessHelper.AddErrorMessage("Parts",
+                                String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InventorySkuNotFoundImport], invCode)));
+                        }
+                    }
+                }
+            }
+
+            //skus and inventory skus exist in db
+            messages = BusinessHelper.FormatRowsRecordErrorMessages(records);
+            if (messages.Count > 0)
+            {
+                throw new AppValidationException(messages);
+            }
+
+            var products = await _productService.SelectTransfersAsync(productIds);
+            foreach (var record in records)
+            {
+                var product = products.FirstOrDefault(p => p.ProductDynamic.Id == record.IdProduct);
+                var sku = product.ProductDynamic.Skus.FirstOrDefault(p => p.Id == record.IdSku);
+                sku.Data.InventorySkuChannel = record.IdChannel;
+                sku.Data.Assemble = record.AssembleBool;
+                if (record.BornDate.HasValue)
+                {
+                    sku.Data.BornDate = record.BornDate;
+                }
+
+                foreach (var item in record.SkuToInventorySkus)
+                {
+                    if (sku.SkusToInventorySkus.All(p => p.IdInventorySku != item.IdInventorySku))
+                    {
+                        sku.SkusToInventorySkus.Add(item);
+                    }
+                }
+                product.ProductDynamic.IdEditedBy = userId;
+            }
+
+            await _productService.UpdateRangeAsync(products);
+
+            return true;
+        }
+
+        #endregion
     }
 }

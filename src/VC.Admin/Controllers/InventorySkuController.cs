@@ -205,6 +205,31 @@ namespace VC.Admin.Controllers
             }
         }
 
+        [HttpPost]
+        [AdminAuthorize(PermissionType.InventorySkus)]
+        public async Task<Result<bool>> ImportSkuInventoryInfo()
+        {
+            var form = await Request.ReadFormAsync();
+
+            var parsedContentDisposition = ContentDispositionHeaderValue.Parse(form.Files[0].ContentDisposition);
+
+            var contentType = form.Files[0].ContentType;
+            using (var stream = form.Files[0].OpenReadStream())
+            {
+                var fileContent = stream.ReadFully();
+
+                var sUserId = _userManager.GetUserId(Request.HttpContext.User);
+                int userId;
+                var toReturn = false;
+                if (int.TryParse(sUserId, out userId))
+                {
+                    toReturn = await _inventorySkuService.ImportSkuInventoryInfoAsync(fileContent, userId);
+                }
+
+                return toReturn;
+            }
+        }
+
         #endregion
 
         #region InventorySkuCategories
