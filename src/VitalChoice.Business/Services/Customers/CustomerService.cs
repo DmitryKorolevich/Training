@@ -510,6 +510,7 @@ namespace VitalChoice.Business.Services.Customers
                             .WithId(filter.SearchText)
                             .WithEmailContains(filter.Email)
                             .WithIdAffiliate(filter.IdAffiliate, filter.IdAffiliateRequired)
+                            .WithIdOrder(filter.IdOrder)
                             .FilterProfileAddress(filter.Address)
                             .FilterDefaultShippingAddress(filter.DefaultShippingAddress),
                         includes =>

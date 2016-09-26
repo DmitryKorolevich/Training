@@ -35,6 +35,7 @@ angular.module('app.modules.customer.controllers.customerManagementController', 
 		        $scope.defaultShippingAddress = {};
 
 		        $scope.filter = {
+		            IdOrder: null,
 		            Address: null,
 		            DefaultShippingAddress: null,
 		            SearchText: "",
@@ -79,7 +80,8 @@ angular.module('app.modules.customer.controllers.customerManagementController', 
                     (!$scope.defaultShippingAddress.City || $scope.defaultShippingAddress.City.length < 3) &&
                     (!$scope.defaultShippingAddress.Zip || $scope.defaultShippingAddress.Zip.length < 3) &&
                     (!$scope.address.Phone || $scope.address.Phone.length < 3) &&
-                    (!$scope.address.Company || $scope.address.Company.length < 3))
+                    (!$scope.address.Company || $scope.address.Company.length < 3) &&
+                    (!$scope.filter.IdOrder || $scope.filter.IdOrder.length < 3))
 		        {
 		            toaster.pop('error', "Info", "At least one field should be filled with at least 3 characters.");
 		            return false;
