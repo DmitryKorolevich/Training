@@ -59,6 +59,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         $scope.skusFilter = {
             Code: '',
             DescriptionName: '',
+            ActiveOnly: true,
             Paging: { PageIndex: 1, PageItemCount: 20 },
         };
 
