@@ -169,9 +169,17 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             ICollection<ProductContent> productContents = new List<ProductContent>();
             if (productIds.Count > 0)
             {
-                products =
+                var tempProducts =
                     (await _productService.SelectAsync(productIds, true)).Where(
                         x => targetStatuses.Contains((RecordStatusCode) x.StatusCode)).ToList();
+                foreach (var productId in productIds)
+                {
+                    var product = tempProducts.FirstOrDefault(p => p.Id == productId);
+                    if (product != null)
+                    {
+                        products.Add(product);
+                    }
+                }
                 productContents = await _productContentRepository.Query(p => productIds.Contains(p.Id)).SelectAsync(false);
             }
 
