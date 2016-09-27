@@ -33,6 +33,8 @@ namespace VitalChoice.Interfaces.Services.Products
 
 	    Task<bool> UpdateProductsOnCategoryOrderAsync(int idCategory, ICollection<ProductListItemModel> products);
 
+	    Task<bool> UpdateProductsOnCategoriesOrderAsync(ICollection<int> categoryIds);
+
         Task<IDictionary<int, int>> GetProductIdsBySkuIds(ICollection<int> skuIds);
 
         #endregion

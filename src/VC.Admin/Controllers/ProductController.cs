@@ -298,16 +298,46 @@ namespace VC.Admin.Controllers
             transferEntity.ProductContent = content;
             transferEntity.ProductDynamic = product;
 
+            List<int> categoryIdsForResave = new List<int>();
             if (model.Id > 0)
-                product = (await productService.UpdateAsync(transferEntity));
+            {
+                var dbItem = await productService.SelectAsync(model.Id);
+
+                product = await productService.UpdateAsync(transferEntity);
+
+                foreach (var productDynamicCategoryId in product.CategoryIds)
+                {
+                    var add = true;
+                    foreach (var dbItemCategoryId in dbItem.CategoryIds)
+                    {
+                        if (productDynamicCategoryId == dbItemCategoryId)
+                        {
+                            add = false;
+                            break;
+                        }
+                    }
+                    if (add)
+                    {
+                        categoryIdsForResave.Add(productDynamicCategoryId);
+                    }
+                }
+            }
             else
             {
                 transferEntity.ProductDynamic.PublicId = Guid.NewGuid();
-                product = (await productService.InsertAsync(transferEntity));
+                product = await productService.InsertAsync(transferEntity);
+
+                categoryIdsForResave = product.CategoryIds.ToList();
             }
 
             ProductManageModel toReturn = await _mapper.ToModelAsync<ProductManageModel>(product);
             toReturn.MasterContentItemId = transferEntity.ProductContent.MasterContentItemId;
+
+            //Set products orderring in categories where they were added
+            if (categoryIdsForResave.Count > 0)
+            {
+                await productService.UpdateProductsOnCategoriesOrderAsync(categoryIdsForResave);
+            }
 
             return toReturn;
         }

@@ -58,7 +58,7 @@
                                                     <div class="form-group">
                                                         <label for="type" class="col-md-3 control-label">Service Code</label>
                                                         <div class="col-md-9">
-                                                            <select data-ng-disabled="orderEditDisabled" class="form-control" name="ServiceCode" data-ng-model="order.ServiceCode" ng-options="item.Key as item.Text for item in ReferenceData.ServiceCodes" required></select>
+                                                            <select data-ng-disabled="order.Id" class="form-control" name="ServiceCode" data-ng-model="order.ServiceCode" ng-options="item.Key as item.Text for item in ReferenceData.ServiceCodes" required></select>
                                                             <div class="error-container" ng-show="forms.topForm.submitted && forms.topForm.ServiceCode.$invalid">
                                                                 <small class="error" ng-show="forms.topForm.ServiceCode.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Service Code")}}</small>
                                                                 <small class="error" ng-show="forms.topForm.ServiceCode.$error.server">{{serverMessages.GetMessage('ServiceCode')}}</small>
@@ -70,7 +70,7 @@
                                                         <div class="col-md-9">
                                                             <div class="checkbox">
                                                                 <label>
-                                                                    <input type="checkbox" data-ng-disabled="orderEditDisabled" data-ng-model="order.ReturnAssociated">
+                                                                    <input type="checkbox" data-ng-disabled="order.Id" data-ng-model="order.ReturnAssociated">
                                                                     <strong>Is there a product return associated with this Customer Service call?</strong>
                                                                 </label>
                                                             </div>
@@ -79,7 +79,7 @@
                                                     <div class="form-group">
                                                         <label class="col-md-3 control-label">Notes</label>
                                                         <div class="col-md-9">
-                                                            <textarea type="text" name="OrderNotes" class="form-control" placeholder="Notes" rows="5" data-ng-model="order.OrderNotes" data-ng-disabled="orderEditDisabled" required></textarea>
+                                                            <textarea type="text" name="OrderNotes" class="form-control" placeholder="Notes" rows="5" data-ng-model="order.OrderNotes" data-ng-disabled="order.Id" required></textarea>
                                                             <div class="error-container" ng-show="forms.topForm.submitted && forms.topForm.OrderNotes.$invalid">
                                                                 <small class="error" ng-show="forms.topForm.OrderNotes.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Order Notes")}}</small>
                                                                 <small class="error" ng-show="forms.topForm.OrderNotes.$error.server">{{serverMessages.GetMessage('OrderNotes')}}</small>
@@ -100,7 +100,7 @@
                                                                 <td class="activate-all">
                                                                     <div class="input-group">
                                                                         <label>
-                                                                            <input data-ng-model="options.allActiveRefundSkus" type="checkbox" data-ng-change="toggleAllActiveRefundSkus()" />
+                                                                            <input data-ng-model="options.allActiveRefundSkus" type="checkbox" data-ng-disabled="order.Id" data-ng-change="toggleAllActiveRefundSkus()" />
                                                                         </label>
                                                                     </div>
                                                                 </td>
