@@ -148,13 +148,22 @@ namespace VitalChoice.Business.Queries.Customers
             return this;
         }
 
-
         public CustomerQuery WithIds(ICollection<int> ids)
         {
             if (ids != null)
             {
                 Add(p => ids.Contains(p.Id));
             }
+            return this;
+        }
+
+        public CustomerQuery WithIdOrder(int? idOrder)
+        {
+            if (idOrder.HasValue)
+            {
+                Add(c => c.Orders.Any(p => p.Id == idOrder.Value && p.StatusCode!=(int)RecordStatusCode.Deleted));
+            }
+
             return this;
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Users;
 
@@ -47,5 +48,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Customers
 	    public ICollection<CustomerPaymentMethod> CustomerPaymentMethods { get; set; }
 
 	    public ICollection<CustomerFile> Files { get; set; }
+
+	    public ICollection<Order> Orders { get; set; }
 	}
 }

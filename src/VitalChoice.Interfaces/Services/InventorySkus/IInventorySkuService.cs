@@ -27,5 +27,7 @@ namespace VitalChoice.Interfaces.Services.InventorySkus
 	        out IList<DynamicExportColumn> columns, out IList<ExpandoObject> items);
 
         Task<bool> ImportInventorySkusAsync(byte[] file, int userId);
+
+        Task<bool> ImportSkuInventoryInfoAsync(byte[] file, int userId);
     }
 }

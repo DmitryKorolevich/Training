@@ -43,7 +43,7 @@
             <div class="form-group review-box-line checkbox">
                 <label class="control-label">E-Gift certificates</label>
                 <label class="input-group bold">
-                    @Html.CheckBoxFor(m => m.All, new { @class = "form-control" })
+                    @Html.CheckBoxFor(m => m.All, new { @class = "form-control all-egifts" })
                     <span>All</span>
                 </label>
             </div>
@@ -52,7 +52,14 @@
                 <div class="form-group review-box-line checkbox">
                     <label class="control-label">&nbsp;</label>
                     <label class="input-group bold">
-                        <input type="checkbox" class="form-control" name="SelectedCodes" value="@Model.Codes[i].Code" />
+                        @if (Model.Codes[i].Selected)
+                        {
+                            <input type="checkbox" class="form-control egift" name="SelectedCodes" checked value="@Model.Codes[i].Code"/>
+                        }
+                        else
+                        {
+                            <input type="checkbox" class="form-control egift" name="SelectedCodes" value="@Model.Codes[i].Code" />
+                        }
                         <span>@Model.Codes[i].Code</span>
                     </label>
                 </div>

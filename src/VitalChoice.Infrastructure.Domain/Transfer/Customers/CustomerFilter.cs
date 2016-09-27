@@ -25,6 +25,8 @@
 
         public string Email { get; set; }
 
+        public int? IdOrder { get; set; }
+
         public CustomerAddressFilter Address { get; set; }
 
         public CustomerAddressFilter DefaultShippingAddress { get; set; }

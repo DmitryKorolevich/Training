@@ -984,6 +984,28 @@ namespace VitalChoice.Business.Services.Products
             return true;
         }
 
+        public async Task<bool> UpdateProductsOnCategoriesOrderAsync(ICollection<int> categoryIds)
+        {
+            var dbProductsOnCategories = await _productToCategoryRepository.Query(p => categoryIds.Contains(p.IdCategory) &&
+                                                                                   p.Product.StatusCode != (int)RecordStatusCode.Deleted).SelectAsync(false);
+            var categories = dbProductsOnCategories.GroupBy(p => p.IdCategory).ToList();
+            int order;
+            foreach (var category in categories)
+            {
+                order = 0;
+                foreach (var productToCategory in category.OrderBy(p=>p.Order))
+                {
+                    productToCategory.Order = order;
+                    order++;
+                }
+            }
+
+            await _productToCategoryRepository.UpdateRangeAsync(dbProductsOnCategories);
+
+            return true;
+        }
+
+
         public async Task<IDictionary<int, int>> GetProductIdsBySkuIds(ICollection<int> skuIds)
         {
             var toReturn =

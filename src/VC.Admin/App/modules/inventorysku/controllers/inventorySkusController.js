@@ -130,5 +130,56 @@
             }
         };
 
+        $scope.uploadSkuInfo = function (files)
+        {
+            $scope.options.selectedOrderImportFile = files && files.length > 0 ? files[0] : null;
+            if ($scope.options.selectedOrderImportFile)
+            {
+                $scope.options.uploadingOrdersImport = true;
+                var deferred = $scope.refreshTracker.createPromise();
+                Upload.upload({
+                    url: '/api/inventorysku/ImportSkuInventoryInfo',
+                    data: {},
+                    file: $scope.options.selectedOrderImportFile
+                }).progress(function (evt)
+                {
+
+                }).success(function (result, status, headers, config)
+                {
+                    deferred.resolve();
+                    if (result.Success)
+                    {
+                        modalUtil.open('app/modules/setting/partials/infoDetailsPopup.html', 'infoDetailsPopupController', {
+                            Header: "Success!",
+                            Messages: [{ Message: "Successfully imported" }],
+                            OkButton: {
+                                Label: 'Ok',
+                                Handler: function ()
+                                {
+                                }
+                            },
+                        }, { size: 'xs' });
+                        $scope.filterItems();
+                    } else
+                    {
+                        if (result.Messages)
+                        {
+                            modalUtil.open('app/modules/setting/partials/infoDetailsPopup.html', 'infoDetailsPopupController', {
+                                Header: "Error details",
+                                Messages: result.Messages
+                            });
+                        }
+                    }
+                    $scope.options.selectedOrderImportFile = null;
+                }).error(function (data, status, headers, config)
+                {
+                    deferred.resolve();
+                    $scope.options.selectedOrderImportFile = null;
+
+                    toaster.pop('error', "Error!", "Server error ocurred");
+                });
+            }
+        };
+
         initialize();
     }]);

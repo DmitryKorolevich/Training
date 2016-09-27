@@ -118,7 +118,7 @@
                     if (add)
                     {
                         var newSelectedProduct = angular.copy(item);
-                        $scope.items.push(newSelectedProduct);
+                        $scope.items.splice(0,0,newSelectedProduct);
                     }
                 });
             }

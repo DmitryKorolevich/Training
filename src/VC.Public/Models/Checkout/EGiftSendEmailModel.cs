@@ -7,6 +7,8 @@ namespace VC.Public.Models.Checkout
     public class EGiftSendEmailCodeModel
     {
         public string Code { get; set; }
+
+        public bool Selected { get; set; }
     }
 
     public class EGiftSendEmailModel

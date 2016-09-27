@@ -732,6 +732,7 @@ namespace VC.Public.Controllers
                     SelectMany(p => p.GcsGenerated).Select(p => new EGiftSendEmailCodeModel()
                     {
                         Code = p.Code,
+                        Selected = true
                     }).ToList();
             }
 
@@ -742,17 +743,29 @@ namespace VC.Public.Controllers
         [CustomerStatusCheck]
         public async Task<IActionResult> SendEGiftEmail(EGiftSendEmailModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
             var idOrder = HttpContext.Session.GetInt32(CheckoutConstants.ReceiptSessionOrderId);
             if (!idOrder.HasValue)
             {
+                model.Codes=new List<EGiftSendEmailCodeModel>();
                 return PartialView("_SendEGiftEmail", model);
             }
-
             var order = await OrderService.SelectAsync(idOrder.Value);
+
+            if (!model.All && (model.SelectedCodes == null || model.SelectedCodes.Count == 0))
+            {
+                ModelState.AddModelError("", "At least one E-Gift should be specified");
+            }
+            if (!ModelState.IsValid)
+            {
+                model.Codes = order.Skus.Where(p => p.Sku.Product.IdObjectType == (int)ProductType.EGс).
+                   SelectMany(p => p.GcsGenerated).Select(p => new EGiftSendEmailCodeModel()
+                   {
+                       Code = p.Code,
+                       Selected = false
+                   }).ToList();
+                return PartialView("_SendEGiftEmail", model);
+            }
+            
             var customer = await CustomerService.SelectAsync(order.Customer.Id);
             var emailModel = new EGiftNotificationEmail();
             emailModel.Sender = $"{customer.ProfileAddress.SafeData.FirstName} {customer.ProfileAddress.SafeData.LastName}";
@@ -772,11 +785,12 @@ namespace VC.Public.Controllers
             ViewBag.SuccessMessage = InfoMessagesLibrary.Data[InfoMessagesLibrary.Keys.EntitySuccessfullySent];
             ModelState.Clear();
             var newModel = new EGiftSendEmailModel();
-            newModel.All = false;
+            newModel.All = true;
             newModel.Codes = order.Skus.Where(p => p.Sku.Product.IdObjectType == (int) ProductType.EGс).
                 SelectMany(p => p.GcsGenerated).Select(p => new EGiftSendEmailCodeModel()
                 {
                     Code = p.Code,
+                    Selected = true
                 }).ToList();
             return PartialView("_SendEGiftEmail", newModel);
         }
