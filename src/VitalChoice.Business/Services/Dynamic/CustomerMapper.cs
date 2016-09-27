@@ -9,6 +9,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Users;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -68,6 +69,8 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = pair.Entity;
                 var dynamic = pair.Dynamic;
 
+                CheckForOnlyOneDefaultShippingAndCC(dynamic);
+
                 entity.Email = dynamic.Email;
 				entity.PublicId = dynamic.PublicId;
 				entity.IdDefaultPaymentMethod = dynamic.IdDefaultPaymentMethod;
@@ -99,7 +102,6 @@ namespace VitalChoice.Business.Services.Dynamic
                 {
                     paymentMethod.IdCustomer = dynamic.Id;
                 }
-
                 await
                     _customerAddressMapper.SyncCollectionsAsync(dynamic.ShippingAddresses, entity.ShippingAddresses,
                         address => address.ShippingAddress, address => new CustomerToShippingAddress
@@ -131,7 +133,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 await _customerAddressMapper.UpdateEntityAsync(dynamic.ProfileAddress, entity.ProfileAddress);
             });
         }
-
+        
         protected override Task ToEntityRangeInternalAsync(
             ICollection<DynamicEntityPair<CustomerDynamic, Customer>> items)
         {
@@ -140,7 +142,9 @@ namespace VitalChoice.Business.Services.Dynamic
                 var entity = item.Entity;
                 var dynamic = item.Dynamic;
 
-	            if (entity.User == null)
+                CheckForOnlyOneDefaultShippingAndCC(dynamic);
+
+                if (entity.User == null)
 	            {
 		            entity.User = new User();
 	            }
@@ -188,6 +192,49 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.CustomerNotes = await _customerNoteMapper.ToEntityRangeAsync(dynamic.CustomerNotes);
 				entity.Files = dynamic.Files;
 			});
+        }
+
+
+        private static void CheckForOnlyOneDefaultShippingAndCC(CustomerDynamic dynamic)
+        {
+            var firstDefault = false;
+            if (dynamic.ShippingAddresses != null)
+            {
+                foreach (var dynamicShippingAddress in dynamic.ShippingAddresses)
+                {
+                    if (dynamicShippingAddress.SafeData.Default == true)
+                    {
+                        if (!firstDefault)
+                        {
+                            firstDefault = true;
+                        }
+                        else
+                        {
+                            dynamicShippingAddress.Data.Default = false;
+                        }
+                    }
+                }
+            }
+            firstDefault = false;
+            if (dynamic.CustomerPaymentMethods != null)
+            {
+                foreach (
+                    var customerPaymentMethod in
+                    dynamic.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard))
+                {
+                    if (customerPaymentMethod.SafeData.Default == true)
+                    {
+                        if (!firstDefault)
+                        {
+                            firstDefault = true;
+                        }
+                        else
+                        {
+                            customerPaymentMethod.Data.Default = false;
+                        }
+                    }
+                }
+            }
         }
     }
 }
