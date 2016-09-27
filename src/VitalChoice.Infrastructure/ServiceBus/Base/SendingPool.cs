@@ -13,7 +13,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             _sender = sender;
         }
 
-        protected override void ProcessingAction(BrokeredMessage data)
+        protected override void ProcessingAction(BrokeredMessage data, object localData)
         {
             if (data.Size < 196608)
             {

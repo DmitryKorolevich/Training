@@ -15,7 +15,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             _sender = sender;
         }
 
-        protected override void ProcessingAction(IEnumerable<BrokeredMessage> data)
+        protected override void ProcessingAction(IEnumerable<BrokeredMessage> data, object localData)
         {
             var extraList = new Lazy<List<BrokeredMessage>>(() => new List<BrokeredMessage>());
             _sender.SendBatch(GetCompleteBatch(data, extraList));

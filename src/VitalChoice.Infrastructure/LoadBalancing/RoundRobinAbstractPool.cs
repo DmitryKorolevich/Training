@@ -14,7 +14,7 @@ namespace VitalChoice.Infrastructure.LoadBalancing
         private readonly object _lock = new object();
         private readonly ThreadStartData[] _threadData;
 
-        protected RoundRobinAbstractPool(byte maxThreads, ILogger logger)
+        protected RoundRobinAbstractPool(byte maxThreads, ILogger logger, Func<object> threadLocalFactory = null)
         {
             if (maxThreads == 0)
                 throw new ArgumentException("Max Thread should be > 0", nameof(maxThreads));
@@ -29,7 +29,8 @@ namespace VitalChoice.Infrastructure.LoadBalancing
                     new ThreadStartData
                     {
                         DataQueue = new ConcurrentQueue<T>(),
-                        DataReadyEvent = new ManualResetEvent(false)
+                        DataReadyEvent = new ManualResetEvent(false),
+                        LocalData = threadLocalFactory?.Invoke()
                     };
                 pool[i] = new Thread(ProcessThread);
                 pool[i].Start(_threadData[i]);
@@ -46,7 +47,13 @@ namespace VitalChoice.Infrastructure.LoadBalancing
             }
         }
 
-        protected abstract void ProcessingAction(T data);
+        protected abstract void ProcessingAction(T data, object localData);
+
+        protected virtual void DisposeLocalData(object localData)
+        {
+            var disposable = localData as IDisposable;
+            disposable?.Dispose();
+        }
 
         private void ProcessThread(object poolParameter)
         {
@@ -61,7 +68,7 @@ namespace VitalChoice.Infrastructure.LoadBalancing
                 {
                     try
                     {
-                        ProcessingAction(data);
+                        ProcessingAction(data, parameters.LocalData);
                     }
                     catch (Exception e)
                     {
@@ -77,6 +84,7 @@ namespace VitalChoice.Infrastructure.LoadBalancing
             for (var i = 0; i < _maxThreads; i++)
             {
                 _threadData[i].DataReadyEvent.Set();
+                DisposeLocalData(_threadData[i].LocalData);
             }
         }
 
@@ -84,6 +92,7 @@ namespace VitalChoice.Infrastructure.LoadBalancing
         {
             public ManualResetEvent DataReadyEvent;
             public ConcurrentQueue<T> DataQueue;
+            public object LocalData;
         }
     }
 }

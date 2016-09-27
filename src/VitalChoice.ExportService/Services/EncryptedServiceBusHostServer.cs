@@ -30,18 +30,18 @@ namespace VitalChoice.ExportService.Services
         {
             _rootScope = rootScope;
             _keyExchangeProvider = new RSACng();
-            _exportPool = new CommandProcessingPool(4, Logger, command =>
+            _exportPool = new CommandProcessingPool(4, Logger, (command, scope) =>
             {
                 switch (command.CommandName)
                 {
                     case OrderExportServiceCommandConstants.ExportOrder:
-                        ProcessExportOrders(command);
+                        ProcessExportOrders(command, scope);
                         break;
                     case OrderExportServiceCommandConstants.ExportGiftListCard:
-                        ProcessGiftListCardExport(command);
+                        ProcessGiftListCardExport(command, scope);
                         break;
                 }
-            });
+            }, () => _rootScope.Resolve<ILifetimeScope>());
         }
 
         protected override bool ProcessPlainCommand(ServiceBusCommandBase command)
@@ -102,23 +102,6 @@ namespace VitalChoice.ExportService.Services
                     return ProcessCardAuthorizeInOrderCommand(command);
                 default:
                     return false;
-            }
-        }
-
-        private void ProcessGiftListCardExport(ServiceBusCommandBase command)
-        {
-            var customerExportInfo = command.Data.Data as GiftListExportModel;
-            if (customerExportInfo == null)
-            {
-                SendCommand(command.CreateError("Gift list export data is empty"));
-                return;
-            }
-
-            using (var scope = _rootScope.BeginLifetimeScope())
-            {
-                var orderExportService = scope.Resolve<IOrderExportService>();
-                orderExportService.ExportGiftListCreditCard(customerExportInfo).GetAwaiter().GetResult();
-                SendCommand(command.CreateResult(true));
             }
         }
 
@@ -210,7 +193,7 @@ namespace VitalChoice.ExportService.Services
             return true;
         }
 
-        private void ProcessExportOrders(ServiceBusCommandBase command)
+        private void ProcessExportOrders(ServiceBusCommandBase command, ILifetimeScope scope)
         {
             var exportData = command.Data.Data as OrderExportData;
             if (exportData == null)
@@ -218,14 +201,25 @@ namespace VitalChoice.ExportService.Services
                 SendCommand(new ServiceBusCommandBase(command, "Export data is empty"));
                 return;
             }
-            using (var scope = _rootScope.BeginLifetimeScope())
+            var orderExportService = scope.Resolve<IOrderExportService>();
+            orderExportService.ExportOrders(exportData.ExportInfo, result => SendCommand(new ServiceBusCommandBase(command, result)),
+                    exportData.UserId)
+                .GetAwaiter()
+                .GetResult();
+        }
+
+        private void ProcessGiftListCardExport(ServiceBusCommandBase command, ILifetimeScope scope)
+        {
+            var customerExportInfo = command.Data.Data as GiftListExportModel;
+            if (customerExportInfo == null)
             {
-                var orderExportService = scope.Resolve<IOrderExportService>();
-                orderExportService.ExportOrders(exportData.ExportInfo, result => SendCommand(new ServiceBusCommandBase(command, result)),
-                        exportData.UserId)
-                    .GetAwaiter()
-                    .GetResult();
+                SendCommand(command.CreateError("Gift list export data is empty"));
+                return;
             }
+
+            var orderExportService = scope.Resolve<IOrderExportService>();
+            orderExportService.ExportGiftListCreditCard(customerExportInfo).GetAwaiter().GetResult();
+            SendCommand(command.CreateResult(true));
         }
 
         public override void Dispose()
@@ -236,17 +230,18 @@ namespace VitalChoice.ExportService.Services
 
         private class CommandProcessingPool : RoundRobinAbstractPool<ServiceBusCommandBase>
         {
-            private readonly Action<ServiceBusCommandBase> _commandProcessor;
+            private readonly Action<ServiceBusCommandBase, ILifetimeScope> _commandProcessor;
 
-            public CommandProcessingPool(byte maxThreads, ILogger logger, Action<ServiceBusCommandBase> commandProcessor)
-                : base(maxThreads, logger)
+            public CommandProcessingPool(byte maxThreads, ILogger logger, Action<ServiceBusCommandBase, ILifetimeScope> commandProcessor,
+                Func<ILifetimeScope> tlsFactory)
+                : base(maxThreads, logger, tlsFactory)
             {
                 _commandProcessor = commandProcessor;
             }
 
-            protected override void ProcessingAction(ServiceBusCommandBase data)
+            protected override void ProcessingAction(ServiceBusCommandBase data, object localData)
             {
-                _commandProcessor(data);
+                _commandProcessor(data, (ILifetimeScope) localData);
             }
         }
     }
