@@ -161,6 +161,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 orderEditService.baseReferencedDataInitExistOrder($scope);
 
                 initOrder();
+                if ($scope.order.Id)
+                {
+                    $scope.orderEditDisabled = true;
+                }
 
                 if (!$scope.orderEditDisabled)
                 {
