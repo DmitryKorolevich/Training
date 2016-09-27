@@ -12,7 +12,6 @@ using Templates.Strings.Core;
 using VitalChoice.Caching.Debuging;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Ecommerce.Domain.Exceptions;
-using Microsoft.AspNetCore.Http.Extensions;
 
 namespace VitalChoice.Core.GlobalFilters
 {

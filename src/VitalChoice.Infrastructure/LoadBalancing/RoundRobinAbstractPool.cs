@@ -1,23 +1,26 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace VitalChoice.Infrastructure.LoadBalancing
 {
-    public abstract class RoundRobinAbstractPool<T> : IDisposable
+    public abstract class RoundRobinAbstractPool<T> : IRoundRobinPool<T>
     {
         private readonly byte _maxThreads;
+        protected readonly ILogger Logger;
         private volatile bool _terminated;
         private byte _nextToUse;
         private readonly object _lock = new object();
         private readonly ThreadStartData[] _threadData;
 
-        protected RoundRobinAbstractPool(byte maxThreads)
+        protected RoundRobinAbstractPool(byte maxThreads, ILogger logger)
         {
             if (maxThreads == 0)
                 throw new ArgumentException("Max Thread should be > 0", nameof(maxThreads));
 
             _maxThreads = maxThreads;
+            Logger = logger;
             var pool = new Thread[maxThreads];
             _threadData = new ThreadStartData[maxThreads];
             for (var i = 0; i < maxThreads; i++)
@@ -33,7 +36,7 @@ namespace VitalChoice.Infrastructure.LoadBalancing
             }
         }
 
-        public void ProcessItem(T data)
+        public void EnqueueData(T data)
         {
             lock (_lock)
             {
@@ -56,7 +59,14 @@ namespace VitalChoice.Infrastructure.LoadBalancing
                 T data;
                 while (parameters.DataQueue.TryDequeue(out data))
                 {
-                    ProcessingAction(data);
+                    try
+                    {
+                        ProcessingAction(data);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogError(e.ToString());
+                    }
                 }
             }
         }

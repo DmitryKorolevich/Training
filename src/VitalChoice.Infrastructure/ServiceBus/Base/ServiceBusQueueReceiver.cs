@@ -1,52 +1,24 @@
-#if !NETSTANDARD1_5
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
 
 namespace VitalChoice.Infrastructure.ServiceBus.Base
 {
-    public class ServiceBusQueueReceiver : IServiceBusReceiver
+    public class ServiceBusQueueReceiver : ServiceBusAbstractReceiver<QueueClient>
     {
-        private readonly QueueClient _queue;
-
-        public ServiceBusQueueReceiver(QueueClient queue, Action<BrokeredMessage> onReceive = null)
+        public ServiceBusQueueReceiver(Func<QueueClient> queueFactory, ILogger logger) : base(queueFactory, logger)
         {
-            _queue = queue;
-            if (onReceive != null)
-            {
-                _queue.OnMessage(onReceive, new OnMessageOptions()
-                {
-                    MaxConcurrentCalls = 4
-                });
-            }
         }
 
-        public Task<BrokeredMessage> ReceiveAsync()
-        {
-            return _queue.ReceiveAsync();
-        }
+        public override Task<BrokeredMessage> ReceiveAsync() => DoReadActionAsync(que => que.ReceiveAsync());
 
-        public BrokeredMessage Receive()
-        {
-            return _queue.Receive();
-        }
+        public override BrokeredMessage Receive() => DoReadAction(que => que.Receive());
 
-        public Task<IEnumerable<BrokeredMessage>> ReceiveBatchAsync(int count)
-        {
-            return _queue.ReceiveBatchAsync(count);
-        }
+        public override Task<IEnumerable<BrokeredMessage>> ReceiveBatchAsync(int count)
+            => DoReadActionAsync(que => que.ReceiveBatchAsync(count));
 
-        public IEnumerable<BrokeredMessage> ReceiveBatch(int count)
-        {
-            return _queue.ReceiveBatch(count);
-        }
-
-        public void Dispose()
-        {
-            _queue.Close();
-        }
+        public override IEnumerable<BrokeredMessage> ReceiveBatch(int count) => DoReadAction(que => que.ReceiveBatch(count));
     }
 }
-
-#endif

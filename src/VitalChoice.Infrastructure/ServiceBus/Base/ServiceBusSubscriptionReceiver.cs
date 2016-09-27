@@ -1,51 +1,23 @@
-#if !NETSTANDARD1_5
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
 
 namespace VitalChoice.Infrastructure.ServiceBus.Base
 {
-    public class ServiceBusSubscriptionReceiver : IServiceBusReceiver
+    public class ServiceBusSubscriptionReceiver : ServiceBusAbstractReceiver<SubscriptionClient>
     {
-        private readonly SubscriptionClient _subscription;
-
-        public ServiceBusSubscriptionReceiver(SubscriptionClient subscription, Action<BrokeredMessage> receiveAction = null)
+        public ServiceBusSubscriptionReceiver(Func<SubscriptionClient> subscriptionFactory, ILogger logger): base(subscriptionFactory, logger)
         {
-            _subscription = subscription;
-            if (receiveAction != null)
-            {
-                _subscription.OnMessage(receiveAction, new OnMessageOptions
-                {
-                    MaxConcurrentCalls = 2
-                });
-            }
         }
 
-        public Task<BrokeredMessage> ReceiveAsync()
-        {
-            return _subscription.ReceiveAsync();
-        }
+        public override Task<BrokeredMessage> ReceiveAsync() => DoReadActionAsync(que => que.ReceiveAsync());
 
-        public BrokeredMessage Receive()
-        {
-            return _subscription.Receive();
-        }
+        public override BrokeredMessage Receive() => DoReadAction(que => que.Receive());
 
-        public Task<IEnumerable<BrokeredMessage>> ReceiveBatchAsync(int count)
-        {
-            return _subscription.ReceiveBatchAsync(count);
-        }
+        public override Task<IEnumerable<BrokeredMessage>> ReceiveBatchAsync(int count) => DoReadActionAsync(que => que.ReceiveBatchAsync(count));
 
-        public IEnumerable<BrokeredMessage> ReceiveBatch(int count)
-        {
-            return _subscription.ReceiveBatch(count);
-        }
-
-        public void Dispose()
-        {
-            _subscription.Close();
-        }
+        public override IEnumerable<BrokeredMessage> ReceiveBatch(int count) => DoReadAction(que => que.ReceiveBatch(count));
     }
 }
-#endif

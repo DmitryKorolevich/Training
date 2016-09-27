@@ -10,8 +10,8 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
     {
         Task SendAsync(BrokeredMessage message);
         void Send(BrokeredMessage message);
-        Task SendBatchAsync(IEnumerable<BrokeredMessage> message);
-        void SendBatch(IEnumerable<BrokeredMessage> message);
+        Task SendBatchAsync(IEnumerable<BrokeredMessage> messages);
+        void SendBatch(IEnumerable<BrokeredMessage> messages);
     }
 }
 #endif

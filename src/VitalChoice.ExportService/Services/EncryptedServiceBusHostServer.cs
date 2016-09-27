@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Security.Cryptography;
 using Autofac;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
@@ -9,6 +10,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
+using VitalChoice.Infrastructure.LoadBalancing;
 using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 
@@ -16,6 +18,8 @@ namespace VitalChoice.ExportService.Services
 {
     public sealed class EncryptedServiceBusHostServer : EncryptedServiceBusHost
     {
+        private readonly CommandProcessingPool _exportPool;
+
         private readonly ILifetimeScope _rootScope;
         private readonly RSACng _keyExchangeProvider;
         public override string LocalHostName => ServerHostName;
@@ -26,6 +30,18 @@ namespace VitalChoice.ExportService.Services
         {
             _rootScope = rootScope;
             _keyExchangeProvider = new RSACng();
+            _exportPool = new CommandProcessingPool(4, Logger, command =>
+            {
+                switch (command.CommandName)
+                {
+                    case OrderExportServiceCommandConstants.ExportOrder:
+                        ProcessExportOrders(command);
+                        break;
+                    case OrderExportServiceCommandConstants.ExportGiftListCard:
+                        ProcessGiftListCardExport(command);
+                        break;
+                }
+            });
         }
 
         protected override bool ProcessPlainCommand(ServiceBusCommandBase command)
@@ -69,7 +85,11 @@ namespace VitalChoice.ExportService.Services
             switch (command.CommandName)
             {
                 case OrderExportServiceCommandConstants.ExportOrder:
-                    return ProcessExportOrders(command);
+                    _exportPool.EnqueueData(command);
+                    return true;
+                case OrderExportServiceCommandConstants.ExportGiftListCard:
+                    _exportPool.EnqueueData(command);
+                    return true;
                 case OrderExportServiceCommandConstants.UpdateOrderPayment:
                     return ProcessUpdateOrderPayment(command);
                 case OrderExportServiceCommandConstants.UpdateCustomerPayment:
@@ -80,20 +100,18 @@ namespace VitalChoice.ExportService.Services
                     return ProcessCardAuthorizeCommand(command);
                 case OrderExportServiceCommandConstants.AuthorizeCardInOrder:
                     return ProcessCardAuthorizeInOrderCommand(command);
-                case OrderExportServiceCommandConstants.ExportGiftListCard:
-                    return ProcessGiftListCardExport(command);
                 default:
                     return false;
             }
         }
 
-        private bool ProcessGiftListCardExport(ServiceBusCommandBase command)
+        private void ProcessGiftListCardExport(ServiceBusCommandBase command)
         {
             var customerExportInfo = command.Data.Data as GiftListExportModel;
             if (customerExportInfo == null)
             {
                 SendCommand(command.CreateError("Gift list export data is empty"));
-                return false;
+                return;
             }
 
             using (var scope = _rootScope.BeginLifetimeScope())
@@ -102,7 +120,6 @@ namespace VitalChoice.ExportService.Services
                 orderExportService.ExportGiftListCreditCard(customerExportInfo).GetAwaiter().GetResult();
                 SendCommand(command.CreateResult(true));
             }
-            return true;
         }
 
         private bool ProcessCardExistCommand(ServiceBusCommandBase command)
@@ -193,13 +210,13 @@ namespace VitalChoice.ExportService.Services
             return true;
         }
 
-        private bool ProcessExportOrders(ServiceBusCommandBase command)
+        private void ProcessExportOrders(ServiceBusCommandBase command)
         {
             var exportData = command.Data.Data as OrderExportData;
             if (exportData == null)
             {
                 SendCommand(new ServiceBusCommandBase(command, "Export data is empty"));
-                return false;
+                return;
             }
             using (var scope = _rootScope.BeginLifetimeScope())
             {
@@ -209,13 +226,28 @@ namespace VitalChoice.ExportService.Services
                     .GetAwaiter()
                     .GetResult();
             }
-            return true;
         }
 
         public override void Dispose()
         {
             base.Dispose();
             _keyExchangeProvider.Dispose();
+        }
+
+        private class CommandProcessingPool : RoundRobinAbstractPool<ServiceBusCommandBase>
+        {
+            private readonly Action<ServiceBusCommandBase> _commandProcessor;
+
+            public CommandProcessingPool(byte maxThreads, ILogger logger, Action<ServiceBusCommandBase> commandProcessor)
+                : base(maxThreads, logger)
+            {
+                _commandProcessor = commandProcessor;
+            }
+
+            protected override void ProcessingAction(ServiceBusCommandBase data)
+            {
+                _commandProcessor(data);
+            }
         }
     }
 }
