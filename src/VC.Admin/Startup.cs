@@ -38,7 +38,7 @@ namespace VC.Admin
         {
             var reg = new AdminDependencyConfig();
 
-            var container = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly, _hostingEnvironment, false);
+            var container = reg.RegisterInfrastructure(Configuration, services, typeof(Startup).GetTypeInfo().Assembly, _hostingEnvironment);
             return container.Resolve<IServiceProvider>();
         }
 
