@@ -502,23 +502,42 @@ namespace VitalChoice.Business.Services.Customers
                                 : x.OrderByDescending(y => y.StatusCode);
                     break;
             }
-            var customers =
-                await
-                    SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount,
-                        new CustomerQuery().WithIdContains(filter.IdContains)
-                            .NotDeleted()
-                            .WithId(filter.SearchText)
-                            .WithEmailContains(filter.Email)
-                            .WithIdAffiliate(filter.IdAffiliate, filter.IdAffiliateRequired)
-                            .WithIdOrder(filter.IdOrder)
-                            .FilterProfileAddress(filter.Address)
-                            .FilterDefaultShippingAddress(filter.DefaultShippingAddress),
-                        includes =>
-                            includes.Include(c => c.ProfileAddress)
-                                .ThenInclude(c => c.OptionValues)
-                                .Include(p => p.ShippingAddresses)
-                                .ThenInclude(p => p.ShippingAddress)
-                                .ThenInclude(p => p.OptionValues), orderBy: sortable, withDefaults: true);
+
+            var conditions = new CustomerQuery().WithIdContains(filter.IdContains)
+                .NotDeleted()
+                .WithId(filter.SearchText)
+                .WithEmailContains(filter.Email)
+                .WithIdAffiliate(filter.IdAffiliate, filter.IdAffiliateRequired)
+                .FilterProfileAddress(filter.Address)
+                .FilterDefaultShippingAddress(filter.DefaultShippingAddress);
+            Order order = null;
+            if (filter.IdOrder.HasValue)
+            {
+                order =await _orderRepository.Query(p => p.Id == filter.IdOrder.Value &&
+                    p.IdObjectType != (int)OrderType.AutoShip && p.StatusCode != (int)RecordStatusCode.Deleted).SelectFirstOrDefaultAsync(false);
+                if (order != null)
+                {
+                    conditions = conditions.WithId(order.IdCustomer);
+                }
+            }
+            PagedList<CustomerDynamic> customers = null;
+            if (filter.IdOrder.HasValue && order == null)
+            {
+                customers = new PagedList<CustomerDynamic>();
+            }
+            else
+            {
+                customers =
+                    await
+                        SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount,
+                            conditions,
+                            includes =>
+                                includes.Include(c => c.ProfileAddress)
+                                    .ThenInclude(c => c.OptionValues)
+                                    .Include(p => p.ShippingAddresses)
+                                    .ThenInclude(p => p.ShippingAddress)
+                                    .ThenInclude(p => p.OptionValues), orderBy: sortable, withDefaults: true);
+            }
 
             var adminProfileCondition =
                 new AdminProfileQuery().IdInRange(

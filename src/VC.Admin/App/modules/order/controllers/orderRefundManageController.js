@@ -349,6 +349,14 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     return;
                 }
 
+                if ($scope.order.Total == 0 && !$scope.options.RefundGiftCertificatesEnable)
+                {
+                    billingErrorMessages += "Refund should have not zero total or return money to gcs. ";
+                    toaster.pop('error', 'Error!', billingErrorMessages, null, 'trustedHtml');
+                    deferredRecalculate.reject();
+                    return;
+                }
+
                 var order = orderEditService.orderDataProcessingBeforeSave($scope);
 
                 orderService.addRefundOrder(order, $scope.addEditTracker).success(function (result)
