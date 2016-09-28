@@ -158,6 +158,16 @@ namespace VitalChoice.Business.Queries.Customers
             return this;
         }
 
+        public CustomerQuery WithIdOrder(int? idOrder)
+        {
+            if (idOrder.HasValue)
+            {
+                Add(c => c.Orders.Any(p => p.Id == idOrder.Value && p.IdObjectType!=(int)OrderType.AutoShip && p.StatusCode!=(int)RecordStatusCode.Deleted));
+            }
+
+            return this;
+        }
+
         public CustomerQuery FilterWholesaleOptions(int? idTradeClass,int? idTier)
         {
             if (idTradeClass != null || idTier!=null)
