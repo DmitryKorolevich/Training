@@ -48,7 +48,5 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Customers
 	    public ICollection<CustomerPaymentMethod> CustomerPaymentMethods { get; set; }
 
 	    public ICollection<CustomerFile> Files { get; set; }
-
-	    public ICollection<Order> Orders { get; set; }
 	}
 }

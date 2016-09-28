@@ -425,15 +425,19 @@ namespace VC.Admin.Controllers
                 Count = result.Count,
             };
 
-            var statistic = await _customerService.GetCustomerOrderStatistics(toReturn.Items.Select(p => p.Id).ToList());
-            foreach(var statisticItem in statistic)
+            if (toReturn.Items.Count > 0)
             {
-                var customer = toReturn.Items.FirstOrDefault(p => p.Id == statisticItem.IdCustomer);
-                if(customer!=null)
+                var statistic =
+                    await _customerService.GetCustomerOrderStatistics(toReturn.Items.Select(p => p.Id).ToList());
+                foreach (var statisticItem in statistic)
                 {
-                    customer.TotalOrders = statisticItem.TotalOrders;
-                    customer.FirstOrderPlaced = statisticItem.FirstOrderPlaced;
-                    customer.LastOrderPlaced = statisticItem.LastOrderPlaced;
+                    var customer = toReturn.Items.FirstOrDefault(p => p.Id == statisticItem.IdCustomer);
+                    if (customer != null)
+                    {
+                        customer.TotalOrders = statisticItem.TotalOrders;
+                        customer.FirstOrderPlaced = statisticItem.FirstOrderPlaced;
+                        customer.LastOrderPlaced = statisticItem.LastOrderPlaced;
+                    }
                 }
             }
 

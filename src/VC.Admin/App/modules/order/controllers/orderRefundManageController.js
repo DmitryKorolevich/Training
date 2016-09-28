@@ -161,6 +161,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 orderEditService.baseReferencedDataInitExistOrder($scope);
 
                 initOrder();
+                if ($scope.order.Id)
+                {
+                    $scope.orderEditDisabled = true;
+                }
 
                 if (!$scope.orderEditDisabled)
                 {
@@ -341,6 +345,14 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 {
                     toaster.pop('error', 'Error!', billingErrorMessages, null, 'trustedHtml');
                     $scope.options.activeTabIndex = $scope.paymentInfoTab.index;
+                    deferredRecalculate.reject();
+                    return;
+                }
+
+                if ($scope.order.Total == 0 && !$scope.options.RefundGiftCertificatesEnable)
+                {
+                    billingErrorMessages += "Refund should have not zero total or return money to gcs. ";
+                    toaster.pop('error', 'Error!', billingErrorMessages, null, 'trustedHtml');
                     deferredRecalculate.reject();
                     return;
                 }
