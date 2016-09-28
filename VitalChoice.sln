@@ -121,10 +121,6 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VitalChoice.CreditCards", "
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SendGrid", "src\SendGrid\SendGrid.xproj", "{403FEF91-1754-49A0-9357-2A89A96415B8}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.EntityFrameworkCore", "src\Microsoft.EntityFrameworkCore\Microsoft.EntityFrameworkCore.xproj", "{45C6A6D2-AD42-4CFE-BF5C-A56ECB8563BD}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.EntityFrameworkCore.Relational", "src\Microsoft.EntityFrameworkCore.Relational\Microsoft.EntityFrameworkCore.Relational.xproj", "{539436BC-9F4B-4492-8ECC-4451E0C3FDEC}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -399,22 +395,6 @@ Global
 		{403FEF91-1754-49A0-9357-2A89A96415B8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{403FEF91-1754-49A0-9357-2A89A96415B8}.Release|x64.ActiveCfg = Release|Any CPU
 		{403FEF91-1754-49A0-9357-2A89A96415B8}.Release|x64.Build.0 = Release|Any CPU
-		{45C6A6D2-AD42-4CFE-BF5C-A56ECB8563BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{45C6A6D2-AD42-4CFE-BF5C-A56ECB8563BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{45C6A6D2-AD42-4CFE-BF5C-A56ECB8563BD}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{45C6A6D2-AD42-4CFE-BF5C-A56ECB8563BD}.Debug|x64.Build.0 = Debug|Any CPU
-		{45C6A6D2-AD42-4CFE-BF5C-A56ECB8563BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{45C6A6D2-AD42-4CFE-BF5C-A56ECB8563BD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{45C6A6D2-AD42-4CFE-BF5C-A56ECB8563BD}.Release|x64.ActiveCfg = Release|Any CPU
-		{45C6A6D2-AD42-4CFE-BF5C-A56ECB8563BD}.Release|x64.Build.0 = Release|Any CPU
-		{539436BC-9F4B-4492-8ECC-4451E0C3FDEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{539436BC-9F4B-4492-8ECC-4451E0C3FDEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{539436BC-9F4B-4492-8ECC-4451E0C3FDEC}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{539436BC-9F4B-4492-8ECC-4451E0C3FDEC}.Debug|x64.Build.0 = Debug|Any CPU
-		{539436BC-9F4B-4492-8ECC-4451E0C3FDEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{539436BC-9F4B-4492-8ECC-4451E0C3FDEC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{539436BC-9F4B-4492-8ECC-4451E0C3FDEC}.Release|x64.ActiveCfg = Release|Any CPU
-		{539436BC-9F4B-4492-8ECC-4451E0C3FDEC}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -460,7 +440,5 @@ Global
 		{4289856B-7356-41A5-9971-41A5117B9B0A} = {FE1D5CD3-4181-4B60-A4F3-66AC9C8DC333}
 		{1DDD85E5-8A8E-4069-B0AC-9B945A5824E5} = {4F813A97-F059-44E0-B6DA-14266E51225C}
 		{403FEF91-1754-49A0-9357-2A89A96415B8} = {4289856B-7356-41A5-9971-41A5117B9B0A}
-		{45C6A6D2-AD42-4CFE-BF5C-A56ECB8563BD} = {4289856B-7356-41A5-9971-41A5117B9B0A}
-		{539436BC-9F4B-4492-8ECC-4451E0C3FDEC} = {4289856B-7356-41A5-9971-41A5117B9B0A}
 	EndGlobalSection
 EndGlobal
