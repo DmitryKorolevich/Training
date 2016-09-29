@@ -93,6 +93,16 @@ namespace VitalChoice.Business.Services.InventorySkus
             _referenceData = referenceData;
         }
 
+        public async Task ValidateInventorySkuAsync(InventorySkuDynamic model)
+        {
+            var existDublices = await ObjectRepository.Query(p=>p.StatusCode!=(int)RecordStatusCode.Deleted && p.Code==model.Code &&
+                p.Id!=model.Id).SelectAnyAsync();
+            if (existDublices)
+            {
+                throw new AppValidationException("Code", ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InventorySkuImportCodeDublicate]);
+            }
+        }
+
         public async Task<PagedList<InventorySkuListItemModel>> GetInventorySkusAsync(InventorySkuFilter filter)
         {
             var conditions = new InventorySkuQuery().NotDeleted().WithIds(filter.Ids).WithStatus(filter.StatusCode)

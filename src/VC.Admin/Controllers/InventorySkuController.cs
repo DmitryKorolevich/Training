@@ -159,6 +159,7 @@ namespace VC.Admin.Controllers
             {
                 item.IdEditedBy = userId;
             }
+            await _inventorySkuService.ValidateInventorySkuAsync(item);
             if (item.Id > 0)
             {
                 item = await _inventorySkuService.UpdateAsync(item);
