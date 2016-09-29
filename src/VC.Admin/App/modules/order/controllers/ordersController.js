@@ -186,10 +186,10 @@
                     errorHandler(result);
                 });
 
-            //if ($rootScope.exportStatusRefreshTimer == null)
-            //{
-            //    refreshExportStatus();
-            //}
+            if ($rootScope.exportStatusRefreshTimer == null)
+            {
+                refreshExportStatus();
+            }
         }
 
         var refreshExportStatus = function ()
