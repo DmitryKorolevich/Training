@@ -27,14 +27,11 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
 
             if (dataContext.Order.Discount == null)
                 return 0;
-            if (!await ValidateDiscount(dataContext, executionContext))
-            {
-                return 0;
-            }
+            await ValidateDiscount(dataContext, executionContext);
             return dataContext.Order.Discount.IdObjectType;
         }
 
-        private static async Task<bool> ValidateDiscount(OrderDataContext dataContext, ITreeContext executionContext)
+        private static async Task ValidateDiscount(OrderDataContext dataContext, ITreeContext executionContext)
         {
             var noIssues = true;
 
@@ -127,14 +124,6 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
                                 dataContext.Order.IsFirstHealthwise = true;
                             }
                         }
-                        else
-                        {
-                            dataContext.Messages.Add(new MessageInfo
-                            {
-                                Message = "Discount not valid. WEB order only",
-                                Field = "DiscountCode"
-                            });
-                        }
                     }
                     else
                     {
@@ -142,11 +131,20 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
                         {
                             dataContext.Order.Data.IsHealthwise = false;
                         }
+                        else
+                        {
+                            if (dataContext.Order.Data.OrderType != (int) SourceOrderType.Web)
+                            {
+                                dataContext.Messages.Add(new MessageInfo
+                                {
+                                    Message = "Discount not valid. WEB order only",
+                                    Field = "DiscountCode"
+                                });
+                            }
+                        }
                     }
                 }
             }
-
-            return noIssues;
         }
     }
 }

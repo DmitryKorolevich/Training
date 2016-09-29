@@ -172,8 +172,9 @@ namespace VC.Admin.Controllers
             _referenceData = referenceData;
         }
 
-        #region BaseOrderLogic
+        #region Export
 
+        [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
         public async Task<Result<List<OrderExportItemResult>>> ExportOrders([FromBody] List<OrderExportItem> itemsToExport)
         {
@@ -194,6 +195,68 @@ namespace VC.Admin.Controllers
             }
             return new Result<List<OrderExportItemResult>>(false);
         }
+
+        [AdminAuthorize(PermissionType.Orders)]
+        [HttpGet]
+        public async Task<Result<OrderExportGeneralStatusModel>> GetExportGeneralStatus()
+        {
+            var toReturn = new OrderExportGeneralStatusModel();
+            toReturn.Exported=(new Random()).Next(100);
+            toReturn.All = toReturn.Exported + 5;
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Orders)]
+        [HttpGet]
+        public async Task<Result<ICollection<OrderExportRequestModel>>> GetExportDetails()
+        {
+            var toReturn = new List<OrderExportRequestModel>();
+            var item = new OrderExportRequestModel();
+            item.AgentId = "VC";
+            item.DateCreated=DateTime.Now.AddHours(-1);
+            item.ExportedOrders=new List<OrderExportItemResult>()
+            {
+                new OrderExportItemResult()
+                {
+                    Id = 1,
+                    Success = true,
+                },
+                new OrderExportItemResult()
+                {
+                    Id = 2,
+                    Success = false,
+                    Error = "Test error"
+                }
+            };
+            item.All = item.ExportedOrders.Count + 5;
+            toReturn.Add(item);
+
+            item = new OrderExportRequestModel();
+            item.AgentId = "GG";
+            item.DateCreated = DateTime.Now;
+            item.ExportedOrders = new List<OrderExportItemResult>()
+            {
+                new OrderExportItemResult()
+                {
+                    Id = 3,
+                    Success = true,
+                },
+                new OrderExportItemResult()
+                {
+                    Id = 4,
+                    Success = false,
+                    Error = "Test error"
+                }
+            };
+            item.All = item.ExportedOrders.Count + 5;
+            toReturn.Add(item);
+
+            return toReturn;
+        }
+
+        #endregion
+
+        #region BaseOrderLogic
 
         [HttpPost]
         public async Task<Result<PagedList<ShortOrderItemModel>>> GetShortOrders([FromBody]OrderFilter filter)

@@ -57,12 +57,22 @@ namespace VC.Public.Components.Tracking
                     order = await orderService.Value.SelectAsync(idOrder.Value, true);
                     if (order.IdObjectType == (int)OrderType.AutoShip)
                     {
-                        var id = (await tOrderService.SelectAutoShipOrdersAsync(idOrder.Value)).First();
+                        var id = (await tOrderService.SelectAutoShipOrdersAsync(idOrder.Value)).FirstOrDefault();
 
-                        order = await tOrderService.SelectAsync(id, true);
+                        if (id != 0)
+                        {
+                            order = await tOrderService.SelectAsync(id, true);
+                        }
+                        else
+                        {
+                            order = null;
+                        }
                     }
 
-                    order.Customer = await customerService.Value.SelectAsync(order.Customer.Id, true);
+                    if (order != null)
+                    {
+                        order.Customer = await customerService.Value.SelectAsync(order.Customer.Id, true);
+                    }
                     toReturn.OrderCompleteStep = true;
                     toReturn.Order = order;
                 }

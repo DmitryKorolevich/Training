@@ -1,0 +1,42 @@
+﻿<div class="modal-header">
+    <h3>Export Request Details</h3>
+</div>
+<div class="modal-body">
+    <div data-ng-repeat="item in items">
+        <p class="text-primary">
+            <b>Created:</b>&nbsp;{{item.DateCreated | date:"MM/dd/yy h:mm a"}}&nbsp;
+            <b>Agent:</b>&nbsp;{{item.AgentId}}&nbsp;
+        </p>
+        <p>
+            <b class="text-primary">Total:</b>&nbsp;{{item.All}}&nbsp;
+            <b class="text-success">Succeeded:</b>&nbsp;{{item.SuccessExportedOrders.length}}&nbsp;
+            <b class="text-danger">Failed:</b>&nbsp;{{item.ErrorExportedOrders.length}}&nbsp;
+        </p>
+        <div class="export-result-errors">
+            <table class="margin-top-20px table table-striped table-hover" data-ng-if="item.ErrorExportedOrders.length > 0">
+                <thead>
+                    <tr>
+                        <th>
+                            Order Id
+                        </th>
+                        <th>
+                            Error
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="error in item.ErrorExportedOrders">
+                        <td>{{error.Id}}</td>
+                        <td>
+                            <p class="text-danger">{{error.Error}}</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <hr/>
+    </div>
+</div>
+<div class="modal-footer">
+    <button data-ng-click="ok()" class="btn btn-success">OK</button>
+</div>
