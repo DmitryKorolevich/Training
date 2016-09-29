@@ -36,7 +36,14 @@ namespace VitalChoice.SharedWeb.Helpers
 
         public async Task<AutoShipHistoryItemModel> PopulateAutoShipItemModel(OrderDynamic orderDynamic)
 	    {
-			var skuItem = orderDynamic.Skus.First();
+			var skuItem = orderDynamic.Skus.FirstOrDefault(p => p.Sku.SafeData.AutoShipFrequency1==true
+                || p.Sku.SafeData.AutoShipFrequency2 == true 
+                || p.Sku.SafeData.AutoShipFrequency3 == true
+                || p.Sku.SafeData.AutoShipFrequency6 == true);
+	        if (skuItem == null)
+	        {
+	            skuItem = orderDynamic.Skus.First();
+	        }
 
 			var result = await _skuMapper.ToModelAsync<AutoShipHistoryItemModel>(skuItem.Sku);
 			await _productMapper.UpdateModelAsync(result, skuItem.Sku.Product);

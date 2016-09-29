@@ -1,6 +1,6 @@
 ﻿angular.module('app.modules.order.controllers.ordersController', [])
-.controller('ordersController', ['$scope', '$rootScope', '$state', '$stateParams', 'orderService', 'settingService', 'gcService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
-    function ($scope, $rootScope, $state, $stateParams, orderService, settingService, gcService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
+.controller('ordersController', ['$scope', '$rootScope', '$state', '$stateParams', '$location', 'orderService', 'settingService', 'gcService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
+    function ($scope, $rootScope, $state, $stateParams, $location, orderService, settingService, gcService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
     {
         $scope.refreshTracker = promiseTracker("refresh");
         $scope.deleteTracker = promiseTracker("delete");
@@ -185,7 +185,35 @@
                 {
                     errorHandler(result);
                 });
+
+            //if ($rootScope.exportStatusRefreshTimer == null)
+            //{
+            //    refreshExportStatus();
+            //}
         }
+
+        var refreshExportStatus = function ()
+        {
+            if ($state.is('index.oneCol.manageOrders') || $state.is('index.oneCol.dashboard'))
+            {
+                orderService.getExportGeneralStatus()
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            $scope.options.exportStatus = result.Data;
+                        } else
+                        {
+                            errorHandler(result);
+                        }
+                    })
+                    .error(function (result)
+                    {
+                        errorHandler(result);
+                    });
+            }
+            $rootScope.exportStatusRefreshTimer = setTimeout(refreshExportStatus, 5000);
+        };
 
         $scope.filterGCs = function ()
         {
@@ -408,6 +436,27 @@
         $scope.openOrder = function (id)
         {
             $state.go('index.oneCol.orderDetail', { id: id });
+        };
+
+        $scope.showExportDetails = function ()
+        {
+            orderService.getExportDetails()
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        modalUtil.open('app/modules/order/partials/exportRequestDetails.html', 'exportRequestDetailsController', {
+                            items: result.Data
+                        });
+                    } else
+                    {
+                        errorHandler(result);
+                    }
+                })
+                .error(function (result)
+                {
+                    errorHandler(result);
+                });
         };
 
         initialize();

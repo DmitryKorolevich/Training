@@ -26,6 +26,14 @@
             {
                 data.ValidTo = data.ValidTo.toServerDateTime();
             }
+            if (data.Assigned == -1)
+            {
+                data.SearchByAssigned = false;
+            }
+            else
+            {
+                data.SearchByAssigned = true;
+            }
 
             discountService.getDiscounts(data, $scope.refreshTracker)
                 .success(function (result) {
@@ -46,6 +54,7 @@
 
             $scope.customerTypes = angular.copy($rootScope.ReferenceData.CustomerTypes);
             $scope.customerTypes.splice(0, 0, { Key: null, Text: 'All Customer Types' });
+            $scope.customerTypes.splice(0, 0, { Key: -1, Text: 'Any' });
 
             $scope.filter = {
                 SearchText: '',
