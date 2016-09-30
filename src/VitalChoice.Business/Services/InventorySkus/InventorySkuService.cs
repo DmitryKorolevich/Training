@@ -1012,13 +1012,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                     sku.Data.BornDate = record.BornDate;
                 }
 
-                foreach (var item in record.SkuToInventorySkus)
-                {
-                    if (sku.SkusToInventorySkus.All(p => p.IdInventorySku != item.IdInventorySku))
-                    {
-                        sku.SkusToInventorySkus.Add(item);
-                    }
-                }
+                sku.SkusToInventorySkus = record.SkuToInventorySkus;
                 product.ProductDynamic.IdEditedBy = userId;
             }
 
