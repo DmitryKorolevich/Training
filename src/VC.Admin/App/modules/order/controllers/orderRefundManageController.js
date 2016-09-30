@@ -297,6 +297,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
     var initOrder = function ()
     {
         orderEditService.initOrderOptions($scope);
+        $scope.legend.CustomerId = $scope.currentCustomer.Id;
         $scope.legend.IdOrderSource = $scope.order.IdOrderSource;
         $scope.legend.OrderSourceRefundIds = $scope.order.OrderSourceRefundIds;
         $scope.legend.OrderSourceDateCreated = $scope.order.OrderSourceDateCreated;
