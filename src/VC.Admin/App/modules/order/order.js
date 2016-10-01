@@ -30,6 +30,7 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.productQualitySalesReportController',
 	'app.modules.order.controllers.productQualitySkusReportController',
 	'app.modules.order.controllers.aAFESShipReportController',
+	'app.modules.order.controllers.exportRequestDetailsController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

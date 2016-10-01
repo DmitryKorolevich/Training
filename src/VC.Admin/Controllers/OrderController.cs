@@ -56,6 +56,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Services;
 using VitalChoice.Infrastructure.Domain;
+using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.Extensions;
 
@@ -172,8 +173,9 @@ namespace VC.Admin.Controllers
             _referenceData = referenceData;
         }
 
-        #region BaseOrderLogic
+        #region Export
 
+        [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
         public async Task<Result<List<OrderExportItemResult>>> ExportOrders([FromBody] List<OrderExportItem> itemsToExport)
         {
@@ -194,6 +196,68 @@ namespace VC.Admin.Controllers
             }
             return new Result<List<OrderExportItemResult>>(false);
         }
+
+        [AdminAuthorize(PermissionType.Orders)]
+        [HttpGet]
+        public async Task<Result<OrderExportGeneralStatusModel>> GetExportGeneralStatus()
+        {
+            var toReturn = new OrderExportGeneralStatusModel();
+            toReturn.Exported=(new Random()).Next(100);
+            toReturn.All = toReturn.Exported + 5;
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Orders)]
+        [HttpGet]
+        public async Task<Result<ICollection<OrderExportRequestModel>>> GetExportDetails()
+        {
+            var toReturn = new List<OrderExportRequestModel>();
+            var item = new OrderExportRequestModel();
+            item.AgentId = "VC";
+            item.DateCreated=DateTime.Now.AddHours(-1);
+            item.ExportedOrders=new List<OrderExportItemResult>()
+            {
+                new OrderExportItemResult()
+                {
+                    Id = 1,
+                    Success = true,
+                },
+                new OrderExportItemResult()
+                {
+                    Id = 2,
+                    Success = false,
+                    Error = "Test error"
+                }
+            };
+            item.All = item.ExportedOrders.Count + 5;
+            toReturn.Add(item);
+
+            item = new OrderExportRequestModel();
+            item.AgentId = "GG";
+            item.DateCreated = DateTime.Now;
+            item.ExportedOrders = new List<OrderExportItemResult>()
+            {
+                new OrderExportItemResult()
+                {
+                    Id = 3,
+                    Success = true,
+                },
+                new OrderExportItemResult()
+                {
+                    Id = 4,
+                    Success = false,
+                    Error = "Test error"
+                }
+            };
+            item.All = item.ExportedOrders.Count + 5;
+            toReturn.Add(item);
+
+            return toReturn;
+        }
+
+        #endregion
+
+        #region BaseOrderLogic
 
         [HttpPost]
         public async Task<Result<PagedList<ShortOrderItemModel>>> GetShortOrders([FromBody]OrderFilter filter)
@@ -361,6 +425,11 @@ namespace VC.Admin.Controllers
                 return null;
 
             var order = await _mapper.FromModelAsync(model);
+
+            if (order.IdObjectType == (int) OrderType.AutoShip && order.PaymentMethod?.IdObjectType != (int) PaymentMethodType.CreditCard)
+            {
+                throw new AppValidationException("Only Credit Card is allowed for a new autoship order.");
+            }
 
             var sUserId = _userManager.GetUserId(Request.HttpContext.User);
             int userId;
@@ -760,11 +829,28 @@ namespace VC.Admin.Controllers
             }
 
             var customer =await _customerService.SelectAsync(order.Customer.Id);
+            var updateCustomer = false;
             if (customer.SafeData.Source == null)
             {
                 customer.Data.Source = model.Customer.Source;
                 customer.Data.SourceDetails = model.Customer.SourceDetails;
                 customer.IdEditedBy = userId;
+                updateCustomer = true;
+            }
+
+            if (model.Id == 0 && order.SafeData.OrderNotes != null)
+            {
+                var note = new CustomerNoteDynamic();
+                note.IdAddedBy = userId;
+                note.Note = order.SafeData.OrderNotes;
+                note.Data.Priority = (int)CustomerNotePriority.NormalPriority;
+                customer.CustomerNotes.Add(note);
+                customer.IdEditedBy = userId;
+                updateCustomer = true;
+            }
+
+            if (updateCustomer)
+            {
                 await _customerService.UpdateAsync(customer);
             }
 
@@ -919,6 +1005,20 @@ namespace VC.Admin.Controllers
             if (int.TryParse(sUserId, out userId))
             {
                 order.IdEditedBy = userId;
+            }
+
+            if (model.Id == 0 && order.SafeData.OrderNotes != null)
+            {
+                var customer = await _customerService.SelectAsync(order.Customer.Id);
+
+                var note = new CustomerNoteDynamic();
+                note.IdAddedBy = userId;
+                note.Note = order.SafeData.OrderNotes;
+                note.Data.Priority = (int)CustomerNotePriority.NormalPriority;
+                customer.CustomerNotes.Add(note);
+                customer.IdEditedBy = userId;
+
+                await _customerService.UpdateAsync(customer);
             }
 
             if (model.OrderStatus != OrderStatus.Cancelled && model.OrderStatus != OrderStatus.Exported && model.OrderStatus != OrderStatus.Shipped)

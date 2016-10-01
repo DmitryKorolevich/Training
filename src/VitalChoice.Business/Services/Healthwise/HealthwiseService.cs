@@ -32,6 +32,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Healthwise;
 using VitalChoice.Infrastructure.UOW;
 using VitalChoice.Interfaces.Services;
+using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Healthwise;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Products;
@@ -52,6 +53,7 @@ namespace VitalChoice.Business.Services.Healthwise
         private readonly AppSettings _appSettings;
         private readonly ILogger _logger;
         private readonly IOptions<AppOptionsBase> _options;
+        private readonly ICustomerService _customerService;
 
         public HealthwiseService(
             IEcommerceRepositoryAsync<VHealthwisePeriod> vHealthwisePeriodRepository,
@@ -62,7 +64,11 @@ namespace VitalChoice.Business.Services.Healthwise
             IGcService gcService,
             INotificationService notificationService,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
-            ILoggerFactory loggerProvider, DbContextOptions<EcommerceContext> eccomerceContextOptions, AppSettings appSettings, IOptions<AppOptionsBase> options)
+            ILoggerFactory loggerProvider, 
+            DbContextOptions<EcommerceContext> eccomerceContextOptions, 
+            AppSettings appSettings,
+            IOptions<AppOptionsBase> options,
+            ICustomerService customerService)
         {
             _vHealthwisePeriodRepository = vHealthwisePeriodRepository;
             _healthwiseOrderRepository = healthwiseOrderRepository;
@@ -76,6 +82,7 @@ namespace VitalChoice.Business.Services.Healthwise
             _appSettings = appSettings;
             _options = options;
             _logger = loggerProvider.CreateLogger<HealthwiseService>();
+            _customerService = customerService;
         }
 
         public async Task<ICollection<HealthwiseOrder>> GetHealthwiseOrdersAsync(int idPeriod)
@@ -132,6 +139,8 @@ namespace VitalChoice.Business.Services.Healthwise
         public async Task<bool> MakeHealthwisePeriodPaymentAsync(int id, decimal amount, DateTime date, bool payAsGC = false,
             int? userId = null)
         {
+            VHealthwisePeriod paidHealthwise = null;
+            string paidGCCode = null;
             GCNotificationEmail notificationModel = new GCNotificationEmail();
             using (var uow = new EcommerceUnitOfWork(_eccomerceContextOptions, _options))
             {
@@ -142,7 +151,7 @@ namespace VitalChoice.Business.Services.Healthwise
                         var vHealthwisePeriodRepository = uow.RepositoryAsync<VHealthwisePeriod>();
                         var giftCertificateRepository = uow.RepositoryAsync<GiftCertificate>();
                         var healthwise = await vHealthwisePeriodRepository.Query(p => p.Id == id).SelectFirstOrDefaultAsync(true);
-
+                        
                         if (healthwise != null && !healthwise.PaidDate.HasValue &&
                             healthwise.OrdersCount >= _appSettings.HealthwisePeriodMaxItemsCount)
                         {
@@ -165,6 +174,8 @@ namespace VitalChoice.Business.Services.Healthwise
                                 notificationModel.LastName = gc.LastName;
                                 notificationModel.Data = new Dictionary<string, decimal>();
                                 notificationModel.Data.Add(gc.Code, gc.Balance);
+
+                                paidGCCode = gc.Code;
                             }
 
                             healthwise.PaidDate = date;
@@ -172,6 +183,8 @@ namespace VitalChoice.Business.Services.Healthwise
 
                             await uow.SaveChangesAsync();
                             transaction.Commit();
+
+                            paidHealthwise = healthwise;
                         }
                     }
                     catch
@@ -180,6 +193,26 @@ namespace VitalChoice.Business.Services.Healthwise
                         throw;
                     }
                 }
+            }
+            if (paidHealthwise!=null)
+            {
+                var customer = await _customerService.SelectAsync(paidHealthwise.IdCustomer);
+
+                var note = new CustomerNoteDynamic();
+                note.IdAddedBy = userId;
+                if (payAsGC)
+                {
+                    note.Note = $"HealthWise GC Payment - {paidGCCode} - ${paidHealthwise.PaidAmount}";
+                }
+                else
+                {
+                    note.Note = $"HealthWise GC Payment - ${paidHealthwise.PaidAmount}";
+                }
+                note.Data.Priority = (int)CustomerNotePriority.NormalPriority;
+                customer.CustomerNotes.Add(note);
+                customer.IdEditedBy = userId;
+
+                await _customerService.UpdateAsync(customer);
             }
             if (payAsGC)
             {

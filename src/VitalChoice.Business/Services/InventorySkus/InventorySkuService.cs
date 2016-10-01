@@ -93,6 +93,16 @@ namespace VitalChoice.Business.Services.InventorySkus
             _referenceData = referenceData;
         }
 
+        public async Task ValidateInventorySkuAsync(InventorySkuDynamic model)
+        {
+            var existDublices = await ObjectRepository.Query(p=>p.StatusCode!=(int)RecordStatusCode.Deleted && p.Code==model.Code &&
+                p.Id!=model.Id).SelectAnyAsync();
+            if (existDublices)
+            {
+                throw new AppValidationException("Code", ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InventorySkuImportCodeDublicate]);
+            }
+        }
+
         public async Task<PagedList<InventorySkuListItemModel>> GetInventorySkusAsync(InventorySkuFilter filter)
         {
             var conditions = new InventorySkuQuery().NotDeleted().WithIds(filter.Ids).WithStatus(filter.StatusCode)
@@ -637,29 +647,16 @@ namespace VitalChoice.Business.Services.InventorySkus
                 throw new AppValidationException(messages);
             }
 
-            var map = records.ToDictionary(p => p.Code, pp => pp);
             int i = 0;
             var groups = codes.GroupBy(x => i++ / SqlConstants.MAX_CONTAINS_COUNT).ToList();
+            List<InventorySkuDynamic> dbInventorySkus =new List<InventorySkuDynamic>();
             foreach (var group in groups)
             {
-                var dbCodes = await ObjectRepository.Query(p => p.StatusCode != (int)RecordStatusCode.Deleted &&
-                    group.Contains(p.Code)).SelectAsync(p => p.Code, false);
-                foreach (var dbCode in dbCodes)
-                {
-                    InventorySkuImportItem item = null;
-                    if (map.TryGetValue(dbCode, out item))
-                    {
-                        item.ErrorMessages.Add(BusinessHelper.AddErrorMessage("Code",ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InventorySkuImportCodeDublicate]));
-                    }
-                }
+                var tempDbInventorySkus = await SelectAsync(p => p.StatusCode != (int) RecordStatusCode.Deleted &&
+                                                                 group.Contains(p.Code));
+                dbInventorySkus.AddRange(tempDbInventorySkus);
             }
-
-            //codes dublicates in db
-            messages = BusinessHelper.FormatRowsRecordErrorMessages(records);
-            if (messages.Count > 0)
-            {
-                throw new AppValidationException(messages);
-            }
+            var dbMap = dbInventorySkus.ToDictionary(p => p.Code, pp => pp, StringComparer.OrdinalIgnoreCase);
 
             var categories = await _inventorySkuCategoryService.GetCategoriesTreeAsync(new InventorySkuCategoryTreeFilter() {});
             var lookups = await _settingService.GetLookupsAsync(SettingConstants.INVENTORY_SKU_LOOKUP_NAMES.Split(','));
@@ -672,11 +669,11 @@ namespace VitalChoice.Business.Services.InventorySkus
             var unitOfMeasureLookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.INVENTORY_SKU_LOOKUP_UNIT_OF_MEASURE_NAME);
             var purchaseUnitOfMeasureLookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.INVENTORY_SKU_LOOKUP_PURCHASE_UNIT_OF_MEASURE_NAME);
 
-            var toReturn = new List<InventorySkuDynamic>();
+            var toInsert = new List<InventorySkuDynamic>();
             foreach (var inventorySkuImportItem in records)
             {
                 var item = Mapper.CreatePrototype();
-                item.Code = inventorySkuImportItem.Code;
+                item.Code = inventorySkuImportItem.Code.ToUpper();
                 item.StatusCode = string.Equals(inventorySkuImportItem.Active, "Y", StringComparison.InvariantCultureIgnoreCase)
                     ? (int) RecordStatusCode.Active
                     : (int) RecordStatusCode.NotActive;
@@ -742,7 +739,25 @@ namespace VitalChoice.Business.Services.InventorySkus
                         ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InventorySkuCategoryMissed]));
                 }
 
-                toReturn.Add(item);
+                InventorySkuDynamic dbInventorySku = null;
+                if (dbMap.TryGetValue(item.Code, out dbInventorySku))
+                {
+                    dbInventorySku.StatusCode = item.StatusCode;
+                    dbInventorySku.Description = item.Description;
+                    dbInventorySku.IdEditedBy = item.IdEditedBy;
+
+                    dbInventorySku.Data.ProductSource = item.Data.ProductSource;
+                    dbInventorySku.Data.Quantity = item.Data.Quantity;
+                    dbInventorySku.Data.UnitOfMeasure = item.Data.UnitOfMeasure;
+                    dbInventorySku.Data.UnitOfMeasureAmount = item.Data.UnitOfMeasureAmount;
+                    dbInventorySku.Data.PurchaseUnitOfMeasure = item.Data.PurchaseUnitOfMeasure;
+                    dbInventorySku.Data.PurchaseUnitOfMeasureAmount = item.Data.PurchaseUnitOfMeasureAmount;
+                    dbInventorySku.IdInventorySkuCategory = item.IdInventorySkuCategory;
+                }
+                else
+                {
+                    toInsert.Add(item);
+                }
             }
 
             //category and lookups errors
@@ -752,7 +767,14 @@ namespace VitalChoice.Business.Services.InventorySkus
                 throw new AppValidationException(messages);
             }
 
-            await InsertRangeAsync(toReturn);
+            if (dbInventorySkus.Count > 0)
+            {
+                await UpdateRangeAsync(dbInventorySkus);
+            }
+            if (toInsert.Count > 0)
+            {
+                await InsertRangeAsync(toInsert);
+            }
 
             return true;
         }
@@ -990,13 +1012,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                     sku.Data.BornDate = record.BornDate;
                 }
 
-                foreach (var item in record.SkuToInventorySkus)
-                {
-                    if (sku.SkusToInventorySkus.All(p => p.IdInventorySku != item.IdInventorySku))
-                    {
-                        sku.SkusToInventorySkus.Add(item);
-                    }
-                }
+                sku.SkusToInventorySkus = record.SkuToInventorySkus;
                 product.ProductDynamic.IdEditedBy = userId;
             }
 

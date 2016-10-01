@@ -13,7 +13,7 @@
                     </div>
                     <div class="col-md-4">
                         <button class="btn btn-info" data-ng-click="directFilterOrders();" type="button">Locate Order</button>
-                    </div> 
+                    </div>
                     <div class="col-md-6">
                         <div class="pull-right padding-left-15px">
                             <button class="btn btn-info" data-ng-click="filterGCs();" type="button" ladda="gcRefreshTracker.active()">Check GC Balance</button>
@@ -138,6 +138,19 @@
         <div class="row form-group">
             <div class="col-md-4">
                 <button class="btn btn-info" data-ng-click="filterOrders();" type="button">Filter</button>
+            </div>
+            <div class="col-md-8">
+                <div data-ng-if="options.exportStatus" class="export-status-section pull-right">
+                    <strong class="title">Export Status:</strong>
+                    <div class="progress-bar-wrapper margin-left-15px">
+                        <uib-progressbar animate="true" value="options.exportStatus.Percent" type="success">
+                            <b>{{options.exportStatus.Exported}}/{{options.exportStatus.All}}</b>
+                        </uib-progressbar>
+                    </div>
+                    <button title="Export Details" class="btn btn-default btn-success btn-xs margin-left-15px" data-ng-click="showExportDetails()">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
             </div>
         </div>
         <hr />
@@ -294,7 +307,7 @@
         </spinner-overlay>
         <div>
             <strong>{{totalItems}}</strong> Orders Found - Displaying <strong>
-            <select data-ng-change="filterOrders();scrollTo('data-grid');" data-ng-model="filter.Paging.PageItemCount" data-ng-options="item.Key as item.Key for item in pageSizeOptions"></select>
+                <select data-ng-change="filterOrders();scrollTo('data-grid');" data-ng-model="filter.Paging.PageItemCount" data-ng-options="item.Key as item.Key for item in pageSizeOptions"></select>
             </strong> Orders Per Page
         </div>
         <uib-pagination boundary-links="true"

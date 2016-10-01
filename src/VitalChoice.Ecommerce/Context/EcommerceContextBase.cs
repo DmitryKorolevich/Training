@@ -886,7 +886,7 @@ namespace VitalChoice.Ecommerce.Context
                 entity.HasKey(o => o.Id);
                 entity.ToTable("Orders");
                 entity.HasOne(o => o.Customer)
-                    .WithMany(p=>p.Orders)
+                    .WithMany()
                     .HasForeignKey(o => o.IdCustomer)
                     .HasPrincipalKey(c => c.Id)
                     .IsRequired();

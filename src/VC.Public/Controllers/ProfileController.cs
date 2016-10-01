@@ -369,12 +369,13 @@ namespace VC.Public.Controllers
                 return View(model);
             }
 
-            if (model.Id > 0)
-            {
-                var creditCardToUpdate =
-                    currentCustomer.CustomerPaymentMethods.Single(
-                        x => x.IdObjectType == (int) PaymentMethodType.CreditCard && x.Id == model.Id);
+            var creditCardToUpdate = model.Id > 0
+                ? currentCustomer.CustomerPaymentMethods.FirstOrDefault(
+                    x => x.IdObjectType == (int) PaymentMethodType.CreditCard && x.Id == model.Id)
+                : null;
 
+            if (creditCardToUpdate != null)
+            {
                 var otherAddresses =
                     currentCustomer.CustomerPaymentMethods.Where(x => x.IdObjectType == (int) PaymentMethodType.CreditCard).ToList();
                 if (model.Default)
@@ -410,6 +411,8 @@ namespace VC.Public.Controllers
                 {
                     model.Default = true;
                 }
+
+                model.Id = 0;
 
                 var newMethod = await _customerPaymentMethodConverter.FromModelAsync(model, (int) PaymentMethodType.CreditCard);
                 newMethod.Address = await _addressConverter.FromModelAsync(model, (int) AddressType.Billing);

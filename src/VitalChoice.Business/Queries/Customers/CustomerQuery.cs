@@ -7,6 +7,7 @@ using VitalChoice.DynamicData.Extensions;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 
 namespace VitalChoice.Business.Queries.Customers
@@ -154,16 +155,6 @@ namespace VitalChoice.Business.Queries.Customers
             {
                 Add(p => ids.Contains(p.Id));
             }
-            return this;
-        }
-
-        public CustomerQuery WithIdOrder(int? idOrder)
-        {
-            if (idOrder.HasValue)
-            {
-                Add(c => c.Orders.Any(p => p.Id == idOrder.Value && p.StatusCode!=(int)RecordStatusCode.Deleted));
-            }
-
             return this;
         }
 
