@@ -141,7 +141,7 @@ namespace VitalChoice.Business.Services.Healthwise
         {
             VHealthwisePeriod paidHealthwise = null;
             string paidGCCode = null;
-            GCNotificationEmail notificationModel = new GCNotificationEmail();
+            GiftAdminNotificationEmail notificationModel = new GiftAdminNotificationEmail();
             using (var uow = new EcommerceUnitOfWork(_eccomerceContextOptions, _options))
             {
                 using (var transaction = uow.BeginTransaction())
@@ -170,10 +170,15 @@ namespace VitalChoice.Business.Services.Healthwise
 
                                 giftCertificateRepository.Insert(gc);
                                 notificationModel.Email = gc.Email;
-                                notificationModel.FirstName = gc.FirstName;
-                                notificationModel.LastName = gc.LastName;
-                                notificationModel.Data = new Dictionary<string, decimal>();
-                                notificationModel.Data.Add(gc.Code, gc.Balance);
+                                notificationModel.Recipient =$"{gc.FirstName} {gc.LastName}";
+                                notificationModel.Gifts =new List<GiftEmailModel>()
+                                {
+                                    new GiftEmailModel()
+                                    {
+                                        Amount = gc.Balance,
+                                        Code = gc.Code
+                                    }
+                                };
 
                                 paidGCCode = gc.Code;
                             }
@@ -216,7 +221,7 @@ namespace VitalChoice.Business.Services.Healthwise
             }
             if (payAsGC)
             {
-                await _notificationService.SendGCNotificationEmailAsyn(notificationModel.Email, notificationModel);
+                await _notificationService.SendGiftAdminNotificationEmailAsync(notificationModel.Email, notificationModel);
             }
             return true;
         }

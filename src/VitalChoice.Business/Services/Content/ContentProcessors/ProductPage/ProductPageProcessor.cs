@@ -227,6 +227,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                         || ((int?) x.SafeData.Stock ?? 0) > 0;
                     return item;
                 }).ToListAsync();
+            toReturn.AtLeastOneSkuInStock = toReturn.Skus.Any(p => p.InStock);
             toReturn.YoutubeVideos = new List<TtlRelatedYoutubeVideoModel>()
             {
                 new TtlRelatedYoutubeVideoModel()

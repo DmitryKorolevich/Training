@@ -105,7 +105,7 @@
                     {
                         $scope.rootCategory = {};
                         $scope.rootCategory.SubItems = result.Data;
-                        $scope.filterCategories = [{ Key: null, Text: 'All' }];
+                        $scope.filterCategories = [{ Key: null, Text: 'All Parts Categories' }];
                         initCategory($scope.rootCategory, 0);
 
                         $scope.filterChanged();

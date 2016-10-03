@@ -355,6 +355,8 @@ namespace VitalChoice.Business.Services.InventorySkus
             var invIds = data.Select(p => p.IdInventorySku).Distinct().ToList();
             var inventories = await this.SelectAsync(invIds);
 
+            var unitOfMeasureLookup = (await _settingService.GetLookupsAsync(new [] { SettingConstants.INVENTORY_SKU_LOOKUP_UNIT_OF_MEASURE_NAME})).FirstOrDefault();
+
             List<InventoriesSummaryUsageDateItem> dates = new List<InventoriesSummaryUsageDateItem>();
 
             DateTime current = filter.From;
@@ -424,6 +426,9 @@ namespace VitalChoice.Business.Services.InventorySkus
                         Code = inventory.Code,
                         Description = inventory.Description,
                         UnitOfMeasure = inventory.SafeData.UnitOfMeasure,
+                        UnitOfMeasureName = inventory.SafeData.UnitOfMeasure!=null ? 
+                            unitOfMeasureLookup.LookupVariants.FirstOrDefault(p=>p.Id== inventory.SafeData.UnitOfMeasure)?.ValueVariant
+                            : null,
                         UnitOfMeasureAmount = inventory.SafeData.UnitOfMeasureAmount,
                         Items = dates.Select(p => new InventoriesSummaryUsageDateItem() { Date = p.Date, }).ToList(),
                     };
@@ -456,13 +461,37 @@ namespace VitalChoice.Business.Services.InventorySkus
                 toReturn.GrandTotal += dateItem.Quantity;
             }
 
-            var notSpecifiedCategory = toReturn.Categories.FirstOrDefault(p => !p.Id.HasValue);
+            var tempReportCategories = toReturn.Categories;
+            toReturn.Categories=new List<InventoriesSummaryUsageCategoryItem>();
+            FillFlatCategoriesStructure(toReturn, categoryTree.SubCategories, tempReportCategories);
+
+            var notSpecifiedCategory = tempReportCategories.FirstOrDefault(p => !p.Id.HasValue);
             if (notSpecifiedCategory != null)
             {
-                toReturn.Categories.Remove(notSpecifiedCategory);
+                toReturn.Categories.Add(notSpecifiedCategory);
             }
 
             return toReturn;
+        }
+
+        public void FillFlatCategoriesStructure(InventoriesSummaryUsageReport report, IList<InventorySkuCategory> currentCategories, 
+            IList<InventoriesSummaryUsageCategoryItem> allCategories)
+        {
+            foreach (var currentCategory in currentCategories)
+            {
+                if (currentCategory.SubCategories != null && currentCategory.SubCategories.Count > 0)
+                {
+                    FillFlatCategoriesStructure(report, currentCategory.SubCategories, allCategories);
+                }
+                else
+                {
+                    var reportCategory = allCategories.FirstOrDefault(p => p.Id == currentCategory.Id);
+                    if (reportCategory != null)
+                    {
+                        report.Categories.Add(reportCategory);
+                    }
+                }
+            }
         }
 
         public void ConvertInventoriesSummaryUsageReportForExport(InventoriesSummaryUsageReport report, out IList<DynamicExportColumn> columns, out IList<ExpandoObject> items)
@@ -508,7 +537,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                     map = (IDictionary<string, object>)item;
                     item.InventoryCode = inventory.Code;
                     item.InventoryDescription = inventory.Description;
-                    item.UOM = inventory.UnitOfMeasureAmount;
+                    item.UOM = inventory.UnitOfMeasureName;
                     foreach (var dateItem in inventory.Items)
                     {
                         map.Add(dateItem.Date.ToString("MMMyy"), dateItem.Quantity);
