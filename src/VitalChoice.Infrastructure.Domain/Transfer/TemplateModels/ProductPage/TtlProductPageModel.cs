@@ -46,6 +46,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
 
 	    public IList<TtlBreadcrumbItemModel> BreadcrumbOrderedItems { get; set; }
 
+        public bool AtLeastOneSkuInStock { get; set; }
+
 	    public IList<TtlProductPageSkuModel> Skus { get; set; }
 
 	    public TtlProductPageTabModel DescriptionTab { get; set; }

@@ -18,6 +18,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.InventorySkus
 
         public int UnitOfMeasure { get; set; }
 
+        public string UnitOfMeasureName { get; set; }
+
         public decimal UnitOfMeasureAmount { get; set; }
 
         public IList<InventoriesSummaryUsageDateItem> Items { get; set; }

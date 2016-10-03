@@ -87,7 +87,7 @@
                     <tr data-ng-repeat="inventory in category.Inventories">
                         <td>{{inventory.Code}}</td>
                         <td><div class="description">{{inventory.Description}}</div></td>
-                        <td>{{inventory.UnitOfMeasureAmount}}</td>
+                        <td>{{inventory.UnitOfMeasureName}}</td>
                         <td data-ng-repeat="item in inventory.Items">{{item.Quantity}}</td>
                         <td><strong>{{inventory.GrandTotal}}</strong></td>
                     </tr>

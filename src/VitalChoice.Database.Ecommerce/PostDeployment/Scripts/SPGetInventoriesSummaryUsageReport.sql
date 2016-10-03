@@ -53,9 +53,7 @@ BEGIN
 			JOIN OrderToSkusToInventorySkus osToInv WITH(NOLOCK) ON os.IdOrder=osToInv.IdOrder AND os.IdSku=osToInv.IdSku
 			LEFT JOIN @InvIds invId ON osToInv.IdInventorySku=invId.Id
 			WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
-				(OrderStatus=2 OR OrderStatus=3 OR OrderStatus=5 OR OrderStatus=6 OR OrderStatus=7
-				OR POrderStatus=2 OR POrderStatus=3 OR POrderStatus=5 OR POrderStatus=6 OR POrderStatus=7
-				OR NPOrderStatus=2 OR NPOrderStatus=3 OR NPOrderStatus=5 OR NPOrderStatus=6 OR NPOrderStatus=7) AND 
+				(OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3) AND 
 				((@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR invId.Id is NOT NULL)
 			UNION ALL
 			SELECT o.DateCreated, opToInv.IdInventorySku, op.Quantity*opToInv.Quantity AS Quantity
@@ -64,9 +62,7 @@ BEGIN
 			JOIN OrderToPromosToInventorySkus opToInv WITH(NOLOCK) ON op.IdOrder=opToInv.IdOrder AND op.IdSku=opToInv.IdSku
 			LEFT JOIN @InvIds invId ON opToInv.IdInventorySku=invId.Id
 			WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
-				(OrderStatus=2 OR OrderStatus=3 OR OrderStatus=5 OR OrderStatus=6 OR OrderStatus=7
-				OR POrderStatus=2 OR POrderStatus=3 OR POrderStatus=5 OR POrderStatus=6 OR POrderStatus=7
-				OR NPOrderStatus=2 OR NPOrderStatus=3 OR NPOrderStatus=5 OR NPOrderStatus=6 OR NPOrderStatus=7) AND 
+				(OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3) AND 
 				((@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR invId.Id is NOT NULL)) temp
 		GROUP BY DATEPART(Year, temp.DateCreated), DATEPART(Month, temp.DateCreated), temp.IdInventorySku
 	END
@@ -91,9 +87,7 @@ BEGIN
 		JOIN OrderShippingPackages osp ON o.Id=osp.IdOrder
 		WHERE osp.ShippedDate>=@from AND osp.ShippedDate<=@to AND StatusCode!=3 AND 
 			(
-				OrderStatus=2 OR OrderStatus=3 OR OrderStatus=5 OR OrderStatus=6 OR OrderStatus=7
-				OR POrderStatus=2 OR POrderStatus=3 OR POrderStatus=5 OR POrderStatus=6 OR POrderStatus=7
-				OR NPOrderStatus=2 OR NPOrderStatus=3 OR NPOrderStatus=5 OR NPOrderStatus=6 OR NPOrderStatus=7
+				OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3
 			)
 		)
 
