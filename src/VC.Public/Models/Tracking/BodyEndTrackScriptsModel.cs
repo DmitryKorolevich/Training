@@ -13,5 +13,6 @@ namespace VC.Public.Models.Tracking
         public string GoogleActionPurchase { get; set; }
         public string CustomerEmail { get; set; }
         public string Criteo { get; set; }
+        public string PepperjamQuery { get; set; }
     }
 }

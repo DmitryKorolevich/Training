@@ -41,6 +41,8 @@ namespace VC.Public.Components.Tracking
     [ViewComponent(Name = "BodyEndTrackScripts")]
     public class BodyEndTrackScriptsComponent : ViewComponent
     {
+        private const string PepperjamProgramId = "";
+
         private readonly Lazy<IAuthorizationService> _authorizationService;
         private readonly Lazy<ICheckoutService> _checkoutService;
         private readonly Lazy<IOrderService> _orderService;
@@ -201,12 +203,33 @@ namespace VC.Public.Components.Tracking
                     for (int i = 0; i < skus.Count; i++)
                     {
                         var item = skus[i];
-                        toReturn.Criteo += $"{{ id: \"{item.Sku.Product.Id}\", price: {item.Amount.ToString("F")}, quantity: {item.Quantity} }}";
+                        toReturn.Criteo += $"{{ id: \"{item.Sku.Product.Id}\", price: {item.Amount:F}, quantity: {item.Quantity} }}";
                         if (i != skus.Count - 1)
                         {
                             toReturn.Criteo += ",";
                         }
                     }
+                }
+
+                //pepperjam
+                if (toReturn.OrderCompleteStep)
+                {
+                    var statisticData =
+                        (await _customerService.Value.GetCustomerOrderStatistics(new[] {toReturn.Order.Customer.Id}))
+                            .FirstOrDefault();
+                    int isNewCustomer = !(statisticData != null && statisticData.FirstOrderPlaced < toReturn.Order.DateCreated) ? 1 : 0;
+                    toReturn.PepperjamQuery =
+                        $"INT=DYNAMIC&PROGRAM_ID={PepperjamProgramId}&ORDER_ID={order.Id}&COUPON={order.Discount?.Code}&NEW_TO_FILE={isNewCustomer}";
+
+                    for (int i = 0; i < skus.Count; i++)
+                    {
+                        var skuOrdered = skus[i];
+                        var index = i + 1;
+                        var price = Math.Round(skuOrdered.Amount, 2);
+                        toReturn.PepperjamQuery += $"&ITEM_ID{index}={skuOrdered.Sku.Code}&ITEM_PRICE{index}={price:F}&QUANTITY{index}={skuOrdered.Quantity}";
+                    }
+
+                    toReturn.PepperjamQuery = null;
                 }
             }
 
