@@ -12,5 +12,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
         public DateTime To { get; set; }
 
         public FrequencyType FrequencyType { get; set; }
+
+        public string Code { get; set; }
     }
 }
