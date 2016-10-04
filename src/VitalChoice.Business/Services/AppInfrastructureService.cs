@@ -442,14 +442,24 @@ namespace VitalChoice.Business.Services
 
         public ReferenceData CachedData => _cachedData;
 
-        public async Task<ReferenceData> GetDataAsync()
+        private static readonly object LockObj = new object();
+
+        public ReferenceData GetData()
         {
             var referenceData = _cache.GetItem<ReferenceData>(CacheKeys.AppInfrastructure);
 
             if (referenceData == null)
             {
-                referenceData = await Populate();
-                _cache.SetItem(CacheKeys.AppInfrastructure, referenceData, _expirationTerm);
+                lock (LockObj)
+                {
+                    referenceData = _cache.GetItem<ReferenceData>(CacheKeys.AppInfrastructure);
+
+                    if (referenceData == null)
+                    {
+                        referenceData = Populate().GetAwaiter().GetResult();
+                        _cache.SetItem(CacheKeys.AppInfrastructure, referenceData, _expirationTerm);
+                    }
+                }
             }
             _cachedData = referenceData;
             return referenceData;
