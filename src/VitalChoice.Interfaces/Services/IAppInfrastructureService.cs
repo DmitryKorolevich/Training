@@ -6,7 +6,7 @@ namespace VitalChoice.Interfaces.Services
     public interface IAppInfrastructureService
     {
         ReferenceData CachedData { get; }
-        ReferenceData GetData();
+        Task<ReferenceData> GetDataAsync();
         Task SetupAppSettings();
     }
 }
