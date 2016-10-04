@@ -39,6 +39,18 @@
                     </div>
                 </div>
                 <div class="row form-group">
+                    <div class="col-md-3">
+                        <div class="input-group autocomplete col-md-12">
+                            <input type="text" name="Code" class="form-control" placeholder="Product SKU" data-ng-change="filterChanged();" data-ng-model="filter.Code" autocomplete="off" data-ng-minlength="3"
+                                   typeahead-min-length="3" uib-typeahead="sku.Code as sku.Code for sku in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU"
+                                   typeahead-wait-ms="200">
+                        </div>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.Code.$invalid">
+                            <small class="error" ng-show="forms.form.Code.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Product SKU")}}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
                     <div class="col-md-12">
                         <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
                     </div>

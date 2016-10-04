@@ -302,17 +302,23 @@ namespace VitalChoice.Business.Repositories
 
         public async Task<ICollection<SkuPOrderTypeBreakDownReportRawItem>> GetSkuPOrderTypeBreakDownReportRawItemsAsync(SkuPOrderTypeBreakDownReportFilter filter)
         {
+            if (string.IsNullOrEmpty(filter.Code))
+                filter.Code = null;
+
             var toReturn = await _context.Set<SkuPOrderTypeBreakDownReportRawItem>().FromSql
-                ("[dbo].[SPGetSkuPOrderTypeBreakDownReport] @from={0}, @to={1}",
-                filter.From, filter.To).ToListAsync();
+                ("[dbo].[SPGetSkuPOrderTypeBreakDownReport] @from={0}, @to={1}, @code={2}",
+                filter.From, filter.To, filter.Code).ToListAsync();
             return toReturn;
         }
 
         public async Task<ICollection<SkuPOrderTypeFutureBreakDownReportRawItem>> GetSkuPOrderTypeFutureBreakDownReportRawItemsAsync(SkuPOrderTypeBreakDownReportFilter filter)
         {
+            if (string.IsNullOrEmpty(filter.Code))
+                filter.Code = null;
+
             var toReturn = await _context.Set<SkuPOrderTypeFutureBreakDownReportRawItem>().FromSql
-                ("[dbo].[SPGetSkuPOrderTypeFutureBreakDownReport] @from={0}, @to={1}",
-                filter.From, filter.To).ToListAsync();
+                ("[dbo].[SPGetSkuPOrderTypeFutureBreakDownReport] @from={0}, @to={1}, @code={2}",
+                filter.From, filter.To, filter.Code).ToListAsync();
             return toReturn;
         }
 
