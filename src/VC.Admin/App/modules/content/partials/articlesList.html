@@ -41,6 +41,13 @@
                             </span>
                         </th>
                         <th>Category</th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('StatusCode')">
+                            <span>Status</span>
+                            <span data-ng-if="filter.Sorting.Path == 'StatusCode'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Updated')">
                             <span>Updated</span>
                             <span data-ng-if="filter.Sorting.Path == 'Updated'">
@@ -64,6 +71,10 @@
                                 </div>
                             </div>
                             <div data-ng-if="!article.Categories || article.Categories.length==0">No Categories</div>
+                        </td>
+                        <td>
+                            <span data-ng-if="article.StatusCode == 1" class="label label-draft font-default ng-binding ng-scope">Draft</span>
+                            <span data-ng-if="article.StatusCode == 2" class="label label-info font-default ng-binding ng-scope">Published</span>
                         </td>
                         <td>{{article.Updated | date:"MM/dd/yy"}}<br />{{article.Updated | date:"h:mm a"}}<br />{{article.AgentId}}</td>
                         <td>

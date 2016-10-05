@@ -103,6 +103,7 @@ namespace VC.Admin.Models.ContentManagement
             toReturn.SubTitle = SubTitle;
             toReturn.Author = Author;
             toReturn.PublishedDate = PublishedDate;
+            toReturn.StatusCode = StatusCode;
             toReturn.ContentItem = new ContentItem();
             toReturn.ContentItem.Template = Template;
             toReturn.ContentItem.Description = Description?.Trim();

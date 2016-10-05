@@ -49,6 +49,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Recipes
             if (viewContext.Entity.ParentId.HasValue)
             {
                 RecipeListFilter filter = new RecipeListFilter();
+                filter.StatusCode = RecordStatusCode.Active;
                 filter.CategoryId = viewContext.Entity.Id;
                 filter.Sorting.Path = RecipeSortPath.Created;
                 filter.Sorting.SortOrder = FilterSortOrder.Desc;

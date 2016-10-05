@@ -150,6 +150,7 @@ namespace VC.Admin.Models.ContentManagement
             toReturn.Url = Url?.Trim();
             toReturn.Url = toReturn.Url?.ToLower();
             toReturn.FileUrl = FileUrl?.Trim();
+            toReturn.StatusCode = StatusCode;
             toReturn.ContentItem = new ContentItem();
             toReturn.ContentItem.Template = Template;
             toReturn.ContentItem.Description = Description?.Trim();
