@@ -305,6 +305,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             toReturn.IngredientsTab.AdditionalNotes = toReturn.IngredientsTab.AdditionalNotes?.Replace("\n", "<br/>");
 
             var filter = new RecipeListFilter() {ProductId = eProduct.Id};
+            filter.Paging = null;
             filter.StatusCode = RecordStatusCode.Active;
             var recipes = await _recipeService.GetRecipesAsync(filter);
 
