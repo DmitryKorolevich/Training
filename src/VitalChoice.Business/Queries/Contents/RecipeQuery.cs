@@ -55,7 +55,16 @@ namespace VitalChoice.Business.Queries.Contents
             return this;
         }
 
-	    public RecipeQuery AssignedToProduct(int? productId)
+        public RecipeQuery WithStatusCode(RecordStatusCode? status)
+        {
+            if (status.HasValue)
+            {
+                And(x => x.StatusCode == status.Value);
+            }
+            return this;
+        }
+
+        public RecipeQuery AssignedToProduct(int? productId)
 	    {
 		    if (productId.HasValue)
 		    {

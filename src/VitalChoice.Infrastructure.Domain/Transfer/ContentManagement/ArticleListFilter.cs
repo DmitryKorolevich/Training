@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using VitalChoice.Ecommerce.Domain.Entities;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.ContentManagement
 {
@@ -9,5 +10,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.ContentManagement
         public int? CategoryId { get; set; }
 
         public ICollection<int> ExcludeIds { get; set; }
+
+        public RecordStatusCode? StatusCode { get; set; }
     }
 }

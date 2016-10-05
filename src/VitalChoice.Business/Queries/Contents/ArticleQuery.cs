@@ -65,5 +65,14 @@ namespace VitalChoice.Business.Queries.Content
             And(x => x.StatusCode == RecordStatusCode.Active || x.StatusCode == RecordStatusCode.NotActive);
             return this;
         }
+
+        public ArticleQuery WithStatusCode(RecordStatusCode? status)
+        {
+            if (status.HasValue)
+            {
+                And(x => x.StatusCode == status.Value);
+            }
+            return this;
+        }
     }
 }

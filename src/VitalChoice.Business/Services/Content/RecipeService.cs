@@ -110,7 +110,7 @@ namespace VitalChoice.Business.Services.Content
                     query = query.NotWithIds(ids);
                 }
             }
-            query = query.WithName(filter.Name).AssignedToProduct(filter.ProductId).NotDeleted();
+            query = query.WithName(filter.Name).AssignedToProduct(filter.ProductId).NotDeleted().WithStatusCode(filter.StatusCode);
 
             Func<IQueryable<Recipe>, IOrderedQueryable<Recipe>> sortable = x => x.OrderBy(y => y.Name);
             var sortOrder = filter.Sorting.SortOrder;
@@ -129,6 +129,13 @@ namespace VitalChoice.Business.Services.Content
                             sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Url)
                                 : x.OrderByDescending(y => y.Url);
+                    break;
+                case RecipeSortPath.StatusCode:
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.StatusCode)
+                                : x.OrderByDescending(y => y.StatusCode);
                     break;
                 case RecipeSortPath.Updated:
                     sortable =
@@ -215,7 +222,6 @@ namespace VitalChoice.Business.Services.Content
             if (model.Id == 0)
             {
                 dbItem = new Recipe();
-                dbItem.StatusCode = RecordStatusCode.Active;
                 dbItem.ContentItem = new ContentItem();
                 dbItem.ContentItem.Created = DateTime.Now;
                 dbItem.ContentItem.ContentItemToContentProcessors = new List<ContentItemToContentProcessor>();
@@ -254,8 +260,7 @@ namespace VitalChoice.Business.Services.Content
 			    {
 				    throw new AppValidationException("Url", "Recipe with the same URL already exists, please use a unique URL.");
 			    }
-
-			    //what is the purpose of such strange code? both model and dbItem are of the same type. Why do we need to maintain additional object?
+                
 			    dbItem.Name = model.Name;
 			    dbItem.Subtitle = model.Subtitle ?? String.Empty;
 			    dbItem.YoutubeVideo = model.YoutubeVideo ?? String.Empty;
@@ -266,7 +271,8 @@ namespace VitalChoice.Business.Services.Content
 			    dbItem.AboutChef = model.AboutChef;
 			    dbItem.Directions = model.Directions;
 			    dbItem.Ingredients = model.Ingredients;
-			    dbItem.ContentItem.Updated = DateTime.Now;
+                dbItem.StatusCode = model.StatusCode;
+                dbItem.ContentItem.Updated = DateTime.Now;
 			    dbItem.ContentItem.Template = model.ContentItem.Template;
 			    dbItem.ContentItem.Description = model.ContentItem.Description;
 			    dbItem.ContentItem.Title = model.ContentItem.Title;
