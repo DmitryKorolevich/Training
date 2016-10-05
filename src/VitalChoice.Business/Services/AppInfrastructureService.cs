@@ -92,9 +92,9 @@ namespace VitalChoice.Business.Services
             _backendSettingsService = backendSettingsService;
         }
 
-        private async Task<ReferenceData> Populate()
+        private ReferenceData Populate()
         {
-            var lookups = (await _lookupRepository.Query().SelectAsync(false)).GroupBy(l => l.Name)
+            var lookups = (_lookupRepository.Query().Select(false)).GroupBy(l => l.Name)
                 .ToDictionary(g => g.Key, g => g.ToList());
             var tradeLookup = lookups[LookupNames.CustomerTradeClass].Single().Id;
             var taxExemptLookup = lookups[LookupNames.CustomerTaxExempt].Single().Id;
@@ -119,40 +119,40 @@ namespace VitalChoice.Business.Services
             var productSellersOptions = lookups[LookupNames.ProductSellers].Single().Id;
             var googleCategoriesOptions = lookups[LookupNames.GoogleCategories].Single().Id;
 
-            var lookupVariants = (await _lookupVariantRepository.Query()
-                .SelectAsync(false))
+            var lookupVariants = (_lookupVariantRepository.Query()
+                .Select(false))
                 .GroupBy(l => l.IdLookup)
                 .ToDictionary(l => l.Key, l => l.ToArray());
 
             // ReSharper disable once UseObjectOrCollectionInitializer
             var referenceData = new ReferenceData();
             referenceData.DefaultCountry = _backendSettingsService.GetDefaultCountry();
-            referenceData.AdminRoles = await _roleManager.Roles.Where(x => x.IdUserType == UserType.Admin).OrderBy(p=>p.Order).Select(x => new LookupItem<int>
+            referenceData.AdminRoles = _roleManager.Roles.Where(x => x.IdUserType == UserType.Admin).OrderBy(p=>p.Order).Select(x => new LookupItem<int>
             {
                 Key = x.Id,
                 Text = x.Name
-            }).ToListAsync();
-            referenceData.CustomerRoles = await _roleManager.Roles.Where(x => x.IdUserType == UserType.Customer).Select(x => new LookupItem<int>
+            }).ToList();
+            referenceData.CustomerRoles = _roleManager.Roles.Where(x => x.IdUserType == UserType.Customer).Select(x => new LookupItem<int>
             {
                 Key = x.Id,
                 Text = x.Name
-            }).ToListAsync();
-            referenceData.AffiliateRoles = await _roleManager.Roles.Where(x => x.IdUserType == UserType.Affiliate).Select(x => new LookupItem<int>
+            }).ToList();
+            referenceData.AffiliateRoles = _roleManager.Roles.Where(x => x.IdUserType == UserType.Affiliate).Select(x => new LookupItem<int>
             {
                 Key = x.Id,
                 Text = x.Name
-            }).ToListAsync();
+            }).ToList();
             referenceData.UserStatuses = EnumHelper.GetItemsWithDescription<byte>(typeof(UserStatus)).Select(x => new LookupItem<byte>()
             {
                 Key = x.Key,
                 Text = x.Value
             }).ToList();
-            referenceData.ContentTypes = (await _contentTypeRepository.Query().SelectAsync(false)).Select(x => new LookupItem<int>
+            referenceData.ContentTypes = (_contentTypeRepository.Query().Select(false)).Select(x => new LookupItem<int>
             {
                 Key = x.Id,
                 Text = x.Name
             }).ToList();
-            referenceData.ContentProcessors = await _contentProcessorRepository.Query().SelectAsync(false);
+            referenceData.ContentProcessors = _contentProcessorRepository.Query().Select(false);
             referenceData.Labels = _localizationService.GetStrings();
             var months = CultureInfo.InvariantCulture.DateTimeFormat.MonthNames.Where(p => !String.IsNullOrEmpty(p)).ToList();
             referenceData.Months = new List<LookupItem<int>>();
@@ -229,19 +229,19 @@ namespace VitalChoice.Business.Services
                 Key = x.Key == -1 ? null : (int?)x.Key,
                 Text = x.Value
             }).ToList();
-            referenceData.CustomerTypes = (await _customerTypeRepository.Query(new CustomerTypeQuery().NotDeleted())
-                .SelectAsync(false)).Select(x => new LookupItem<int> {Key = x.Id, Text = x.Name}).ToList();
+            referenceData.CustomerTypes = (_customerTypeRepository.Query(new CustomerTypeQuery().NotDeleted())
+                .Select(false)).Select(x => new LookupItem<int> {Key = x.Id, Text = x.Name}).ToList();
             referenceData.ShortCustomerTypes = referenceData.CustomerTypes.Select(x => new LookupItem<int>() { Key = x.Key, Text = x.Text.Substring(0,1) }).ToList();
             referenceData.OrderStatuses =
-                (await _orderStatusRepository.Query().SelectAsync(false)).Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
+                (_orderStatusRepository.Query().Select(false)).Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
                     .ToList();
             referenceData.PaymentMethods =
-                (await _paymentMethodRepository.Query().SelectAsync(false)).Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
+                (_paymentMethodRepository.Query().Select(false)).Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
                     .ToList();
             var shortPaymentMethods = new List<LookupItem<int>>(referenceData.PaymentMethods);
             referenceData.ShortPaymentMethods = LookupHelper.GetShortPaymentMethods(shortPaymentMethods);
             referenceData.OrderTypes =
-                (await _orderTypeEntityRepository.Query().SelectAsync(false)).Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
+                (_orderTypeEntityRepository.Query().Select(false)).Select(x => new LookupItem<int>() {Key = x.Id, Text = x.Name})
                     .ToList();
             referenceData.PublicOrderTypes = LookupHelper.GetPublicOrderTypes(referenceData.OrderTypes);
             var shortOrderTypes = (new List<LookupItem<int>>(referenceData.OrderTypes));
@@ -442,17 +442,31 @@ namespace VitalChoice.Business.Services
 
         public ReferenceData CachedData => _cachedData;
 
-        public async Task<ReferenceData> GetDataAsync()
+        private static readonly object LockObj = new object();
+
+        public Task<ReferenceData> GetDataAsync()
         {
             var referenceData = _cache.GetItem<ReferenceData>(CacheKeys.AppInfrastructure);
 
             if (referenceData == null)
             {
-                referenceData = await Populate();
-                _cache.SetItem(CacheKeys.AppInfrastructure, referenceData, _expirationTerm);
+                return Task.Factory.StartNew(() =>
+                {
+                    lock (LockObj)
+                    {
+                        referenceData = _cache.GetItem<ReferenceData>(CacheKeys.AppInfrastructure);
+
+                        if (referenceData == null)
+                        {
+                            referenceData = Populate();
+                            _cache.SetItem(CacheKeys.AppInfrastructure, referenceData, _expirationTerm);
+                            _cachedData = referenceData;
+                        }
+                        return referenceData;
+                    }
+                });
             }
-            _cachedData = referenceData;
-            return referenceData;
+            return Task.FromResult(referenceData);
         }
     }
 }
