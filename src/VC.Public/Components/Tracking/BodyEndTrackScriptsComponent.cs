@@ -41,7 +41,7 @@ namespace VC.Public.Components.Tracking
     [ViewComponent(Name = "BodyEndTrackScripts")]
     public class BodyEndTrackScriptsComponent : ViewComponent
     {
-        private const string PepperjamProgramId = "";
+        private const string PepperjamProgramId = "8392";
 
         private readonly Lazy<IAuthorizationService> _authorizationService;
         private readonly Lazy<ICheckoutService> _checkoutService;
@@ -228,8 +228,6 @@ namespace VC.Public.Components.Tracking
                         var price = Math.Round(skuOrdered.Amount, 2);
                         toReturn.PepperjamQuery += $"&ITEM_ID{index}={skuOrdered.Sku.Code}&ITEM_PRICE{index}={price:F}&QUANTITY{index}={skuOrdered.Quantity}";
                     }
-
-                    toReturn.PepperjamQuery = null;
                 }
             }
 
