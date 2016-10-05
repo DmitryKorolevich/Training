@@ -513,8 +513,8 @@ namespace VitalChoice.Business.Services.Customers
             Order order = null;
             if (filter.IdOrder.HasValue)
             {
-                order = await _orderRepository.Query(p => p.Id == filter.IdOrder.Value &&
-                     p.IdObjectType != (int)OrderType.AutoShip && p.StatusCode != (int)RecordStatusCode.Deleted).SelectFirstOrDefaultAsync(false);
+                order =await _orderRepository.Query(p => p.Id == filter.IdOrder.Value &&
+                    p.IdObjectType != (int)OrderType.AutoShip && p.StatusCode != (int)RecordStatusCode.Deleted).SelectFirstOrDefaultAsync(false);
                 if (order != null)
                 {
                     conditions = conditions.WithId(order.IdCustomer);
