@@ -1082,25 +1082,39 @@ namespace VitalChoice.Business.Services.Customers
                                 }
                             }
 
-                            var customerPaymentMethodRepository = uow.RepositoryAsync<CustomerPaymentMethod>();
-                            var customerPaymentMethodOptionValueRepository = uow.RepositoryAsync<CustomerPaymentMethodOptionValue>();
-                            var cards = customer.CustomerPaymentMethods.Where(p=>p.IdObjectType==(int)PaymentMethodType.CreditCard).ToList();
+                            //var customerPaymentMethodRepository = uow.RepositoryAsync<CustomerPaymentMethod>();
+                            //var customerPaymentMethodOptionValueRepository = uow.RepositoryAsync<CustomerPaymentMethodOptionValue>();
+                            //var cards = customer.CustomerPaymentMethods.Where(p=>p.IdObjectType==(int)PaymentMethodType.CreditCard).ToList();
+                            //foreach (var customerPaymentMethodDynamic in cards)
+                            //{
+                            //    var dbCard = await customerPaymentMethodRepository.Query(p=>p.Id== customerPaymentMethodDynamic.Id).SelectFirstOrDefaultAsync(true);
+                            //    if (dbCard!=null)
+                            //    {
+                            //        dbCard.IdCustomer = primaryCustomer.Id;
+                            //        dbCard.StatusCode = (int)RecordStatusCode.Active;
+                            //    }
+
+                            //    var defaultType = _customerPaymentMethodMapper.OptionTypes.FirstOrDefault(p => p.Name == "Default");
+                            //    var dbCardDefaultSetting = await customerPaymentMethodOptionValueRepository.Query(p=>p.IdCustomerPaymentMethod==dbCard.Id
+                            //        && p.IdOptionType==defaultType.Id).SelectFirstOrDefaultAsync(false);
+                            //    if (dbCardDefaultSetting != null)
+                            //    {
+                            //        await customerPaymentMethodOptionValueRepository.DeleteAsync(dbCardDefaultSetting);
+                            //    }
+                            //}
+
+                            var cards = customer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard).ToList();
                             foreach (var customerPaymentMethodDynamic in cards)
                             {
-                                var dbCard = await customerPaymentMethodRepository.Query(p=>p.Id== customerPaymentMethodDynamic.Id).SelectFirstOrDefaultAsync(true);
-                                if (dbCard!=null)
-                                {
-                                    dbCard.IdCustomer = primaryCustomer.Id;
-                                    dbCard.StatusCode = (int)RecordStatusCode.Active;
-                                }
-
-                                var defaultType = _customerPaymentMethodMapper.OptionTypes.FirstOrDefault(p => p.Name == "Default");
-                                var dbCardDefaultSetting = await customerPaymentMethodOptionValueRepository.Query(p=>p.IdCustomerPaymentMethod==dbCard.Id
-                                    && p.IdOptionType==defaultType.Id).SelectFirstOrDefaultAsync(false);
-                                if (dbCardDefaultSetting != null)
-                                {
-                                    await customerPaymentMethodOptionValueRepository.DeleteAsync(dbCardDefaultSetting);
-                                }
+                                var newCard = customerPaymentMethodDynamic.Clone<CustomerPaymentMethodDynamic, MappedObject>()
+                                        .Clone<CustomerPaymentMethodDynamic, Entity>();
+                                newCard.Id = 0;
+                                newCard.Address.Id = 0;
+                                //at lest one card show be a default one
+                                newCard.Data.Default = !primaryCustomer.CustomerPaymentMethods.Any(p => p.IdObjectType == (int)PaymentMethodType.CreditCard);
+                                newCard.IdCustomerSource = customerPaymentMethodDynamic.IdCustomer;
+                                newCard.IdPaymentMethodSource = customerPaymentMethodDynamic.Id;
+                                primaryCustomer.CustomerPaymentMethods.Add(newCard);
                             }
                         }
 
