@@ -1045,6 +1045,12 @@ namespace VitalChoice.Business.Services.Customers
                                 }
                             }
 
+                            //healtwise is enabled if it's enabled on at list one customer
+                            if (customer.SafeData.HasHealthwiseOrders == true)
+                            {
+                                primaryCustomer.Data.HasHealthwiseOrders = true;
+                            }
+
                             var notes = customer.CustomerNotes.Select(p=> p.Clone<CustomerNoteDynamic, MappedObject>()
                                             .Clone<CustomerNoteDynamic, Entity>()).ToList();
                             foreach (var customerNoteDynamic in notes)

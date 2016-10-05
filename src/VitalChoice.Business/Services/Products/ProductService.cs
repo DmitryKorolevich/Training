@@ -1598,6 +1598,11 @@ namespace VitalChoice.Business.Services.Products
             }
 
             var dbItems = await _sPEcommerceRepository.GetSkuPOrderTypeBreakDownReportRawItemsAsync(filter);
+            //remove out of view skus from an order(which was filtered by at least one filter code inside) which aren't matched to this condition
+            if (!string.IsNullOrEmpty(filter.Code))
+            {
+                dbItems = dbItems.Where(p=>p.Code.StartsWith(filter.Code, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            }
 
             //create periods
             DateTime current = filter.From;
@@ -1716,6 +1721,8 @@ namespace VitalChoice.Business.Services.Products
                 }
             }
 
+            toReturn.Skus = toReturn.Skus.OrderBy(p => p.Code).ToList();
+
             return toReturn;
         }
 
@@ -1730,6 +1737,11 @@ namespace VitalChoice.Business.Services.Products
             }
 
             var dbItems = await _sPEcommerceRepository.GetSkuPOrderTypeFutureBreakDownReportRawItemsAsync(filter);
+            //remove out of view skus from an order(which was filtered by at least one filter code inside) which aren't matched to this condition
+            if (!string.IsNullOrEmpty(filter.Code))
+            {
+                dbItems = dbItems.Where(p => p.Code.StartsWith(filter.Code, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            }
 
             //create periods
             DateTime current = filter.From;
@@ -1856,6 +1868,8 @@ namespace VitalChoice.Business.Services.Products
                     skuPeriod.Quantity += skuPOrderTypeBreakDownReportRawItem.Quantity;
                 }
             }
+
+            toReturn.Skus = toReturn.Skus.OrderBy(p => p.Code).ToList();
 
             return toReturn;
         }

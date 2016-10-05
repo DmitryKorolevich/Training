@@ -355,6 +355,8 @@ namespace VitalChoice.Business.Services.InventorySkus
             var invIds = data.Select(p => p.IdInventorySku).Distinct().ToList();
             var inventories = await this.SelectAsync(invIds);
 
+            var unitOfMeasureLookup = (await _settingService.GetLookupsAsync(new [] { SettingConstants.INVENTORY_SKU_LOOKUP_UNIT_OF_MEASURE_NAME})).FirstOrDefault();
+
             List<InventoriesSummaryUsageDateItem> dates = new List<InventoriesSummaryUsageDateItem>();
 
             DateTime current = filter.From;
@@ -424,6 +426,9 @@ namespace VitalChoice.Business.Services.InventorySkus
                         Code = inventory.Code,
                         Description = inventory.Description,
                         UnitOfMeasure = inventory.SafeData.UnitOfMeasure,
+                        UnitOfMeasureName = inventory.SafeData.UnitOfMeasure!=null ? 
+                            unitOfMeasureLookup.LookupVariants.FirstOrDefault(p=>p.Id== inventory.SafeData.UnitOfMeasure)?.ValueVariant
+                            : null,
                         UnitOfMeasureAmount = inventory.SafeData.UnitOfMeasureAmount,
                         Items = dates.Select(p => new InventoriesSummaryUsageDateItem() { Date = p.Date, }).ToList(),
                     };
@@ -456,13 +461,37 @@ namespace VitalChoice.Business.Services.InventorySkus
                 toReturn.GrandTotal += dateItem.Quantity;
             }
 
-            var notSpecifiedCategory = toReturn.Categories.FirstOrDefault(p => !p.Id.HasValue);
+            var tempReportCategories = toReturn.Categories;
+            toReturn.Categories=new List<InventoriesSummaryUsageCategoryItem>();
+            FillFlatCategoriesStructure(toReturn, categoryTree.SubCategories, tempReportCategories);
+
+            var notSpecifiedCategory = tempReportCategories.FirstOrDefault(p => !p.Id.HasValue);
             if (notSpecifiedCategory != null)
             {
-                toReturn.Categories.Remove(notSpecifiedCategory);
+                toReturn.Categories.Add(notSpecifiedCategory);
             }
 
             return toReturn;
+        }
+
+        public void FillFlatCategoriesStructure(InventoriesSummaryUsageReport report, IList<InventorySkuCategory> currentCategories, 
+            IList<InventoriesSummaryUsageCategoryItem> allCategories)
+        {
+            foreach (var currentCategory in currentCategories)
+            {
+                if (currentCategory.SubCategories != null && currentCategory.SubCategories.Count > 0)
+                {
+                    FillFlatCategoriesStructure(report, currentCategory.SubCategories, allCategories);
+                }
+                else
+                {
+                    var reportCategory = allCategories.FirstOrDefault(p => p.Id == currentCategory.Id);
+                    if (reportCategory != null)
+                    {
+                        report.Categories.Add(reportCategory);
+                    }
+                }
+            }
         }
 
         public void ConvertInventoriesSummaryUsageReportForExport(InventoriesSummaryUsageReport report, out IList<DynamicExportColumn> columns, out IList<ExpandoObject> items)
@@ -508,7 +537,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                     map = (IDictionary<string, object>)item;
                     item.InventoryCode = inventory.Code;
                     item.InventoryDescription = inventory.Description;
-                    item.UOM = inventory.UnitOfMeasureAmount;
+                    item.UOM = inventory.UnitOfMeasureName;
                     foreach (var dateItem in inventory.Items)
                     {
                         map.Add(dateItem.Date.ToString("MMMyy"), dateItem.Quantity);
@@ -647,29 +676,16 @@ namespace VitalChoice.Business.Services.InventorySkus
                 throw new AppValidationException(messages);
             }
 
-            var map = records.ToDictionary(p => p.Code, pp => pp);
             int i = 0;
             var groups = codes.GroupBy(x => i++ / SqlConstants.MAX_CONTAINS_COUNT).ToList();
+            List<InventorySkuDynamic> dbInventorySkus =new List<InventorySkuDynamic>();
             foreach (var group in groups)
             {
-                var dbCodes = await ObjectRepository.Query(p => p.StatusCode != (int)RecordStatusCode.Deleted &&
-                    group.Contains(p.Code)).SelectAsync(p => p.Code, false);
-                foreach (var dbCode in dbCodes)
-                {
-                    InventorySkuImportItem item = null;
-                    if (map.TryGetValue(dbCode, out item))
-                    {
-                        item.ErrorMessages.Add(BusinessHelper.AddErrorMessage("Code",ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InventorySkuImportCodeDublicate]));
-                    }
-                }
+                var tempDbInventorySkus = await SelectAsync(p => p.StatusCode != (int) RecordStatusCode.Deleted &&
+                                                                 group.Contains(p.Code));
+                dbInventorySkus.AddRange(tempDbInventorySkus);
             }
-
-            //codes dublicates in db
-            messages = BusinessHelper.FormatRowsRecordErrorMessages(records);
-            if (messages.Count > 0)
-            {
-                throw new AppValidationException(messages);
-            }
+            var dbMap = dbInventorySkus.ToDictionary(p => p.Code, pp => pp, StringComparer.OrdinalIgnoreCase);
 
             var categories = await _inventorySkuCategoryService.GetCategoriesTreeAsync(new InventorySkuCategoryTreeFilter() {});
             var lookups = await _settingService.GetLookupsAsync(SettingConstants.INVENTORY_SKU_LOOKUP_NAMES.Split(','));
@@ -682,11 +698,11 @@ namespace VitalChoice.Business.Services.InventorySkus
             var unitOfMeasureLookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.INVENTORY_SKU_LOOKUP_UNIT_OF_MEASURE_NAME);
             var purchaseUnitOfMeasureLookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.INVENTORY_SKU_LOOKUP_PURCHASE_UNIT_OF_MEASURE_NAME);
 
-            var toReturn = new List<InventorySkuDynamic>();
+            var toInsert = new List<InventorySkuDynamic>();
             foreach (var inventorySkuImportItem in records)
             {
                 var item = Mapper.CreatePrototype();
-                item.Code = inventorySkuImportItem.Code;
+                item.Code = inventorySkuImportItem.Code.ToUpper();
                 item.StatusCode = string.Equals(inventorySkuImportItem.Active, "Y", StringComparison.InvariantCultureIgnoreCase)
                     ? (int) RecordStatusCode.Active
                     : (int) RecordStatusCode.NotActive;
@@ -752,7 +768,25 @@ namespace VitalChoice.Business.Services.InventorySkus
                         ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.InventorySkuCategoryMissed]));
                 }
 
-                toReturn.Add(item);
+                InventorySkuDynamic dbInventorySku = null;
+                if (dbMap.TryGetValue(item.Code, out dbInventorySku))
+                {
+                    dbInventorySku.StatusCode = item.StatusCode;
+                    dbInventorySku.Description = item.Description;
+                    dbInventorySku.IdEditedBy = item.IdEditedBy;
+
+                    dbInventorySku.Data.ProductSource = item.Data.ProductSource;
+                    dbInventorySku.Data.Quantity = item.Data.Quantity;
+                    dbInventorySku.Data.UnitOfMeasure = item.Data.UnitOfMeasure;
+                    dbInventorySku.Data.UnitOfMeasureAmount = item.Data.UnitOfMeasureAmount;
+                    dbInventorySku.Data.PurchaseUnitOfMeasure = item.Data.PurchaseUnitOfMeasure;
+                    dbInventorySku.Data.PurchaseUnitOfMeasureAmount = item.Data.PurchaseUnitOfMeasureAmount;
+                    dbInventorySku.IdInventorySkuCategory = item.IdInventorySkuCategory;
+                }
+                else
+                {
+                    toInsert.Add(item);
+                }
             }
 
             //category and lookups errors
@@ -762,7 +796,14 @@ namespace VitalChoice.Business.Services.InventorySkus
                 throw new AppValidationException(messages);
             }
 
-            await InsertRangeAsync(toReturn);
+            if (dbInventorySkus.Count > 0)
+            {
+                await UpdateRangeAsync(dbInventorySkus);
+            }
+            if (toInsert.Count > 0)
+            {
+                await InsertRangeAsync(toInsert);
+            }
 
             return true;
         }
