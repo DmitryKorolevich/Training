@@ -770,7 +770,7 @@ namespace VitalChoice.ExportService.Services
             if ((exportSide == ExportSide.All || exportSide == ExportSide.NonPerishable) && order.Skus.Any(s => s.GcsGenerated?.Count > 0))
             {
                 result.Header.Comments =
-                    $"{result.Header.Comments}\n{string.Join("\n", order.Skus.SelectMany(g => g.GcsGenerated).Select(g => $"{g.Sku.Amount:C} #{g.Code}"))}";
+                    $"{result.Header.Comments}\n{string.Join(", ", order.Skus.SelectMany(g => g.GcsGenerated).Select(g => $"{g.Sku.Amount:C} #{g.Code}"))}";
             }
 
             ParsePaymentInfo(order, context, result, exportSide);
