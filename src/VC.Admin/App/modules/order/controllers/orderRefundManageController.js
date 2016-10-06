@@ -352,7 +352,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
 
                 if ($scope.order.Total == 0 && !$scope.options.RefundGiftCertificatesEnable)
                 {
-                    billingErrorMessages += "Refund should have not zero total or return money to gcs. ";
+                    billingErrorMessages += "Refund total should not equal $0.00 or select return to gift certificate option. ";
                     toaster.pop('error', 'Error!', billingErrorMessages, null, 'trustedHtml');
                     deferredRecalculate.reject();
                     return;
