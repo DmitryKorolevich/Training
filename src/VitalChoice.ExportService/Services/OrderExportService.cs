@@ -266,7 +266,10 @@ namespace VitalChoice.ExportService.Services
                     InMemoryCustomerCardDatas.Enqueue(customerCardData);
                 }
             }
-            await UpdateCustomerPaymentMethodsInternal(paymentMethods, _infoContext);
+            else
+            {
+                await UpdateCustomerPaymentMethodsInternal(paymentMethods, _infoContext);
+            }
         }
 
         private async Task UpdateCustomerPaymentMethodsInternal(ICollection<CustomerCardData> paymentMethods, ExportInfoContext context)
@@ -275,7 +278,18 @@ namespace VitalChoice.ExportService.Services
             {
                 var customerIds = paymentMethods.Select(p => p.IdCustomer).Where(p => p != 0).Distinct().ToList();
                 var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
+                var customerSources = paymentMethods.Where(p => p.IdCustomerSource.HasValue && p.IdPaymentMethodSource.HasValue).ToArray();
                 var customerPayments = await rep.Query(c => customerIds.Contains(c.IdCustomer)).SelectAsync(true);
+
+                if (customerSources.Length > 0)
+                {
+                    var sourceCustomerIds = customerSources.Select(s => s.IdCustomerSource).Distinct().ToList();
+                    var sourcePayments = await rep.Query(c => sourceCustomerIds.Contains(c.IdCustomer)).SelectAsync(false);
+
+                    paymentMethods.UpdateKeyed(sourcePayments, export => export.IdPaymentMethodSource,
+                        data => data.IdPaymentMethod,
+                        (data, export) => data.CardNumber = _encryptionHost.LocalDecrypt<string>(export.CreditCardNumber));
+                }
 
                 var validPaymentMethods =
                     paymentMethods.Where(
@@ -305,7 +319,7 @@ namespace VitalChoice.ExportService.Services
                 await uow.SaveChangesAsync();
             }
         }
-
+        
         public async Task UpdateOrderPaymentMethod(OrderCardData paymentMethod)
         {
             await LockOrdersEvent.WaitAsync();
@@ -313,7 +327,10 @@ namespace VitalChoice.ExportService.Services
             {
                 InMemoryOrderCardDatas.Enqueue(paymentMethod);
             }
-            await UpdateOrderPaymentInternal(paymentMethod, _infoContext);
+            else
+            {
+                await UpdateOrderPaymentInternal(paymentMethod, _infoContext);
+            }
         }
 
         private async Task UpdateOrderPaymentInternal(OrderCardData paymentMethod, ExportInfoContext context)

@@ -199,7 +199,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpGet]
-        public async Task<Result<OrderExportGeneralStatusModel>> GetExportGeneralStatus()
+        public Result<OrderExportGeneralStatusModel> GetExportGeneralStatus()
         {
             var toReturn = new OrderExportGeneralStatusModel();
             toReturn.Exported=(new Random()).Next(100);
@@ -209,7 +209,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpGet]
-        public async Task<Result<ICollection<OrderExportRequestModel>>> GetExportDetails()
+        public Result<ICollection<OrderExportRequestModel>> GetExportDetails()
         {
             var toReturn = new List<OrderExportRequestModel>();
             var item = new OrderExportRequestModel();

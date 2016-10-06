@@ -744,7 +744,9 @@ namespace VitalChoice.Business.Services.Customers
                                 {
                                     CardNumber = p.CardNumber,
                                     IdPaymentMethod = p.Model.Id,
-                                    IdCustomer = p.Model.IdCustomer
+                                    IdCustomer = p.Model.IdCustomer,
+                                    IdCustomerSource = p.Model.IdCustomerSource,
+                                    IdPaymentMethodSource = p.Model.IdPaymentMethodSource
                                 }).ToArray()))
                     {
                         throw new ApiException("Cannot update customer payment info on remote.");
@@ -846,7 +848,9 @@ namespace VitalChoice.Business.Services.Customers
                             {
                                 CardNumber = p.CardNumber,
                                 IdPaymentMethod = p.Model.Id,
-                                IdCustomer = p.Model.IdCustomer
+                                IdCustomer = p.Model.IdCustomer,
+                                IdCustomerSource = p.Model.IdCustomerSource,
+                                IdPaymentMethodSource = p.Model.IdPaymentMethodSource
                             }).ToArray());
 
                     if (!await updatePaymentsTask)
@@ -1111,7 +1115,7 @@ namespace VitalChoice.Business.Services.Customers
                                 newCard.Id = 0;
                                 newCard.Address.Id = 0;
                                 //at lest one card show be a default one
-                                newCard.Data.Default = !primaryCustomer.CustomerPaymentMethods.Any(p => p.IdObjectType == (int)PaymentMethodType.CreditCard);
+                                newCard.Data.Default = primaryCustomer.CustomerPaymentMethods.All(p => p.IdObjectType != (int) PaymentMethodType.CreditCard);
                                 newCard.IdCustomerSource = customerPaymentMethodDynamic.IdCustomer;
                                 newCard.IdPaymentMethodSource = customerPaymentMethodDynamic.Id;
                                 primaryCustomer.CustomerPaymentMethods.Add(newCard);

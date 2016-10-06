@@ -241,7 +241,10 @@ namespace VitalChoice.Business.Services.Orders
                 return Task.FromResult(true);
             }
             var paymentsToUpdate =
-                paymentMethods.Where(p => !ObjectMapper.IsValuesMasked(typeof(CustomerPaymentMethodDynamic), p.CardNumber, "CardNumber"))
+                paymentMethods.Where(
+                        p =>
+                            !ObjectMapper.IsValuesMasked(typeof(CustomerPaymentMethodDynamic), p.CardNumber, "CardNumber") ||
+                            (p.IdCustomerSource.HasValue && p.IdPaymentMethodSource.HasValue))
                     .ToArray();
             if (paymentsToUpdate.Any())
             {
@@ -249,7 +252,8 @@ namespace VitalChoice.Business.Services.Orders
                     return TaskCache<bool>.DefaultCompletedTask;
 
                 return
-                    SendCommand<bool>(new ServiceBusCommandWithResult(Guid.NewGuid(), OrderExportServiceCommandConstants.UpdateCustomerPayment,
+                    SendCommand<bool>(new ServiceBusCommandWithResult(Guid.NewGuid(),
+                        OrderExportServiceCommandConstants.UpdateCustomerPayment,
                         ServerHostName, LocalHostName)
                     {
                         Data = new ServiceBusCommandData(paymentsToUpdate)
