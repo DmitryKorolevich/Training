@@ -522,7 +522,7 @@ BEGIN
             <span class="sub-title">@(@model.Model.SubTitle)</span>
             <br/>
             <br/>
-            <span class="date">@date(@model.Model.PublishedDate) {{MM'/'dd'/'yyyy}}</span>
+            <span class="date">@date(@model.Model.PublishedDate) {{MM''/''dd''/''yyyy}}</span>
             <span class="author">@(@model.Model.Author)</span>
             <div class="icons-bar not-printable">
         	    <a target="_blank" href="http://www.facebook.com/sharer.php?u=@(@model.ViewContext.AbsoluteUrl)&t=@(@model.Model.Name)" class="margin-right-medium small-window-open-link">
@@ -555,7 +555,7 @@ BEGIN
 {{
 	@if(ArticleBonusLink){{
     <div class="right-wrapper">
-        <a href="#"><img src="/assets/images/articles/bonuses.jpg"></a>
+        <a href="@(ArticleBonusLink.Url)"><img src="/assets/images/articles/bonuses.jpg"></a>
     </div>
     }}
     <div class="right-wrapper">
