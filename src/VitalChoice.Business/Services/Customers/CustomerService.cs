@@ -1207,7 +1207,10 @@ namespace VitalChoice.Business.Services.Customers
             foreach (var targerItem in target.DictionaryData.Where(p=>p.Key!="Default"))
             {
                 if (!source.DictionaryData.ContainsKey(targerItem.Key) ||
-                    source.DictionaryData[targerItem.Key].ToString() != target.DictionaryData[targerItem.Key].ToString())
+                    (source.DictionaryData[targerItem.Key]==null && target.DictionaryData[targerItem.Key]!=null) ||
+                    (target.DictionaryData[targerItem.Key] == null && source.DictionaryData[targerItem.Key] != null) ||
+                    (target.DictionaryData[targerItem.Key] != null && source.DictionaryData[targerItem.Key] != null) &&
+                    source.DictionaryData[targerItem.Key].ToString().ToLower() != target.DictionaryData[targerItem.Key].ToString().ToLower())
                 {
                     return false;
                 }
