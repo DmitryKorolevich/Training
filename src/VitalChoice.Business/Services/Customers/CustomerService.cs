@@ -1193,6 +1193,12 @@ namespace VitalChoice.Business.Services.Customers
 
         private bool IsTheSame(AddressDynamic source, AddressDynamic target)
         {
+            if (target == null)
+                return true;
+
+            if (source == null)
+                return false;
+
             if (source.County != target.County || source.IdCountry != target.IdCountry ||
                 source.IdState != target.IdState)
             {
@@ -1202,6 +1208,13 @@ namespace VitalChoice.Business.Services.Customers
             {
                 if (!source.DictionaryData.ContainsKey(targerItem.Key) ||
                     source.DictionaryData[targerItem.Key].ToString() != target.DictionaryData[targerItem.Key].ToString())
+                {
+                    return false;
+                }
+            }
+            foreach (var sourceItem in source.DictionaryData.Where(p => p.Key != "Default"))
+            {
+                if (!target.DictionaryData.ContainsKey(sourceItem.Key))
                 {
                     return false;
                 }
