@@ -26,7 +26,7 @@ SELECT temp.Id, temp.ProductName, ISNULL(val.Value, opt.DefaultValue) AS Product
 							 o.NPOrderStatus = 6 OR
 							 o.NPOrderStatus = 7) INNER JOIN
 							 dbo.Skus AS s ON ots.IdSku = s.Id INNER JOIN
-							 dbo.Products AS p ON s.IdProduct = p.Id AND p.IdVisibility IS NOT NULL
+							 dbo.Products AS p ON s.IdProduct = p.Id AND p.IdVisibility IS NOT NULL AND p.StatusCode=2
 	GROUP BY p.Id, p.IdObjectType, p.Name, o.IdCustomer) temp
 LEFT OUTER JOIN dbo.ProductOptionTypes AS opt ON opt.Name = N'Thumbnail' AND opt.IdObjectType = temp.IdObjectType
 LEFT OUTER JOIN dbo.ProductOptionValues AS val ON val.IdProduct = temp.Id AND val.IdOptionType = opt.Id
