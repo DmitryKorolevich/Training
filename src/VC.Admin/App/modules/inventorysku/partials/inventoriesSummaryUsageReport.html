@@ -26,6 +26,9 @@
                             <small class="error" ng-show="forms.form.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <select class="form-control" name="FrequencyType" data-ng-change="filterChanged();" data-ng-model="filter.FrequencyType" ng-options="item.Key as item.Text for item in frequencyTypes"></select>
+                    </div>
                     <div class="col-md-2">
                         <div class="checkbox">
                             <label>
@@ -64,6 +67,11 @@
                     </div>
                 </div>
                 <div class="row form-group">
+                    <div class="col-md-3">
+                        <select class="form-control" data-ng-change="filterChanged();" data-ng-model="filter.InfoType" ng-options="item.Key as item.Text for item in infoTypes"></select>
+                    </div>
+                </div>
+                <div class="row form-group">
                     <div class="col-md-12">
                         <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
                         <a target="_self" class="btn btn-primary pull-right" data-ng-href={{options.exportUrl}} data-ng-click="exportClick($event)">Export</a>
@@ -77,34 +85,36 @@
                     <tr>
                         <th>Inventory Code</th>
                         <th>Inventory Description</th>
-                        <th>UOM</th>
-                        <th data-ng-repeat="item in report.TotalItems">{{item.Date | date:"MMM-yy"}}</th>
+                        <th data-ng-if="filter.InfoType==1">Inventory UOM</th>
+                        <th data-ng-if="filter.InfoType==2">Purchasing UOM</th>
+                        <th data-ng-repeat="item in report.TotalItems">{{item.DateLabel}}</th>
                         <th>Total</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr data-ng-repeat-start="category in report.Categories"></tr>
+                    <tr>
+                        <td colspan="5"><strong>{{category.Name}}</strong></td>
+                    </tr>
                     <tr data-ng-repeat="inventory in category.Inventories">
                         <td>{{inventory.Code}}</td>
                         <td><div class="description">{{inventory.Description}}</div></td>
-                        <td>{{inventory.UnitOfMeasureName}}</td>
-                        <td data-ng-repeat="item in inventory.Items">{{item.Quantity}}</td>
-                        <td><strong>{{inventory.GrandTotal}}</strong></td>
-                    </tr>
-                    <tr>
-                        <td><strong>{{category.Name}} Total</strong></td>
-                        <td></td>
-                        <td><div class="description"></div></td>
-                        <td data-ng-repeat="item in category.TotalItems"><strong>{{item.Quantity}}</strong></td>
-                        <td><strong>{{category.GrandTotal}}</strong></td>
+                        <td data-ng-if="filter.InfoType==1">{{inventory.UnitOfMeasureName}}</td>
+                        <td data-ng-if="filter.InfoType==1" data-ng-repeat="item in inventory.Items">{{item.Quantity}}</td>
+                        <td data-ng-if="filter.InfoType==1"><strong>{{inventory.GrandTotal}}</strong></td>
+                        <td data-ng-if="filter.InfoType==2">{{inventory.PurchaseUnitOfMeasureName}}</td>
+                        <td data-ng-if="filter.InfoType==2" data-ng-repeat="item in inventory.Items">{{item.PurchaseAmount}}</td>
+                        <td data-ng-if="filter.InfoType==2"><strong>{{inventory.GrandPurchaseAmount}}</strong></td>
                     </tr>
                     <tr data-ng-repeat-end></tr>
                     <tr>
                         <td><strong>Total</strong></td>
                         <td></td>
                         <td><div class="description"></div></td>
-                        <td data-ng-repeat="item in report.TotalItems"><strong>{{item.Quantity}}</strong></td>
-                        <td><strong>{{report.GrandTotal}}</strong></td>
+                        <td data-ng-if="filter.InfoType==1" data-ng-repeat="item in report.TotalItems"><strong>{{item.Quantity}}</strong></td>
+                        <td data-ng-if="filter.InfoType==1"><strong>{{report.GrandTotal}}</strong></td>
+                        <td data-ng-if="filter.InfoType==2" data-ng-repeat="item in report.TotalItems"><strong>{{item.PurchaseAmount}}</strong></td>
+                        <td data-ng-if="filter.InfoType==2"><strong>{{report.GrandPurchaseAmount}}</strong></td>
                     </tr>
                 </tbody>
             </table>

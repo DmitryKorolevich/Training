@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Entities;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.InventorySkus
 {
@@ -19,5 +20,9 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.InventorySkus
         public bool? Assemble { get; set; }
 
         public IList<int> IdsInvCat { get; set; }
+
+        public int InfoType { get; set; }
+
+        public FrequencyType FrequencyType { get; set; }
     }
 }

@@ -70,6 +70,17 @@
                 { Key: false, Text: 'Not Assembled' }
             ];
 
+            $scope.infoTypes = [
+                { Key: 1, Text: 'Inventory UOM' },
+                { Key: 2, Text: 'Purchasing UOM' },
+            ];
+
+            $scope.frequencyTypes = [
+                { Key: 2, Text: 'Weekly' },
+                { Key: 3, Text: 'Monthly' },
+                { Key: 4, Text: 'Annual' },
+            ];
+
             $scope.forms = {};
 
             var currentDate = new Date();
@@ -81,6 +92,8 @@
                 InvSku: null,
                 Assemble: null,
                 IdsInvCat: null,
+                InfoType: 2,
+                FrequencyType: 3,
             };
 
             $scope.skusFilter = {
@@ -171,11 +184,31 @@
             {
                 msg = "'To' date can't be less than 'From' date.";
             }
-            var months = $scope.filter.To.getMonth() - $scope.filter.From.getMonth()
-                + (12 * ($scope.filter.To.getFullYear() - $scope.filter.From.getFullYear()));
-            if (months > 12)
+            if ($scope.filter.FrequencyType == 3)
             {
-                msg = "Date range can't be more than 12 months.";
+                var months = $scope.filter.To.getMonth() - $scope.filter.From.getMonth()
+                    + (12 * ($scope.filter.To.getFullYear() - $scope.filter.From.getFullYear()));
+                if (months > 12)
+                {
+                    msg = "Date range can't be more than 12 months.";
+                }
+            }
+            if ($scope.filter.FrequencyType == 2)
+            {
+                var days = Math.round(Math.abs($scope.filter.To.getTime() - $scope.filter.From.getTime()) / 8.64e7);
+                var weeks = Math.round(days / 7);
+                if (weeks > 12)
+                {
+                    msg = "Date range can't be more than 12 weeks.";
+                }
+            }
+            if ($scope.filter.FrequencyType == 4)
+            {
+                var years = $scope.filter.To.getFullYear() - $scope.filter.From.getFullYear();
+                if (years > 12)
+                {
+                    msg = "Date range can't be more than 12 years.";
+                }
             }
             return msg;
         };

@@ -14,7 +14,8 @@ CREATE PROCEDURE [dbo].[SPGetInventoriesSummaryUsageReport]
 	@invsku nvarchar(250) = NULL,
 	@assemble bit = NULL,
 	@idsinvcat nvarchar(MAX) = NULL,
-	@shipdate bit = 0
+	@shipdate bit = 0,
+	@frequency int = 3
 AS
 BEGIN
 
@@ -24,6 +25,12 @@ BEGIN
     (
         Id int NOT NULL
     );
+
+	DECLARE @orderIds AS TABLE
+	(
+		Id int NOT NULL,
+		DateCreated Datetime2 NOT NULL
+	);
 
 	IF(@sku IS NOT NULL OR @invsku IS NOT NULL OR @assemble IS NOT NULL OR @idsinvcat IS NOT NULL)
 	BEGIN
@@ -42,90 +49,272 @@ BEGIN
 		(@assemble IS NULL OR (@assemble=1 AND oval.Value='True') OR (@assemble=0 AND (oval.Value='False' OR oval.Value IS NULL)))
 	END
 
-	IF(@shipdate=0)
-	BEGIN
-		SELECT dateadd(mm, (DATEPART(Year, DateCreated) - 1900) * 12 + DATEPART(Month, DateCreated) - 1 , 0) As Date,
-			temp.IdInventorySku, SUM(temp.Quantity) AS Quantity
-			FROM
-			(SELECT o.DateCreated, osToInv.IdInventorySku, os.Quantity*osToInv.Quantity AS Quantity 
-			FROM Orders o WITH(NOLOCK)
-			JOIN OrderToSkus os WITH(NOLOCK) ON o.Id=os.IdOrder
-			JOIN OrderToSkusToInventorySkus osToInv WITH(NOLOCK) ON os.IdOrder=osToInv.IdOrder AND os.IdSku=osToInv.IdSku
-			LEFT JOIN @InvIds invId ON osToInv.IdInventorySku=invId.Id
-			WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
-				(OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3) AND 
-				((@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR invId.Id is NOT NULL)
-			UNION ALL
-			SELECT o.DateCreated, opToInv.IdInventorySku, op.Quantity*opToInv.Quantity AS Quantity
-			FROM Orders o WITH(NOLOCK)
-			JOIN OrderToPromos op WITH(NOLOCK) ON o.Id=op.IdOrder AND op.[Disabled]=0
-			JOIN OrderToPromosToInventorySkus opToInv WITH(NOLOCK) ON op.IdOrder=opToInv.IdOrder AND op.IdSku=opToInv.IdSku
-			LEFT JOIN @InvIds invId ON opToInv.IdInventorySku=invId.Id
-			WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
-				(OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3) AND 
-				((@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR invId.Id is NOT NULL)) temp
-		GROUP BY DATEPART(Year, temp.DateCreated), DATEPART(Month, temp.DateCreated), temp.IdInventorySku
-	END
-	ELSE
+	--monthly
+	IF(@frequency=3)
 	BEGIN
 
-		DECLARE @orderIds AS TABLE
-		(
-			Id int NOT NULL,
-			DateCreated Datetime2 NOT NULL
-		);
+		IF(@shipdate=0)
+		BEGIN
+			SELECT dateadd(mm, (DATEPART(Year, DateCreated) - 1900) * 12 + DATEPART(Month, DateCreated) - 1 , 0) As Date,
+				temp.IdInventorySku, SUM(temp.Quantity) AS Quantity
+				FROM
+				(SELECT o.DateCreated, osToInv.IdInventorySku, os.Quantity*osToInv.Quantity AS Quantity 
+				FROM Orders o WITH(NOLOCK)
+				JOIN OrderToSkus os WITH(NOLOCK) ON o.Id=os.IdOrder
+				JOIN OrderToSkusToInventorySkus osToInv WITH(NOLOCK) ON os.IdOrder=osToInv.IdOrder AND os.IdSku=osToInv.IdSku
+				LEFT JOIN @InvIds invId ON osToInv.IdInventorySku=invId.Id
+				WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
+					(OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3) AND 
+					((@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR invId.Id is NOT NULL)
+				UNION ALL
+				SELECT o.DateCreated, opToInv.IdInventorySku, op.Quantity*opToInv.Quantity AS Quantity
+				FROM Orders o WITH(NOLOCK)
+				JOIN OrderToPromos op WITH(NOLOCK) ON o.Id=op.IdOrder AND op.[Disabled]=0
+				JOIN OrderToPromosToInventorySkus opToInv WITH(NOLOCK) ON op.IdOrder=opToInv.IdOrder AND op.IdSku=opToInv.IdSku
+				LEFT JOIN @InvIds invId ON opToInv.IdInventorySku=invId.Id
+				WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
+					(OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3) AND 
+					((@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR invId.Id is NOT NULL)) temp
+			GROUP BY DATEPART(Year, temp.DateCreated), DATEPART(Month, temp.DateCreated), temp.IdInventorySku
+		END
+		ELSE
+		BEGIN
 
-		INSERT INTO @orderIds
-		(	
-			Id,
-			DateCreated
-		)
-		(SELECT 
-			o.Id,
-			o.DateCreated		
-		FROM Orders o WITH(NOLOCK)
-		JOIN OrderShippingPackages osp ON o.Id=osp.IdOrder
-		WHERE osp.ShippedDate>=@from AND osp.ShippedDate<=@to AND StatusCode!=3 AND 
-			(
-				OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3
+			INSERT INTO @orderIds
+			(	
+				Id,
+				DateCreated
 			)
-		)
+			(SELECT 
+				o.Id,
+				o.DateCreated		
+			FROM Orders o WITH(NOLOCK)
+			JOIN OrderShippingPackages osp ON o.Id=osp.IdOrder
+			WHERE osp.ShippedDate>=@from AND osp.ShippedDate<=@to AND StatusCode!=3 AND 
+				(
+					OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3
+				)
+			)
 
-		SELECT 
-			dateadd(mm, (DATEPART(Year, DateCreated) - 1900) * 12 + DATEPART(Month, DateCreated) - 1 , 0) As Date,
-			temp.IdInventorySku,
-			SUM(temp.Quantity) AS Quantity
-		FROM
-			(
-			SELECT
-				o.DateCreated, 
-				osToInv.IdInventorySku,
-				os.Quantity*osToInv.Quantity AS Quantity 
-			FROM @orderIds o
-			JOIN OrderToSkus os WITH(NOLOCK) ON o.Id=os.IdOrder
-			JOIN OrderToSkusToInventorySkus osToInv WITH(NOLOCK) ON os.IdOrder=osToInv.IdOrder AND os.IdSku=osToInv.IdSku
-			LEFT JOIN @InvIds invId ON osToInv.IdInventorySku=invId.Id
-			WHERE 
+			SELECT 
+				dateadd(mm, (DATEPART(Year, DateCreated) - 1900) * 12 + DATEPART(Month, DateCreated) - 1 , 0) As Date,
+				temp.IdInventorySku,
+				SUM(temp.Quantity) AS Quantity
+			FROM
 				(
-					(@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR
-					invId.Id is NOT NULL
-				)
-			UNION ALL
-			SELECT
-				o.DateCreated,
-				opToInv.IdInventorySku,
-				op.Quantity*opToInv.Quantity AS Quantity
-			FROM @orderIds o
-			JOIN OrderToPromos op WITH(NOLOCK) ON o.Id=op.IdOrder AND op.[Disabled]=0
-			JOIN OrderToPromosToInventorySkus opToInv WITH(NOLOCK) ON op.IdOrder=opToInv.IdOrder AND op.IdSku=opToInv.IdSku
-			LEFT JOIN @InvIds invId ON opToInv.IdInventorySku=invId.Id
-			WHERE 
+				SELECT
+					o.DateCreated, 
+					osToInv.IdInventorySku,
+					os.Quantity*osToInv.Quantity AS Quantity 
+				FROM @orderIds o
+				JOIN OrderToSkus os WITH(NOLOCK) ON o.Id=os.IdOrder
+				JOIN OrderToSkusToInventorySkus osToInv WITH(NOLOCK) ON os.IdOrder=osToInv.IdOrder AND os.IdSku=osToInv.IdSku
+				LEFT JOIN @InvIds invId ON osToInv.IdInventorySku=invId.Id
+				WHERE 
+					(
+						(@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR
+						invId.Id is NOT NULL
+					)
+				UNION ALL
+				SELECT
+					o.DateCreated,
+					opToInv.IdInventorySku,
+					op.Quantity*opToInv.Quantity AS Quantity
+				FROM @orderIds o
+				JOIN OrderToPromos op WITH(NOLOCK) ON o.Id=op.IdOrder AND op.[Disabled]=0
+				JOIN OrderToPromosToInventorySkus opToInv WITH(NOLOCK) ON op.IdOrder=opToInv.IdOrder AND op.IdSku=opToInv.IdSku
+				LEFT JOIN @InvIds invId ON opToInv.IdInventorySku=invId.Id
+				WHERE 
+					(
+						(@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR
+						invId.Id is NOT NULL
+					)
+				) temp
+			GROUP BY DATEPART(Year, temp.DateCreated), DATEPART(Month, temp.DateCreated), temp.IdInventorySku
+
+		END
+
+	END
+
+	--weekly
+	IF(@frequency=2)
+	BEGIN
+
+		IF(@shipdate=0)
+		BEGIN
+			SELECT 
+				dateadd(
+					day,1 - datepart(dw, dateadd(yy, (DATEPART(Year, temp.DateCreated) - 1900) , 0)) + (DATEPART(week, temp.DateCreated)-1) * 7, 
+					dateadd(yy, (DATEPART(Year,  temp.DateCreated) - 1900) , 0)
+				) As Date,
+				temp.IdInventorySku, SUM(temp.Quantity) AS Quantity
+				FROM
+				(SELECT o.DateCreated, osToInv.IdInventorySku, os.Quantity*osToInv.Quantity AS Quantity 
+				FROM Orders o WITH(NOLOCK)
+				JOIN OrderToSkus os WITH(NOLOCK) ON o.Id=os.IdOrder
+				JOIN OrderToSkusToInventorySkus osToInv WITH(NOLOCK) ON os.IdOrder=osToInv.IdOrder AND os.IdSku=osToInv.IdSku
+				LEFT JOIN @InvIds invId ON osToInv.IdInventorySku=invId.Id
+				WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
+					(OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3) AND 
+					((@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR invId.Id is NOT NULL)
+				UNION ALL
+				SELECT o.DateCreated, opToInv.IdInventorySku, op.Quantity*opToInv.Quantity AS Quantity
+				FROM Orders o WITH(NOLOCK)
+				JOIN OrderToPromos op WITH(NOLOCK) ON o.Id=op.IdOrder AND op.[Disabled]=0
+				JOIN OrderToPromosToInventorySkus opToInv WITH(NOLOCK) ON op.IdOrder=opToInv.IdOrder AND op.IdSku=opToInv.IdSku
+				LEFT JOIN @InvIds invId ON opToInv.IdInventorySku=invId.Id
+				WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
+					(OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3) AND 
+					((@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR invId.Id is NOT NULL)) temp
+			GROUP BY DATEPART(Year, temp.DateCreated), DATEPART(Month, temp.DateCreated), DATEPART(week, temp.DateCreated), temp.IdInventorySku
+		END
+		ELSE
+		BEGIN
+
+			INSERT INTO @orderIds
+			(	
+				Id,
+				DateCreated
+			)
+			(SELECT 
+				o.Id,
+				o.DateCreated		
+			FROM Orders o WITH(NOLOCK)
+			JOIN OrderShippingPackages osp ON o.Id=osp.IdOrder
+			WHERE osp.ShippedDate>=@from AND osp.ShippedDate<=@to AND StatusCode!=3 AND 
 				(
-					(@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR
-					invId.Id is NOT NULL
+					OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3
 				)
-			) temp
-		GROUP BY DATEPART(Year, temp.DateCreated), DATEPART(Month, temp.DateCreated), temp.IdInventorySku
+			)
+
+			SELECT 
+				dateadd(
+					day,1 - datepart(dw, dateadd(yy, (DATEPART(Year, temp.DateCreated) - 1900) , 0)) + (DATEPART(week, temp.DateCreated)-1) * 7, 
+					dateadd(yy, (DATEPART(Year,  temp.DateCreated) - 1900) , 0)
+				) As Date,
+				temp.IdInventorySku,
+				SUM(temp.Quantity) AS Quantity
+			FROM
+				(
+				SELECT
+					o.DateCreated, 
+					osToInv.IdInventorySku,
+					os.Quantity*osToInv.Quantity AS Quantity 
+				FROM @orderIds o
+				JOIN OrderToSkus os WITH(NOLOCK) ON o.Id=os.IdOrder
+				JOIN OrderToSkusToInventorySkus osToInv WITH(NOLOCK) ON os.IdOrder=osToInv.IdOrder AND os.IdSku=osToInv.IdSku
+				LEFT JOIN @InvIds invId ON osToInv.IdInventorySku=invId.Id
+				WHERE 
+					(
+						(@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR
+						invId.Id is NOT NULL
+					)
+				UNION ALL
+				SELECT
+					o.DateCreated,
+					opToInv.IdInventorySku,
+					op.Quantity*opToInv.Quantity AS Quantity
+				FROM @orderIds o
+				JOIN OrderToPromos op WITH(NOLOCK) ON o.Id=op.IdOrder AND op.[Disabled]=0
+				JOIN OrderToPromosToInventorySkus opToInv WITH(NOLOCK) ON op.IdOrder=opToInv.IdOrder AND op.IdSku=opToInv.IdSku
+				LEFT JOIN @InvIds invId ON opToInv.IdInventorySku=invId.Id
+				WHERE 
+					(
+						(@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR
+						invId.Id is NOT NULL
+					)
+				) temp
+			GROUP BY DATEPART(Year, temp.DateCreated), DATEPART(Month, temp.DateCreated), DATEPART(week, temp.DateCreated), temp.IdInventorySku
+
+		END
+
+	END
+
+	--annual
+	IF(@frequency=4)
+	BEGIN
+
+		IF(@shipdate=0)
+		BEGIN
+			SELECT 
+				dateadd(yy, (DATEPART(Year,  temp.DateCreated) - 1900) , 0) As Date,
+				temp.IdInventorySku, SUM(temp.Quantity) AS Quantity
+				FROM
+				(SELECT o.DateCreated, osToInv.IdInventorySku, os.Quantity*osToInv.Quantity AS Quantity 
+				FROM Orders o WITH(NOLOCK)
+				JOIN OrderToSkus os WITH(NOLOCK) ON o.Id=os.IdOrder
+				JOIN OrderToSkusToInventorySkus osToInv WITH(NOLOCK) ON os.IdOrder=osToInv.IdOrder AND os.IdSku=osToInv.IdSku
+				LEFT JOIN @InvIds invId ON osToInv.IdInventorySku=invId.Id
+				WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
+					(OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3) AND 
+					((@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR invId.Id is NOT NULL)
+				UNION ALL
+				SELECT o.DateCreated, opToInv.IdInventorySku, op.Quantity*opToInv.Quantity AS Quantity
+				FROM Orders o WITH(NOLOCK)
+				JOIN OrderToPromos op WITH(NOLOCK) ON o.Id=op.IdOrder AND op.[Disabled]=0
+				JOIN OrderToPromosToInventorySkus opToInv WITH(NOLOCK) ON op.IdOrder=opToInv.IdOrder AND op.IdSku=opToInv.IdSku
+				LEFT JOIN @InvIds invId ON opToInv.IdInventorySku=invId.Id
+				WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
+					(OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3) AND 
+					((@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR invId.Id is NOT NULL)) temp
+			GROUP BY DATEPART(Year, temp.DateCreated), temp.IdInventorySku
+		END
+		ELSE
+		BEGIN
+
+			INSERT INTO @orderIds
+			(	
+				Id,
+				DateCreated
+			)
+			(SELECT 
+				o.Id,
+				o.DateCreated		
+			FROM Orders o WITH(NOLOCK)
+			JOIN OrderShippingPackages osp ON o.Id=osp.IdOrder
+			WHERE osp.ShippedDate>=@from AND osp.ShippedDate<=@to AND StatusCode!=3 AND 
+				(
+					OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3
+				)
+			)
+
+			SELECT 
+				dateadd(yy, (DATEPART(Year,  temp.DateCreated) - 1900) , 0) As Date,
+				temp.IdInventorySku,
+				SUM(temp.Quantity) AS Quantity
+			FROM
+				(
+				SELECT
+					o.DateCreated, 
+					osToInv.IdInventorySku,
+					os.Quantity*osToInv.Quantity AS Quantity 
+				FROM @orderIds o
+				JOIN OrderToSkus os WITH(NOLOCK) ON o.Id=os.IdOrder
+				JOIN OrderToSkusToInventorySkus osToInv WITH(NOLOCK) ON os.IdOrder=osToInv.IdOrder AND os.IdSku=osToInv.IdSku
+				LEFT JOIN @InvIds invId ON osToInv.IdInventorySku=invId.Id
+				WHERE 
+					(
+						(@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR
+						invId.Id is NOT NULL
+					)
+				UNION ALL
+				SELECT
+					o.DateCreated,
+					opToInv.IdInventorySku,
+					op.Quantity*opToInv.Quantity AS Quantity
+				FROM @orderIds o
+				JOIN OrderToPromos op WITH(NOLOCK) ON o.Id=op.IdOrder AND op.[Disabled]=0
+				JOIN OrderToPromosToInventorySkus opToInv WITH(NOLOCK) ON op.IdOrder=opToInv.IdOrder AND op.IdSku=opToInv.IdSku
+				LEFT JOIN @InvIds invId ON opToInv.IdInventorySku=invId.Id
+				WHERE 
+					(
+						(@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR
+						invId.Id is NOT NULL
+					)
+				) temp
+			GROUP BY DATEPART(Year, temp.DateCreated), temp.IdInventorySku
+
+		END
 
 	END
 

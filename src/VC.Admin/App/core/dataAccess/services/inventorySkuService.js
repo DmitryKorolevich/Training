@@ -75,8 +75,8 @@ angular.module('app.core.dataAccess.services.inventorySkuService', [])
 	    },
 	    getInventoriesSummaryUsageReportFile: function (filter, buildNumber)
 	    {
-	        return baseUrl + 'GetInventoriesSummaryUsageReportFile?from={0}&to={1}&sku={2}&invsku={3}&assemble={4}&idsinvcat={5}&buildNumber={6}'
-                .format(filter.From, filter.To, filter.Sku, filter.InvSku, filter.Assemble, filter.IdsInvCat, buildNumber);
+	        return baseUrl + 'GetInventoriesSummaryUsageReportFile?from={0}&to={1}&sku={2}&invsku={3}&assemble={4}&idsinvcat={5}&frequency={6}&infotype={7}&buildNumber={8}'
+                .format(filter.From, filter.To, filter.Sku, filter.InvSku, filter.Assemble, filter.IdsInvCat, filter.FrequencyType, filter.InfoType, buildNumber);
 	    },
 	};
 }]);

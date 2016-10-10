@@ -16,5 +16,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.InventorySkus
         public IList<InventoriesSummaryUsageDateItem> TotalItems { get; set; }
 
         public int GrandTotal { get; set; }
+
+        public decimal GrandPurchaseAmount { get; set; }
     }
 }

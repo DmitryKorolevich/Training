@@ -354,7 +354,8 @@ namespace VC.Admin.Controllers
         [HttpGet]
         [AdminAuthorize(PermissionType.Reports)]
         public async Task<FileResult> GetInventoriesSummaryUsageReportFile([FromQuery]string from, [FromQuery]string to,
-             [FromQuery]string sku, [FromQuery]string invsku, [FromQuery]bool? assemble, [FromQuery]string idsinvcat)
+             [FromQuery]string sku, [FromQuery]string invsku, [FromQuery]bool? assemble, [FromQuery]string idsinvcat, [FromQuery]int infotype,
+             [FromQuery]int frequency)
         {
             var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
             var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
@@ -371,6 +372,8 @@ namespace VC.Admin.Controllers
                 InvSku = invsku,
                 Assemble = assemble,
                 IdsInvCat = !string.IsNullOrEmpty(idsinvcat) ? idsinvcat.Split(',').Select(Int32.Parse).ToList() : null,
+                InfoType = infotype,
+                FrequencyType = (FrequencyType)frequency
             };
 
             filter.To = filter.To.AddDays(1);
@@ -378,7 +381,7 @@ namespace VC.Admin.Controllers
             var result = await _inventorySkuService.GetInventoriesSummaryUsageReportAsync(filter);
             IList<DynamicExportColumn> columns = null;
             IList<ExpandoObject> items = null;
-            _inventorySkuService.ConvertInventoriesSummaryUsageReportForExport(result, out columns, out items);
+            _inventorySkuService.ConvertInventoriesSummaryUsageReportForExport(result, infotype, out columns, out items);
 
             var data = CsvExportService.ExportToCsv(columns, items);
 
