@@ -47,6 +47,8 @@ using System.Globalization;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Interfaces.Services.Products;
 using System.Text.RegularExpressions;
+using VitalChoice.Business.Queries.Products;
+using VitalChoice.Data.Helpers;
 
 namespace VitalChoice.Business.Services.InventorySkus
 {
@@ -210,6 +212,57 @@ namespace VitalChoice.Business.Services.InventorySkus
             //}
             //return toReturn;
             return items.GroupBy(inv => inv.IdSku).ToDictionary(inv => inv.Key, g => g.ToList());
+        }
+
+        public async Task<ICollection<SkuInventoriesInfoItem>> GetSkuInventoriesInfoAsync(bool activeOnly,bool withInventories)
+        {
+            ICollection<SkuInventoriesInfoItem> toReturn=new List<SkuInventoriesInfoItem>();
+
+            SkuQuery conditions = new SkuQuery().NotDeleted().ProductNotDeleted().ActiveOnly(activeOnly);
+            Func<IQueryable<Sku>, IOrderedQueryable<Sku>> sortable = x => x.OrderBy(y => y.Code);
+
+            var data = await _skuRepository.Query(conditions).
+                Include(p=>p.Product).Include(p=>p.SkusToInventorySkus).ThenInclude(p=>p.InventorySku)
+                .OrderBy(sortable).SelectAsync(false);
+
+            foreach (var p in data)
+            {
+                var item = new SkuInventoriesInfoItem()
+                {
+                    IdSku = p.Id,
+                    IdProduct = p.IdProduct,
+                    Code = p.Code,
+                    StatusCode = (RecordStatusCode) p.StatusCode,
+                    Hidden = p.Hidden,
+                    ProductStatusCode = (RecordStatusCode) p.Product.StatusCode,
+                    ProductIdVisibility = p.Product.IdVisibility,
+                    Inventories = p.SkusToInventorySkus.Select(pp => new SkuInventoryInfoItem()
+                    {
+                        Code = pp.InventorySku.Code,
+                        IdInventorySku = pp.IdInventorySku,
+                        Quantity = pp.Quantity
+                    }).ToList()
+                };
+                item.InventoriesLine = string.Empty;
+                for (int i = 0; i < item.Inventories.Count; i++)
+                {
+                    var inventory = item.Inventories[i];
+                    item.InventoriesLine +=$"{inventory.Code}({inventory.Quantity})" ;
+                    if (i != item.Inventories.Count - 1)
+                    {
+                        item.InventoriesLine += ", ";
+                    }
+                }
+
+                toReturn.Add(item);
+            }
+
+            if (withInventories)
+            {
+                toReturn = toReturn.Where(p => p.Inventories.Count > 0).ToList();
+            }
+
+            return toReturn;
         }
 
         #region Reports

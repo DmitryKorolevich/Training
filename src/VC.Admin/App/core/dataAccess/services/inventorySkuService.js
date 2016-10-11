@@ -78,5 +78,14 @@ angular.module('app.core.dataAccess.services.inventorySkuService', [])
 	        return baseUrl + 'GetInventoriesSummaryUsageReportFile?from={0}&to={1}&sku={2}&invsku={3}&assemble={4}&idsinvcat={5}&frequency={6}&infotype={7}&buildNumber={8}'
                 .format(filter.From, filter.To, filter.Sku, filter.InvSku, filter.Assemble, filter.IdsInvCat, filter.FrequencyType, filter.InfoType, buildNumber);
 	    },
+	    getSkuInventoriesInfo: function (tracker)
+	    {
+	        return $http.get(baseUrl + 'GetSkuInventoriesInfo', getConfig(tracker));
+	    },
+	    getSkuInventoriesInfoReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + 'GetSkuInventoriesInfoReportFile?activeOnly={0}&withInventories={1}&buildNumber={2}'
+                .format(filter.activeOnly, filter.withInventories, buildNumber);
+	    },
 	};
 }]);

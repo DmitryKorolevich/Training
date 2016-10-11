@@ -9,6 +9,8 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Products
 
         public int IdInventorySku { get; set; }
 
+        public InventorySku InventorySku { get; set; }
+
         public int Quantity { get; set; }
     }
 }

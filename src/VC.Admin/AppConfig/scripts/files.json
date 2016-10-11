@@ -202,6 +202,7 @@
     "app/modules/inventorysku/controllers/assignInventorySkusController.js",
     "app/modules/inventorysku/controllers/inventorySkusUsageReportController.js",
     "app/modules/inventorysku/controllers/inventoriesSummaryUsageReportController.js",
+    "app/modules/inventorysku/controllers/skuInventoriesInfoController.js",
     "app/modules/inventorysku/inventorysku.js",
     "app/modules/order/services/orderEditService.js",
     "app/modules/order/controllers/ordersController.js",
