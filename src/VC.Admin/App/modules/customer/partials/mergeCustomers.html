@@ -78,7 +78,7 @@
                 <tbody>
                     <tr data-ng-repeat="customer in selectedCustomers">
                         <td>
-                            <a target="_blank" target="_blank" ui-sref="index.oneCol.customerDetail({id:customer.Id})">{{::customer.Id}}</a>
+                            <a target="_blank" ui-sref="index.oneCol.customerDetail({id:customer.Id})">{{::customer.Id}}</a>
                         </td>
                         <td>
                             <span data-ng-if="customer.IdObjectType == 1" class="label label-retail font-default">{{getReferenceItem(ReferenceData.ShortCustomerTypes, customer.IdObjectType).Text}}</span>

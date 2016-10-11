@@ -16,17 +16,17 @@
         };
 
         function refreshItems() {
-            inventorySkuService.getSkuInventoriesInfo($scope.filter, $scope.refreshTracker)
+            inventorySkuService.getSkuInventoriesInfo($scope.refreshTracker)
                 .success(function (result) {
                     if (result.Success) {
                         var items = result.Data;
-                        $scope.noPartsItems = $.grep(items, function (index, item)
+                        $scope.noPartsActiveItems = $.grep(items, function (item, index)
                         {
-                            return !item.InventoriesLine;
+                            return (!item.InventoriesLine || item.InventoriesLine.length == 0) && item.StatusCode == 2 && item.ProductStatusCode == 2;
                         });
-                        $scope.activeItems = $.grep(items, function (index, item)
+                        $scope.withPartsItems = $.grep(items, function (item, index)
                         {
-                            return item.StatusCode==2;
+                            return item.InventoriesLine && item.InventoriesLine.length > 0;
                         });
                     } else {
                         errorHandler(result);
@@ -40,7 +40,7 @@
         function initialize()
         {
             $scope.options = {};
-            $scope.options.activeExportUrl = inventorySkuService.getSkuInventoriesInfoReportFile({ activeOnly: true}, $rootScope.buildNumber);
+            $scope.options.activeExportUrl = inventorySkuService.getSkuInventoriesInfoReportFile({ withInventories: true, activeOnly: false }, $rootScope.buildNumber);
 
             $scope.filter = {
             };

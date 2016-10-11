@@ -401,7 +401,7 @@ namespace VC.Admin.Controllers
             return File(data, "text/csv");
         }
 
-        [HttpPost]
+        [HttpGet]
         [AdminAuthorize(PermissionType.Reports)]
         public async Task<Result<ICollection<SkuInventoriesInfoItem>>> GetSkuInventoriesInfo()
         {

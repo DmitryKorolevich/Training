@@ -49,7 +49,7 @@ angular.module('app.modules.inventorysku', [
 		            controller: 'inventoriesSummaryUsageReportController'
 		        })
 		        .state('index.oneCol.skuInventoriesInfoList', {
-		            url: '/skuinventoriesinfo',
+		            url: '/report/skuinventoriesinfo',
 		            templateUrl: 'app/modules/inventorysku/partials/skuInventoriesInfoList.html',
 		            controller: 'skuInventoriesInfoController'
 		        });

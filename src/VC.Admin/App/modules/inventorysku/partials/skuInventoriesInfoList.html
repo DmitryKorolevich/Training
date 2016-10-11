@@ -9,16 +9,16 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr data-ng-repeat="item in noPartsItems">
+                <tr data-ng-repeat="item in noPartsActiveItems">
                     <td>
-                        <a ui-sref="index.oneCol.productDetail({id:item.IdProduct})">{{::item.Code}}</a>
+                        <a target="_blank" ui-sref="index.oneCol.productDetail({id:item.IdProduct})">{{::item.Code}}</a>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </spinner-overlay>
         <span class="legend">SKU Part Assignments</span>
-        <div class="form-group">
+        <div class="form-group btn-line">
             <a target="_self" class="btn btn-primary pull-right" data-ng-href="{{options.activeExportUrl}}">Export</a>
         </div>
         <spinner-overlay data-loading="refreshTracker.active()">
@@ -32,9 +32,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-ng-repeat="item in activeItems">
+                    <tr data-ng-repeat="item in withPartsItems">
                         <td>
-                            <a ui-sref="index.oneCol.productDetail({id:item.IdProduct})">{{::item.Code}}</a>
+                            <a target="_blank" ui-sref="index.oneCol.productDetail({id:item.IdProduct})">{{::item.Code}}</a>
                         </td>
                         <td>
                             <span data-ng-if="::(item.StatusCode == 2)" class="label label-draft font-default">Yes</span>
