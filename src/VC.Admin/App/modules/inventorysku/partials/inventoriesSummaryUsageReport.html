@@ -94,7 +94,8 @@
                 <tbody>
                     <tr data-ng-repeat-start="category in report.Categories"></tr>
                     <tr>
-                        <td colspan="5"><strong>{{category.Name}}</strong></td>
+                        <td colspan="4"><strong>{{category.Name}}</strong></td>
+                        <td data-ng-repeat="item in category.TotalItems"></td>
                     </tr>
                     <tr data-ng-repeat="inventory in category.Inventories">
                         <td>{{inventory.Code}}</td>
