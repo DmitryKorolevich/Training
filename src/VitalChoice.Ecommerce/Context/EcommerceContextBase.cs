@@ -1376,6 +1376,11 @@ namespace VitalChoice.Ecommerce.Context
                     o.IdInventorySku
                 });
                 entity.ToTable("SkusToInventorySkus");
+                entity.HasOne(p => p.InventorySku)
+                    .WithMany()
+                    .HasForeignKey(p => p.IdInventorySku)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired();
                 entity.Ignore(p=>p.Id);
             });
         }

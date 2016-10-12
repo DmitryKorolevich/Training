@@ -62,7 +62,10 @@ namespace VC.Admin.Controllers
         private readonly IInventorySkuService _inventorySkuService;
         private readonly InventorySkuMapper _mapper;
         private readonly ISettingService _settingService;
-        private readonly ICsvExportService<InventorySkuUsageReportItemForExport, InventorySkuUsageReportItemForExportCsvMap> _inventorySkuUsageReportItemForExportCSVExportService;
+        private readonly ICsvExportService<InventorySkuUsageReportItemForExport, InventorySkuUsageReportItemForExportCsvMap>
+            _inventorySkuUsageReportItemForExportCSVExportService;
+        private readonly ICsvExportService<SkuInventoriesInfoItem, SkuInventoriesInfoItemCsvMap>
+            _skuInventoriesInfoItemCSVExportService;
         private readonly ILogger _logger;
         private readonly ExtendedUserManager _userManager;
 
@@ -71,7 +74,10 @@ namespace VC.Admin.Controllers
             IInventorySkuService inventorySkuService,
             InventorySkuMapper mapper,
             ISettingService settingService,
-            ICsvExportService<InventorySkuUsageReportItemForExport, InventorySkuUsageReportItemForExportCsvMap> inventorySkuUsageReportItemForExportCSVExportService,
+            ICsvExportService<InventorySkuUsageReportItemForExport, InventorySkuUsageReportItemForExportCsvMap>
+                inventorySkuUsageReportItemForExportCSVExportService,
+            ICsvExportService<SkuInventoriesInfoItem, SkuInventoriesInfoItemCsvMap>
+                skuInventoriesInfoItemCSVExportService,
             ILoggerFactory loggerProvider, ExtendedUserManager userManager)
         {
             _inventorySkuCategoryService = inventorySkuCategoryService;
@@ -79,6 +85,7 @@ namespace VC.Admin.Controllers
             _mapper = mapper;
             _settingService = settingService;
             _inventorySkuUsageReportItemForExportCSVExportService = inventorySkuUsageReportItemForExportCSVExportService;
+            _skuInventoriesInfoItemCSVExportService = skuInventoriesInfoItemCSVExportService;
             _userManager = userManager;
             _logger = loggerProvider.CreateLogger<InventorySkuController>();
         }
@@ -388,6 +395,32 @@ namespace VC.Admin.Controllers
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileName = String.Format(FileConstants.INVENTORY_SUMMARY_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(data, "text/csv");
+        }
+
+        [HttpGet]
+        [AdminAuthorize(PermissionType.Reports)]
+        public async Task<Result<ICollection<SkuInventoriesInfoItem>>> GetSkuInventoriesInfo()
+        {
+            var toReturn = await _inventorySkuService.GetSkuInventoriesInfoAsync(false,false);
+
+            return toReturn.ToList();
+        }
+
+        [HttpGet]
+        [AdminAuthorize(PermissionType.Reports)]
+        public async Task<FileResult> GetSkuInventoriesInfoReportFile([FromQuery]bool activeOnly=false, [FromQuery]bool withInventories=false)
+        {
+            var result = await _inventorySkuService.GetSkuInventoriesInfoAsync(activeOnly,withInventories);
+
+            var data = _skuInventoriesInfoItemCSVExportService.ExportToCsv(result);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.SKU_PART_SUMMARY_LIST, DateTime.Now)
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());

@@ -1,0 +1,55 @@
+﻿<div class="container-fluid sku-parts-info-list">
+    <div class="well">
+        <span class="legend">Active SKUs with No Parts Assignments</span>
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <table class="table table-striped table-hover ">
+                <thead>
+                <tr>
+                    <th>SKU</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr data-ng-repeat="item in noPartsActiveItems">
+                    <td>
+                        <a target="_blank" ui-sref="index.oneCol.productDetail({id:item.IdProduct})">{{::item.Code}}</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </spinner-overlay>
+        <span class="legend">SKU Part Assignments</span>
+        <div class="form-group btn-line">
+            <a target="_self" class="btn btn-primary pull-right" data-ng-href="{{options.activeExportUrl}}">Export</a>
+        </div>
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <table class="table table-striped table-hover ">
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Active</th>
+                        <th>Product Active</th>
+                        <th>Parts</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="item in withPartsItems">
+                        <td>
+                            <a target="_blank" ui-sref="index.oneCol.productDetail({id:item.IdProduct})">{{::item.Code}}</a>
+                        </td>
+                        <td>
+                            <span data-ng-if="::(item.StatusCode == 2)" class="label label-draft font-default">Yes</span>
+                            <span data-ng-if="::(item.StatusCode == 1)" class="label label-draft font-default">No</span>
+                        </td>
+                        <td>
+                            <span data-ng-if="::(item.ProductStatusCode == 2)" class="label label-draft font-default">Yes</span>
+                            <span data-ng-if="::(item.ProductStatusCode == 1)" class="label label-draft font-default">No</span>
+                        </td>
+                        <td>
+                            {{::item.InventoriesLine}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </spinner-overlay>
+    </div>
+</div>
