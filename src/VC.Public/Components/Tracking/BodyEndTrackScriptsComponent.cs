@@ -221,11 +221,16 @@ namespace VC.Public.Components.Tracking
                     toReturn.PepperjamQuery =
                         $"INT=DYNAMIC&PROGRAM_ID={PepperjamProgramId}&ORDER_ID={order.Id}&COUPON={order.Discount?.Code}&NEW_TO_FILE={isNewCustomer}";
 
+
+                    var pricePart = toReturn.Order.ProductsSubtotal != 0
+                        ? 1 - toReturn.Order.DiscountTotal/toReturn.Order.ProductsSubtotal
+                        : 1;
+                    
                     for (int i = 0; i < skus.Count; i++)
                     {
                         var skuOrdered = skus[i];
                         var index = i + 1;
-                        var price = Math.Round(skuOrdered.Amount, 2);
+                        var price = Math.Round(skuOrdered.Amount * pricePart, 2);
                         toReturn.PepperjamQuery += $"&ITEM_ID{index}={skuOrdered.Sku.Code}&ITEM_PRICE{index}={price:F}&QUANTITY{index}={skuOrdered.Quantity}";
                     }
                 }
