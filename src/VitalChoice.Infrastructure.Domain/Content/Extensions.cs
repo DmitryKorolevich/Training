@@ -17,6 +17,7 @@ namespace VitalChoice.Infrastructure.Domain.Content
                 foreach (var subCategory in subCategories)
                 {
                     subCategory.Parent = root;
+                    heapCategories.Remove(subCategory);
                 }
                 root.SubCategories = subCategories.OrderBy(p => p.Order).ToArray();
             }
@@ -57,6 +58,7 @@ namespace VitalChoice.Infrastructure.Domain.Content
                 foreach (var subCategory in subCategories)
                 {
                     subCategory.Parent = root;
+                    heapCategories.Remove(subCategory);
                 }
                 root.SubCategories = subCategories.OrderBy(p => p.Order).ToArray();
             }
@@ -97,6 +99,7 @@ namespace VitalChoice.Infrastructure.Domain.Content
                 foreach (var subCategory in subCategories)
                 {
                     subCategory.Parent = root;
+                    heapCategories.Remove(subCategory);
                 }
                 root.SubCategories = subCategories.OrderBy(p => p.Order).ToArray();
             }
@@ -137,6 +140,7 @@ namespace VitalChoice.Infrastructure.Domain.Content
                 foreach (var subCategory in subCategories)
                 {
                     subCategory.Parent = root;
+                    heapCategories.Remove(subCategory);
                 }
                 root.SubCategories = subCategories.OrderBy(p => p.Order).ToArray();
             }
