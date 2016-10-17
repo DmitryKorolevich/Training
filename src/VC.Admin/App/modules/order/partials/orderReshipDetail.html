@@ -125,7 +125,7 @@
                                                             <span data-ng-if="item.IdProductType==4" class="perishable">GC</span>
                                                         </td>
                                                         <td class="qty">
-                                                            <input name="QTY{{$index}}" class="form-control" placeholder="QTY" numbers-only numbers-only-deny-zero min="1" max="1000" data-ng-model="item.QTY" data-ng-blur="requestRecalculate()" data-ng-disabled="orderEditDisabled">
+                                                            <input name="QTY{{$index}}" class="form-control" placeholder="QTY" numbers-only numbers-only-deny-zero min="1" max="10000" data-ng-model="item.QTY" data-ng-blur="requestRecalculate()" data-ng-disabled="orderEditDisabled">
                                                         </td>
                                                         <td class="product-name">
                                                             <div class="input-group autocomplete">
