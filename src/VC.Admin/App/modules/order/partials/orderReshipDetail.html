@@ -90,6 +90,16 @@
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
+                                                        <label class="col-md-3 control-label">Service Code Notes</label>
+                                                        <div class="col-md-9">
+                                                            <textarea type="text" name="ServiceCodeNotes" class="form-control" placeholder="Service Code Notes" rows="5" data-ng-model="order.ServiceCodeNotes" data-ng-disabled="order.Id || orderEditDisabled" required></textarea>
+                                                            <div class="error-container" ng-show="forms.topForm.submitted && forms.topForm.ServiceCodeNotes.$invalid">
+                                                                <small class="error" ng-show="forms.topForm.ServiceCodeNotes.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Service Code Notes")}}</small>
+                                                                <small class="error" ng-show="forms.topForm.ServiceCodeNotes.$error.server">{{serverMessages.GetMessage('ServiceCodeNotes')}}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
                                                         <label class="col-md-3 control-label">Notes</label>
                                                         <div class="col-md-9">
                                                             <textarea type="text" name="OrderNotes" class="form-control" placeholder="Notes" rows="5" data-ng-model="order.OrderNotes" data-ng-disabled="orderEditDisabled" required></textarea>

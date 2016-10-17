@@ -1779,6 +1779,22 @@ namespace VitalChoice.Business.Services.Orders
             var calculationMessages = new Dictionary<IList<int>, IList<MessageInfo>>();
             foreach (var item in map)
             {
+                //merge the same skus
+                var forRemove = new List<SkuOrdered>();
+                foreach (var skuOrdered in item.Order.Skus)
+                {
+                    if (!forRemove.Contains(skuOrdered))
+                    {
+                        var dublicates = item.Order.Skus.Where(p => p.Sku.Id == skuOrdered.Sku.Id && p!=skuOrdered).ToList();
+                        foreach (var dublicate in dublicates)
+                        {
+                            skuOrdered.Quantity += dublicate.Quantity;
+                            forRemove.Add(dublicate);
+                        }
+                    }
+                }
+                item.Order.Skus.RemoveAll(forRemove);
+
                 var orderCombinedStatus = item.Order.OrderStatus ?? OrderStatus.Processed;
                 item.Order.Data.ShipDelayType = item.Order.SafeData.ShipDelayDate != null ? ShipDelayType.EntireOrder : ShipDelayType.None;
 
