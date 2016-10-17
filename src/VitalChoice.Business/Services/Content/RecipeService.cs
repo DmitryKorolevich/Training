@@ -272,6 +272,7 @@ namespace VitalChoice.Business.Services.Content
 			    dbItem.Directions = model.Directions;
 			    dbItem.Ingredients = model.Ingredients;
                 dbItem.StatusCode = model.StatusCode;
+                dbItem.MasterContentItemId = model.MasterContentItemId;
                 dbItem.ContentItem.Updated = DateTime.Now;
 			    dbItem.ContentItem.Template = model.ContentItem.Template;
 			    dbItem.ContentItem.Description = model.ContentItem.Description;

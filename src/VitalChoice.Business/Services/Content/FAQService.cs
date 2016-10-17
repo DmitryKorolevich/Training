@@ -184,6 +184,7 @@ namespace VitalChoice.Business.Services.Content
                 dbItem.Name = model.Name;
                 dbItem.Url = model.Url;
                 dbItem.UserId = model.UserId;
+                dbItem.MasterContentItemId = model.MasterContentItemId;
                 dbItem.ContentItem.Updated = DateTime.Now;
                 dbItem.ContentItem.Template = model.ContentItem.Template;
                 dbItem.ContentItem.Description = model.ContentItem.Description;

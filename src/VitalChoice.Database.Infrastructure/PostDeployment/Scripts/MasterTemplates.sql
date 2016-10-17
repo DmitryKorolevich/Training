@@ -495,13 +495,14 @@ END
 
 GO
 
-IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Article Individual' AND Updated<'2016-10-07 00:00:00.000')
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Article Individual - 2016 2 Column Layout')
 BEGIN
 
-	UPDATE [dbo].[MasterContentItems]
-	SET 
-		Updated = GETDATE(),
-		Template = '@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Articles}}
+	INSERT [dbo].[MasterContentItems]
+	(Name,TypeId,Created,Updated,StatusCode,IdEditedBy, Template)
+	VALUES
+	('Article Individual - 2016 2 Column Layout',4, getdate(),getdate(), 2, NULL,
+	'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Articles}}
 @using() {{System.Collections.Generic}}
 @model() {{dynamic}}
 
@@ -637,7 +638,7 @@ BEGIN
             <link rel="image_src" href="https://@(@root.AppOptions.PublicHost)@(@model.Model.FileUrl)" />
         }}
     }}
-    <div class="working-area-holder content-page article-page">
+    <div class="working-area-holder content-page article-page-2-column">
         <div class="header-block">
             <img usemap="#ArticleHeader" src="/assets/images/articles/article-page-header.jpg">
             <map name="ArticleHeader" id="ArticleHeader">
@@ -651,8 +652,14 @@ BEGIN
     	@right()
 	</div>
 }}
-%>'
-	WHERE Name = 'Article Individual'
+%>')
+
+	INSERT MasterContentItemsToContentProcessors
+	(MasterContentItemId,ContentProcessorId)
+	VALUES
+	((SELECT TOP 1 Id FROM MasterContentItems WHERE Name = 'Article Individual - 2016 2 Column Layout')
+	,(SELECT TOP 1 Id FROM ContentProcessors WHERE Type = 'ArticleBonusLinkProcessor'))
+
 
 END
 

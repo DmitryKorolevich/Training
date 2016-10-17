@@ -110,6 +110,7 @@ namespace VC.Admin.Models.ContentManagement
             toReturn.ContentItem.Title = Title;
             toReturn.ContentItem.MetaKeywords = MetaKeywords;
             toReturn.ContentItem.MetaDescription = MetaDescription;
+            toReturn.MasterContentItemId = MasterContentItemId;
             if (ProcessorIds != null)
             {
                 toReturn.ContentItem.ContentItemToContentProcessors = ProcessorIds.Select(p => new ContentItemToContentProcessor()

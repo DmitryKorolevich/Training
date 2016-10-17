@@ -160,7 +160,8 @@ namespace VC.Admin.Models.ContentManagement
 			toReturn.AboutChef = AboutChef;
 			toReturn.Ingredients = Ingredients;
 			toReturn.Directions = Directions;
-			if (ProcessorIds != null)
+            toReturn.MasterContentItemId = MasterContentItemId;
+            if (ProcessorIds != null)
             {
                 toReturn.ContentItem.ContentItemToContentProcessors = ProcessorIds.Select(p => new ContentItemToContentProcessor()
                 {

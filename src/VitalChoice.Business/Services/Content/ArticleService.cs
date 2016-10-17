@@ -261,6 +261,7 @@ namespace VitalChoice.Business.Services.Content
                 dbItem.Author = model.Author;
                 dbItem.FileUrl = model.FileUrl;
                 dbItem.PublishedDate = model.PublishedDate;
+                dbItem.MasterContentItemId = model.MasterContentItemId;
                 dbItem.ContentItem.Updated = DateTime.Now;
                 dbItem.ContentItem.Template = model.ContentItem.Template;
                 dbItem.ContentItem.Description = model.ContentItem.Description;
