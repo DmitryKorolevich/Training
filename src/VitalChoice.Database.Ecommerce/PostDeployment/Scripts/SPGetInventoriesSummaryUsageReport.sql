@@ -87,13 +87,14 @@ BEGIN
 			)
 			(SELECT 
 				o.Id,
-				o.DateCreated		
+				MIN(osp.ShippedDate)		
 			FROM Orders o WITH(NOLOCK)
-			JOIN OrderShippingPackages osp ON o.Id=osp.IdOrder
+			JOIN OrderShippingPackages osp WITH(NOLOCK) ON o.Id=osp.IdOrder
 			WHERE osp.ShippedDate>=@from AND osp.ShippedDate<=@to AND StatusCode!=3 AND 
 				(
 					OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3
 				)
+			GROUP BY o.Id
 			)
 
 			SELECT 
@@ -178,13 +179,14 @@ BEGIN
 			)
 			(SELECT 
 				o.Id,
-				o.DateCreated		
+				MIN(osp.ShippedDate)		
 			FROM Orders o WITH(NOLOCK)
-			JOIN OrderShippingPackages osp ON o.Id=osp.IdOrder
+			JOIN OrderShippingPackages osp WITH(NOLOCK) ON o.Id=osp.IdOrder
 			WHERE osp.ShippedDate>=@from AND osp.ShippedDate<=@to AND StatusCode!=3 AND 
 				(
 					OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3
 				)
+			GROUP BY o.Id
 			)
 
 			SELECT 
@@ -269,13 +271,14 @@ BEGIN
 			)
 			(SELECT 
 				o.Id,
-				o.DateCreated		
+				MIN(osp.ShippedDate)		
 			FROM Orders o WITH(NOLOCK)
-			JOIN OrderShippingPackages osp ON o.Id=osp.IdOrder
+			JOIN OrderShippingPackages osp WITH(NOLOCK) ON o.Id=osp.IdOrder
 			WHERE osp.ShippedDate>=@from AND osp.ShippedDate<=@to AND StatusCode!=3 AND 
 				(
 					OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3
 				)
+			GROUP BY o.Id
 			)
 
 			SELECT 
