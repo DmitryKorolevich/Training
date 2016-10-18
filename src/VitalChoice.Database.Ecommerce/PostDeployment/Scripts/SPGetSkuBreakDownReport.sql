@@ -29,7 +29,7 @@ BEGIN
 		FROM Orders o WITH(NOLOCK)
 		JOIN Customers c WITH(NOLOCK) ON o.IdCustomer=c.Id
 		WHERE o.DateCreated>=@from AND o.DateCreated<=@to AND o.StatusCode!=3 AND
-			o.IdObjectType NOT IN (2,5,6) AND 
+			o.IdObjectType NOT IN (2,6) AND 
 			((o.OrderStatus IS NOT NULL AND o.OrderStatus !=1 AND o.OrderStatus !=4) OR 
 			(o.OrderStatus IS NULL AND o.POrderStatus !=1 AND o.POrderStatus !=4 AND 
 			o.NPOrderStatus !=1 AND o.NPOrderStatus !=4))

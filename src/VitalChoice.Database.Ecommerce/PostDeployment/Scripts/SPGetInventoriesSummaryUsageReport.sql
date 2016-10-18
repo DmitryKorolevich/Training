@@ -63,7 +63,7 @@ BEGIN
 				JOIN OrderToSkus os WITH(NOLOCK) ON o.Id=os.IdOrder
 				JOIN OrderToSkusToInventorySkus osToInv WITH(NOLOCK) ON os.IdOrder=osToInv.IdOrder AND os.IdSku=osToInv.IdSku
 				LEFT JOIN @InvIds invId ON osToInv.IdInventorySku=invId.Id
-				WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
+				WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND o.IdObjectType NOT IN (2,6) AND
 					(OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3) AND 
 					((@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR invId.Id is NOT NULL)
 				UNION ALL
@@ -87,13 +87,14 @@ BEGIN
 			)
 			(SELECT 
 				o.Id,
-				o.DateCreated		
+				MIN(osp.ShippedDate)		
 			FROM Orders o WITH(NOLOCK)
-			JOIN OrderShippingPackages osp ON o.Id=osp.IdOrder
-			WHERE osp.ShippedDate>=@from AND osp.ShippedDate<=@to AND StatusCode!=3 AND 
+			JOIN OrderShippingPackages osp WITH(NOLOCK) ON o.Id=osp.IdOrder
+			WHERE osp.ShippedDate>=@from AND osp.ShippedDate<=@to AND StatusCode!=3 AND o.IdObjectType NOT IN (2,6) AND
 				(
 					OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3
 				)
+			GROUP BY o.Id
 			)
 
 			SELECT 
@@ -154,7 +155,7 @@ BEGIN
 				JOIN OrderToSkus os WITH(NOLOCK) ON o.Id=os.IdOrder
 				JOIN OrderToSkusToInventorySkus osToInv WITH(NOLOCK) ON os.IdOrder=osToInv.IdOrder AND os.IdSku=osToInv.IdSku
 				LEFT JOIN @InvIds invId ON osToInv.IdInventorySku=invId.Id
-				WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
+				WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND o.IdObjectType NOT IN (2,6) AND
 					(OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3) AND 
 					((@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR invId.Id is NOT NULL)
 				UNION ALL
@@ -178,13 +179,14 @@ BEGIN
 			)
 			(SELECT 
 				o.Id,
-				o.DateCreated		
+				MIN(osp.ShippedDate)		
 			FROM Orders o WITH(NOLOCK)
-			JOIN OrderShippingPackages osp ON o.Id=osp.IdOrder
-			WHERE osp.ShippedDate>=@from AND osp.ShippedDate<=@to AND StatusCode!=3 AND 
+			JOIN OrderShippingPackages osp WITH(NOLOCK) ON o.Id=osp.IdOrder
+			WHERE osp.ShippedDate>=@from AND osp.ShippedDate<=@to AND StatusCode!=3 AND o.IdObjectType NOT IN (2,6) AND
 				(
 					OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3
 				)
+			GROUP BY o.Id
 			)
 
 			SELECT 
@@ -254,7 +256,7 @@ BEGIN
 				JOIN OrderToPromos op WITH(NOLOCK) ON o.Id=op.IdOrder AND op.[Disabled]=0
 				JOIN OrderToPromosToInventorySkus opToInv WITH(NOLOCK) ON op.IdOrder=opToInv.IdOrder AND op.IdSku=opToInv.IdSku
 				LEFT JOIN @InvIds invId ON opToInv.IdInventorySku=invId.Id
-				WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND 
+				WHERE DateCreated>=@from AND DateCreated<=@to AND StatusCode!=3 AND o.IdObjectType NOT IN (2,6) AND
 					(OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3) AND 
 					((@sku IS NULL AND @invsku IS NULL AND @assemble IS NULL AND @idsinvcat IS NULL) OR invId.Id is NOT NULL)) temp
 			GROUP BY DATEPART(Year, temp.DateCreated), temp.IdInventorySku
@@ -269,13 +271,14 @@ BEGIN
 			)
 			(SELECT 
 				o.Id,
-				o.DateCreated		
+				MIN(osp.ShippedDate)		
 			FROM Orders o WITH(NOLOCK)
-			JOIN OrderShippingPackages osp ON o.Id=osp.IdOrder
-			WHERE osp.ShippedDate>=@from AND osp.ShippedDate<=@to AND StatusCode!=3 AND 
+			JOIN OrderShippingPackages osp WITH(NOLOCK) ON o.Id=osp.IdOrder
+			WHERE osp.ShippedDate>=@from AND osp.ShippedDate<=@to AND StatusCode!=3 AND o.IdObjectType NOT IN (2,6) AND
 				(
 					OrderStatus=3 OR POrderStatus=3 OR NPOrderStatus=3
 				)
+			GROUP BY o.Id
 			)
 
 			SELECT 
