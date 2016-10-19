@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
@@ -18,6 +19,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
         public bool ShipDate { get; set; }
 
         public OrderStatus? OrderStatus { get; set; }
+
+        public ICollection<OrderStatus> IncludeOrderStatuses { get; set; }
 
         public bool IgnoreNotShowingIncomplete { get; set; }
 

@@ -108,6 +108,7 @@
             var idSku = $stateParams.idsku ? $stateParams.idsku : null;
             var from = $stateParams.from ? Date.parseDateTime($stateParams.from) : currentDate.shiftDate('-1m');
             var to = $stateParams.to ? Date.parseDateTime($stateParams.to) : currentDate.shiftDate('+1d');
+            var statuses = $stateParams.statuses ? $stateParams.statuses.split(',') : null;
             $scope.filter = {
                 To: to,
                 From: from,
@@ -117,6 +118,7 @@
                 IdOrderSource: null,
                 POrderType: null,
                 IdSku: idSku,
+                IncludeOrderStatuses: statuses,
                 IdCustomerType: null,
                 IdShippingMethod: null,
                 IdShipState: null,
@@ -249,6 +251,8 @@
 
         $scope.filterOrders = function ()
         {
+            $scope.filter.IdSku = null;
+            $scope.filter.IncludeOrderStatuses = null;
             $scope.forms.IsActive = true;
             if ($scope.forms.filterForm.$valid)
             {
