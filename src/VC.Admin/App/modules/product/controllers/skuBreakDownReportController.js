@@ -89,6 +89,7 @@
         {
             var data = {};
             data.idsku = idsku;
+            data.statuses = '2,3,5,6,7';
             if ($scope.filter.From)
             {
                 data.from = $scope.filter.From.toQueryParamDateTime();

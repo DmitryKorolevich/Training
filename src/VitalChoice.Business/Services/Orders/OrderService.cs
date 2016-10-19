@@ -1503,6 +1503,7 @@ namespace VitalChoice.Business.Services.Orders
                 //TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
                 .WithOrderType(filter.IdObjectType)
                 .WithOrderStatus(filter.OrderStatus)
+                .WithOrderStatuses(filter.IncludeOrderStatuses)
                 .WithCustomerType(filter.IdCustomerType)
                 .WithoutIncomplete(filter.OrderStatus, filter.IgnoreNotShowingIncomplete)
                 .WithIdSku(filter.IdSku)
