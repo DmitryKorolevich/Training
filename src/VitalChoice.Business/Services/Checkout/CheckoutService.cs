@@ -403,7 +403,6 @@ namespace VitalChoice.Business.Services.Checkout
                         cart.ShippingUpgradeP = null;
                     }
                     await _context.SaveChangesAsync();
-                    transaction.Commit();
 
                     if (sendOrderConfirm && cartOrder.Order?.Customer != null)
                     {
@@ -430,11 +429,8 @@ namespace VitalChoice.Business.Services.Checkout
                             }
                         }
                     }
-                }
-                catch (AppValidationException)
-                {
-                    transaction.Rollback();
-                    throw;
+
+                    transaction.Commit();
                 }
                 catch
                 {

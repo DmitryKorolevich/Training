@@ -947,6 +947,9 @@ namespace VitalChoice.Business.Services.Orders
                             }
                             standardOrder.ShippingAddress.Id = 0;
                             standardOrder.Data.AutoShipId = autoShip.Id;
+                            standardOrder.OrderStatus = OrderStatus.Processed;
+                            standardOrder.POrderStatus = null;
+                            standardOrder.NPOrderStatus = null;
 
                             var order = await InsertAsyncInternal(standardOrder, uow);
 
