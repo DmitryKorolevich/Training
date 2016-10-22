@@ -63,6 +63,12 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public string NPShipService { get; set; }
 
+        public DateTime? OrderSourceDateCreated { get; set; }
+
+        public int? IdAddedBy { get; set; }
+
+        public string AddedByAgentId { get; set; }
+
         public ServiceCodeReshipItem(OrderDynamic reship, ICollection<VitalChoice.Ecommerce.Domain.Entities.Addresses.Country> countries)
         {
             if (reship != null)

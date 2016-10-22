@@ -40,6 +40,10 @@ namespace VC.Admin.Models.Orders
 
         public DateTime DateEdited { get; set; }
 
+        public int? IdAddedBy { get; set; }
+
+        public string AddedByAgentId { get; set; }
+
         public int? POrderType { get; set; }
 
         public int? IdShippingMethod { get; set; }
@@ -109,6 +113,8 @@ namespace VC.Admin.Models.Orders
                 Total = item.Total;
                 IdEditedBy = item.IdEditedBy;
                 EditedByAgentId = item.EditedByAgentId;
+                IdAddedBy = item.IdAddedBy;
+                AddedByAgentId = item.AddedByAgentId;
                 DateEdited = item.DateEdited;
                 POrderType = item.POrderType;
                 IdCustomerType = item.IdCustomerType;

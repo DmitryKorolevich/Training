@@ -36,6 +36,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public int? IdShipState { get; set; }
 
+        public int? IdAddedBy { get; set; }
+
         public string CustomerFirstName { get; set; }
 
         public string CustomerLastName { get; set; }

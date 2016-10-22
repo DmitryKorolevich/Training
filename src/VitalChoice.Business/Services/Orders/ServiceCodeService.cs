@@ -33,6 +33,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly OrderService _orderService;
         private readonly OrderRefundService _orderRefundService;
         private readonly IEcommerceRepositoryAsync<Order> _orderRepository;
+        private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly ISettingService _settingService;
         private readonly ICountryService _countryService;
         private readonly ReferenceData _referenceData;
@@ -42,6 +43,7 @@ namespace VitalChoice.Business.Services.Orders
             OrderService orderService,
             OrderRefundService orderRefundService,
             IEcommerceRepositoryAsync<Order> orderRepository,
+            IRepositoryAsync<AdminProfile> adminProfileRepository,
             ISettingService settingService,
             ICountryService countryService,
             ReferenceData referenceData,
@@ -50,6 +52,7 @@ namespace VitalChoice.Business.Services.Orders
             _orderService = orderService;
             _orderRefundService = orderRefundService;
             _orderRepository = orderRepository;
+            _adminProfileRepository = adminProfileRepository;
             _settingService = settingService;
             _countryService = countryService;
             _referenceData = referenceData;
@@ -275,6 +278,24 @@ namespace VitalChoice.Business.Services.Orders
                             refund.Carrier = carrier;
                             refund.PCarrier = pCarrier;
                             refund.NPCarrier = npCarrier;
+
+                            refund.IdAddedBy = orderSource.IdAddedBy;
+                        }
+                    }
+                }
+            }
+
+            if (toReturn.Items.Count > 0)
+            {
+                var ids = new HashSet<int>(toReturn.Items.Where(p => p.IdAddedBy.HasValue).Select(p => p.IdAddedBy.Value));
+                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
+                foreach (var item in toReturn.Items)
+                {
+                    foreach (var profile in profiles)
+                    {
+                        if (item.IdAddedBy == profile.Id)
+                        {
+                            item.AddedByAgentId = profile.AgentId;
                         }
                     }
                 }
@@ -412,7 +433,26 @@ namespace VitalChoice.Business.Services.Orders
                                 reship.NPWarehouse = npWarehouse;
                                 reship.NPCarrier = npCarrier;
                                 reship.NPShipService = npShipService;
+
+                                reship.OrderSourceDateCreated = orderSource.DateCreated;
+                                reship.IdAddedBy = orderSource.IdAddedBy;
                             }
+                        }
+                    }
+                }
+            }
+
+            if (toReturn.Items.Count > 0)
+            {
+                var ids = new HashSet<int>(toReturn.Items.Where(p => p.IdAddedBy.HasValue).Select(p => p.IdAddedBy.Value));
+                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
+                foreach (var item in toReturn.Items)
+                {
+                    foreach (var profile in profiles)
+                    {
+                        if (item.IdAddedBy == profile.Id)
+                        {
+                            item.AddedByAgentId = profile.AgentId;
                         }
                     }
                 }

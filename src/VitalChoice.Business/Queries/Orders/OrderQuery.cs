@@ -301,6 +301,15 @@ namespace VitalChoice.Business.Queries.Orders
             return this;
         }
 
+        public OrderQuery WithIdAddedBy(int? idAddedBy)
+        {
+            if (idAddedBy.HasValue)
+            {
+                Add(x => x.IdAddedBy == idAddedBy.Value);
+            }
+            return this;
+        }
+
         #region AffiliateOrders
 
         public OrderQuery WithIdAffiliate(int? idAffiliate)
