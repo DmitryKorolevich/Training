@@ -44,7 +44,7 @@ angular.module('app.modules.order', [
 				    controller: 'ordersController'
 				})
 				.state('index.oneCol.manageOrders', {
-				    url: '/orders?{from:string}{to:string}{idsku:int}',
+				    url: '/orders?{from:string}{to:string}{idsku:int}{statuses:string}',
 				    templateUrl: 'app/modules/order/partials/ordersList.html',
 				    controller: 'ordersController'
 				})

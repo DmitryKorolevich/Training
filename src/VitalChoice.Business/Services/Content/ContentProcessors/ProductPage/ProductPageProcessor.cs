@@ -227,6 +227,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
                         || ((int?) x.SafeData.Stock ?? 0) > 0;
                     return item;
                 }).ToListAsync();
+            toReturn.AtLeastOneSkuInStock = toReturn.Skus.Any(p => p.InStock);
             toReturn.YoutubeVideos = new List<TtlRelatedYoutubeVideoModel>()
             {
                 new TtlRelatedYoutubeVideoModel()
@@ -303,7 +304,10 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             toReturn.IngredientsTab = await _productMapper.ToModelAsync<TtlProductIngredientsTabModel>(eProduct);
             toReturn.IngredientsTab.AdditionalNotes = toReturn.IngredientsTab.AdditionalNotes?.Replace("\n", "<br/>");
 
-            var recipes = await _recipeService.GetRecipesAsync(new RecipeListFilter() { ProductId = eProduct.Id });
+            var filter = new RecipeListFilter() {ProductId = eProduct.Id};
+            filter.Paging = null;
+            filter.StatusCode = RecordStatusCode.Active;
+            var recipes = await _recipeService.GetRecipesAsync(filter);
 
             toReturn.RecipesTab = new TtlProductRecipesTabModel()
             {

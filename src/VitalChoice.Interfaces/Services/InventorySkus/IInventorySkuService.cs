@@ -19,14 +19,16 @@ namespace VitalChoice.Interfaces.Services.InventorySkus
 
         Task<Dictionary<int, List<SkuToInventorySku>>> GetAssignedInventorySkusAsync(IEnumerable<int> skuIds);
 
-	    Task<ICollection<InventorySkuUsageReportItem>> GetInventorySkuUsageReportAsync(InventorySkuUsageReportFilter filter);
+	    Task<ICollection<SkuInventoriesInfoItem>> GetSkuInventoriesInfoAsync(bool activeOnly, bool withInventories);
+
+        Task<ICollection<InventorySkuUsageReportItem>> GetInventorySkuUsageReportAsync(InventorySkuUsageReportFilter filter);
 
         Task<ICollection<InventorySkuUsageReportItemForExport>> GetInventorySkuUsageReportForExportAsync(InventorySkuUsageReportFilter filter);
 
         Task<InventoriesSummaryUsageReport> GetInventoriesSummaryUsageReportAsync(InventoriesSummaryUsageReportFilter filter);
 
-	    void ConvertInventoriesSummaryUsageReportForExport(InventoriesSummaryUsageReport report,
-	        out IList<DynamicExportColumn> columns, out IList<ExpandoObject> items);
+	    void ConvertInventoriesSummaryUsageReportForExport(InventoriesSummaryUsageReport report, int infoType,
+            out IList<DynamicExportColumn> columns, out IList<ExpandoObject> items);
 
         Task<bool> ImportInventorySkusAsync(byte[] file, int userId);
 

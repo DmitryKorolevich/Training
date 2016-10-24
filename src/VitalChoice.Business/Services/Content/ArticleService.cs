@@ -106,7 +106,7 @@ namespace VitalChoice.Business.Services.Content
                     query = query.NotWithIds(ids);
                 }
             }
-            query = query.WithName(filter.Name).NotDeleted().NotWithIds(filter.ExcludeIds);
+            query = query.WithName(filter.Name).NotDeleted().WithStatusCode(filter.StatusCode).NotWithIds(filter.ExcludeIds);
 
             Func<IQueryable<Article>, IOrderedQueryable<Article>> sortable = x => x.OrderBy(y => y.Name);
             var sortOrder = filter.Sorting.SortOrder;
@@ -125,6 +125,13 @@ namespace VitalChoice.Business.Services.Content
                             sortOrder == FilterSortOrder.Asc
                                 ? x.OrderBy(y => y.Url)
                                 : x.OrderByDescending(y => y.Url);
+                    break;
+                case ArticleSortPath.StatusCode:
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.StatusCode)
+                                : x.OrderByDescending(y => y.StatusCode);
                     break;
                 case ArticleSortPath.Updated:
                     sortable =
@@ -198,7 +205,6 @@ namespace VitalChoice.Business.Services.Content
             if (model.Id == 0)
             {
                 dbItem = new Article();
-                dbItem.StatusCode = RecordStatusCode.Active;
                 dbItem.ContentItem = new ContentItem();
                 dbItem.ContentItem.Created = DateTime.Now;
                 dbItem.ContentItem.ContentItemToContentProcessors = new List<ContentItemToContentProcessor>();
@@ -246,6 +252,7 @@ namespace VitalChoice.Business.Services.Content
                     throw new AppValidationException("Url","Article with the same URL already exists, please use a unique URL.");
                 }
 
+                dbItem.StatusCode = model.StatusCode;
                 dbItem.Name = model.Name;
                 dbItem.Url = model.Url;
                 dbItem.FileUrl = model.FileUrl;
@@ -254,6 +261,7 @@ namespace VitalChoice.Business.Services.Content
                 dbItem.Author = model.Author;
                 dbItem.FileUrl = model.FileUrl;
                 dbItem.PublishedDate = model.PublishedDate;
+                dbItem.MasterContentItemId = model.MasterContentItemId;
                 dbItem.ContentItem.Updated = DateTime.Now;
                 dbItem.ContentItem.Template = model.ContentItem.Template;
                 dbItem.ContentItem.Description = model.ContentItem.Description;

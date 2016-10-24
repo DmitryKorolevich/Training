@@ -9,7 +9,8 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[SPGetSkuPOrderTypeBreakDownReport]
 	@from datetime2,
-	@to datetime2
+	@to datetime2,
+	@code nvarchar(250)
 AS
 BEGIN
 
@@ -20,6 +21,25 @@ BEGIN
         IdOrder int NOT NULL, DateCreated DATETIME2, POrderType int NULL
     );
 
+	DECLARE @skus AS TABLE
+	(
+		IdSku int NOT NULL
+	);
+
+	IF(@code IS NOT NULL)
+	BEGIN
+		INSERT INTO @skus
+		(
+			IdSku
+		)
+		(
+			SELECT 
+				s.Id
+			FROM Skus s
+			WHERE 
+				s.StatusCode!=3 AND s.Code LIKE @code+'%'
+		)
+	END
 
 	INSERT INTO @orders
 	(
@@ -34,8 +54,24 @@ BEGIN
 			o.IdObjectType NOT IN (2,5,6) AND 
 			((o.OrderStatus IS NOT NULL AND o.OrderStatus !=1 AND o.OrderStatus !=4) OR 
 			(o.OrderStatus IS NULL AND o.POrderStatus !=1 AND o.POrderStatus !=4 AND 
-			o.NPOrderStatus !=1 AND o.NPOrderStatus !=4))
-		
+			o.NPOrderStatus !=1 AND o.NPOrderStatus !=4)) AND
+			(
+				@code IS NULL OR
+				EXISTS
+				(
+					SELECT
+						TOP 1 os.IdOrder
+					FROM OrderToSkus os
+					WHERE os.IdOrder=o.Id AND os.IdSku IN (SELECT IdSku FROM @skus)
+				) OR
+				EXISTS
+				(
+					SELECT
+						TOP 1 op.IdOrder
+					FROM OrderToPromos op
+					WHERE op.IdOrder=o.Id AND op.Disabled=0 AND op.IdSku IN (SELECT IdSku FROM @skus)
+				)
+			)		
 	)
 
 	SELECT 

@@ -293,7 +293,8 @@ namespace VC.Admin.Controllers
                 {
                     Template = string.Empty,
                     CategoryIds = new List<int>(),
-                    RecipesToProducts = new List<RecipeToProduct>()
+                    RecipesToProducts = new List<RecipeToProduct>(),
+                    StatusCode = RecordStatusCode.NotActive,
 				};
 
 	            for (short i = 0; i < RecipeManageModel.CrossSellRecipesMaxCount; i++)
@@ -432,6 +433,7 @@ namespace VC.Admin.Controllers
                     Template=String.Empty,
                     CategoryIds=new List<int>(),
                     ArticlesToProducts =new List<ArticleToProduct>(),
+                    StatusCode = RecordStatusCode.NotActive,
                 };
             }
             return new ArticleManageModel((await articleService.GetArticleAsync(id)));

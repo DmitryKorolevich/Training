@@ -27,7 +27,7 @@ namespace VC.Admin.Models.Orders
 
         [Map]
         public bool ReturnAssociated { get; set; }
-
+        
         public decimal OrderSourceTotal { get; set; }
 
         public DateTime OrderSourceDateCreated { get; set; }

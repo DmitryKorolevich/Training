@@ -48,6 +48,10 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public DateTime? OrderSourceDateCreated { get; set; }
 
+        public int? IdAddedBy { get; set; }
+
+        public string AddedByAgentId { get; set; }
+
         public ServiceCodeRefundItem(OrderRefundDynamic refund)
         {
             if (refund != null)

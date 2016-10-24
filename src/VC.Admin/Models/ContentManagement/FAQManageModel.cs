@@ -84,6 +84,7 @@ namespace VC.Admin.Models.ContentManagement
                 Id = Id,
                 Name = Name?.Trim(),
                 Url = Url?.Trim().ToLower(),
+                MasterContentItemId = MasterContentItemId,
                 ContentItem = new ContentItem
                 {
                     Template = Template,

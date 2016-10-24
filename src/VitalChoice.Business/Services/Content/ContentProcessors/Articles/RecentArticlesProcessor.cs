@@ -47,6 +47,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
             filter.ExcludeIds = new List<int>() {
                 viewContext.Entity.Id
             };
+            filter.StatusCode = RecordStatusCode.Active;
             filter.Paging.PageItemCount = ContentConstants.RECENT_ARTICLES_LIST_TAKE_COUNT;
             filter.Sorting.Path = ArticleSortPath.PublishedDate;
             filter.Sorting.SortOrder = FilterSortOrder.Desc;

@@ -46,6 +46,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
             }
 
             RecipeListFilter filter = new RecipeListFilter();
+            filter.StatusCode = RecordStatusCode.Active;
             filter.Paging.PageItemCount = ContentConstants.RECENT_RECIPES_FOR_ARTICLE_LIST_TAKE_COUNT;
             filter.Sorting.Path = RecipeSortPath.Created;
             filter.Sorting.SortOrder = FilterSortOrder.Desc;

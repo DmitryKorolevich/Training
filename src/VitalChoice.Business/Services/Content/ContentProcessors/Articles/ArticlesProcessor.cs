@@ -46,6 +46,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Articles
             var page = viewContext.Parameters.Page != 0 ? viewContext.Parameters.Page : 1;
             ArticleItemListFilter filter = new ArticleItemListFilter();
             filter.CategoryId = viewContext.Entity.ParentId.HasValue ? (int?)viewContext.Entity.Id : null;
+            filter.StatusCode=RecordStatusCode.Active;
             filter.Paging.PageIndex = page;
             filter.Paging.PageItemCount = ContentConstants.ARTICLES_LIST_TAKE_COUNT;
             filter.Sorting.Path = ArticleSortPath.PublishedDate;

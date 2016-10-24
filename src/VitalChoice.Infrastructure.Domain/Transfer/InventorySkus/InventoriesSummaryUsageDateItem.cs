@@ -7,6 +7,10 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.InventorySkus
     {
         public DateTime Date { get; set; }
 
+        public string DateLabel { get; set; }
+
         public int Quantity { get; set; }
+
+        public decimal PurchaseAmount { get; set; }
     }
 }

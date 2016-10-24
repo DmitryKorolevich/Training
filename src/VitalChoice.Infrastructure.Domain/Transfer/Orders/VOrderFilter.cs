@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
@@ -19,6 +20,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public OrderStatus? OrderStatus { get; set; }
 
+        public ICollection<OrderStatus> IncludeOrderStatuses { get; set; }
+
         public bool IgnoreNotShowingIncomplete { get; set; }
 
         public int? POrderType { get; set; }
@@ -32,6 +35,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
         public int? IdShippingMethod { get; set; }
 
         public int? IdShipState { get; set; }
+
+        public int? IdAddedBy { get; set; }
 
         public string CustomerFirstName { get; set; }
 

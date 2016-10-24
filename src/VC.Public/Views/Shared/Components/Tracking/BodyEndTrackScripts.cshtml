@@ -169,3 +169,9 @@ else
         })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
 </script>
 <!-- Hotjar Tracking Code for http://www.vitalchoice.com -->
+<!-- Pepperjam iframe-->
+@if (!string.IsNullOrEmpty(Model.PepperjamQuery))
+{
+    <iframe src="https://t.pepperjamnetwork.com/track?@Html.Raw(Model.PepperjamQuery)" width="1" height="1" frameborder="0"></iframe>
+}
+<!-- Pepperjam iframe-->

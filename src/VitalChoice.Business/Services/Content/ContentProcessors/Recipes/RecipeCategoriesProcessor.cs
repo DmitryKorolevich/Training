@@ -77,6 +77,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.Recipes
                     if (category.Name.ToLower() != RecipeVideosChefOtherCategoryName.ToLower())
                     {
                         RecipeListFilter filter = new RecipeListFilter();
+                        filter.StatusCode = RecordStatusCode.Active;
                         filter.CategoryId = category.Id;
                         filter.Sorting.Path = RecipeSortPath.Created;
                         filter.Sorting.SortOrder = FilterSortOrder.Desc;

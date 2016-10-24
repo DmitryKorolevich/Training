@@ -16,5 +16,6 @@
         public const string Id = "Id";
         public const string Total = "Total";
         public const string DateEdited = "DateEdited";
+        public const string IdAddedBy = "IdAddedBy";
     }
 }

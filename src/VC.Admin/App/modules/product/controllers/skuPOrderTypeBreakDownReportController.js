@@ -78,6 +78,11 @@
                 FrequencyType: 1,//daily
             };
 
+            $scope.skusFilter = {
+                Code: '',
+                Paging: { PageIndex: 1, PageItemCount: 20 },
+            };
+
             $scope.filterChanged();
             refreshItems();
         }
@@ -217,6 +222,22 @@
                 $scope.filter.FrequencyType = 1;//daily
             }
             $scope.filterChanged();
+        };
+
+        $scope.getSKUsBySKU = function (val)
+        {
+            if (val)
+            {
+                $scope.skusFilter.Code = val;
+                return productService.getSkus($scope.skusFilter)
+                    .then(function (result)
+                    {
+                        return result.data.Data.map(function (item)
+                        {
+                            return item;
+                        });
+                    });
+            }
         };
 
         initialize();

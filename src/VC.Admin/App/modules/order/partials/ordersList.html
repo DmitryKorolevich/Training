@@ -132,6 +132,9 @@
                     <div class="col-md-2">
                         <select class="form-control" placeholder="Ship State" data-ng-model="filter.IdShipState" data-ng-options="item.Id as item.StateName for item in states"></select>
                     </div>
+                    <div class="col-md-2">
+                        <select class="form-control" placeholder="Agent ID" data-ng-model="filter.IdAddedBy" data-ng-options="item.Id as item.AgentId for item in admins"></select>
+                    </div>
                 </div>
             </fieldset>
         </form>
@@ -186,6 +189,13 @@
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('DateCreated')">
                             <span>Order Date</span>
                             <span data-ng-if="filter.Sorting.Path == 'DateCreated'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('IdAddedBy')">
+                            <span>Agent ID</span>
+                            <span data-ng-if="filter.Sorting.Path == 'IdAddedBy'">
                                 <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
@@ -249,6 +259,7 @@
                             <span>{{::getReferenceItem(ReferenceData.ShortPaymentMethods, item.IdPaymentMethod).Text}}</span>
                         </td>
                         <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
+                        <td>{{::item.AddedByAgentId}}</td>
                         <td>
                             <span data-ng-if="::item.DateShipped">{{::item.DateShipped | date:"MM/dd/yy"}}</span>
                             <div data-ng-if="::(!item.DateShipped && (item.PDateShipped || item.NPDateShipped))">

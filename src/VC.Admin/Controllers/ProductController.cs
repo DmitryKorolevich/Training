@@ -751,6 +751,7 @@ namespace VC.Admin.Controllers
         [HttpPost]
         public async Task<Result<ICollection<SkuBreakDownReportItem>>> GetSkuBreakDownReportItems([FromBody]SkuBreakDownReportFilter filter)
         {
+            filter.To = filter.To.AddDays(1);
             var toReturn = await productService.GetSkuBreakDownReportItemsAsync(filter);
             return toReturn.ToList();
         }

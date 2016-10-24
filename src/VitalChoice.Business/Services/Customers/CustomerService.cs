@@ -513,8 +513,8 @@ namespace VitalChoice.Business.Services.Customers
             Order order = null;
             if (filter.IdOrder.HasValue)
             {
-                order = await _orderRepository.Query(p => p.Id == filter.IdOrder.Value &&
-                     p.IdObjectType != (int)OrderType.AutoShip && p.StatusCode != (int)RecordStatusCode.Deleted).SelectFirstOrDefaultAsync(false);
+                order =await _orderRepository.Query(p => p.Id == filter.IdOrder.Value &&
+                    p.IdObjectType != (int)OrderType.AutoShip && p.StatusCode != (int)RecordStatusCode.Deleted).SelectFirstOrDefaultAsync(false);
                 if (order != null)
                 {
                     conditions = conditions.WithId(order.IdCustomer);
@@ -744,7 +744,9 @@ namespace VitalChoice.Business.Services.Customers
                                 {
                                     CardNumber = p.CardNumber,
                                     IdPaymentMethod = p.Model.Id,
-                                    IdCustomer = p.Model.IdCustomer
+                                    IdCustomer = p.Model.IdCustomer,
+                                    IdCustomerSource = p.Model.IdCustomerSource,
+                                    IdPaymentMethodSource = p.Model.IdPaymentMethodSource
                                 }).ToArray()))
                     {
                         throw new ApiException("Cannot update customer payment info on remote.");
@@ -846,7 +848,9 @@ namespace VitalChoice.Business.Services.Customers
                             {
                                 CardNumber = p.CardNumber,
                                 IdPaymentMethod = p.Model.Id,
-                                IdCustomer = p.Model.IdCustomer
+                                IdCustomer = p.Model.IdCustomer,
+                                IdCustomerSource = p.Model.IdCustomerSource,
+                                IdPaymentMethodSource = p.Model.IdPaymentMethodSource
                             }).ToArray());
 
                     if (!await updatePaymentsTask)
@@ -1082,25 +1086,39 @@ namespace VitalChoice.Business.Services.Customers
                                 }
                             }
 
-                            var customerPaymentMethodRepository = uow.RepositoryAsync<CustomerPaymentMethod>();
-                            var customerPaymentMethodOptionValueRepository = uow.RepositoryAsync<CustomerPaymentMethodOptionValue>();
-                            var cards = customer.CustomerPaymentMethods.Where(p=>p.IdObjectType==(int)PaymentMethodType.CreditCard).ToList();
+                            //var customerPaymentMethodRepository = uow.RepositoryAsync<CustomerPaymentMethod>();
+                            //var customerPaymentMethodOptionValueRepository = uow.RepositoryAsync<CustomerPaymentMethodOptionValue>();
+                            //var cards = customer.CustomerPaymentMethods.Where(p=>p.IdObjectType==(int)PaymentMethodType.CreditCard).ToList();
+                            //foreach (var customerPaymentMethodDynamic in cards)
+                            //{
+                            //    var dbCard = await customerPaymentMethodRepository.Query(p=>p.Id== customerPaymentMethodDynamic.Id).SelectFirstOrDefaultAsync(true);
+                            //    if (dbCard!=null)
+                            //    {
+                            //        dbCard.IdCustomer = primaryCustomer.Id;
+                            //        dbCard.StatusCode = (int)RecordStatusCode.Active;
+                            //    }
+
+                            //    var defaultType = _customerPaymentMethodMapper.OptionTypes.FirstOrDefault(p => p.Name == "Default");
+                            //    var dbCardDefaultSetting = await customerPaymentMethodOptionValueRepository.Query(p=>p.IdCustomerPaymentMethod==dbCard.Id
+                            //        && p.IdOptionType==defaultType.Id).SelectFirstOrDefaultAsync(false);
+                            //    if (dbCardDefaultSetting != null)
+                            //    {
+                            //        await customerPaymentMethodOptionValueRepository.DeleteAsync(dbCardDefaultSetting);
+                            //    }
+                            //}
+
+                            var cards = customer.CustomerPaymentMethods.Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard).ToList();
                             foreach (var customerPaymentMethodDynamic in cards)
                             {
-                                var dbCard = await customerPaymentMethodRepository.Query(p=>p.Id== customerPaymentMethodDynamic.Id).SelectFirstOrDefaultAsync(true);
-                                if (dbCard!=null)
-                                {
-                                    dbCard.IdCustomer = primaryCustomer.Id;
-                                    dbCard.StatusCode = (int)RecordStatusCode.Active;
-                                }
-
-                                var defaultType = _customerPaymentMethodMapper.OptionTypes.FirstOrDefault(p => p.Name == "Default");
-                                var dbCardDefaultSetting = await customerPaymentMethodOptionValueRepository.Query(p=>p.IdCustomerPaymentMethod==dbCard.Id
-                                    && p.IdOptionType==defaultType.Id).SelectFirstOrDefaultAsync(false);
-                                if (dbCardDefaultSetting != null)
-                                {
-                                    await customerPaymentMethodOptionValueRepository.DeleteAsync(dbCardDefaultSetting);
-                                }
+                                var newCard = customerPaymentMethodDynamic.Clone<CustomerPaymentMethodDynamic, MappedObject>()
+                                        .Clone<CustomerPaymentMethodDynamic, Entity>();
+                                newCard.Id = 0;
+                                newCard.Address.Id = 0;
+                                //at lest one card show be a default one
+                                newCard.Data.Default = primaryCustomer.CustomerPaymentMethods.All(p => p.IdObjectType != (int) PaymentMethodType.CreditCard);
+                                newCard.IdCustomerSource = customerPaymentMethodDynamic.IdCustomer;
+                                newCard.IdPaymentMethodSource = customerPaymentMethodDynamic.Id;
+                                primaryCustomer.CustomerPaymentMethods.Add(newCard);
                             }
                         }
 
@@ -1175,6 +1193,12 @@ namespace VitalChoice.Business.Services.Customers
 
         private bool IsTheSame(AddressDynamic source, AddressDynamic target)
         {
+            if (target == null)
+                return true;
+
+            if (source == null)
+                return false;
+
             if (source.County != target.County || source.IdCountry != target.IdCountry ||
                 source.IdState != target.IdState)
             {
@@ -1183,7 +1207,17 @@ namespace VitalChoice.Business.Services.Customers
             foreach (var targerItem in target.DictionaryData.Where(p=>p.Key!="Default"))
             {
                 if (!source.DictionaryData.ContainsKey(targerItem.Key) ||
-                    source.DictionaryData[targerItem.Key].ToString() != target.DictionaryData[targerItem.Key].ToString())
+                    (source.DictionaryData[targerItem.Key]==null && target.DictionaryData[targerItem.Key]!=null) ||
+                    (target.DictionaryData[targerItem.Key] == null && source.DictionaryData[targerItem.Key] != null) ||
+                    (target.DictionaryData[targerItem.Key] != null && source.DictionaryData[targerItem.Key] != null) &&
+                    source.DictionaryData[targerItem.Key].ToString().ToLower() != target.DictionaryData[targerItem.Key].ToString().ToLower())
+                {
+                    return false;
+                }
+            }
+            foreach (var sourceItem in source.DictionaryData.Where(p => p.Key != "Default"))
+            {
+                if (!target.DictionaryData.ContainsKey(sourceItem.Key))
                 {
                     return false;
                 }

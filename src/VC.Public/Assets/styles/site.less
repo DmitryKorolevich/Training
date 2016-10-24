@@ -1476,6 +1476,14 @@ a.block-link{
     color: black;
 }
 
+a.block-link:hover {
+    text-decoration: none;
+}
+
+.working-area-holder a.block-link:hover {
+    text-decoration: none;
+}
+
 .header-main {
     clear: left;
     margin-top: 5px;
@@ -3032,6 +3040,184 @@ footer {
     }
 }
 
+.newsletter-block {
+    .header {
+        text-align: center;
+        color: white;
+        background-color: #F25125;
+        padding-top: 4px;
+        padding-bottom: 4px;
+        font-style: italic;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .body {
+        border: 1px solid #e3e3e3;
+        text-align: center;
+        padding-top: 4px;
+        padding-bottom: 4px;
+
+        .input-wrapper {
+            margin-top: 10px;
+            margin-bottom: 10px;
+
+            input[type=text] {
+                width: 115px;
+                margin-right: 5px;
+            }
+
+            input[type=button], input[type=submit], button {
+                padding: 2px 8px;
+                vertical-align: top;
+            }
+        }
+    }
+}
+
+.working-area-holder.content-page.article-page-2-column {
+    .header-block {
+        img {
+            width: 984px;
+            margin-right: -15px;
+            margin-left: -15px;
+            margin-bottom: 20px;
+        }
+    }
+
+    .right-content-pane{
+        width: 246px;
+    }
+
+    .center-content-pane {
+        min-height: 780px;
+        width: 654px;
+        border-left: none;
+        border-right: none;
+
+        .main-img {
+            padding: 0 10px 30px 0;
+            max-width: 654px;
+        }
+
+        .top-section
+        { 
+            color: #a6703f;
+
+            .title
+            {
+                color: #a6703f;
+                font-weight: 400;
+                height: auto;
+                font-size: 28px;
+                line-height: normal;
+            }
+
+            .sub-title
+            {
+                color: #a6703f;
+                font-weight: 400;
+                height: auto;
+                font-size: 20px;
+                line-height: normal;
+            }
+        }
+
+        .date {
+        }
+
+        .author {
+            font-style: normal;
+            margin-left: 30px;
+        }        
+
+        .icons-bar{
+            border-top: none;
+            border-bottom: none; 
+            margin-top: 20px;
+            margin-bottom: 0px;
+
+            a{
+                img{
+                    width: auto;
+                    height: auto;
+                }
+            }
+        }
+
+        .body {
+            margin-top: 20px;
+        }
+    }
+
+    .more-articles
+    {
+        font-size: 16px;
+        text-align: center;
+        color: white;
+        background: #7dad2c;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        -webkit-box-shadow: 2px 2px 10px 0px rgba(138,138,138,1);
+        -moz-box-shadow: 2px 2px 10px 0px rgba(138,138,138,1);
+        box-shadow: 2px 2px 10px 0px rgba(138,138,138,1);
+    }
+
+    .right-wrapper{
+
+    }
+
+    .right-wrapper.newsletter-block {
+        overflow: visible;
+
+        .header {
+            text-align: center;
+            color: white;
+            background-color: #F25125;
+            padding-top: 4px;
+            padding-bottom: 4px;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 14px;
+        }
+
+        .body {
+            border: 1px solid #e3e3e3;
+            text-align: center;
+            padding-top: 4px;
+            padding-bottom: 4px;
+
+            a{
+                font-style: italic;
+                color: #F25125;
+            }
+
+            span{
+                font-style: italic;
+            }
+
+            .input-wrapper {
+                margin-top: 10px;
+                margin-bottom: 10px;
+
+                input[type=text] {
+                    width: 115px;
+                    margin-right: 5px;
+                }
+
+                input[type=button], input[type=submit], button {
+                    padding: 2px 8px;
+                    vertical-align: top;
+                }
+
+                .yellow{
+                    background: #F25125;
+                    color: white;
+                }
+            }
+        }
+    }   
+}
 
 .working-area-holder.content-page.recipe-categories-page {
     .header-block {
@@ -3510,7 +3696,7 @@ footer {
 }
 
 @media print {
-    .separator-top, header, footer, .content-bottom, .alert-banner {
+    .separator-top, header, footer, .content-bottom, .alert-banner, .header-top.main {
         display: none !important;
     }
 
@@ -3552,41 +3738,6 @@ footer {
 
             .video {
                 display: none;
-            }
-        }
-    }
-}
-
-.newsletter-block {
-    .header {
-        text-align: center;
-        color: white;
-        background-color: #F25125;
-        padding-top: 4px;
-        padding-bottom: 4px;
-        font-style: italic;
-        font-weight: bold;
-        font-size: 14px;
-    }
-
-    .body {
-        border: 1px solid #e3e3e3;
-        text-align: center;
-        padding-top: 4px;
-        padding-bottom: 4px;
-
-        .input-wrapper {
-            margin-top: 10px;
-            margin-bottom: 10px;
-
-            input[type=text] {
-                width: 115px;
-                margin-right: 5px;
-            }
-
-            input[type=button], input[type=submit], button {
-                padding: 2px 8px;
-                vertical-align: top;
             }
         }
     }

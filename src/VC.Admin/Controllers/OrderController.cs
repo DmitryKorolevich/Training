@@ -199,7 +199,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpGet]
-        public async Task<Result<OrderExportGeneralStatusModel>> GetExportGeneralStatus()
+        public Result<OrderExportGeneralStatusModel> GetExportGeneralStatus()
         {
             var toReturn = new OrderExportGeneralStatusModel();
             toReturn.Exported=(new Random()).Next(100);
@@ -209,7 +209,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpGet]
-        public async Task<Result<ICollection<OrderExportRequestModel>>> GetExportDetails()
+        public Result<ICollection<OrderExportRequestModel>> GetExportDetails()
         {
             var toReturn = new List<OrderExportRequestModel>();
             var item = new OrderExportRequestModel();
@@ -838,11 +838,11 @@ namespace VC.Admin.Controllers
                 updateCustomer = true;
             }
 
-            if (model.Id == 0 && order.SafeData.OrderNotes != null)
+            if (model.Id == 0 && order.SafeData.ServiceCodeNotes != null)
             {
                 var note = new CustomerNoteDynamic();
                 note.IdAddedBy = userId;
-                note.Note = order.SafeData.OrderNotes;
+                note.Note = order.SafeData.ServiceCodeNotes;
                 note.Data.Priority = (int)CustomerNotePriority.NormalPriority;
                 customer.CustomerNotes.Add(note);
                 customer.IdEditedBy = userId;
@@ -880,10 +880,6 @@ namespace VC.Admin.Controllers
                 }
                 else
                 {
-                    if (order.SafeData.OrderNotes != null)
-                    {
-                        order.Data.ServiceCodeNotes = order.SafeData.OrderNotes;
-                    }
                     order = await _orderService.InsertAsync(order);
                 }
             }

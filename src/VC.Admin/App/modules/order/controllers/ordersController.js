@@ -1,6 +1,6 @@
 ﻿angular.module('app.modules.order.controllers.ordersController', [])
-.controller('ordersController', ['$scope', '$rootScope', '$state', '$stateParams', '$location', 'orderService', 'settingService', 'gcService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
-    function ($scope, $rootScope, $state, $stateParams, $location, orderService, settingService, gcService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
+.controller('ordersController', ['$scope', '$rootScope', '$state', '$stateParams', '$location', '$q', 'orderService', 'settingService', 'userService', 'gcService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
+    function ($scope, $rootScope, $state, $stateParams, $location, $q, orderService, settingService, userService, gcService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
     {
         $scope.refreshTracker = promiseTracker("refresh");
         $scope.deleteTracker = promiseTracker("delete");
@@ -108,6 +108,7 @@
             var idSku = $stateParams.idsku ? $stateParams.idsku : null;
             var from = $stateParams.from ? Date.parseDateTime($stateParams.from) : currentDate.shiftDate('-1m');
             var to = $stateParams.to ? Date.parseDateTime($stateParams.to) : currentDate.shiftDate('+1d');
+            var statuses = $stateParams.statuses ? $stateParams.statuses.split(',') : null;
             $scope.filter = {
                 To: to,
                 From: from,
@@ -117,12 +118,14 @@
                 IdOrderSource: null,
                 POrderType: null,
                 IdSku: idSku,
+                IncludeOrderStatuses: statuses,
                 IdCustomerType: null,
                 IdShippingMethod: null,
                 IdShipState: null,
                 CustomerFirstName: null,
                 CustomerLastName: null,
                 CustomerCompany: null,
+                IdAddedBy: null,
                 Paging: { PageIndex: 1, PageItemCount: 200 },
                 Sorting: gridSorterUtil.resolve(refreshOrders, "DateCreated", "Desc"),
                 IsActive: true,
@@ -161,31 +164,33 @@
 
             $scope.forms.IsActive = true;
 
-            settingService.getCountries({}, $scope.refreshTracker)
-                .success(function (result)
+
+            $q.all({
+                countriesCall: settingService.getCountries({}, $scope.refreshTracker),
+                adminsCall: userService.getUsers({}, $scope.refreshTracker),
+            }).then(function (result)
+            {
+                if (result.countriesCall.data.Success && result.adminsCall.data.Success)
                 {
-                    if (result.Success)
+                    $scope.state = result.countriesCall.data.Data;
+                    $.each(result.countriesCall.data.Data, function (index, country)
                     {
-                        $scope.state = result.Data;
-                        $.each(result.Data, function (index, country)
+                        if (country.CountryCode == 'US')
                         {
-                            if (country.CountryCode == 'US')
-                            {
-                                $scope.states = country.States;
-                                $scope.states.splice(0, 0, { Id: null, StateName: 'All'});
-                            }
-                        });
-                        refreshOrders();
-                    } else
-                    {
-                        errorHandler(result);
-                    }
-                })
-                .error(function (result)
+                            $scope.states = country.States;
+                            $scope.states.splice(0, 0, { Id: null, StateName: 'All' });
+                        }
+                    });
+                    $scope.admins = result.adminsCall.data.Data.Items;
+                    $scope.admins.splice(0, 0, { Id: null, AgentId: 'All Agents' });
+
+                    refreshOrders();
+                }
+                else
                 {
                     errorHandler(result);
-                });
-
+                }
+            });
             if ($rootScope.exportStatusRefreshTimer == null)
             {
                 refreshExportStatus();
@@ -249,6 +254,8 @@
 
         $scope.filterOrders = function ()
         {
+            $scope.filter.IdSku = null;
+            $scope.filter.IncludeOrderStatuses = null;
             $scope.forms.IsActive = true;
             if ($scope.forms.filterForm.$valid)
             {

@@ -131,6 +131,21 @@ namespace VitalChoice.Business.Helpers
             return toReturn;
         }
 
+        public static string GetYesNoRecordStatus(RecordStatusCode status)
+        {
+            string toReturn = null;
+            switch (status)
+            {
+                case RecordStatusCode.Active:
+                    toReturn = "Yes";
+                    break;
+                case RecordStatusCode.NotActive:
+                    toReturn = "No";
+                    break;
+            }
+            return toReturn;
+        }
+
         public static Dictionary<int, string> GetRecordStatuses()
         {
             Dictionary<int, string> toReturn = new Dictionary<int, string>

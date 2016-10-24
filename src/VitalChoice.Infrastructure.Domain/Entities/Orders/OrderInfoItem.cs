@@ -53,6 +53,10 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
 
         public DateTime DateEdited { get; set; }
 
+        public int? IdAddedBy { get; set; }
+
+        public string AddedByAgentId { get; set; }
+
         [Map]
         public int? POrderType { get; set; }
 

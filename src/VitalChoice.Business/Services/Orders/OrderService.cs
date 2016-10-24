@@ -947,6 +947,9 @@ namespace VitalChoice.Business.Services.Orders
                             }
                             standardOrder.ShippingAddress.Id = 0;
                             standardOrder.Data.AutoShipId = autoShip.Id;
+                            standardOrder.OrderStatus = OrderStatus.Processed;
+                            standardOrder.POrderStatus = null;
+                            standardOrder.NPOrderStatus = null;
 
                             var order = await InsertAsyncInternal(standardOrder, uow);
 
@@ -1503,9 +1506,11 @@ namespace VitalChoice.Business.Services.Orders
                 //TODO - should be redone after adding - https://github.com/aspnet/EntityFramework/issues/2850
                 .WithOrderType(filter.IdObjectType)
                 .WithOrderStatus(filter.OrderStatus)
+                .WithOrderStatuses(filter.IncludeOrderStatuses)
                 .WithCustomerType(filter.IdCustomerType)
                 .WithoutIncomplete(filter.OrderStatus, filter.IgnoreNotShowingIncomplete)
                 .WithIdSku(filter.IdSku)
+                .WithIdAddedBy(filter.IdAddedBy)
                 .WithShipState(filter.IdShipState)
                 .WithOrderDynamicValues(filter.IdOrderSource, filter.POrderType, filter.IdShippingMethod)
                 .WithCustomerDynamicValues(filter.CustomerFirstName, filter.CustomerLastName, filter.CustomerCompany)
@@ -1557,6 +1562,10 @@ namespace VitalChoice.Business.Services.Orders
                                 ? OrderingExtension.OrderByValue(x, "OrderType")
                                 : OrderingExtension.OrderByDescendingValue(x, "OrderType");
                     break;
+                case VOrderSortPath.IdAddedBy:
+                    sortable =
+                        (x) => sortOrder == FilterSortOrder.Asc ? x.OrderBy(y => y.IdAddedBy) : x.OrderByDescending(y => y.IdAddedBy);
+                    break;
             }
 
             var orders = await SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, conditions, 
@@ -1579,6 +1588,7 @@ namespace VitalChoice.Business.Services.Orders
                     DateCreated = item.DateCreated,
                     Total = item.Total,
                     IdEditedBy = item.IdEditedBy,
+                    IdAddedBy = item.IdAddedBy,
                     DateEdited = item.DateEdited,
                     IdCustomerType = item.Customer.IdObjectType,
                     IdCustomer = item.Customer.Id,
@@ -1612,6 +1622,7 @@ namespace VitalChoice.Business.Services.Orders
             if (toReturn.Items.Count > 0)
             {
                 var ids = new HashSet<int>(toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value));
+                ids.AddRange(toReturn.Items.Where(p => p.IdAddedBy.HasValue).Select(p => p.IdAddedBy.Value));
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
                 foreach (var item in toReturn.Items)
                 {
@@ -1620,6 +1631,10 @@ namespace VitalChoice.Business.Services.Orders
                         if (item.IdEditedBy == profile.Id)
                         {
                             item.EditedByAgentId = profile.AgentId;
+                        }
+                        if (item.IdAddedBy == profile.Id)
+                        {
+                            item.AddedByAgentId = profile.AgentId;
                         }
                     }
                 }
@@ -1779,6 +1794,22 @@ namespace VitalChoice.Business.Services.Orders
             var calculationMessages = new Dictionary<IList<int>, IList<MessageInfo>>();
             foreach (var item in map)
             {
+                //merge the same skus
+                var forRemove = new List<SkuOrdered>();
+                foreach (var skuOrdered in item.Order.Skus)
+                {
+                    if (!forRemove.Contains(skuOrdered))
+                    {
+                        var dublicates = item.Order.Skus.Where(p => p.Sku.Id == skuOrdered.Sku.Id && p!=skuOrdered).ToList();
+                        foreach (var dublicate in dublicates)
+                        {
+                            skuOrdered.Quantity += dublicate.Quantity;
+                            forRemove.Add(dublicate);
+                        }
+                    }
+                }
+                item.Order.Skus.RemoveAll(forRemove);
+
                 var orderCombinedStatus = item.Order.OrderStatus ?? OrderStatus.Processed;
                 item.Order.Data.ShipDelayType = item.Order.SafeData.ShipDelayDate != null ? ShipDelayType.EntireOrder : ShipDelayType.None;
 
