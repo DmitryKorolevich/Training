@@ -18,6 +18,11 @@ angular.module('app.core.utils.appBootstrap', [])
             webStorageUtil,
             confirmUtil)
         {
+            function downloadFileIframe(url)
+            {
+                $("<iframe/>").attr('src', url).css('visibility', 'hidden').css('display', 'none').appendTo($('body'));
+            };
+
             function scrollTo(id)
             {
                 $location.hash(id);
@@ -278,6 +283,7 @@ angular.module('app.core.utils.appBootstrap', [])
                         toaster.pop('error', "Error!", "Server error occured");
                     });
 
+                $rootScope.downloadFileIframe = downloadFileIframe;
                 $rootScope.scrollTo = scrollTo;
                 $rootScope.getReferenceItem = getReferenceItem;
                 $rootScope.getValidationMessage = getValidationMessage;

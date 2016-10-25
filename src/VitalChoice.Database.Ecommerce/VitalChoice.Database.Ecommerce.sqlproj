@@ -223,4 +223,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\TempShipDelayAutoShipRebuilding.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetCustomerSkuUsageReport.sql" />
+  </ItemGroup>
 </Project>

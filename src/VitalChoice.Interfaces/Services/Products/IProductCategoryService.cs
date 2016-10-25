@@ -9,6 +9,8 @@ namespace VitalChoice.Interfaces.Services.Products
 {
     public interface IProductCategoryService
     {
+        Task<ICollection<ProductCategory>> GetCategoriesAsync(ProductCategoryTreeFilter filter);
+
         Task<ProductCategory> GetCategoriesTreeAsync(ProductCategoryTreeFilter filter);
         /// <summary>
         /// Allow only update ordering categories in a tree, without ability to add or delete items. Not active status is ignored for this method, but not active categories willn't 

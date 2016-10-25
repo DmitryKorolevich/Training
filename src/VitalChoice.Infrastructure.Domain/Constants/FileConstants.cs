@@ -33,5 +33,7 @@
         public const string AFFILIATE_ORDER_STATUSES_REPORT = "Affiliate_Order_Status_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
 
         public const string SKU_PART_SUMMARY_LIST = "SKU_Part_Summary_List_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+
+        public const string CUSTOMER_SKU_USAGE_REPORT = "Customer_Sku_Usage_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
     }
 }

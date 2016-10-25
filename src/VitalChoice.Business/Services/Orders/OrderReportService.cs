@@ -43,6 +43,7 @@ using System.Reflection;
 using CsvHelper;
 using CsvHelper.Configuration;
 using VitalChoice.Business.CsvImportMaps;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -55,6 +56,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly SpEcommerceRepository _sPEcommerceRepository;
         private readonly ICountryService _countryService;
         private readonly IProductService _productService;
+        private readonly IProductCategoryService _productCategoryService;
         private readonly IDiscountService _discountService;
         private readonly IDynamicMapper<AddressDynamic, Address> _addresMapper;
         private readonly ReferenceData _referenceData;
@@ -74,6 +76,7 @@ namespace VitalChoice.Business.Services.Orders
             SpEcommerceRepository sPEcommerceRepository,
             ICountryService countryService,
             IProductService productService,
+            IProductCategoryService productCategoryService,
             IDiscountService discountService,
             IDynamicMapper<AddressDynamic, Address> addresMapper,
             ITrackingService trackingService,
@@ -92,6 +95,7 @@ namespace VitalChoice.Business.Services.Orders
             _sPEcommerceRepository = sPEcommerceRepository;
             _countryService = countryService;
             _productService = productService;
+            _productCategoryService = productCategoryService;
             _discountService = discountService;
             _addresMapper = addresMapper;
             _referenceData = referenceData;
@@ -1562,6 +1566,59 @@ namespace VitalChoice.Business.Services.Orders
                     }
                 }
             }
+
+            return toReturn;
+        }
+
+        public async Task<PagedList<CustomerSkuUsageReportRawItem>> GetCustomerSkuUsageReportItemsAsync(CustomerSkuUsageReportFilter filter)
+        {
+            var toReturn = await _sPEcommerceRepository.GetCustomerSkuUsageReportItemsAsync(filter);
+            if (filter.Exclude?.Count > 0)
+            {
+                toReturn.Items.RemoveAll(p => filter.Exclude.Any(pp => pp.Key == p.IdCustomer && pp.Value == p.IdSku));
+            }
+            var categories = await _productCategoryService.GetCategoriesAsync(new ProductCategoryTreeFilter());
+            var countries = await _countryService.GetCountriesAsync();
+
+            foreach (var customerSkuUsageReportRawItem in toReturn.Items)
+            {
+                customerSkuUsageReportRawItem.DoNotMail = customerSkuUsageReportRawItem.DoNotMail.HasValue;
+                customerSkuUsageReportRawItem.CustomerType = (CustomerType)customerSkuUsageReportRawItem.CustomerIdObjectType;
+                customerSkuUsageReportRawItem.ShippingCountryCode = customerSkuUsageReportRawItem.ShippingIdCountry.HasValue
+                    ? countries.FirstOrDefault(p => p.Id == customerSkuUsageReportRawItem.ShippingIdCountry)?.CountryCode
+                    : null;
+                customerSkuUsageReportRawItem.ShippingStateCode = customerSkuUsageReportRawItem.ShippingIdState.HasValue
+                    ? countries.SelectMany(p=>p.States).FirstOrDefault(p => p.Id == customerSkuUsageReportRawItem.ShippingIdState)?.StateCode
+                    : null;
+
+                customerSkuUsageReportRawItem.CategoryNames = string.Empty;
+                if (!string.IsNullOrEmpty(customerSkuUsageReportRawItem.CategoryIds))
+                {
+                    var ids = customerSkuUsageReportRawItem.CategoryIds.Split(',');
+                    foreach (var sId in ids)
+                    {
+                        int id;
+                        if (Int32.TryParse(sId, out id))
+                        {
+                            if (!filter.IdCategory.HasValue || filter.IdCategory.Value == id)
+                            {
+                                var name = categories.FirstOrDefault(p => p.Id == id)?.Name;
+                                if (!string.IsNullOrEmpty(name))
+                                {
+                                    customerSkuUsageReportRawItem.CategoryNames += name + ", ";
+                                }
+                            }
+                        }
+                    }
+                    if (customerSkuUsageReportRawItem.CategoryNames.EndsWith(","))
+                    {
+                        customerSkuUsageReportRawItem.CategoryNames =
+                            customerSkuUsageReportRawItem.CategoryNames.Remove(
+                                customerSkuUsageReportRawItem.CategoryNames.Length - 1, 1);
+                    }
+                }
+            }
+
 
             return toReturn;
         }

@@ -58,5 +58,7 @@ namespace VitalChoice.Interfaces.Services.Orders
 	    Task<ICollection<AAFESReportItem>> GetAAFESReportItemsAsync(AAFESReportFilter filter);
 
 	    Task<ICollection<AfiiliateOrderItemImportExportModel>> GetAffiliateOrdersInfo(byte[] file);
+
+	    Task<PagedList<CustomerSkuUsageReportRawItem>> GetCustomerSkuUsageReportItemsAsync(CustomerSkuUsageReportFilter filter);
 	}
 }

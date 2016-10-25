@@ -59,6 +59,7 @@ using VitalChoice.Infrastructure.Domain;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.Extensions;
+using VitalChoice.Business.CsvExportMaps.Products;
 
 namespace VC.Admin.Controllers
 {
@@ -88,6 +89,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<ShippedViaReportRawOrderItem, ShippedViaItemsReportOrderItemCsvMap> _shippedViaItemsReportOrderItemCsvMapСSVExportService;
         private readonly ICsvExportService<AAFESReportItem, AAFESReportItemCsvMap> _aAFESReportItemCsvMapСSVExportService;
         private readonly ICsvExportService<AfiiliateOrderItemImportExportModel, AfiiliateOrderItemImportExportCsvMap> _afiiliateOrderItemImportExportСSVExportService;
+        private readonly ICsvExportService<CustomerSkuUsageReportRawItem, CustomerSkuUsageReportRawItemExportCsvMap> _customerSkuUsageReportRawItemExportСSVExportService;
         private readonly INotificationService _notificationService;
         private readonly BrontoService _brontoService;
         private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
@@ -123,6 +125,7 @@ namespace VC.Admin.Controllers
                 shippedViaItemsReportOrderItemCsvMapСSVExportService,
             ICsvExportService<AAFESReportItem, AAFESReportItemCsvMap> aAFESReportItemCsvMapСSVExportService,
             ICsvExportService<AfiiliateOrderItemImportExportModel, AfiiliateOrderItemImportExportCsvMap> afiiliateOrderItemImportExportСSVExportService,
+            ICsvExportService<CustomerSkuUsageReportRawItem, CustomerSkuUsageReportRawItemExportCsvMap> customerSkuUsageReportRawItemExportСSVExportService,
             INotificationService notificationService,
             BrontoService brontoService,
             IOrderReportService orderReportService,
@@ -154,6 +157,7 @@ namespace VC.Admin.Controllers
             _shippedViaItemsReportOrderItemCsvMapСSVExportService = shippedViaItemsReportOrderItemCsvMapСSVExportService;
             _aAFESReportItemCsvMapСSVExportService = aAFESReportItemCsvMapСSVExportService;
             _afiiliateOrderItemImportExportСSVExportService = afiiliateOrderItemImportExportСSVExportService;
+            _customerSkuUsageReportRawItemExportСSVExportService = customerSkuUsageReportRawItemExportСSVExportService;
             _notificationService = notificationService;
             _brontoService = brontoService;
             _orderReportService = orderReportService;
@@ -1841,6 +1845,51 @@ namespace VC.Admin.Controllers
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileName = String.Format(FileConstants.AFFILIATE_ORDER_STATUSES_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<PagedList<CustomerSkuUsageReportRawItem>>> GetCustomerSkuUsageReportItems([FromBody]CustomerSkuUsageReportFilter filter)
+        {
+            filter.To = filter.To.AddDays(1);
+            var toReturn = await _orderReportService.GetCustomerSkuUsageReportItemsAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<string>> RequestCustomerSkuUsageReportFile([FromBody]CustomerSkuUsageReportFilter filter)
+        {
+            filter.Paging = null;
+            filter.To = filter.To.AddDays(1);
+
+            var data = await _orderReportService.GetCustomerSkuUsageReportItemsAsync(filter);
+
+            var result = _customerSkuUsageReportRawItemExportСSVExportService.ExportToCsv(data.Items);
+
+            var guid = Guid.NewGuid().ToString().ToLower();
+            _cache.SetItem(String.Format(CacheKeys.ReportFormat, guid), result);
+
+            return guid;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public FileResult GetCustomerSkuUsageReportFile(string id)
+        {
+            var result = _cache.GetItem<byte[]>(String.Format(CacheKeys.ReportFormat, id));
+            if (result == null)
+            {
+                throw new AppValidationException("Please reload a file.");
+            }
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.CUSTOMER_SKU_USAGE_REPORT, DateTime.Now)
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
