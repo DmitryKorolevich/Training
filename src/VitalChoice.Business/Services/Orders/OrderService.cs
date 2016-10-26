@@ -1036,8 +1036,6 @@ namespace VitalChoice.Business.Services.Orders
 
                                 if (IsAllCancel(pOrderType, order))
                                 {
-                                    usedGcs.UpdateKeyed(order.GiftCertificates, g => g.Id, g => g.GiftCertificate.Id, (db, gc) => db.Balance += gc.Amount);
-
                                     order.GiftCertificates.Clear();
                                 }
                                 else
