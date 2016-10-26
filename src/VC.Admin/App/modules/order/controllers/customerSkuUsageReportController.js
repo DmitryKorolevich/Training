@@ -109,7 +109,7 @@
                 IdCategory: null,
                 Skus: [],
                 Exclude: [],
-                Paging: { PageIndex: 1, PageItemCount: 100 },
+                Paging: { PageIndex: 1, PageItemCount: 500 },
             };
             $scope.options.allExlude = true;
 

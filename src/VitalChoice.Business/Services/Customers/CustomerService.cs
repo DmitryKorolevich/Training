@@ -1263,8 +1263,8 @@ namespace VitalChoice.Business.Services.Customers
 
         #region Reports 
 
-            public
-            async Task<WholesaleSummaryReport> GetWholesaleSummaryReportAsync()
+        public
+        async Task<WholesaleSummaryReport> GetWholesaleSummaryReportAsync()
         {
             WholesaleSummaryReport toReturn = new WholesaleSummaryReport();
             toReturn.TradeClasses = _referenceData.TradeClasses.Select(p => new WholesaleSummaryReportTradeClassItem()
