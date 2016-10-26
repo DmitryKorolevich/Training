@@ -675,6 +675,13 @@ namespace VC.Admin.Controllers
         {
             return await _customerService.GetCustomersWithDublicateEmailsAsync(filter);
         }
+        
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
+        public async Task<Result<bool>> UnlockCustomer(int id, [FromBody]object model)
+        {
+            return await _customerService.UnlockCustomerAsync(id);
+        }
 
         #region Reports
 

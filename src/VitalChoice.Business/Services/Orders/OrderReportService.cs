@@ -1582,7 +1582,7 @@ namespace VitalChoice.Business.Services.Orders
 
             foreach (var customerSkuUsageReportRawItem in toReturn.Items)
             {
-                customerSkuUsageReportRawItem.DoNotMail = customerSkuUsageReportRawItem.DoNotMail.HasValue;
+                customerSkuUsageReportRawItem.DoNotMail = customerSkuUsageReportRawItem.DoNotMail ?? false;
                 customerSkuUsageReportRawItem.CustomerType = (CustomerType)customerSkuUsageReportRawItem.CustomerIdObjectType;
                 customerSkuUsageReportRawItem.ShippingCountryCode = customerSkuUsageReportRawItem.ShippingIdCountry.HasValue
                     ? countries.FirstOrDefault(p => p.Id == customerSkuUsageReportRawItem.ShippingIdCountry)?.CountryCode

@@ -167,7 +167,9 @@
 
             $q.all({
                 countriesCall: settingService.getCountries({}, $scope.refreshTracker),
-                adminsCall: userService.getUsers({}, $scope.refreshTracker),
+                adminsCall: userService.getUsers({
+                    Sorting: gridSorterUtil.resolve(refreshOrders, "AgentId", "Asc")
+                }, $scope.refreshTracker),
             }).then(function (result)
             {
                 if (result.countriesCall.data.Success && result.adminsCall.data.Success)

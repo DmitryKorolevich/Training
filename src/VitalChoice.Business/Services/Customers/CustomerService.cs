@@ -1234,9 +1234,37 @@ namespace VitalChoice.Business.Services.Customers
             return toReturn;
         }
 
+        public async Task<bool> UnlockCustomerAsync(int id)
+        {
+            var toReturn = false;
+
+            using (var uow = CreateUnitOfWork())
+            {
+                using (var transaction = uow.BeginTransaction())
+                {
+                    try
+                    {
+                        var appUser = await _storefrontUserService.GetAsync(id);
+
+                        toReturn = await _storefrontUserService.UnlockUserAsync(appUser);
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+            
+            return toReturn;
+        }
+
         #region Reports 
 
-        public async Task<WholesaleSummaryReport> GetWholesaleSummaryReportAsync()
+            public
+            async Task<WholesaleSummaryReport> GetWholesaleSummaryReportAsync()
         {
             WholesaleSummaryReport toReturn = new WholesaleSummaryReport();
             toReturn.TradeClasses = _referenceData.TradeClasses.Select(p => new WholesaleSummaryReportTradeClassItem()

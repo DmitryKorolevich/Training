@@ -309,6 +309,16 @@ namespace VitalChoice.Business.Services.Users
 	        return await UserManager.DeleteAsync(await GetAsync(idInternal));
 	    }
 
+	    public async Task<bool> UnlockUserAsync(ApplicationUser user)
+        {
+            var updateResult = await UserManager.SetLockoutEndDateAsync(user, null);
+            if (updateResult.Succeeded)
+            {
+                return true;
+            }
+            throw new AppValidationException(AggregateIdentityErrors(updateResult.Errors));
+        }
+
 	    public async Task<ApplicationUser> UpdateAsync(ApplicationUser user, IList<RoleType> roleIds = null, string password = null)
 		{
 			await ValidateUserInternalAsync(user);

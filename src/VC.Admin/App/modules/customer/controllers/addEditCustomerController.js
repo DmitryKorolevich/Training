@@ -13,6 +13,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			$scope.resetTracker = promiseTracker("reset");
 			$scope.resendTracker = promiseTracker("resend");
 			$scope.loginAsCustomerTracker = promiseTracker("loginAsCustomer");
+			$scope.unlockCustomerTracker = promiseTracker("unlockCustomer");
 
 			function refreshHistory()
 			{
@@ -644,6 +645,21 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			        });
 			        $scope.uploadOrderCreditCards = uploadOrderCreditCards;
 			    }
+			};
+
+			$scope.unlockCustomer = function ()
+			{
+			    customerService.unlockCustomer($scope.currentCustomer.Id, $scope.unlockCustomerTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            toaster.pop('success', "Success!", "Successfully unlocked");
+                        }
+                    }).error(function ()
+                    {
+                        toaster.pop('error', "Error!", "Server error occured");
+                    });
 			};
 
 			initialize();

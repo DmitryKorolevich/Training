@@ -59,13 +59,16 @@
                         $scope.items = result.Data.Items;
                         $scope.totalItems = result.Data.Count;
 
+                        $scope.options.allExlude = true;
                         $.each($scope.items, function (index, item)
                         {
+                            item.IsSelected = true;
                             $.each($scope.filter.Exclude, function (index, excludeItem)
                             {
                                 if (item.IdCustomer == excludeItem.Key && item.IdSku == excludeItem.Value)
                                 {
-                                    item.IsSelected = true;
+                                    item.IsSelected = false;
+                                    $scope.options.allExlude = false;
                                 }
                             });
                         });
@@ -108,6 +111,7 @@
                 Exclude: [],
                 Paging: { PageIndex: 1, PageItemCount: 100 },
             };
+            $scope.options.allExlude = true;
 
             loadCategories();
         }
@@ -148,29 +152,76 @@
             });
         }
 
+        function compareId(a, b)
+        {
+            return b-a;
+        }
+
         $scope.itemExludeChanged = function (item, event)
         {
             if (item.IsSelected)
+            {
+                $scope.filter.Exclude = jQuery.grep($scope.filter.Exclude, function (value)
+                {
+                    var remove=false;
+                    if(value.Key == item.IdCustomer && value.Value == item.IdSku)
+                    {
+                        remove=true;
+                    }
+                    return !remove;
+                });
+                
+                $scope.options.allExlude = true;
+                $.each($scope.items, function (index, innerItem)
+                {
+                    if (!innerItem.IsSelected)
+                    {
+                        $scope.options.allExlude = false;
+                        return false;
+                    }
+                });
+            }
+            else
             {
                 $scope.filter.Exclude.push({
                     Key: item.IdCustomer,
                     Value: item.IdSku
                 });
+                $scope.options.allExlude = false;
+            }
+        };
+
+        $scope.allItemExludeCall = function ()
+        {
+            if ($scope.options.allExlude)
+            {
+                $scope.filter.Exclude = jQuery.grep($scope.filter.Exclude, function (value)
+                {
+                    var remove=false;
+                    $.each($scope.items, function (index, item)
+                    {
+                        if(value.Key == item.IdCustomer && value.Value == item.IdSku)
+                        {
+                            remove=true;
+                        }
+                    });
+                    return !remove;
+                });
             }
             else
             {
-                var forDeleteIndexes= [];
-                $.each($scope.filter.Exclude, function(index, value){
-                    if (value.Key == item.IdCustomer && value.Value == item.IdSku)
-                    {
-                        forDeleteIndexes.push(index);
-                    }
-                });
-                $.each(forDeleteIndexes, function (index, item)
+                $.each($scope.items, function (index, item)
                 {
-                    $scope.filter.Exclude.splice(index, 1);
+                    $scope.filter.Exclude.push({
+                        Key: item.IdCustomer,
+                        Value: item.IdSku
+                    });
                 });
             }
+            $.each($scope.items, function (index, item)
+            {
+                item.IsSelected = $scope.options.allExlude;
+            });
         };
 
         $scope.exportItems = function ()
@@ -206,6 +257,7 @@
             if ($scope.forms.form.$valid)
             {
                 $scope.filter.Exclude = [];
+                $scope.options.allExlude = true;
                 refreshItems();
             }
             else

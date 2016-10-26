@@ -63,6 +63,8 @@ namespace VitalChoice.Interfaces.Services.Customers
 
 	    Task<PagedList<VCustomerWithDublicateEmail>> GetCustomersWithDublicateEmailsAsync(FilterBase filter);
 
+	    Task<bool> UnlockCustomerAsync(int id);
+
         #region Reports 
 
         Task<WholesaleSummaryReport> GetWholesaleSummaryReportAsync();

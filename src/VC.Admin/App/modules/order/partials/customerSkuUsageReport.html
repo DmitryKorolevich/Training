@@ -85,7 +85,14 @@
                         <th>Ship to Country</th>
                         <th>DNM flag</th>
                         <th>Email</th>
-                        <th>Online Only</th>
+                        <th>
+                            <div class="checkbox-inline">
+                                <label class="margin-bottom-0px">
+                                    <input data-ng-model="options.allExlude" type="checkbox" data-ng-change="allItemExludeCall()">
+                                    <strong>Download</strong>
+                                </label>
+                            </div>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
