@@ -319,7 +319,12 @@ namespace VitalChoice.Business.Services.Users
             throw new AppValidationException(AggregateIdentityErrors(updateResult.Errors));
         }
 
-	    public async Task<ApplicationUser> UpdateAsync(ApplicationUser user, IList<RoleType> roleIds = null, string password = null)
+        public async Task<bool> IsUserLockedAsync(ApplicationUser user)
+        {
+            return await UserManager.IsLockedOutAsync(user);
+        }
+
+        public async Task<ApplicationUser> UpdateAsync(ApplicationUser user, IList<RoleType> roleIds = null, string password = null)
 		{
 			await ValidateUserInternalAsync(user);
 

@@ -655,6 +655,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
                         if (result.Success)
                         {
                             toaster.pop('success', "Success!", "Successfully unlocked");
+                            $scope.currentCustomer.LoginLocked = false;
                         }
                     }).error(function ()
                     {

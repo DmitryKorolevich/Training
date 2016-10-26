@@ -503,8 +503,9 @@ namespace VC.Admin.Controllers
 	        {
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
 			}
+            customerModel.LoginLocked = await _storefrontUserService.IsUserLockedAsync(login);
 
-			customerModel.IsConfirmed = login.PasswordHash !=null;
+            customerModel.IsConfirmed = login.PasswordHash !=null;
 			customerModel.PublicUserId = login.PublicId;
 
             await PrepareCustomerNotes(result,customerModel);

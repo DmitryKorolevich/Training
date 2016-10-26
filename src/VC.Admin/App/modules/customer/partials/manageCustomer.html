@@ -7,7 +7,7 @@
             <div class="margin-top-10px">
                 <button cancel-button-default-state="index.oneCol.manageCustomers" cancel-button class="btn btn-default width-160px" unsaved-warning-clear>Cancel</button>
             </div>
-            <div data-ng-if="currentCustomer.Id" class="margin-top-10px">
+            <div data-ng-if="currentCustomer.LoginLocked" class="margin-top-10px">
                 <button class="btn btn-purple width-160px" data-ng-click="unlockCustomer();" ladda="unlockCustomerTracker.active()">Unlock Login</button>
             </div>
             <div class="margin-top-10px">
