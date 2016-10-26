@@ -4,6 +4,6 @@ namespace VitalChoice.Infrastructure.LoadBalancing
 {
     public interface IRoundRobinPool<in T> : IDisposable
     {
-        void EnqueueData(T data);
+        void EnqueueData(T data, object processParameter = null);
     }
 }

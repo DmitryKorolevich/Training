@@ -229,7 +229,7 @@ namespace VC.Admin.Controllers
                     Error = "Test error"
                 }
             };
-            item.All = item.ExportedOrders.Count + 5;
+            item.TotalCount = item.ExportedOrders.Count + 5;
             toReturn.Add(item);
 
             item = new OrderExportRequestModel();
@@ -249,7 +249,7 @@ namespace VC.Admin.Controllers
                     Error = "Test error"
                 }
             };
-            item.All = item.ExportedOrders.Count + 5;
+            item.TotalCount = item.ExportedOrders.Count + 5;
             toReturn.Add(item);
 
             return toReturn;

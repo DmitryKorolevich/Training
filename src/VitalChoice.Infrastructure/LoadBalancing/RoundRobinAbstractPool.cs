@@ -28,7 +28,7 @@ namespace VitalChoice.Infrastructure.LoadBalancing
                 _threadData[i] =
                     new ThreadStartData
                     {
-                        DataQueue = new ConcurrentQueue<T>(),
+                        DataQueue = new ConcurrentQueue<ProcessData>(),
                         DataReadyEvent = new ManualResetEvent(false),
                         LocalData = threadLocalFactory?.Invoke()
                     };
@@ -37,17 +37,21 @@ namespace VitalChoice.Infrastructure.LoadBalancing
             }
         }
 
-        public void EnqueueData(T data)
+        public void EnqueueData(T data, object processParameter)
         {
             lock (_lock)
             {
-                _threadData[_nextToUse].DataQueue.Enqueue(data);
+                _threadData[_nextToUse].DataQueue.Enqueue(new ProcessData
+                {
+                    Data = data,
+                    ProcessParameter = processParameter
+                });
                 _threadData[_nextToUse].DataReadyEvent.Set();
                 _nextToUse = (byte) ((_nextToUse + 1)%_maxThreads);
             }
         }
 
-        protected abstract void ProcessingAction(T data, object localData);
+        protected abstract void ProcessingAction(T data, object localData, object processParameter);
 
         protected virtual void DisposeLocalData(object localData)
         {
@@ -63,12 +67,12 @@ namespace VitalChoice.Infrastructure.LoadBalancing
                 parameters.DataReadyEvent.WaitOne();
                 parameters.DataReadyEvent.Reset();
 
-                T data;
+                ProcessData data;
                 while (parameters.DataQueue.TryDequeue(out data))
                 {
                     try
                     {
-                        ProcessingAction(data, parameters.LocalData);
+                        ProcessingAction(data.Data, parameters.LocalData, data.ProcessParameter);
                     }
                     catch (Exception e)
                     {
@@ -88,10 +92,16 @@ namespace VitalChoice.Infrastructure.LoadBalancing
             }
         }
 
+        private struct ProcessData
+        {
+            public T Data;
+            public object ProcessParameter;
+        }
+
         private struct ThreadStartData
         {
             public ManualResetEvent DataReadyEvent;
-            public ConcurrentQueue<T> DataQueue;
+            public ConcurrentQueue<ProcessData> DataQueue;
             public object LocalData;
         }
     }

@@ -18,7 +18,7 @@ namespace VC.Admin.Models.Orders
 
         public string AgentId { get; set; }
 
-        public int All { get; set; }
+        public int TotalCount { get; set; }
 
         public ICollection<OrderExportItemResult> ExportedOrders { get; set; }
     }
