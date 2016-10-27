@@ -19,5 +19,6 @@
         MasterContentItem = 17,
         EmailTemplate = 18,
         CustomPublicStyle = 19,
+        GiftCertificate = 20,
     }
 }

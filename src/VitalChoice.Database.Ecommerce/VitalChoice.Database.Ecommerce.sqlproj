@@ -226,4 +226,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPGetCustomerSkuUsageReport.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\GCs.sql" />
+  </ItemGroup>
 </Project>

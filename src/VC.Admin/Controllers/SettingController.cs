@@ -37,6 +37,7 @@ using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Data.Extensions;
+using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Infrastructure.Domain.Content;
 using VitalChoice.Infrastructure.Domain.Content.Emails;
@@ -372,6 +373,9 @@ namespace VC.Admin.Controllers
                     break;
                 case ObjectType.CustomPublicStyle:
                     toReturn = new KeyValuePair<Type, Type>(typeof(CustomPublicStyle), typeof(StylesModel));
+                    break;
+                case ObjectType.GiftCertificate:
+                    toReturn = new KeyValuePair<Type, Type>(typeof(GiftCertificate), typeof(GCManageModel));
                     break;
                 default:
                     throw new NotImplementedException();

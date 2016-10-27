@@ -109,7 +109,6 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
                         PublicId = Guid.NewGuid(),
                         Created = DateTime.Now,
                         StatusCode = RecordStatusCode.Active,
-                        UserId = context.Order.Customer?.Id
                     });
             }
             return result;

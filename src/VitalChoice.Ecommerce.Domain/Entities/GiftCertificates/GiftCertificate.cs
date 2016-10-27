@@ -5,7 +5,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Products;
 
 namespace VitalChoice.Ecommerce.Domain.Entities.GiftCertificates
 {
-    public class GiftCertificate : Entity
+    public class GiftCertificate : LogEntity
     {
         public DateTime Created { get; set; }
 
@@ -31,9 +31,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.GiftCertificates
 
         [NotMapped]
         public string AgentId { get; set; }
-
-        public RecordStatusCode StatusCode { get; set; }
-
+        
         public GCType GCType { get; set; }
 
         public Guid PublicId { get; set; }
@@ -51,6 +49,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.GiftCertificates
             toReturn.StatusCode = this.StatusCode;
             toReturn.GCType = this.GCType;
             toReturn.UserId = this.UserId;
+            toReturn.IdEditedBy = this.IdEditedBy;
             return toReturn;
         }
     }

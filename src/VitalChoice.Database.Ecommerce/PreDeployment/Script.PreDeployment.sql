@@ -12,3 +12,4 @@
 
 :r .\Scripts\KPICacheItems.sql
 :r .\Scripts\OrderShippingPackages.sql
+:r .\Scripts\GCs.sql

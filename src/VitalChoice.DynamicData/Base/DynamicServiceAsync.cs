@@ -90,7 +90,7 @@ namespace VitalChoice.DynamicData.Base
             return Task.FromResult(new List<MessageInfo>());
         }
 
-        public async Task<TDynamic> InsertAsync(TDynamic model)
+        public virtual async Task<TDynamic> InsertAsync(TDynamic model)
         {
             using (var uow = CreateUnitOfWork())
             {
@@ -98,7 +98,7 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        public async Task<TDynamic> UpdateAsync(TDynamic model)
+        public virtual async Task<TDynamic> UpdateAsync(TDynamic model)
         {
             using (var uow = CreateUnitOfWork())
             {
@@ -106,7 +106,7 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        public async Task<List<TDynamic>> InsertRangeAsync(ICollection<TDynamic> models)
+        public virtual async Task<List<TDynamic>> InsertRangeAsync(ICollection<TDynamic> models)
         {
             using (var uow = CreateUnitOfWork())
             {
@@ -114,7 +114,7 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        public async Task<List<TDynamic>> UpdateRangeAsync(ICollection<TDynamic> models)
+        public virtual async Task<List<TDynamic>> UpdateRangeAsync(ICollection<TDynamic> models)
         {
             using (var uow = CreateUnitOfWork())
             {
@@ -353,7 +353,7 @@ namespace VitalChoice.DynamicData.Base
             }
         }
 
-        private async Task<TDynamic> InsertAsync(IUnitOfWorkAsync uow, TDynamic model)
+        protected async Task<TDynamic> InsertAsync(IUnitOfWorkAsync uow, TDynamic model)
         {
             //TODO: lock writing DB until we read result (Low, race condition for logging)
             var entity = await InsertAsync(model, uow);
@@ -363,7 +363,7 @@ namespace VitalChoice.DynamicData.Base
             return await DynamicMapper.FromEntityAsync(entity);
         }
 
-        private async Task<TDynamic> UpdateAsync(IUnitOfWorkAsync uow, TDynamic model)
+        protected async Task<TDynamic> UpdateAsync(IUnitOfWorkAsync uow, TDynamic model)
         {
             //TODO: lock writing DB until we read result (Low, race condition for logging)
             var entity = await UpdateAsync(model, uow);
@@ -373,7 +373,7 @@ namespace VitalChoice.DynamicData.Base
             return await DynamicMapper.FromEntityAsync(entity);
         }
 
-        private async Task<List<TDynamic>> InsertRangeAsync(IUnitOfWorkAsync uow, ICollection<TDynamic> models)
+        protected async Task<List<TDynamic>> InsertRangeAsync(IUnitOfWorkAsync uow, ICollection<TDynamic> models)
         {
             //TODO: lock writing DB until we read result (Low, race condition for logging)
             var entityIds = (await InsertRangeAsync(models, uow)).Select(e => e.Id).ToList();
@@ -382,7 +382,7 @@ namespace VitalChoice.DynamicData.Base
             return await DynamicMapper.FromEntityRangeAsync(entities);
         }
 
-        private async Task<List<TDynamic>> UpdateRangeAsync(IUnitOfWorkAsync uow, ICollection<TDynamic> models)
+        protected async Task<List<TDynamic>> UpdateRangeAsync(IUnitOfWorkAsync uow, ICollection<TDynamic> models)
         {
             //TODO: lock writing DB until we read result (Low, race condition for logging)
             var entities = await UpdateRangeAsync(models, uow);

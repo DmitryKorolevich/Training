@@ -167,6 +167,7 @@ namespace VitalChoice.Business.Services.Healthwise
                                 gc.Balance = amount;
                                 gc.Code = await _gcService.GenerateGCCode();
                                 gc.UserId = userId;
+                                gc.IdEditedBy = userId;
 
                                 giftCertificateRepository.Insert(gc);
                                 notificationModel.Email = gc.Email;
