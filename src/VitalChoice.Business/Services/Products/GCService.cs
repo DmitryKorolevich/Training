@@ -264,7 +264,7 @@ namespace VitalChoice.Business.Services.Products
         {
             if (codes == null || codes.Count == 0)
             {
-                return TaskCache<List<GiftCertificate>>.DefaultCompletedTask;
+                return Task.FromResult(new List<GiftCertificate>());
             }
 
             var query = giftCertificateRepository.Query(new GcQuery().WithEqualCodes(codes).NotDeleted());
