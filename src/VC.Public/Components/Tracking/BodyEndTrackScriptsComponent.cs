@@ -195,7 +195,7 @@ namespace VC.Public.Components.Tracking
                 }
 
                 //criteo viewBasket
-                toReturn.CustomerEmail = order.Customer?.Email;
+                toReturn.CustomerEmail = order.Customer?.Email ?? string.Empty;
                 if (step.HasValue)
                 {
                     toReturn.CriteoViewCart = String.Empty;

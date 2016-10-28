@@ -213,7 +213,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             if (viewContext.User != null)
             {
                 var customer = await _customerService.SelectAsync(Convert.ToInt32(_userManager.GetUserId(viewContext.User)));
-                toReturn.CustomerEmail = customer?.Email;
+                toReturn.CustomerEmail = customer?.Email ?? string.Empty;
             }
 
             return toReturn;

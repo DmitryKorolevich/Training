@@ -665,7 +665,7 @@ END
 
 GO
 
-IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Product sub categories' AND Updated<'2016-10-28 00:00:00.000')
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Product sub categories' AND Updated<'2016-10-29 00:00:00.000')
 BEGIN
 
 	UPDATE [dbo].[MasterContentItems]
@@ -764,14 +764,7 @@ BEGIN
         window.criteo_q = window.criteo_q || [];
         window.criteo_q.push(
         { event: "setAccount", account: 27307 },
-        @if(@model.CustomerEmail!=null)
-        {{
         { event: "setEmail", email: "@(CustomerEmail)" },
-        }}
-        @ifnot(@model.CustomerEmail!=null)
-        {{
-        { event: "setEmail", email: null },
-        }}
         { event: "setSiteType", type: "d" },
         { event: "viewList", item:[ @(Criterio) ]}
         );

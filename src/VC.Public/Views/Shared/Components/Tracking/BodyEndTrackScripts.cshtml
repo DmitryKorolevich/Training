@@ -55,14 +55,7 @@
         window.criteo_q = window.criteo_q || [];
         window.criteo_q.push(
             { event: "setAccount", account: 27307 },
-            @if (Model.CustomerEmail != null)
-            {
-                <text>{ event: "setEmail", email: "@Model.CustomerEmail" },</text>
-            }
-            else
-            {
-                <text>{ event: "setEmail", email: null },</text>
-            }
+            { event: "setEmail", email: "@Model.CustomerEmail" },
             { event: "setSiteType", type: "d" },
             { event: "viewBasket", item: [
             @Html.Raw(Model.CriteoViewCart) ]});
