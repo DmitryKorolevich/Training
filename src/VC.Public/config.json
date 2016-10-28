@@ -14,7 +14,7 @@
     //cdbdf92c@trustpilotservice.com
     "AffiliateEmailBcc": "affiliatesupport@vitalchoice.com",
 
-    "EnableOrderTrackScripts": true,
+    "EnableOrderTrackScripts": false,
     "GenerateLowercaseUrls": true,
     "EnableBundlingAndMinification": true,
     "Versioning": {
