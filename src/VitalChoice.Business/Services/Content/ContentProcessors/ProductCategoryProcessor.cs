@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
+using Microsoft.Extensions.Options;
 using VitalChoice.ContentProcessing.Base;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Data.Repositories.Specifics;
@@ -15,6 +16,7 @@ using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.TemplateModels;
 using VitalChoice.Infrastructure.Identity;
@@ -43,6 +45,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
         private readonly IEcommerceRepositoryAsync<ProductToCategory> _productToCategoryEcommerceRepository;
         private readonly ICustomerService _customerService;
         private readonly ExtendedUserManager _userManager;
+        private readonly IOptions<AppOptions> _appOptions;
 
         public ProductCategoryProcessor(IObjectMapper<ProductCategoryParameters> mapper,
             IProductCategoryService productCategoryService,
@@ -50,7 +53,10 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             IRepositoryAsync<ProductCategoryContent> productCategoryRepository,
             IRepositoryAsync<ProductContent> productContentRepository,
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoryEcommerceRepository,
-            ICustomerService customerService, ExtendedUserManager userManager, IDynamicMapper<ProductDynamic, Product> productMapper, IDynamicMapper<SkuDynamic, Sku> skuMapper) : base(mapper)
+            ICustomerService customerService, ExtendedUserManager userManager,
+            IDynamicMapper<ProductDynamic, Product> productMapper, 
+            IDynamicMapper<SkuDynamic, Sku> skuMapper,
+            IOptions<AppOptions> appOptions) : base(mapper)
         {
             _productCategoryService = productCategoryService;
             _productService = productService;
@@ -61,6 +67,7 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             _userManager = userManager;
             _productMapper = productMapper;
             _skuMapper = skuMapper;
+            _appOptions = appOptions;
         }
 
         private IList<CustomerTypeCode> GetCustomerVisibility(ProcessorViewContext viewContext)
@@ -201,6 +208,12 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                 {
                     viewContext.CommandOptions.RedirectUrl = "/product/" + toReturn.Products.First().Url;
                 }
+            }
+
+            if (viewContext.User != null)
+            {
+                var customer = await _customerService.SelectAsync(Convert.ToInt32(_userManager.GetUserId(viewContext.User)));
+                toReturn.CustomerEmail = customer?.Email;
             }
 
             return toReturn;
@@ -371,6 +384,19 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
                     if (productContent != null)
                     {
                         product.Url = productContent.Url + "?cat=" + productCategoryContent.Id;
+                    }
+                }
+            }
+
+            if (_appOptions.Value.EnableOrderTrackScripts && toReturn.Products != null)
+            {
+                for (int i = 0; i < toReturn.Products.Count; i++)
+                {
+                    var item = toReturn.Products[i];
+                    toReturn.Criterio += $"\"{item.Id}\"";
+                    if (i != toReturn.Products.Count - 1)
+                    {
+                        toReturn.Criterio += ",";
                     }
                 }
             }

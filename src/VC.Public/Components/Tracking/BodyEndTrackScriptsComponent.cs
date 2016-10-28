@@ -194,19 +194,34 @@ namespace VC.Public.Components.Tracking
                     }
                 }
 
-                //criteo
-                if (toReturn.OrderCompleteStep)
+                //criteo viewBasket
+                toReturn.CustomerEmail = order.Customer?.Email;
+                if (step.HasValue)
                 {
-                    toReturn.CustomerEmail = order.Customer?.Email;
-
-                    toReturn.Criteo = String.Empty;
+                    toReturn.CriteoViewCart = String.Empty;
                     for (int i = 0; i < skus.Count; i++)
                     {
                         var item = skus[i];
-                        toReturn.Criteo += $"{{ id: \"{item.Sku.Product.Id}\", price: {item.Amount:F}, quantity: {item.Quantity} }}";
+                        toReturn.CriteoViewCart +=
+                            $"{{ id: \"{item.Sku.Product.Id}\", price: {item.Amount:F}, quantity: {item.Quantity} }}";
                         if (i != skus.Count - 1)
                         {
-                            toReturn.Criteo += ",";
+                            toReturn.CriteoViewCart += ",";
+                        }
+                    }
+                }
+
+                //criteo trackTransaction
+                if (toReturn.OrderCompleteStep)
+                {
+                    toReturn.CriteoOrderComplete = String.Empty;
+                    for (int i = 0; i < skus.Count; i++)
+                    {
+                        var item = skus[i];
+                        toReturn.CriteoOrderComplete += $"{{ id: \"{item.Sku.Product.Id}\", price: {item.Amount:F}, quantity: {item.Quantity} }}";
+                        if (i != skus.Count - 1)
+                        {
+                            toReturn.CriteoOrderComplete += ",";
                         }
                     }
                 }

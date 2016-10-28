@@ -459,6 +459,12 @@ namespace VitalChoice.Core.DependencyInjection
                 AppId = section["AppId"],
                 AppSecret = section["AppSecret"]
             };
+            section = configuration.GetSection("App:GrooveSettings");
+            options.GrooveSettings = new GrooveSettings()
+            {
+                AccessToken = section["AccessToken"],
+                ServiceEmail = section["ServiceEmail"],
+            };
         }
 
         public IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
@@ -612,6 +618,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<GoogleService>().As<IGoogleService>().InstancePerLifetimeScope();
             builder.RegisterType<FacebookService>().As<FacebookService>().InstancePerLifetimeScope();
             builder.RegisterType<TwitterService>().As<TwitterService>().InstancePerLifetimeScope();
+            builder.RegisterType<GrooveService>().As<IGrooveService>().InstancePerLifetimeScope();
 
             builder.RegisterMappers(typeof(ProductService).GetTypeInfo().Assembly, (type, registration) =>
             {

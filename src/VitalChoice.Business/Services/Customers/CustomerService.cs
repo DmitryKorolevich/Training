@@ -1261,6 +1261,11 @@ namespace VitalChoice.Business.Services.Customers
             return toReturn;
         }
 
+        public async Task<int?> GetIdCustomerIdByIdOrder(int idOrder)
+        {
+            return (await _orderRepository.Query(p => p.Id == idOrder).SelectAsync(p => p.Customer.Id,false)).FirstOrDefault();
+        }
+
         #region Reports 
 
         public

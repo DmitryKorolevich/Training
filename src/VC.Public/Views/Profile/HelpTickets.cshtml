@@ -33,16 +33,10 @@
                     <thead>
                         <tr>
                             <th>
-                                Priority
-                            </th>
-                            <th>
                                 Summary
                             </th>
                             <th>
-                                Last Updated
-                            </th>
-                            <th>
-                                Status
+                                Date Submitted
                             </th>
                         </tr>
                     </thead>
@@ -53,18 +47,10 @@
                             {
                                 <tr>
                                     <td>
-                                        <span class="label @(item.Priority == VitalChoice.Infrastructure.Domain.Entities.Help.TicketPriority.Medium ? "label-warning" : item.Priority == VitalChoice.Infrastructure.Domain.Entities.Help.TicketPriority.Low ? "label-info" : "label-danger" )">
-                                            @infrastructure.Priorities.Single(x => x.Key == (int)item.Priority).Text
-                                        </span>
-                                    </td>
-                                    <td>
                                         @Html.ActionLink(item.Summary, "HelpTicket", "Profile", new { id = item.Id })
                                     </td>
-                                    <td>@item.DateEdited.ConvertToPst().ToString("MM/dd/yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)</td>
                                     <td>
-                                        <span class="label @(item.StatusCode == VitalChoice.Ecommerce.Domain.Entities.RecordStatusCode.NotActive ? "label-warning" : "label-info" )">
-                                            @infrastructure.TicketStatuses.Single(x => x.Key == (int)item.StatusCode).Text
-                                            </span>
+                                        @item.DateCreated.ConvertToPst().ToString("MM/dd/yyyy hh:mm tt", System.Globalization.CultureInfo.InvariantCulture)
                                     </td>
                                 </tr>
                             }

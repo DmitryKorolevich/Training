@@ -664,3 +664,221 @@ BEGIN
 END
 
 GO
+
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Product sub categories' AND Updated<'2016-10-28 00:00:00.000')
+BEGIN
+
+	UPDATE [dbo].[MasterContentItems]
+	SET 
+		Template = '@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels}}
+@using() {{System.Linq}}
+@model() {{dynamic}}
+
+<%
+<menu_sidebar>
+{{
+	<ul class="category-sidebar">
+	    @list(SideMenuItems)
+        {{
+            <li>
+			     @if(@model.SubItems.Count > 0) {{
+			        <a href="#" title="@(Label)">
+				        @(Label)
+			        </a>
+		            <ul>
+		                    @list(SubItems)
+                            {{
+                                <li>
+                                    <a href="@(Url)" title="@(Label)">
+                                        @(Label)
+                                    </a>
+                                </li>
+                            }}
+		            </ul>
+		        }}
+		        @if(@model.SubItems.Count == 0){{
+		            <a href="@(Url)" title="@(Label)">
+				        @(Label)
+			        </a>
+		        }}
+			</li>
+        }}
+		<li><a href="/products/top-sellers">Top Sellers</a></li>
+		<li><a href="/products/special-offers">Special Offers</a></li>
+		<li><a href="/products/new-at-vital-choice">New Products</a></li>
+	</ul>
+}}
+
+<category_breadcrumb>
+{{
+    <div class="category-breadcrumb">
+	    @list(@model.BreadcrumbOrderedItems.Take(model.BreadcrumbOrderedItems.Count - 1))
+        {{
+            <a href="@(Url)" title="@(Label)">@(Label)</a>
+            <img src="/assets/images/breadarrow2.jpg">
+        }}
+        @if(@model.BreadcrumbOrderedItems.Any())
+        {{
+            @(@model.BreadcrumbOrderedItems.Last())
+            {{
+                <a href="@(Url)" title="@(Label)">@(Label)</a>
+            }}
+        }}
+	</div>
+}}
+
+<category_top>
+{{
+	@if(@!string.IsNullOrEmpty(model.FileImageLargeUrl)) {{
+	    <img src="@(FileImageLargeUrl)">
+	    <br>
+	}}
+    @ifnot(HideLongDescription){{
+	    @(LongDescription)
+	}}
+}}
+
+<category_article>
+{{
+    @ifnot(HideLongDescriptionBottom){{
+        @(LongDescriptionBottom)
+    }}
+}}
+
+<layout> -> (ProductCategory)
+{{
+    @script(){{
+        <script src="/app/modules/product/addtocart.js"></script>
+        <script src="/app/modules/product/product-category.js"></script>
+    }}
+    @if(@model.FileImageLargeUrl!=null){{
+        @socialmeta(){{
+            <meta property="og:image" content="https://@(@root.AppOptions.PublicHost)@(FileImageLargeUrl)">
+            <meta itemprop="image" content="https://@(@root.AppOptions.PublicHost)@(FileImageLargeUrl)" />
+            <link rel="image_src" href="https://@(@root.AppOptions.PublicHost)@(FileImageLargeUrl)" />
+        }}
+    }}
+    @if(@model.Criterio!=null){{
+        <script type="text/javascript" src="//static.criteo.net/js/ld/ld.js" async="true"></script>
+        <script type="text/javascript">
+        window.criteo_q = window.criteo_q || [];
+        window.criteo_q.push(
+        { event: "setAccount", account: 27307 },
+        @if(@model.CustomerEmail!=null)
+        {{
+        { event: "setEmail", email: "@(CustomerEmail)" },
+        }}
+        @ifnot(@model.CustomerEmail!=null)
+        {{
+        { event: "setEmail", email: null },
+        }}
+        { event: "setSiteType", type: "d" },
+        { event: "viewList", item:[ @(Criterio) ]}
+        );
+        </script>
+    }}
+<aside id="menuSidebar" class="category-aside">
+    @menu_sidebar()
+</aside>
+<section class="category-main">
+	@category_breadcrumb()
+	@if(@model.ViewType==1)
+	{{
+	<div class="category-top">
+	    @category_top()
+	</div>
+	<div class="categories-selection-container">
+	    @list(SubCategories)
+        {{
+			<a href="@(Url)" title="@(Name)">
+				<img src="@(FileImageSmallUrl)" alt="@(Name)">@(Name)
+			</a>
+        }}
+        @list(Products)
+        {{
+			<a href="/product/@(Url)" title="@(Name)">
+				<img src="@(Thumbnail)" alt="@(Name)">
+				@(Name)<br/>
+				@(SubTitle)
+			</a>
+        }}
+	</div>
+	<article class="category-article">
+	    @category_article()
+	</article>
+	}}
+	@if(@model.ViewType==2)
+	{{
+    <div class="category-skus relative">
+        <div class="overlay hide">
+				<div class="loading">Loading…</div>
+		</div>
+        <div class="margin-bottom-small">
+            Specify a quantity for any of the products listed on this page, then click ''Add to Cart'' to add them to your shopping cart.
+        </div>
+        <table class="standard-table margin-bottom-small">
+	        <thead>
+        		<tr>
+        			<th>Qty</th>
+        			<th></th>
+        			<th>SKU</th>
+        			<th>Description</th>
+        			<th>Case Price</th>
+        		</tr>
+        	</thead>
+	        <tbody>
+	            @list(Skus)
+	            {{
+	            <tr>
+	                <td class="qty">
+	                    @if(InStock)
+	                    {{
+	                    <input data-sku-code="@(Code)" class="input-control width-small">
+	                    <span class="field-validation-error hide-imp">
+	                        <span>Quantity must be whole number. 3 digits max.</span>
+	                    </span>
+	                    }}
+	                </td>
+	                </td>
+                    <td>
+                      	<div class="thumb">
+                      	    <img src="@(Thumbnail)">
+                        </div>
+                    </td>
+	                <td>
+	                    <span>@(Code)</span>
+	                </td>
+                    <td>
+                        <span class="title">
+                            @(Name) @(SubTitle)
+                        </span>
+                        <br/>
+                        @(ShortDescription)
+	                    @ifnot(InStock)
+	                    {{
+	                    <span class="field-validation-error">
+	                        <span>Currently out of stock.</span>
+	                    </span>
+	                    }}
+                    </td>
+                    <td class="price">
+	                    <span>@money(Price)</span>
+                    </td>
+                </tr>
+                }}
+            </tbody>
+        </table>
+        <a href="javascript:void()" id="lnkAddToCart" class="ladda-button" data-style="zoom-in">
+    	    <span class="ladda-label"></span>
+    		<img src="/assets/images/addtocartorange-2015.jpg">
+    	</a>
+	</div>
+	}}
+</section>
+}}:: TtlCategoryModel 
+%>'
+	WHERE Name = 'Product sub categories'
+
+END
+
+GO

@@ -65,6 +65,8 @@ namespace VitalChoice.Interfaces.Services.Customers
 
 	    Task<bool> UnlockCustomerAsync(int id);
 
+	    Task<int?> GetIdCustomerIdByIdOrder(int idOrder);
+
         #region Reports 
 
         Task<WholesaleSummaryReport> GetWholesaleSummaryReportAsync();

@@ -113,6 +113,10 @@
       "Id": "47801159762",
       "AppId": "646339008847665",
       "AppSecret": "3dd38a002172186d1a1513c377adfb58"
+    },
+    "GrooveSettings": {
+      "AccessToken": "1af0970232f25cc920564217d507686ea81080e476c682d9d527208c64a1ad93",
+      "ServiceEmail": "007exs@gmail.com"
     }
   }
 }

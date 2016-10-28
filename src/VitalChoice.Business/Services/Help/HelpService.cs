@@ -25,6 +25,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Azure;
 using VitalChoice.Infrastructure.Domain.Transfer.Help;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Transfer.Groove;
 
 namespace VitalChoice.Business.Services.HelpService
 {
@@ -39,11 +40,13 @@ namespace VitalChoice.Business.Services.HelpService
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly INotificationService _notificationService;
         private readonly IBlobStorageClient _storageClient;
+        private readonly IGrooveService _grooveService;
         private static string _bugTicketFilesContainerName;
         private static string _bugTicketCommentFilesContainerName;
         private readonly ILogger _logger;
         private readonly ITransactionAccessor<EcommerceContext> _ecommerceTransactionAccessor;
         private readonly ITransactionAccessor<VitalChoiceContext> _infrastructureTransactionAccessor;
+        private readonly ICustomerService _customerService;
 
         public HelpService(IEcommerceRepositoryAsync<HelpTicket> helpTicketRepository,
             IEcommerceRepositoryAsync<HelpTicketComment> helpTicketCommentRepository,
@@ -54,9 +57,11 @@ namespace VitalChoice.Business.Services.HelpService
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             INotificationService notificationService,
             IBlobStorageClient storageClient,
+            IGrooveService grooveService,
             IOptions<AppOptions> appOptions,
             ILoggerFactory loggerProvider, ITransactionAccessor<EcommerceContext> ecommerceTransactionAccessor,
-            ITransactionAccessor<VitalChoiceContext> infrastructureTransactionAccessor)
+            ITransactionAccessor<VitalChoiceContext> infrastructureTransactionAccessor,
+            ICustomerService customerService)
         {
             _helpTicketRepository = helpTicketRepository;
             _helpTicketCommentRepository = helpTicketCommentRepository;
@@ -71,6 +76,8 @@ namespace VitalChoice.Business.Services.HelpService
             _infrastructureTransactionAccessor = infrastructureTransactionAccessor;
             _bugTicketFilesContainerName = appOptions.Value.AzureStorage.BugTicketFilesContainerName;
             _bugTicketCommentFilesContainerName = appOptions.Value.AzureStorage.BugTicketCommentFilesContainerName;
+            _grooveService = grooveService;
+            _customerService = customerService;
             _logger = loggerProvider.CreateLogger<HelpService>();
         }
 
@@ -208,6 +215,20 @@ namespace VitalChoice.Business.Services.HelpService
                     {
                         item.StatusCode = RecordStatusCode.Active;
                         item.DateCreated = item.DateEdited = DateTime.Now;
+                        
+                        AddTicketModel grooveTicket = new AddTicketModel();
+                        grooveTicket.body = item.Description;
+                        grooveTicket.subject = $"Subject Line: {item.Summary} on Order #{item.IdOrder}";
+                        var idCustomer = await _customerService.GetIdCustomerIdByIdOrder(item.IdOrder);
+                        if (idCustomer.HasValue)
+                        {
+                            var customer = await _customerService.SelectAsync(idCustomer.Value);
+                            grooveTicket.from = customer.Email;
+                            grooveTicket.name = $"{customer.ProfileAddress.SafeData.FirstName} {customer.ProfileAddress.SafeData.LastName}";
+                        }
+
+                        await _grooveService.AddHelpTicketAsync(grooveTicket);
+
                         await _helpTicketRepository.InsertAsync(item);
                     }
                     else
