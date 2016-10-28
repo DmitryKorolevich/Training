@@ -227,9 +227,12 @@ namespace VitalChoice.Business.Services.HelpService
                             grooveTicket.name = $"{customer.ProfileAddress.SafeData.FirstName} {customer.ProfileAddress.SafeData.LastName}";
                         }
 
-                        await _grooveService.AddHelpTicketAsync(grooveTicket);
+                        var result = await _grooveService.AddHelpTicketAsync(grooveTicket);
 
-                        await _helpTicketRepository.InsertAsync(item);
+                        if (result)
+                        {
+                            await _helpTicketRepository.InsertAsync(item);
+                        }
                     }
                     else
                     {
