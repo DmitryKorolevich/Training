@@ -218,7 +218,7 @@ namespace VitalChoice.Business.Services.HelpService
                         
                         AddTicketModel grooveTicket = new AddTicketModel();
                         grooveTicket.body = item.Description;
-                        grooveTicket.subject = $"Subject Line: {item.Summary} on Order #{item.IdOrder}";
+                        grooveTicket.subject = $"Order #{item.IdOrder}: {item.Summary}";
                         var idCustomer = await _customerService.GetIdCustomerIdByIdOrder(item.IdOrder);
                         if (idCustomer.HasValue)
                         {
