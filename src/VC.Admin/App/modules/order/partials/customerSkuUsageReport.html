@@ -61,6 +61,14 @@
                     <div class="col-md-12">
                         <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
                         <a target="_self" class="btn btn-primary pull-right" data-ng-click="exportItems($event)">Export</a>
+                        <div class="margin-right-15px pull-right">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="ExportRemoveEmailDublicates" data-ng-model="filter.ExportRemoveEmailDublicates" />
+                                    No Duplicate Emails
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </fieldset>

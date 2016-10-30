@@ -109,6 +109,7 @@
                 IdCategory: null,
                 Skus: [],
                 Exclude: [],
+                ExportRemoveEmailDublicates: false,
                 Paging: { PageIndex: 1, PageItemCount: 500 },
             };
             $scope.options.allExlude = true;

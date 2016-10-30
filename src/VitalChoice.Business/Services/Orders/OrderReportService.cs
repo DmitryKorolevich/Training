@@ -1570,7 +1570,8 @@ namespace VitalChoice.Business.Services.Orders
             return toReturn;
         }
 
-        public async Task<PagedList<CustomerSkuUsageReportRawItem>> GetCustomerSkuUsageReportItemsAsync(CustomerSkuUsageReportFilter filter)
+        public async Task<PagedList<CustomerSkuUsageReportRawItem>> GetCustomerSkuUsageReportItemsAsync(CustomerSkuUsageReportFilter filter,
+            bool removeEmailDublicates=false)
         {
             var toReturn = await _sPEcommerceRepository.GetCustomerSkuUsageReportItemsAsync(filter);
             if (filter.Exclude?.Count > 0)
@@ -1619,6 +1620,10 @@ namespace VitalChoice.Business.Services.Orders
                 }
             }
 
+            if (removeEmailDublicates)
+            {
+                toReturn.Items = toReturn.Items.GroupBy(p => p.Email).Select(x => x.First()).ToList();
+            }
 
             return toReturn;
         }

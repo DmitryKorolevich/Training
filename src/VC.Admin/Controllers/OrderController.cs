@@ -1867,7 +1867,7 @@ namespace VC.Admin.Controllers
             filter.Paging = null;
             filter.To = filter.To.AddDays(1);
 
-            var data = await _orderReportService.GetCustomerSkuUsageReportItemsAsync(filter);
+            var data = await _orderReportService.GetCustomerSkuUsageReportItemsAsync(filter, filter.ExportRemoveEmailDublicates);
 
             var result = _customerSkuUsageReportRawItemExportСSVExportService.ExportToCsv(data.Items);
 
