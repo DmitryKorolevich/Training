@@ -1,8 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VC.Admin.Models.Infrastructure;
 using VitalChoice.Core.Base;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Validation.Models;
@@ -97,6 +99,8 @@ namespace VC.Admin.Controllers
                     RefundRedeemOptions = referenceData.RefundRedeemOptions,
                     ProductSellers = referenceData.ProductSellers,
                     GoogleCategories = referenceData.GoogleCategories,
+                    EditLockAreas= BaseAppConstants.ADMIN_EDIT_LOCK_AREAS!=null ?
+                        BaseAppConstants.ADMIN_EDIT_LOCK_AREAS.Split(',') : new string[0],
                 };
             }
             else

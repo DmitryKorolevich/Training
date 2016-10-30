@@ -93,6 +93,126 @@ namespace VC.Admin.Controllers
             _contentAreaService = contentAreaService;
         }
 
+        private static List<EditLockArea> _adminEditLockAreas;
+        private const int secCount = 30;
+
+        static SettingController()
+        {
+            _adminEditLockAreas= BaseAppConstants.ADMIN_EDIT_LOCK_AREAS != null ?
+                        BaseAppConstants.ADMIN_EDIT_LOCK_AREAS.Split(',').
+                        Select(p=> new EditLockArea(p)).ToList()
+                        : new List<EditLockArea>();
+        }
+
+        #region EditLocks
+
+        [HttpPost]
+        public async Task<bool> EditLockPing([FromBody] EditLockPingModel model)
+        {
+            string browserUserAgent = Request.Headers["User-Agent"];
+            var area = _adminEditLockAreas.FirstOrDefault(p => p.Name == model.AreaName);
+
+            //not confugired
+            if (area == null || model.Id == 0)
+            {
+                return true;
+            }
+
+
+            EditLockAreaItem currentStatus;
+            lock (area.LockObject)
+            {
+                area.Items.TryGetValue(model.Id, out currentStatus);
+            }
+
+            if (currentStatus != null)
+            {
+                if (currentStatus.IdAgent == model.IdAgent && currentStatus.BrowserUserAgent == browserUserAgent)
+                {
+                    var now = DateTime.Now;
+                    if (currentStatus.Expired <= now)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        currentStatus.Expired = now.AddSeconds(30);
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        [HttpPost]
+        public async Task<EditLockRequestModel> EditLockRequest([FromBody]EditLockRequestModel model)
+        {
+            model.Avaliable = false;
+            string browserUserAgent = Request.Headers["User-Agent"];
+
+            var area = _adminEditLockAreas.FirstOrDefault(p => p.Name == model.AreaName);
+
+            //not confugired - allow edit
+            if (area == null || model.Id==0)
+            {
+                model.Avaliable = true;
+                return model;
+            }
+
+            EditLockAreaItem currentStatus;
+            lock (area.LockObject)
+            {
+                var now = new DateTime();
+                if (!area.Items.TryGetValue(model.Id, out currentStatus))
+                {
+                    currentStatus = new EditLockAreaItem()
+                    {
+                        Agent = model.Agent,
+                        IdAgent = model.IdAgent,
+                        BrowserUserAgent = browserUserAgent,
+                        Expired = now.AddSeconds(secCount)
+                    };
+                    area.Items.Add(model.Id, currentStatus);
+                }
+
+                if (currentStatus.Expired <= now)
+                {
+                    currentStatus.Agent = model.Agent;
+                    currentStatus.IdAgent = model.IdAgent;
+                    currentStatus.BrowserUserAgent = browserUserAgent;
+                    currentStatus.Expired = now.AddSeconds(secCount);
+
+                    model.Avaliable = true;
+                    return model;
+                }
+                else
+                {
+                    //the same
+                    if (currentStatus.IdAgent == model.IdAgent && currentStatus.BrowserUserAgent == browserUserAgent)
+                    {
+                        currentStatus.Expired = now.AddSeconds(secCount);
+
+                        model.Avaliable = true;
+                        return model;
+                    }
+                    else
+                    {
+                        //different
+                        var toReturn= new EditLockRequestModel()
+                        {
+                            Agent = currentStatus.Agent,
+                            IdAgent = currentStatus.IdAgent,
+                            Avaliable = false,
+                        };
+
+                        return toReturn;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
         #region Lookups
 
         [HttpGet]
