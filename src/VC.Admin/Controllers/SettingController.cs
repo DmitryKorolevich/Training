@@ -107,7 +107,7 @@ namespace VC.Admin.Controllers
         #region EditLocks
 
         [HttpPost]
-        public async Task<bool> EditLockPing([FromBody] EditLockPingModel model)
+        public async Task<Result<bool>> EditLockPing([FromBody] EditLockPingModel model)
         {
             string browserUserAgent = Request.Headers["User-Agent"];
             var area = _adminEditLockAreas.FirstOrDefault(p => p.Name == model.AreaName);
@@ -145,7 +145,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<EditLockRequestModel> EditLockRequest([FromBody]EditLockRequestModel model)
+        public async Task<Result<EditLockRequestModel>> EditLockRequest([FromBody]EditLockRequestModel model)
         {
             model.Avaliable = false;
             string browserUserAgent = Request.Headers["User-Agent"];
@@ -162,7 +162,7 @@ namespace VC.Admin.Controllers
             EditLockAreaItem currentStatus;
             lock (area.LockObject)
             {
-                var now = new DateTime();
+                var now = DateTime.Now;
                 if (!area.Items.TryGetValue(model.Id, out currentStatus))
                 {
                     currentStatus = new EditLockAreaItem()

@@ -20,6 +20,6 @@
         public const string ORDER_INVOICE_PAGE_URL_TEMPLATE = "https://{0}/api/orderinvoice/pdf/{1}";
         public const string PDF_URL_GENERATE_ORDER_INVOICE_TEMPLATE = "{0}?license={1}url={2}&page_size=Letter&orientation=portrait&filename=Vital+Choice+Seafood+Invoice-{3}.pdf";
         public const string BASE_PHONE_FORMAT = "(___) ___-____? x_____";
-        public const string ADMIN_EDIT_LOCK_AREAS = "products,customers";
+        public const string ADMIN_EDIT_LOCK_AREAS = "index.oneCol.productDetail,index.oneCol.customerDetail,index.oneCol.orderDetail,index.oneCol.orderReshipDetail,index.oneCol.orderRefundDetail";
     }
 }
