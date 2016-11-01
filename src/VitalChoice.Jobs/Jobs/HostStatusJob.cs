@@ -84,7 +84,7 @@ namespace VitalChoice.Jobs.Jobs
             }
         }
 
-        private bool CheckHost(string host, int retryNumber = 0)
+        private bool CheckHost(string host, int retryNumber = 0, HttpStatusCode previousStatus = HttpStatusCode.OK)
         {
             try
             {
@@ -100,8 +100,7 @@ namespace VitalChoice.Jobs.Jobs
                         SendAlertEmail("Vital Choice Host Failure", errorBody);
                     }
 
-                    if (response.StatusCode == HttpStatusCode.BadGateway || response.StatusCode == HttpStatusCode.GatewayTimeout ||
-                        response.StatusCode == HttpStatusCode.ServiceUnavailable)
+                    if (response.StatusCode == HttpStatusCode.BadGateway || response.StatusCode == HttpStatusCode.GatewayTimeout)
                     {
                         if (retryNumber > 1)
                         {
@@ -109,6 +108,15 @@ namespace VitalChoice.Jobs.Jobs
                         }
                         Thread.Sleep(TimeSpan.FromMinutes(1));
                         return CheckHost(host, retryNumber + 1);
+                    }
+                    if (response.StatusCode == HttpStatusCode.ServiceUnavailable)
+                    {
+                        if (retryNumber > 1 && previousStatus == HttpStatusCode.ServiceUnavailable)
+                        {
+                            return false;
+                        }
+                        Thread.Sleep(TimeSpan.FromMinutes(5));
+                        return CheckHost(host, retryNumber + 1, response.StatusCode);
                     }
                     response.GetResponseStream()?.Dispose();
                 }
