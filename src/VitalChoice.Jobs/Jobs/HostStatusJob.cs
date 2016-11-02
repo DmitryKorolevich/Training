@@ -95,9 +95,8 @@ namespace VitalChoice.Jobs.Jobs
             catch (Exception e)
             {
                 var errorBody = e.ToString();
-                SendAlertEmail("Vital Choice Host Failure", errorBody);
-
                 _logger.LogError(errorBody);
+                SendAlertEmail("Vital Choice Host Failure", errorBody);
             }
             return true;
         }
