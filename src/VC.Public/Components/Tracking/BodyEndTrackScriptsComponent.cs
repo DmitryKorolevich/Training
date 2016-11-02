@@ -51,6 +51,7 @@ namespace VC.Public.Components.Tracking
         private readonly Lazy<ReferenceData> _referenceData;
         private readonly BaseTrackScriptsComponentHelper _helper;
         private readonly Lazy<IOptions<AppOptions>> _appOptions;
+        private readonly Lazy<ExtendedUserManager> _userManager;
 
         public BodyEndTrackScriptsComponent()
         {
@@ -62,6 +63,7 @@ namespace VC.Public.Components.Tracking
             _affiliateService = new Lazy<IAffiliateService>(() => HttpContext.RequestServices.GetService<IAffiliateService>());
             _referenceData = new Lazy<ReferenceData>(() => HttpContext.RequestServices.GetService<ReferenceData>());
             _appOptions = new Lazy<IOptions<AppOptions>>(() => HttpContext.RequestServices.GetService<IOptions<AppOptions>>());
+            _userManager = new Lazy<ExtendedUserManager>(() => HttpContext.RequestServices.GetService<ExtendedUserManager>());
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
@@ -73,180 +75,200 @@ namespace VC.Public.Components.Tracking
                 _referenceData);
             OrderDynamic order = toReturn.Order;
             var referenceData = _referenceData.Value;
-            if (order != null && _appOptions.Value.Value.EnableOrderTrackScripts)
+
+
+            if (_appOptions.Value.Value.EnableOrderTrackScripts)
             {
-                toReturn.MyBuysEnabled = true;
-                //bronto recovery
-                BrontoOrderInfo info = new BrontoOrderInfo();
-                info.url = $"https://{referenceData.PublicHost}/cart/viewcart";
-                info.customerEmail = order?.Customer?.Email;
-                info.currency = "USD";
-                info.subtotal = Math.Round(order.ProductsSubtotal, 2);
-
-                if (toReturn.OrderCompleteStep)
+                if (path == "/") //home
                 {
-                    info.orderID = order.Id;
-                    info.discountAmount = order.DiscountTotal;
-                    info.grandTotal = order.Total;
-                    info.taxAmount = order.TaxTotal;
-                }
-
-                var skus = order.Skus.ToList();
-                skus.AddRange(order.PromoSkus.Where(p => p.Enabled));
-                foreach (var skuOrdered in skus)
-                {
-                    BrontoOrderItemInfo item = new BrontoOrderItemInfo();
-                    item.sku = skuOrdered.Sku.Code;
-                    item.imageUrl = skuOrdered.Sku.Product.SafeData.Thumbnail != null ?
-                        $"https://{referenceData.PublicHost}{skuOrdered.Sku.Product.Data.Thumbnail}"
-                        : null;
-                    item.productUrl = $"https://{referenceData.PublicHost}/product/{skuOrdered.Sku.Product.Url}";
-                    item.quantity = skuOrdered.Quantity;
-                    item.unitPrice = Math.Round(skuOrdered.Amount, 2);
-                    item.totalPrice = Math.Round(skuOrdered.Quantity * skuOrdered.Amount, 2);
-                    item.name = _helper.GetProductFullName(skuOrdered);
-
-                    info.lineItems.Add(item);
-                }
-
-                var settings = new JsonSerializerSettings()
-                {
-                    NullValueHandling = NullValueHandling.Ignore,
-                };
-                var data = JsonConvert.SerializeObject(info, settings);
-                toReturn.BrontoOrderInfo = $"var brontoCartRecovery = {data};";
-
-                //google action scripts
-                int? step = null;
-                switch (path)
-                {
-                    case "/cart/viewcart":
-                    case "/checkout/welcome":
-                        step = 1;
-                        break;
-                    case "/checkout/addupdatebillingaddress":
-                        step = 2;
-                        break;
-                    case "/checkout/addupdateshippingmethod":
-                        step = 3;
-                        break;
-                    case "/checkout/revieworder":
-                        step = 4;
-                        break;
-                    case "/checkout/receipt":
-                        step = 5;
-                        break;
-                }
-                if (step.HasValue)
-                {
-                    var checkout = new GoogleActionCheckoutInfo();
-                    checkout.actionField = new GoogleActionCheckoutStepInfo()
+                    toReturn.CriteoHomeRender = true;
+                    if (HttpContext.User != null)
                     {
-                        step = step.Value,
-                    };
-
-                    foreach (var skuOrdered in skus)
-                    {
-                        GoogleActionOrderItemInfo item = new GoogleActionOrderItemInfo();
-                        item.id = skuOrdered.Sku.Code;
-                        item.name = _helper.GetProductFullName(skuOrdered).Replace("|", "-");
-                        item.price = Math.Round(skuOrdered.Amount, 2);
-                        item.quantity = skuOrdered.Quantity;
-                        item.brand = "Vital Choice";
-                        item.category = "";
-                        item.variant = "";
-
-                        checkout.products.Add(item);
+                        var customer = await _customerService.Value.SelectAsync(Convert.ToInt32(_userManager.Value.GetUserId(HttpContext.User)));
+                        toReturn.CustomerEmail = customer?.Email ?? string.Empty;
                     }
+                }
 
-                    toReturn.GoogleActionCheckout = JsonConvert.SerializeObject(checkout);
+                if (order != null)
+                {
+                    toReturn.MyBuysEnabled = true;
+                    //bronto recovery
+                    BrontoOrderInfo info = new BrontoOrderInfo();
+                    info.url = $"https://{referenceData.PublicHost}/cart/viewcart";
+                    info.customerEmail = order?.Customer?.Email;
+                    info.currency = "USD";
+                    info.subtotal = Math.Round(order.ProductsSubtotal, 2);
 
                     if (toReturn.OrderCompleteStep)
                     {
-                        var purchase = new GoogleActionPurchaseInfo();
-                        purchase.actionField = new GoogleActionPurchaseActionInfo();
-                        purchase.actionField.id = order.Id;
-                        purchase.actionField.revenue = Math.Round(order.Total, 2);
-                        purchase.actionField.shipping = Math.Round(order.ShippingTotal, 2);
-                        purchase.actionField.tax = Math.Round(order.TaxTotal, 2);
-                        purchase.actionField.coupon = order.Discount?.Code;
+                        info.orderID = order.Id;
+                        info.discountAmount = order.DiscountTotal;
+                        info.grandTotal = order.Total;
+                        info.taxAmount = order.TaxTotal;
+                    }
 
-                        purchase.actionField.affiliation = "N/A";
-                        var affiliateService = _affiliateService.Value;
-                        var affiliateOrderPayment = await affiliateService.GetAffiliateOrderPaymentAsync(order.Id);
-                        if (affiliateOrderPayment != null)
+                    var skus = order.Skus.ToList();
+                    skus.AddRange(order.PromoSkus.Where(p => p.Enabled));
+                    foreach (var skuOrdered in skus)
+                    {
+                        BrontoOrderItemInfo item = new BrontoOrderItemInfo();
+                        item.sku = skuOrdered.Sku.Code;
+                        item.imageUrl = skuOrdered.Sku.Product.SafeData.Thumbnail != null
+                            ? $"https://{referenceData.PublicHost}{skuOrdered.Sku.Product.Data.Thumbnail}"
+                            : null;
+                        item.productUrl = $"https://{referenceData.PublicHost}/product/{skuOrdered.Sku.Product.Url}";
+                        item.quantity = skuOrdered.Quantity;
+                        item.unitPrice = Math.Round(skuOrdered.Amount, 2);
+                        item.totalPrice = Math.Round(skuOrdered.Quantity*skuOrdered.Amount, 2);
+                        item.name = _helper.GetProductFullName(skuOrdered);
+
+                        info.lineItems.Add(item);
+                    }
+
+                    var settings = new JsonSerializerSettings()
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                    };
+                    var data = JsonConvert.SerializeObject(info, settings);
+                    toReturn.BrontoOrderInfo = $"var brontoCartRecovery = {data};";
+
+                    //google action scripts
+                    int? step = null;
+                    switch (path)
+                    {
+                        case "/cart/viewcart":
+                        case "/checkout/welcome":
+                            step = 1;
+                            break;
+                        case "/checkout/addupdatebillingaddress":
+                            step = 2;
+                            break;
+                        case "/checkout/addupdateshippingmethod":
+                            step = 3;
+                            break;
+                        case "/checkout/revieworder":
+                            step = 4;
+                            break;
+                        case "/checkout/receipt":
+                            step = 5;
+                            break;
+                    }
+                    if (step.HasValue)
+                    {
+                        var checkout = new GoogleActionCheckoutInfo();
+                        checkout.actionField = new GoogleActionCheckoutStepInfo()
                         {
-                            var affiliate = await affiliateService.SelectAsync(affiliateOrderPayment.IdAffiliate);
-                            if (affiliate != null)
+                            step = step.Value,
+                        };
+
+                        foreach (var skuOrdered in skus)
+                        {
+                            GoogleActionOrderItemInfo item = new GoogleActionOrderItemInfo();
+                            item.id = skuOrdered.Sku.Code;
+                            item.name = _helper.GetProductFullName(skuOrdered).Replace("|", "-");
+                            item.price = Math.Round(skuOrdered.Amount, 2);
+                            item.quantity = skuOrdered.Quantity;
+                            item.brand = "Vital Choice";
+                            item.category = "";
+                            item.variant = "";
+
+                            checkout.products.Add(item);
+                        }
+
+                        toReturn.GoogleActionCheckout = JsonConvert.SerializeObject(checkout);
+
+                        if (toReturn.OrderCompleteStep)
+                        {
+                            var purchase = new GoogleActionPurchaseInfo();
+                            purchase.actionField = new GoogleActionPurchaseActionInfo();
+                            purchase.actionField.id = order.Id;
+                            purchase.actionField.revenue = Math.Round(order.Total, 2);
+                            purchase.actionField.shipping = Math.Round(order.ShippingTotal, 2);
+                            purchase.actionField.tax = Math.Round(order.TaxTotal, 2);
+                            purchase.actionField.coupon = order.Discount?.Code;
+
+                            purchase.actionField.affiliation = "N/A";
+                            var affiliateService = _affiliateService.Value;
+                            var affiliateOrderPayment = await affiliateService.GetAffiliateOrderPaymentAsync(order.Id);
+                            if (affiliateOrderPayment != null)
                             {
-                                purchase.actionField.affiliation = affiliate.Name;
-                                if (affiliate.SafeData.Company != null)
+                                var affiliate = await affiliateService.SelectAsync(affiliateOrderPayment.IdAffiliate);
+                                if (affiliate != null)
                                 {
-                                    purchase.actionField.affiliation += $"({affiliate.Data.Company})";
+                                    purchase.actionField.affiliation = affiliate.Name;
+                                    if (affiliate.SafeData.Company != null)
+                                    {
+                                        purchase.actionField.affiliation += $"({affiliate.Data.Company})";
+                                    }
+                                    purchase.actionField.affiliation = purchase.actionField.affiliation.Replace("|", "-");
                                 }
-                                purchase.actionField.affiliation = purchase.actionField.affiliation.Replace("|", "-");
+                            }
+
+                            purchase.products = checkout.products;
+
+                            toReturn.GoogleActionPurchase = JsonConvert.SerializeObject(purchase);
+                        }
+                    }
+
+                    //criteo viewBasket
+                    toReturn.CustomerEmail = order.Customer?.Email ?? string.Empty;
+                    if (path == "/cart/viewcart")
+                    {
+                        toReturn.CriteoViewCart = String.Empty;
+                        for (int i = 0; i < skus.Count; i++)
+                        {
+                            var item = skus[i];
+                            toReturn.CriteoViewCart +=
+                                $"{{ id: \"{item.Sku.Product.Id}\", price: {item.Amount:F}, quantity: {item.Quantity} }}";
+                            if (i != skus.Count - 1)
+                            {
+                                toReturn.CriteoViewCart += ",";
                             }
                         }
-
-                        purchase.products = checkout.products;
-
-                        toReturn.GoogleActionPurchase = JsonConvert.SerializeObject(purchase);
                     }
-                }
 
-                //criteo viewBasket
-                toReturn.CustomerEmail = order.Customer?.Email ?? string.Empty;
-                if (path== "/cart/viewcart")
-                {
-                    toReturn.CriteoViewCart = String.Empty;
-                    for (int i = 0; i < skus.Count; i++)
+                    //criteo trackTransaction
+                    if (toReturn.OrderCompleteStep)
                     {
-                        var item = skus[i];
-                        toReturn.CriteoViewCart +=
-                            $"{{ id: \"{item.Sku.Product.Id}\", price: {item.Amount:F}, quantity: {item.Quantity} }}";
-                        if (i != skus.Count - 1)
+                        toReturn.CriteoOrderComplete = String.Empty;
+                        for (int i = 0; i < skus.Count; i++)
                         {
-                            toReturn.CriteoViewCart += ",";
+                            var item = skus[i];
+                            toReturn.CriteoOrderComplete +=
+                                $"{{ id: \"{item.Sku.Product.Id}\", price: {item.Amount:F}, quantity: {item.Quantity} }}";
+                            if (i != skus.Count - 1)
+                            {
+                                toReturn.CriteoOrderComplete += ",";
+                            }
                         }
                     }
-                }
 
-                //criteo trackTransaction
-                if (toReturn.OrderCompleteStep)
-                {
-                    toReturn.CriteoOrderComplete = String.Empty;
-                    for (int i = 0; i < skus.Count; i++)
+                    //pepperjam
+                    if (toReturn.OrderCompleteStep)
                     {
-                        var item = skus[i];
-                        toReturn.CriteoOrderComplete += $"{{ id: \"{item.Sku.Product.Id}\", price: {item.Amount:F}, quantity: {item.Quantity} }}";
-                        if (i != skus.Count - 1)
+                        var statisticData =
+                            (await _customerService.Value.GetCustomerOrderStatistics(new[] {toReturn.Order.Customer.Id}))
+                                .FirstOrDefault();
+                        int isNewCustomer =
+                            !(statisticData != null && statisticData.FirstOrderPlaced < toReturn.Order.DateCreated)
+                                ? 1
+                                : 0;
+                        toReturn.PepperjamQuery =
+                            $"INT=DYNAMIC&PROGRAM_ID={PepperjamProgramId}&ORDER_ID={order.Id}&COUPON={order.Discount?.Code}&NEW_TO_FILE={isNewCustomer}";
+
+
+                        var pricePart = toReturn.Order.ProductsSubtotal != 0
+                            ? 1 - toReturn.Order.DiscountTotal/toReturn.Order.ProductsSubtotal
+                            : 1;
+
+                        for (int i = 0; i < skus.Count; i++)
                         {
-                            toReturn.CriteoOrderComplete += ",";
+                            var skuOrdered = skus[i];
+                            var index = i + 1;
+                            var price = Math.Round(skuOrdered.Amount*pricePart, 2);
+                            toReturn.PepperjamQuery +=
+                                $"&ITEM_ID{index}={skuOrdered.Sku.Code}&ITEM_PRICE{index}={price:F}&QUANTITY{index}={skuOrdered.Quantity}";
                         }
-                    }
-                }
-
-                //pepperjam
-                if (toReturn.OrderCompleteStep)
-                {
-                    var statisticData =
-                        (await _customerService.Value.GetCustomerOrderStatistics(new[] {toReturn.Order.Customer.Id}))
-                            .FirstOrDefault();
-                    int isNewCustomer = !(statisticData != null && statisticData.FirstOrderPlaced < toReturn.Order.DateCreated) ? 1 : 0;
-                    toReturn.PepperjamQuery =
-                        $"INT=DYNAMIC&PROGRAM_ID={PepperjamProgramId}&ORDER_ID={order.Id}&COUPON={order.Discount?.Code}&NEW_TO_FILE={isNewCustomer}";
-
-
-                    var pricePart = toReturn.Order.ProductsSubtotal != 0
-                        ? 1 - toReturn.Order.DiscountTotal/toReturn.Order.ProductsSubtotal
-                        : 1;
-                    
-                    for (int i = 0; i < skus.Count; i++)
-                    {
-                        var skuOrdered = skus[i];
-                        var index = i + 1;
-                        var price = Math.Round(skuOrdered.Amount * pricePart, 2);
-                        toReturn.PepperjamQuery += $"&ITEM_ID{index}={skuOrdered.Sku.Code}&ITEM_PRICE{index}={price:F}&QUANTITY{index}={skuOrdered.Quantity}";
                     }
                 }
             }

@@ -184,3 +184,63 @@ INSERT INTO [dbo].[EmailTemplates]
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[EmailTemplates] WHERE [Name] = 'HelpTicketAddCustomerNotification')
+BEGIN
+
+DECLARE @contentItemId int
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,'<%
+<body:body>
+{{
+	<p>
+		Thanks for contacting Vital Choice.<br/><br/>
+		This is just a quick note to let you know we received your message, and Customer Service will be responding to you soon.
+	</p><br/>
+    <br/><br/><br/>
+	Sincerely,<br/>
+	Vital Choice Wild Seafood & Organics
+	<br/><br/><br/><br/><br/>
+	<i>
+	*Please note. This is an automated message. Do not reply. This mailbox is not monitored.
+	</i>
+}}
+%>'
+           ,''
+           ,'Support Ticket Created - Vital Choice Wild Seafood & Organics'
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[EmailTemplates]
+           ([Name]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[UserId]
+           ,[ModelType]
+           ,[EmailDescription])
+     VALUES
+           ('HelpTicketAddCustomerNotification'
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='Admin Email Template')
+           ,2
+           ,NULL
+           ,'VitalChoice.Ecommerce.Domain.Mail.HelpTicketEmail'
+           ,'Help ticket add customer notification')
+
+END
+
+GO

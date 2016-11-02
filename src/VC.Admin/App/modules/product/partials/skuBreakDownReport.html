@@ -50,7 +50,7 @@
                     <tbody>
                         <tr data-ng-repeat="item in items">
                             <td>
-                                <a data-ng-click="openOrders(item.IdSku)">{{::item.Code}}</a>
+                                <a target="_blank" data-ng-href="{{item.Url}}">{{::item.Code}}</a>
                             </td>
                             <td>{{::item.TotalQuantity}}</td>
                             <td>{{::item.TotalAmount | currency}}</td>
