@@ -100,11 +100,10 @@ namespace VitalChoice.Jobs.Jobs
                     _logger.LogError(e.ToString());
                     return true;
                 }
-                var errorBody = $"{host} Check Failure, Status: {response.StatusCode}";
-                _logger.LogError(errorBody);
-
                 if ((int) response.StatusCode >= 500)
                 {
+                    var errorBody = $"{host} Check Failure, Status: {e}";
+                    _logger.LogError(errorBody);
                     SendAlertEmail("Vital Choice Host Failure", errorBody);
                 }
                 if (response.StatusCode == HttpStatusCode.BadGateway || response.StatusCode == HttpStatusCode.GatewayTimeout)
