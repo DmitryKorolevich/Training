@@ -13,5 +13,9 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Settings
         public int IdAgent { get; set; }
 
         public string Agent { get; set; }
+
+        public string AgentFirstName { get; set; }
+
+        public string AgentLastName { get; set; }
     }
 }

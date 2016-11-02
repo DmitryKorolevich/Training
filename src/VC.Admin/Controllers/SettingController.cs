@@ -168,6 +168,8 @@ namespace VC.Admin.Controllers
                     currentStatus = new EditLockAreaItem()
                     {
                         Agent = model.Agent,
+                        AgentFirstName = model.AgentFirstName,
+                        AgentLastName = model.AgentLastName,
                         IdAgent = model.IdAgent,
                         BrowserUserAgent = browserUserAgent,
                         Expired = now.AddSeconds(secCount)
@@ -178,6 +180,8 @@ namespace VC.Admin.Controllers
                 if (currentStatus.Expired <= now)
                 {
                     currentStatus.Agent = model.Agent;
+                    currentStatus.AgentFirstName = model.AgentFirstName;
+                    currentStatus.AgentLastName = model.AgentLastName;
                     currentStatus.IdAgent = model.IdAgent;
                     currentStatus.BrowserUserAgent = browserUserAgent;
                     currentStatus.Expired = now.AddSeconds(secCount);
@@ -201,6 +205,8 @@ namespace VC.Admin.Controllers
                         var toReturn= new EditLockRequestModel()
                         {
                             Agent = currentStatus.Agent,
+                            AgentFirstName = currentStatus.AgentFirstName,
+                            AgentLastName = currentStatus.AgentLastName,
                             IdAgent = currentStatus.IdAgent,
                             Avaliable = false,
                         };

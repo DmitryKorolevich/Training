@@ -11,6 +11,10 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Settings
 
         public string Agent { get; set; }
 
+        public string AgentFirstName { get; set; }
+
+        public string AgentLastName { get; set; }
+
         public string BrowserUserAgent { get; set; }
     }
 }
