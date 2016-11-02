@@ -6,13 +6,15 @@ angular.module('app.core.utils.modalUtil', [])
 	    open: function (templateUrl, controller, data, options, successCallback, errorCallback) {
 	        var options = $.extend(
                 {
-                    size: 'sm'
+                    size: 'sm',
+                    backdrop: true
                 }, options);
 
 			var modalInstance = $uibModal.open({
 				templateUrl: templateUrl,
 				controller: controller,
 				size: options.size,
+				backdrop: options.backdrop,
 				resolve: {
 					data: function () {
 						return data;

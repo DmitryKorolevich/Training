@@ -264,6 +264,8 @@ angular.module('app.core.utils.appBootstrap', [])
                             Id: id,
                             IdAgent: $rootScope.currentUser.Id,
                             Agent: $rootScope.currentUser.Agent,
+                            AgentFirstName: $rootScope.currentUser.FirstName,
+                            AgentLastName: $rootScope.currentUser.LastName,
                         };
 
                         settingService.editLockPing(model)
@@ -307,6 +309,8 @@ angular.module('app.core.utils.appBootstrap', [])
                             Id: id,
                             IdAgent: $rootScope.currentUser.Id,
                             Agent: $rootScope.currentUser.Agent,
+                            AgentFirstName: $rootScope.currentUser.FirstName,
+                            AgentLastName: $rootScope.currentUser.LastName,
                         };
 
                         $rootScope.editLockState.Areas[areaName].Items[id] = null;
@@ -323,8 +327,20 @@ angular.module('app.core.utils.appBootstrap', [])
                                     else
                                     {
                                         modalUtil.open('app/modules/setting/partials/infoDetailsPopup.html', 'infoDetailsPopupController', {
-                                            Header: "This item is already opened by {0}".format(result.Data.Agent),
-                                            Messages: [{ Message: "This item is already opened by {0}. You won't be able to save this item.".format(result.Data.Agent) }]
+                                            Header: "This area is currently being viewed by {0} {1} ({2})".
+                                                format(result.Data.AgentFirstName, result.Data.AgentLastName, result.Data.Agent),
+                                            Messages: [
+                                                {
+                                                    Message: "This area is currently being viewed by {0} {1} ({2}). You won't be able to save your changes. Wait a few minutes then refresh or contact {0} {1} ({2}).".
+                                                        format(result.Data.AgentFirstName, result.Data.AgentLastName, result.Data.Agent)
+                                                }
+                                            ],
+                                            OkButton: {
+                                                Label: 'OK'
+                                            },
+                                        },
+                                        {
+                                            backdrop: false,
                                         });
                                     }
                                 }
