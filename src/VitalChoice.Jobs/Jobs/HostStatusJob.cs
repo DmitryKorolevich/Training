@@ -77,7 +77,9 @@ namespace VitalChoice.Jobs.Jobs
                 request.Timeout = 120000;
                 using (var response = (HttpWebResponse) request.GetResponse())
                 {
+                    var result = ProcessResponse(host, retryNumber, previousStatus, response);
                     response.GetResponseStream()?.Dispose();
+                    return result;
                 }
             }
             catch (WebException e)
@@ -88,37 +90,43 @@ namespace VitalChoice.Jobs.Jobs
                     _logger.LogError(e.ToString());
                     return true;
                 }
-                if ((int) response.StatusCode >= 500)
-                {
-                    var errorBody = $"{host} Check Failure, Status: {e}";
-                    _logger.LogError(errorBody);
-                    SendAlertEmail("Vital Choice Host Failure", errorBody);
-                }
-                if (response.StatusCode == HttpStatusCode.BadGateway || response.StatusCode == HttpStatusCode.GatewayTimeout)
-                {
-                    if (retryNumber > 1)
-                    {
-                        return false;
-                    }
-                    Thread.Sleep(TimeSpan.FromMinutes(1));
-                    return CheckHost(host, retryNumber + 1);
-                }
-                if (response.StatusCode == HttpStatusCode.ServiceUnavailable)
-                {
-                    if (retryNumber > 1 && previousStatus == HttpStatusCode.ServiceUnavailable)
-                    {
-                        return false;
-                    }
-                    Thread.Sleep(TimeSpan.FromMinutes(1));
-                    return CheckHost(host, retryNumber + 1, response.StatusCode);
-                }
+                return ProcessResponse(host, retryNumber, previousStatus, response);
             }
-            catch (TimeoutException e)
+            catch (Exception e)
             {
                 var errorBody = e.ToString();
                 SendAlertEmail("Vital Choice Host Failure", errorBody);
 
                 _logger.LogError(errorBody);
+            }
+            return true;
+        }
+
+        private bool ProcessResponse(string host, int retryNumber, HttpStatusCode previousStatus, HttpWebResponse response)
+        {
+            if ((int) response.StatusCode >= 500)
+            {
+                var errorBody = $"{host} Check Failure, Status: {response.StatusCode}";
+                _logger.LogError(errorBody);
+                SendAlertEmail("Vital Choice Host Failure", errorBody);
+            }
+            if (response.StatusCode == HttpStatusCode.BadGateway || response.StatusCode == HttpStatusCode.GatewayTimeout)
+            {
+                if (retryNumber > 1)
+                {
+                    return false;
+                }
+                Thread.Sleep(TimeSpan.FromMinutes(1));
+                return CheckHost(host, retryNumber + 1);
+            }
+            if (response.StatusCode == HttpStatusCode.ServiceUnavailable)
+            {
+                if (retryNumber > 1 && previousStatus == HttpStatusCode.ServiceUnavailable)
+                {
+                    return false;
+                }
+                Thread.Sleep(TimeSpan.FromMinutes(1));
+                return CheckHost(host, retryNumber + 1, response.StatusCode);
             }
             return true;
         }
