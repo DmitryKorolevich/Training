@@ -33,19 +33,13 @@ namespace VitalChoice.Jobs.Jobs
                     _logger.LogCritical("Restarting public app pool");
                     using (
                         var process =
-                            Process.Start(new ProcessStartInfo(@"C:\Windows\system32\inetsrv\appcmd.exe", "stop apppool /apppool.name:public")
-                            {
-                                UseShellExecute = true
-                            }))
+                            Process.Start(new ProcessStartInfo(@"C:\Windows\system32\inetsrv\appcmd.exe", "stop apppool /apppool.name:public")))
                     {
                         process?.WaitForExit();
                     }
                     using (
                         var process =
-                            Process.Start(new ProcessStartInfo(@"C:\Windows\system32\inetsrv\appcmd.exe", "start apppool /apppool.name:public")
-                            {
-                                UseShellExecute = true
-                            }))
+                            Process.Start(new ProcessStartInfo(@"C:\Windows\system32\inetsrv\appcmd.exe", "start apppool /apppool.name:public")))
                     {
                         process?.WaitForExit();
                     }
@@ -56,19 +50,13 @@ namespace VitalChoice.Jobs.Jobs
                     _logger.LogCritical("Restarting admin app pool");
                     using (
                         var process =
-                            Process.Start(new ProcessStartInfo(@"C:\Windows\system32\inetsrv\appcmd.exe", "stop apppool /apppool.name:admin")
-                            {
-                                UseShellExecute = true
-                            }))
+                            Process.Start(new ProcessStartInfo(@"C:\Windows\system32\inetsrv\appcmd.exe", "stop apppool /apppool.name:admin")))
                     {
                         process?.WaitForExit();
                     }
                     using (
                         var process =
-                            Process.Start(new ProcessStartInfo(@"C:\Windows\system32\inetsrv\appcmd.exe", "start apppool /apppool.name:admin")
-                            {
-                                UseShellExecute = true
-                            }))
+                            Process.Start(new ProcessStartInfo(@"C:\Windows\system32\inetsrv\appcmd.exe", "start apppool /apppool.name:admin")))
                     {
                         process?.WaitForExit();
                     }
@@ -121,7 +109,7 @@ namespace VitalChoice.Jobs.Jobs
                     {
                         return false;
                     }
-                    Thread.Sleep(TimeSpan.FromMinutes(2));
+                    Thread.Sleep(TimeSpan.FromMinutes(1));
                     return CheckHost(host, retryNumber + 1, response.StatusCode);
                 }
             }
