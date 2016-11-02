@@ -1,5 +1,4 @@
-﻿#if !NETSTANDARD1_5
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +25,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         protected readonly IObjectEncryptionHost EncryptionHost;
         protected readonly ILogger Logger;
+        public bool Disabled { get; }
         public bool InitSuccess { get; }
         public virtual string LocalHostName { get; }
         public string ServerHostName { get; }
@@ -33,6 +33,9 @@ namespace VitalChoice.Infrastructure.ServiceBus
         protected EncryptedServiceBusHost(IOptions<AppOptions> appOptions, ILogger logger, IObjectEncryptionHost encryptionHost,
             IHostingEnvironment env)
         {
+            Disabled = appOptions.Value.ExportService.Disabled;
+            if (Disabled)
+                return;
             ServerHostName = appOptions.Value.ExportService.ServerHostName;
             LocalHostName = env.ApplicationName + Guid.NewGuid().ToString("N");
             EncryptionHost = encryptionHost;
@@ -50,7 +53,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             }
         }
 
-        private void Initialize(IOptions<AppOptions> appOptions, ILogger logger)
+        public void Initialize(IOptions<AppOptions> appOptions, ILogger logger)
         {
             try
             {
@@ -81,7 +84,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             {
                 Logger.LogCritical(e.ToString());
             }
-
+            _plainClient?.Dispose();
             _plainClient = new ServiceBusHostOneToMany(logger, () =>
             {
                 var plainFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.PlainConnectionString);
@@ -102,6 +105,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                     Logger.LogError(e.ToString());
                 }
             });
+            _encryptedClient?.Dispose();
             _encryptedClient = new ServiceBusHostOneToMany(logger, () =>
             {
                 var plainFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.EncryptedConnectionString);
@@ -461,5 +465,3 @@ namespace VitalChoice.Infrastructure.ServiceBus
         }
     }
 }
-
-#endif

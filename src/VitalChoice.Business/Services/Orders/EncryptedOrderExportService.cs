@@ -10,7 +10,6 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
-using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Orders;
@@ -28,9 +27,11 @@ namespace VitalChoice.Business.Services.Orders
 
         public bool InitSuccess => EncryptedBusHost.InitSuccess;
 
+        public bool Disabled => EncryptedBusHost.Disabled;
+
         public async Task ExportOrdersAsync(OrderExportData exportData, Action<OrderExportItemResult> exportedAction)
         {
-            if (!InitSuccess)
+            if (!InitSuccess || Disabled)
             {
                 exportedAction(new OrderExportItemResult
                 {
@@ -64,7 +65,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<List<OrderExportItemResult>> ExportOrdersAsync(OrderExportData exportData)
         {
-            if (!InitSuccess)
+            if (!InitSuccess || Disabled)
             {
                 return new List<OrderExportItemResult>
                 {
@@ -147,7 +148,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public Task ExportGiftListCreditCard(GiftListExportModel model)
         {
-            if (!InitSuccess)
+            if (!InitSuccess || Disabled)
             {
                 return TaskCache.CompletedTask;
             }
@@ -168,9 +169,13 @@ namespace VitalChoice.Business.Services.Orders
                     "CardNumber") ||
                 orderPaymentMethod.IdCustomerPaymentMethod > 0 || orderPaymentMethod.IdOrderSource > 0)
             {
-                if (!InitSuccess)
+                if (Disabled)
                 {
                     return Task.FromResult(true);
+                }
+                if (!InitSuccess)
+                {
+                    return TaskCache<bool>.DefaultCompletedTask;
                 }
                 return
                     SendCommand<bool>(new ServiceBusCommandWithResult(Guid.NewGuid(),
@@ -186,9 +191,13 @@ namespace VitalChoice.Business.Services.Orders
 
         public Task<bool> CardExistAsync(CustomerExportInfo customerExportInfo)
         {
-            if (!InitSuccess)
+            if (Disabled)
             {
                 return Task.FromResult(true);
+            }
+            if (!InitSuccess)
+            {
+                return Task.FromResult(false);
             }
             if (customerExportInfo.IdPaymentMethod > 0 || customerExportInfo.IdCustomer > 0)
                 return
@@ -202,7 +211,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public Task<List<MessageInfo>> AuthorizeCard(CustomerPaymentMethodDynamic paymentData)
         {
-            if (!InitSuccess || paymentData == null)
+            if (!InitSuccess || paymentData == null || Disabled)
             {
                 return Task.FromResult(new List<MessageInfo>());
             }
@@ -219,7 +228,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public Task<List<MessageInfo>> AuthorizeCard(OrderPaymentMethodDynamic paymentData)
         {
-            if (!InitSuccess || paymentData == null)
+            if (!InitSuccess || paymentData == null || Disabled)
             {
                 return Task.FromResult(new List<MessageInfo>());
             }
@@ -236,9 +245,13 @@ namespace VitalChoice.Business.Services.Orders
 
         public Task<bool> UpdateCustomerPaymentMethodsAsync(ICollection<CustomerCardData> paymentMethods)
         {
-            if (!InitSuccess)
+            if (Disabled)
             {
                 return Task.FromResult(true);
+            }
+            if (!InitSuccess)
+            {
+                return Task.FromResult(false);
             }
             var paymentsToUpdate =
                 paymentMethods.Where(

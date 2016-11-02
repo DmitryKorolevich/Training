@@ -15,6 +15,9 @@
       "AppFilesContainerName": "app-files",
       "ObjectHistoryContainerName": "object-history-data",
       "ProductGoogleFeedFileName": "datafeed.csv"
+    },
+    "ExportService": {
+      "Disabled": true
     }
   }
 }

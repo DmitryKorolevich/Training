@@ -15,5 +15,6 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public string RootThumbprint { get; set; }
         public bool EncryptionHostSessionExpire { get; set; }
         public string ServerHostName { get; set; }
+        public bool Disabled { get; set; }
     }
 }
