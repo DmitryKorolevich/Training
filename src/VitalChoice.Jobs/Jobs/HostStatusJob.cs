@@ -26,6 +26,7 @@ namespace VitalChoice.Jobs.Jobs
 
         public void Execute(IJobExecutionContext context)
         {
+            _logger.LogWarning("Host Status Check started");
             try
             {
                 if (!CheckHost(_options.Value.PublicHost))
@@ -66,6 +67,7 @@ namespace VitalChoice.Jobs.Jobs
             {
                 _logger.LogError(ex.ToString());
             }
+            _logger.LogWarning("Host Status Check stopped");
         }
 
         private bool CheckHost(string host, int retryNumber = 0, HttpStatusCode previousStatus = HttpStatusCode.OK)
