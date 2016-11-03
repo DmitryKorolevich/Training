@@ -32,35 +32,15 @@ namespace VitalChoice.Jobs.Jobs
                 if (!CheckHost(_options.Value.PublicHost))
                 {
                     _logger.LogCritical("Restarting public app pool");
-                    using (
-                        var process =
-                            Process.Start(new ProcessStartInfo(@"C:\Windows\system32\inetsrv\appcmd.exe", "stop apppool /apppool.name:public")))
-                    {
-                        process?.WaitForExit();
-                    }
-                    using (
-                        var process =
-                            Process.Start(new ProcessStartInfo(@"C:\Windows\system32\inetsrv\appcmd.exe", "start apppool /apppool.name:public")))
-                    {
-                        process?.WaitForExit();
-                    }
+                    AppCmd("stop apppool /apppool.name:public");
+                    AppCmd("start apppool /apppool.name:public");
                 }
 
                 if (!CheckHost(_options.Value.AdminHost))
                 {
                     _logger.LogCritical("Restarting admin app pool");
-                    using (
-                        var process =
-                            Process.Start(new ProcessStartInfo(@"C:\Windows\system32\inetsrv\appcmd.exe", "stop apppool /apppool.name:admin")))
-                    {
-                        process?.WaitForExit();
-                    }
-                    using (
-                        var process =
-                            Process.Start(new ProcessStartInfo(@"C:\Windows\system32\inetsrv\appcmd.exe", "start apppool /apppool.name:admin")))
-                    {
-                        process?.WaitForExit();
-                    }
+                    AppCmd("stop apppool /apppool.name:admin");
+                    AppCmd("start apppool /apppool.name:admin");
                 }
             }
             catch (Exception ex)
@@ -68,6 +48,24 @@ namespace VitalChoice.Jobs.Jobs
                 _logger.LogError(ex.ToString());
             }
             _logger.LogWarning("Host Status Check stopped");
+        }
+
+        private void AppCmd(string command)
+        {
+            using (
+                var process =
+                    Process.Start(new ProcessStartInfo(@"C:\Windows\system32\inetsrv\appcmd.exe",
+                        command)
+                    {
+                        RedirectStandardOutput = true
+                    }))
+            {
+                process?.WaitForExit();
+                if (process != null && process.ExitCode != 0)
+                {
+                    _logger.LogWarning($"The start process existed with code {process.ExitCode:X8}");
+                }
+            }
         }
 
         private bool CheckHost(string host, int retryNumber = 0, HttpStatusCode previousStatusCode = HttpStatusCode.OK)
@@ -93,6 +91,7 @@ namespace VitalChoice.Jobs.Jobs
                     _logger.LogError(e.ToString());
                     return true;
                 }
+                _logger.LogWarning($"{host} Status: {response.StatusCode}");
                 return ProcessResponse(host, retryNumber, response, previousStatusCode);
             }
             catch (Exception e)
