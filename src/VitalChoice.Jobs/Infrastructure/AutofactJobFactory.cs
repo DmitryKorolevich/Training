@@ -3,14 +3,16 @@ using System.Collections.Concurrent;
 using System.Globalization;
 using Autofac;
 using Common.Logging;
+using Microsoft.Extensions.Logging;
 using Quartz;
 using Quartz.Spi;
+using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Jobs.Infrastructure
 {
 	public class AutofacJobFactory : IJobFactory, IDisposable
 	{
-		private static readonly ILog s_log = LogManager.GetLogger<AutofacJobFactory>();
+	    private readonly ILogger _logger;
 		private readonly ILifetimeScope _lifetimeScope;
 
 		private readonly string _scopeName;
@@ -26,6 +28,8 @@ namespace VitalChoice.Jobs.Infrastructure
 			if (scopeName == null) throw new ArgumentNullException(nameof(scopeName));
 			_lifetimeScope = lifetimeScope;
 			_scopeName = scopeName;
+		    _logger = lifetimeScope.Resolve<ILoggerFactory>().CreateLogger<AutofacJobFactory>();
+
 		}
 
 		internal ConcurrentDictionary<object, JobTrackingInfo> RunningJobs { get; } = new ConcurrentDictionary<object, JobTrackingInfo>();
@@ -40,7 +44,7 @@ namespace VitalChoice.Jobs.Infrastructure
 
 			if (runningJobs.Length > 0)
 			{
-				s_log.InfoFormat("Cleaned {0} scopes for running jobs", runningJobs.Length);
+			    _logger.LogInfo(i => $"Cleaned {i} scopes for running jobs", runningJobs.Length);
 			}
 		}
 
@@ -84,12 +88,6 @@ namespace VitalChoice.Jobs.Infrastructure
 				var jobTrackingInfo = new JobTrackingInfo(nestedScope);
 				RunningJobs[newJob] = jobTrackingInfo;
 
-				if (s_log.IsDebugEnabled)
-				{
-					s_log.DebugFormat(CultureInfo.InvariantCulture, "Scope 0x{0:x} associated with Job 0x{1:x}",
-						jobTrackingInfo.Scope.GetHashCode(), newJob.GetHashCode());
-				}
-
 				nestedScope = null;
 			}
 			catch (Exception ex)
@@ -98,6 +96,7 @@ namespace VitalChoice.Jobs.Infrastructure
 				{
 					DisposeScope(newJob, nestedScope);
 				}
+			    _logger.LogError(ex.ToString());
 				throw new SchedulerConfigException(string.Format(CultureInfo.InvariantCulture,
 					"Failed to instantiate Job '{0}' of type '{1}'",
 					bundle.JobDetail.Key, bundle.JobDetail.JobType), ex);
@@ -116,7 +115,7 @@ namespace VitalChoice.Jobs.Infrastructure
 			JobTrackingInfo trackingInfo;
 			if (!RunningJobs.TryRemove(job, out trackingInfo))
 			{
-				s_log.WarnFormat("Tracking info for job 0x{0:x} not found", job.GetHashCode());
+			    _logger.LogWarn(i => $"Tracking info for job 0x{0:x} not found", job.GetHashCode());
 				var disposableJob = job as IDisposable;
 				disposableJob?.Dispose();
 			}
@@ -129,12 +128,6 @@ namespace VitalChoice.Jobs.Infrastructure
 
 		private static void DisposeScope(IJob job, ILifetimeScope lifetimeScope)
 		{
-			if (s_log.IsDebugEnabled)
-			{
-				s_log.DebugFormat("Disposing Scope 0x{0:x} for Job 0x{1:x}",
-					lifetimeScope?.GetHashCode() ?? 0,
-					job?.GetHashCode() ?? 0);
-			}
 			lifetimeScope?.Dispose();
 		}
 

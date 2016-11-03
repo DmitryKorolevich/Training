@@ -70,7 +70,7 @@ namespace VitalChoice.Jobs.Jobs
             _logger.LogWarning("Host Status Check stopped");
         }
 
-        private bool CheckHost(string host, int retryNumber = 0, HttpStatusCode previousStatus = HttpStatusCode.OK)
+        private bool CheckHost(string host, int retryNumber = 0, HttpStatusCode previousStatusCode = HttpStatusCode.OK)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace VitalChoice.Jobs.Jobs
                 request.Timeout = 120000;
                 using (var response = (HttpWebResponse) request.GetResponse())
                 {
-                    var result = ProcessResponse(host, retryNumber, previousStatus, response);
+                    var result = ProcessResponse(host, retryNumber, response, previousStatusCode);
                     response.GetResponseStream()?.Dispose();
                     _logger.LogWarning($"{host} Status: {response.StatusCode}");
                     return result;
@@ -93,7 +93,7 @@ namespace VitalChoice.Jobs.Jobs
                     _logger.LogError(e.ToString());
                     return true;
                 }
-                return ProcessResponse(host, retryNumber, previousStatus, response);
+                return ProcessResponse(host, retryNumber, response, previousStatusCode);
             }
             catch (Exception e)
             {
@@ -104,7 +104,7 @@ namespace VitalChoice.Jobs.Jobs
             return true;
         }
 
-        private bool ProcessResponse(string host, int retryNumber, HttpStatusCode previousStatus, HttpWebResponse response)
+        private bool ProcessResponse(string host, int retryNumber, HttpWebResponse response, HttpStatusCode previousStatus)
         {
             if ((int) response.StatusCode >= 500)
             {
