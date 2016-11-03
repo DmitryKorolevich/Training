@@ -63,7 +63,7 @@ namespace VitalChoice.Jobs.Jobs
                 process?.WaitForExit();
                 if (process != null && process.ExitCode != 0)
                 {
-                    _logger.LogWarning($"The start process existed with code {process.ExitCode:X8}");
+                    _logger.LogWarning($"The start process existed with code {process.ExitCode:X8} \n{process.StandardOutput.ReadToEnd()}");
                 }
             }
         }
