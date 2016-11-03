@@ -81,6 +81,7 @@ namespace VitalChoice.Jobs.Jobs
                 {
                     var result = ProcessResponse(host, retryNumber, previousStatus, response);
                     response.GetResponseStream()?.Dispose();
+                    _logger.LogWarning($"Host Status: {response.StatusCode}");
                     return result;
                 }
             }
