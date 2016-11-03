@@ -1,17 +1,31 @@
 ﻿'use strict';
 
 angular.module('app.modules.gc.controllers.gcDetailController', [])
-.controller('gcDetailController', ['$scope', '$rootScope', '$state', '$stateParams', 'gcService', 'orderService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker',
-function ($scope, $rootScope, $state, $stateParams, gcService, orderService, toaster, modalUtil, confirmUtil, promiseTracker)
+.controller('gcDetailController', ['$scope', '$rootScope', '$state', '$stateParams', 'gcService', 'orderService', 'settingService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker',
+function ($scope, $rootScope, $state, $stateParams, gcService, orderService, settingService, toaster, modalUtil, confirmUtil, promiseTracker)
 {
     $scope.refreshTracker = promiseTracker("get");
     $scope.editTracker = promiseTracker("edit");
+
+    function refreshHistory()
+    {
+        if ($scope.gc && $scope.gc.Id)
+        {
+            var data = {};
+            data.service = settingService;
+            data.tracker = $scope.refreshTracker;
+            data.idObject = $scope.gc.Id;
+            data.idObjectType = 20//gc
+            $scope.$broadcast('objectHistorySection#in#refresh', data);
+        }
+    }
 
     function successSaveHandler(result)
     {
         if (result.Success)
         {
             toaster.pop('success', "Success!", "Successfully saved.");
+            refreshHistory();
         } else
         {
             var messages = "";
@@ -57,6 +71,7 @@ function ($scope, $rootScope, $state, $stateParams, gcService, orderService, toa
                 {
                     $scope.gc = result.Data;
                     $scope.gc.StatusCode = $scope.gc.StatusCode;
+                    refreshHistory();
                 } else
                 {
                     errorHandler(result);

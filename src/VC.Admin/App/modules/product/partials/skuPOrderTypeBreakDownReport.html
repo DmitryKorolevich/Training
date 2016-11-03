@@ -96,7 +96,7 @@
                 <tbody>
                     <tr data-ng-repeat="sku in report.Skus">
                         <td>
-                            <a data-ng-click="openOrders(sku.IdSku)">{{::sku.Code}}</a>
+                            <a target="_blank" data-ng-href="{{sku.Url}}">{{::sku.Code}}</a>
                         </td>
                         <td data-ng-repeat="period in sku.Periods">
                             {{::period.Quantity}}

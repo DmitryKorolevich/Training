@@ -6,6 +6,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 {
     public interface IEncryptedServiceBusHost : IDisposable
     {
+        bool Disabled { get; }
         bool InitSuccess { get; }
         void SendCommand(ServiceBusCommandBase command);
         Task<T> ExecuteCommand<T>(ServiceBusCommandWithResult command);

@@ -79,7 +79,6 @@ angular.module('app.shared.menu.services.navigationFactory', [])
                         { name: 'skuBreakDownReport', stateName: 'index.oneCol.skuBreakDownReport', stateLabel: 'SKU Breakdown Report', access: 3 },
                         { name: 'ordersSummarySalesReport', stateName: 'index.oneCol.ordersSummarySalesReport', stateLabel: 'Summary Sales Report', access: 3 },
                         { name: 'transactionsAndRefundsReport', stateName: 'index.oneCol.transactionsAndRefundsReport', stateLabel: 'Transaction & Refund Report', access: 3 },
-                        //{ name: 'deletedOrdersReport', stateName: 'index.oneCol.deletedOrdersReport', stateLabel: 'Deleted Orders Report', access: 3 },
 				    ]
 				},
 				{
@@ -115,13 +114,10 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    name: 'listProcessingAnalysis',
 				    stateLabel: 'List Processing, Analysis',
 				    subMenu: [
+                        { name: 'customerSkuUsageReportReport', stateName: 'index.oneCol.customerSkuUsageReportReport', stateLabel: 'Customer by Product Report', access: 3 },
                         { name: 'giftCertificateReport', stateName: 'index.oneCol.manageGCOrders', stateLabel: 'Gift Certificate Report', access: 3 },
                         { name: 'mailingReport', stateName: 'index.oneCol.mailingReport', stateLabel: 'Mailing List Report', access: 3 },
                         { name: 'matchbackReport', stateName: 'index.oneCol.matchbackReport', stateLabel: 'Matchback and Post-Season Analysis Report', access: 3 },
-                        //{ name: 'giftCertificateUsageReport', stateName: 'index.oneCol.giftCertificateUsageReport', stateLabel: 'Gift Certificate Usage Report', access: 3 },
-                        //{ name: 'lifeTimeCalculationReport', stateName: 'index.oneCol.lifeTimeCalculationReport', stateLabel: 'Life Time Calculation Report', access: 3 },
-                        //{ name: 'weeklySalesReport', stateName: 'index.oneCol.weeklySalesReport', stateLabel: 'Weekly Sales Report', access: 3 },
-                        //{ name: 'newCustomersReport', stateName: 'index.oneCol.newCustomersReport', stateLabel: 'New Customers Report', access: 3 },
 				    ]
 				},
                 { name: 'catalogRequests', stateName: 'index.oneCol.catalogRequests', stateLabel: 'Catalog Requests', access: 3 },

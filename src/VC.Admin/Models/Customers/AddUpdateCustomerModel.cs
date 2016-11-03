@@ -96,6 +96,8 @@ namespace VC.Admin.Models.Customer
         [Map]
         public bool HasHealthwiseOrders { get; set; }
 
+	    public bool LoginLocked { get; set; }
+
         public AddressModel ProfileAddress { get; set; }
 
         public IList<AddressModel> Shipping { get; set; }

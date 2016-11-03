@@ -503,8 +503,9 @@ namespace VC.Admin.Controllers
 	        {
 				throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
 			}
+            customerModel.LoginLocked = await _storefrontUserService.IsUserLockedAsync(login);
 
-			customerModel.IsConfirmed = login.PasswordHash !=null;
+            customerModel.IsConfirmed = login.PasswordHash !=null;
 			customerModel.PublicUserId = login.PublicId;
 
             await PrepareCustomerNotes(result,customerModel);
@@ -674,6 +675,13 @@ namespace VC.Admin.Controllers
         public async Task<Result<PagedList<VCustomerWithDublicateEmail>>> GetCustomersWithDublicateEmails([FromBody]FilterBase filter)
         {
             return await _customerService.GetCustomersWithDublicateEmailsAsync(filter);
+        }
+        
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Customers)]
+        public async Task<Result<bool>> UnlockCustomer(int id, [FromBody]object model)
+        {
+            return await _customerService.UnlockCustomerAsync(id);
         }
 
         #region Reports

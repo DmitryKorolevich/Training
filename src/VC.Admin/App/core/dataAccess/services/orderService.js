@@ -297,6 +297,19 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	        return baseUrl + ('GetAAFESReportItemsReportFile?{0}buildNumber={1}')
                 .format(generateQueryParamsBasedOnFilter(filter), buildNumber);
 	    },
+	    getCustomerSkuUsageReportItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetCustomerSkuUsageReportItems', filter, getConfig(tracker));
+	    },
+	    requestCustomerSkuUsageReportFile: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'RequestCustomerSkuUsageReportFile', filter, getConfig(tracker));
+	    },
+	    getCustomerSkuUsageReportFile: function (id, buildNumber)
+	    {
+	        return baseUrl + ('GetCustomerSkuUsageReportFile/{0}?buildNumber={1}')
+                .format(id, buildNumber);
+	    },
 
 	    //export
 	    getExportGeneralStatus: function (tracker)

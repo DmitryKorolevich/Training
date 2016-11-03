@@ -150,6 +150,7 @@ namespace VC.Admin.Controllers
             if (Int32.TryParse(sUserId, out userId))
             {
                 item.UserId = userId;
+                item.IdEditedBy = userId;
             }
 
             return (await GCService.AddManualGiftCertificatesAsync(quantity, item)).Select(p => new GCListItemModel(p)).ToList();
@@ -162,6 +163,14 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return null;
             var item = model.Convert();
+
+            var sUserId = _userManager.GetUserId(User);
+            int userId;
+            if (Int32.TryParse(sUserId, out userId))
+            {
+                item.IdEditedBy = userId;
+            }
+
             item = await GCService.UpdateGiftCertificateAsync(item);
 
             return new GCManageModel(item);

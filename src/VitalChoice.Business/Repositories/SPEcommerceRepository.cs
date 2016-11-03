@@ -418,5 +418,31 @@ namespace VitalChoice.Business.Repositories
                 filter.From, filter.To, filter.ShipFrom, filter.ShipTo).ToListAsync();
             return toReturn;
         }
+
+        public async Task<PagedList<CustomerSkuUsageReportRawItem>> GetCustomerSkuUsageReportItemsAsync(CustomerSkuUsageReportFilter filter)
+        {
+            string sSkuIds = null;
+            if (filter.SkuIds != null && filter.SkuIds.Count > 0)
+            {
+                sSkuIds = string.Empty;
+                for (int i = 0; i < filter.SkuIds.Count; i++)
+                {
+                    sSkuIds += filter.SkuIds[i];
+                    if (i != filter.SkuIds.Count - 1)
+                    {
+                        sSkuIds += ",";
+                    }
+                }
+            }
+
+            var data = await _context.Set<CustomerSkuUsageReportRawItem>().FromSql("[dbo].[SPGetCustomerSkuUsageReport] @from={0}, @to={1}, @skus={2}, @idcategory={3},"+
+                "@idcustomertype={4}, @pageindex={5}, @pagesize={6}",
+                filter.From, filter.To, sSkuIds, filter.IdCategory,
+                filter.IdCustomerType, filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
+            var toReturn = new PagedList<CustomerSkuUsageReportRawItem>();
+            toReturn.Count = data.FirstOrDefault()?.TotalCount ?? 0;
+            toReturn.Items = data;
+            return toReturn;
+        }
     }
 }

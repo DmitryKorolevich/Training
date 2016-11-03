@@ -21,18 +21,17 @@ namespace VitalChoice.Jobs.Jobs
         {
             try
             {
-                Console.WriteLine("Started AutoShip job");
+                _logger.LogWarning("Started AutoShip job");
                 using (var scope = _rootScope.BeginLifetimeScope())
                 {
                     var orderService = scope.Resolve<IOrderService>();
                     orderService.SubmitAutoShipOrders().GetAwaiter().GetResult();
                 }
-                Console.WriteLine("Finished AutoShip job");
+                _logger.LogWarning("Finished AutoShip job");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                throw;
             }
         }
     }

@@ -12,7 +12,9 @@ namespace VC.Public.Models.Tracking
         public string GoogleActionCheckout { get; set; }
         public string GoogleActionPurchase { get; set; }
         public string CustomerEmail { get; set; }
-        public string Criteo { get; set; }
+        public string CriteoOrderComplete { get; set; }
+        public string CriteoViewCart { get; set; }
+        public bool CriteoHomeRender { get; set; }
         public string PepperjamQuery { get; set; }
     }
 }

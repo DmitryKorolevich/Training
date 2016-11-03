@@ -166,6 +166,16 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(f => f.RowNumber);
             });
 
+            builder.Entity<CustomerSkuUsageReportRawItem>(entity =>
+            {
+                entity.Ignore(f => f.Id);
+                entity.Ignore(f => f.CustomerType);
+                entity.Ignore(f => f.CategoryNames);
+                entity.Ignore(f => f.ShippingCountryCode);
+                entity.Ignore(f => f.ShippingStateCode);
+                entity.HasKey(f => new { f.IdCustomer, f.IdSku});
+            });
+
             #endregion
 
             builder.Entity<VCustomerFavorite>(entity =>

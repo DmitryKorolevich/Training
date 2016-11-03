@@ -106,6 +106,10 @@ angular.module('app.core.dataAccess.services.customerService', [])
 		{
 		    return $http.post(baseUrl + 'GetCustomersWithDublicateEmails', model, getConfig(tracker));
 		},
+		unlockCustomer: function (id, tracker)
+		{
+		    return $http.post(baseUrl + 'UnlockCustomer/' + id, null, getConfig(tracker));
+		},
 
 	    //reports
 		getWholesaleSummaryReport: function (tracker)

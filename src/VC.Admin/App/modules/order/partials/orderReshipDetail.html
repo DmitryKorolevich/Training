@@ -2,7 +2,9 @@
     <div class="left-pane-controls">
         <div class="well container-fluid">
             <div>
-                <button data-ng-bind="order.Id ? 'Save' : 'Submit'" data-ng-click="save()" class="btn btn-success width-160px" unsaved-warning-clear></button>
+                <button data-ng-bind="order.Id ? 'Save' : 'Submit'"
+                        data-ng-disabled="!order || (order.Id && !editLockState.Areas['index.oneCol.orderReshipDetail'].Items[order.Id])"
+                        data-ng-click="save()" class="btn btn-success width-160px" unsaved-warning-clear></button>
             </div>
             <div class="btn-group margin-top-10px">
                 <button ui-sref="index.oneCol.manageOrders" class="btn btn-default width-160px" unsaved-warning-clear>Cancel</button>
@@ -102,7 +104,7 @@
                                                     <div class="form-group">
                                                         <label class="col-md-3 control-label">Order Specific Notes<br/>(*Will appear on invoice)</label>
                                                         <div class="col-md-9">
-                                                            <textarea type="text" name="OrderNotes" class="form-control" placeholder="Notes" rows="5" data-ng-model="order.OrderNotes" data-ng-disabled="orderEditDisabled" required></textarea>
+                                                            <textarea type="text" name="OrderNotes" class="form-control" placeholder="Order Specific Notes" rows="5" data-ng-model="order.OrderNotes" data-ng-disabled="orderEditDisabled" required></textarea>
                                                             <div class="error-container" ng-show="forms.topForm.submitted && forms.topForm.OrderNotes.$invalid">
                                                                 <small class="error" ng-show="forms.topForm.OrderNotes.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Order Notes")}}</small>
                                                                 <small class="error" ng-show="forms.topForm.OrderNotes.$error.server">{{serverMessages.GetMessage('OrderNotes')}}</small>

@@ -25,6 +25,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Azure;
 using VitalChoice.Infrastructure.Domain.Transfer.Help;
 using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Infrastructure.Domain.Transfer.Groove;
 
 namespace VitalChoice.Business.Services.HelpService
 {
@@ -39,11 +40,13 @@ namespace VitalChoice.Business.Services.HelpService
         private readonly IRepositoryAsync<AdminProfile> _adminProfileRepository;
         private readonly INotificationService _notificationService;
         private readonly IBlobStorageClient _storageClient;
+        private readonly IGrooveService _grooveService;
         private static string _bugTicketFilesContainerName;
         private static string _bugTicketCommentFilesContainerName;
         private readonly ILogger _logger;
         private readonly ITransactionAccessor<EcommerceContext> _ecommerceTransactionAccessor;
         private readonly ITransactionAccessor<VitalChoiceContext> _infrastructureTransactionAccessor;
+        private readonly ICustomerService _customerService;
 
         public HelpService(IEcommerceRepositoryAsync<HelpTicket> helpTicketRepository,
             IEcommerceRepositoryAsync<HelpTicketComment> helpTicketCommentRepository,
@@ -54,9 +57,11 @@ namespace VitalChoice.Business.Services.HelpService
             IRepositoryAsync<AdminProfile> adminProfileRepository,
             INotificationService notificationService,
             IBlobStorageClient storageClient,
+            IGrooveService grooveService,
             IOptions<AppOptions> appOptions,
             ILoggerFactory loggerProvider, ITransactionAccessor<EcommerceContext> ecommerceTransactionAccessor,
-            ITransactionAccessor<VitalChoiceContext> infrastructureTransactionAccessor)
+            ITransactionAccessor<VitalChoiceContext> infrastructureTransactionAccessor,
+            ICustomerService customerService)
         {
             _helpTicketRepository = helpTicketRepository;
             _helpTicketCommentRepository = helpTicketCommentRepository;
@@ -71,6 +76,8 @@ namespace VitalChoice.Business.Services.HelpService
             _infrastructureTransactionAccessor = infrastructureTransactionAccessor;
             _bugTicketFilesContainerName = appOptions.Value.AzureStorage.BugTicketFilesContainerName;
             _bugTicketCommentFilesContainerName = appOptions.Value.AzureStorage.BugTicketCommentFilesContainerName;
+            _grooveService = grooveService;
+            _customerService = customerService;
             _logger = loggerProvider.CreateLogger<HelpService>();
         }
 
@@ -200,15 +207,34 @@ namespace VitalChoice.Business.Services.HelpService
 
         public async Task<HelpTicket> UpdateHelpTicketAsync(HelpTicket item, int? adminId)
         {
+            var newticket = false;
             using (var transaction = _ecommerceTransactionAccessor.BeginTransaction())
             {
                 try
                 {
                     if (item.Id == 0)
                     {
-                        item.StatusCode = RecordStatusCode.Active;
+                        item.StatusCode = RecordStatusCode.NotActive;
                         item.DateCreated = item.DateEdited = DateTime.Now;
-                        await _helpTicketRepository.InsertAsync(item);
+                        
+                        AddTicketModel grooveTicket = new AddTicketModel();
+                        grooveTicket.body = item.Description;
+                        grooveTicket.subject = $"Order #{item.IdOrder}: {item.Summary}";
+                        var idCustomer = await _customerService.GetIdCustomerIdByIdOrder(item.IdOrder);
+                        if (idCustomer.HasValue)
+                        {
+                            var customer = await _customerService.SelectAsync(idCustomer.Value);
+                            grooveTicket.from = customer.Email;
+                            grooveTicket.name = $"{customer.ProfileAddress.SafeData.FirstName} {customer.ProfileAddress.SafeData.LastName}";
+                        }
+
+                        var result = await _grooveService.AddHelpTicketAsync(grooveTicket);
+
+                        if (result)
+                        {
+                            await _helpTicketRepository.InsertAsync(item);
+                            newticket = true;
+                        }
                     }
                     else
                     {
@@ -237,6 +263,10 @@ namespace VitalChoice.Business.Services.HelpService
             }
             else
             {
+                if (newticket)
+                {
+                    await NotifyCustomerTicketCreated(item.Id);
+                }
                 await NotifyCustomerService(item.Id);
             }
 
@@ -404,6 +434,23 @@ namespace VitalChoice.Business.Services.HelpService
                     Id=helpTicket.Id,
                     IdOrder=helpTicket.IdOrder,
                     Customer=helpTicket.Customer,
+                });
+
+                return true;
+            }
+            return false;
+        }
+
+        private async Task<bool> NotifyCustomerTicketCreated(int idHelpTicket)
+        {
+            var helpTicket = await GetHelpTicketAsync(idHelpTicket);
+            if (helpTicket != null)
+            {
+                await _notificationService.SendHelpTicketAddingEmailForCustomerAsync(helpTicket.CustomerEmail, new HelpTicketEmail()
+                {
+                    Id = helpTicket.Id,
+                    IdOrder = helpTicket.IdOrder,
+                    Customer = helpTicket.Customer
                 });
 
                 return true;

@@ -29,6 +29,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         protected readonly IObjectEncryptionHost EncryptionHost;
         protected readonly ILogger Logger;
+        public bool Disabled { get; }
         public bool InitSuccess { get; }
         public virtual string LocalHostName { get; }
         public string ServerHostName { get; }
@@ -38,6 +39,9 @@ namespace VitalChoice.Infrastructure.ServiceBus
         protected EncryptedServiceBusHost(IOptions<AppOptions> appOptions, ILogger logger, IObjectEncryptionHost encryptionHost,
             IHostingEnvironment env)
         {
+            Disabled = appOptions.Value.ExportService.Disabled;
+            if (Disabled)
+                return;
             ServerHostName = appOptions.Value.ExportService.ServerHostName;
             LocalHostName = env.ApplicationName + Guid.NewGuid().ToString("N");
             EncryptionHost = encryptionHost;
@@ -52,6 +56,115 @@ namespace VitalChoice.Infrastructure.ServiceBus
             {
                 InitSuccess = false;
                 logger.LogCritical(e.ToString());
+            }
+        }
+
+        public void Initialize(IOptions<AppOptions> appOptions, ILogger logger)
+        {
+            try
+            {
+                try
+                {
+                    EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.PlainConnectionString,
+                        appOptions.Value.ExportService.PlainQueueName, LocalHostName);
+                }
+                catch
+                {
+                    Thread.Sleep(TimeSpan.FromSeconds(1));
+                    EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.PlainConnectionString,
+                        appOptions.Value.ExportService.PlainQueueName, LocalHostName);
+                }
+                try
+                {
+                    EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.EncryptedConnectionString,
+                        appOptions.Value.ExportService.EncryptedQueueName, LocalHostName);
+                }
+                catch
+                {
+                    Thread.Sleep(TimeSpan.FromSeconds(1));
+                    EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.EncryptedConnectionString,
+                        appOptions.Value.ExportService.EncryptedQueueName, LocalHostName);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogCritical(e.ToString());
+            }
+            _plainClient?.Dispose();
+            _plainClient = new ServiceBusHostOneToMany(logger, () =>
+            {
+                var plainFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.PlainConnectionString);
+                return plainFactory.CreateTopicClient(appOptions.Value.ExportService.PlainQueueName);
+            }, () =>
+            {
+                var factory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.PlainConnectionString);
+                return factory.CreateSubscriptionClient(appOptions.Value.ExportService.PlainQueueName, LocalHostName,
+                    ReceiveMode.ReceiveAndDelete);
+            }, m =>
+            {
+                try
+                {
+                    ProcessPlainMessage(m);
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError(e.ToString());
+                }
+            });
+            _encryptedClient?.Dispose();
+            _encryptedClient = new ServiceBusHostOneToMany(logger, () =>
+            {
+                var plainFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.EncryptedConnectionString);
+                return plainFactory.CreateTopicClient(appOptions.Value.ExportService.EncryptedQueueName);
+            }, () =>
+            {
+                var factory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.EncryptedConnectionString);
+                return factory.CreateSubscriptionClient(appOptions.Value.ExportService.EncryptedQueueName, LocalHostName,
+                    ReceiveMode.ReceiveAndDelete);
+            }, m =>
+            {
+                try
+                {
+                    ProcessEncryptedMessage(m);
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError(e.ToString());
+                }
+            });
+            _plainClient.Start();
+            _encryptedClient.Start();
+        }
+
+        private void EnsureTopicAndSubscriptionExists(string connectionString, string topicName, string subscriptionName)
+        {
+            var ns = NamespaceManager.CreateFromConnectionString(connectionString);
+            if (!ns.TopicExists(topicName))
+            {
+                TopicDescription topic = new TopicDescription(topicName)
+                {
+                    EnableExpress = true,
+                    EnablePartitioning = true,
+                    EnableBatchedOperations = true,
+                    DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
+                    RequiresDuplicateDetection = false
+                };
+
+                ns.CreateTopic(topic);
+            }
+            if (!ns.SubscriptionExists(topicName, subscriptionName))
+            {
+                SubscriptionDescription subscription = new SubscriptionDescription(topicName, subscriptionName)
+                {
+                    EnableBatchedOperations = true,
+                    DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
+                    RequiresSession = false,
+                    EnableDeadLetteringOnFilterEvaluationExceptions = false,
+                    EnableDeadLetteringOnMessageExpiration = false,
+                    AutoDeleteOnIdle = TimeSpan.FromMinutes(20),
+                    MaxDeliveryCount = 1
+                };
+                ns.CreateSubscription(subscription);
             }
         }
 

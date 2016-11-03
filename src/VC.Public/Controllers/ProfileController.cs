@@ -870,8 +870,6 @@ namespace VC.Public.Controllers
             {
                 toReturn = new HelpTicketManageModel(null)
                 {
-                    StatusCode = RecordStatusCode.Active,
-                    Priority = TicketPriority.Low,
                     IdOrder = idorder.Value,
                 };
             }

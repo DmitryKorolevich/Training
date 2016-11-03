@@ -24,17 +24,10 @@ namespace VC.Public.Models.Profile
 
         public string Customer { get; set; }
 
-        [Display(Name = "Initially posted on")]
+        [Display(Name = "Date Submitted")]
         public DateTime DateCreated { get; set; }
 
         public DateTime DateEdited { get; set; }
-
-        [Display(Name = "Status")]
-        public RecordStatusCode StatusCode { get; set; }
-
-        [Required]
-        [Display(Name = "Priority")]
-        public TicketPriority Priority { get; set; }
 
         [Required]
         [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
@@ -60,8 +53,6 @@ namespace VC.Public.Models.Profile
                 IdOrder = item.IdOrder;
                 DateCreated = item.DateCreated;
                 DateEdited = item.DateEdited;
-                StatusCode = item.StatusCode;
-                Priority = item.Priority;
                 Summary = item.Summary;
                 Description = item.Description;
                 IdCustomer = item.IdCustomer;
@@ -82,8 +73,8 @@ namespace VC.Public.Models.Profile
             HelpTicket toReturn = new HelpTicket();
             toReturn.Id = Id;
             toReturn.IdOrder = IdOrder;
-            toReturn.StatusCode = StatusCode;
-            toReturn.Priority = Priority;
+            toReturn.Priority= TicketPriority.Medium;
+            toReturn.StatusCode = RecordStatusCode.Active;
             toReturn.Summary = Summary;
             toReturn.Description = Description;
 

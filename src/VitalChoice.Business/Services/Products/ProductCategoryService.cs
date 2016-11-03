@@ -55,6 +55,14 @@ namespace VitalChoice.Business.Services.Products
 
         #region Categories
 
+        public async Task<ICollection<ProductCategory>> GetCategoriesAsync(ProductCategoryTreeFilter filter)
+        {
+            var query = new ProductCategoryQuery().NotDeleted().WithStatus(filter.Statuses);
+            var toReturn = await productCategoryEcommerceRepository.Query(query).SelectAsync(false);
+
+            return toReturn;
+        }
+
         public async Task<ProductCategory> GetCategoriesTreeAsync(ProductCategoryTreeFilter filter)
         {
             ProductCategory toReturn = null;

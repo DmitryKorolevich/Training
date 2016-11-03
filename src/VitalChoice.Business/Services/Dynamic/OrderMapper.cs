@@ -261,6 +261,12 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdSku = s.Sku.Id,
                     GeneratedGiftCertificates = s.GcsGenerated
                 }));
+                foreach (var gc in entity?.Skus?.Where(p=>p.GeneratedGiftCertificates!=null).SelectMany(p=>p.GeneratedGiftCertificates))
+                {
+                    gc.UserId = entity.IdEditedBy;
+                    gc.IdEditedBy = entity.IdEditedBy;
+                }
+
                 foreach (var orderToSku in entity.Skus)
                 {
                     List<SkuToInventorySku> inventories;
@@ -364,6 +370,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         },
                         removed => removed.ForEach(gc => gc.GiftCertificate.Balance += gc.Amount));
                 }
+
                 entity.IdDiscount = dynamic.Discount?.Id;
                 if (dynamic.PaymentMethod.Address != null && entity.PaymentMethod.BillingAddress == null)
                 {
@@ -415,6 +422,13 @@ namespace VitalChoice.Business.Services.Dynamic
                             },
                             (p, rp) => p.Quantity = rp.Quantity);
                     });
+
+                foreach (var gc in entity?.Skus?.Where(p => p.GeneratedGiftCertificates != null).SelectMany(p => p.GeneratedGiftCertificates))
+                {
+                    gc.UserId = gc.Id == 0 ? entity.IdEditedBy : gc.UserId;
+                    gc.IdEditedBy = entity.IdEditedBy;
+                }
+
 
                 if (entity.PromoSkus == null)
                 {

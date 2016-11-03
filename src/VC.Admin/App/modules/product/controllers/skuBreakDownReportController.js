@@ -35,6 +35,7 @@
                 .success(function (result) {
                     if (result.Success) {
                         $scope.items = result.Data;
+                        updateSkuUrls();
                     } else {
                         errorHandler(result);
                     }
@@ -85,20 +86,20 @@
             }
         };
 
-        $scope.openOrders = function (idsku)
+        function updateSkuUrls()
         {
-            var data = {};
-            data.idsku = idsku;
-            data.statuses = '2,3,5,6,7';
-            if ($scope.filter.From)
+            $.each($scope.items, function (index, item)
             {
-                data.from = $scope.filter.From.toQueryParamDateTime();
-            }
-            if ($scope.filter.To)
-            {
-                data.to = $scope.filter.To.toQueryParamDateTime();
-            }
-            $state.go('index.oneCol.manageOrders', data);
+                item.Url = '/orders?idsku={0}&statuses=2,3,5,6,7'.format(item.IdSku);
+                if ($scope.filter.From)
+                {
+                    item.Url +='&from='+ $scope.filter.From.toQueryParamDateTime();
+                }
+                if ($scope.filter.To)
+                {
+                    item.Url += '&to=' + $scope.filter.To.toQueryParamDateTime();
+                }
+            });
         };
 
         initialize();

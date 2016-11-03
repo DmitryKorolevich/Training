@@ -11,6 +11,7 @@ namespace VitalChoice.Interfaces.Services.Orders
     public interface IEncryptedOrderExportService: IDisposable
     {
         Task ExportGiftListCreditCard(GiftListExportModel model);
+        bool Disabled { get; }
         bool InitSuccess { get; }
         Task ExportOrdersAsync(OrderExportData exportData, Action<OrderExportItemResult> exportedAction);
         Task<List<OrderExportItemResult>> ExportOrdersAsync(OrderExportData exportData);

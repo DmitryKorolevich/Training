@@ -29,6 +29,8 @@ using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.ObjectMapping.Interfaces;
 using ApiException = VitalChoice.Ecommerce.Domain.Exceptions.ApiException;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Identity.UserManagers;
+using VitalChoice.Interfaces.Services.Customers;
 
 namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 {
@@ -53,6 +55,8 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
         private readonly IProductCategoryService _productCategoryService;
         private readonly IProductReviewService _productReviewService;
         private readonly IRecipeService _recipeService;
+        private readonly ICustomerService _customerService;
+        private readonly ExtendedUserManager _userManager;
         private readonly IOptions<AppOptions> _appOptions;
         private readonly IDynamicMapper<ProductDynamic, Product> _productMapper;
         private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
@@ -61,13 +65,18 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             IProductCategoryService productCategoryService,
             IProductReviewService productReviewService,
             IRecipeService recipeService,
-            IOptions<AppOptions> appOptions, IDynamicMapper<ProductDynamic, Product> productMapper,
+            ICustomerService customerService,
+            ExtendedUserManager userManager,
+            IOptions<AppOptions> appOptions, 
+            IDynamicMapper<ProductDynamic, Product> productMapper,
             IDynamicMapper<SkuDynamic, Sku> skuMapper)
             : base(mapper)
         {
             _productCategoryService = productCategoryService;
             _productReviewService = productReviewService;
             _recipeService = recipeService;
+            _customerService = customerService;
+            _userManager = userManager;
             _appOptions = appOptions;
             _productMapper = productMapper;
             _skuMapper = skuMapper;
@@ -148,6 +157,18 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
 
             toReturn.ShowDiscountMessage = viewContext.User.Identity.IsAuthenticated && viewContext.User.IsInRole(IdentityConstants.WholesaleCustomer) &&
                 eProduct.IdObjectType == (int)ProductType.Perishable;
+
+
+            if (_appOptions.Value.EnableOrderTrackScripts && eProduct != null)
+            {
+                toReturn.Criterio = eProduct.Id.ToString();
+                if (viewContext.User != null)
+                {
+                    var customer =
+                        await _customerService.SelectAsync(Convert.ToInt32(_userManager.GetUserId(viewContext.User)));
+                    toReturn.CustomerEmail = customer?.Email ?? string.Empty;
+                }
+            }
 
             return toReturn;
         }

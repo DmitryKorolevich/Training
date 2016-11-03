@@ -197,7 +197,8 @@ namespace VitalChoice.Business.Services.InventorySkus
         public async Task<Dictionary<int, List<SkuToInventorySku>>> GetAssignedInventorySkusAsync(IEnumerable<int> skuIds)
         {
             skuIds = skuIds.Distinct().ToList();
-            var items = await _skuToInventorySkuRepository.Query(p => skuIds.Contains(p.IdSku)).SelectAsync(false);
+            var items = await _skuToInventorySkuRepository.Query(p => skuIds.Contains(p.IdSku) && p.InventorySku.StatusCode!=(int)RecordStatusCode.Deleted)
+                .SelectAsync(false);
             //var toReturn = new Dictionary<int, List<SkuToInventorySku>>();
             //foreach (var skuToInventorySku in items)
             //{
@@ -574,7 +575,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                     dateItem.Quantity += quantity;
                     inventoryItem.GrandTotal += quantity;
 
-                    var amount =Math.Round(quantity / inventoryItem.UnitOfMeasureAmount,2);
+                    var amount =Math.Floor(quantity / inventoryItem.UnitOfMeasureAmount);
                     dateItem.PurchaseAmount += amount;
                     inventoryItem.GrandPurchaseAmount += amount;
                 }

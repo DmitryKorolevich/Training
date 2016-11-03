@@ -40,7 +40,8 @@
       "CertThumbprint": "C52142BC62BC407E3C7F3BB22E4E97D12122CAB6",
       "RootThumbprint": "F06F3F3FC0B276358AEAB83C614B46181D0C1CC9",
       "EncryptionHostSessionExpire": false,
-      "ServerHostName": "export-server"
+      "ServerHostName": "export-server",
+      "Disabled": false
     },
     "FedExOptions": {
       "AccountNumber": "304955066",
@@ -116,6 +117,10 @@
       "Id": "47801159762",
       "AppId": "",
       "AppSecret": ""
+    },
+    "GrooveSettings": {
+      "AccessToken": "1af0970232f25cc920564217d507686ea81080e476c682d9d527208c64a1ad93",
+      "ServiceEmail": "007exs@rambler.ru"
     }
   }
 }

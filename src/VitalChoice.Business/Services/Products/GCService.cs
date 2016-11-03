@@ -25,6 +25,7 @@ using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services.Bronto;
 using Microsoft.EntityFrameworkCore;
 using VitalChoice.Business.Mailings;
+using VitalChoice.Data.Services;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
@@ -44,19 +45,22 @@ namespace VitalChoice.Business.Services.Products
         private readonly OrderAddressMapper orderAddressMapper;
         private readonly ILogger logger;
         private readonly DynamicExtensionsRewriter queryVisitor;
+        private readonly IObjectLogItemExternalService _objectLogItemExternalService;
 
         public GCService(IEcommerceRepositoryAsync<GiftCertificate> giftCertificateRepository,
             UserManager<ApplicationUser> userManager, 
             INotificationService notificationService,
             OrderAddressMapper orderAddressMapper,
             ILoggerFactory loggerProvider,
-            DynamicExtensionsRewriter queryVisitor)
+            DynamicExtensionsRewriter queryVisitor,
+            IObjectLogItemExternalService objectLogItemExternalService)
         {
             this.giftCertificateRepository = giftCertificateRepository;
             this.userManager = userManager;
             this.notificationService = notificationService;
             this.orderAddressMapper = orderAddressMapper;
             this.queryVisitor = queryVisitor;
+            _objectLogItemExternalService = objectLogItemExternalService;
             logger = loggerProvider.CreateLogger<GCService>();
         }
 
@@ -264,7 +268,7 @@ namespace VitalChoice.Business.Services.Products
         {
             if (codes == null || codes.Count == 0)
             {
-                return TaskCache<List<GiftCertificate>>.DefaultCompletedTask;
+                return Task.FromResult(new List<GiftCertificate>());
             }
 
             var query = giftCertificateRepository.Query(new GcQuery().WithEqualCodes(codes).NotDeleted());
@@ -284,12 +288,15 @@ namespace VitalChoice.Business.Services.Products
                 dbItem.LastName = model.LastName;
                 dbItem.Email = model.Email;
                 dbItem.Balance = model.Balance;
+                dbItem.IdEditedBy = model.IdEditedBy;
                 if (model.StatusCode != RecordStatusCode.Deleted)
                 {
                     dbItem.StatusCode = model.StatusCode;
                 }
 
                 await giftCertificateRepository.UpdateAsync(dbItem);
+
+                await _objectLogItemExternalService.LogItem(dbItem);
             }
 
             return dbItem;
@@ -307,10 +314,14 @@ namespace VitalChoice.Business.Services.Products
                 item.GCType = GCType.ManualGC;
                 item.StatusCode = RecordStatusCode.Active;
                 item.Code = await GenerateGCCode();
+                item.IdEditedBy = model.IdEditedBy;
+                item.UserId = model.UserId;
                 items.Add(item);
             }
 
             await giftCertificateRepository.InsertRangeAsync(items);
+            
+            await _objectLogItemExternalService.LogItems(items);
 
             return items;
         }

@@ -39,7 +39,11 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
 	    public string SubProductGroupName { get; set; }
 
         public bool ShowDiscountMessage { get; set; }
-        
+
+        public string Criterio { get; set; }
+
+        public string CustomerEmail { get; set; }
+
         public IList<TtlRelatedYoutubeVideoModel> YoutubeVideos { get; set; }
 
 	    public IList<TtlCrossSellProductModel> CrossSells { get; set; }

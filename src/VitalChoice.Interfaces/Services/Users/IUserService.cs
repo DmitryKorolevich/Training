@@ -18,6 +18,10 @@ namespace VitalChoice.Interfaces.Services.Users
 
         Task<IdentityResult> RemoveAsync(int idInternal);
 
+        Task<bool> UnlockUserAsync(ApplicationUser user);
+
+        Task<bool> IsUserLockedAsync(ApplicationUser user);
+
         Task<ApplicationUser> UpdateAsync(ApplicationUser user, IList<RoleType> roleIds = null, string password = null);
 
 	    Task<ApplicationUser> GetAsync(Guid publicId);

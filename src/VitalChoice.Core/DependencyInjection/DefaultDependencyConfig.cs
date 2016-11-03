@@ -365,7 +365,8 @@ namespace VitalChoice.Core.DependencyInjection
                 EncryptionHostSessionExpire =
                     Convert.ToBoolean(
                         configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value),
-                ServerHostName = configuration.GetSection("App:ExportService:ServerHostName").Value
+                ServerHostName = configuration.GetSection("App:ExportService:ServerHostName").Value,
+                Disabled = Convert.ToBoolean(configuration.GetSection("App:ExportService:Disabled").Value)
             };
             options.AzureStorage = new AzureStorage
             {
@@ -458,6 +459,12 @@ namespace VitalChoice.Core.DependencyInjection
                 Id = section["Id"],
                 AppId = section["AppId"],
                 AppSecret = section["AppSecret"]
+            };
+            section = configuration.GetSection("App:GrooveSettings");
+            options.GrooveSettings = new GrooveSettings()
+            {
+                AccessToken = section["AccessToken"],
+                ServiceEmail = section["ServiceEmail"],
             };
         }
 
@@ -612,6 +619,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<GoogleService>().As<IGoogleService>().InstancePerLifetimeScope();
             builder.RegisterType<FacebookService>().As<FacebookService>().InstancePerLifetimeScope();
             builder.RegisterType<TwitterService>().As<TwitterService>().InstancePerLifetimeScope();
+            builder.RegisterType<GrooveService>().As<IGrooveService>().InstancePerLifetimeScope();
 
             builder.RegisterMappers(typeof(ProductService).GetTypeInfo().Assembly, (type, registration) =>
             {

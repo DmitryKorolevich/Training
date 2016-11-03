@@ -36,6 +36,10 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels
 
         public string PublicHost { get; set; }
 
+        public string Criterio { get; set; }
+
+        public string CustomerEmail { get; set; }
+
         public IList<TtlCategoryModel> SubCategories { get; set; }
 
 	    public IList<TtlCategoryProductModel> Products { get; set; }

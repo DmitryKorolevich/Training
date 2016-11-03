@@ -2,7 +2,9 @@
     <div class="left-pane-controls">
         <div class="well container-fluid">
             <div data-ng-if="!order.Id">
-                <button data-ng-click="save()" class="btn btn-success width-160px" unsaved-warning-clear>Submit Refund</button>
+                <button data-ng-click="save()"
+                        data-ng-disabled="!order || (order.Id && !editLockState.Areas['index.oneCol.orderRefundDetail'].Items[order.Id])"
+                        class="btn btn-success width-160px" unsaved-warning-clear>Submit Refund</button>
             </div>
             <div data-ng-if="order.Id && order.OrderStatus!=4">
                 <button data-ng-click="cancelRefund()" class="btn btn-default width-160px" unsaved-warning-clear>Cancel Refund</button>

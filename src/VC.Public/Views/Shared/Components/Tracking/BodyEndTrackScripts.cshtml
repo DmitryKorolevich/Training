@@ -30,10 +30,26 @@
     </script>
     <!-- Google Action Checkout -->
 }
-@if (Model.Criteo != null && Model.Order!=null)
+@if ((Model.CriteoOrderComplete != null && Model.Order != null) || Model.CriteoViewCart != null || Model.CriteoHomeRender)
 {
-    <!-- Criteo -->
     <script type="text/javascript" src="//static.criteo.net/js/ld/ld.js" async="async"></script>
+}
+@if (Model.CriteoHomeRender)
+{
+    <!-- Criteo viewHome -->
+    <script type="text/javascript">
+        window.criteo_q = window.criteo_q || [];
+        window.criteo_q.push(
+            { event: "setAccount", account: 27307 },
+            { event: "setEmail", email: "@Model.CustomerEmail" },
+            { event: "setSiteType", type: "d" },
+            { event: "viewHome" });
+    </script>
+    <!-- Criteo viewHome -->
+}
+@if (Model.CriteoOrderComplete != null && Model.Order!=null)
+{
+    <!-- Criteo trackTransaction-->
     <script type="text/javascript">
         window.criteo_q = window.criteo_q || [];
         window.criteo_q.push(
@@ -41,9 +57,23 @@
             { event: "setEmail", email: "@Model.CustomerEmail" },
             { event: "setSiteType", type: "d" },
             { event: "trackTransaction", id: '@Model.Order.Id', item: [
-            @Html.Raw(Model.Criteo) ]});
+            @Html.Raw(Model.CriteoOrderComplete) ]});
     </script>
-    <!-- Criteo -->
+    <!-- Criteo trackTransaction-->
+}
+@if (Model.CriteoViewCart != null)
+{
+    <!-- Criteo viewBasket -->
+    <script type="text/javascript">
+        window.criteo_q = window.criteo_q || [];
+        window.criteo_q.push(
+            { event: "setAccount", account: 27307 },
+            { event: "setEmail", email: "@Model.CustomerEmail" },
+            { event: "setSiteType", type: "d" },
+            { event: "viewBasket", item: [
+            @Html.Raw(Model.CriteoViewCart) ]});
+    </script>
+    <!-- Criteo viewBasket -->
 }
 <!-- Google Code for Remarketing tag -->
 <!-- Remarketing tags may not be associated with personally identifiable information or placed on pages related to sensitive categories. For instructions on adding this tag and more information on the above requirements, read the setup guide: google.com/ads/remarketingsetup -->

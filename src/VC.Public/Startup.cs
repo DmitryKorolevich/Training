@@ -64,8 +64,6 @@ namespace VC.Public
 
         public void ConfigureStaging(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(minLevel: LogLevel.Warning);
-
             app.UseExceptionHandler("/Home/Error");
 
             Configure(app);
@@ -73,8 +71,6 @@ namespace VC.Public
 
         public void ConfigureProduction(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(minLevel: LogLevel.Warning);
-
             app.UseExceptionHandler("/Home/Error");
 
             Configure(app);

@@ -16,6 +16,7 @@
         public const string CustomerServiceRequestEmail = "CustomerServiceRequestEmail";
         public const string HelpTicketUpdateCustomerServiceNotification = "HelpTicketUpdateCustomerServiceNotification";
         public const string HelpTicketUpdateCustomerNotification = "HelpTicketUpdateCustomerNotification";
+        public const string HelpTicketAddCustomerNotification = "HelpTicketAddCustomerNotification";
         public const string BugTicketUpdateSuperAdminNotification = "BugTicketUpdateSuperAdminNotification";
         public const string BugTicketUpdateAuthorNotification = "BugTicketUpdateAuthorNotification";
         public const string HealthwiseSendGCEmail = "HealthwiseSendGCEmail";

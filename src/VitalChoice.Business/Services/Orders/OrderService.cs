@@ -964,9 +964,9 @@ namespace VitalChoice.Business.Services.Orders
                         }
                         catch (Exception e)
                         {
+                            transaction.Rollback();
                             Logger.LogError(
                                 $"AutoShip {autoShip.Id} skipped due to error ocurred. Customer Id: {autoShip.Customer?.Id}. Error: {e}");
-                            transaction.Rollback();
 
                             success = false;
                         }
@@ -1036,8 +1036,6 @@ namespace VitalChoice.Business.Services.Orders
 
                                 if (IsAllCancel(pOrderType, order))
                                 {
-                                    usedGcs.UpdateKeyed(order.GiftCertificates, g => g.Id, g => g.GiftCertificate.Id, (db, gc) => db.Balance += gc.Amount);
-
                                     order.GiftCertificates.Clear();
                                 }
                                 else
@@ -1715,6 +1713,71 @@ namespace VitalChoice.Business.Services.Orders
                     }
                     item.Data.POrderType = (int?) toReturn;
                 }
+            }
+        }
+
+
+        public override async Task<OrderDynamic> InsertAsync(OrderDynamic model)
+        {
+            using (var uow = CreateUnitOfWork())
+            {
+                var toReturn = await InsertAsync(uow, model);
+
+                ICollection<GiftCertificate> generatedGCs = toReturn.Skus?.SelectMany(p => p?.GcsGenerated).ToList();
+                if (generatedGCs?.Count > 0)
+                {
+                    await ObjectLogItemExternalService.LogItems(generatedGCs);
+                }
+
+                return toReturn;
+            }
+        }
+
+        public override async Task<OrderDynamic> UpdateAsync(OrderDynamic model)
+        {
+            using (var uow = CreateUnitOfWork())
+            {
+                var toReturn = await UpdateAsync(uow, model);
+
+                ICollection<GiftCertificate> generatedGCs = toReturn.Skus?.SelectMany(p => p?.GcsGenerated).ToList();
+                if (generatedGCs?.Count > 0)
+                {
+                    await ObjectLogItemExternalService.LogItems(generatedGCs);
+                }
+
+                return toReturn;
+            }
+        }
+
+        public override async Task<List<OrderDynamic>> InsertRangeAsync(ICollection<OrderDynamic> models)
+        {
+            using (var uow = CreateUnitOfWork())
+            {
+                var toReturn = await InsertRangeAsync(uow, models);
+
+                ICollection<GiftCertificate> generatedGCs = toReturn?.SelectMany(p=>p.Skus?.SelectMany(pp => pp?.GcsGenerated)).ToList();
+                if (generatedGCs?.Count > 0)
+                {
+                    await ObjectLogItemExternalService.LogItems(generatedGCs);
+                }
+
+                return toReturn;
+            }
+        }
+
+        public override async Task<List<OrderDynamic>> UpdateRangeAsync(ICollection<OrderDynamic> models)
+        {
+            using (var uow = CreateUnitOfWork())
+            {
+                var toReturn = await UpdateRangeAsync(uow, models);
+
+                ICollection<GiftCertificate> generatedGCs = toReturn?.SelectMany(p => p.Skus?.SelectMany(pp => pp?.GcsGenerated)).ToList();
+                if (generatedGCs?.Count > 0)
+                {
+                    await ObjectLogItemExternalService.LogItems(generatedGCs);
+                }
+
+                return toReturn;
             }
         }
 

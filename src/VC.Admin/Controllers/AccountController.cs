@@ -30,6 +30,7 @@ namespace VC.Admin.Controllers
 			return new UserInfoModel()
 			{
                 Id = user.Id,
+                Agent = user.Profile?.AgentId,
 				Email = user.Email,
 				FirstName = user.FirstName,
 				LastName = user.LastName,
