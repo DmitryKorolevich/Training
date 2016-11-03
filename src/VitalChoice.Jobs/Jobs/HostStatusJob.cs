@@ -57,7 +57,8 @@ namespace VitalChoice.Jobs.Jobs
                     Process.Start(new ProcessStartInfo(@"C:\Windows\system32\inetsrv\appcmd.exe",
                         command)
                     {
-                        RedirectStandardOutput = true
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false
                     }))
             {
                 process?.WaitForExit();
