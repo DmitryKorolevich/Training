@@ -80,7 +80,6 @@ namespace VitalChoice.Jobs.Jobs
                 {
                     var result = ProcessResponse(host, retryNumber, response, previousStatusCode);
                     response.GetResponseStream()?.Dispose();
-                    _logger.LogWarning($"{host} Status: {response.StatusCode}");
                     return result;
                 }
             }
@@ -92,7 +91,6 @@ namespace VitalChoice.Jobs.Jobs
                     _logger.LogError(e.ToString());
                     return true;
                 }
-                _logger.LogWarning($"{host} Status: {response.StatusCode}");
                 return ProcessResponse(host, retryNumber, response, previousStatusCode);
             }
             catch (Exception e)
