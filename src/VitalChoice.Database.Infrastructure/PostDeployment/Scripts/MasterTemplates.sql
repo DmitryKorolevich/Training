@@ -1,4 +1,4 @@
-﻿IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Product page' AND Updated<'2016-10-01 00:00:00.000')
+﻿IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Product page' AND Updated<'2016-11-01 00:00:00.000')
 BEGIN
 
 	UPDATE [dbo].[MasterContentItems]
@@ -470,6 +470,18 @@ BEGIN
             <meta itemprop="image" content="https://@(::AppOptions.PublicHost)@(Image)" />
             <link rel="image_src" href="https://@(::AppOptions.PublicHost)@(Image)" />
         }}
+    }}
+    @if(@model.Criterio!=null){{
+        <script type="text/javascript" src="//static.criteo.net/js/ld/ld.js" async="true"></script>
+        <script type="text/javascript">
+        window.criteo_q = window.criteo_q || [];
+        window.criteo_q.push(
+        { event: "setAccount", account: 27307 },
+        { event: "setEmail", email: "@(CustomerEmail)" },
+        { event: "setSiteType", type: "d" },
+        { event: "viewItem", item:[ "@(Criterio)" ]}
+        );
+        </script>
     }}
     <div class="product-main relative">
         <div class="overlay hide">

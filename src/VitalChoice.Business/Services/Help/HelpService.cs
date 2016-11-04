@@ -207,13 +207,14 @@ namespace VitalChoice.Business.Services.HelpService
 
         public async Task<HelpTicket> UpdateHelpTicketAsync(HelpTicket item, int? adminId)
         {
+            var newticket = false;
             using (var transaction = _ecommerceTransactionAccessor.BeginTransaction())
             {
                 try
                 {
                     if (item.Id == 0)
                     {
-                        item.StatusCode = RecordStatusCode.Active;
+                        item.StatusCode = RecordStatusCode.NotActive;
                         item.DateCreated = item.DateEdited = DateTime.Now;
                         
                         AddTicketModel grooveTicket = new AddTicketModel();
@@ -232,6 +233,7 @@ namespace VitalChoice.Business.Services.HelpService
                         if (result)
                         {
                             await _helpTicketRepository.InsertAsync(item);
+                            newticket = true;
                         }
                     }
                     else
@@ -261,6 +263,10 @@ namespace VitalChoice.Business.Services.HelpService
             }
             else
             {
+                if (newticket)
+                {
+                    await NotifyCustomerTicketCreated(item.Id);
+                }
                 await NotifyCustomerService(item.Id);
             }
 
@@ -428,6 +434,23 @@ namespace VitalChoice.Business.Services.HelpService
                     Id=helpTicket.Id,
                     IdOrder=helpTicket.IdOrder,
                     Customer=helpTicket.Customer,
+                });
+
+                return true;
+            }
+            return false;
+        }
+
+        private async Task<bool> NotifyCustomerTicketCreated(int idHelpTicket)
+        {
+            var helpTicket = await GetHelpTicketAsync(idHelpTicket);
+            if (helpTicket != null)
+            {
+                await _notificationService.SendHelpTicketAddingEmailForCustomerAsync(helpTicket.CustomerEmail, new HelpTicketEmail()
+                {
+                    Id = helpTicket.Id,
+                    IdOrder = helpTicket.IdOrder,
+                    Customer = helpTicket.Customer
                 });
 
                 return true;

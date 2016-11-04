@@ -38,7 +38,8 @@
       "CertThumbprint": "C52142BC62BC407E3C7F3BB22E4E97D12122CAB6",
       "RootThumbprint": "F06F3F3FC0B276358AEAB83C614B46181D0C1CC9",
       "EncryptionHostSessionExpire": false,
-      "ServerHostName": "export-server"
+      "ServerHostName": "export-server",
+      "Disabled": false
     },
     "AzureStorage": {
       "StorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=stagingvcfiles;AccountKey=RxGv/t6KyB7aFPKaKIljivC0YtoYv/FR+0f5uGcORdie1h5WGigJKazfMiYL/gNJz+fGUWsUhEvGjdfwfZAq6A==;BlobEndpoint=https://stagingvcfiles.blob.core.windows.net/;TableEndpoint=https://stagingvcfiles.table.core.windows.net/;QueueEndpoint=https://stagingvcfiles.queue.core.windows.net/;FileEndpoint=https://stagingvcfiles.file.core.windows.net/",
@@ -56,6 +57,7 @@
         "ShipDelayJob": "0 0 2 * * ?",
         "OrderProductReviewEmailsJob": "0 0 2 * * ?",
         "VeraCoreNotificationsJob": "0 0/5 * * * ?",
+        "HostStatusJob": "0 0/5 * * * ?",
         "AppOptionsSetupJob": "0 0 2 * * ?",
         "KPIReportJob": "0 0 3 * * ?"
         //"KPIReportJob": "0 0/9 * * * ?"

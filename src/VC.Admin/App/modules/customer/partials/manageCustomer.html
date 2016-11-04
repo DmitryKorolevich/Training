@@ -2,7 +2,7 @@
     <div class="left-pane-controls">
         <div class="well container-fluid">
             <div>
-                <button data-ng-click="save()" class="btn btn-success width-160px" unsaved-warning-clear>Save</button>
+                <button data-ng-click="save()" data-ng-disabled="!currentCustomer || (currentCustomer.Id && !editLockState.Areas['index.oneCol.customerDetail'].Items[currentCustomer.Id])" class="btn btn-success width-160px" unsaved-warning-clear>Save</button>
             </div>
             <div class="margin-top-10px">
                 <button cancel-button-default-state="index.oneCol.manageCustomers" cancel-button class="btn btn-default width-160px" unsaved-warning-clear>Cancel</button>

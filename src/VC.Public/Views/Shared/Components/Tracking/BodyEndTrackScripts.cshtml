@@ -30,9 +30,22 @@
     </script>
     <!-- Google Action Checkout -->
 }
-@if ((Model.CriteoOrderComplete != null && Model.Order != null) || Model.CriteoViewCart != null)
+@if ((Model.CriteoOrderComplete != null && Model.Order != null) || Model.CriteoViewCart != null || Model.CriteoHomeRender)
 {
     <script type="text/javascript" src="//static.criteo.net/js/ld/ld.js" async="async"></script>
+}
+@if (Model.CriteoHomeRender)
+{
+    <!-- Criteo viewHome -->
+    <script type="text/javascript">
+        window.criteo_q = window.criteo_q || [];
+        window.criteo_q.push(
+            { event: "setAccount", account: 27307 },
+            { event: "setEmail", email: "@Model.CustomerEmail" },
+            { event: "setSiteType", type: "d" },
+            { event: "viewHome" });
+    </script>
+    <!-- Criteo viewHome -->
 }
 @if (Model.CriteoOrderComplete != null && Model.Order!=null)
 {

@@ -14,6 +14,7 @@ namespace VC.Public.Models.Tracking
         public string CustomerEmail { get; set; }
         public string CriteoOrderComplete { get; set; }
         public string CriteoViewCart { get; set; }
+        public bool CriteoHomeRender { get; set; }
         public string PepperjamQuery { get; set; }
     }
 }

@@ -95,5 +95,15 @@ angular.module('app.core.dataAccess.services.settingService', [])
 	    {
 	        return $http.post(baseUrl + 'DeleteCatalogRequests', null, getConfig(tracker));
 	    },
+
+	    //edit locks
+	    editLockPing: function (model, tracker)
+	    {
+	        return $http.post(baseUrl + 'EditLockPing', model, getConfig(tracker));
+	    },
+	    editLockRequest: function (model, tracker)
+	    {
+	        return $http.post(baseUrl + 'EditLockRequest', model, getConfig(tracker));
+	    },
 	};
 }]);

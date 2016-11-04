@@ -38,7 +38,8 @@
       "CertThumbprint": "C52142BC62BC407E3C7F3BB22E4E97D12122CAB6",
       "RootThumbprint": "F06F3F3FC0B276358AEAB83C614B46181D0C1CC9",
       "EncryptionHostSessionExpire": false,
-      "ServerHostName": "export-server"
+      "ServerHostName": "export-server",
+      "Disabled": false
     },
     "AuthorizeNet": {
       "ApiLogin": "36qq5ECXB",

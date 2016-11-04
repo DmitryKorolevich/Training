@@ -365,7 +365,8 @@ namespace VitalChoice.Core.DependencyInjection
                 EncryptionHostSessionExpire =
                     Convert.ToBoolean(
                         configuration.GetSection("App:ExportService:EncryptionHostSessionExpire").Value),
-                ServerHostName = configuration.GetSection("App:ExportService:ServerHostName").Value
+                ServerHostName = configuration.GetSection("App:ExportService:ServerHostName").Value,
+                Disabled = Convert.ToBoolean(configuration.GetSection("App:ExportService:Disabled").Value)
             };
             options.AzureStorage = new AzureStorage
             {

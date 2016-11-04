@@ -89,6 +89,18 @@ namespace VitalChoice.Business.Mailings
             }
         }
 
+        public async Task SendHelpTicketAddingEmailForCustomerAsync(string email, HelpTicketEmail helpTicketEmail)
+        {
+            helpTicketEmail.Url = $"https://{_publicHost}/profile/helpticket/{helpTicketEmail.Id}";
+
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.HelpTicketAddCustomerNotification, helpTicketEmail);
+
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(email, generatedEmail.Subject, generatedEmail.Body);
+            }
+        }
+
         public async Task SendHelpTicketUpdatingEmailForCustomerAsync(string email, HelpTicketEmail helpTicketEmail)
         {
             helpTicketEmail.Url = $"https://{_publicHost}/profile/helpticket/{helpTicketEmail.Id}";

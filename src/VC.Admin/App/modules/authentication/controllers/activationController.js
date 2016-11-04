@@ -56,7 +56,8 @@ angular.module('app.modules.authentication.controllers.activationController', []
 
 							infrastructureService.getReferenceData().success(function(res) {
 								if (res.Success) {
-									$rootScope.ReferenceData = res.Data;
+								    $rootScope.ReferenceData = res.Data;
+								    $rootScope.initEditLock();
 								} else {
 									toaster.pop('error', 'Error!', "Unable to refresh reference data");
 								}

@@ -575,7 +575,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                     dateItem.Quantity += quantity;
                     inventoryItem.GrandTotal += quantity;
 
-                    var amount =Math.Round(quantity / inventoryItem.UnitOfMeasureAmount,2);
+                    var amount =Math.Floor(quantity / inventoryItem.UnitOfMeasureAmount);
                     dateItem.PurchaseAmount += amount;
                     inventoryItem.GrandPurchaseAmount += amount;
                 }

@@ -53,7 +53,8 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             IRepositoryAsync<ProductCategoryContent> productCategoryRepository,
             IRepositoryAsync<ProductContent> productContentRepository,
             IEcommerceRepositoryAsync<ProductToCategory> productToCategoryEcommerceRepository,
-            ICustomerService customerService, ExtendedUserManager userManager,
+            ICustomerService customerService,
+            ExtendedUserManager userManager,
             IDynamicMapper<ProductDynamic, Product> productMapper, 
             IDynamicMapper<SkuDynamic, Sku> skuMapper,
             IOptions<AppOptions> appOptions) : base(mapper)

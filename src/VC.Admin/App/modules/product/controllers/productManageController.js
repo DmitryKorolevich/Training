@@ -31,7 +31,13 @@ angular.module('app.modules.product.controllers.productManageController', [])
         }
 
         function successSaveHandler(result) {
-            if (result.Success) {
+            if (result.Success)
+            {
+                if (!$scope.product.Id)
+                {
+                    $state.go('index.oneCol.productDetail', { id: result.Data.Id });
+                }
+
                 toaster.pop('success', "Success!", "Successfully saved.");
                 $scope.product.Id = result.Data.Id;
                 $scope.previewUrl = $scope.basePreviewUrl.format($scope.product.Url);

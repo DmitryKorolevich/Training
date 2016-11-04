@@ -3,17 +3,20 @@
 angular.module('app.core.utils.appBootstrap', [])
     .service('appBootstrap',
     [
-        'infrastructureService', '$rootScope', '$anchorScroll', 'toaster', 'authenticationService',
-        'cacheService', 'settingService', '$location',
+        'infrastructureService', '$rootScope', '$state', '$anchorScroll', '$location',
+        'toaster', 'authenticationService',
+        'cacheService', 'settingService', 'modalUtil', 
         'ngProgress', 'webStorageUtil',
         'confirmUtil', function (infrastructureService,
             $rootScope,
+            $state,
             $anchorScroll,
+            $location,
             toaster,
             authenticationService,
             cacheService,
             settingService,
-            $location,
+            modalUtil,
             ngProgress,
             webStorageUtil,
             confirmUtil)
@@ -201,7 +204,7 @@ angular.module('app.core.utils.appBootstrap', [])
 
             function checkAreas()
             {
-                if ($rootScope.authenticated)
+                if ($rootScope.authenticated) 
                 {
                     settingService.getContentAreas()
                         .success(function (result)
@@ -225,7 +228,131 @@ angular.module('app.core.utils.appBootstrap', [])
                 {
                     setTimeout(checkAreas, 2000);
                 }
-            }
+            };
+
+            function initEditLock() {
+                if($rootScope.ReferenceData && $rootScope.ReferenceData.EditLockAreas){
+                    $rootScope.editLockState.Areas={};
+                    $.each($rootScope.ReferenceData.EditLockAreas, function(index, item){
+                        $rootScope.editLockState.Areas[item] = {};
+                        $rootScope.editLockState.Areas[item].Items = [];
+                    });
+
+                    editLockRequest();
+                }
+            };
+
+            function editLockPing()
+            {
+                if ($rootScope.authenticated && $rootScope.currentUser && $rootScope.editLockState.Areas)
+                {
+                    var id=null;
+                    var areaName=null;
+                    $.each($rootScope.ReferenceData.EditLockAreas, function(index, item){
+                        if ($state.is(item) && Number.isInteger($state.params.id))
+                        {
+                            id = parseInt($state.params.id);
+                            areaName = item;
+                            return false;
+                        }
+                    });
+
+                    if(id && areaName)
+                    {
+                        var model = {
+                            AreaName: areaName,
+                            Id: id,
+                            IdAgent: $rootScope.currentUser.Id,
+                            Agent: $rootScope.currentUser.Agent,
+                            AgentFirstName: $rootScope.currentUser.FirstName,
+                            AgentLastName: $rootScope.currentUser.LastName,
+                        };
+
+                        settingService.editLockPing(model)
+                            .success(function (result)
+                            {
+                                setTimeout(editLockPing, 5000);
+                            })
+                            .error(function ()
+                            {
+                                setTimeout(editLockPing, 5000);
+                            });
+                        
+                        return;
+                    }
+                }
+                
+                setTimeout(editLockPing, 5000);
+            };
+
+            
+            function editLockRequest()
+            {
+                if ($rootScope.authenticated && $rootScope.currentUser && $rootScope.editLockState.Areas)
+                {
+                    var id = null;
+                    var areaName = null;
+                    $.each($rootScope.ReferenceData.EditLockAreas, function (index, item)
+                    {
+                        if ($state.is(item) && Number.isInteger($state.params.id))
+                        {
+                            id = parseInt($state.params.id);
+                            areaName = item;
+                            return false;
+                        }
+                    });
+
+                    if (id && areaName)
+                    {
+                        var model = {
+                            AreaName: areaName,
+                            Id: id,
+                            IdAgent: $rootScope.currentUser.Id,
+                            Agent: $rootScope.currentUser.Agent,
+                            AgentFirstName: $rootScope.currentUser.FirstName,
+                            AgentLastName: $rootScope.currentUser.LastName,
+                        };
+
+                        $rootScope.editLockState.Areas[areaName].Items[id] = null;
+
+                        settingService.editLockRequest(model)
+                            .success(function (result)
+                            {
+                                if (result.Data)
+                                {
+                                    if (result.Data.Avaliable)
+                                    {
+                                        $rootScope.editLockState.Areas[areaName].Items[id] = {};
+                                    }
+                                    else
+                                    {
+                                        modalUtil.open('app/modules/setting/partials/infoDetailsPopup.html', 'infoDetailsPopupController', {
+                                            Header: "This area is currently being viewed by {0} {1} ({2})".
+                                                format(result.Data.AgentFirstName, result.Data.AgentLastName, result.Data.Agent),
+                                            Messages: [
+                                                {
+                                                    Message: "This area is currently being viewed by {0} {1} ({2}). You won't be able to save your changes. Wait a few minutes then refresh or contact {0} {1} ({2}).".
+                                                        format(result.Data.AgentFirstName, result.Data.AgentLastName, result.Data.Agent)
+                                                }
+                                            ],
+                                            OkButton: {
+                                                Label: 'OK'
+                                            },
+                                        },
+                                        {
+                                            backdrop: false,
+                                        });
+                                    }
+                                }
+                            })
+                            .error(function ()
+                            {
+                            });
+
+                        return;
+                    }
+                };
+            };
 
             function initialize()
             {
@@ -237,6 +364,7 @@ angular.module('app.core.utils.appBootstrap', [])
 
                 cacheStatus();
                 checkAreas();
+                editLockPing();
 
                 infrastructureService.getReferenceData()
                     .success(function (res)
@@ -254,6 +382,7 @@ angular.module('app.core.utils.appBootstrap', [])
                                         {
                                             $rootScope.authenticated = true;
                                             $rootScope.currentUser = res.Data;
+                                            initEditLock();
                                         } else
                                         {
                                             $rootScope.authenticated = false;
@@ -294,6 +423,8 @@ angular.module('app.core.utils.appBootstrap', [])
                 $rootScope.stopPropagation = stopPropagation;
                 $rootScope.UIOptions = {};
                 $rootScope.UIOptions.DatepickerFormat = 'MM/dd/yyyy';
+                $rootScope.editLockState={};
+                $rootScope.initEditLock = initEditLock;
             }
 
             function bindRootScope()
@@ -326,6 +457,8 @@ angular.module('app.core.utils.appBootstrap', [])
                         ngProgress.complete();
                         $rootScope.$state.previous = angular.copy(fromState);
                         $rootScope.$state.previous.params = fromParams;
+
+                        editLockRequest();
                     });
                 $rootScope.$on('$stateChangeError',
                     function ()

@@ -47,6 +47,7 @@
                     .success(function (result) {
                         if (result.Success) {
                             $scope.report = result.Data;
+                            updateSkuUrls();
                         } else {
                             errorHandler(result);
                         }
@@ -190,20 +191,22 @@
             }
         };
 
-        $scope.openOrders = function (idsku)
+        function updateSkuUrls()
         {
-            var data = {};
-            data.idsku = idsku;
-            if ($scope.filter.From)
+            $.each($scope.report.Skus, function (index, item)
             {
-                data.from = $scope.filter.From.toQueryParamDateTime();
-            }
-            if ($scope.filter.To)
-            {
-                data.to = $scope.filter.To.toQueryParamDateTime();
-            }
-            $state.go('index.oneCol.manageOrders', data);
+                item.Url = '/orders?idsku={0}'.format(item.IdSku);
+                if ($scope.filter.From)
+                {
+                    item.Url += '&from=' + $scope.filter.From.toQueryParamDateTime();
+                }
+                if ($scope.filter.To)
+                {
+                    item.Url += '&to=' + $scope.filter.To.toQueryParamDateTime();
+                }
+            });
         };
+
 
         $scope.futureChanged = function ()
         {
