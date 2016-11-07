@@ -74,9 +74,16 @@ BEGIN
 	WHERE
 		o.DateCreated>=@from AND o.DateCreated<@to AND
 		o.StatusCode!=3 AND o.IdObjectType NOT IN (2,5,6) AND 
-		((o.OrderStatus IS NOT NULL AND o.OrderStatus !=1 AND o.OrderStatus !=4 AND o.OrderStatus !=6 ) OR 
-		(o.OrderStatus IS NULL AND o.POrderStatus !=1 AND o.POrderStatus !=4 AND o.POrderStatus !=6 AND 
-		o.NPOrderStatus !=1 AND o.NPOrderStatus !=4 AND o.NPOrderStatus !=6)) AND
+		(
+			o.OrderStatus IN(2,3,5,7)
+			OR 
+			(
+				o.POrderStatus IN(2,3,5,7) 
+				OR 
+				o.NPOrderStatus IN(2,3,5,7)
+			)
+		) 
+		 AND
 		(@idcustomertype IS NULL OR c.IdObjectType = @idcustomertype) AND
 		(@idcustomer IS NULL OR o.IdCustomer = @idcustomer) AND
 		(@shipfrom IS NULL OR EXISTS
