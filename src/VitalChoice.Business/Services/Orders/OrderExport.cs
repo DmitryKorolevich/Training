@@ -18,16 +18,7 @@ namespace VitalChoice.Business.Services.Orders
 {
     public class OrderExport : IOrderExport
     {
-        public int TotalExporting
-        {
-            get
-            {
-                lock (_exportedOrders)
-                {
-                    return _exportedOrders.Count;
-                }
-            }
-        }
+        public int TotalExporting { get; private set; }
 
         public int TotalExported
         {
@@ -81,15 +72,18 @@ namespace VitalChoice.Business.Services.Orders
                                     break;
                                 case ExportSide.Perishable:
                                     _exportedOrders[data.Id] = ExportSide.All;
+                                    TotalExporting++;
                                     break;
                                 case ExportSide.NonPerishable:
                                     _exportedOrders[data.Id] = ExportSide.All;
+                                    TotalExporting++;
                                     break;
                             }
                         }
                     }
                     else
                     {
+                        TotalExporting++;
                         _exportedOrders.Add(data.Id, data.OrderType);
                     }
                 }
