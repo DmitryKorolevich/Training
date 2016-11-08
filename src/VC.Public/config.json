@@ -121,6 +121,9 @@
     "GrooveSettings": {
       "AccessToken": "1af0970232f25cc920564217d507686ea81080e476c682d9d527208c64a1ad93",
       "ServiceEmail": "007exs@rambler.ru"
+    },
+    "UspsSettings": {
+      "UserId": "990TEST03242"
     }
   }
 }

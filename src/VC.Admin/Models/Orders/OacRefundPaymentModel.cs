@@ -1,4 +1,5 @@
 ﻿using VC.Admin.Models.Customer;
+using VC.Admin.Models.Customers;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Validation.Models;

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
 using VC.Admin.Models.Customer;
+using VC.Admin.Models.Customers;
 using VitalChoice.Business.Queries.Product;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.Base;

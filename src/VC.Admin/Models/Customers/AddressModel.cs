@@ -6,7 +6,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Customer
+namespace VC.Admin.Models.Customers
 {
 	[ApiValidator(typeof(AddressModelValidator))]
 	public class AddressModel : BaseModel

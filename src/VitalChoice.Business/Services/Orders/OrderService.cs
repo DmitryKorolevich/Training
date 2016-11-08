@@ -1487,8 +1487,6 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<PagedList<OrderInfoItem>> GetOrdersAsync(VOrderFilter filter)
         {
-            //_googleService.Test();
-
             var conditions = new OrderQuery();
             conditions = conditions.WithCustomerId(filter.IdCustomer).NotDeleted();
 

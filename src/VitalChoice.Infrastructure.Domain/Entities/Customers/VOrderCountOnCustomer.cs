@@ -3,8 +3,10 @@ using VitalChoice.Ecommerce.Domain;
 
 namespace VitalChoice.Infrastructure.Domain.Entities.Customers
 {
-    public class CustomerOrdersTotal : Entity
+    public class VOrderCountOnCustomer : Entity
     {
-        public decimal Total { get; set; }
+        public int IdCustomer { get; set; }
+
+        public long Count { get; set; }
     }
 }

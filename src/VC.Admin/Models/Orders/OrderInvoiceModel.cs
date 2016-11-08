@@ -18,6 +18,7 @@ using VitalChoice.Interfaces.Services;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using System.Threading.Tasks;
+using VC.Admin.Models.Customers;
 using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;
