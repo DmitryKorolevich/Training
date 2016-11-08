@@ -217,7 +217,7 @@ namespace VitalChoice.Business.Services.Orders
                                 {
                                     agent.ReshipsCount++;
                                 }
-                                else
+                                else if (orderForAgentReport.Order.IdObjectType != (int)OrderType.AutoShip && orderForAgentReport.Order.IdObjectType != (int)OrderType.AutoShipOrder)
                                 {
                                     agent.OrdersCount++;
                                     agent.TotalOrdersAmount += orderTotalWithoutShipping;
@@ -243,7 +243,7 @@ namespace VitalChoice.Business.Services.Orders
                         {
                             period.ReshipsCount++;
                         }
-                        else
+                        else if (orderForAgentReport.Order.IdObjectType != (int)OrderType.AutoShip && orderForAgentReport.Order.IdObjectType != (int)OrderType.AutoShipOrder)
                         {
                             period.OrdersCount++;
                             period.TotalOrdersAmount += orderTotalWithoutShipping;
@@ -268,7 +268,7 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         period.AllReshipsCount++;
                     }
-                    else
+                    else if (orderForAgentReport.Order.IdObjectType != (int)OrderType.AutoShip)
                     {
                         period.AllOrdersCount++;
                         period.AllTotalOrdersAmount += orderTotalWithoutShipping;
