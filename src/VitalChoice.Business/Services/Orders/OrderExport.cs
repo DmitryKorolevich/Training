@@ -139,15 +139,13 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         try
                         {
-                            var exportTask = exportService.ExportOrdersAsync(data, r =>
+                            exportService.ExportOrdersAsync(data, r =>
                             {
                                 lock (result)
                                 {
                                     result.ExportedOrders.Add(r);
                                 }
-                            });
-                            exportTask.RunSynchronously();
-                            exportTask.Wait();
+                            }).GetAwaiter().GetResult();
                         }
                         catch (Exception e)
                         {

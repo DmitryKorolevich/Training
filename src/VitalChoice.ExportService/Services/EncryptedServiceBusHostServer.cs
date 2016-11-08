@@ -118,7 +118,7 @@ namespace VitalChoice.ExportService.Services
             using (var scope = _rootScope.BeginLifetimeScope())
             {
                 var orderExportService = scope.Resolve<IOrderExportService>();
-                SendCommand(command.CreateResult(orderExportService.CardExist(customerExportInfo).RunSyncWait()));
+                SendCommand(command.CreateResult(orderExportService.CardExist(customerExportInfo).GetResult()));
             }
             return true;
         }
@@ -136,7 +136,7 @@ namespace VitalChoice.ExportService.Services
             {
                 var orderExportService = scope.Resolve<IOrderExportService>();
                 SendCommand(new ServiceBusCommandBase(command,
-                    orderExportService.AuthorizeCreditCard(paymentMethod).RunSyncWait()));
+                    orderExportService.AuthorizeCreditCard(paymentMethod).GetResult()));
             }
             return true;
         }
@@ -154,7 +154,7 @@ namespace VitalChoice.ExportService.Services
             {
                 var orderExportService = scope.Resolve<IOrderExportService>();
                 SendCommand(new ServiceBusCommandBase(command,
-                    orderExportService.AuthorizeCreditCard(paymentMethod).RunSyncWait()));
+                    orderExportService.AuthorizeCreditCard(paymentMethod).GetResult()));
             }
             return true;
         }
@@ -172,7 +172,7 @@ namespace VitalChoice.ExportService.Services
             {
                 var orderExportService = scope.Resolve<IOrderExportService>();
                 var updateTask = orderExportService.UpdateCustomerPaymentMethods(customerPaymentInfo);
-                orderExportService.UpdateCustomerPaymentMethods(customerPaymentInfo).RunSyncWait();
+                orderExportService.UpdateCustomerPaymentMethods(customerPaymentInfo).WaitResult();
             }
             SendCommand(new ServiceBusCommandBase(command, true));
             return true;
@@ -189,7 +189,7 @@ namespace VitalChoice.ExportService.Services
             using (var scope = _rootScope.BeginLifetimeScope())
             {
                 var orderExportService = scope.Resolve<IOrderExportService>();
-                orderExportService.UpdateOrderPaymentMethod(orderPaymentInfo).RunSyncWait();
+                orderExportService.UpdateOrderPaymentMethod(orderPaymentInfo).WaitResult();
             }
             SendCommand(new ServiceBusCommandBase(command, true));
             return true;
@@ -206,7 +206,7 @@ namespace VitalChoice.ExportService.Services
             var orderExportService = scope.Resolve<IOrderExportService>();
             orderExportService.ExportOrders(exportData.ExportInfo,
                 result => SendCommand(new ServiceBusCommandBase(command, result)),
-                exportData.UserId).RunSyncWait();
+                exportData.UserId).WaitResult();
         }
 
         private void ProcessGiftListCardExport(ServiceBusCommandBase command, ILifetimeScope scope)
@@ -219,7 +219,7 @@ namespace VitalChoice.ExportService.Services
             }
 
             var orderExportService = scope.Resolve<IOrderExportService>();
-            orderExportService.ExportGiftListCreditCard(customerExportInfo).RunSyncWait();
+            orderExportService.ExportGiftListCreditCard(customerExportInfo).WaitResult();
             SendCommand(command.CreateResult(true));
         }
 
