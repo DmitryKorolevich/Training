@@ -37,7 +37,7 @@ namespace VitalChoice.Infrastructure.LoadBalancing
             }
         }
 
-        public void EnqueueData(T data, object processParameter)
+        public virtual void EnqueueData(T data, object processParameter = null)
         {
             lock (_lock)
             {

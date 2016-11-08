@@ -18,7 +18,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             _processMessage = processMessage;
         }
 
-        protected override void ProcessingAction(BrokeredMessage data, object localData)
+        protected override void ProcessingAction(BrokeredMessage data, object localData, object processParameter)
         {
             _processMessage(data);
         }

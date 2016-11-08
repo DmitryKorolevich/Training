@@ -4,6 +4,7 @@ using Autofac;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using VitalChoice.Ecommerce.Utils;
 using VitalChoice.Infrastructure.Domain;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -117,7 +118,7 @@ namespace VitalChoice.ExportService.Services
             using (var scope = _rootScope.BeginLifetimeScope())
             {
                 var orderExportService = scope.Resolve<IOrderExportService>();
-                SendCommand(command.CreateResult(orderExportService.CardExist(customerExportInfo).GetAwaiter().GetResult()));
+                SendCommand(command.CreateResult(orderExportService.CardExist(customerExportInfo).RunSyncWait()));
             }
             return true;
         }
@@ -135,7 +136,7 @@ namespace VitalChoice.ExportService.Services
             {
                 var orderExportService = scope.Resolve<IOrderExportService>();
                 SendCommand(new ServiceBusCommandBase(command,
-                    orderExportService.AuthorizeCreditCard(paymentMethod).GetAwaiter().GetResult()));
+                    orderExportService.AuthorizeCreditCard(paymentMethod).RunSyncWait()));
             }
             return true;
         }
@@ -153,7 +154,7 @@ namespace VitalChoice.ExportService.Services
             {
                 var orderExportService = scope.Resolve<IOrderExportService>();
                 SendCommand(new ServiceBusCommandBase(command,
-                    orderExportService.AuthorizeCreditCard(paymentMethod).GetAwaiter().GetResult()));
+                    orderExportService.AuthorizeCreditCard(paymentMethod).RunSyncWait()));
             }
             return true;
         }
@@ -170,7 +171,8 @@ namespace VitalChoice.ExportService.Services
             using (var scope = _rootScope.BeginLifetimeScope())
             {
                 var orderExportService = scope.Resolve<IOrderExportService>();
-                orderExportService.UpdateCustomerPaymentMethods(customerPaymentInfo).GetAwaiter().GetResult();
+                var updateTask = orderExportService.UpdateCustomerPaymentMethods(customerPaymentInfo);
+                orderExportService.UpdateCustomerPaymentMethods(customerPaymentInfo).RunSyncWait();
             }
             SendCommand(new ServiceBusCommandBase(command, true));
             return true;
@@ -187,7 +189,7 @@ namespace VitalChoice.ExportService.Services
             using (var scope = _rootScope.BeginLifetimeScope())
             {
                 var orderExportService = scope.Resolve<IOrderExportService>();
-                orderExportService.UpdateOrderPaymentMethod(orderPaymentInfo).GetAwaiter().GetResult();
+                orderExportService.UpdateOrderPaymentMethod(orderPaymentInfo).RunSyncWait();
             }
             SendCommand(new ServiceBusCommandBase(command, true));
             return true;
@@ -202,10 +204,9 @@ namespace VitalChoice.ExportService.Services
                 return;
             }
             var orderExportService = scope.Resolve<IOrderExportService>();
-            orderExportService.ExportOrders(exportData.ExportInfo, result => SendCommand(new ServiceBusCommandBase(command, result)),
-                    exportData.UserId)
-                .GetAwaiter()
-                .GetResult();
+            orderExportService.ExportOrders(exportData.ExportInfo,
+                result => SendCommand(new ServiceBusCommandBase(command, result)),
+                exportData.UserId).RunSyncWait();
         }
 
         private void ProcessGiftListCardExport(ServiceBusCommandBase command, ILifetimeScope scope)
@@ -218,7 +219,7 @@ namespace VitalChoice.ExportService.Services
             }
 
             var orderExportService = scope.Resolve<IOrderExportService>();
-            orderExportService.ExportGiftListCreditCard(customerExportInfo).GetAwaiter().GetResult();
+            orderExportService.ExportGiftListCreditCard(customerExportInfo).RunSyncWait();
             SendCommand(command.CreateResult(true));
         }
 
@@ -239,7 +240,7 @@ namespace VitalChoice.ExportService.Services
                 _commandProcessor = commandProcessor;
             }
 
-            protected override void ProcessingAction(ServiceBusCommandBase data, object localData)
+            protected override void ProcessingAction(ServiceBusCommandBase data, object localData, object processParameter)
             {
                 _commandProcessor(data, (ILifetimeScope) localData);
             }

@@ -9,7 +9,6 @@ namespace VitalChoice.Interfaces.Services
 {
     public interface IEncryptedServiceBusHostClient : IEncryptedServiceBusHost
     {
-        void Initialize(IOptions<AppOptions> appOptions, ILogger logger); 
         Task<Guid> AuthenticateClient(Guid sessionId);
     }
 }

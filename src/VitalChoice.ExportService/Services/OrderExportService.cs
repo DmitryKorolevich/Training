@@ -283,7 +283,9 @@ namespace VitalChoice.ExportService.Services
 
                 if (customerSources.Length > 0)
                 {
-                    var sourceCustomerIds = customerSources.Select(s => s.IdCustomerSource).Distinct().ToList();
+                    var sourceCustomerIds =
+                        // ReSharper disable once PossibleInvalidOperationException
+                        customerSources.Select(s => s.IdCustomerSource.Value).Distinct().ToList();
                     var sourcePayments = await rep.Query(c => sourceCustomerIds.Contains(c.IdCustomer)).SelectAsync(false);
 
                     paymentMethods.UpdateKeyed(sourcePayments, export => export.IdPaymentMethodSource,
@@ -476,37 +478,29 @@ namespace VitalChoice.ExportService.Services
                 }
             }
 
-            var rootScope = ((LifetimeScope) _scope).RootLifetimeScope;
-            Parallel.ForEach(orderList, new ParallelOptions
+
+            foreach (var order in orderList)
             {
-                MaxDegreeOfParallelism = 16,
-                CancellationToken = CancellationToken.None,
-                TaskScheduler = TaskScheduler.Default
-            }, order =>
-            {
-                using (var scope = rootScope.BeginLifetimeScope())
+                try
                 {
-                    var veracoreExportService = scope.Resolve<IVeraCoreExportService>();
-                    try
+                    _veraCoreExportService.ExportOrder(order, orders[order.Id].OrderType).GetAwaiter().GetResult();
+                    exportCallBack(new OrderExportItemResult
                     {
-                        veracoreExportService.ExportOrder(order, orders[order.Id].OrderType).GetAwaiter().GetResult();
-                        exportCallBack(new OrderExportItemResult
-                        {
-                            Id = order.Id,
-                            Success = true
-                        });
-                    }
-                    catch (Exception e)
-                    {
-                        exportCallBack(new OrderExportItemResult
-                        {
-                            Error = e.ToString(),
-                            Id = order.Id,
-                            Success = false
-                        });
-                    }
+                        Id = order.Id,
+                        Success = true
+                    });
                 }
-            });
+                catch (Exception e)
+                {
+                    exportCallBack(new OrderExportItemResult
+                    {
+                        Error = e.ToString(),
+                        Id = order.Id,
+                        Success = false
+                    });
+                }
+            }
+
             foreach (var order in orderList)
             {
                 if (order.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
