@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Ecommerce.Utils;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.LoadBalancing;
@@ -54,7 +55,7 @@ namespace VitalChoice.Business.Services.Orders
 
         public OrderExport(ILifetimeScope rootScope, ILoggerFactory loggerFactory)
         {
-            _exportPool = new ExportPool(loggerFactory.CreateLogger<OrderExport>(), rootScope);
+            _exportPool = new ExportPool(loggerFactory.CreateLogger<OrderExport>(), rootScope, _exportedOrders);
             _rootScope = rootScope;
         }
 
@@ -192,7 +193,7 @@ namespace VitalChoice.Business.Services.Orders
                                             break;
                                     }
                                 }
-                            }).GetAwaiter().GetResult();
+                            }).WaitResult();
                         }
                         catch (Exception e)
                         {
