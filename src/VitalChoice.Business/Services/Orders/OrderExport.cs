@@ -18,9 +18,7 @@ namespace VitalChoice.Business.Services.Orders
 {
     public class OrderExport : IOrderExport
     {
-        public int TotalExporting { get; private set; }
-
-        public int TotalExported
+        public int TotalExporting
         {
             get
             {
@@ -31,7 +29,33 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         lock (result)
                         {
-                            totalCount += result.ExportedOrders.Count;
+                            totalCount += result.TotalCount;
+                        }
+                    }
+                }
+                return totalCount;
+            }
+        }
+
+        public int TotalExported
+        {
+            get
+            {
+                var totalCount = 0;
+                lock (_exportResults)
+                {
+                    foreach (var result in _exportResults.ToArray())
+                    {
+                        lock (result)
+                        {
+                            if (result.ExportedOrders.Count == result.TotalCount && result.ExportedOrders.All(o => o.Success))
+                            {
+                                _exportResults.Remove(result);
+                            }
+                            else
+                            {
+                                totalCount += result.ExportedOrders.Count;
+                            }
                         }
                     }
                 }
@@ -72,18 +96,15 @@ namespace VitalChoice.Business.Services.Orders
                                     break;
                                 case ExportSide.Perishable:
                                     _exportedOrders[data.Id] = ExportSide.All;
-                                    TotalExporting++;
                                     break;
                                 case ExportSide.NonPerishable:
                                     _exportedOrders[data.Id] = ExportSide.All;
-                                    TotalExporting++;
                                     break;
                             }
                         }
                     }
                     else
                     {
-                        TotalExporting++;
                         _exportedOrders.Add(data.Id, data.OrderType);
                     }
                 }
