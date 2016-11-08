@@ -466,6 +466,11 @@ namespace VitalChoice.Core.DependencyInjection
                 AccessToken = section["AccessToken"],
                 ServiceEmail = section["ServiceEmail"],
             };
+            section = configuration.GetSection("App:UspsSettings");
+            options.UspsSettings = new UspsSettings()
+            {
+                UserId = section["UserId"]
+            };
         }
 
         public IContainer BuildContainer(Assembly projectAssembly, ContainerBuilder builder)
@@ -620,6 +625,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<FacebookService>().As<FacebookService>().InstancePerLifetimeScope();
             builder.RegisterType<TwitterService>().As<TwitterService>().InstancePerLifetimeScope();
             builder.RegisterType<GrooveService>().As<IGrooveService>().InstancePerLifetimeScope();
+            builder.RegisterType<UspsService>().As<IUspsService>().InstancePerLifetimeScope();
 
             builder.RegisterMappers(typeof(ProductService).GetTypeInfo().Assembly, (type, registration) =>
             {

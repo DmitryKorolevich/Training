@@ -37,5 +37,6 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public TwitterSettings TwitterSettings { get; set; }
         public FacebookSettings FacebookSettings { get; set; }
         public GrooveSettings GrooveSettings { get; set; }
+        public UspsSettings UspsSettings { get; set; }
     }
 }

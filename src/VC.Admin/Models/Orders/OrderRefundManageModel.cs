@@ -6,6 +6,7 @@ using VitalChoice.Validation.Models;
 using VitalChoice.Validation.Attributes;
 using VC.Admin.Validators.Order;
 using VC.Admin.Models.Customer;
+using VC.Admin.Models.Customers;
 using VC.Admin.Models.Products;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
