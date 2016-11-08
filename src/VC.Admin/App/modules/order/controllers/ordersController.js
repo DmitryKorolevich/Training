@@ -412,9 +412,8 @@
                     .success(function (result)
                     {
                         if (result.Success) {
-                            openExportResultModal(result.Data);
 
-                            toaster.pop('success', "Success!", "Export completed");
+                            toaster.pop('success', "Success!", "Export Successfully Started");
                             refreshOrders();
                         } else
                         {
