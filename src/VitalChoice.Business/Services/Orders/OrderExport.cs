@@ -125,13 +125,15 @@ namespace VitalChoice.Business.Services.Orders
         {
             private readonly ILifetimeScope _rootScope;
 
-            public ExportPool(ILogger logger, ILifetimeScope rootScope) : base(1, logger)
+            public ExportPool(ILogger logger, ILifetimeScope rootScope, Dictionary<int, ExportSide> exportLockList)
+                : base(1, logger, () => exportLockList)
             {
                 _rootScope = rootScope;
             }
 
             protected override void ProcessingAction(OrderExportData data, object localData, object processParameter)
             {
+                var lockList = (Dictionary<int, ExportSide>) localData;
                 var result = (ExportResult) processParameter;
                 using (var scope = _rootScope.BeginLifetimeScope())
                 {
@@ -144,6 +146,51 @@ namespace VitalChoice.Business.Services.Orders
                                 lock (result)
                                 {
                                     result.ExportedOrders.Add(r);
+                                }
+
+                                if (r.Success)
+                                    return;
+
+                                lock (lockList)
+                                {
+                                    var order = data.ExportInfo.FirstOrDefault(o => o.Id == r.Id);
+                                    if (order == null)
+                                        return;
+                                    ExportSide side;
+                                    switch (order.OrderType)
+                                    {
+                                        case ExportSide.All:
+                                            lockList.Remove(r.Id);
+                                            break;
+                                        case ExportSide.Perishable:
+                                            if (lockList.TryGetValue(r.Id, out side))
+                                            {
+                                                switch (side)
+                                                {
+                                                    case ExportSide.Perishable:
+                                                        lockList.Remove(r.Id);
+                                                        break;
+                                                    case ExportSide.All:
+                                                        lockList[r.Id] = ExportSide.NonPerishable;
+                                                        break;
+                                                }
+                                            }
+                                            break;
+                                        case ExportSide.NonPerishable:
+                                            if (lockList.TryGetValue(r.Id, out side))
+                                            {
+                                                switch (side)
+                                                {
+                                                    case ExportSide.NonPerishable:
+                                                        lockList.Remove(r.Id);
+                                                        break;
+                                                    case ExportSide.All:
+                                                        lockList[r.Id] = ExportSide.Perishable;
+                                                        break;
+                                                }
+                                            }
+                                            break;
+                                    }
                                 }
                             }).GetAwaiter().GetResult();
                         }
