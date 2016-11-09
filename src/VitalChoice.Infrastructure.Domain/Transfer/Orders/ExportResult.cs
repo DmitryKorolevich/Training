@@ -12,6 +12,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
         {
             AgentId = agentId;
             TotalCount = totalCount;
+            DateStarted = DateTime.MaxValue;
         }
 
         public DateTime DateStarted { get; set; }
