@@ -3,7 +3,7 @@
 angular.module('app.modules.order.controllers.exportRequestDetailsController', [])
 .controller('exportRequestDetailsController', ['$scope', '$uibModalInstance', 'data', '$rootScope', 'orderService', function ($scope, $uibModalInstance, data, $rootScope, orderService) {
     function initialize() {
-        $scope.loadTimestamp = data.items.LoadTimestamp;
+        $scope.loadTimestamp = new Date(data.items.LoadTimestamp);
         $scope.items = data.items.ExportModels;
         $.each($scope.items, function (i, item) {
             item.ErrorExportedOrders = $.grep(item.ExportedOrders,

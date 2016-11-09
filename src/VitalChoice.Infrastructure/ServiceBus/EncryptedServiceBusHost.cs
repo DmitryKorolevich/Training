@@ -40,13 +40,13 @@ namespace VitalChoice.Infrastructure.ServiceBus
             IHostingEnvironment env)
         {
             Disabled = appOptions.Value.ExportService.Disabled;
+            _commands = new ConcurrentDictionary<CommandItem, WeakReference<ServiceBusCommandBase>>();
             if (Disabled)
                 return;
             ServerHostName = appOptions.Value.ExportService.ServerHostName;
             LocalHostName = env.ApplicationName + Guid.NewGuid().ToString("N");
             EncryptionHost = encryptionHost;
             Logger = logger;
-            _commands = new ConcurrentDictionary<CommandItem, WeakReference<ServiceBusCommandBase>>();
             try
             {
                 Initialize(appOptions, logger);

@@ -220,20 +220,20 @@ namespace VC.Admin.Controllers
             var results = _exportService.GetExportResults();
             return new OrderExportResults
             {
-                LoadTimestamp = results.FirstOrDefault()?.DateCreated ?? DateTime.MinValue,
+                LoadTimestamp = results.FirstOrDefault()?.DateStarted ?? DateTime.MinValue,
                 ExportModels = results.Select(r => new OrderExportRequestModel
                 {
                     ExportedOrders = r.ExportedOrders,
                     AgentId = r.AgentId,
                     TotalCount = r.TotalCount,
-                    DateCreated = r.DateCreated
+                    DateCreated = r.DateStarted
                 }).ToList()
             };
         }
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
-        public Result<bool> ClearExportDetails(DateTime loadTimestamp)
+        public Result<bool> ClearExportDetails([FromBody]DateTime loadTimestamp)
         {
             _exportService.ClearDone(loadTimestamp);
             return true;

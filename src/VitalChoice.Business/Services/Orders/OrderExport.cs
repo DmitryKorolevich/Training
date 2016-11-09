@@ -149,19 +149,20 @@ namespace VitalChoice.Business.Services.Orders
                     {
                         return r.TotalCount == r.ExportedOrders.Count && r.ExportedOrders.Any(o => !o.Success);
                     }
-                }).OrderByDescending(r => r.DateCreated).ToList();
+                }).OrderByDescending(r => r.DateStarted).ToList();
             }
         }
 
         public void ClearDone(DateTime loadTimestamp)
         {
+            loadTimestamp = loadTimestamp.AddSeconds(1);
             lock (_exportResults)
             {
                 foreach (var result in _exportResults.ToArray())
                 {
                     lock (result)
                     {
-                        if (result.DateCreated <= loadTimestamp && result.TotalCount == result.ExportedOrders.Count)
+                        if (result.DateStarted <= loadTimestamp && result.TotalCount == result.ExportedOrders.Count)
                         {
                             _exportResults.Remove(result);
                         }
@@ -184,6 +185,7 @@ namespace VitalChoice.Business.Services.Orders
             {
                 var lockList = (Dictionary<int, ExportSide>) localData;
                 var result = (ExportResult) processParameter;
+                result.DateStarted = DateTime.Now;
                 using (var scope = _rootScope.BeginLifetimeScope())
                 {
                     using (var exportService = scope.Resolve<IEncryptedOrderExportService>())

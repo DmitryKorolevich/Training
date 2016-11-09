@@ -33,11 +33,7 @@ namespace VitalChoice.Business.Services.Orders
         {
             if (!InitSuccess || Disabled)
             {
-                exportedAction(new OrderExportItemResult
-                {
-                    Error = "Cannot initialize export service client",
-                    Success = false
-                });
+                throw new ApiException("Cannot export orders, initialization failed");
             }
             var sentItems = new HashSet<int>(exportData.ExportInfo.Select(o => o.Id));
             var doneAllEvent = new AsyncManualResetEvent(false);

@@ -14,7 +14,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
             TotalCount = totalCount;
         }
 
-        public DateTime DateCreated { get; } = DateTime.Now;
+        public DateTime DateStarted { get; set; }
         public string AgentId { get; }
         public int TotalCount { get; }
         public List<OrderExportItemResult> ExportedOrders { get; } = new List<OrderExportItemResult>();
