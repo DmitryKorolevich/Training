@@ -42,10 +42,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 {
                     _batchReceivingPool.EnqueueData(batch);
                 }
-                else
-                {
-                    Thread.Sleep(1);
-                }
             }
         }
 
@@ -57,10 +53,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 if (message != null)
                 {
                     _receivingPool.EnqueueData(message);
-                }
-                else
-                {
-                    Thread.Sleep(1);
                 }
             }
         }

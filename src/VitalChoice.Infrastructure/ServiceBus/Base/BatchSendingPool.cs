@@ -10,7 +10,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
     {
         private readonly IServiceBusSender _sender;
 
-        public BatchSendingPool(byte maxThreads, IServiceBusSender sender, ILogger logger) : base(maxThreads, logger)
+        public BatchSendingPool(IServiceBusSender sender, ILogger logger) : base(1, logger)
         {
             _sender = sender;
         }

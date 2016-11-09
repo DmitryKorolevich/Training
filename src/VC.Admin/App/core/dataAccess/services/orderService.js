@@ -320,5 +320,8 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    {
 	        return $http.get(baseUrl + 'GetExportDetails', getConfig(tracker));
 	    },
+	    clearExportDetails: function (timestamp, tracker) {
+	        return $http.post(baseUrl + 'ClearExportDetails', timestamp, getConfig(tracker));
+	    }
 	};
 }]);

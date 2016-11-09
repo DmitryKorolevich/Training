@@ -7,6 +7,8 @@ namespace VC.Admin.Models.Orders
 {
     public class OrderExportGeneralStatusModel
     {
+        public int Errors { get; set; }
+
         public int Exported { get; set; }
 
         public int All { get; set; }

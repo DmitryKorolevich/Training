@@ -214,16 +214,28 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpGet]
-        public Result<ICollection<OrderExportRequestModel>> GetExportDetails()
+        public Result<OrderExportResults> GetExportDetails()
         {
             var results = _exportService.GetExportResults();
-            return results.Select(r => new OrderExportRequestModel
+            return new OrderExportResults
             {
-                ExportedOrders = r.ExportedOrders,
-                AgentId = r.AgentId,
-                TotalCount = r.TotalCount,
-                DateCreated = r.DateCreated
-            }).ToList();
+                LoadTimestamp = results.FirstOrDefault()?.DateCreated ?? DateTime.MinValue,
+                ExportModels = results.Select(r => new OrderExportRequestModel
+                {
+                    ExportedOrders = r.ExportedOrders,
+                    AgentId = r.AgentId,
+                    TotalCount = r.TotalCount,
+                    DateCreated = r.DateCreated
+                }).ToList()
+            };
+        }
+
+        [AdminAuthorize(PermissionType.Orders)]
+        [HttpPost]
+        public Result<bool> ClearExportDetails(DateTime loadTimestamp)
+        {
+            _exportService.ClearDone(loadTimestamp);
+            return true;
         }
 
         #endregion

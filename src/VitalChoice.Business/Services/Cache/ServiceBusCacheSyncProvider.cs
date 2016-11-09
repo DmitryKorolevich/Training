@@ -83,7 +83,7 @@ namespace VitalChoice.Business.Services.Cache
                 {
                     var factory = MessagingFactory.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
                     return factory.CreateSubscriptionClient(queName, applicationEnvironment.ApplicationName, ReceiveMode.ReceiveAndDelete);
-                }, Logger), true, maxConcurrentProcessors: 2);
+                }, Logger), true);
 
                 _receiverHost.ReceiveBatchEvent += ReceiveMessages;
                 _receiverHost.Start();
@@ -94,7 +94,7 @@ namespace VitalChoice.Business.Services.Cache
                     return factory.CreateTopicClient(queName);
                 }, Logger);
 
-                _sendingPool = new BatchSendingPool(2, _sendingClient, Logger);
+                _sendingPool = new BatchSendingPool(_sendingClient, Logger);
             }
         }
 
@@ -147,7 +147,7 @@ namespace VitalChoice.Business.Services.Cache
                     })
                     {
                         CorrelationId = _clientUid.ToString(),
-                        TimeToLive = TimeSpan.FromSeconds(10)
+                        TimeToLive = TimeSpan.FromSeconds(30)
                     }, 1));
                 }
                 Logger.LogInfo(ops => $"Accepting cache messages: {string.Join(",", ops.Select(m => m.ToString()))}", syncOperations);

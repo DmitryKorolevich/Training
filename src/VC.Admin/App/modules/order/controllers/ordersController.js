@@ -412,9 +412,7 @@
                     .success(function (result)
                     {
                         if (result.Success) {
-
                             toaster.pop('success', "Success!", "Export Successfully Started");
-                            refreshOrders();
                         } else
                         {
                             var messages = "";
@@ -425,7 +423,6 @@
                             } else {
                                 messages = "Can't export orders";
                             }
-
                             toaster.pop('error', 'Error!', messages, null, 'trustedHtml');
                         }
                     })

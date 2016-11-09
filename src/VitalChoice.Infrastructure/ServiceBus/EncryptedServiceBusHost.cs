@@ -59,38 +59,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
             }
         }
 
-        private void EnsureTopicAndSubscriptionExists(string connectionString, string topicName, string subscriptionName)
-        {
-            var ns = NamespaceManager.CreateFromConnectionString(connectionString);
-            if (!ns.TopicExists(topicName))
-            {
-                TopicDescription topic = new TopicDescription(topicName)
-                {
-                    EnableExpress = true,
-                    EnablePartitioning = true,
-                    EnableBatchedOperations = true,
-                    DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
-                    RequiresDuplicateDetection = false
-                };
-
-                ns.CreateTopic(topic);
-            }
-            if (!ns.SubscriptionExists(topicName, subscriptionName))
-            {
-                SubscriptionDescription subscription = new SubscriptionDescription(topicName, subscriptionName)
-                {
-                    EnableBatchedOperations = true,
-                    DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
-                    RequiresSession = false,
-                    EnableDeadLetteringOnFilterEvaluationExceptions = false,
-                    EnableDeadLetteringOnMessageExpiration = false,
-                    AutoDeleteOnIdle = TimeSpan.FromMinutes(20),
-                    MaxDeliveryCount = 1
-                };
-                ns.CreateSubscription(subscription);
-            }
-        }
-
         protected void SendPlainCommand(ServiceBusCommandBase command)
         {
             if (SendPlain(command))
@@ -265,11 +233,43 @@ namespace VitalChoice.Infrastructure.ServiceBus
             _plainSender = new ServiceBusTopicSender(topicPlainFactory.Create, logger);
             _encryptedSender = new ServiceBusTopicSender(topicEncryptedFactory.Create, logger);
 
-            _plainPool = new SendingPool(4, _plainSender, logger);
-            _encryptedPool = new SendingPool(4, _encryptedSender, logger);
+            _plainPool = new SendingPool(_plainSender, logger);
+            _encryptedPool = new SendingPool(_encryptedSender, logger);
 
             _plainClient.Start();
             _encryptedClient.Start();
+        }
+
+        private void EnsureTopicAndSubscriptionExists(string connectionString, string topicName, string subscriptionName)
+        {
+            var ns = NamespaceManager.CreateFromConnectionString(connectionString);
+            if (!ns.TopicExists(topicName))
+            {
+                TopicDescription topic = new TopicDescription(topicName)
+                {
+                    EnableExpress = true,
+                    EnablePartitioning = true,
+                    EnableBatchedOperations = true,
+                    DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
+                    RequiresDuplicateDetection = false
+                };
+
+                ns.CreateTopic(topic);
+            }
+            if (!ns.SubscriptionExists(topicName, subscriptionName))
+            {
+                SubscriptionDescription subscription = new SubscriptionDescription(topicName, subscriptionName)
+                {
+                    EnableBatchedOperations = true,
+                    DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
+                    RequiresSession = false,
+                    EnableDeadLetteringOnFilterEvaluationExceptions = false,
+                    EnableDeadLetteringOnMessageExpiration = false,
+                    AutoDeleteOnIdle = TimeSpan.FromMinutes(20),
+                    MaxDeliveryCount = 1
+                };
+                ns.CreateSubscription(subscription);
+            }
         }
 
         private void ProcessEncryptedMessage(BrokeredMessage message)

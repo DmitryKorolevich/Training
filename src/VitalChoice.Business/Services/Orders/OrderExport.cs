@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Microsoft.Extensions.Logging;
@@ -44,18 +42,11 @@ namespace VitalChoice.Business.Services.Orders
                 var totalCount = 0;
                 lock (_exportResults)
                 {
-                    foreach (var result in _exportResults.ToArray())
+                    foreach (var result in _exportResults)
                     {
                         lock (result)
                         {
-                            if (result.ExportedOrders.Count == result.TotalCount && result.ExportedOrders.All(o => o.Success))
-                            {
-                                _exportResults.Remove(result);
-                            }
-                            else
-                            {
-                                totalCount += result.ExportedOrders.Count;
-                            }
+                            totalCount += result.ExportedOrders.Count;
                         }
                     }
                 }
@@ -133,7 +124,30 @@ namespace VitalChoice.Business.Services.Orders
         {
             lock (_exportResults)
             {
-                return _exportResults.ToList();
+                return _exportResults.Where(r =>
+                {
+                    lock (r)
+                    {
+                        return r.TotalCount == r.ExportedOrders.Count && r.ExportedOrders.Any(o => !o.Success);
+                    }
+                }).OrderByDescending(r => r.DateCreated).ToList();
+            }
+        }
+
+        public void ClearDone(DateTime loadTimestamp)
+        {
+            lock (_exportResults)
+            {
+                foreach (var result in _exportResults.ToArray())
+                {
+                    lock (result)
+                    {
+                        if (result.DateCreated <= loadTimestamp && result.TotalCount == result.ExportedOrders.Count)
+                        {
+                            _exportResults.Remove(result);
+                        }
+                    }
+                }
             }
         }
 
@@ -172,56 +186,71 @@ namespace VitalChoice.Business.Services.Orders
                                     var order = data.ExportInfo.FirstOrDefault(o => o.Id == r.Id);
                                     if (order == null)
                                         return;
-                                    ExportSide side;
-                                    switch (order.OrderType)
-                                    {
-                                        case ExportSide.All:
-                                            lockList.Remove(r.Id);
-                                            break;
-                                        case ExportSide.Perishable:
-                                            if (lockList.TryGetValue(r.Id, out side))
-                                            {
-                                                switch (side)
-                                                {
-                                                    case ExportSide.Perishable:
-                                                        lockList.Remove(r.Id);
-                                                        break;
-                                                    case ExportSide.All:
-                                                        lockList[r.Id] = ExportSide.NonPerishable;
-                                                        break;
-                                                }
-                                            }
-                                            break;
-                                        case ExportSide.NonPerishable:
-                                            if (lockList.TryGetValue(r.Id, out side))
-                                            {
-                                                switch (side)
-                                                {
-                                                    case ExportSide.NonPerishable:
-                                                        lockList.Remove(r.Id);
-                                                        break;
-                                                    case ExportSide.All:
-                                                        lockList[r.Id] = ExportSide.Perishable;
-                                                        break;
-                                                }
-                                            }
-                                            break;
-                                    }
+                                    ProcessFailingOrder(lockList, order);
                                 }
                             }).WaitResult();
                         }
                         catch (Exception e)
                         {
+                            var errorText = e.ToString();
+                            Logger.LogError(errorText);
                             lock (result)
                             {
-                                result.ExportedOrders.Add(new OrderExportItemResult
+                                lock (lockList)
                                 {
-                                    Error = e.ToString(),
-                                    Success = false
-                                });
+                                    foreach (var order in data.ExportInfo.Where(o => result.ExportedOrders.All(eo => eo.Id != o.Id)))
+                                    {
+                                        ProcessFailingOrder(lockList, order);
+                                        result.ExportedOrders.Add(new OrderExportItemResult
+                                        {
+                                            Error = errorText,
+                                            Success = false,
+                                            Id = order.Id
+                                        });
+                                    }
+                                }
                             }
                         }
                     }
+                }
+            }
+
+            private static void ProcessFailingOrder(Dictionary<int, ExportSide> lockList, OrderExportItem order)
+            {
+                ExportSide side;
+                switch (order.OrderType)
+                {
+                    case ExportSide.All:
+                        lockList.Remove(order.Id);
+                        break;
+                    case ExportSide.Perishable:
+                        if (lockList.TryGetValue(order.Id, out side))
+                        {
+                            switch (side)
+                            {
+                                case ExportSide.Perishable:
+                                    lockList.Remove(order.Id);
+                                    break;
+                                case ExportSide.All:
+                                    lockList[order.Id] = ExportSide.NonPerishable;
+                                    break;
+                            }
+                        }
+                        break;
+                    case ExportSide.NonPerishable:
+                        if (lockList.TryGetValue(order.Id, out side))
+                        {
+                            switch (side)
+                            {
+                                case ExportSide.NonPerishable:
+                                    lockList.Remove(order.Id);
+                                    break;
+                                case ExportSide.All:
+                                    lockList[order.Id] = ExportSide.Perishable;
+                                    break;
+                            }
+                        }
+                        break;
                 }
             }
         }

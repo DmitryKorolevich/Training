@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
@@ -11,5 +12,6 @@ namespace VitalChoice.Interfaces.Services.Orders
         int TotalExported { get; }
         Task ExportOrders(OrderExportData exportData);
         IReadOnlyList<ExportResult> GetExportResults();
+        void ClearDone(DateTime loadTimestamp);
     }
 }
