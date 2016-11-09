@@ -11,27 +11,28 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
     {
         protected readonly Func<TQue> QueFactory;
         protected readonly ILogger Logger;
+        private readonly Func<object, BrokeredMessage> _messageConstructor;
         protected volatile TQue Que;
 
-        protected ServiceBusAbstractSender(Func<TQue> queFactory, ILogger logger)
+        protected ServiceBusAbstractSender(Func<TQue> queFactory, ILogger logger, Func<object, BrokeredMessage> messageConstructor)
         {
             QueFactory = queFactory;
             Que = queFactory();
             Logger = logger;
+            _messageConstructor = messageConstructor;
         }
 
         public void Dispose() => Que.Close();
 
-        protected void DoSendAction<T>(Action<TQue, T> action, T value)
-            where T : class
+        protected void DoSendAction(Action<TQue, BrokeredMessage> action, object value)
         {
             try
             {
-                action(Que, value);
+                action(Que, _messageConstructor(value));
             }
             catch (OperationCanceledException)
             {
-                action(Que, value);
+                action(Que, _messageConstructor(value));
             }
             catch (Exception e)
             {
@@ -42,7 +43,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                     Que = QueFactory();
                     try
                     {
-                        action(Que, value);
+                        action(Que, _messageConstructor(value));
                     }
                     finally
                     {
@@ -56,16 +57,15 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             }
         }
 
-        protected async Task DoSendActionAsync<T>(Func<TQue, T, Task> action, T value)
-            where T : class
+        protected async Task DoSendActionAsync(Func<TQue, BrokeredMessage, Task> action, object value)
         {
             try
             {
-                await action(Que, value);
+                await action(Que, _messageConstructor(value));
             }
             catch (OperationCanceledException)
             {
-                await action(Que, value);
+                await action(Que, _messageConstructor(value));
             }
             catch (Exception e)
             {
@@ -74,7 +74,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 Que = QueFactory();
                 try
                 {
-                    await action(Que, value);
+                    await action(Que, _messageConstructor(value));
                 }
                 finally
                 {
@@ -83,9 +83,9 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             }
         }
 
-        public abstract Task SendAsync(BrokeredMessage message);
-        public abstract void Send(BrokeredMessage message);
-        public abstract Task SendBatchAsync(IEnumerable<BrokeredMessage> messages);
-        public abstract void SendBatch(IEnumerable<BrokeredMessage> messages);
+        public abstract Task SendAsync(object message);
+        public abstract void Send(object message);
+        public abstract Task SendBatchAsync(IEnumerable<object> messages);
+        public abstract void SendBatch(IEnumerable<object> messages);
     }
 }

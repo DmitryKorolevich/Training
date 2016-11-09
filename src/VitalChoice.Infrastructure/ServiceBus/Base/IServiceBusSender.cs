@@ -8,10 +8,11 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 {
     public interface IServiceBusSender : IDisposable
     {
-        Task SendAsync(BrokeredMessage message);
-        void Send(BrokeredMessage message);
-        Task SendBatchAsync(IEnumerable<BrokeredMessage> messages);
-        void SendBatch(IEnumerable<BrokeredMessage> messages);
+        Task SendAsync(object message);
+        void Send(object message);
+        Task SendBatchAsync(IEnumerable<object> messages);
+        void SendBatch(IEnumerable<object> messages);
     }
 }
+
 #endif
