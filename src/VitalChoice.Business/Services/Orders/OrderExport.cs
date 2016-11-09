@@ -54,6 +54,25 @@ namespace VitalChoice.Business.Services.Orders
             }
         }
 
+        public int ExportErrors
+        {
+            get
+            {
+                var totalCount = 0;
+                lock (_exportResults)
+                {
+                    foreach (var result in _exportResults)
+                    {
+                        lock (result)
+                        {
+                            totalCount += result.ExportedOrders.Count(o => !o.Success);
+                        }
+                    }
+                }
+                return totalCount;
+            }
+        }
+
         private readonly List<ExportResult> _exportResults = new List<ExportResult>();
         private readonly Dictionary<int, ExportSide> _exportedOrders = new Dictionary<int, ExportSide>();
         private readonly ILifetimeScope _rootScope;

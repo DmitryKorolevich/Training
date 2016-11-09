@@ -208,7 +208,8 @@ namespace VC.Admin.Controllers
             return new OrderExportGeneralStatusModel
             {
                 All = _exportService.TotalExporting,
-                Exported = _exportService.TotalExported
+                Exported = _exportService.TotalExported,
+                Errors = _exportService.ExportErrors
             };
         }
 

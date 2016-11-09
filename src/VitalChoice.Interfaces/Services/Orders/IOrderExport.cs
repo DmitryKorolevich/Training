@@ -10,6 +10,7 @@ namespace VitalChoice.Interfaces.Services.Orders
     {
         int TotalExporting { get; }
         int TotalExported { get; }
+        int ExportErrors { get; }
         Task ExportOrders(OrderExportData exportData);
         IReadOnlyList<ExportResult> GetExportResults();
         void ClearDone(DateTime loadTimestamp);
