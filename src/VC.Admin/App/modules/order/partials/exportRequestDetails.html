@@ -2,6 +2,9 @@
     <h3>Export Request Details</h3>
 </div>
 <div class="modal-body">
+    <div class="modal-header">
+        <button class="btn btn-info btn-right width-160px" data-ng-click="clear();">Clear Errors</button>
+    </div>
     <div data-ng-repeat="item in items">
         <p class="text-primary">
             <b>Created:</b>&nbsp;{{item.DateCreated | date:"MM/dd/yy h:mm a"}}&nbsp;
@@ -15,22 +18,22 @@
         <div class="export-result-errors">
             <table class="margin-top-20px table table-striped table-hover" data-ng-if="item.ErrorExportedOrders.length > 0">
                 <thead>
-                    <tr>
-                        <th>
-                            Order Id
-                        </th>
-                        <th>
-                            Error
-                        </th>
-                    </tr>
+                <tr>
+                    <th>
+                        Order Id
+                    </th>
+                    <th>
+                        Error
+                    </th>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr data-ng-repeat="error in item.ErrorExportedOrders">
-                        <td>{{error.Id}}</td>
-                        <td>
-                            <p class="text-danger">{{error.Error}}</p>
-                        </td>
-                    </tr>
+                <tr data-ng-repeat="error in item.ErrorExportedOrders">
+                    <td>{{error.Id}}</td>
+                    <td>
+                        <p class="text-danger">{{error.Error}}</p>
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>

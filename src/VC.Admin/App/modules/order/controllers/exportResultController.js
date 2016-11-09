@@ -11,7 +11,7 @@ angular.module('app.modules.order.controllers.exportResultController', [])
         $scope.successCount = data.exportRes.ExportModels.length - $scope.errors.length;
         $scope.errorCount = $scope.errors.length;
         $scope.total = data.exportRes.ExportModels.length;
-        $scope.loadTimestamp = data.exportRes.LoadTimestamp;
+        
     }
 
     $scope.ok = function () {

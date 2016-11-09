@@ -432,12 +432,6 @@
                     });
         };
 
-        function openExportResultModal(exportRes) {
-            modalUtil.open('app/modules/order/partials/exportResult.html', 'exportResultController', {
-                exportRes: exportRes
-            });
-        }
-
         $scope.openOrder = function (id)
         {
             $state.go('index.oneCol.orderDetail', { id: id });
