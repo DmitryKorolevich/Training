@@ -193,10 +193,11 @@
                     errorHandler(result);
                 }
             });
-            if ($rootScope.exportStatusRefreshTimer == null)
+            if ($rootScope.exportStatusRefreshTimer != null)
             {
-                refreshExportStatus();
+                clearTimeout($rootScope.exportStatusRefreshTimer);
             }
+            refreshExportStatus();
         }
 
         var refreshExportStatus = function ()
