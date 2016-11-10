@@ -7,8 +7,8 @@ $(document).ready(function ()
 
         var inStock = jChecked.data("in-stock");
         if (inStock) {
-            $(".product-action-right .in-stock").show();
-            $(".product-action-right .out-of-stock").hide();
+            $(".product-action-bar .in-stock").show();
+            $(".product-action-bar .out-of-stock").hide();
             $("#spSelectedPrice").text("Selected Price " + jChecked.attr("data-price"));
             if (jChecked.attr("data-autoship") && jChecked.attr("data-autoship").toLowerCase() == "true") {
                 $(".product-autoship-container").show();
@@ -17,8 +17,8 @@ $(document).ready(function ()
             }
         }
         else {
-            $(".product-action-right .in-stock").hide();
-            $(".product-action-right .out-of-stock").show();
+            $(".product-action-bar .in-stock").hide();
+            $(".product-action-bar .out-of-stock").show();
         }
         $("#hSelectedCode").text("Product #" + jChecked.val());
     };
@@ -77,7 +77,8 @@ $(document).ready(function ()
         return false;
     });
 
-    $(".product-action-right .out-of-stock a").click(function (e) {
+    $(".product-action-bar .out-of-stock a").click(function (e)
+    {
         $.ajax({
             url: "/Product/AddOutOfStockProductRequest/" + productPublicId,
             dataType: "html"
