@@ -229,4 +229,7 @@
   <ItemGroup>
     <None Include="PreDeployment\Scripts\GCs.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\ProductOptionTypes.sql" />
+  </ItemGroup>
 </Project>

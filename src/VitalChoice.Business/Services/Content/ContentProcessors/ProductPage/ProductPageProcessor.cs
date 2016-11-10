@@ -10,6 +10,7 @@ using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.DynamicData.TypeConverters;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
@@ -158,6 +159,9 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors.ProductPage
             toReturn.ShowDiscountMessage = viewContext.User.Identity.IsAuthenticated && viewContext.User.IsInRole(IdentityConstants.WholesaleCustomer) &&
                 eProduct.IdObjectType == (int)ProductType.Perishable;
 
+            toReturn.IdCustomerType = viewContext.User.Identity.IsAuthenticated && viewContext.User.IsInRole(IdentityConstants.WholesaleCustomer)
+                ? (int)CustomerType.Wholesale
+                : (int)CustomerType.Retail;
 
             if (_appOptions.Value.EnableOrderTrackScripts && eProduct != null)
             {

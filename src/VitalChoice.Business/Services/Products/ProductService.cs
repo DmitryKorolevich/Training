@@ -676,12 +676,10 @@ namespace VitalChoice.Business.Services.Products
             return await _skuMapper.FromEntityRangeAsync(skus, withDefaults);
         }
 
-        public async Task<byte[]> GenerateSkuGoogleItemsReportFile()
+        public async Task<byte[]> GenerateSkuGoogleItemsReportFile(ICollection<ProductContentTransferEntity> products, ProductCategory productCategories)
         {
             byte[] toReturn = null;
             List<SkuGoogleItem> items = new List<SkuGoogleItem>();
-            var productCategories = await _productCategoryService.GetCategoriesTreeAsync(new ProductCategoryLiteFilter());
-            var products = await this.SelectTransferAsync(true);
 
             foreach (var productContentTransferEntity in products)
             {
@@ -768,12 +766,109 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
-        public async Task UpdateSkuGoogleItemsReportFile()
+        public async Task<byte[]> GenerateSkuCriteoItemsReportFile(ICollection<ProductContentTransferEntity> products, ProductCategory productCategories)
+        {
+            byte[] toReturn = null;
+            List<SkuGoogleItem> items = new List<SkuGoogleItem>();
+
+            foreach (var productContentTransferEntity in products)
+            {
+                if (productContentTransferEntity.ProductDynamic.StatusCode == (int)RecordStatusCode.Active
+                    && productContentTransferEntity.ProductDynamic.IdVisibility.HasValue
+                    && (productContentTransferEntity.ProductDynamic.IdVisibility.Value == CustomerTypeCode.All ||
+                    productContentTransferEntity.ProductDynamic.IdVisibility.Value == CustomerTypeCode.Retail)
+                    && productContentTransferEntity.ProductDynamic.Skus != null)
+                {
+                    var activeSkus =
+                        productContentTransferEntity.ProductDynamic.Skus.Where(p => p.StatusCode == (int)RecordStatusCode.Active &&
+                                                                                    !p.Hidden && p.SafeData.HideFromDataFeed != true).ToArray();
+
+                    if (activeSkus.Length == 0)
+                        continue;
+
+                    //find sku code group part in sku codes
+                    var skuGroupCode = activeSkus.First().Code.Length >= 4
+                        ? activeSkus.First().Code.Substring(0, 4)
+                        : activeSkus.First().Code;
+
+                    var find = false;
+                    while (!find && skuGroupCode.Length > 0)
+                    {
+                        find = true;
+                        foreach (var skuDynamic in activeSkus)
+                        {
+                            if (!skuDynamic.Code.StartsWith(skuGroupCode))
+                            {
+                                find = false;
+                                skuGroupCode = skuGroupCode.Substring(0, skuGroupCode.Length - 1);
+                                break;
+                            }
+                        }
+                    }
+
+                    foreach (var skuDynamic in activeSkus)
+                    {
+                        SkuGoogleItem item = new SkuGoogleItem();
+                        item.Id = productContentTransferEntity.ProductDynamic.Id;
+                        item.Title = productContentTransferEntity.ProductDynamic.SafeData.GoogleFeedTitle;
+                        if (string.IsNullOrEmpty(item.Title))
+                        {
+                            item.Title = $"{productContentTransferEntity.ProductDynamic.Name} {productContentTransferEntity.ProductDynamic.SafeData.SubTitle}";
+                        }
+                        item.Url = $"https://{_options.Value.PublicHost}/product/{productContentTransferEntity.ProductContent?.Url}";
+                        item.RetailPrice = skuDynamic.Price;
+                        item.Description = productContentTransferEntity.ProductDynamic.SafeData.GoogleFeedDescription;
+                        item.Condition = "new";
+                        item.Brand = "Vital Choice";
+                        item.SkuCode = skuDynamic.Code;
+                        if (productContentTransferEntity.ProductDynamic.SafeData.Thumbnail != null)
+                        {
+                            item.Thumbnail = $"https://{_options.Value.PublicHost}{productContentTransferEntity.ProductDynamic.SafeData.Thumbnail}";
+                        }
+                        item.GoogleCategory =
+                            _referenceData.GoogleCategories.FirstOrDefault(
+                                p => p.Key == productContentTransferEntity.ProductDynamic.SafeData.GoogleCategory)?.Text;
+
+                        var category = GetProductCategory(productContentTransferEntity.ProductDynamic.CategoryIds.FirstOrDefault(), productCategories);
+                        item.ProductRootCategory = GetRootProductCategory(productCategories, category)?.Name;
+
+                        item.Availability = (productContentTransferEntity.ProductDynamic.IdObjectType == (int)ProductType.EGс || productContentTransferEntity.ProductDynamic.IdObjectType == (int)ProductType.Gc ||
+                            ((bool?)skuDynamic.SafeData.DisregardStock ?? false) || ((int?)skuDynamic.SafeData.Stock ?? 0) > 0) ?
+                            "in stock" : "out of stock";
+                        item.SkuCodeGroup = skuGroupCode;
+                        if (productContentTransferEntity.ProductDynamic.SafeData.MainProductImage != null)
+                        {
+                            item.MainProductImage = $"https://{_options.Value.PublicHost}{productContentTransferEntity.ProductDynamic.SafeData.MainProductImage}";
+                        }
+                        item.Quantity = skuDynamic.SafeData.QTY;
+                        item.Manufacturer = "Vital Choice";
+                        item.Seller = _referenceData.ProductSellers.FirstOrDefault(
+                                p => p.Key == productContentTransferEntity.ProductDynamic.SafeData.Seller)?.Text;
+
+                        items.Add(item);
+                    }
+                }
+            }
+
+            items = items.OrderBy(p => p.Url).ToList();
+            toReturn = _skuGoogleItemCSVExportService.ExportToCsv(items);
+
+            return toReturn;
+        }
+
+        public async Task UpdateSkuFeedItemsReportFiles()
         {
             try
             {
-                var file = await GenerateSkuGoogleItemsReportFile();
-                await _storageClient.UploadBlobAsync(_options.Value.AzureStorage.AppFilesContainerName, _options.Value.AzureStorage.ProductGoogleFeedFileName,
+                var productCategories = await _productCategoryService.GetCategoriesTreeAsync(new ProductCategoryLiteFilter());
+                var products = await this.SelectTransferAsync(true);
+
+                var file = await GenerateSkuGoogleItemsReportFile(products, productCategories);
+                await _storageClient.UploadBlobAsync(_options.Value.AzureStorage.AppFilesContainerName, FileConstants.GOOGLE_PRODUCTS_FEED,
+                    file, "text/csv");
+
+                file = await GenerateSkuCriteoItemsReportFile(products, productCategories);
+                await _storageClient.UploadBlobAsync(_options.Value.AzureStorage.AppFilesContainerName, FileConstants.CRITEO_PRODUCTS_FEED,
                     file, "text/csv");
             }
             catch (Exception e)
@@ -784,7 +879,13 @@ namespace VitalChoice.Business.Services.Products
 
         public async Task<byte[]> GetSkuGoogleItemsReportFile()
         {
-            var blob = await _storageClient.DownloadBlobBlockAsync(_options.Value.AzureStorage.AppFilesContainerName, _options.Value.AzureStorage.ProductGoogleFeedFileName);
+            var blob = await _storageClient.DownloadBlobBlockAsync(_options.Value.AzureStorage.AppFilesContainerName, FileConstants.GOOGLE_PRODUCTS_FEED);
+            return blob?.File;
+        }
+
+        public async Task<byte[]> GetSkuCriteoItemsReportFile()
+        {
+            var blob = await _storageClient.DownloadBlobBlockAsync(_options.Value.AzureStorage.AppFilesContainerName, FileConstants.CRITEO_PRODUCTS_FEED);
             return blob?.File;
         }
 
