@@ -16,7 +16,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Business.Services.Cache
 {
-    public class ServiceBusCacheSyncProvider : CacheSyncProvider, IDisposable
+    public class ServiceBusCacheSyncProvider : CacheSyncProvider
     {
         public const int PingAverageMaxCount = 50;
 
@@ -25,11 +25,11 @@ namespace VitalChoice.Business.Services.Cache
         private readonly object _lockObject = new object();
         private readonly ServiceBusReceiverHost _receiverHost;
         private readonly Guid _clientUid = Guid.NewGuid();
-        private static readonly ConcurrentDictionary<string, int> AveragePing = new ConcurrentDictionary<string, int>();
-        private readonly int[] _pingMilliseconds = new int[PingAverageMaxCount];
+        private static readonly ConcurrentDictionary<string, double> AveragePing = new ConcurrentDictionary<string, double>();
+        private readonly double[] _pingMilliseconds = new double[PingAverageMaxCount];
         private int _totalMessagesReceived;
-        private readonly BatchSendingPool _sendingPool;
-        private readonly ServiceBusTopicSender _sendingClient;
+        private readonly BatchSendingPool<SyncOperation> _sendingPool;
+        private readonly ServiceBusTopicSender<SyncOperation> _sendingClient;
 
         public ServiceBusCacheSyncProvider(IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage keyStorage,
             ILoggerFactory loggerFactory,
@@ -88,13 +88,13 @@ namespace VitalChoice.Business.Services.Cache
                 _receiverHost.ReceiveBatchEvent += ReceiveMessages;
                 _receiverHost.Start();
 
-                _sendingClient = new ServiceBusTopicSender(() =>
+                _sendingClient = new ServiceBusTopicSender<SyncOperation>(() =>
                 {
                     var factory = MessagingFactory.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
                     return factory.CreateTopicClient(queName);
-                }, Logger);
+                }, Logger, ConstructMessage);
 
-                _sendingPool = new BatchSendingPool(_sendingClient, Logger);
+                _sendingPool = new BatchSendingPool<SyncOperation>(_sendingClient, Logger);
             }
         }
 
@@ -103,22 +103,14 @@ namespace VitalChoice.Business.Services.Cache
             if (!_enabled)
                 return;
 
-            var now = DateTime.UtcNow;
-            _sendingPool.EnqueueData(syncOperations.Select(operation =>
-            {
-                operation.SendTime = now;
-                return new BrokeredMessage(operation)
-                {
-                    CorrelationId = _clientUid.ToString(),
-                    TimeToLive = TimeSpan.FromMinutes(5)
-                };
-            }));
+            _sendingPool.EnqueueData(syncOperations.ToList());
         }
 
-        public static ICollection<KeyValuePair<string, int>> AverageLatency => AveragePing;
+        public static ICollection<KeyValuePair<string, double>> AverageLatency => AveragePing;
 
-        public void Dispose()
+        public override void Dispose()
         {
+            base.Dispose();
             _receiverHost.Dispose();
             _sendingPool.Dispose();
             _sendingClient.Dispose();
@@ -129,31 +121,37 @@ namespace VitalChoice.Business.Services.Cache
             var syncOperations = ParseSyncOperations(incomingItems);
             if (syncOperations.Count > 0)
             {
-                int[] pings;
+                Logger.LogInfo(ops => $"Accepting cache messages: {string.Join(",", ops.Select(m => m.ToString()))}", syncOperations);
+                AcceptChanges(syncOperations);
+                double[] pings;
                 lock (_lockObject)
                 {
                     pings = _pingMilliseconds.Where(p => p > 0).ToArray();
                 }
+                double averagePing = 0;
                 if (pings.Length > 0)
                 {
-                    var averagePing = (int) pings.Average();
-                    AveragePing.AddOrUpdate(_applicationEnvironment.ApplicationName, averagePing, (s, i) => averagePing);
-                    _sendingPool.EnqueueData(Enumerable.Repeat(new BrokeredMessage(new SyncOperation
+                    averagePing = pings.Average();
+                }
+                AveragePing.AddOrUpdate(_applicationEnvironment.ApplicationName, averagePing, (s, i) => averagePing);
+                _sendingPool.EnqueueData(new List<SyncOperation>
+                {
+                    new SyncOperation
                     {
                         SyncType = SyncType.Ping,
                         AppName = _applicationEnvironment.ApplicationName,
                         AveragePing = averagePing,
                         SendTime = DateTime.UtcNow
-                    })
-                    {
-                        CorrelationId = _clientUid.ToString(),
-                        TimeToLive = TimeSpan.FromSeconds(30)
-                    }, 1));
-                }
-                Logger.LogInfo(ops => $"Accepting cache messages: {string.Join(",", ops.Select(m => m.ToString()))}", syncOperations);
-                AcceptChanges(syncOperations);
+                    }
+                });
             }
         }
+
+        private BrokeredMessage ConstructMessage(SyncOperation operation) => new BrokeredMessage(operation)
+        {
+            CorrelationId = _clientUid.ToString(),
+            TimeToLive = TimeSpan.FromMinutes(5)
+        };
 
         private List<SyncOperation> ParseSyncOperations(IEnumerable<BrokeredMessage> incomingItems)
         {
@@ -162,10 +160,6 @@ namespace VitalChoice.Business.Services.Cache
             {
                 try
                 {
-                    if (message.ExpiresAtUtc < DateTime.UtcNow)
-                    {
-                        continue;
-                    }
                     Guid senderUid;
                     if (Guid.TryParse(message.CorrelationId, out senderUid))
                     {
@@ -175,20 +169,19 @@ namespace VitalChoice.Business.Services.Cache
                         }
                         var syncOp = message.GetBody<SyncOperation>();
 
-                        if (syncOp.SyncType != SyncType.Ping)
+                        if (syncOp.SyncType == SyncType.Ping && syncOp.SendTime.HasValue)
                         {
-                            var ping = (DateTime.UtcNow - syncOp.SendTime).Milliseconds;
+                            var ping = (DateTime.UtcNow - syncOp.SendTime.Value).TotalMilliseconds;
                             Logger.LogInfo((op, p) => $"{op} Message lag: {p} ms", syncOp, ping);
                             lock (_lockObject)
                             {
                                 _pingMilliseconds[_totalMessagesReceived] = ping;
-                                _totalMessagesReceived = (_totalMessagesReceived + 1)%PingAverageMaxCount;
+                                _totalMessagesReceived = (_totalMessagesReceived + 1) % PingAverageMaxCount;
                             }
-                        }
-
-                        if (syncOp.SyncType == SyncType.Ping && syncOp.AveragePing > 0)
-                        {
-                            AveragePing.AddOrUpdate(syncOp.AppName, syncOp.AveragePing, (s, i) => syncOp.AveragePing);
+                            if (syncOp.AveragePing > 0)
+                            {
+                                AveragePing.AddOrUpdate(syncOp.AppName, syncOp.AveragePing, (s, i) => syncOp.AveragePing);
+                            }
                         }
                         else
                         {

@@ -21,10 +21,10 @@ namespace VitalChoice.Infrastructure.ServiceBus
     {
         private ServiceBusReceiverHost _plainClient;
         private ServiceBusReceiverHost _encryptedClient;
-        private ServiceBusTopicSender _plainSender;
-        private ServiceBusTopicSender _encryptedSender;
-        private SendingPool _plainPool;
-        private SendingPool _encryptedPool;
+        private ServiceBusTopicSender<ServiceBusCommandBase> _plainSender;
+        private ServiceBusTopicSender<ServiceBusCommandBase> _encryptedSender;
+        private SendingPool<ServiceBusCommandBase> _plainPool;
+        private SendingPool<ServiceBusCommandBase> _encryptedPool;
         private readonly ConcurrentDictionary<CommandItem, WeakReference<ServiceBusCommandBase>> _commands;
 
         protected readonly IObjectEncryptionHost EncryptionHost;
@@ -230,11 +230,11 @@ namespace VitalChoice.Infrastructure.ServiceBus
             var topicEncryptedFactory = new TopicDefaultFactory(appOptions.Value.ExportService.EncryptedConnectionString,
                 appOptions.Value.ExportService.EncryptedQueueName);
 
-            _plainSender = new ServiceBusTopicSender(topicPlainFactory.Create, logger);
-            _encryptedSender = new ServiceBusTopicSender(topicEncryptedFactory.Create, logger);
+            _plainSender = new ServiceBusTopicSender<ServiceBusCommandBase>(topicPlainFactory.Create, logger, CreatePlainMessage);
+            _encryptedSender = new ServiceBusTopicSender<ServiceBusCommandBase>(topicEncryptedFactory.Create, logger, CreateEncryptedMessage);
 
-            _plainPool = new SendingPool(_plainSender, logger);
-            _encryptedPool = new SendingPool(_encryptedSender, logger);
+            _plainPool = new SendingPool<ServiceBusCommandBase>(_plainSender, logger);
+            _encryptedPool = new SendingPool<ServiceBusCommandBase>(_encryptedSender, logger);
 
             _plainClient.Start();
             _encryptedClient.Start();
@@ -393,7 +393,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             if (_encryptedClient == null)
                 return false;
 
-            _encryptedPool.EnqueueData(CreateEncryptedMessage(command));
+            _encryptedPool.EnqueueData(command);
             return true;
         }
 
@@ -402,7 +402,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             if (_plainClient == null)
                 return false;
 
-            _plainPool.EnqueueData(CreatePlainMessage(command));
+            _plainPool.EnqueueData(command);
             return true;
         }
 

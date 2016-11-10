@@ -147,5 +147,9 @@ namespace VitalChoice.Caching.Services
                 }
             }
         }
+
+        public virtual void Dispose()
+        {
+        }
     }
 }

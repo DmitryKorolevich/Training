@@ -5,33 +5,56 @@ using Microsoft.Extensions.Logging;
 
 namespace VitalChoice.Infrastructure.LoadBalancing
 {
+    public enum RoundRobinTlsBehaviour
+    {
+        PerThread = 0,
+        PerItem = 1
+    }
+
     public abstract class RoundRobinAbstractPool<T> : IRoundRobinPool<T>
     {
         private readonly byte _maxThreads;
         protected readonly ILogger Logger;
+        private readonly Func<object> _threadLocalFactory;
+        private readonly RoundRobinTlsBehaviour _behaviour;
         private volatile bool _terminated;
         private byte _nextToUse;
         private readonly object _lock = new object();
         private readonly ThreadStartData[] _threadData;
 
-        protected RoundRobinAbstractPool(byte maxThreads, ILogger logger, Func<object> threadLocalFactory = null)
+        protected RoundRobinAbstractPool(byte maxThreads, ILogger logger, Func<object> threadLocalFactory = null, RoundRobinTlsBehaviour behaviour = RoundRobinTlsBehaviour.PerThread)
         {
             if (maxThreads == 0)
                 throw new ArgumentException("Max Thread should be > 0", nameof(maxThreads));
 
             _maxThreads = maxThreads;
             Logger = logger;
+            _threadLocalFactory = threadLocalFactory;
+            _behaviour = behaviour;
             var pool = new Thread[maxThreads];
             _threadData = new ThreadStartData[maxThreads];
             for (var i = 0; i < maxThreads; i++)
             {
-                _threadData[i] =
-                    new ThreadStartData
-                    {
-                        DataQueue = new ConcurrentQueue<ProcessData>(),
-                        DataReadyEvent = new ManualResetEvent(false),
-                        LocalData = threadLocalFactory?.Invoke()
-                    };
+                switch (_behaviour)
+                {
+                    case RoundRobinTlsBehaviour.PerThread:
+                        _threadData[i] =
+                            new ThreadStartData
+                            {
+                                DataQueue = new ConcurrentQueue<ProcessData>(),
+                                DataReadyEvent = new ManualResetEvent(false),
+                                LocalData = threadLocalFactory?.Invoke()
+                            };
+                        break;
+                    case RoundRobinTlsBehaviour.PerItem:
+                        _threadData[i] =
+                            new ThreadStartData
+                            {
+                                DataQueue = new ConcurrentQueue<ProcessData>(),
+                                DataReadyEvent = new ManualResetEvent(false)
+                            };
+                        break;
+                }
                 pool[i] = new Thread(ProcessThread);
                 pool[i].Start(_threadData[i]);
             }
@@ -53,11 +76,7 @@ namespace VitalChoice.Infrastructure.LoadBalancing
 
         protected abstract void ProcessingAction(T data, object localData, object processParameter);
 
-        protected virtual void DisposeLocalData(object localData)
-        {
-            var disposable = localData as IDisposable;
-            disposable?.Dispose();
-        }
+        protected virtual void DisposeLocalData(object localData) => (localData as IDisposable)?.Dispose();
 
         private void ProcessThread(object poolParameter)
         {
@@ -72,7 +91,23 @@ namespace VitalChoice.Infrastructure.LoadBalancing
                 {
                     try
                     {
-                        ProcessingAction(data.Data, parameters.LocalData, data.ProcessParameter);
+                        switch (_behaviour)
+                        {
+                            case RoundRobinTlsBehaviour.PerThread:
+                                ProcessingAction(data.Data, parameters.LocalData, data.ProcessParameter);
+                                break;
+                            case RoundRobinTlsBehaviour.PerItem:
+                                var localData = _threadLocalFactory?.Invoke();
+                                try
+                                {
+                                    ProcessingAction(data.Data, localData, data.ProcessParameter);
+                                }
+                                finally
+                                {
+                                    (localData as IDisposable)?.Dispose();
+                                }
+                                break;
+                        }
                     }
                     catch (Exception e)
                     {

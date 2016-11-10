@@ -6,20 +6,21 @@ using Microsoft.ServiceBus.Messaging;
 
 namespace VitalChoice.Infrastructure.ServiceBus.Base
 {
-    public class ServiceBusTopicSender : ServiceBusAbstractSender<TopicClient>
+    public class ServiceBusTopicSender<T> : ServiceBusAbstractSender<TopicClient, T>
     {
-        public ServiceBusTopicSender(Func<TopicClient> topicFactory, ILogger logger) : base(topicFactory, logger)
+        public ServiceBusTopicSender(Func<TopicClient> topicFactory, ILogger logger, Func<T, BrokeredMessage> messageConstructor)
+            : base(topicFactory, logger, messageConstructor)
         {
         }
 
-        public override Task SendAsync(BrokeredMessage message) => DoSendActionAsync((que, msg) => que.SendAsync(msg), message);
+        public override Task SendAsync(T message) => DoSendActionAsync((que, msg) => que.SendAsync(msg), message);
 
-        public override void Send(BrokeredMessage message) => DoSendAction((que, msg) => que.Send(msg), message);
+        public override void Send(T message) => DoSendAction((que, msg) => que.Send(msg), message);
 
-        public override Task SendBatchAsync(IEnumerable<BrokeredMessage> messages)
-            => DoSendActionAsync((que, batch) => que.SendBatchAsync(batch), messages);
+        public override Task SendBatchAsync(ICollection<T> messages)
+            => DoCollectionSendActionAsync((que, batch) => que.SendBatchAsync(batch), messages);
 
-        public override void SendBatch(IEnumerable<BrokeredMessage> messages)
-            => DoSendAction((que, batch) => que.SendBatch(batch), messages);
+        public override void SendBatch(ICollection<T> messages)
+            => DoCollectionSendAction((que, batch) => que.SendBatch(batch), messages);
     }
 }

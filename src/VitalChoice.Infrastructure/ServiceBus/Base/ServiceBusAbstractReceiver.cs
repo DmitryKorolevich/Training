@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
 
@@ -12,6 +13,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         protected readonly Func<TQue> QueFactory;
         protected readonly ILogger Logger;
         protected volatile TQue Que;
+        protected volatile bool Disposed;
 
         protected ServiceBusAbstractReceiver(Func<TQue> queFactory, ILogger logger)
         {
@@ -20,18 +22,25 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             Logger = logger;
         }
 
-        public void Dispose() => Que.Close();
+        public void Dispose()
+        {
+            if (!Disposed)
+            {
+                Disposed = true;
+                Que.Close();
+            }
+        }
 
-        protected T DoReadAction<T>(Func<TQue, T> action)
+        protected virtual T DoReadAction<T>(Func<TQue, T> action)
             where T : class
         {
             try
             {
-                return action(Que);
+                return ReadResult(action);
             }
             catch (OperationCanceledException)
             {
-                return action(Que);
+                return ReadResult(action);
             }
             catch (Exception e)
             {
@@ -42,8 +51,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                     Que = QueFactory();
                     try
                     {
-                        var result = action(Que);
-                        return result;
+                        return ReadResult(action);
                     }
                     finally
                     {
@@ -58,16 +66,21 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             }
         }
 
-        protected async Task<T> DoReadActionAsync<T>(Func<TQue, Task<T>> action)
+        private T ReadResult<T>(Func<TQue, T> action) where T : class => Disposed ? default(T) : action(Que);
+
+        private Task<T> ReadResultAsync<T>(Func<TQue, Task<T>> action) where T : class
+        => Disposed ? TaskCache<T>.DefaultCompletedTask : action(Que);
+
+        protected virtual async Task<T> DoReadActionAsync<T>(Func<TQue, Task<T>> action)
             where T : class
         {
             try
             {
-                return await action(Que);
+                return await ReadResultAsync(action);
             }
             catch (OperationCanceledException)
             {
-                return await action(Que);
+                return await ReadResultAsync(action);
             }
             catch (Exception e)
             {
@@ -78,8 +91,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                     Que = QueFactory();
                     try
                     {
-                        var result = await action(Que);
-                        return result;
+                        return await ReadResultAsync(action);
                     }
                     finally
                     {
