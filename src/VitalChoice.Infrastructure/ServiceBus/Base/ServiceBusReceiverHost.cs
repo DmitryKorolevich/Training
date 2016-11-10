@@ -16,7 +16,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         private readonly Thread _scanThread;
         private volatile bool _terminated;
 
-        public ServiceBusReceiverHost(ILogger logger, IServiceBusReceiver receiver, bool enableBatching = false, int maxBatchSize = 100,
+        public ServiceBusReceiverHost(ILogger logger, IServiceBusReceiver receiver, bool enableBatching = false, int maxBatchSize = 300,
             byte maxConcurrentProcessors = 4)
         {
             _logger = logger;
