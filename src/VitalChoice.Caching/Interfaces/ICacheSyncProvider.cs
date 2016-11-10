@@ -4,7 +4,7 @@ using VitalChoice.Caching.Relational.Base;
 
 namespace VitalChoice.Caching.Interfaces
 {
-    public interface ICacheSyncProvider
+    public interface ICacheSyncProvider: IDisposable
     {
         void SendChanges(IEnumerable<SyncOperation> syncOperations);
 

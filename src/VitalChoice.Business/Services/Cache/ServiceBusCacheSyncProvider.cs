@@ -16,7 +16,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Business.Services.Cache
 {
-    public class ServiceBusCacheSyncProvider : CacheSyncProvider, IDisposable
+    public class ServiceBusCacheSyncProvider : CacheSyncProvider
     {
         public const int PingAverageMaxCount = 50;
 
@@ -108,8 +108,9 @@ namespace VitalChoice.Business.Services.Cache
 
         public static ICollection<KeyValuePair<string, double>> AverageLatency => AveragePing;
 
-        public void Dispose()
+        public override void Dispose()
         {
+            base.Dispose();
             _receiverHost.Dispose();
             _sendingPool.Dispose();
             _sendingClient.Dispose();

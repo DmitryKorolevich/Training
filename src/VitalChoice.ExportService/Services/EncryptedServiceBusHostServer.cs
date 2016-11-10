@@ -42,7 +42,7 @@ namespace VitalChoice.ExportService.Services
                         ProcessGiftListCardExport(command, scope);
                         break;
                 }
-            }, () => _rootScope.Resolve<ILifetimeScope>());
+            }, () => _rootScope.BeginLifetimeScope());
         }
 
         protected override bool ProcessPlainCommand(ServiceBusCommandBase command)
