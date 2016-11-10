@@ -98,8 +98,14 @@ namespace VitalChoice.Infrastructure.LoadBalancing
                                 break;
                             case RoundRobinTlsBehaviour.PerItem:
                                 var localData = _threadLocalFactory?.Invoke();
-                                ProcessingAction(data.Data, localData, data.ProcessParameter);
-                                (localData as IDisposable)?.Dispose();
+                                try
+                                {
+                                    ProcessingAction(data.Data, localData, data.ProcessParameter);
+                                }
+                                finally
+                                {
+                                    (localData as IDisposable)?.Dispose();
+                                }
                                 break;
                         }
                     }

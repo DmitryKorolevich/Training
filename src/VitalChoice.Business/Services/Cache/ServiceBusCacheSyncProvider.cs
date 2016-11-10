@@ -127,7 +127,11 @@ namespace VitalChoice.Business.Services.Cache
                 {
                     pings = _pingMilliseconds.Where(p => p > 0).ToArray();
                 }
-                var averagePing = pings.Average();
+                double averagePing = 0;
+                if (pings.Length > 0)
+                {
+                    averagePing = pings.Average();
+                }
                 AveragePing.AddOrUpdate(_applicationEnvironment.ApplicationName, averagePing, (s, i) => averagePing);
                 _sendingPool.EnqueueData(new List<SyncOperation>
                 {
