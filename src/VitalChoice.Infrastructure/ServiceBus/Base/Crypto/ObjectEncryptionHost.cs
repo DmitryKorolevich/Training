@@ -277,7 +277,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
         {
             _disposeEvent?.Set();
             _sessionExpiration?.Abort();
-            _disposeEvent?.Dispose();
             _signProvider?.Dispose();
             lock (_sessions)
             {
@@ -294,6 +293,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base.Crypto
                     signCheckProvider.Dispose();
                 }
             }
+            _disposeEvent?.Dispose();
         }
 
         public Guid GetSession()
