@@ -586,6 +586,11 @@ namespace VC.Admin.Controllers
             {
                 throw new AppValidationException("This operation isn't allowed for the order in the given status");
             }
+            if (_exportService.GetIsOrderExporting(id))
+            {
+                throw new AppValidationException(
+                    "Cannot cancel order. Order is currently in export queue. Once export process is done, the order will need to be cancelled manually in Veracore.");
+            }
 
             var toReturn = await _orderService.CancelOrderAsync(id);
             if (toReturn)
