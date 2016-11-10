@@ -13,7 +13,7 @@ namespace VitalChoice.Caching.Relational.Base
         public string AppName { get; set; }
 
         [DataMember]
-        public int AveragePing { get; set; }
+        public double AveragePing { get; set; }
 
         [DataMember]
         public DateTime? SendTime { get; set; }

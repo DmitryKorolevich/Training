@@ -9,7 +9,7 @@
             <div class="nav navbar-nav navbar-cache" data-ng-if="authenticated">
                 <div class=".nav-small-font">Cache latency:</div>
                 <div ng-repeat="(appName, latency) in cacheState">
-                    {{appName}}: <span ng-if="latency > 500" style="background-color: red; color: white;">{{latency}}</span><span ng-if="latency <= 500" style="color:forestgreen">{{latency}}</span> ms
+                    {{appName}}: <span ng-if="latency > 500" style="background-color: red; color: white;">{{Math.round(latency * 10) / 10}}</span><span ng-if="latency <= 500" style="color:forestgreen">{{Math.round(latency * 10) / 10}}</span> ms
                 </div>
             </div>
             <ul class="nav navbar-nav navbar-right navbar-custom-header" data-ng-if="authenticated">

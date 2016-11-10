@@ -178,28 +178,21 @@ angular.module('app.core.utils.appBootstrap', [])
 
             function cacheStatus()
             {
-                if ($rootScope.authenticated)
-                {
-                    cacheService.getCacheStatus()
-                        .success(function (cacheResult)
+                cacheService.getCacheStatus()
+                    .success(function (cacheResult)
+                    {
+                        if (cacheResult.Success && cacheResult.Data)
                         {
-                            if (cacheResult.Success && cacheResult.Data)
-                            {
-                                $rootScope.cacheState = cacheResult.Data;
-                            }
+                            $rootScope.cacheState = cacheResult.Data;
+                        }
 
-                            setTimeout(cacheStatus, 5000);
-                        })
-                        .error(function ()
-                        {
-                            $rootScope.cacheState = [{ "Error": 0 }];
-                            setTimeout(cacheStatus, 60000);
-                        });
-                }
-                else
-                {
-                    setTimeout(cacheStatus, 2000);
-                }
+                        setTimeout(cacheStatus, 5000);
+                    })
+                    .error(function ()
+                    {
+                        $rootScope.cacheState = [{ "Error": 0 }];
+                        setTimeout(cacheStatus, 60000);
+                    });
             }
 
             function checkAreas()

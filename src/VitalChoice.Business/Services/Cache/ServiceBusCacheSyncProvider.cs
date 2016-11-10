@@ -25,8 +25,8 @@ namespace VitalChoice.Business.Services.Cache
         private readonly object _lockObject = new object();
         private readonly ServiceBusReceiverHost _receiverHost;
         private readonly Guid _clientUid = Guid.NewGuid();
-        private static readonly ConcurrentDictionary<string, int> AveragePing = new ConcurrentDictionary<string, int>();
-        private readonly int[] _pingMilliseconds = new int[PingAverageMaxCount];
+        private static readonly ConcurrentDictionary<string, double> AveragePing = new ConcurrentDictionary<string, double>();
+        private readonly double[] _pingMilliseconds = new double[PingAverageMaxCount];
         private int _totalMessagesReceived;
         private readonly BatchSendingPool<SyncOperation> _sendingPool;
         private readonly ServiceBusTopicSender<SyncOperation> _sendingClient;
@@ -106,7 +106,7 @@ namespace VitalChoice.Business.Services.Cache
             _sendingPool.EnqueueData(syncOperations.ToList());
         }
 
-        public static ICollection<KeyValuePair<string, int>> AverageLatency => AveragePing;
+        public static ICollection<KeyValuePair<string, double>> AverageLatency => AveragePing;
 
         public void Dispose()
         {
@@ -122,12 +122,12 @@ namespace VitalChoice.Business.Services.Cache
             {
                 Logger.LogInfo(ops => $"Accepting cache messages: {string.Join(",", ops.Select(m => m.ToString()))}", syncOperations);
                 AcceptChanges(syncOperations);
-                int[] pings;
+                double[] pings;
                 lock (_lockObject)
                 {
                     pings = _pingMilliseconds.Where(p => p > 0).ToArray();
                 }
-                var averagePing = (int) pings.Average();
+                var averagePing = pings.Average();
                 AveragePing.AddOrUpdate(_applicationEnvironment.ApplicationName, averagePing, (s, i) => averagePing);
                 _sendingPool.EnqueueData(new List<SyncOperation>
                 {
@@ -155,10 +155,6 @@ namespace VitalChoice.Business.Services.Cache
             {
                 try
                 {
-                    if (message.ExpiresAtUtc < DateTime.UtcNow)
-                    {
-                        continue;
-                    }
                     Guid senderUid;
                     if (Guid.TryParse(message.CorrelationId, out senderUid))
                     {
@@ -170,7 +166,7 @@ namespace VitalChoice.Business.Services.Cache
 
                         if (syncOp.SyncType == SyncType.Ping && syncOp.SendTime.HasValue)
                         {
-                            var ping = (int) (DateTime.UtcNow - syncOp.SendTime.Value).TotalMilliseconds;
+                            var ping = (DateTime.UtcNow - syncOp.SendTime.Value).TotalMilliseconds;
                             Logger.LogInfo((op, p) => $"{op} Message lag: {p} ms", syncOp, ping);
                             lock (_lockObject)
                             {
