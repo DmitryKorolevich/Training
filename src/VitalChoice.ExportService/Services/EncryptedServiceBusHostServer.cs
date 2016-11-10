@@ -171,7 +171,6 @@ namespace VitalChoice.ExportService.Services
             using (var scope = _rootScope.BeginLifetimeScope())
             {
                 var orderExportService = scope.Resolve<IOrderExportService>();
-                var updateTask = orderExportService.UpdateCustomerPaymentMethods(customerPaymentInfo);
                 orderExportService.UpdateCustomerPaymentMethods(customerPaymentInfo).WaitResult();
             }
             SendCommand(new ServiceBusCommandBase(command, true));
@@ -235,15 +234,13 @@ namespace VitalChoice.ExportService.Services
 
             public CommandProcessingPool(byte maxThreads, ILogger logger, Action<ServiceBusCommandBase, ILifetimeScope> commandProcessor,
                 Func<ILifetimeScope> tlsFactory)
-                : base(maxThreads, logger, tlsFactory)
+                : base(maxThreads, logger, tlsFactory, RoundRobinTlsBehaviour.PerItem)
             {
                 _commandProcessor = commandProcessor;
             }
 
             protected override void ProcessingAction(ServiceBusCommandBase data, object localData, object processParameter)
-            {
-                _commandProcessor(data, (ILifetimeScope) localData);
-            }
+                => _commandProcessor(data, (ILifetimeScope) localData);
         }
     }
 }

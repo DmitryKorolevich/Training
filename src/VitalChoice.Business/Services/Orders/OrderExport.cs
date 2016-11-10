@@ -61,7 +61,7 @@ namespace VitalChoice.Business.Services.Orders
                 var totalCount = 0;
                 lock (_exportResults)
                 {
-                    foreach (var result in _exportResults)
+                    foreach (var result in _exportResults.Where(r => r.TotalCount == r.ExportedOrders.Count))
                     {
                         lock (result)
                         {

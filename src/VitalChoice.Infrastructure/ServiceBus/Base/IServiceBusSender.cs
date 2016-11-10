@@ -1,18 +1,15 @@
-﻿#if !NETSTANDARD1_5
-using System;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.ServiceBus.Messaging;
 
 namespace VitalChoice.Infrastructure.ServiceBus.Base
 {
-    public interface IServiceBusSender : IDisposable
+    public interface IServiceBusSender<T> : IDisposable
     {
-        Task SendAsync(object message);
-        void Send(object message);
-        Task SendBatchAsync(IEnumerable<object> messages);
-        void SendBatch(IEnumerable<object> messages);
+        Task SendAsync(T message);
+        void Send(T message);
+        Task SendBatchAsync(ICollection<T> messages);
+        void SendBatch(ICollection<T> messages);
     }
 }
-
-#endif

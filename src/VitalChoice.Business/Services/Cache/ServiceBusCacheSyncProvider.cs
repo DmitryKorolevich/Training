@@ -28,8 +28,8 @@ namespace VitalChoice.Business.Services.Cache
         private static readonly ConcurrentDictionary<string, int> AveragePing = new ConcurrentDictionary<string, int>();
         private readonly int[] _pingMilliseconds = new int[PingAverageMaxCount];
         private int _totalMessagesReceived;
-        private readonly BatchSendingPool _sendingPool;
-        private readonly ServiceBusTopicSender _sendingClient;
+        private readonly BatchSendingPool<SyncOperation> _sendingPool;
+        private readonly ServiceBusTopicSender<SyncOperation> _sendingClient;
 
         public ServiceBusCacheSyncProvider(IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage keyStorage,
             ILoggerFactory loggerFactory,
@@ -88,13 +88,13 @@ namespace VitalChoice.Business.Services.Cache
                 _receiverHost.ReceiveBatchEvent += ReceiveMessages;
                 _receiverHost.Start();
 
-                _sendingClient = new ServiceBusTopicSender(() =>
+                _sendingClient = new ServiceBusTopicSender<SyncOperation>(() =>
                 {
                     var factory = MessagingFactory.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
                     return factory.CreateTopicClient(queName);
-                }, Logger);
+                }, Logger, ConstructMessage);
 
-                _sendingPool = new BatchSendingPool(_sendingClient, Logger);
+                _sendingPool = new BatchSendingPool<SyncOperation>(_sendingClient, Logger);
             }
         }
 
@@ -103,16 +103,7 @@ namespace VitalChoice.Business.Services.Cache
             if (!_enabled)
                 return;
 
-            var now = DateTime.UtcNow;
-            _sendingPool.EnqueueData(syncOperations.Select(operation =>
-            {
-                operation.SendTime = now;
-                return new BrokeredMessage(operation)
-                {
-                    CorrelationId = _clientUid.ToString(),
-                    TimeToLive = TimeSpan.FromMinutes(5)
-                };
-            }));
+            _sendingPool.EnqueueData(syncOperations.ToList());
         }
 
         public static ICollection<KeyValuePair<string, int>> AverageLatency => AveragePing;
@@ -129,6 +120,8 @@ namespace VitalChoice.Business.Services.Cache
             var syncOperations = ParseSyncOperations(incomingItems);
             if (syncOperations.Count > 0)
             {
+                Logger.LogInfo(ops => $"Accepting cache messages: {string.Join(",", ops.Select(m => m.ToString()))}", syncOperations);
+                AcceptChanges(syncOperations);
                 int[] pings;
                 lock (_lockObject)
                 {
@@ -138,22 +131,25 @@ namespace VitalChoice.Business.Services.Cache
                 {
                     var averagePing = (int) pings.Average();
                     AveragePing.AddOrUpdate(_applicationEnvironment.ApplicationName, averagePing, (s, i) => averagePing);
-                    _sendingPool.EnqueueData(Enumerable.Repeat(new BrokeredMessage(new SyncOperation
+                    _sendingPool.EnqueueData(new List<SyncOperation>
                     {
-                        SyncType = SyncType.Ping,
-                        AppName = _applicationEnvironment.ApplicationName,
-                        AveragePing = averagePing,
-                        SendTime = DateTime.UtcNow
-                    })
-                    {
-                        CorrelationId = _clientUid.ToString(),
-                        TimeToLive = TimeSpan.FromSeconds(30)
-                    }, 1));
+                        new SyncOperation
+                        {
+                            SyncType = SyncType.Ping,
+                            AppName = _applicationEnvironment.ApplicationName,
+                            AveragePing = averagePing,
+                            SendTime = DateTime.UtcNow
+                        }
+                    });
                 }
-                Logger.LogInfo(ops => $"Accepting cache messages: {string.Join(",", ops.Select(m => m.ToString()))}", syncOperations);
-                AcceptChanges(syncOperations);
             }
         }
+
+        private BrokeredMessage ConstructMessage(SyncOperation operation) => new BrokeredMessage(operation)
+        {
+            CorrelationId = _clientUid.ToString(),
+            TimeToLive = TimeSpan.FromMinutes(5)
+        };
 
         private List<SyncOperation> ParseSyncOperations(IEnumerable<BrokeredMessage> incomingItems)
         {
@@ -175,20 +171,19 @@ namespace VitalChoice.Business.Services.Cache
                         }
                         var syncOp = message.GetBody<SyncOperation>();
 
-                        if (syncOp.SyncType != SyncType.Ping)
+                        if (syncOp.SyncType == SyncType.Ping && syncOp.SendTime.HasValue)
                         {
-                            var ping = (DateTime.UtcNow - syncOp.SendTime).Milliseconds;
+                            var ping = (int) (DateTime.UtcNow - syncOp.SendTime.Value).TotalMilliseconds;
                             Logger.LogInfo((op, p) => $"{op} Message lag: {p} ms", syncOp, ping);
                             lock (_lockObject)
                             {
                                 _pingMilliseconds[_totalMessagesReceived] = ping;
-                                _totalMessagesReceived = (_totalMessagesReceived + 1)%PingAverageMaxCount;
+                                _totalMessagesReceived = (_totalMessagesReceived + 1) % PingAverageMaxCount;
                             }
-                        }
-
-                        if (syncOp.SyncType == SyncType.Ping && syncOp.AveragePing > 0)
-                        {
-                            AveragePing.AddOrUpdate(syncOp.AppName, syncOp.AveragePing, (s, i) => syncOp.AveragePing);
+                            if (syncOp.AveragePing > 0)
+                            {
+                                AveragePing.AddOrUpdate(syncOp.AppName, syncOp.AveragePing, (s, i) => syncOp.AveragePing);
+                            }
                         }
                         else
                         {

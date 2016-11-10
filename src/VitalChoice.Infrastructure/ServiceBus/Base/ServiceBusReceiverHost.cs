@@ -8,6 +8,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
 {
     public class ServiceBusReceiverHost : IDisposable
     {
+        private readonly ILogger _logger;
         private readonly IServiceBusReceiver _receiver;
         private readonly int _maxBatchSize;
         private readonly BatchReceivingPool _batchReceivingPool;
@@ -15,8 +16,10 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         private readonly Thread _scanThread;
         private volatile bool _terminated;
 
-        public ServiceBusReceiverHost(ILogger logger, IServiceBusReceiver receiver, bool enableBatching = false, int maxBatchSize = 100, byte maxConcurrentProcessors = 4)
+        public ServiceBusReceiverHost(ILogger logger, IServiceBusReceiver receiver, bool enableBatching = false, int maxBatchSize = 100,
+            byte maxConcurrentProcessors = 4)
         {
+            _logger = logger;
             _receiver = receiver;
             _maxBatchSize = maxBatchSize;
             if (enableBatching)
@@ -42,6 +45,11 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 {
                     _batchReceivingPool.EnqueueData(batch);
                 }
+                else
+                {
+                    _logger.LogWarning("Batch que stopped");
+                    break;
+                }
             }
         }
 
@@ -53,6 +61,11 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 if (message != null)
                 {
                     _receivingPool.EnqueueData(message);
+                }
+                else
+                {
+                    _logger.LogWarning("Non-batch que stopped");
+                    break;
                 }
             }
         }
@@ -66,9 +79,9 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         public void Dispose()
         {
             _terminated = true;
+            _receiver.Dispose();
             _batchReceivingPool?.Dispose();
             _receivingPool?.Dispose();
-            _receiver.Dispose();
             _scanThread.Abort();
         }
     }

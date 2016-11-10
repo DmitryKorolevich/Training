@@ -12,12 +12,45 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         {
         }
 
-        public override Task<BrokeredMessage> ReceiveAsync() => DoReadActionAsync(que => que.ReceiveAsync());
+        public override Task<BrokeredMessage> ReceiveAsync()
+            => ReceiveUntilNotNullAsync(() => DoReadActionAsync(que => que.ReceiveAsync()));
 
-        public override BrokeredMessage Receive() => DoReadAction(que => que.Receive());
+        public override BrokeredMessage Receive() => ReceiveUntilNotNull(() => DoReadAction(que => que.Receive()));
 
-        public override Task<IEnumerable<BrokeredMessage>> ReceiveBatchAsync(int count) => DoReadActionAsync(que => que.ReceiveBatchAsync(count));
+        public override Task<IEnumerable<BrokeredMessage>> ReceiveBatchAsync(int count)
+            => ReceiveUntilNotNullAsync(() => DoReadActionAsync(que => que.ReceiveBatchAsync(count)));
 
-        public override IEnumerable<BrokeredMessage> ReceiveBatch(int count) => DoReadAction(que => que.ReceiveBatch(count));
+        public override IEnumerable<BrokeredMessage> ReceiveBatch(int count)
+            => ReceiveUntilNotNull(() => DoReadAction(que => que.ReceiveBatch(count)));
+
+        private async Task<T> ReceiveUntilNotNullAsync<T>(Func<Task<T>> receiveTask)
+            where T : class
+        {
+            while (true)
+            {
+                if (Disposed)
+                    return null;
+
+                var result = await receiveTask();
+                if (result == null)
+                    continue;
+                return result;
+            }
+        }
+
+        private T ReceiveUntilNotNull<T>(Func<T> receiveTask)
+            where T : class
+        {
+            while (true)
+            {
+                if (Disposed)
+                    return null;
+
+                var result = receiveTask();
+                if (result == null)
+                    continue;
+                return result;
+            }
+        }
     }
 }

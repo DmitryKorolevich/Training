@@ -47,13 +47,12 @@ namespace VitalChoice.ExportService.Services
         private readonly ExportInfoContext _infoContext;
         private readonly IOrderRefundService _refundService;
         private readonly ICustomerService _customerService;
-        private readonly ILifetimeScope _scope;
         private readonly IPaymentMethodService _paymentMethodService;
         private readonly IVeraCoreSFTPService _sftpService;
         private readonly IGiftListCreditCardExportFileGenerator _giftListFileGenerator;
-        private static volatile bool _writeQueue;
-        private static readonly AsyncManualResetEvent LockCustomersEvent = new AsyncManualResetEvent(true);
-        private static readonly AsyncManualResetEvent LockOrdersEvent = new AsyncManualResetEvent(true);
+        //private static volatile bool _writeQueue;
+        //private static readonly AsyncManualResetEvent LockCustomersEvent = new AsyncManualResetEvent(true);
+        //private static readonly AsyncManualResetEvent LockOrdersEvent = new AsyncManualResetEvent(true);
         private readonly ILogger _logger;
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _paymentMapper;
         private readonly IEcommerceRepositoryAsync<Order> _orderRepositoryAsync;
@@ -61,7 +60,7 @@ namespace VitalChoice.ExportService.Services
         public OrderExportService(IOptions<ExportOptions> options, IObjectEncryptionHost encryptionHost,
             DbContextOptions<ExportInfoContext> contextOptions, ILoggerFactory loggerFactory,
             IVeraCoreExportService veraCoreExportService, IOrderService orderService, ExportInfoContext infoContext,
-            IOrderRefundService refundService, ICustomerService customerService, ILifetimeScope scope,
+            IOrderRefundService refundService, ICustomerService customerService,
             IPaymentMethodService paymentMethodService, IVeraCoreSFTPService sftpService,
             IGiftListCreditCardExportFileGenerator giftListFileGenerator,
             IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> paymentMapper, IEcommerceRepositoryAsync<Order> orderRepositoryAsync)
@@ -74,7 +73,6 @@ namespace VitalChoice.ExportService.Services
             _infoContext = infoContext;
             _refundService = refundService;
             _customerService = customerService;
-            _scope = scope;
             _paymentMethodService = paymentMethodService;
             _sftpService = sftpService;
             _giftListFileGenerator = giftListFileGenerator;
@@ -85,11 +83,11 @@ namespace VitalChoice.ExportService.Services
 
         public async Task ExportGiftListCreditCard(GiftListExportModel model)
         {
-            await LockCustomersEvent.WaitAsync();
-            if (_writeQueue)
-            {
-                throw new ApiException("Cannot place gift list file with CC info while encrypted database update is in progress");
-            }
+            //await LockCustomersEvent.WaitAsync();
+//            if (_writeQueue)
+//            {
+//                throw new ApiException("Cannot place gift list file with CC info while encrypted database update is in progress");
+//            }
 
             string plainCreditCard;
 
@@ -132,11 +130,11 @@ namespace VitalChoice.ExportService.Services
 
         public async Task<bool> CardExist(CustomerExportInfo customerExportInfo)
         {
-            await LockCustomersEvent.WaitAsync();
-            if (_writeQueue)
-            {
-                return true;
-            }
+//            await LockCustomersEvent.WaitAsync();
+//            if (_writeQueue)
+//            {
+//                return true;
+//            }
             using (var uow = new UnitOfWork(_infoContext, false))
             {
                 var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
@@ -150,11 +148,11 @@ namespace VitalChoice.ExportService.Services
 
         public async Task<List<MessageInfo>> AuthorizeCreditCard(CustomerPaymentMethodDynamic customerPaymentMethod)
         {
-            await LockCustomersEvent.WaitAsync();
-            if (_writeQueue || customerPaymentMethod == null)
-            {
-                return new List<MessageInfo>();
-            }
+//            await LockCustomersEvent.WaitAsync();
+//            if (_writeQueue || customerPaymentMethod == null)
+//            {
+//                return new List<MessageInfo>();
+//            }
             using (var uow = new UnitOfWork(_infoContext, false))
             {
                 var rep = uow.RepositoryAsync<CustomerPaymentMethodExport>();
@@ -177,11 +175,11 @@ namespace VitalChoice.ExportService.Services
 
         public async Task<List<MessageInfo>> AuthorizeCreditCard(OrderPaymentMethodDynamic paymentMethod)
         {
-            await LockCustomersEvent.WaitAsync();
-            if (_writeQueue || paymentMethod == null)
-            {
-                return new List<MessageInfo>();
-            }
+//            await LockCustomersEvent.WaitAsync();
+//            if (_writeQueue || paymentMethod == null)
+//            {
+//                return new List<MessageInfo>();
+//            }
             using (var uow = new UnitOfWork(_infoContext, false))
             {
                 PaymentMethodExport cardData;
@@ -258,18 +256,18 @@ namespace VitalChoice.ExportService.Services
 
         public async Task UpdateCustomerPaymentMethods(ICollection<CustomerCardData> paymentMethods)
         {
-            await LockCustomersEvent.WaitAsync();
-            if (_writeQueue)
-            {
-                foreach (var customerCardData in paymentMethods)
-                {
-                    InMemoryCustomerCardDatas.Enqueue(customerCardData);
-                }
-            }
-            else
-            {
+//            await LockCustomersEvent.WaitAsync();
+//            if (_writeQueue)
+//            {
+//                foreach (var customerCardData in paymentMethods)
+//                {
+//                    InMemoryCustomerCardDatas.Enqueue(customerCardData);
+//                }
+//            }
+//            else
+//            {
                 await UpdateCustomerPaymentMethodsInternal(paymentMethods, _infoContext);
-            }
+            //}
         }
 
         private async Task UpdateCustomerPaymentMethodsInternal(ICollection<CustomerCardData> paymentMethods, ExportInfoContext context)
@@ -324,15 +322,15 @@ namespace VitalChoice.ExportService.Services
         
         public async Task UpdateOrderPaymentMethod(OrderCardData paymentMethod)
         {
-            await LockOrdersEvent.WaitAsync();
-            if (_writeQueue)
-            {
-                InMemoryOrderCardDatas.Enqueue(paymentMethod);
-            }
-            else
-            {
+//            await LockOrdersEvent.WaitAsync();
+//            if (_writeQueue)
+//            {
+//                InMemoryOrderCardDatas.Enqueue(paymentMethod);
+//            }
+//            else
+//            {
                 await UpdateOrderPaymentInternal(paymentMethod, _infoContext);
-            }
+            //}
         }
 
         private async Task UpdateOrderPaymentInternal(OrderCardData paymentMethod, ExportInfoContext context)
@@ -415,10 +413,10 @@ namespace VitalChoice.ExportService.Services
         public async Task ExportOrders(ICollection<OrderExportItem> exportItems,
             Action<OrderExportItemResult> exportCallBack, int userId)
         {
-            if (_writeQueue)
-            {
-                throw new ApiException("Orders cannot be exported while encrypted database update is in progress");
-            }
+//            if (_writeQueue)
+//            {
+//                throw new ApiException("Orders cannot be exported while encrypted database update is in progress");
+//            }
             try
             {
                 await DoExportOrders(exportItems, exportCallBack, userId);
@@ -590,7 +588,7 @@ namespace VitalChoice.ExportService.Services
 
         public void SwitchToInMemoryContext()
         {
-            _writeQueue = true;
+            //_writeQueue = true;
         }
 
         public async Task SwitchToRealContext()
@@ -607,8 +605,8 @@ namespace VitalChoice.ExportService.Services
                         customerCards.Add(customerCard);
                     }
                     await UpdateCustomerPaymentMethodsInternal(customerCards, realContext);
-                    LockCustomersEvent.Reset();
-                    LockOrdersEvent.Reset();
+                    //LockCustomersEvent.Reset();
+                    //LockOrdersEvent.Reset();
                     customerCards.Clear();
                     while (InMemoryCustomerCardDatas.TryDequeue(out customerCard))
                     {
@@ -628,7 +626,7 @@ namespace VitalChoice.ExportService.Services
                             _logger.LogError(e.ToString());
                         }
                     }
-                    LockOrdersEvent.Reset();
+                    //LockOrdersEvent.Reset();
                     while (InMemoryOrderCardDatas.TryDequeue(out cardData))
                     {
                         try
@@ -650,9 +648,9 @@ namespace VitalChoice.ExportService.Services
             {
                 _logger.LogCritical($"Issue while moving to real payments:\n{e}");
             }
-            _writeQueue = false;
-            LockCustomersEvent.Set();
-            LockOrdersEvent.Set();
+            //_writeQueue = false;
+            //LockCustomersEvent.Set();
+            //LockOrdersEvent.Set();
         }
     }
 }

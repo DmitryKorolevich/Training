@@ -20,8 +20,6 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         }
 
         protected override void ProcessingAction(IEnumerable<BrokeredMessage> data, object localData, object processParameter)
-        {
-            _processMessages(data);
-        }
+            => _processMessages(data);
     }
 }
