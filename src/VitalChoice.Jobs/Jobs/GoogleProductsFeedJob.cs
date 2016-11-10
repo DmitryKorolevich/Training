@@ -25,7 +25,7 @@ namespace VitalChoice.Jobs.Jobs
                 using (var scope = _rootScope.BeginLifetimeScope())
                 {
                     var productService = scope.Resolve<IProductService>();
-                    productService.UpdateSkuGoogleItemsReportFile().GetAwaiter().GetResult();
+                    productService.UpdateSkuFeedItemsReportFiles().GetAwaiter().GetResult();
                 }
                 _logger.LogWarning("Finished GoogleProductsFeed job");
             }

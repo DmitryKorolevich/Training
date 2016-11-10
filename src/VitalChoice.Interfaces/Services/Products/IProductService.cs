@@ -71,11 +71,17 @@ namespace VitalChoice.Interfaces.Services.Products
 
 	    Task<bool> UpdateSkusPricesAsync(ICollection<SkuPricesManageItemModel> items);
 
-        Task<byte[]> GenerateSkuGoogleItemsReportFile();
+	    Task<byte[]> GenerateSkuGoogleItemsReportFile(ICollection<ProductContentTransferEntity> products,
+	        ProductCategory productCategories);
 
-	    Task UpdateSkuGoogleItemsReportFile();
+        Task<byte[]> GenerateSkuCriteoItemsReportFile(ICollection<ProductContentTransferEntity> products,
+	        ProductCategory productCategories);
+
+        Task UpdateSkuFeedItemsReportFiles();
 
 	    Task<byte[]> GetSkuGoogleItemsReportFile();
+
+        Task<byte[]> GetSkuCriteoItemsReportFile();
 
         #endregion
 

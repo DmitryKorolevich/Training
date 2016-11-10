@@ -17,6 +17,7 @@
         public const string INVENTORY_SUMMARY_REPORT = "Product_Shipment_Summary_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
 
         public const string GOOGLE_PRODUCTS_FEED = "datafeed.csv";
+        public const string CRITEO_PRODUCTS_FEED = "criteo-datafeed.csv";
 
         public const string ORDERS_AGENT_REPORT = "Agents_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
 

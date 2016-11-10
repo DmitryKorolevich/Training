@@ -64,6 +64,9 @@ namespace VC.Admin.Models.Products
         public ProductType Type { get; set; }
 
         [Map]
+        public bool Shellfish { get; set; }
+
+        [Map]
         public RecordStatusCode StatusCode { get; set; }
 
         [Map]
