@@ -497,39 +497,21 @@ namespace VitalChoice.ExportService.Services
                         Success = false
                     });
                 }
-            }
-
-            foreach (var order in orderList)
-            {
                 if (order.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
                 {
                     _paymentMapper.SecureObject(order.PaymentMethod);
                 }
                 order.IdEditedBy = userId;
-            }
-            try
-            {
-                await _orderService.UpdateRangeAsync(orderList);
-            }
-            //Temp solution to bypass validation fuckups
-            catch
-            {
-                var updatedOrders = orderList.ToDictionary(l => l.Id);
-                var ids = orderList.ToDictionary(l => l.Id).Keys.ToList();
-                var dbOrders = await _orderRepositoryAsync.Query(o => ids.Contains(o.Id)).SelectAsync(true);
-                foreach (var order in dbOrders)
+                try
                 {
-                    OrderDynamic updatedOrder;
-                    if (updatedOrders.TryGetValue(order.Id, out updatedOrder))
-                    {
-                        order.OrderStatus = updatedOrder.OrderStatus;
-                        order.POrderStatus = updatedOrder.POrderStatus;
-                        order.NPOrderStatus = updatedOrder.NPOrderStatus;
-                        order.IdEditedBy = updatedOrder.IdEditedBy;
-                        order.DateEdited = DateTime.Now;
-                    }
+                    await _orderService.UpdateAsync(order);
                 }
-                await _orderRepositoryAsync.SaveChangesAsync();
+                catch (TimeoutException)
+                {
+                    //Retry once
+                    await Task.Delay(TimeSpan.FromMinutes(1));
+                    await _orderService.UpdateAsync(order);
+                }
             }
         }
 
@@ -537,8 +519,8 @@ namespace VitalChoice.ExportService.Services
             int userId)
         {
             var refundList =
-                new HashSet<OrderRefundDynamic>(
-                    await _refundService.SelectAsync(exportItems.Where(i => i.IsRefund).Select(o => o.Id).ToList(), true));
+                await _refundService.SelectAsync(exportItems.Where(i => i.IsRefund).Select(o => o.Id).ToList(), true);
+
             var refundCustomerList =
                 (await
                         _customerService.SelectAsync(
@@ -550,7 +532,7 @@ namespace VitalChoice.ExportService.Services
                 refund.Customer = refundCustomerList.GetValueOrDefault(refund.Customer.Id) ?? refund.Customer;
             }
 
-            await refundList.ToArray().ForEachAsync(async refund =>
+            await refundList.ForEachAsync(async refund =>
             {
                 try
                 {
@@ -560,10 +542,11 @@ namespace VitalChoice.ExportService.Services
                         Id = refund.Id,
                         Success = true
                     });
+                    refund.IdEditedBy = userId;
+                    await _refundService.UpdateAsync(refund);
                 }
                 catch (Exception e)
                 {
-                    refundList.Remove(refund);
                     exportCallBack(new OrderExportItemResult
                     {
                         Error = e.ToString(),
@@ -572,18 +555,6 @@ namespace VitalChoice.ExportService.Services
                     });
                 }
             });
-            foreach (var refund in refundList)
-            {
-                refund.IdEditedBy = userId;
-            }
-            await _refundService.UpdateRangeAsync(refundList);
-        }
-
-        public async Task ExportRefunds(int idOrder)
-        {
-            var refund = await _refundService.SelectAsync(idOrder, true);
-            refund.Customer = await _customerService.SelectAsync(refund.Customer.Id, true);
-            await _veraCoreExportService.ExportRefund(refund);
         }
 
         public void SwitchToInMemoryContext()
