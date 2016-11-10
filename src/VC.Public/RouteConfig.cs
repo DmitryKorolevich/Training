@@ -154,6 +154,11 @@ namespace VC.Public
                 defaults: new { controller = "Help", action = "GoogleProductsFeed" });
 
             routeBuilder.MapRoute(
+                name: "CriteoProductsFeed",
+                template: "criteo/criteo-datafeed.csv",
+                defaults: new { controller = "Help", action = "CriteoProductsFeed" });
+
+            routeBuilder.MapRoute(
                 name: "Default",
                 template: "{controller}/{action}/{id?}",
                 defaults: new { controller = "Home", action = "Index" });
