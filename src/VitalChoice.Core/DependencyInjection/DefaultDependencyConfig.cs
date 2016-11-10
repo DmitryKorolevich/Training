@@ -378,8 +378,6 @@ namespace VitalChoice.Core.DependencyInjection
                     configuration.GetSection("App:AzureStorage:BugTicketCommentFilesContainerName").Value,
                 AppFilesContainerName =
                     configuration.GetSection("App:AzureStorage:AppFilesContainerName").Value,
-                ProductGoogleFeedFileName =
-                    configuration.GetSection("App:AzureStorage:ProductGoogleFeedFileName").Value,
                 ObjectHistoryContainerName = configuration.GetSection("App:AzureStorage:ObjectHistoryContainerName").Value
             };
             options.FedExOptions = new FedExOptions()

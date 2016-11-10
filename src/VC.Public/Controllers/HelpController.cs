@@ -206,6 +206,7 @@ namespace VC.Public.Controllers
             return PartialView("_SendContentUrlNotificationInner", model);
         }
 
+        [HttpGet]
         public async Task<FileResult> GoogleProductsFeed()
         {
             var data = await _productService.GetSkuGoogleItemsReportFile();
@@ -213,6 +214,20 @@ namespace VC.Public.Controllers
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileName = FileConstants.GOOGLE_PRODUCTS_FEED
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(data, "text/csv");
+        }
+
+        [HttpGet]
+        public async Task<FileResult> CriteoProductsFeed()
+        {
+            var data = await _productService.GetSkuCriteoItemsReportFile();
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = FileConstants.CRITEO_PRODUCTS_FEED
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());

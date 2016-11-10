@@ -45,7 +45,13 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    href: $rootScope.PublicHost != null ? 'https://{0}/google/datafeed.csv'.format($rootScope.PublicHost) : '',
 			        stateLabel: 'Download Google Data Feed',
 			        access: 4
-		        },
+				},
+				{
+				    name: 'downloadCriteoFeed',
+				    href: $rootScope.PublicHost != null ? 'https://{0}/criteo/criteo-datafeed.csv'.format($rootScope.PublicHost) : '',
+				    stateLabel: 'Download Criteo Data Feed',
+				    access: 4
+				},
 				{ name: 'manageSkuPrices', stateName: 'index.oneCol.manageSkuPrices', stateLabel: 'Bulk Product Price Update', access: 4 },
 			]
 		},

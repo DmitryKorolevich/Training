@@ -38,11 +38,19 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.ProductPage
         [Map]
 	    public string SubProductGroupName { get; set; }
 
+        [Map("IdObjectType")]
+        public int Type { get; set; }
+
+        [Map]
+        public bool Shellfish { get; set; }
+
         public bool ShowDiscountMessage { get; set; }
 
         public string Criterio { get; set; }
 
         public string CustomerEmail { get; set; }
+
+        public int IdCustomerType { get; set; }
 
         public IList<TtlRelatedYoutubeVideoModel> YoutubeVideos { get; set; }
 

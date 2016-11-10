@@ -55,3 +55,4 @@ Post-Deployment Script Template
 :r .\Scripts\SettingOptionTypesData.sql
 :r .\Scripts\Indexes.sql
 :r .\Scripts\OrderOptionTypes.sql
+:r .\Scripts\ProductOptionTypes.sql

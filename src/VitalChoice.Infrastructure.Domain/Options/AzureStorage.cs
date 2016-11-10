@@ -11,9 +11,7 @@
         public string BugTicketCommentFilesContainerName { get; set; }
 
         public string AppFilesContainerName { get; set; }
-
-        public string ProductGoogleFeedFileName { get; set; }
-
+        
         public string ObjectHistoryContainerName { get; set; }
     }
 }
