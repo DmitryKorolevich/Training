@@ -195,10 +195,14 @@ BEGIN
                                 		<li>Vital Choice Guarantee: We''ll replace your product or refund your money if you''re not satisfied.</li>
                         	        }}
                         	    }}
-                        	    @if(@model.Type==1){{
+                        	    @if(@(model.Type==1 || model.Type==4)){{
                         	        <li>Free shipping on orders over $99.</li>
                             		<li>Ships via Ground Service for 3-7 day delivery.</li>
                             		<li>Vital Choice Guarantee: We''ll replace your product or refund your money if you''re not satisfied.</li>
+                        	    }}
+                        	    @if(@model.Type==3){{
+                        	        <li>There are no shipping or handling charges for e-Gift Certificates.</li>
+                                	<li>You can customize who your e-Gift Certificate will be emailed to by providing the Name and Email in the specified section after placing your order on the "Order Receipt" page.</li>
                         	    }}
                         	</ul>
                         </div>
