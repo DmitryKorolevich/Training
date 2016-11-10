@@ -127,21 +127,18 @@ namespace VitalChoice.Business.Services.Cache
                 {
                     pings = _pingMilliseconds.Where(p => p > 0).ToArray();
                 }
-                if (pings.Length > 0)
+                var averagePing = (int) pings.Average();
+                AveragePing.AddOrUpdate(_applicationEnvironment.ApplicationName, averagePing, (s, i) => averagePing);
+                _sendingPool.EnqueueData(new List<SyncOperation>
                 {
-                    var averagePing = (int) pings.Average();
-                    AveragePing.AddOrUpdate(_applicationEnvironment.ApplicationName, averagePing, (s, i) => averagePing);
-                    _sendingPool.EnqueueData(new List<SyncOperation>
+                    new SyncOperation
                     {
-                        new SyncOperation
-                        {
-                            SyncType = SyncType.Ping,
-                            AppName = _applicationEnvironment.ApplicationName,
-                            AveragePing = averagePing,
-                            SendTime = DateTime.UtcNow
-                        }
-                    });
-                }
+                        SyncType = SyncType.Ping,
+                        AppName = _applicationEnvironment.ApplicationName,
+                        AveragePing = averagePing,
+                        SendTime = DateTime.UtcNow
+                    }
+                });
             }
         }
 
