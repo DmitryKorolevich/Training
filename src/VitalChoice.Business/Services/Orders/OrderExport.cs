@@ -24,6 +24,7 @@ namespace VitalChoice.Business.Services.Orders
                 var totalCount = 0;
                 lock (_exportResults)
                 {
+                    ClearExpiredList();
                     foreach (var result in _exportResults)
                     {
                         lock (result)
@@ -43,6 +44,7 @@ namespace VitalChoice.Business.Services.Orders
                 var totalCount = 0;
                 lock (_exportResults)
                 {
+                    ClearExpiredList();
                     foreach (var result in _exportResults)
                     {
                         lock (result)
@@ -62,6 +64,7 @@ namespace VitalChoice.Business.Services.Orders
                 var totalCount = 0;
                 lock (_exportResults)
                 {
+                    ClearExpiredList();
                     foreach (var result in _exportResults.Where(r => r.TotalCount == r.ExportedOrders.Count))
                     {
                         lock (result)
@@ -171,6 +174,23 @@ namespace VitalChoice.Business.Services.Orders
         }
 
         public bool GetIsOrderExporting(int id) => _exportedOrders.ContainsKey(id);
+
+        private void ClearExpiredList()
+        {
+            DateTime hourAgo = DateTime.Now.AddHours(-1);
+            if (_exportResults.All(r => r.DateStarted < hourAgo))
+            {
+                foreach (var result in _exportResults)
+                {
+                    foreach (var order in result.ExportedOrders)
+                    {
+                        ExportSide side;
+                        _exportedOrders.TryRemove(order.Id, out side);
+                    }
+                }
+                _exportResults.Clear();
+            }
+        }
 
         private class ExportPool : RoundRobinAbstractPool<OrderExportData>
         {
