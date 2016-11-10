@@ -70,11 +70,11 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         {
             try
             {
-                ExecuteBatchWithCheck(action, values);
+                ExecuteBatchWithCheck(action, values.Select(_messageConstructor));
             }
             catch (OperationCanceledException)
             {
-                ExecuteBatchWithCheck(action, values);
+                ExecuteBatchWithCheck(action, values.Select(_messageConstructor));
             }
             catch (Exception e)
             {
@@ -85,7 +85,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                     Que = QueFactory();
                     try
                     {
-                        ExecuteBatchWithCheck(action, values);
+                        ExecuteBatchWithCheck(action, values.Select(_messageConstructor));
                     }
                     finally
                     {
@@ -129,11 +129,11 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
         {
             try
             {
-                await ExecuteBatchWithCheckAsync(action, values);
+                await ExecuteBatchWithCheckAsync(action, values.Select(_messageConstructor));
             }
             catch (OperationCanceledException)
             {
-                await ExecuteBatchWithCheckAsync(action, values);
+                await ExecuteBatchWithCheckAsync(action, values.Select(_messageConstructor));
             }
             catch (Exception e)
             {
@@ -142,7 +142,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                 Que = QueFactory();
                 try
                 {
-                    await ExecuteBatchWithCheckAsync(action, values);
+                    await ExecuteBatchWithCheckAsync(action, values.Select(_messageConstructor));
                 }
                 finally
                 {
@@ -188,13 +188,13 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             }
         }
 
-        protected virtual void ExecuteBatchWithCheck(Action<TQue, IEnumerable<BrokeredMessage>> action, IEnumerable<T> value)
+        protected virtual void ExecuteBatchWithCheck(Action<TQue, IEnumerable<BrokeredMessage>> action, IEnumerable<BrokeredMessage> values)
         {
             if (Disposed)
                 return;
 
             var extraList = new Lazy<List<BrokeredMessage>>(() => new List<BrokeredMessage>());
-            var messages = GetCompleteBatch(value.Select(_messageConstructor), extraList);
+            var messages = GetCompleteBatch(values, extraList);
             action(Que, messages);
             while (extraList.IsValueCreated)
             {
@@ -205,13 +205,13 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             }
         }
 
-        protected virtual async Task ExecuteBatchWithCheckAsync(Func<TQue, IEnumerable<BrokeredMessage>, Task> action, IEnumerable<T> value)
+        protected virtual async Task ExecuteBatchWithCheckAsync(Func<TQue, IEnumerable<BrokeredMessage>, Task> action, IEnumerable<BrokeredMessage> values)
         {
             if (Disposed)
                 return;
 
             var extraList = new Lazy<List<BrokeredMessage>>(() => new List<BrokeredMessage>());
-            var messages = GetCompleteBatch(value.Select(_messageConstructor), extraList);
+            var messages = GetCompleteBatch(values, extraList);
             await action(Que, messages);
             while (extraList.IsValueCreated)
             {
@@ -222,8 +222,10 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             }
         }
 
-        protected virtual IEnumerable<BrokeredMessage> GetCompleteBatch(IEnumerable<BrokeredMessage> messages, Lazy<List<BrokeredMessage>> extraList)
+        protected virtual List<BrokeredMessage> GetCompleteBatch(IEnumerable<BrokeredMessage> messages,
+            Lazy<List<BrokeredMessage>> extraList)
         {
+            var results = new List<BrokeredMessage>(300);
             long batchSize = 0;
             foreach (var message in messages)
             {
@@ -232,7 +234,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                     if (batchSize < 196608)
                     {
                         batchSize += message.Size;
-                        yield return message;
+                        results.Add(message);
                     }
                     else
                     {
@@ -244,6 +246,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
                     Logger.LogWarning($"Message too big: {message.Size} bytes, {message.ContentType}, skipping.");
                 }
             }
+            return results;
         }
     }
 }
