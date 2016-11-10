@@ -676,7 +676,7 @@ namespace VitalChoice.Business.Services.Products
             return await _skuMapper.FromEntityRangeAsync(skus, withDefaults);
         }
 
-        public async Task<byte[]> GenerateSkuGoogleItemsReportFile(ICollection<ProductContentTransferEntity> products, ProductCategory productCategories)
+        public byte[] GenerateSkuGoogleItemsReportFile(ICollection<ProductContentTransferEntity> products, ProductCategory productCategories)
         {
             byte[] toReturn = null;
             List<SkuGoogleItem> items = new List<SkuGoogleItem>();
@@ -766,7 +766,7 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
-        public async Task<byte[]> GenerateSkuCriteoItemsReportFile(ICollection<ProductContentTransferEntity> products, ProductCategory productCategories)
+        public byte[] GenerateSkuCriteoItemsReportFile(ICollection<ProductContentTransferEntity> products, ProductCategory productCategories)
         {
             byte[] toReturn = null;
             List<SkuGoogleItem> items = new List<SkuGoogleItem>();
@@ -863,11 +863,11 @@ namespace VitalChoice.Business.Services.Products
                 var productCategories = await _productCategoryService.GetCategoriesTreeAsync(new ProductCategoryLiteFilter());
                 var products = await this.SelectTransferAsync(true);
 
-                var file = await GenerateSkuGoogleItemsReportFile(products, productCategories);
+                var file = GenerateSkuGoogleItemsReportFile(products, productCategories);
                 await _storageClient.UploadBlobAsync(_options.Value.AzureStorage.AppFilesContainerName, FileConstants.GOOGLE_PRODUCTS_FEED,
                     file, "text/csv");
 
-                file = await GenerateSkuCriteoItemsReportFile(products, productCategories);
+                file = GenerateSkuCriteoItemsReportFile(products, productCategories);
                 await _storageClient.UploadBlobAsync(_options.Value.AzureStorage.AppFilesContainerName, FileConstants.CRITEO_PRODUCTS_FEED,
                     file, "text/csv");
             }
