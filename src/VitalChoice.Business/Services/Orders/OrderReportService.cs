@@ -419,7 +419,7 @@ namespace VitalChoice.Business.Services.Orders
                         toReturn.Add(new OrdersAgentReportExportItem()
                         {
                             Agent = "% of total phone orders",
-                            OrdersCount = $"{team.AgentOrdersPercent:P2}",
+                            TotalOrdersAmount = $"{team.AgentOrdersPercent:P2}",
                             AverageOrdersAmount = team.AverageOrdersAmountDifference.ToString("C2"),
                         });
                     }
@@ -444,7 +444,7 @@ namespace VitalChoice.Business.Services.Orders
                     toReturn.Add(new OrdersAgentReportExportItem()
                     {
                         Agent = "% of total orders",
-                        OrdersCount = $"{period.AgentOrdersPercent:P2}",
+                        TotalOrdersAmount = $"{period.AgentOrdersPercent:P2}",
                         AverageOrdersAmount = period.AverageOrdersAmountDifference.ToString("C2"),
                     });
                     toReturn.Add(new OrdersAgentReportExportItem()

@@ -1,4 +1,4 @@
-﻿IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Product page' AND Updated<'2016-11-01 00:00:00.000')
+﻿IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Product page' AND Updated<'2016-11-10 00:00:00.000')
 BEGIN
 
 	UPDATE [dbo].[MasterContentItems]
@@ -118,70 +118,164 @@ BEGIN
 		        }}
 		    }}
 		}}
-		<div class="product-action-bar">
-			<div class="product-action-left">
-				@if(SubProductGroupName){{
-					<span class="action-left-header">@(SubProductGroupName)</span>
-				}}
-				@ifnot(SubProductGroupName){{
-					<span class="action-left-header">Number of Portions:</span>
-				}}
-				@list(Skus) {{
-				    <label class="product-portion-line">
-					    <input name="sku" type="radio" value="@(Code)" data-in-stock="@(@model.InStock.ToString().ToLower())" data-price="@money(Price)" data-autoship="@(AutoShip)"/>
-					    @(PortionsCount) - @money(Price)
-					    @if(SalesText) {{
-					        <span class="product-best-value">@(SalesText)</span>
-					    }}
-				    </label>
-				}}
-				<div class="mybuys" style="display:none">
-    				@list(Skus) {{
-    				    <div class="MyBuys_ProductPrice">@(@model.Price.ToString("F"))</div>
+		@if(@model.IdCustomerType==1) {{
+		    <div class="product-action-bar retail">
+		        <div class="wf-orange-stripe"></div>
+    			<div class="product-action-left">
+    				@if(SubProductGroupName){{
+    					<span class="action-left-header">@(SubProductGroupName)</span>
     				}}
-				</div>
-				<div id="hidden_mybuys" style="display:none">
-                    <span class="inStock_mb">@(@model.AtLeastOneSkuInStock.ToString())</span>
-                </div>
-			</div>
-            <div class="product-action-right">
-			    @if(@model.Skus.Any()){{
-			        <div style="display: none;" class="in-stock">
-    				    <span id="spSelectedPrice" class="product-selected-price">Selected Price @money(@model.Skus.First().Price)</span>
-    				    @if(@model.ShowDiscountMessage==true){{
-    				    <span class="wholesale-message-line">15% discount on largest size</span>
-    				    <a href="javascript:void()" id="lnkAddToCart" class="ladda-button" data-style="zoom-in">
-    				    }}
-    				    @ifnot(@model.ShowDiscountMessage==true){{
-    				    <a href="javascript:void()" id="lnkAddToCart" class="ladda-button no-message" data-style="zoom-in">
-    				    }}
-    					    <span class="ladda-label"></span>
-    					    <img src="/assets/images/addtocartorange-2015.jpg"/>
-    				    </a>
-    				        <div class="product-autoship-container" style="display: none;">
-    				            <a href="#" class="product-autoship-link"></a>
-    				            <i class="tooltip-v glyphicon glyphicon-question-sign" data-tooltip-title="Learn About Auto-Shipping" data-tooltip-body="<strong>Why choose Auto-Shipping?</strong><br>
-• You get <u>FREE Shipping &amp; Discount*</u> every shipment!<br>
-• Easily Pause or Cancel your our Auto-Shipments at any time.<br>
-• We only charge your credit card when an item ships … we''ll alert you by email.<br><br>
- 
-<strong>Important Notes:</strong><br>
-• Your Cart will be emptied of any existing items if you choose Auto-Ship for this item.<br>
-• You <em>cannot</em> add other items to your Cart until you finish your Auto-Ship order.<br>
-• After clicking Auto-Ship, you must log in to your account, or create one.<br>
-• Choose your desired delivery schedule on the page that appears after you log in.
-<br><br>
-*Cannot be combined with other offers."></i>
+    				@ifnot(SubProductGroupName){{
+    					<span class="action-left-header">Number of Portions:</span>
+    				}}
+    				@list(Skus) {{
+    				    <label class="product-portion-line">
+    					    <input name="sku" type="radio" value="@(Code)" data-in-stock="@(@model.InStock.ToString().ToLower())" data-price="@money(Price)" data-autoship="@(AutoShip)"/>
+    					    @(PortionsCount) - @money(Price)
+    					    @if(SalesText) {{
+    					        <span class="product-best-value">@(SalesText)</span>
+    					    }}
+    				    </label>
+    				}}
+    				<div class="mybuys" style="display:none">
+        				@list(Skus) {{
+        				    <div class="MyBuys_ProductPrice">@(@model.Price.ToString("F"))</div>
+        				}}
+    				</div>
+    				<div id="hidden_mybuys" style="display:none">
+                        <span class="inStock_mb">@(@model.AtLeastOneSkuInStock.ToString())</span>
+                    </div>
+    			    @if(@model.Skus.Any()){{
+    			        <div style="display: none;" class="in-stock">
+        				    <span id="spSelectedPrice" class="product-selected-price">Selected Price @money(@model.Skus.First().Price)</span>
+                            <a href="javascript:void()" id="lnkAddToCart" class="ladda-button no-message" data-style="zoom-in">
+        					    <span class="ladda-label"></span>
+        					    <img src="/assets/images/addtocartorange-2015.jpg"/>
+        				    </a>
+        				    <div class="product-autoship-container" style="display: none;">
+        				        <a href="#" class="product-autoship-link"></a>
+        				        <i class="tooltip-v glyphicon glyphicon-question-sign" data-tooltip-title="Learn About Auto-Shipping" data-tooltip-body="<strong>Why choose Auto-Shipping?</strong><br>
+    • You get <u>FREE Shipping &amp; Discount*</u> every shipment!<br>
+    • Easily Pause or Cancel your our Auto-Shipments at any time.<br>
+    • We only charge your credit card when an item ships … we''ll alert you by email.<br><br>
+     
+    <strong>Important Notes:</strong><br>
+    • Your Cart will be emptied of any existing items if you choose Auto-Ship for this item.<br>
+    • You <em>cannot</em> add other items to your Cart until you finish your Auto-Ship order.<br>
+    • After clicking Auto-Ship, you must log in to your account, or create one.<br>
+    • Choose your desired delivery schedule on the page that appears after you log in.
+    <br><br>
+    *Cannot be combined with other offers."></i>
                             </div>
-				    </div>
-			        <div style="display: none;" class="out-of-stock">
-			            <a href="#">
-    					    <img src="/assets/images/OOS-graphic.png"/>
-    				    </a>
-			        </div>
-				}}
-			</div>
-		</div>
+    				    </div>
+    				}}
+    			</div>
+                <div class="product-action-right">
+    			    @if(@model.Skus.Any()){{
+    			        <div style="display: none;" class="out-of-stock">
+    			            <a href="#">
+    			                <div class="out-of-stock-image"></div>
+    			                <div class="out-of-stock-right-block">
+        			                <div class="out-of-stock-text">Would you like us to send you an email when this product returns?</div>
+        			                <div class="out-of-stock-button"></div>
+    			                </div>
+        				    </a>
+    			        </div>
+    			        <div style="display: none;" class="in-stock cart-list">
+                        	<ul>
+                        	    @if(@model.Type==2){{
+                        	        @if(@model.Shellfish==false){{
+                                		<li>Free shipping on orders over $99.</li>
+                                		<li>Ships frozen with dry ice for 1-3 day Express Ground or Air delivery.</li>
+                                		<li>Vital Choice Guarantee: We''ll replace your product or refund your money if you''re not satisfied.</li>
+                                	}}
+                        	        @if(@model.Shellfish==true){{
+                        	            <li>Free shipping on orders over $99.</li>
+                                		<li>All live shellfish are shipped overnight with ice-cold gel packs.</li>
+                                		<li>Vital Choice Guarantee: We''ll replace your product or refund your money if you''re not satisfied.</li>
+                        	        }}
+                        	    }}
+                        	    @if(@(model.Type==1 || model.Type==4)){{
+                        	        <li>Free shipping on orders over $99.</li>
+                            		<li>Ships via Ground Service for 3-7 day delivery.</li>
+                            		<li>Vital Choice Guarantee: We''ll replace your product or refund your money if you''re not satisfied.</li>
+                        	    }}
+                        	    @if(@model.Type==3){{
+                        	        <li>There are no shipping or handling charges for e-Gift Certificates.</li>
+                                	<li>You can customize who your e-Gift Certificate will be emailed to by providing the Name and Email in the specified section after placing your order on the "Order Receipt" page.</li>
+                        	    }}
+                        	</ul>
+                        </div>
+    				}}
+    			</div>
+    		</div>  
+		}}
+		@ifnot(@model.IdCustomerType==1) {{
+    		<div class="product-action-bar">
+    			<div class="product-action-left">
+    				@if(SubProductGroupName){{
+    					<span class="action-left-header">@(SubProductGroupName)</span>
+    				}}
+    				@ifnot(SubProductGroupName){{
+    					<span class="action-left-header">Number of Portions:</span>
+    				}}
+    				@list(Skus) {{
+    				    <label class="product-portion-line">
+    					    <input name="sku" type="radio" value="@(Code)" data-in-stock="@(@model.InStock.ToString().ToLower())" data-price="@money(Price)" data-autoship="@(AutoShip)"/>
+    					    @(PortionsCount) - @money(Price)
+    					    @if(SalesText) {{
+    					        <span class="product-best-value">@(SalesText)</span>
+    					    }}
+    				    </label>
+    				}}
+    				<div class="mybuys" style="display:none">
+        				@list(Skus) {{
+        				    <div class="MyBuys_ProductPrice">@(@model.Price.ToString("F"))</div>
+        				}}
+    				</div>
+    				<div id="hidden_mybuys" style="display:none">
+                        <span class="inStock_mb">@(@model.AtLeastOneSkuInStock.ToString())</span>
+                    </div>
+    			</div>
+                <div class="product-action-right">
+    			    @if(@model.Skus.Any()){{
+    			        <div style="display: none;" class="in-stock">
+        				    <span id="spSelectedPrice" class="product-selected-price">Selected Price @money(@model.Skus.First().Price)</span>
+        				    @if(@model.ShowDiscountMessage==true){{
+        				    <span class="wholesale-message-line">15% discount on largest size</span>
+        				    <a href="javascript:void()" id="lnkAddToCart" class="ladda-button" data-style="zoom-in">
+        				    }}
+        				    @ifnot(@model.ShowDiscountMessage==true){{
+        				    <a href="javascript:void()" id="lnkAddToCart" class="ladda-button no-message" data-style="zoom-in">
+        				    }}
+        					    <span class="ladda-label"></span>
+        					    <img src="/assets/images/addtocartorange-2015.jpg"/>
+        				    </a>
+        				        <div class="product-autoship-container" style="display: none;">
+        				            <a href="#" class="product-autoship-link"></a>
+        				            <i class="tooltip-v glyphicon glyphicon-question-sign" data-tooltip-title="Learn About Auto-Shipping" data-tooltip-body="<strong>Why choose Auto-Shipping?</strong><br>
+    • You get <u>FREE Shipping &amp; Discount*</u> every shipment!<br>
+    • Easily Pause or Cancel your our Auto-Shipments at any time.<br>
+    • We only charge your credit card when an item ships … we''ll alert you by email.<br><br>
+     
+    <strong>Important Notes:</strong><br>
+    • Your Cart will be emptied of any existing items if you choose Auto-Ship for this item.<br>
+    • You <em>cannot</em> add other items to your Cart until you finish your Auto-Ship order.<br>
+    • After clicking Auto-Ship, you must log in to your account, or create one.<br>
+    • Choose your desired delivery schedule on the page that appears after you log in.
+    <br><br>
+    *Cannot be combined with other offers."></i>
+                                </div>
+    				    </div>
+    			        <div style="display: none;" class="out-of-stock">
+    			            <a href="#">
+        					    <img src="/assets/images/OOS-graphic.png"/>
+        				    </a>
+    			        </div>
+    				}}
+    			</div>
+    		</div>  
+		}}
 	</div>
 }}
 

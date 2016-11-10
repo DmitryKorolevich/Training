@@ -155,8 +155,8 @@
                                 <tr>
                                     <td class="agent">% of total phone orders</td>
                                     <td class="agent-name"></td>
-                                    <td class="orders-count">{{team.AgentOrdersPercent}}%</td>
-                                    <td class="orders-total-amount"></td>
+                                    <td class="orders-count"></td>
+                                    <td class="orders-total-amount">{{team.AgentOrdersPercent}}%</td>
                                     <td data-ng-if="team.AverageOrdersAmountDifference>=0" class="orders-average-amount">{{team.AverageOrdersAmountDifference | currency}}</td>
                                     <td data-ng-if="team.AverageOrdersAmountDifference<0" class="orders-average-amount">({{Math.abs(team.AverageOrdersAmountDifference) | currency}})</td>
                                     <td class="orders-lowest-amount"></td>
@@ -189,8 +189,8 @@
                             <tr>
                                 <td class="agent">% of total orders</td>
                                 <td class="agent-name"></td>
-                                <td class="orders-count">{{period.AgentOrdersPercent}}%</td>
-                                <td class="orders-total-amount"></td>
+                                <td class="orders-count"></td>
+                                <td class="orders-total-amount">{{period.AgentOrdersPercent}}%</td>
                                 <td data-ng-if="period.AverageOrdersAmountDifference>=0" class="orders-average-amount">{{period.AverageOrdersAmountDifference | currency}}</td>
                                 <td data-ng-if="period.AverageOrdersAmountDifference<0" class="orders-average-amount">({{Math.abs(period.AverageOrdersAmountDifference) | currency}})</td>
                                 <td class="orders-lowest-amount"></td>
