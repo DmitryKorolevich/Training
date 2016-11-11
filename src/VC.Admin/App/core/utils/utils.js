@@ -12,6 +12,7 @@ angular.module('app.utils', [
     'ngFileUpload',
     'fiestah.money',
     'jsonFormatter',
+    'ui.tinymce',
     'app.core.utils.unsavedChanges.unsavedChangesFacilities',
 	'app.core.utils.httpInterceptor',
 	'app.core.utils.appBootstrap',
