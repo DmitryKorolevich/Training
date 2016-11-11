@@ -472,7 +472,8 @@ angular.module('app.core.utils.appBootstrap', [])
                 $rootScope.UIOptions = {};
                 $rootScope.UIOptions.DatepickerFormat = 'MM/dd/yyyy';
                 $rootScope.editLockState={};
-                $rootScope.initEditLock = initEditLock;             
+                $rootScope.initEditLock = initEditLock;
+                $rootScope.initTinymceOptions = initTinymceOptions;
             }
 
             function bindRootScope()
