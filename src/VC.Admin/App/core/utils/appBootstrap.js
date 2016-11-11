@@ -439,6 +439,7 @@ angular.module('app.core.utils.appBootstrap', [])
                     ],
                     toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | forecolor backcolor',
                     image_advtab: true,
+                    document_base_url: '/',
                     file_browser_callback: function (field_name, url, type, win)
                     {
                         if (!url)
@@ -449,7 +450,7 @@ angular.module('app.core.utils.appBootstrap', [])
                             fileUrl: url,
                             thenCallback: function (data)
                             {
-                                win.document.getElementById(field_name).value = data != null ? 'https://{0}{1}'.format($rootScope.PublicHost, data.FullRelativeName) : '';
+                                win.document.getElementById(field_name).value = data != null ? data.FullRelativeName : '';
 
                                 if (self.fileManagementPopup)
                                 {
