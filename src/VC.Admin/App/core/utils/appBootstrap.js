@@ -251,6 +251,7 @@ angular.module('app.core.utils.appBootstrap', [])
                     image_advtab: true,
                     document_base_url: '/',
                     convert_urls: false,
+                    body_class: 'working-area-holder',
                     file_browser_callback: function (field_name, url, type, win)
                     {
                         if (!url)
