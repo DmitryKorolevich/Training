@@ -449,7 +449,7 @@ angular.module('app.core.utils.appBootstrap', [])
                             fileUrl: url,
                             thenCallback: function (data)
                             {
-                                win.document.getElementById(field_name).value = data != null ? data.FullRelativeName : '';
+                                win.document.getElementById(field_name).value = data != null ? 'https://{0}{1}'.format($rootScope.PublicHost, data.FullRelativeName) : '';
 
                                 if (self.fileManagementPopup)
                                 {
@@ -457,7 +457,7 @@ angular.module('app.core.utils.appBootstrap', [])
                                 }
                             }
                         };
-                        appBootstrap.setData('FILES_POPUP_DATA', data);
+                        setData('FILES_POPUP_DATA', data);
                         self.fileManagementPopup = modalUtil.open('app/modules/file/partials/selectFile.html', 'filesController', data, { size: 'lg' });
                     },
                     file_browser_callback_types: 'image'

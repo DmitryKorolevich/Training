@@ -50,45 +50,6 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
 
     function initialize()
     {
-        $scope.tinymceOptions = {
-            min_height: 300,
-            skin: "lightgray",
-            theme: 'modern',
-            content_css: 'https://{0}/styles.min.css?v={1}'.format($rootScope.PublicHost, $rootScope.buildNumber),
-            menubar: 'edit insert view format table tools',
-            plugins: [
-                'advlist autolink lists link image charmap anchor',
-                'searchreplace visualblocks code',
-                'insertdatetime media table contextmenu paste code',
-                'textcolor colorpicker textpattern autoresize'
-            ],
-            toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | forecolor backcolor',
-            image_advtab: true,
-            file_browser_callback: function (field_name, url, type, win)
-            {
-                if (!url)
-                {
-                    url = null;
-                }
-                var data = {
-                    fileUrl: url,
-                    thenCallback: function (data)
-                    {                        
-                        win.document.getElementById(field_name).value = data!=null ? data.FullRelativeName : '';
-
-                        if (self.fileManagementPopup)
-                        {
-                            self.fileManagementPopup.close();
-                        }
-                    }
-                };
-                appBootstrap.setData('FILES_POPUP_DATA', data);
-                self.fileManagementPopup = modalUtil.open('app/modules/file/partials/selectFile.html', 'filesController', data, { size: 'lg' });
-            },
-            file_browser_callback_types: 'image'
-        };
-
-
         $scope.id = $stateParams.id ? $stateParams.id : 0;
         $scope.descriptionExpanded = false;
 
