@@ -230,6 +230,52 @@ angular.module('app.core.utils.appBootstrap', [])
                 }
             };
 
+            function initTinymceOptions()
+            {
+                $rootScope.tinymceOptions = {
+                    min_height: 300,
+                    skin: "lightgray",
+                    theme: 'modern',
+                    content_css: [
+                        'https://{0}/styles.min.css?v={1}'.format($rootScope.ReferenceData.PublicHost, $rootScope.buildNumber),
+                        '/assets/styles/html-editor-defaults.css'
+                    ],
+                    menubar: 'edit insert view format table tools',
+                    plugins: [
+                        'advlist autolink lists link image charmap anchor',
+                        'searchreplace visualblocks code',
+                        'insertdatetime media table contextmenu paste code',
+                        'textcolor colorpicker textpattern autoresize'
+                    ],
+                    toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | forecolor backcolor',
+                    image_advtab: true,
+                    document_base_url: '/',
+                    convert_urls: false,
+                    file_browser_callback: function (field_name, url, type, win)
+                    {
+                        if (!url)
+                        {
+                            url = null;
+                        }
+                        var data = {
+                            fileUrl: url,
+                            thenCallback: function (data)
+                            {
+                                win.document.getElementById(field_name).value = data != null ? data.FullRelativeName : '';
+
+                                if (self.fileManagementPopup)
+                                {
+                                    self.fileManagementPopup.close();
+                                }
+                            }
+                        };
+                        setData('FILES_POPUP_DATA', data);
+                        self.fileManagementPopup = modalUtil.open('app/modules/file/partials/selectFile.html', 'filesController', data, { size: 'lg' });
+                    },
+                    file_browser_callback_types: 'image'
+                };
+            };
+
             function initEditLock() {
                 if($rootScope.ReferenceData && $rootScope.ReferenceData.EditLockAreas){
                     $rootScope.editLockState.Areas={};
@@ -383,6 +429,7 @@ angular.module('app.core.utils.appBootstrap', [])
                                             $rootScope.authenticated = true;
                                             $rootScope.currentUser = res.Data;
                                             initEditLock();
+                                            initTinymceOptions();
                                         } else
                                         {
                                             $rootScope.authenticated = false;
@@ -424,50 +471,7 @@ angular.module('app.core.utils.appBootstrap', [])
                 $rootScope.UIOptions = {};
                 $rootScope.UIOptions.DatepickerFormat = 'MM/dd/yyyy';
                 $rootScope.editLockState={};
-                $rootScope.initEditLock = initEditLock;
-
-                $rootScope.tinymceOptions = {
-                    min_height: 300,
-                    skin: "lightgray",
-                    theme: 'modern',
-                    content_css: [
-                        'https://{0}/styles.min.css?v={1}'.format($rootScope.PublicHost, $rootScope.buildNumber),
-                        '/assets/styles/html-editor-defaults.css'
-                    ],
-                    menubar: 'edit insert view format table tools',
-                    plugins: [
-                        'advlist autolink lists link image charmap anchor',
-                        'searchreplace visualblocks code',
-                        'insertdatetime media table contextmenu paste code',
-                        'textcolor colorpicker textpattern autoresize'
-                    ],
-                    toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | forecolor backcolor',
-                    image_advtab: true,
-                    document_base_url: '/',
-                    convert_urls: false,
-                    file_browser_callback: function (field_name, url, type, win)
-                    {
-                        if (!url)
-                        {
-                            url = null;
-                        }
-                        var data = {
-                            fileUrl: url,
-                            thenCallback: function (data)
-                            {
-                                win.document.getElementById(field_name).value = data != null ? data.FullRelativeName : '';
-
-                                if (self.fileManagementPopup)
-                                {
-                                    self.fileManagementPopup.close();
-                                }
-                            }
-                        };
-                        setData('FILES_POPUP_DATA', data);
-                        self.fileManagementPopup = modalUtil.open('app/modules/file/partials/selectFile.html', 'filesController', data, { size: 'lg' });
-                    },
-                    file_browser_callback_types: 'image'
-                };
+                $rootScope.initEditLock = initEditLock;             
             }
 
             function bindRootScope()

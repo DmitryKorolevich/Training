@@ -31,6 +31,7 @@ angular.module('app.modules.authentication.controllers.loginController', [])
 								if (res.Success) {
 								    $rootScope.ReferenceData = res.Data;
 								    $rootScope.initEditLock();
+								    $rootScope.initTinymceOptions();
 
 									var stateToRedirect = "index.oneCol.dashboard";
 									var paramsToRedirect = null;
