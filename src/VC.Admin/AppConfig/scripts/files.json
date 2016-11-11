@@ -7,7 +7,6 @@
     "lib/jquery.maskedinput/jquery.maskedinput.js",
     "lib/ace-builds/src-min-noconflict/ace.js",
     "lib/ace-builds/src-min-noconflict/ext-language_tools.js",
-    "lib/tinymce/tinymce.js",
     "lib/angular/angular.js",
     "lib/angular-ui-tinymce/tinymce.js",
     "lib/angular-bootstrap/ui-bootstrap-tpls.js",
