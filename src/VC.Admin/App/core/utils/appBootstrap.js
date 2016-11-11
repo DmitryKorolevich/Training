@@ -425,11 +425,15 @@ angular.module('app.core.utils.appBootstrap', [])
                 $rootScope.UIOptions.DatepickerFormat = 'MM/dd/yyyy';
                 $rootScope.editLockState={};
                 $rootScope.initEditLock = initEditLock;
+
                 $rootScope.tinymceOptions = {
                     min_height: 300,
                     skin: "lightgray",
                     theme: 'modern',
-                    content_css: 'https://{0}/styles.min.css?v={1}'.format($rootScope.PublicHost, $rootScope.buildNumber),
+                    content_css: [
+                        'https://{0}/styles.min.css?v={1}'.format($rootScope.PublicHost, $rootScope.buildNumber),
+                        '/assets/styles/html-editor-defaults.css'
+                    ],
                     menubar: 'edit insert view format table tools',
                     plugins: [
                         'advlist autolink lists link image charmap anchor',
@@ -440,6 +444,7 @@ angular.module('app.core.utils.appBootstrap', [])
                     toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | forecolor backcolor',
                     image_advtab: true,
                     document_base_url: '/',
+                    convert_urls: false,
                     file_browser_callback: function (field_name, url, type, win)
                     {
                         if (!url)
