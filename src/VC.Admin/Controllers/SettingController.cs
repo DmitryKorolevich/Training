@@ -107,7 +107,7 @@ namespace VC.Admin.Controllers
         #region EditLocks
 
         [HttpPost]
-        public async Task<Result<bool>> EditLockPing([FromBody] EditLockPingModel model)
+        public Result<bool> EditLockPing([FromBody] EditLockPingModel model)
         {
             string browserUserAgent = Request.Headers["User-Agent"];
             var area = _adminEditLockAreas.FirstOrDefault(p => p.Name == model.AreaName);
@@ -145,7 +145,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<Result<EditLockRequestModel>> EditLockRequest([FromBody]EditLockRequestModel model)
+        public Result<EditLockRequestModel> EditLockRequest([FromBody]EditLockRequestModel model)
         {
             model.Avaliable = false;
             string browserUserAgent = Request.Headers["User-Agent"];

@@ -196,3 +196,4 @@ internalLog.txt
 /src/VitalChoice.Database.Ecommerce/*.jfm
 /src/VitalChoice.Database.ExportInfo/*.jfm
 /src/VitalChoice.Database.Infrastructure/*.jfm
+/.idea/.idea.VitalChoice
