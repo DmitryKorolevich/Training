@@ -11,6 +11,6 @@ namespace VitalChoice.Core.DependencyInjection
     public interface IDependencyConfig
     {
 		IContainer RegisterInfrastructure(IConfiguration configuration, IServiceCollection services, Assembly projectAssembly,
-            IHostingEnvironment appEnv = null, bool enableCache = true);
+            IHostingEnvironment appEnv = null, bool enableCache = true, bool enableProfiler = false);
     }
 }
