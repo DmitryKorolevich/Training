@@ -230,14 +230,15 @@ angular.module('app.core.utils.appBootstrap', [])
                 }
             };
 
-            function initTinymceOptions()
+            function getTinymceOptions()
             {
-                $rootScope.tinymceOptions = {
+                var toReturn= {
                     min_height: 300,
                     skin: "lightgray",
                     theme: 'modern',
                     content_css: [
                         'https://{0}/styles.min.css?v={1}'.format($rootScope.ReferenceData.PublicHost, $rootScope.buildNumber),
+                        'https://{0}/custom-styles.css?v={1}'.format($rootScope.ReferenceData.PublicHost, Math.floor((Math.random() * 1000000) + 1)),
                         '/assets/styles/html-editor-defaults.css'
                     ],
                     menubar: 'edit insert view format table tools',
@@ -275,6 +276,8 @@ angular.module('app.core.utils.appBootstrap', [])
                     },
                     file_browser_callback_types: 'image'
                 };
+
+                return toReturn;
             };
 
             function initEditLock() {
@@ -430,7 +433,6 @@ angular.module('app.core.utils.appBootstrap', [])
                                             $rootScope.authenticated = true;
                                             $rootScope.currentUser = res.Data;
                                             initEditLock();
-                                            initTinymceOptions();
                                         } else
                                         {
                                             $rootScope.authenticated = false;
@@ -473,7 +475,7 @@ angular.module('app.core.utils.appBootstrap', [])
                 $rootScope.UIOptions.DatepickerFormat = 'MM/dd/yyyy';
                 $rootScope.editLockState={};
                 $rootScope.initEditLock = initEditLock;
-                $rootScope.initTinymceOptions = initTinymceOptions;
+                $rootScope.getTinymceOptions = getTinymceOptions;
             }
 
             function bindRootScope()

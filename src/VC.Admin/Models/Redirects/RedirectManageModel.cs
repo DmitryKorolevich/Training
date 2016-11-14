@@ -21,6 +21,8 @@ namespace VC.Admin.Models.Redirects
         [Localized(GeneralFieldNames.RedirectUrl)]
         public string To { get; set; }
 
+        public bool IgnoreQuery { get; set; }
+
         public RedirectManageModel()
         {
         }
@@ -32,6 +34,7 @@ namespace VC.Admin.Models.Redirects
                 Id = item.Id;
                 From = item.From;
                 To = item.To;
+                IgnoreQuery = item.IgnoreQuery;
             }
         }
 
@@ -45,6 +48,7 @@ namespace VC.Admin.Models.Redirects
                 toReturn.From = "/" + toReturn.From;
             }
             toReturn.To = To;
+            toReturn.IgnoreQuery = IgnoreQuery;
 
             return toReturn;
         }

@@ -159,6 +159,11 @@ namespace VC.Public
                 defaults: new { controller = "Help", action = "CriteoProductsFeed" });
 
             routeBuilder.MapRoute(
+                name: "CustomCSS",
+                template: "custom-styles.css",
+                defaults: new { controller = "Help", action = "CustomCSS" });
+
+            routeBuilder.MapRoute(
                 name: "Default",
                 template: "{controller}/{action}/{id?}",
                 defaults: new { controller = "Home", action = "Index" });

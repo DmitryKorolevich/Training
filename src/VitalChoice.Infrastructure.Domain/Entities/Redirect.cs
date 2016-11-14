@@ -23,5 +23,7 @@ namespace VitalChoice.Infrastructure.Domain.Entities
         public string EditedBy { get; set; }
 
         public RecordStatusCode StatusCode { get; set; }
+
+        public bool IgnoreQuery { get; set; }
     }
 }
