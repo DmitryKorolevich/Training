@@ -14,7 +14,7 @@
     </RootPath>
     <RootNamespace>VitalChoice.Database.Infrastructure</RootNamespace>
     <AssemblyName>VitalChoice.Database.Infrastructure</AssemblyName>
-    <ModelCollation>1049,CI</ModelCollation>
+    <ModelCollation>1033,CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -23,7 +23,7 @@
     <SqlServerVerification>False</SqlServerVerification>
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseSet>True</TargetDatabaseSet>
-    <DefaultCollation>Cyrillic_General_CI_AS</DefaultCollation>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
     <DefaultFilegroup>PRIMARY</DefaultFilegroup>
     <CreateProjectFromDatabaseCompleted>True</CreateProjectFromDatabaseCompleted>
     <TargetDatabase>VitalChoice.Infrastructure</TargetDatabase>
@@ -108,5 +108,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\Scripts\MasterTemplates.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\Redirects.sql" />
   </ItemGroup>
 </Project>

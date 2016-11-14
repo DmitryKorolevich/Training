@@ -18,16 +18,28 @@ namespace VitalChoice.Business.Services
 {
     public class RedirectViewService : IRedirectViewService
     {
+        private class RedirectOptions
+        {
+            public Dictionary<string, string> PathQueryMap { get; set; }
+
+            public Dictionary<string, string> PathMap { get; set; }
+        }
+
         private readonly IRepositoryAsync<Redirect> _redirectRepository;
 
-        public Dictionary<string, string> Map
+        private RedirectOptions _redirectOptions
         {
             get
             {
                 //will be loaded from cache
                 var items = _redirectRepository.Query().Select(false);
                 items = items.Where(p => p.StatusCode == RecordStatusCode.Active).ToList();
-                return items.ToDictionary(p => p.From.ToLower(), x => x.To);
+
+                var toReturn = new RedirectOptions();
+                toReturn.PathQueryMap = items.Where(p=>!p.IgnoreQuery).ToDictionary(p => p.From, x => x.To, StringComparer.InvariantCultureIgnoreCase);
+                toReturn.PathMap = items.Where(p => p.IgnoreQuery).ToDictionary(p => p.From, x => x.To, StringComparer.InvariantCultureIgnoreCase);
+
+                return toReturn;
             }
         }
 
@@ -42,13 +54,13 @@ namespace VitalChoice.Business.Services
                 return false;
 
             var pagePath = context.Request.Path.ToUriComponent();
-            if (pagePath == "/shop/pc/home.asp" &&
+            if (pagePath.Equals("/shop/pc/home.asp", StringComparison.InvariantCultureIgnoreCase) &&
                 context.Request.Query.ContainsKey("idaffiliate"))
             {
                 context.Response.Redirect($"/?idaffiliate={context.Request.Query["idaffiliate"]}", true);
                 return true;
             }
-            else if (pagePath.StartsWith("/category/"))
+            else if (pagePath.StartsWith("/category/", StringComparison.InvariantCultureIgnoreCase))
             {
                 pagePath = "/products/" + pagePath.Substring("/category/".Length, pagePath.Length - "/category/".Length);
                 context.Response.Redirect(pagePath + context.Request.QueryString.ToUriComponent(), true);
@@ -56,15 +68,33 @@ namespace VitalChoice.Business.Services
             }
             else
             {
-                var path = pagePath + context.Request.QueryString.ToUriComponent();
-                path = path.ToLower();
+                var options = _redirectOptions;
+
+                var queryPart = context.Request.QueryString.ToUriComponent();
+                var fullPath = pagePath + queryPart;
                 string redirect;
 
-                if (!Map.TryGetValue(path, out redirect))
-                    return false;
-
-                context.Response.Redirect(redirect, true);
-                return true;
+                if (!options.PathQueryMap.TryGetValue(fullPath, out redirect))
+                {
+                    if (!options.PathMap.TryGetValue(pagePath, out redirect))
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        if (redirect.Contains("?") && !string.IsNullOrEmpty(queryPart))
+                        {
+                            queryPart ="&"+ queryPart.Remove(0, 1);
+                        }
+                        context.Response.Redirect(redirect+ queryPart, true);
+                        return true;
+                    }
+                }
+                else
+                {
+                    context.Response.Redirect(redirect, true);
+                    return true;
+                }
             }
         }
     }
