@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using FluentValidation.Validators;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;
@@ -169,6 +170,12 @@ namespace VitalChoice.Business.Helpers
                 Field = field ?? "Base",
                 Message = message,
             };
+        }
+
+        public static bool InStock(this SkuDynamic dynamic)
+        {
+            return dynamic.IdObjectType == (int)ProductType.EGс || dynamic.IdObjectType == (int)ProductType.Gc ||
+                            ((bool?)dynamic.SafeData.DisregardStock ?? false) || ((int?)dynamic.SafeData.Stock ?? 0) > 0;
         }
     }
 }
