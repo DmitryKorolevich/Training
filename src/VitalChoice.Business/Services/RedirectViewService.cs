@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using VitalChoice.Data.Repositories;
@@ -18,7 +19,13 @@ namespace VitalChoice.Business.Services
 {
     public class RedirectViewService : IRedirectViewService
     {
-        private class RedirectOptions
+        private static readonly object LockObj = new object();
+
+        private static volatile RedirectData _latestData;
+
+        private static long _nextUpdateDate;
+
+        private class RedirectData
         {
             public Dictionary<string, string> PathQueryMap { get; set; }
 
@@ -27,20 +34,30 @@ namespace VitalChoice.Business.Services
 
         private readonly IRepositoryAsync<Redirect> _redirectRepository;
 
-        private RedirectOptions _redirectOptions
+        private RedirectData GetRedirectData()
         {
-            get
+            var now = DateTime.Now;
+            if (_latestData == null || now > new DateTime(Interlocked.Read(ref _nextUpdateDate)))
             {
-                //will be loaded from cache
-                var items = _redirectRepository.Query().Select(false);
-                items = items.Where(p => p.StatusCode == RecordStatusCode.Active).ToList();
+                lock (LockObj)
+                {
+                    if (_latestData == null || now > new DateTime(_nextUpdateDate))
+                    {
+                        _nextUpdateDate = now.AddMinutes(5).Ticks;
+                        var items = _redirectRepository.Query().Select(false);
+                        items = items.Where(p => p.StatusCode == RecordStatusCode.Active).ToList();
 
-                var toReturn = new RedirectOptions();
-                toReturn.PathQueryMap = items.Where(p=>!p.IgnoreQuery).ToDictionary(p => p.From, x => x.To, StringComparer.InvariantCultureIgnoreCase);
-                toReturn.PathMap = items.Where(p => p.IgnoreQuery).ToDictionary(p => p.From, x => x.To, StringComparer.InvariantCultureIgnoreCase);
-
-                return toReturn;
+                        _latestData = new RedirectData
+                        {
+                            PathQueryMap = items.Where(p => !p.IgnoreQuery)
+                                .ToDictionary(p => p.From, x => x.To, StringComparer.InvariantCultureIgnoreCase),
+                            PathMap = items.Where(p => p.IgnoreQuery)
+                                .ToDictionary(p => p.From, x => x.To, StringComparer.InvariantCultureIgnoreCase)
+                        };
+                    }
+                }
             }
+            return _latestData;
         }
 
         public RedirectViewService(IRepositoryAsync<Redirect> redirectRepository)
@@ -68,33 +85,27 @@ namespace VitalChoice.Business.Services
             }
             else
             {
-                var options = _redirectOptions;
+                var options = GetRedirectData();
 
                 var queryPart = context.Request.QueryString.ToUriComponent();
                 var fullPath = pagePath + queryPart;
                 string redirect;
 
-                if (!options.PathQueryMap.TryGetValue(fullPath, out redirect))
-                {
-                    if (!options.PathMap.TryGetValue(pagePath, out redirect))
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        if (redirect.Contains("?") && !string.IsNullOrEmpty(queryPart))
-                        {
-                            queryPart ="&"+ queryPart.Remove(0, 1);
-                        }
-                        context.Response.Redirect(redirect+ queryPart, true);
-                        return true;
-                    }
-                }
-                else
+                if (options.PathQueryMap.TryGetValue(fullPath, out redirect))
                 {
                     context.Response.Redirect(redirect, true);
                     return true;
                 }
+                if (options.PathMap.TryGetValue(pagePath, out redirect))
+                {
+                    if (redirect.Contains("?") && !string.IsNullOrEmpty(queryPart))
+                    {
+                        queryPart = "&" + queryPart.Remove(0, 1);
+                    }
+                    context.Response.Redirect(redirect + queryPart, true);
+                    return true;
+                }
+                return false;
             }
         }
     }
