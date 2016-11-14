@@ -13,6 +13,7 @@
 </head>
 <body>
     @RenderBody()
+    <script src="/lib/tinymce/tinymce.min.js"></script>
     @await Component.InvokeAsync("Assets", new { assetType = "scripts" })
 </body>
 </html>

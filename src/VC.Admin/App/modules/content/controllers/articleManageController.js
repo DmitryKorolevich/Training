@@ -48,7 +48,8 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
         toaster.pop('error', "Error!", "Server error occured");
     };
 
-    function initialize() {
+    function initialize()
+    {
         $scope.id = $stateParams.id ? $stateParams.id : 0;
         $scope.descriptionExpanded = false;
 

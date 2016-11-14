@@ -8,6 +8,7 @@
     "lib/ace-builds/src-min-noconflict/ace.js",
     "lib/ace-builds/src-min-noconflict/ext-language_tools.js",
     "lib/angular/angular.js",
+    "lib/angular-ui-tinymce/tinymce.js",
     "lib/angular-bootstrap/ui-bootstrap-tpls.js",
     "lib/angular-ui-router/angular-ui-router.js",
     "lib/bootstrap/js/bootstrap.js",

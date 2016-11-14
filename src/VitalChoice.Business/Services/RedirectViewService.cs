@@ -48,6 +48,12 @@ namespace VitalChoice.Business.Services
                 context.Response.Redirect($"/?idaffiliate={context.Request.Query["idaffiliate"]}", true);
                 return true;
             }
+            else if (pagePath.StartsWith("/category/"))
+            {
+                pagePath = "/products/" + pagePath.Substring("/category/".Length, pagePath.Length - "/category/".Length);
+                context.Response.Redirect(pagePath + context.Request.QueryString.ToUriComponent(), true);
+                return true;
+            }
             else
             {
                 var path = pagePath + context.Request.QueryString.ToUriComponent();
