@@ -48,7 +48,7 @@
                                 <div class="form-group">
                                     <label class="col-md-3 control-label">Redirect URL</label>
                                     <div class="col-md-7">
-                                        <input type="text" name="Url" class="form-control" placeholder="Url" data-ng-model="item.Url" required data-ng-maxlength="100">
+                                        <input type="text" data-ng-disabled="item.Disabled" name="Url" class="form-control" placeholder="Url" data-ng-model="item.Url" required data-ng-maxlength="100">
                                         <div class="error-container " ng-show="forms.submitted && forms.form.i{{$index}}.Url.$invalid">
                                             <small class="error" ng-show="forms.form.i{{$index}}.Url.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Url")}}</small>
                                             <small class="error" ng-show="forms.form.i{{$index}}.Url.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.Url", "100"])}}</small>
@@ -62,7 +62,7 @@
                                     <label class="col-md-3 control-label">Start Date</label>
                                     <div class="col-md-7">
                                         <p class="input-group">
-                                            <input type="text" name="StartDate" class="form-control" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="item.StartDate" is-open="fromOpened" required />
+                                            <input type="text" data-ng-disabled="item.Disabled" name="StartDate" class="form-control" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="item.StartDate" is-open="fromOpened" required />
                                             <span class="input-group-btn">
                                                 <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                             </span>

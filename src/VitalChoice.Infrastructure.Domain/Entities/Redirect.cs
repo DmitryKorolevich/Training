@@ -12,6 +12,8 @@ namespace VitalChoice.Infrastructure.Domain.Entities
         public DateTime StartDate { get; set; }
 
         public string Url { get; set; }
+
+        public bool Disabled { get; set; }
     }
 
     public class Redirect : Entity

@@ -120,11 +120,11 @@ namespace VitalChoice.Business.Services
             foreach (var redirect in redirects)
             {
                 var futureRedirects = redirect.FutureRedirects;
-                var newRoute = futureRedirects.Where(p => p.StartDate < now).OrderBy(p => p.StartDate).FirstOrDefault();
+                var newRoute = futureRedirects.Where(p =>!p.Disabled && p.StartDate < now).OrderBy(p => p.StartDate).FirstOrDefault();
                 if (newRoute != null)
                 {
                     redirect.To = newRoute.Url;
-                    futureRedirects.Remove(newRoute);
+                    newRoute.Disabled = true;
                     redirect.FutureRedirects = futureRedirects;
 
                     forUpdate.Add(redirect);
