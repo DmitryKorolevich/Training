@@ -36,6 +36,7 @@
         $scope.options = {};
 
         $scope.redirect = {};
+        $scope.redirect.FutureRedirects = [];
         if (data.id) {
             redirectService.getRedirect(data.id, $scope.saveTracker).success(function (result)
             {                
