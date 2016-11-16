@@ -312,6 +312,7 @@ namespace VC.Public.Controllers
                         cart.Order.Customer = createResult.Customer;
                         loginTask = createResult.LoginTask;
                     }
+
                     if (model.SendCatalog)
                     {
                         var pnc = await _productService.GetSkuOrderedAsync(CATALOG_PRODUCT_NAME);
@@ -326,6 +327,19 @@ namespace VC.Public.Controllers
                     {
                         cart.Order.Skus.RemoveAll(s => s.Sku.Code.ToLower() == CATALOG_PRODUCT_NAME);
                     }
+                    var statistic = await CustomerService.GetCustomerOrderStatistics(new[] { cart.Order.Customer.Id });
+                    //new custimer - add welcome letter
+                    if (statistic.FirstOrDefault() == null)
+                    {
+                        var wl = await _productService.GetSkuOrderedAsync(ProductConstants.WELCOME_LETTER_SKU);
+                        if (wl != null && wl.Sku.InStock())
+                        {
+                            wl.Quantity = 1;
+                            wl.Amount = wl.Sku.Price;
+                            cart.Order.Skus.AddKeyed(Enumerable.Repeat(wl, 1), ordered => ordered.Sku.Code);
+                        }
+                    }
+
                     if (cart.Order.PaymentMethod?.Address == null || cart.Order.PaymentMethod.Id == 0)
                     {
                         cart.Order.PaymentMethod =

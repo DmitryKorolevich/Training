@@ -50,14 +50,14 @@ namespace VC.Admin
             {
                 SourceCodeLineCount = 25
             });
-
+            app.InjectProfiler();
             Configure(app);
         }
 
         public void ConfigureStaging(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
             app.UseExceptionHandler("/Home/Error");
-
+            app.InjectProfiler();
             Configure(app);
         }
 
@@ -76,8 +76,6 @@ namespace VC.Admin
             });
 
             app.UseIdentity();
-
-            app.InjectProfiler();
 
             app.Use((context, next) =>
             {

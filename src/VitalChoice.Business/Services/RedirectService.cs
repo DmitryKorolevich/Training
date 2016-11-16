@@ -64,6 +64,11 @@ namespace VitalChoice.Business.Services
                 throw new AppValidationException("From", "Redirect with the same Source URL already exists, please use a unique URL.");
             }
 
+            if (item.IgnoreQuery && item.From.Contains("?"))
+            {
+                throw new AppValidationException("From", "From field can't contain query params if \"Ignore Query Params\" option is specified.");
+            }
+
             if (item.Id==0)
             {
                 item.IdAddedBy = item.IdEditedBy;
@@ -80,6 +85,7 @@ namespace VitalChoice.Business.Services
                     dbItem.DateEdited = DateTime.Now;
                     dbItem.From = item.From;
                     dbItem.To = item.To;
+                    dbItem.IgnoreQuery = item.IgnoreQuery;
                     await _redirectRepository.UpdateAsync(dbItem);
                 }
             }

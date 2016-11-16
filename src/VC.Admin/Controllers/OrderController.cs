@@ -60,6 +60,9 @@ using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.Extensions;
 using VitalChoice.Business.CsvExportMaps.Products;
+using VitalChoice.Business.Helpers;
+using VitalChoice.Business.Services.Products;
+using VitalChoice.Interfaces.Services.Products;
 
 namespace VC.Admin.Controllers
 {
@@ -75,6 +78,7 @@ namespace VC.Admin.Controllers
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodMapper;
 
         private readonly ICustomerService _customerService;
+        private readonly IProductService _productService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> _ordersRegionStatisticItemCSVExportService;
         private readonly ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> _ordersZipStatisticItemCSVExportService;
@@ -109,6 +113,7 @@ namespace VC.Admin.Controllers
             OrderMapper mapper,
             OrderRefundMapper orderRefundMapper,
             ICustomerService customerService,
+            IProductService productService,
             ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> ordersRegionStatisticItemCSVExportService,
             ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> ordersZipStatisticItemCSVExportService,
             ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> vOrderWithRegionInfoItemCSVExportService,
@@ -144,6 +149,7 @@ namespace VC.Admin.Controllers
             _mapper = mapper;
             _orderRefundMapper = orderRefundMapper;
             _customerService = customerService;
+            _productService = productService;
             _ordersRegionStatisticItemCSVExportService = ordersRegionStatisticItemCSVExportService;
             _ordersZipStatisticItemCSVExportService = ordersZipStatisticItemCSVExportService;
             _vOrderWithRegionInfoItemCSVExportService = vOrderWithRegionInfoItemCSVExportService;
@@ -348,16 +354,31 @@ namespace VC.Admin.Controllers
 
             if (idOrder == 0)
             {
+                var skus = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) };
+
                 var order = _orderService.CreateNewNormalOrder(OrderStatus.Processed);
                 if (idcustomer.HasValue)
                 {
                     order.Data.OrderNotes = await _customerService.GetNewOrderNotesBasedOnCustomer(idcustomer.Value);
+
+                    var statistic = await _customerService.GetCustomerOrderStatistics(new[] {idcustomer.Value});
+                    //new custimer - add welcome letter
+                    if (statistic.FirstOrDefault()==null)
+                    {
+                        var wl = await _productService.GetSkuOrderedAsync(ProductConstants.WELCOME_LETTER_SKU);
+                        if (wl != null && wl.Sku.InStock())
+                        {
+                            wl.Quantity = 1;
+                            wl.Amount = wl.Sku.Price;
+                            skus.Insert(0,new SkuOrderedManageModel(wl));
+                        }
+                    }
                 }
 
                 var model = await _mapper.ToModelAsync<OrderManageModel>(order);
                 model.UseShippingAndBillingFromCustomer = true;
                 model.GCs = new List<GCListItemModel>() { new GCListItemModel(null) };
-                model.SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) };
+                model.SkuOrdereds = skus;
                 model.UpdateShippingAddressForCustomer = true;
                 model.UpdateCardForCustomer = true;
                 model.UpdateCheckForCustomer = true;

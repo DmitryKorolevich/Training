@@ -25,6 +25,8 @@ namespace VC.Admin.Models.Redirects
 
         public string EditedBy { get; set; }
 
+        public bool IgnoreQuery { get; set; }
+
         public RedirectListItemModel(Redirect item)
         {
             if(item!=null)
@@ -37,6 +39,7 @@ namespace VC.Admin.Models.Redirects
                 AddedBy = item.AddedBy;
                 EditedBy = item.EditedBy;
                 StatusCode = item.StatusCode;
+                IgnoreQuery = item.IgnoreQuery;
             }
         }
     }
