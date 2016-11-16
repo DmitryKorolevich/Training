@@ -27,5 +27,7 @@
         public const decimal DEFAULT_RETURN_AMOUNT = -40;
 
         public const string HEALTHWISE_DISCOUNT_CODE = "healthwise";
+
+        public const string WELCOME_LETTER_SKU = "LTR02";
     }
 }

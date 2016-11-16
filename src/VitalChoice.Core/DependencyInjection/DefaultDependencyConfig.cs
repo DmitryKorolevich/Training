@@ -123,7 +123,7 @@ namespace VitalChoice.Core.DependencyInjection
     public abstract class DefaultDependencyConfig : IDependencyConfig
     {
         public Autofac.IContainer RegisterInfrastructure(IConfiguration configuration, IServiceCollection services,
-            Assembly projectAssembly, IHostingEnvironment appEnv, bool enableCache = true)
+            Assembly projectAssembly, IHostingEnvironment appEnv, bool enableCache = true, bool enableProfiler = false)
         {
             var newOptions = new AppOptions();
             ConfigureAppOptions(configuration, newOptions);
@@ -137,42 +137,7 @@ namespace VitalChoice.Core.DependencyInjection
             // Add EF services to the services container.
             var scopeContainer = new CacheServiceScopeFactoryContainer();
 #if !NETSTANDARD1_5
-            if (enableCache)
-            {
-                services.AddEntityFramework()
-                    .AddDbContext<VitalChoiceContext>(
-                        options =>
-                            options.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
-                                serviceCollection =>
-                                {
-                                    serviceCollection.AddSingleton(appEnv)
-                                        .AddSingleton(new LoggerProviderExtended(appEnv).Factory)
-                                        .InjectProfiler()
-                                        .Configure<AppOptionsBase>(
-                                            appOptions => ConfigureBaseOptions(configuration, appOptions));
-                                }))
-                    .AddDbContext<EcommerceContext>(
-                        options =>
-                            options.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
-                                serviceCollection =>
-                                {
-                                    serviceCollection.AddSingleton(appEnv)
-                                        .AddSingleton(new LoggerProviderExtended(appEnv).Factory)
-                                        .InjectProfiler()
-                                        .Configure<AppOptionsBase>(
-                                            appOptions => ConfigureBaseOptions(configuration, appOptions));
-                                }))
-                    .AddDbContext<LogsContext>()
-                    .AddEntityFrameworkSqlServer();
-            }
-            else
-            {
-                services.AddEntityFramework()
-                    .AddDbContext<VitalChoiceContext>()
-                    .AddDbContext<EcommerceContext>()
-                    .AddDbContext<LogsContext>()
-                    .AddEntityFrameworkSqlServer();
-            }
+            ConfigureDatabases(configuration, services, appEnv, enableCache, scopeContainer, enableProfiler);
 #else
             services.AddEntityFramework()
                 .AddDbContext<VitalChoiceContext>()
@@ -243,6 +208,76 @@ namespace VitalChoice.Core.DependencyInjection
             var container = BuildContainer(projectAssembly, builder);
             scopeContainer.SetFactory(container.Resolve<IServiceProvider>());
             return container;
+        }
+
+        protected virtual void ConfigureDatabases(IConfiguration configuration, IServiceCollection services,
+            IHostingEnvironment appEnv, bool enableCache, CacheServiceScopeFactoryContainer scopeContainer, bool enableProfiler = false)
+        {
+            if (enableCache)
+            {
+                if (enableProfiler)
+                {
+                    services.AddEntityFramework()
+                        .AddDbContext<VitalChoiceContext>(
+                            options =>
+                                options.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
+                                    serviceCollection =>
+                                    {
+                                        serviceCollection.AddSingleton(appEnv)
+                                            .AddSingleton(new LoggerProviderExtended(appEnv).Factory)
+                                            .InjectProfiler()
+                                            .Configure<AppOptionsBase>(
+                                                appOptions => ConfigureBaseOptions(configuration, appOptions));
+                                    }))
+                        .AddDbContext<EcommerceContext>(
+                            options =>
+                                options.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
+                                    serviceCollection =>
+                                    {
+                                        serviceCollection.AddSingleton(appEnv)
+                                            .AddSingleton(new LoggerProviderExtended(appEnv).Factory)
+                                            .InjectProfiler()
+                                            .Configure<AppOptionsBase>(
+                                                appOptions => ConfigureBaseOptions(configuration, appOptions));
+                                    }))
+                        .AddDbContext<LogsContext>()
+                        .AddEntityFrameworkSqlServer();
+                }
+                else
+                {
+                    services.AddEntityFramework()
+                        .AddDbContext<VitalChoiceContext>(
+                            options =>
+                                options.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
+                                    serviceCollection =>
+                                    {
+                                        serviceCollection.AddSingleton(appEnv)
+                                            .AddSingleton(new LoggerProviderExtended(appEnv).Factory)
+                                            .Configure<AppOptionsBase>(
+                                                appOptions => ConfigureBaseOptions(configuration, appOptions));
+                                    }))
+                        .AddDbContext<EcommerceContext>(
+                            options =>
+                                options.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
+                                    serviceCollection =>
+                                    {
+                                        serviceCollection.AddSingleton(appEnv)
+                                            .AddSingleton(new LoggerProviderExtended(appEnv).Factory)
+                                            .Configure<AppOptionsBase>(
+                                                appOptions => ConfigureBaseOptions(configuration, appOptions));
+                                    }))
+                        .AddDbContext<LogsContext>()
+                        .AddEntityFrameworkSqlServer();
+                }
+            }
+            else
+            {
+                services.AddEntityFramework()
+                    .AddDbContext<VitalChoiceContext>()
+                    .AddDbContext<EcommerceContext>()
+                    .AddDbContext<LogsContext>()
+                    .AddEntityFrameworkSqlServer();
+            }
         }
 
         //private void ConfigureMvcOptions(MvcOptions o, ILoggerFactory loggerFactory, ArrayPool<char> charPool,
@@ -577,7 +612,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<NotificationService>().As<INotificationService>().InstancePerLifetimeScope();
             builder.RegisterType<GCService>().As<IGcService>().InstancePerLifetimeScope();
             builder.RegisterType<ProductService>().As<IProductService>().InstancePerLifetimeScope();
-            builder.RegisterType<DiscountService>().As<IDiscountService>().InstancePerLifetimeScope();
+            builder.RegisterType<DiscountService>().As<IDiscountService>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<CountryService>().As<ICountryService>().InstancePerLifetimeScope();
             builder.RegisterType<ActionItemProvider>().As<IActionItemProvider>().InstancePerLifetimeScope();
             builder.RegisterType<WorkflowFactory>().As<IWorkflowFactory>().InstancePerLifetimeScope();

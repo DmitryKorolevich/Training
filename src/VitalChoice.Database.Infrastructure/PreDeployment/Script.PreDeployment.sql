@@ -12,3 +12,4 @@ Post-Deployment Script Template
 
 :r .\Scripts\MasterItems.sql
 :r .\Scripts\Tokens.sql
+:r .\Scripts\Redirects.sql

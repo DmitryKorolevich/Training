@@ -1,39 +1,18 @@
 ﻿using System;
 using System.Linq;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using VC.Public.Helpers;
-using VC.Public.Models.Profile;
 using VC.Public.Models.Tracking;
-using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer;
-using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Checkout;
-using VitalChoice.Interfaces.Services.Content;
 using VitalChoice.Interfaces.Services.Customers;
-using VitalChoice.Interfaces.Services.Users;
-using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
-using Microsoft.AspNetCore.Http;
-using VitalChoice.Business.Services.Customers;
-using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Interfaces.Services.Orders;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using VitalChoice.Business.Services.Affiliates;
-using VitalChoice.Business.Services.Checkout;
-using VitalChoice.Business.Services.Orders;
 using VitalChoice.Infrastructure.Domain.Options;
-using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services.Affiliates;
 
 namespace VC.Public.Components.Tracking
@@ -41,29 +20,29 @@ namespace VC.Public.Components.Tracking
     [ViewComponent(Name = "BodyEndTrackScripts")]
     public class BodyEndTrackScriptsComponent : ViewComponent
     {
+        private readonly Lazy<IAuthorizationService> _authorizationService;
         private const string PepperjamProgramId = "8392";
 
-        private readonly Lazy<IAuthorizationService> _authorizationService;
         private readonly Lazy<ICheckoutService> _checkoutService;
         private readonly Lazy<IOrderService> _orderService;
         private readonly Lazy<ICustomerService> _customerService;
         private readonly Lazy<IAffiliateService> _affiliateService;
         private readonly Lazy<ReferenceData> _referenceData;
-        private readonly BaseTrackScriptsComponentHelper _helper;
         private readonly Lazy<IOptions<AppOptions>> _appOptions;
         private readonly Lazy<ExtendedUserManager> _userManager;
 
-        public BodyEndTrackScriptsComponent()
+        public BodyEndTrackScriptsComponent(Lazy<IAuthorizationService> authorizationService, Lazy<ICheckoutService> checkoutService,
+            Lazy<IOrderService> orderService, Lazy<ICustomerService> customerService, Lazy<IAffiliateService> affiliateService,
+            Lazy<ReferenceData> referenceData, Lazy<IOptions<AppOptions>> appOptions, Lazy<ExtendedUserManager> userManager)
         {
-            _helper =new BaseTrackScriptsComponentHelper();
-            _authorizationService = new Lazy<IAuthorizationService>(() => HttpContext.RequestServices.GetService<IAuthorizationService>());
-            _checkoutService = new Lazy<ICheckoutService>(() => HttpContext.RequestServices.GetService<ICheckoutService>());
-            _orderService = new Lazy<IOrderService>(() => HttpContext.RequestServices.GetService<IOrderService>());
-            _customerService = new Lazy<ICustomerService>(() => HttpContext.RequestServices.GetService<ICustomerService>());
-            _affiliateService = new Lazy<IAffiliateService>(() => HttpContext.RequestServices.GetService<IAffiliateService>());
-            _referenceData = new Lazy<ReferenceData>(() => HttpContext.RequestServices.GetService<ReferenceData>());
-            _appOptions = new Lazy<IOptions<AppOptions>>(() => HttpContext.RequestServices.GetService<IOptions<AppOptions>>());
-            _userManager = new Lazy<ExtendedUserManager>(() => HttpContext.RequestServices.GetService<ExtendedUserManager>());
+            _authorizationService = authorizationService;
+            _checkoutService = checkoutService;
+            _orderService = orderService;
+            _customerService = customerService;
+            _affiliateService = affiliateService;
+            _referenceData = referenceData;
+            _appOptions = appOptions;
+            _userManager = userManager;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
@@ -71,7 +50,7 @@ namespace VC.Public.Components.Tracking
             var toReturn = new BodyEndTrackScriptsModel();
 
             var path = HttpContext.Request.Path.Value;
-            await _helper.SetBaseOptions(toReturn, HttpContext, _orderService, _authorizationService, _checkoutService, _customerService,
+            await BaseTrackScriptsComponentHelper.SetBaseOptions(toReturn, HttpContext, _orderService, _authorizationService, _checkoutService, _customerService,
                 _referenceData);
             OrderDynamic order = toReturn.Order;
             var referenceData = _referenceData.Value;
@@ -93,11 +72,13 @@ namespace VC.Public.Components.Tracking
                 {
                     toReturn.MyBuysEnabled = true;
                     //bronto recovery
-                    BrontoOrderInfo info = new BrontoOrderInfo();
-                    info.url = $"https://{referenceData.PublicHost}/cart/viewcart";
-                    info.customerEmail = order?.Customer?.Email;
-                    info.currency = "USD";
-                    info.subtotal = Math.Round(order.ProductsSubtotal, 2);
+                    BrontoOrderInfo info = new BrontoOrderInfo
+                    {
+                        url = $"https://{referenceData.PublicHost}/cart/viewcart",
+                        customerEmail = order?.Customer?.Email,
+                        currency = "USD",
+                        subtotal = Math.Round(order.ProductsSubtotal, 2)
+                    };
 
                     if (toReturn.OrderCompleteStep)
                     {
@@ -107,20 +88,21 @@ namespace VC.Public.Components.Tracking
                         info.taxAmount = order.TaxTotal;
                     }
 
-                    var skus = order.Skus.ToList();
-                    skus.AddRange(order.PromoSkus.Where(p => p.Enabled));
+                    var skus = order.Skus.Union(order.PromoSkus.Where(p => p.Enabled)).ToArray();
                     foreach (var skuOrdered in skus)
                     {
-                        BrontoOrderItemInfo item = new BrontoOrderItemInfo();
-                        item.sku = skuOrdered.Sku.Code;
-                        item.imageUrl = skuOrdered.Sku.Product.SafeData.Thumbnail != null
-                            ? $"https://{referenceData.PublicHost}{skuOrdered.Sku.Product.Data.Thumbnail}"
-                            : null;
-                        item.productUrl = $"https://{referenceData.PublicHost}/product/{skuOrdered.Sku.Product.Url}";
-                        item.quantity = skuOrdered.Quantity;
-                        item.unitPrice = Math.Round(skuOrdered.Amount, 2);
-                        item.totalPrice = Math.Round(skuOrdered.Quantity*skuOrdered.Amount, 2);
-                        item.name = _helper.GetProductFullName(skuOrdered);
+                        BrontoOrderItemInfo item = new BrontoOrderItemInfo
+                        {
+                            sku = skuOrdered.Sku.Code,
+                            imageUrl = skuOrdered.Sku.Product.SafeData.Thumbnail != null
+                                ? $"https://{referenceData.PublicHost}{skuOrdered.Sku.Product.Data.Thumbnail}"
+                                : null,
+                            productUrl = $"https://{referenceData.PublicHost}/product/{skuOrdered.Sku.Product.Url}",
+                            quantity = skuOrdered.Quantity,
+                            unitPrice = Math.Round(skuOrdered.Amount, 2),
+                            totalPrice = Math.Round(skuOrdered.Quantity*skuOrdered.Amount, 2),
+                            name = BaseTrackScriptsComponentHelper.GetProductFullName(skuOrdered)
+                        };
 
                         info.lineItems.Add(item);
                     }
@@ -165,7 +147,7 @@ namespace VC.Public.Components.Tracking
                         {
                             GoogleActionOrderItemInfo item = new GoogleActionOrderItemInfo();
                             item.id = skuOrdered.Sku.Code;
-                            item.name = _helper.GetProductFullName(skuOrdered).Replace("|", "-");
+                            item.name = BaseTrackScriptsComponentHelper.GetProductFullName(skuOrdered).Replace("|", "-");
                             item.price = Math.Round(skuOrdered.Amount, 2);
                             item.quantity = skuOrdered.Quantity;
                             item.brand = "Vital Choice";
@@ -215,12 +197,12 @@ namespace VC.Public.Components.Tracking
                     if (path == "/cart/viewcart")
                     {
                         toReturn.CriteoViewCart = String.Empty;
-                        for (int i = 0; i < skus.Count; i++)
+                        for (int i = 0; i < skus.Length; i++)
                         {
                             var item = skus[i];
                             toReturn.CriteoViewCart +=
                                 $"{{ id: \"{item.Sku.Product.Id}\", price: {item.Amount:F}, quantity: {item.Quantity} }}";
-                            if (i != skus.Count - 1)
+                            if (i != skus.Length - 1)
                             {
                                 toReturn.CriteoViewCart += ",";
                             }
@@ -231,12 +213,12 @@ namespace VC.Public.Components.Tracking
                     if (toReturn.OrderCompleteStep)
                     {
                         toReturn.CriteoOrderComplete = String.Empty;
-                        for (int i = 0; i < skus.Count; i++)
+                        for (int i = 0; i < skus.Length; i++)
                         {
                             var item = skus[i];
                             toReturn.CriteoOrderComplete +=
                                 $"{{ id: \"{item.Sku.Product.Id}\", price: {item.Amount:F}, quantity: {item.Quantity} }}";
-                            if (i != skus.Count - 1)
+                            if (i != skus.Length - 1)
                             {
                                 toReturn.CriteoOrderComplete += ",";
                             }
@@ -261,7 +243,7 @@ namespace VC.Public.Components.Tracking
                             ? 1 - toReturn.Order.DiscountTotal/toReturn.Order.ProductsSubtotal
                             : 1;
 
-                        for (int i = 0; i < skus.Count; i++)
+                        for (int i = 0; i < skus.Length; i++)
                         {
                             var skuOrdered = skus[i];
                             var index = i + 1;

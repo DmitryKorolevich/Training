@@ -36,6 +36,10 @@ namespace VitalChoice.Ecommerce.Domain.Entities.GiftCertificates
 
         public Guid PublicId { get; set; }
 
+        public DateTime? ExpirationDate { get; set; }
+
+        public string Tag { get; set; }
+
         public GiftCertificate Clone()
         {
             var toReturn = new GiftCertificate();
@@ -50,6 +54,8 @@ namespace VitalChoice.Ecommerce.Domain.Entities.GiftCertificates
             toReturn.GCType = this.GCType;
             toReturn.UserId = this.UserId;
             toReturn.IdEditedBy = this.IdEditedBy;
+            toReturn.ExpirationDate = this.ExpirationDate;
+            toReturn.Tag = this.Tag;
             return toReturn;
         }
     }

@@ -135,5 +135,32 @@ namespace VitalChoice.Business.Queries.Product
             }
             return this;
         }
+
+        public GcQuery WithExpirationDateFrom(DateTime? from)
+        {
+            if (from.HasValue)
+            {
+                Add(x => x.ExpirationDate >= from.Value);
+            }
+            return this;
+        }
+
+        public GcQuery WithExpirationDateTo(DateTime? to)
+        {
+            if (to.HasValue)
+            {
+                Add(x => x.ExpirationDate < to.Value.AddDays(1));
+            }
+            return this;
+        }
+
+        public GcQuery WithTag(string tag)
+        {
+            if (!string.IsNullOrEmpty(tag))
+            {
+                Add(x => x.Tag.StartsWith(tag));
+            }
+            return this;
+        }
     }
 }

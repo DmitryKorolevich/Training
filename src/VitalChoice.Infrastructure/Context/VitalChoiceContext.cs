@@ -618,6 +618,7 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("Redirects");
                 entity.Ignore(p => p.AddedBy);
                 entity.Ignore(p => p.EditedBy);
+                entity.Ignore(p => p.FutureRedirects);
             });
 
             builder.Entity<Token>(entity =>

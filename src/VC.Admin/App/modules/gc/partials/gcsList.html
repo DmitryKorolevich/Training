@@ -16,6 +16,27 @@
             <div class="col-md-4">
                 <select class="form-control" data-ng-model="filter.Type" ng-options="type.Key as type.Text for type in types"></select>
             </div>
+            <div class="col-md-4">
+                <input type="text" class="form-control" placeholder="Tag" data-ng-model="filter.Tag">
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-4">
+                <p class="input-group">
+                    <input type="text" class="form-control" placeholder="Valid From" name="ExpirationFrom" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.ExpirationFrom" is-open="fromOpened" ng-required="true" />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </p>
+            </div>
+            <div class="col-md-4">
+                <p class="input-group">
+                    <input type="text" class="form-control" placeholder="Valid To" name="ExpirationTo" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.ExpirationTo" is-open="toOpened" ng-required="true" />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </p>
+            </div>
         </div>
         <div class="row form-group">
             <div class="col-md-4">
@@ -29,84 +50,100 @@
         <spinner-overlay data-loading="refreshTracker.active()">
             <table id="data-grid" class="table table-striped table-hover ">
                 <thead>
-                <tr>
-                    <th>Product Name</th>
-                    <th>GC Code</th>
-                    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Created')">
-                        <span>Created</span>
-                        <span data-ng-if="filter.Sorting.Path == 'Created'">
-                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
-                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
-                        </span>
-                    </th>
-                    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('IdOrder')">
-                        <span>Order #</span>
-                        <span data-ng-if="filter.Sorting.Path == 'IdOrder'">
-                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
-                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
-                        </span>
-                    </th>
-                    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Recipient')">
-                        <span>Recipient</span>
-                        <span data-ng-if="filter.Sorting.Path == 'Recipient'">
-                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
-                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
-                        </span>
-                    </th>
-                    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Available')">
-                        <span>Available</span>
-                        <span data-ng-if="filter.Sorting.Path == 'Available'">
-                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
-                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
-                        </span>
-                    </th>
-                    <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Status')">
-                        <span>Status</span>
-                        <span data-ng-if="filter.Sorting.Path == 'Status'">
-                            <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
-                            <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
-                        </span>
-                    </th>
-                    <th class="actions-3">Actions</th>
-                </tr>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>GC Code</th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Created')">
+                            <span>Created</span>
+                            <span data-ng-if="filter.Sorting.Path == 'Created'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('IdOrder')">
+                            <span>Order #</span>
+                            <span data-ng-if="filter.Sorting.Path == 'IdOrder'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Recipient')">
+                            <span>Recipient</span>
+                            <span data-ng-if="filter.Sorting.Path == 'Recipient'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Available')">
+                            <span>Available</span>
+                            <span data-ng-if="filter.Sorting.Path == 'Available'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Status')">
+                            <span>Status</span>
+                            <span data-ng-if="filter.Sorting.Path == 'Status'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('ExpirationDate')">
+                            <span>Valid To</span>
+                            <span data-ng-if="filter.Sorting.Path == 'ExpirationDate'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Tag')">
+                            <span>Tag</span>
+                            <span data-ng-if="filter.Sorting.Path == 'Tag'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="actions-3">Actions</th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr data-ng-repeat="item in items">
-                    <td>{{item.ProductName}}</td>
-                    <td>
-                        <a ui-sref="index.oneCol.gcDetail({id:item.Id})">{{::item.Code}}</a>
-                    </td>
-                    <td>{{item.Created | date:"MM/dd/yy"}}<br />{{item.Created | date:"h:mm a"}}<br />{{item.AgentId}}</td>
-                    <td><a data-ng-if="item.IdOrder" ui-sref="index.oneCol.orderDetail({id:item.IdOrder})">{{item.IdOrder}}</a></td>
-                    <td>{{item.RecipientName}}<br />{{item.RecipientEmail}}</td>
-                    <td>{{item.Balance | currency}}</td>
-                    <td>
-                        <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
-                        <span data-ng-if="item.StatusCode == 1" class="label label-danger font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
-                    </td>
-                    <td>
-                        <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="edit(item.Id);">
-                            <i class="glyphicon glyphicon-edit"></i>
-                        </button>
-                        <button title="Delete" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">
-                            <i class="glyphicon glyphicon-remove"></i>
-                        </button>
-                        <button title="Send" class="btn btn-default btn-primary btn-xs" data-ng-show="item.StatusCode == 2 && item.Balance != 0" data-ng-click="send(item);">
-                            <i class="fa fa-envelope"></i>
-                        </button>
-                    </td>
-                </tr>
+                    <tr data-ng-repeat="item in items">
+                        <td>{{item.ProductName}}</td>
+                        <td>
+                            <a ui-sref="index.oneCol.gcDetail({id:item.Id})">{{::item.Code}}</a>
+                        </td>
+                        <td>{{item.Created | date:"MM/dd/yy"}}<br />{{item.Created | date:"h:mm a"}}<br />{{item.AgentId}}</td>
+                        <td><a data-ng-if="item.IdOrder" ui-sref="index.oneCol.orderDetail({id:item.IdOrder})">{{item.IdOrder}}</a></td>
+                        <td>{{item.RecipientName}}<br />{{item.RecipientEmail}}</td>
+                        <td>{{item.Balance | currency}}</td>
+                        <td>
+                            <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
+                            <span data-ng-if="item.StatusCode == 1" class="label label-danger font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
+                        </td>
+                        <td>{{item.ExpirationDate | date:"MM/dd/yy"}}<br />{{item.ExpirationDate | date:"h:mm a"}}</td>
+                        <td>{{item.Tag}}</td>
+                        <td>
+                            <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="edit(item.Id);">
+                                <i class="glyphicon glyphicon-edit"></i>
+                            </button>
+                            <button title="Delete" class="btn btn-default btn-danger btn-xs" ladda="deleteTracker.active()" data-ng-click="delete(item.Id);">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </button>
+                            <button title="Send" class="btn btn-default btn-primary btn-xs" data-ng-show="item.StatusCode == 2 && item.Balance != 0" data-ng-click="send(item);">
+                                <i class="fa fa-envelope"></i>
+                            </button>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <uib-pagination boundary-links="true"
-                        total-items="totalItems"
-                        items-per-page="filter.Paging.PageItemCount"
-                        data-ng-model="filter.Paging.PageIndex"
-                        previous-text="&lsaquo;"
-                        next-text="&rsaquo;"
-                        first-text="&laquo;"
-                        last-text="&raquo;"
-                        data-ng-change="pageChanged();scrollTo('data-grid');">
+                            total-items="totalItems"
+                            items-per-page="filter.Paging.PageItemCount"
+                            data-ng-model="filter.Paging.PageIndex"
+                            previous-text="&lsaquo;"
+                            next-text="&rsaquo;"
+                            first-text="&laquo;"
+                            last-text="&raquo;"
+                            data-ng-change="pageChanged();scrollTo('data-grid');">
             </uib-pagination>
         </spinner-overlay>
     </div>

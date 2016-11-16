@@ -1,0 +1,99 @@
+﻿<div class="container-fluid discount-usage-report">
+    <div class="well">
+        <span class="legend">Discount Usage Report</span>
+        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+            <fieldset>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="From" data-ng-change="filterChanged();" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.From.$invalid">
+                            <small class="error" ng-show="forms.form.From.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","From")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="To" data-ng-change="filterChanged();" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.To.$invalid">
+                            <small class="error" ng-show="forms.form.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group autocomplete col-md-12">
+                            <input type="text" name="Discount" class="form-control" placeholder="Discount Code" data-ng-change="filterChanged();" data-ng-model="filter.Discount" autocomplete="off" data-ng-minlength="1"
+                                   typeahead-min-length="1" uib-typeahead="code for code in getDiscounts($viewValue)" typeahead-loading="loadingDiscounts"
+                                   typeahead-on-select="filterChanged();" typeahead-wait-ms="200">
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
+                        <a target="_self" class="btn btn-primary pull-right" data-ng-href="{{options.exportUrl}}">Export</a>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <spinner-overlay data-loading="refreshTracker.active()">       
+            <div class="orders">
+                <table id="data-grid" class="table table-striped order-statuses">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th class="status">Status</th>
+                            <th>Order Date</th>
+                            <th>Customer</th>
+                            <th>Customer Email</th>
+                            <th>Total</th>
+                            <th>Discount Code</th>
+                            <th>Discount Type</th>
+                            <th>Discount Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="item in items">
+                            <td>
+                                <a ui-sref="{{::item.IdObjectType==5 ? 'index.oneCol.orderReshipDetail({id: item.Id })' : item.IdObjectType==6 ? 'index.oneCol.orderRefundDetail({id: item.Id })' : 'index.oneCol.orderDetail({id: item.Id })'}}">{{::item.Id}}</a>
+                            </td>
+                            <td>
+                                <div data-ng-include="'app/modules/order/partials/orderStatusSection.html'"></div>
+                            </td>
+                            <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}</td>
+                            <td>
+                                <a ui-sref="index.oneCol.customerDetail({id: item.IdCustomer})">{{::item.CustomerFirstName}} {{::item.CustomerLastName}}</a>
+                            </td>
+                            <td>
+                                <a ui-sref="index.oneCol.customerDetail({id: item.IdCustomer})">{{::item.CustomerEmail}}</a>
+                            </td>
+                            <td>
+                                <span data-ng-if="::item.IdObjectType!=6">{{::item.Total | currency}}</span>
+                                <span data-ng-if="::item.IdObjectType==6">({{Math.abs(item.Total) | currency}})</span>
+                            </td>
+                            <td>{{::item.DiscountCode}}</td>
+                            <td>{{::item.DiscountMessage}}</td>
+                            <td>{{::item.DiscountTotal | currency}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </spinner-overlay>
+        <uib-pagination boundary-links="true"
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        previous-text="&lsaquo;"
+                        next-text="&rsaquo;"
+                        first-text="&laquo;"
+                        last-text="&raquo;"
+                        data-ng-change="pageChanged();scrollTo('data-grid');">
+        </uib-pagination>
+    </div>
+</div>

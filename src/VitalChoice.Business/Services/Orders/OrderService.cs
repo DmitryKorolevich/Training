@@ -95,6 +95,8 @@ namespace VitalChoice.Business.Services.Orders
         private readonly AppSettings _appSettings;
         private readonly ILoggerFactory _loggerFactory;
 
+        private readonly IRedirectService _redirectService;
+
         public OrderService(
             IEcommerceRepositoryAsync<VOrderWithRegionInfoItem> vOrderWithRegionInfoItemRepository,
             OrderRepository orderRepository,
@@ -123,7 +125,8 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository, IDiscountService discountService,
             IEcommerceRepositoryAsync<VAutoShip> vAutoShipRepository, IEcommerceRepositoryAsync<VAutoShipOrder> vAutoShipOrderRepository,
             AffiliateOrderPaymentRepository affiliateOrderPaymentRepository, ICountryNameCodeResolver codeResolver,
-            IDynamicEntityOrderingExtension<Order> orderingExtension, ReferenceData referenceData, AppSettings appSettings)
+            IDynamicEntityOrderingExtension<Order> orderingExtension, ReferenceData referenceData, AppSettings appSettings,
+            IRedirectService redirectService)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension
@@ -156,6 +159,8 @@ namespace VitalChoice.Business.Services.Orders
             _productService = productService;
             _notificationService = notificationService;
             _loggerFactory = loggerProvider;
+
+            _redirectService = redirectService;
         }
 
         private async Task<Order> InsertAsyncInternal(OrderDynamic model, IUnitOfWorkAsync uow)

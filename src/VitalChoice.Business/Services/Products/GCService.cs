@@ -72,6 +72,7 @@ namespace VitalChoice.Business.Services.Products
                 conditions = conditions.WithEqualCode(filter.ExactCode);
             }
             conditions = conditions.WithEmail(filter.Email).WithName(filter.Name);
+            conditions = conditions.WithExpirationDateFrom(filter.ExpirationFrom).WithExpirationDateTo(filter.ExpirationTo).WithTag(filter.Tag);
             var query = giftCertificateRepository.Query(conditions);
 
             Func<IQueryable<GiftCertificate>, IOrderedQueryable<GiftCertificate>> sortable = x => x.OrderByDescending(y => y.Created);
@@ -106,7 +107,21 @@ namespace VitalChoice.Business.Services.Products
 								? x.OrderBy(y => y.Created)
 								: x.OrderByDescending(y => y.Created);
 			        break;
-	        }
+                case GiftCertificateSortPath.ExpirationDate:
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.ExpirationDate)
+                                : x.OrderByDescending(y => y.ExpirationDate);
+                    break;
+                case GiftCertificateSortPath.Tag:
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.Tag)
+                                : x.OrderByDescending(y => y.Tag);
+                    break;
+            }
 
 	        PagedList<GiftCertificate> toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
             var userIds = toReturn.Items.Select(pp => pp.UserId).Where(u => u.HasValue).Select(u => u.Value).Distinct().ToList();
@@ -289,6 +304,7 @@ namespace VitalChoice.Business.Services.Products
                 dbItem.Email = model.Email;
                 dbItem.Balance = model.Balance;
                 dbItem.IdEditedBy = model.IdEditedBy;
+                dbItem.Tag = model.Tag;
                 if (model.StatusCode != RecordStatusCode.Deleted)
                 {
                     dbItem.StatusCode = model.StatusCode;

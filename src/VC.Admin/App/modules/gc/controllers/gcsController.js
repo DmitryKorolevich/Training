@@ -47,6 +47,9 @@ function ($scope, $rootScope, $state, gcService, toaster, modalUtil, confirmUtil
         $scope.filter = {
             Type: null,
             Code: null,
+            Tag: null,
+            ExpirationFrom: null,
+            ExpirationTo: null,
             Paging: { PageIndex: 1, PageItemCount: 100 },
             Sorting: gridSorterUtil.resolve(refreshItems, "Created", "Desc")
         };

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using VC.Admin.Validators.Product;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
@@ -21,6 +22,10 @@ namespace VC.Admin.Models.Redirects
         [Localized(GeneralFieldNames.RedirectUrl)]
         public string To { get; set; }
 
+        public bool IgnoreQuery { get; set; }
+
+        public ICollection<FutureRedirect> FutureRedirects { get; set; }
+
         public RedirectManageModel()
         {
         }
@@ -32,6 +37,8 @@ namespace VC.Admin.Models.Redirects
                 Id = item.Id;
                 From = item.From;
                 To = item.To;
+                IgnoreQuery = item.IgnoreQuery;
+                FutureRedirects = item.FutureRedirects;
             }
         }
 
@@ -45,6 +52,8 @@ namespace VC.Admin.Models.Redirects
                 toReturn.From = "/" + toReturn.From;
             }
             toReturn.To = To;
+            toReturn.IgnoreQuery = IgnoreQuery;
+            toReturn.FutureRedirects = FutureRedirects;
 
             return toReturn;
         }

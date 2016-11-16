@@ -58,8 +58,8 @@
         "VeraCoreNotificationsJob": "0 0/5 * * * ?",
         "HostStatusJob": "0 0/5 * * * ?",
         "AppOptionsSetupJob": "0 0 2 * * ?",
-        "KPIReportJob": "0 0 3 * * ?"
-        //"KPIReportJob": "0 0/9 * * * ?"
+        "KPIReportJob": "0 0 3 * * ?",
+        "RedirectJob": "0 0 1 * * ?"
       }
     },
     "Avatax": {

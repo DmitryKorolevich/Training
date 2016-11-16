@@ -7,5 +7,7 @@
 	    public const string Available = "Available";
 	    public const string Status = "Status";
 	    public const string Created = "Created";
+        public const string ExpirationDate = "ExpirationDate";
+        public const string Tag = "Tag";
     }
 }
