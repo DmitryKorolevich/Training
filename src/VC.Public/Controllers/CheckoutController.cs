@@ -127,7 +127,6 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
-        [CustomerAuthorize]
         public async Task<Result<bool>> CheckCreditCard(int id)
         {
             if (await CustomerLoggedIn())
