@@ -74,7 +74,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    stateLabel: 'Sales, Orders',
 				    subMenu: [
                         { name: 'skuPOrderTypeBreakDownReport', stateName: 'index.oneCol.skuPOrderTypeBreakDownReport', stateLabel: 'Breakdown Report', access: 3 },
-                        { name: 'productCategoriesStatistic', stateName: 'index.oneCol.productCategoriesStatistic', stateLabel: 'Category Sales Report', access: 3 },
+                        //{ name: 'productCategoriesStatistic', stateName: 'index.oneCol.productCategoriesStatistic', stateLabel: 'Category Sales Report', access: 3 },
                         { name: 'healthwisePeriods', stateName: 'index.oneCol.healthwisePeriods', stateLabel: 'HealthWise Customer Report', access: 3 },
                         { name: 'KPIReport', stateLabel: 'KPI Report (APIs)', href: '/api/report/kpi', access: null },
                         { name: 'orderSKUAddressReport', stateName: 'index.oneCol.orderSKUAddressReport', stateLabel: 'Order SKU and Address Report', access: 3 },

@@ -31,6 +31,11 @@ namespace VC.Admin.Models.Products
 
         public GCType GCType { get; set; }
 
+        //readonly
+        public DateTime? ExpirationDate { get; set; }
+        
+        public string Tag { get; set; }
+
         public GCManageModel()
         {
         }
@@ -48,6 +53,8 @@ namespace VC.Admin.Models.Products
                 Email = item.Email;
                 StatusCode = item.StatusCode;
                 GCType = item.GCType;
+                ExpirationDate = item.ExpirationDate;
+                Tag = item.Tag;
             }
         }
 
@@ -60,6 +67,7 @@ namespace VC.Admin.Models.Products
             toReturn.LastName = LastName;
             toReturn.Email = Email;
             toReturn.StatusCode = StatusCode;
+            toReturn.Tag = Tag;
 
             return toReturn;
         }
