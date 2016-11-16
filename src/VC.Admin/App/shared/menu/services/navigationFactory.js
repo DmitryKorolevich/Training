@@ -84,6 +84,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
                         { name: 'shippedViaSummaryReport', stateName: 'index.oneCol.shippedViaSummaryReport', stateLabel: 'Shipped Via Report', access: 3 },
                         { name: 'skuBreakDownReport', stateName: 'index.oneCol.skuBreakDownReport', stateLabel: 'SKU Breakdown Report', access: 3 },
                         { name: 'ordersSummarySalesReport', stateName: 'index.oneCol.ordersSummarySalesReport', stateLabel: 'Summary Sales Report', access: 3 },
+                        { name: 'orderDiscountReport', stateName: 'index.oneCol.orderDiscountReport', stateLabel: 'Discount Usage Report', access: 3 },
                         { name: 'transactionsAndRefundsReport', stateName: 'index.oneCol.transactionsAndRefundsReport', stateLabel: 'Transaction & Refund Report', access: 3 },
 				    ]
 				},

@@ -612,7 +612,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<NotificationService>().As<INotificationService>().InstancePerLifetimeScope();
             builder.RegisterType<GCService>().As<IGcService>().InstancePerLifetimeScope();
             builder.RegisterType<ProductService>().As<IProductService>().InstancePerLifetimeScope();
-            builder.RegisterType<DiscountService>().As<IDiscountService>().InstancePerLifetimeScope();
+            builder.RegisterType<DiscountService>().As<IDiscountService>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<CountryService>().As<ICountryService>().InstancePerLifetimeScope();
             builder.RegisterType<ActionItemProvider>().As<IActionItemProvider>().InstancePerLifetimeScope();
             builder.RegisterType<WorkflowFactory>().As<IWorkflowFactory>().InstancePerLifetimeScope();

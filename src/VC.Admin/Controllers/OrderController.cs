@@ -94,6 +94,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<AAFESReportItem, AAFESReportItemCsvMap> _aAFESReportItemCsvMapСSVExportService;
         private readonly ICsvExportService<AfiiliateOrderItemImportExportModel, AfiiliateOrderItemImportExportCsvMap> _afiiliateOrderItemImportExportСSVExportService;
         private readonly ICsvExportService<CustomerSkuUsageReportRawItem, CustomerSkuUsageReportRawItemExportCsvMap> _customerSkuUsageReportRawItemExportСSVExportService;
+        private readonly ICsvExportService<OrderDiscountReportItem, OrderDiscountReportItemExportCsvMap> _orderDiscountReportItemExportCsvMapСSVExportService;
         private readonly INotificationService _notificationService;
         private readonly BrontoService _brontoService;
         private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
@@ -131,6 +132,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<AAFESReportItem, AAFESReportItemCsvMap> aAFESReportItemCsvMapСSVExportService,
             ICsvExportService<AfiiliateOrderItemImportExportModel, AfiiliateOrderItemImportExportCsvMap> afiiliateOrderItemImportExportСSVExportService,
             ICsvExportService<CustomerSkuUsageReportRawItem, CustomerSkuUsageReportRawItemExportCsvMap> customerSkuUsageReportRawItemExportСSVExportService,
+            ICsvExportService<OrderDiscountReportItem, OrderDiscountReportItemExportCsvMap> orderDiscountReportItemExportCsvMapСSVExportService,
             INotificationService notificationService,
             BrontoService brontoService,
             IOrderReportService orderReportService,
@@ -164,6 +166,7 @@ namespace VC.Admin.Controllers
             _aAFESReportItemCsvMapСSVExportService = aAFESReportItemCsvMapСSVExportService;
             _afiiliateOrderItemImportExportСSVExportService = afiiliateOrderItemImportExportСSVExportService;
             _customerSkuUsageReportRawItemExportСSVExportService = customerSkuUsageReportRawItemExportСSVExportService;
+            _orderDiscountReportItemExportCsvMapСSVExportService = orderDiscountReportItemExportCsvMapСSVExportService;
             _notificationService = notificationService;
             _brontoService = brontoService;
             _orderReportService = orderReportService;
@@ -1911,6 +1914,47 @@ namespace VC.Admin.Controllers
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileName = String.Format(FileConstants.CUSTOMER_SKU_USAGE_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<PagedList<OrderDiscountReportItem>>> GetOrderDiscountReportItems([FromBody]OrderDiscountReportFilter filter)
+        {
+            filter.To = filter.To.AddDays(1);
+            var toReturn = await _orderReportService.GetOrderDiscountReportItemsAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<FileResult> GetOrderDiscountReportFile([FromQuery]string from, [FromQuery]string to, [FromQuery]string discount)
+        {
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+
+            OrderDiscountReportFilter filter = new OrderDiscountReportFilter()
+            {
+                From = dFrom.Value,
+                To = dTo.Value.AddDays(1),
+                Discount = discount
+            };
+            filter.Paging = null;
+
+            var data = await _orderReportService.GetOrderDiscountReportItemsAsync(filter);
+
+            var result = _orderDiscountReportItemExportCsvMapСSVExportService.ExportToCsv(data.Items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.DISCOUNT_USAGE_REPORT, DateTime.Now)
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());

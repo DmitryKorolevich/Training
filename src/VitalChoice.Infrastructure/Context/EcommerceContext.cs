@@ -176,6 +176,13 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(f => new { f.IdCustomer, f.IdSku});
             });
 
+            builder.Entity<OrderDiscountReportItem>(entity =>
+            {
+                entity.Ignore(f => f.DiscountCode);
+                entity.Ignore(f => f.DiscountMessage);
+                entity.HasKey(f => f.Id);
+            });
+
             #endregion
 
             builder.Entity<VCustomerFavorite>(entity =>
