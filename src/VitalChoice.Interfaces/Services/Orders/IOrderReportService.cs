@@ -61,5 +61,7 @@ namespace VitalChoice.Interfaces.Services.Orders
 
 	    Task<PagedList<CustomerSkuUsageReportRawItem>> GetCustomerSkuUsageReportItemsAsync(CustomerSkuUsageReportFilter filter,
             bool removeEmailDublicates=false);
+
+	    Task<PagedList<OrderDiscountReportItem>> GetOrderDiscountReportItemsAsync(OrderDiscountReportFilter filter);
 	}
 }

@@ -33,14 +33,27 @@
     function initialize() {
 
         $scope.forms = {};
+        $scope.options = {};
 
         $scope.redirect = {};
+        $scope.redirect.FutureRedirects = [];
         if (data.id) {
             redirectService.getRedirect(data.id, $scope.saveTracker).success(function (result)
             {                
                 if (result.Success)
                 {
                     $scope.redirect = result.Data;
+                    $.each($scope.redirect.FutureRedirects, function (index, item)
+                    {
+                        if (item.StartDate)
+                        {
+                            item.StartDate = Date.parseDateTime(item.StartDate);
+                        }
+                    });
+                    if ($scope.redirect.FutureRedirects && $scope.redirect.FutureRedirects.length > 0)
+                    {
+                        $scope.options.FutureRedirectOpened = true;
+                    }
                 }
             }).
             error(function (result)
@@ -62,7 +75,17 @@
 
         if ($scope.forms.form.$valid)
         {
-            redirectService.updateRedirect($scope.redirect, $scope.saveTracker).success(function (result)
+            var redirect = angular.copy($scope.redirect);
+
+            $.each(redirect.FutureRedirects, function (index, item)
+            {
+                if (item.StartDate)
+                {
+                    item.StartDate = item.StartDate.toServerDateTime();
+                }
+            });
+
+            redirectService.updateRedirect(redirect, $scope.saveTracker).success(function (result)
             {
                 successSaveHandler(result);
             }).
@@ -79,6 +102,28 @@
     $scope.cancel = function ()
     {
         $uibModalInstance.close();
+    };
+
+    $scope.addFutureRedirect = function ()
+    {
+        if (!$scope.forms.form.$valid)
+        {
+            $scope.forms.submitted = true;
+            return false;
+        }
+
+        var newRedirect = {
+            Url: '',
+            StartDate: null,
+        };        
+        $scope.redirect.FutureRedirects.push(newRedirect);
+
+        $scope.forms.submitted = false;
+    };
+
+    $scope.deleteFutureRedirect = function (index)
+    {
+        $scope.redirect.FutureRedirects.splice(index, 1);
     };
 
     initialize();

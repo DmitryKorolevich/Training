@@ -97,11 +97,21 @@ namespace VitalChoice.Business.Services.Products
         {
             foreach (var entity in entities)
             {
-                var skuIds = new HashSet<int>(entity.DiscountsToSelectedSkus.Select(p => p.IdSku));
-                foreach (var id in entity.DiscountsToSkus.Select(p => p.IdSku))
+                var skuIds = new HashSet<int>();
+
+                if (entity.DiscountsToSelectedSkus != null)
                 {
-                    skuIds.Add(id);
+                    skuIds.AddRange(entity.DiscountsToSelectedSkus.Select(p => p.IdSku));
                 }
+
+                if (entity.DiscountsToSkus != null)
+                {
+                    foreach (var id in entity.DiscountsToSkus.Select(p => p.IdSku))
+                    {
+                        skuIds.Add(id);
+                    }
+                }
+
                 if (skuIds.Count > 0)
                 {
                     var shortSkus =
@@ -123,7 +133,10 @@ namespace VitalChoice.Business.Services.Products
                             sku.ShortSkuInfo = skuInfo;
                     }
                 }
-                entity.DiscountTiers = entity.DiscountTiers.OrderBy(p => p.Order).ToArray();
+                if (entity.DiscountTiers != null)
+                {
+                    entity.DiscountTiers = entity.DiscountTiers.OrderBy(p => p.Order).ToArray();
+                }
             }
         }
 

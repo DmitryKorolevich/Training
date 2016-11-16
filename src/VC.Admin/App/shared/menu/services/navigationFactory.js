@@ -74,7 +74,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    stateLabel: 'Sales, Orders',
 				    subMenu: [
                         { name: 'skuPOrderTypeBreakDownReport', stateName: 'index.oneCol.skuPOrderTypeBreakDownReport', stateLabel: 'Breakdown Report', access: 3 },
-                        { name: 'productCategoriesStatistic', stateName: 'index.oneCol.productCategoriesStatistic', stateLabel: 'Category Sales Report', access: 3 },
+                        //{ name: 'productCategoriesStatistic', stateName: 'index.oneCol.productCategoriesStatistic', stateLabel: 'Category Sales Report', access: 3 },
                         { name: 'healthwisePeriods', stateName: 'index.oneCol.healthwisePeriods', stateLabel: 'HealthWise Customer Report', access: 3 },
                         { name: 'KPIReport', stateLabel: 'KPI Report (APIs)', href: '/api/report/kpi', access: null },
                         { name: 'orderSKUAddressReport', stateName: 'index.oneCol.orderSKUAddressReport', stateLabel: 'Order SKU and Address Report', access: 3 },
@@ -84,6 +84,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
                         { name: 'shippedViaSummaryReport', stateName: 'index.oneCol.shippedViaSummaryReport', stateLabel: 'Shipped Via Report', access: 3 },
                         { name: 'skuBreakDownReport', stateName: 'index.oneCol.skuBreakDownReport', stateLabel: 'SKU Breakdown Report', access: 3 },
                         { name: 'ordersSummarySalesReport', stateName: 'index.oneCol.ordersSummarySalesReport', stateLabel: 'Summary Sales Report', access: 3 },
+                        { name: 'orderDiscountReport', stateName: 'index.oneCol.orderDiscountReport', stateLabel: 'Discount Usage Report', access: 3 },
                         { name: 'transactionsAndRefundsReport', stateName: 'index.oneCol.transactionsAndRefundsReport', stateLabel: 'Transaction & Refund Report', access: 3 },
 				    ]
 				},

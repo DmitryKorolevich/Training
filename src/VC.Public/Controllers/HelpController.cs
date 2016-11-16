@@ -18,6 +18,7 @@ using Microsoft.Net.Http.Headers;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Business.Models.Help;
 using VitalChoice.Business.Services.Bronto;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Interfaces.Services.Products;
 using VitalChoice.Validation.Models;
@@ -82,6 +83,16 @@ namespace VC.Public.Controllers
         public Task<IActionResult> SearchFAQ(string q)
         {
             return Task.FromResult<IActionResult>(View());
+        }
+
+        [HttpGet]
+        public IActionResult CustomCSS()
+        {
+            Response.ContentType = "text/css";
+            Response.Headers["Cache-Control"] = "public, max-age=604800";
+            Response.Headers.RemoveAll(p => p.Key == "Pragma");
+            Response.Headers.RemoveAll(p => p.Key == "Expires");
+            return View("CustomCSS");
         }
 
         [HttpPost]

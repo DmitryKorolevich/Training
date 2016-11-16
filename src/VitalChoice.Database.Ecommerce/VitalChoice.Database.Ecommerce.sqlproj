@@ -232,4 +232,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\ProductOptionTypes.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetOrderDiscountReport.sql" />
+  </ItemGroup>
 </Project>
