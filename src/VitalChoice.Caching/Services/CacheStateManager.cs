@@ -239,6 +239,8 @@ namespace VitalChoice.Caching.Services
             var dbContext = DataContext as DbContext;
             var entryGroups = entriesToSave.Where(e => e.EntityType != null).GroupBy(e => e.EntityType);
 
+            var updateList = new List<UpdateOp>();
+
             foreach (var group in entryGroups)
             {
                 var cache = CacheFactory.GetCache(group.Key);
@@ -253,7 +255,11 @@ namespace VitalChoice.Caching.Services
                                 var pk = opPair.Value;
                                 if (pk.IsValid)
                                 {
-                                    cache.Update(op.Entity, dbContext, DataContext);
+                                    updateList.Add(new UpdateOp
+                                    {
+                                        Entity = op.Entity,
+                                        Cache = cache
+                                    });
                                     yield return new SyncOperation
                                     {
                                         Key = pk.ToExportable(group.Key),
@@ -286,7 +292,11 @@ namespace VitalChoice.Caching.Services
                                 var pk = opPair.Value;
                                 if (pk.IsValid)
                                 {
-                                    cache.Update(op.Entity, dbContext, DataContext);
+                                    updateList.Add(new UpdateOp
+                                    {
+                                        Entity = op.Entity,
+                                        Cache = cache
+                                    });
                                     yield return new SyncOperation
                                     {
                                         Key = pk.ToExportable(group.Key),
@@ -299,12 +309,19 @@ namespace VitalChoice.Caching.Services
                     }
                 }
             }
+
+            foreach (var updateOp in updateList)
+            {
+                updateOp.Cache.Update(updateOp.Entity, dbContext, DataContext);
+            }
         }
 
         private void MarkUpdateCache(IEnumerable<ImmutableEntryState> entriesToSave)
         {
             var dbContext = DataContext as DbContext;
             var entryGroups = entriesToSave.Where(e => e.EntityType != null).GroupBy(e => e.EntityType);
+
+            var updateList = new List<UpdateOp>();
 
             foreach (var group in entryGroups)
             {
@@ -320,7 +337,11 @@ namespace VitalChoice.Caching.Services
                                 var pk = opPair.Value;
                                 if (pk.IsValid)
                                 {
-                                    cache.Update(op.Entity, dbContext, DataContext);
+                                    updateList.Add(new UpdateOp
+                                    {
+                                        Entity = op.Entity,
+                                        Cache = cache
+                                    });
                                 }
                             }
                             break;
@@ -341,13 +362,28 @@ namespace VitalChoice.Caching.Services
                                 var pk = opPair.Value;
                                 if (pk.IsValid)
                                 {
-                                    cache.Update(op.Entity, dbContext, DataContext);
+                                    updateList.Add(new UpdateOp
+                                    {
+                                        Entity = op.Entity,
+                                        Cache = cache
+                                    });
                                 }
                             }
                             break;
                     }
                 }
             }
+
+            foreach (var updateOp in updateList)
+            {
+                updateOp.Cache.Update(updateOp.Entity, dbContext, DataContext);
+            }
+        }
+
+        private struct UpdateOp
+        {
+            public object Entity;
+            public IInternalEntityCache Cache;
         }
     }
 }
