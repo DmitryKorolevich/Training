@@ -262,6 +262,31 @@ namespace VitalChoice.Business.Mailings
             }
         }
 
+        public async Task SendGiftAdminNotificationEmailsAsync(ICollection<GiftAdminNotificationEmail> models)
+        {
+            foreach (var model in models)
+            {
+                if (model.Gifts != null)
+                {
+                    for (int i = 0; i < model.Gifts.Count; i++)
+                    {
+                        model.Gifts[i].ShowDots = i != model.Gifts.Count - 1;
+                    }
+                }
+                model.PublicHost = _publicHost;
+            }
+
+            var items = await _emailTemplateService.GenerateEmailsAsync(EmailConstants.GiftAdminNotificationEmail, models);
+
+            if (items != null)
+            {
+                foreach (var item in items)
+                {
+                    await emailSender.SendEmailAsync(item.Key.Email, item.Value.Subject, item.Value.Body, toDisplayName: item.Key.Recipient);
+                }
+            }
+        }
+
         public async Task SendContentUrlNotificationForArticleAsync(string email, ContentUrlNotificationEmail model)
         {
             var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.EmailArticle, model);

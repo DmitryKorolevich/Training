@@ -1,0 +1,42 @@
+﻿<div class="modal-header">
+    <h3 class="modal-title">Import E-Gift Certificates</h3>
+</div>
+<div class="modal-body">
+    <spinner-overlay data-loading="saveTracker.active()">
+        <form class="form-horizontal" name="forms.form" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+            <fieldset>
+                <div class="form-group">
+                    <label for="IdNotificationType" class="col-md-3 control-label">Notification Type</label>
+                    <div class="col-md-9">
+                        <select class="form-control" id="IdNotificationType" name="IdNotificationType" data-ng-model="options.IdNotificationType" ng-options="item.Key as item.Text for item in options.NotificationTypes" required autocomplete="off"></select>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.IdNotificationType.$invalid">
+                            <small class="error" ng-show="forms.form.IdNotificationType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Notification Type")}}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"></label>
+                    <div class="col-md-9 form-control-static">
+                        <a target="_blank" href="/assets/templates/egc_template.csv">Get a template</a>
+                    </div>
+                </div>
+                <div data-ng-if="options.selectedOrderImportFile" class="form-group">
+                    <label class="col-md-3 control-label">File Name</label>
+                    <div class="col-md-9 form-control-static">
+                        <span>{{options.selectedImportFile.name}}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">File</label>
+                    <div class="col-md-9">
+                        <button class="btn btn-primary margin-right-8px" ngf-select ngf-change="setImportFile($files)" accept=".csv">Locate file</button>
+                        <button data-ng-if="options.selectedImportFile" class="btn btn-success" data-ng-click="uploadImportFile()" ladda="uploadingImport">Upload</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </spinner-overlay>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" data-ng-click="cancel()">Cancel</button>
+</div>

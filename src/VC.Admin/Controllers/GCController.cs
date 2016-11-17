@@ -26,8 +26,11 @@ using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Business.Helpers;
+using VitalChoice.Business.Mailings;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain;
+using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Ecommerce.Domain.Mail;
 
 namespace VC.Admin.Controllers
 {
@@ -37,17 +40,21 @@ namespace VC.Admin.Controllers
         private readonly IOrderSchedulerService OrderSchedulerService;
         private readonly ICsvExportService<GCWithOrderListItemModel, GcWithOrderListItemModelCsvMap> _gCWithOrderListItemModelCsvMapCSVExportService;
         private readonly ExtendedUserManager _userManager;
+        private readonly INotificationService _notificationService;
         private readonly ILogger logger;
 
         public GCController(IGcService GCService,
             IOrderSchedulerService OrderSchedulerService,
             ICsvExportService<GCWithOrderListItemModel, GcWithOrderListItemModelCsvMap> gCWithOrderListItemModelCsvMapCSVExportService,
-            ILoggerFactory loggerProvider, ExtendedUserManager userManager)
+            INotificationService notificationService,
+            ILoggerFactory loggerProvider, 
+            ExtendedUserManager userManager)
         {
             this.GCService = GCService;
             this.OrderSchedulerService = OrderSchedulerService;
             _gCWithOrderListItemModelCsvMapCSVExportService = gCWithOrderListItemModelCsvMapCSVExportService;
             _userManager = userManager;
+            _notificationService = notificationService;
             this.logger = loggerProvider.CreateLogger<GCController>();
         }
 
@@ -183,7 +190,8 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return false;
             var item = model.Convert();
-            return await GCService.SendAdminGiftCertificateEmailAsync(item);
+            await _notificationService.SendGiftAdminNotificationEmailAsync(item.Email, item);
+            return true;
         }
 
         [AdminAuthorize(PermissionType.Marketing, PermissionType.GC)]
@@ -191,6 +199,52 @@ namespace VC.Admin.Controllers
         public async Task<Result<bool>> DeleteGiftCertificate(int id)
         {
             return await GCService.DeleteGiftCertificateAsync(id);
+        }
+        
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Marketing, PermissionType.GC)]
+        public async Task<Result<bool>> ImportEGCs()
+        {
+            var form = await Request.ReadFormAsync();
+            
+            int? idNotificationType = null;
+            if (form.ContainsKey("idnotificationtype"))
+            {
+                idNotificationType = Int32.Parse(form["idnotificationtype"]);
+            }
+
+            var parsedContentDisposition = ContentDispositionHeaderValue.Parse(form.Files[0].ContentDisposition);
+
+            var contentType = form.Files[0].ContentType;
+            using (var stream = form.Files[0].OpenReadStream())
+            {
+                var fileContent = stream.ReadFully();
+
+                var sUserId = _userManager.GetUserId(Request.HttpContext.User);
+                int userId = int.Parse(sUserId);
+
+                var gcs = await GCService.ImportGCsAsync(fileContent, userId);
+
+                if (idNotificationType == (int) GCImportNotificationType.StandartAdminEGiftEmail)
+                {
+                    var models = gcs.Select(p => new GiftAdminNotificationEmail()
+                    {
+                        Email = p.Email,
+                        Recipient = p.FirstName + " " + p.LastName,
+                        Gifts = new List<GiftEmailModel>()
+                        {
+                            new GiftEmailModel()
+                            {
+                                Code = p.Code,
+                                Amount = p.Balance
+                            }
+                        },
+                    }).ToList();
+                    await _notificationService.SendGiftAdminNotificationEmailsAsync(models);
+                }
+
+                return true;
+            }
         }
     }
 }

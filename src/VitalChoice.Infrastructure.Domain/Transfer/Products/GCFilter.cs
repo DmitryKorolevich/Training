@@ -31,5 +31,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
         public DateTime? ExpirationTo { get; set; }
 
         public string Tag { get; set; }
+
+        public bool NotZeroBalance { get; set; }
     }
 }
