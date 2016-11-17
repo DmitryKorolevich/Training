@@ -72,7 +72,8 @@ namespace VitalChoice.Business.Services.Products
                 conditions = conditions.WithEqualCode(filter.ExactCode);
             }
             conditions = conditions.WithEmail(filter.Email).WithName(filter.Name);
-            conditions = conditions.WithExpirationDateFrom(filter.ExpirationFrom).WithExpirationDateTo(filter.ExpirationTo).WithTag(filter.Tag);
+            conditions = conditions.WithExpirationDateFrom(filter.ExpirationFrom).WithExpirationDateTo(filter.ExpirationTo).
+                WithTag(filter.Tag).WithNotZeroBalance(filter.NotZeroBalance);
             var query = giftCertificateRepository.Query(conditions);
 
             Func<IQueryable<GiftCertificate>, IOrderedQueryable<GiftCertificate>> sortable = x => x.OrderByDescending(y => y.Created);

@@ -50,6 +50,7 @@ function ($scope, $rootScope, $state, gcService, toaster, modalUtil, confirmUtil
             Tag: null,
             ExpirationFrom: null,
             ExpirationTo: null,
+            NotZeroBalance: false,
             Paging: { PageIndex: 1, PageItemCount: 100 },
             Sorting: gridSorterUtil.resolve(refreshItems, "Created", "Desc")
         };

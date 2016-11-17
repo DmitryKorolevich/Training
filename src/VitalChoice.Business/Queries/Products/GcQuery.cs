@@ -162,5 +162,14 @@ namespace VitalChoice.Business.Queries.Product
             }
             return this;
         }
+
+        public GcQuery WithNotZeroBalance(bool notZeroBalance)
+        {
+            if (notZeroBalance)
+            {
+                Add(x => x.Balance>0);
+            }
+            return this;
+        }
     }
 }
