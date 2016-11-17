@@ -122,5 +122,15 @@ function ($scope, $rootScope, $state, gcService, toaster, modalUtil, confirmUtil
         }, 'Are you sure you want to delete this gift certificate?');
     };
 
+    $scope.importEGCs = function ()
+    {
+        modalUtil.open('app/modules/gc/partials/egcImportPopup.html', 'egcImportController', {
+            thenCallback: function ()
+            {
+                $scope.filterItems();
+            }
+        }, { size: 'sm' });
+    };
+
     initialize();
 }]);

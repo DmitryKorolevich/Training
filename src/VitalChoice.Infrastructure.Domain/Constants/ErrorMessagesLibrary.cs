@@ -68,6 +68,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             public const string InventorySkuCategoryMissed = "InventorySkuCategoryMissed";
             public const string InventorySkuNotFoundImport = "InventorySkuNotFoundImport";
             public const string SkuImportCodeDublicate = "SkuImportCodeDublicate";
+            public const string GCImportAmountRestrictions = "GCImportAmountRestrictions";
         }
 
 	    public static Dictionary<string, string> Data => new Dictionary<string, string>()
@@ -134,6 +135,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             {Keys.InventorySkuCategoryMissed,  "Category wasn't found"},
             {Keys.InventorySkuNotFoundImport, "The given part SKU has not been found in the database({0})"},
             {Keys.SkuImportCodeDublicate,  "SKU with the same code is already exist"},
+            {Keys.GCImportAmountRestrictions,  "Amount is less than ${0} or more than ${1}"},
         };
     }
 }

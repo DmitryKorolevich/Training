@@ -6,6 +6,7 @@ angular.module('app.modules.gc', [
 	'app.modules.gc.controllers.gcDetailController',
 	'app.modules.gc.controllers.gcsAddController',
 	'app.modules.gc.controllers.gcOrdersController',
+	'app.modules.gc.controllers.egcImportController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
