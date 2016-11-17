@@ -103,7 +103,7 @@ namespace VitalChoice.Business.Services.Cache
             if (!_enabled)
                 return;
 
-            _sendingPool.EnqueueData(syncOperations.ToList());
+            _sendingPool.EnqueueData(syncOperations.ToArray());
         }
 
         public static ICollection<KeyValuePair<string, double>> AverageLatency => AveragePing;
