@@ -88,7 +88,6 @@ namespace VC.Public.Controllers
             {
                 ModelState.AddModelError(string.Empty, cartModel.TopGlobalMessage);
             }
-            var gcMessages = context.GcMessageInfos.ToDictionary(m => m.Field);
             if (!string.IsNullOrWhiteSpace(cartModel.DiscountCode) && order.Discount == null)
             {
                 context.Messages.Add(new MessageInfo
@@ -142,16 +141,24 @@ namespace VC.Public.Controllers
                     num++;
                 }
             }
+            var gcMessages = context.GcMessageInfos.GroupBy(m => m.Field).ToArray();
             cartModel.GiftCertificateCodes.AddRange(
                 order.GiftCertificates?.Select(g => g.GiftCertificate.Code).Select(x =>
                 {
-                    var message = gcMessages.ContainsKey(x) ? gcMessages[x] : new MessageInfo();
+                    var messages = gcMessages.Where(m => m.Key == x).SelectMany(m => m).ToArray();
+                    var errorText = string.Join("<br />", messages.Where(m => m.MessageLevel == MessageLevel.Error).Select(m => m.Message));
+                    var infoText = string.Join("<br />", messages.Where(m => m.MessageLevel == MessageLevel.Info).Select(m => m.Message));
+
+                    if (!string.IsNullOrEmpty(errorText))
+                    {
+                        ModelState.AddModelError("", errorText);
+                    }
 
                     return new CartGcModel
                     {
                         Value = x,
-                        SuccessMessage = message.MessageLevel == MessageLevel.Info ? message.Message : string.Empty,
-                        ErrorMessage = message.MessageLevel == MessageLevel.Error ? message.Message : string.Empty
+                        SuccessMessage = string.IsNullOrEmpty(errorText) ? infoText : string.Empty,
+                        ErrorMessage = errorText
                     };
                 }) ??
                 Enumerable.Empty<CartGcModel>());
