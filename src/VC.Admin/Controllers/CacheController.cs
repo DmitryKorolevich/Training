@@ -5,10 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 using VitalChoice.Business.Services.Cache;
 #endif
 using VitalChoice.Core.Base;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Validation.Models;
 
 namespace VC.Admin.Controllers
 {
+    [IgnoreBuildNumber]
     public class CacheController: BaseApiController
     {
         [HttpGet]

@@ -26,6 +26,7 @@ using VC.Admin.Models.Products;
 using VC.Admin.Models.Settings;
 using VitalChoice.Business.CsvExportMaps;
 using VitalChoice.Business.Services;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -107,6 +108,7 @@ namespace VC.Admin.Controllers
         #region EditLocks
 
         [HttpPost]
+        [IgnoreBuildNumber]
         public Result<bool> EditLockPing([FromBody] EditLockPingModel model)
         {
             string browserUserAgent = Request.Headers["User-Agent"];
@@ -145,6 +147,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpPost]
+        [IgnoreBuildNumber]
         public Result<EditLockRequestModel> EditLockRequest([FromBody]EditLockRequestModel model)
         {
             model.Avaliable = false;

@@ -62,6 +62,7 @@ using VitalChoice.Infrastructure.Extensions;
 using VitalChoice.Business.CsvExportMaps.Products;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services.Products;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Interfaces.Services.Products;
 
@@ -213,6 +214,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpGet]
+        [IgnoreBuildNumber]
         public Result<OrderExportGeneralStatusModel> GetExportGeneralStatus()
         {
             return new OrderExportGeneralStatusModel
@@ -225,6 +227,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpGet]
+        [IgnoreBuildNumber]
         public Result<OrderExportResults> GetExportDetails()
         {
             var results = _exportService.GetExportResults();
