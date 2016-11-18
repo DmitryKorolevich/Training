@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
@@ -193,12 +194,12 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             if (Disposed)
                 return;
 
-            var extraList = new Lazy<List<BrokeredMessage>>(() => new List<BrokeredMessage>());
+            var extraList = new Lazy<List<BrokeredMessage>>(() => new List<BrokeredMessage>(), LazyThreadSafetyMode.None);
             var messages = GetCompleteBatch(values, extraList);
             action(Que, messages);
             while (extraList.IsValueCreated)
             {
-                var newExtraList = new Lazy<List<BrokeredMessage>>(() => new List<BrokeredMessage>());
+                var newExtraList = new Lazy<List<BrokeredMessage>>(() => new List<BrokeredMessage>(), LazyThreadSafetyMode.None);
                 messages = GetCompleteBatch(extraList.Value, newExtraList);
                 action(Que, messages);
                 extraList = newExtraList;
@@ -210,12 +211,12 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             if (Disposed)
                 return;
 
-            var extraList = new Lazy<List<BrokeredMessage>>(() => new List<BrokeredMessage>());
+            var extraList = new Lazy<List<BrokeredMessage>>(() => new List<BrokeredMessage>(), LazyThreadSafetyMode.None);
             var messages = GetCompleteBatch(values, extraList);
             await action(Que, messages);
             while (extraList.IsValueCreated)
             {
-                var newExtraList = new Lazy<List<BrokeredMessage>>(() => new List<BrokeredMessage>());
+                var newExtraList = new Lazy<List<BrokeredMessage>>(() => new List<BrokeredMessage>(), LazyThreadSafetyMode.None);
                 messages = GetCompleteBatch(extraList.Value, newExtraList);
                 await action(Que, messages);
                 extraList = newExtraList;

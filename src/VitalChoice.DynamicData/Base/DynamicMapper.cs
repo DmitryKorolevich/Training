@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.DynamicData.Interfaces;
 using System.Threading.Tasks;
@@ -73,7 +74,7 @@ namespace VitalChoice.DynamicData.Base
                         optionTypeRepositoryAsync.Query()
                             .Include(o => o.Lookup)
                             .ThenInclude(l => l.LookupVariants)
-                            .Select(false));
+                            .Select(false), LazyThreadSafetyMode.None);
             _optionTypesByType = new Dictionary<int, ICollection<TOptionType>>();
         }
 

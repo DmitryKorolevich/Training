@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 using Google.Apis.Analytics.v3;
 using Google.Apis.Auth.OAuth2;
@@ -36,7 +37,7 @@ namespace VitalChoice.Business.Services
             _keyFile = options.Value.GoogleSettings.KeyFile;
             _keyPass = options.Value.GoogleSettings.KeyPass;
             _logger = loggerProvider.CreateLogger<GoogleService>();
-            _lclient = new Lazy<AnalyticsService>(CreateAnalyticsService);
+            _lclient = new Lazy<AnalyticsService>(CreateAnalyticsService, LazyThreadSafetyMode.None);
         }
 
         private AnalyticsService CreateAnalyticsService()

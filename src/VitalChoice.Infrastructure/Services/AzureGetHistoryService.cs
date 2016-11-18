@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -55,7 +56,7 @@ namespace VitalChoice.Infrastructure.Services
                 var result = tableClient.GetTableReference("ObjectHistory");
                 result.CreateIfNotExists();
                 return result;
-            });
+            }, LazyThreadSafetyMode.None);
         }
 
         public async Task<PagedList<ObjectHistoryItem>> GetObjectHistoryLogItems(ObjectHistoryLogItemsFilter filter)

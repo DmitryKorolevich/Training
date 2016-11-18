@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Autofac;
+using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Caching.Debuging;
@@ -58,7 +58,7 @@ namespace VitalChoice.Caching.Services
             }).GroupBy(s => s.EntityType);
 
             var updateList = new List<UpdateOp>();
-            var addList = new List<AddOp>();
+            var addList = new List<UpdateOp>();
 
             foreach (var group in syncGroups)
             {
@@ -67,6 +67,8 @@ namespace VitalChoice.Caching.Services
                 if (pkInfo == null)
                     continue;
                 var internalCache = CacheFactory.GetCache(type);
+                var localUpdateList = new Lazy<List<EntityKey>>(() => new List<EntityKey>(), LazyThreadSafetyMode.None);
+                var localAddList = new Lazy<List<EntityKey>>(() => new List<EntityKey>(), LazyThreadSafetyMode.None);
                 foreach (var op in group)
                 {
                     try
@@ -79,12 +81,7 @@ namespace VitalChoice.Caching.Services
                                 internalCache.MarkForUpdateByPrimaryKey(pk, null);
                                 if (internalCache.ItemExistWithoutRelations(pk))
                                 {
-                                    updateList.Add(new UpdateOp
-                                    {
-                                        EntityType = op.EntityType,
-                                        Cache = internalCache,
-                                        Pk = pk
-                                    });
+                                    localUpdateList.Value.Add(pk);
                                 }
                                 break;
                             case SyncType.Delete:
@@ -94,16 +91,7 @@ namespace VitalChoice.Caching.Services
                                 break;
                             case SyncType.Add:
                                 pk = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
-                                var entity = KeyStorage.GetEntity(type, pk, ScopeContainer.ScopeFactory);
-                                internalCache.MarkForAdd(entity, null);
-                                if (internalCache.ItemExistWithoutRelations(pk))
-                                {
-                                    addList.Add(new AddOp
-                                    {
-                                        Entity = entity,
-                                        Cache = internalCache
-                                    });
-                                }
+                                localAddList.Value.Add(pk);
                                 break;
                         }
                     }
@@ -112,15 +100,37 @@ namespace VitalChoice.Caching.Services
                         Logger.LogError(e.ToString());
                     }
                 }
+                if (localUpdateList.IsValueCreated)
+                {
+                    updateList.Add(new UpdateOp
+                    {
+                        Cache = internalCache,
+                        EntityType = type,
+                        PkList = localUpdateList.Value
+                    });
+                }
+                if (localAddList.IsValueCreated)
+                {
+                    addList.Add(new UpdateOp
+                    {
+                        Cache = internalCache,
+                        EntityType = type,
+                        PkList = localAddList.Value
+                    });
+                }
             }
             foreach (var updateOp in updateList)
             {
-                var entity = KeyStorage.GetEntity(updateOp.EntityType, updateOp.Pk, ScopeContainer.ScopeFactory);
-                updateOp.Cache.Update(entity, (DbContext) null, null);
+                var entities = KeyStorage.GetEntities(updateOp.EntityType, updateOp.PkList, ScopeContainer.ScopeFactory);
+                foreach (var entity in entities)
+                {
+                    updateOp.Cache.Update(entity, (DbContext) null, null);
+                }
             }
             foreach (var addOp in addList)
             {
-                addOp.Cache.Update(addOp.Entity, (DbContext) null, null);
+                var entities = KeyStorage.GetEntities(addOp.EntityType, addOp.PkList, ScopeContainer.ScopeFactory);
+                addOp.Cache.MarkForAdd(entities, null);
             }
         }
 
@@ -134,16 +144,10 @@ namespace VitalChoice.Caching.Services
             public SyncOperation SyncOperation;
         }
 
-        private struct AddOp
-        {
-            public object Entity;
-            public IInternalEntityCache Cache;
-        }
-
         private struct UpdateOp
         {
             public Type EntityType;
-            public EntityKey Pk;
+            public List<EntityKey> PkList;
             public IInternalEntityCache Cache;
         }
     }

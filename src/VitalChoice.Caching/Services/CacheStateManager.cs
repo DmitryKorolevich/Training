@@ -29,7 +29,7 @@ namespace VitalChoice.Caching.Services
         protected readonly ILogger Logger;
 
         protected Lazy<Dictionary<TrackedEntityKey, object>> ContextualCacheDatas =
-            new Lazy<Dictionary<TrackedEntityKey, object>>(() => new Dictionary<TrackedEntityKey, object>());
+            new Lazy<Dictionary<TrackedEntityKey, object>>(() => new Dictionary<TrackedEntityKey, object>(), LazyThreadSafetyMode.None);
 
         protected Dictionary<TrackedEntityKey, object> TemporaryContextualCacheDatas;
 

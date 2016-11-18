@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Data.Repositories.Specifics;
@@ -76,7 +77,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         });
                 }
 
-                Lazy<ProductDynamic> clone = new Lazy<ProductDynamic>(() => dynamic.Clone());
+                Lazy<ProductDynamic> clone = new Lazy<ProductDynamic>(() => dynamic.Clone(), LazyThreadSafetyMode.None);
 
                 foreach (var sku in dynamic.Skus)
                 {
@@ -112,7 +113,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 if (entity.Skus == null)
                     entity.Skus = new List<Sku>();
 
-                Lazy<ProductDynamic> clone = new Lazy<ProductDynamic>(() => dynamic.Clone());
+                Lazy<ProductDynamic> clone = new Lazy<ProductDynamic>(() => dynamic.Clone(), LazyThreadSafetyMode.None);
                 foreach (var sku in dynamic.Skus)
                 {
                     if (sku.Product == null)
