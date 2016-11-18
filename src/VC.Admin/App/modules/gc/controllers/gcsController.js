@@ -47,6 +47,10 @@ function ($scope, $rootScope, $state, gcService, toaster, modalUtil, confirmUtil
         $scope.filter = {
             Type: null,
             Code: null,
+            Tag: null,
+            ExpirationFrom: null,
+            ExpirationTo: null,
+            NotZeroBalance: false,
             Paging: { PageIndex: 1, PageItemCount: 100 },
             Sorting: gridSorterUtil.resolve(refreshItems, "Created", "Desc")
         };
@@ -116,6 +120,16 @@ function ($scope, $rootScope, $state, gcService, toaster, modalUtil, confirmUtil
 			        errorHandler(result);
 			    });
         }, 'Are you sure you want to delete this gift certificate?');
+    };
+
+    $scope.importEGCs = function ()
+    {
+        modalUtil.open('app/modules/gc/partials/egcImportPopup.html', 'egcImportController', {
+            thenCallback: function ()
+            {
+                $scope.filterItems();
+            }
+        }, { size: 'sm' });
     };
 
     initialize();

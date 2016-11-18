@@ -60,6 +60,10 @@ using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.Extensions;
 using VitalChoice.Business.CsvExportMaps.Products;
+using VitalChoice.Business.Helpers;
+using VitalChoice.Business.Services.Products;
+using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
+using VitalChoice.Interfaces.Services.Products;
 
 namespace VC.Admin.Controllers
 {
@@ -75,6 +79,7 @@ namespace VC.Admin.Controllers
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodMapper;
 
         private readonly ICustomerService _customerService;
+        private readonly IProductService _productService;
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> _ordersRegionStatisticItemCSVExportService;
         private readonly ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> _ordersZipStatisticItemCSVExportService;
@@ -90,6 +95,7 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<AAFESReportItem, AAFESReportItemCsvMap> _aAFESReportItemCsvMapСSVExportService;
         private readonly ICsvExportService<AfiiliateOrderItemImportExportModel, AfiiliateOrderItemImportExportCsvMap> _afiiliateOrderItemImportExportСSVExportService;
         private readonly ICsvExportService<CustomerSkuUsageReportRawItem, CustomerSkuUsageReportRawItemExportCsvMap> _customerSkuUsageReportRawItemExportСSVExportService;
+        private readonly ICsvExportService<OrderDiscountReportItem, OrderDiscountReportItemExportCsvMap> _orderDiscountReportItemExportCsvMapСSVExportService;
         private readonly INotificationService _notificationService;
         private readonly BrontoService _brontoService;
         private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
@@ -109,6 +115,7 @@ namespace VC.Admin.Controllers
             OrderMapper mapper,
             OrderRefundMapper orderRefundMapper,
             ICustomerService customerService,
+            IProductService productService,
             ICsvExportService<OrdersRegionStatisticItem, OrdersRegionStatisticItemCsvMap> ordersRegionStatisticItemCSVExportService,
             ICsvExportService<OrdersZipStatisticItem, OrdersZipStatisticItemCsvMap> ordersZipStatisticItemCSVExportService,
             ICsvExportService<VOrderWithRegionInfoItem, VOrderWithRegionInfoItemCsvMap> vOrderWithRegionInfoItemCSVExportService,
@@ -126,6 +133,7 @@ namespace VC.Admin.Controllers
             ICsvExportService<AAFESReportItem, AAFESReportItemCsvMap> aAFESReportItemCsvMapСSVExportService,
             ICsvExportService<AfiiliateOrderItemImportExportModel, AfiiliateOrderItemImportExportCsvMap> afiiliateOrderItemImportExportСSVExportService,
             ICsvExportService<CustomerSkuUsageReportRawItem, CustomerSkuUsageReportRawItemExportCsvMap> customerSkuUsageReportRawItemExportСSVExportService,
+            ICsvExportService<OrderDiscountReportItem, OrderDiscountReportItemExportCsvMap> orderDiscountReportItemExportCsvMapСSVExportService,
             INotificationService notificationService,
             BrontoService brontoService,
             IOrderReportService orderReportService,
@@ -144,6 +152,7 @@ namespace VC.Admin.Controllers
             _mapper = mapper;
             _orderRefundMapper = orderRefundMapper;
             _customerService = customerService;
+            _productService = productService;
             _ordersRegionStatisticItemCSVExportService = ordersRegionStatisticItemCSVExportService;
             _ordersZipStatisticItemCSVExportService = ordersZipStatisticItemCSVExportService;
             _vOrderWithRegionInfoItemCSVExportService = vOrderWithRegionInfoItemCSVExportService;
@@ -158,6 +167,7 @@ namespace VC.Admin.Controllers
             _aAFESReportItemCsvMapСSVExportService = aAFESReportItemCsvMapСSVExportService;
             _afiiliateOrderItemImportExportСSVExportService = afiiliateOrderItemImportExportСSVExportService;
             _customerSkuUsageReportRawItemExportСSVExportService = customerSkuUsageReportRawItemExportСSVExportService;
+            _orderDiscountReportItemExportCsvMapСSVExportService = orderDiscountReportItemExportCsvMapСSVExportService;
             _notificationService = notificationService;
             _brontoService = brontoService;
             _orderReportService = orderReportService;
@@ -328,16 +338,31 @@ namespace VC.Admin.Controllers
 
             if (idOrder == 0)
             {
+                var skus = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) };
+
                 var order = _orderService.CreateNewNormalOrder(OrderStatus.Processed);
                 if (idcustomer.HasValue)
                 {
                     order.Data.OrderNotes = await _customerService.GetNewOrderNotesBasedOnCustomer(idcustomer.Value);
+
+                    var statistic = await _customerService.GetCustomerOrderStatistics(new[] {idcustomer.Value});
+                    //new custimer - add welcome letter
+                    if (statistic.FirstOrDefault()==null)
+                    {
+                        var wl = await _productService.GetSkuOrderedAsync(ProductConstants.WELCOME_LETTER_SKU);
+                        if (wl != null && wl.Sku.InStock())
+                        {
+                            wl.Quantity = 1;
+                            wl.Amount = wl.Sku.Price;
+                            skus.Insert(0,new SkuOrderedManageModel(wl));
+                        }
+                    }
                 }
 
                 var model = await _mapper.ToModelAsync<OrderManageModel>(order);
                 model.UseShippingAndBillingFromCustomer = true;
                 model.GCs = new List<GCListItemModel>() { new GCListItemModel(null) };
-                model.SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) };
+                model.SkuOrdereds = skus;
                 model.UpdateShippingAddressForCustomer = true;
                 model.UpdateCardForCustomer = true;
                 model.UpdateCheckForCustomer = true;
@@ -386,6 +411,36 @@ namespace VC.Admin.Controllers
             }
             await _orderService.OrderTypeSetup(order);
             var orderContext = await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus);
+
+            //bind gcs errors
+            if (orderContext.GcMessageInfos != null && orderContext.Order.GiftCertificates != null)
+            {
+                var orderGcs = orderContext.Order.GiftCertificates.ToList();
+                foreach (var error in orderContext.GcMessageInfos.Where(p => p.MessageLevel == MessageLevel.Error && p.MessageType == MessageType.FormField))
+                {
+                    int? index = null;
+                    for (int i = 0; i < orderGcs.Count; i++)
+                    {
+                        if (orderGcs[i].GiftCertificate?.Code == error.Field)
+                        {
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    if (index.HasValue)
+                    {
+                        orderContext.Messages.Add(new MessageInfo
+                        {
+                            MessageLevel = MessageLevel.Error,
+                            MessageType = MessageType.FormField,
+                            Field = $"GCs.i{index.Value}.Code",
+                            Message = error.Message
+                        });
+                    }
+                }
+            }
+
             if (!string.IsNullOrWhiteSpace(model.DiscountCode) && orderContext.Order.Discount == null)
             {
                 orderContext.Messages.Add(new MessageInfo
@@ -1870,6 +1925,47 @@ namespace VC.Admin.Controllers
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileName = String.Format(FileConstants.CUSTOMER_SKU_USAGE_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<PagedList<OrderDiscountReportItem>>> GetOrderDiscountReportItems([FromBody]OrderDiscountReportFilter filter)
+        {
+            filter.To = filter.To.AddDays(1);
+            var toReturn = await _orderReportService.GetOrderDiscountReportItemsAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<FileResult> GetOrderDiscountReportFile([FromQuery]string from, [FromQuery]string to, [FromQuery]string discount)
+        {
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+
+            OrderDiscountReportFilter filter = new OrderDiscountReportFilter()
+            {
+                From = dFrom.Value,
+                To = dTo.Value.AddDays(1),
+                Discount = discount
+            };
+            filter.Paging = null;
+
+            var data = await _orderReportService.GetOrderDiscountReportItemsAsync(filter);
+
+            var result = _orderDiscountReportItemExportCsvMapСSVExportService.ExportToCsv(data.Items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.DISCOUNT_USAGE_REPORT, DateTime.Now)
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());

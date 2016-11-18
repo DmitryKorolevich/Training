@@ -25,5 +25,13 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
         public CustomerAddressFilter ShippingAddress { get; set; }
 
         public CustomerAddressFilter BillingAddress { get; set; }
+
+        public DateTime? ExpirationFrom { get; set; }
+
+        public DateTime? ExpirationTo { get; set; }
+
+        public string Tag { get; set; }
+
+        public bool NotZeroBalance { get; set; }
     }
 }

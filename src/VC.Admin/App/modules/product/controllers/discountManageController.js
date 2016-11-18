@@ -19,9 +19,16 @@ angular.module('app.modules.product.controllers.discountManageController', [])
         }
 
         function successSaveHandler(result) {
-            if (result.Success) {
+            if (result.Success)
+            {
+                if (!$scope.discount.Id)
+                {
+                    $state.go('index.oneCol.discountDetail', { id: result.Data.Id });
+                }
+
                 toaster.pop('success', "Success!", "Successfully saved.");
                 $scope.discount.Id = result.Data.Id;
+                $scope.discount.DiscountTiers = result.Data.DiscountTiers;
                 refreshHistory();
             } else {
                 var messages = "";

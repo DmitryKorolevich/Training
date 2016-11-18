@@ -772,7 +772,6 @@ function registerRequiredIf() {
 }
 
 function trySetFormErrors(result) {
-    $("span[data-valmsg-for]").text('');
     $("div.validation-summary-errors").html('');
     var globalErrors = [];
     for (var i = 0; i < result.Messages.length; i++) {

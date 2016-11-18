@@ -36,6 +36,10 @@ namespace VC.Admin.Models.Products
 
         public GCType GCType { get; set; }
 
+        public DateTime? ExpirationDate { get; set; }
+
+        public string Tag { get; set; }
+
         public GCListItemModel(GiftCertificate item)
         {
             if(item!=null)
@@ -60,6 +64,8 @@ namespace VC.Admin.Models.Products
                 }
                 ProductName = LookupHelper.GetGCTypeName(item.GCType);
                 AgentId = item.AgentId;
+                ExpirationDate = item.ExpirationDate;
+                Tag = item.Tag;
             }
         }
     }

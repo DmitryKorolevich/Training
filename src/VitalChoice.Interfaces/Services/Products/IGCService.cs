@@ -25,13 +25,13 @@ namespace VitalChoice.Interfaces.Services.Products
         Task<GiftCertificate> UpdateGiftCertificateAsync(GiftCertificate model);
 
         Task<ICollection<GiftCertificate>> AddManualGiftCertificatesAsync(int quantity,GiftCertificate model);
-
-        Task<bool> SendAdminGiftCertificateEmailAsync(GiftAdminNotificationEmail model);
-
+        
         Task<bool> DeleteGiftCertificateAsync(int id);
 
 	    Task<List<GiftCertificate>> GetGiftCertificatesAsync(Expression<Func<GiftCertificate, bool>> expression);
 
         Task<string> GenerateGCCode();
+
+        Task<ICollection<GiftCertificate>> ImportGCsAsync(byte[] file, int idAddedBy, GCImportNotificationType? notificationType);
     }
 }

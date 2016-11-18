@@ -18,7 +18,10 @@
                 <tbody>
                     <tr data-ng-repeat="item in items">
                         <td>{{::item.From}}</td>
-                        <td>{{::item.To}}</td>
+                        <td>
+                            {{::item.To}}
+                            <i data-ng-if="item.FutureRedirectsExist" class="fa fa-clock-o"></i>
+                        </td>
                         <td>{{::item.DateCreated | date:"MM/dd/yy"}}<br />{{::item.DateCreated | date:"h:mm a"}}<br />{{::item.AddedBy}}</td>
                         <td>{{::item.DateEdited | date:"MM/dd/yy"}}<br />{{::item.DateEdited | date:"h:mm a"}}<br />{{::item.EditedBy}}</td>
                         <td>

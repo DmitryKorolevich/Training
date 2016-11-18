@@ -71,6 +71,10 @@ function ($scope, $rootScope, $state, $stateParams, gcService, orderService, set
                 {
                     $scope.gc = result.Data;
                     $scope.gc.StatusCode = $scope.gc.StatusCode;
+                    if ($scope.gc.ExpirationDate)
+                    {
+                        $scope.gc.ExpirationDate = Date.parseDateTime($scope.gc.ExpirationDate);
+                    }
                     refreshHistory();
                 } else
                 {
@@ -117,7 +121,13 @@ function ($scope, $rootScope, $state, $stateParams, gcService, orderService, set
 
         if ($scope.forms.form.$valid)
         {
-            gcService.updateGiftCertificate($scope.gc, $scope.editTracker).success(function (result)
+            var data = angular.copy($scope.gc);
+            if (data.ExpirationDate)
+            {
+                data.ExpirationDate = data.ExpirationDate.toServerDateTime();
+            }
+
+            gcService.updateGiftCertificate(data, $scope.editTracker).success(function (result)
             {
                 successSaveHandler(result);
             }).

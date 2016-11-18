@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.Extensions.Logging;
@@ -24,10 +30,15 @@ using VitalChoice.Business.Services.Dynamic;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services.Bronto;
 using Microsoft.EntityFrameworkCore;
+using VitalChoice.Business.CsvImportMaps;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Data.Services;
 using VitalChoice.DynamicData.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Exceptions;
+using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Infrastructure.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
 
 namespace VitalChoice.Business.Services.Products
@@ -72,6 +83,8 @@ namespace VitalChoice.Business.Services.Products
                 conditions = conditions.WithEqualCode(filter.ExactCode);
             }
             conditions = conditions.WithEmail(filter.Email).WithName(filter.Name);
+            conditions = conditions.WithExpirationDateFrom(filter.ExpirationFrom).WithExpirationDateTo(filter.ExpirationTo).
+                WithTag(filter.Tag).WithNotZeroBalance(filter.NotZeroBalance);
             var query = giftCertificateRepository.Query(conditions);
 
             Func<IQueryable<GiftCertificate>, IOrderedQueryable<GiftCertificate>> sortable = x => x.OrderByDescending(y => y.Created);
@@ -106,7 +119,21 @@ namespace VitalChoice.Business.Services.Products
 								? x.OrderBy(y => y.Created)
 								: x.OrderByDescending(y => y.Created);
 			        break;
-	        }
+                case GiftCertificateSortPath.ExpirationDate:
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.ExpirationDate)
+                                : x.OrderByDescending(y => y.ExpirationDate);
+                    break;
+                case GiftCertificateSortPath.Tag:
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.Tag)
+                                : x.OrderByDescending(y => y.Tag);
+                    break;
+            }
 
 	        PagedList<GiftCertificate> toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
             var userIds = toReturn.Items.Select(pp => pp.UserId).Where(u => u.HasValue).Select(u => u.Value).Distinct().ToList();
@@ -289,6 +316,7 @@ namespace VitalChoice.Business.Services.Products
                 dbItem.Email = model.Email;
                 dbItem.Balance = model.Balance;
                 dbItem.IdEditedBy = model.IdEditedBy;
+                dbItem.Tag = model.Tag;
                 if (model.StatusCode != RecordStatusCode.Deleted)
                 {
                     dbItem.StatusCode = model.StatusCode;
@@ -316,6 +344,7 @@ namespace VitalChoice.Business.Services.Products
                 item.Code = await GenerateGCCode();
                 item.IdEditedBy = model.IdEditedBy;
                 item.UserId = model.UserId;
+                item.Tag = model.Tag;
                 items.Add(item);
             }
 
@@ -324,12 +353,6 @@ namespace VitalChoice.Business.Services.Products
             await _objectLogItemExternalService.LogItems(items);
 
             return items;
-        }
-
-        public async Task<bool> SendAdminGiftCertificateEmailAsync(GiftAdminNotificationEmail model)
-        {
-            await notificationService.SendGiftAdminNotificationEmailAsync(model.Email, model);
-            return true;
         }
 
         public async Task<bool> DeleteGiftCertificateAsync(int id)
@@ -371,6 +394,192 @@ namespace VitalChoice.Business.Services.Products
                     toReturn = attempt;
                 }
             }
+            return toReturn;
+        }
+
+        public async Task<IList<string>> GenerateGCCodes(int count)
+        {
+            var toReturn = new List<string>();
+            bool generated = false;
+            while (!generated)
+            {
+                var attempts=new List<string>();
+                for (int j = 0; j < count; j++)
+                {
+                    var attempt = string.Empty;
+                    Guid guid = Guid.NewGuid();
+                    var bytes = guid.ToByteArray();
+                    for (int i = bytes.Length - 1; i >= bytes.Length - GC_SYMBOLS_COUNT; i--)
+                    {
+                        attempt += symbols[bytes[i] % symbols.Count];
+                    }
+                    attempts.Add(attempt);
+                }
+
+                var dbItems = await giftCertificateRepository.Query(p => attempts.Contains(p.Code)).SelectAsync(false);
+                var localItems = toReturn.Intersect(attempts).ToList();
+                localItems.AddRange(dbItems.Select(p=>p.Code));
+
+                var temp = attempts.Except(localItems).ToList();
+                toReturn.AddRange(temp);
+                count -= temp.Count();
+                if (localItems.Count==0)
+                {
+                    generated = true;
+                }
+            }
+            return toReturn;
+        }
+
+        public async Task<ICollection<GiftCertificate>> ImportGCsAsync(byte[] file, int idAddedBy, GCImportNotificationType? notificationType)
+        {
+            List<GCImportItem> records = new List<GCImportItem>();
+            Dictionary<string, ImportItemValidationGenericProperty> validationSettings = null;
+            using (var memoryStream = new MemoryStream(file))
+            {
+                using (var streamReader = new StreamReader(memoryStream))
+                {
+                    CsvConfiguration configuration = new CsvConfiguration();
+                    configuration.TrimFields = true;
+                    configuration.TrimHeaders = true;
+                    configuration.WillThrowOnMissingField = false;
+                    configuration.RegisterClassMap<GCImportItemCsvMap>();
+                    using (var csv = new CsvReader(streamReader, configuration))
+                    {
+                        PropertyInfo[] modelProperties = typeof(GCImportItem).GetProperties();
+                        validationSettings = BusinessHelper.GetAttrBaseImportValidationSettings(modelProperties);
+
+                        int rowNumber = 1;
+                        try
+                        {
+                            while (csv.Read())
+                            {
+                                var item = csv.GetRecord<GCImportItem>();
+                                item.RowNumber = rowNumber;
+                                var localMessages = new List<MessageInfo>();
+                                rowNumber++;
+
+                                var expirationDateProperty = modelProperties.FirstOrDefault(p => p.Name == nameof(GCImportItem.ExpirationDate));
+                                var expirationDateHeader = expirationDateProperty?.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault()?.Name;
+
+                                var sExpirationDate = csv.GetField<string>(expirationDateHeader);
+                                if (!String.IsNullOrEmpty(sExpirationDate))
+                                {
+                                    DateTime tempDate;
+                                    if (DateTime.TryParse(sExpirationDate, CultureInfo.InvariantCulture, DateTimeStyles.None, out tempDate))
+                                    {
+                                        tempDate = TimeZoneInfo.ConvertTime(tempDate, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local);
+                                        if (tempDate < DateTime.Now)
+                                        {
+                                            localMessages.Add(BusinessHelper.AddErrorMessage(expirationDateHeader, 
+                                                String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.MustBeFutureDateError], expirationDateHeader)));
+                                        }
+                                        else
+                                        {
+                                            item.ExpirationDate = tempDate;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        localMessages.Add(BusinessHelper.AddErrorMessage(expirationDateHeader, 
+                                            String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ParseDateError], expirationDateHeader)));
+                                    }
+                                }
+                                else
+                                {
+                                    if(notificationType==GCImportNotificationType.ExpirationDateAdminEGiftEmail)
+                                    {
+                                        localMessages.Add(BusinessHelper.AddErrorMessage(expirationDateHeader, 
+                                            String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsRequired], expirationDateHeader)));
+                                    }
+                                }
+
+                                var amountProperty = modelProperties.FirstOrDefault(p => p.Name == nameof(GCImportItem.Balance));
+                                var amountBaseHeader = amountProperty?.GetCustomAttributes<DisplayAttribute>(true).FirstOrDefault()?.Name;
+                                var sAmount = csv.GetField<string>(amountBaseHeader);
+                                if (!String.IsNullOrEmpty(sAmount))
+                                {
+                                    sAmount = sAmount.Replace("$", "");
+                                    decimal tempAmount=0;
+                                    if (Decimal.TryParse(sAmount, out tempAmount))
+                                    {
+                                        if (tempAmount <= 0 || tempAmount > 1000)
+                                        {
+                                            localMessages.Add(BusinessHelper.AddErrorMessage(amountBaseHeader, 
+                                                String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.GCImportAmountRestrictions], 0, 1000)));
+                                        }
+                                        else
+                                        {
+                                            item.Balance = tempAmount;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        localMessages.Add(BusinessHelper.AddErrorMessage(amountBaseHeader, 
+                                            String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ParseIntError], amountBaseHeader)));
+                                    }
+                                }
+                                else
+                                {
+                                    localMessages.Add(BusinessHelper.AddErrorMessage(amountBaseHeader, 
+                                        String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsRequired], amountBaseHeader)));
+                                }
+
+                                item.ErrorMessages = localMessages;
+                                records.Add(item);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            logger.LogError(e.ToString());
+                            throw new AppValidationException(e.Message);
+                        }
+                    }
+                }
+            }
+
+            if (validationSettings != null)
+            {
+                BusinessHelper.ValidateAttrBaseImportItems(records, validationSettings);
+            }
+
+            //throw parsing and validation errors
+            var messages = BusinessHelper.FormatRowsRecordErrorMessages(records);
+            if (messages.Count > 0)
+            {
+                throw new AppValidationException(messages);
+            }
+
+            var now=DateTime.Now;
+            var toReturn = new List<GiftCertificate>();
+            var codes = await GenerateGCCodes(records.Count);
+            for (int i = 0; i < records.Count; i++)
+            {
+                var gcImportItem = records[i];
+
+                var item = new GiftCertificate()
+                {
+                    FirstName = gcImportItem.FirstName,
+                    LastName = gcImportItem.LastName,
+                    Email = gcImportItem.Email,
+                    Balance = gcImportItem.Balance,
+                    Tag = gcImportItem.Tag,
+                    ExpirationDate = gcImportItem.ExpirationDate,
+
+                    GCType = GCType.EGC,
+                    Created = now,
+                    StatusCode = RecordStatusCode.Active,
+                    IdEditedBy = idAddedBy,
+                    UserId = idAddedBy,
+                    Code = codes[i],
+                };
+                toReturn.Add(item);
+            }
+
+            await giftCertificateRepository.InsertRangeAsync(toReturn);
+
+            await _objectLogItemExternalService.LogItems(toReturn);
+
             return toReturn;
         }
     }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Validation.Models;
 using VitalChoice.Ecommerce.Domain.Entities;
@@ -25,6 +27,10 @@ namespace VC.Admin.Models.Redirects
 
         public string EditedBy { get; set; }
 
+        public bool IgnoreQuery { get; set; }
+
+        public bool FutureRedirectsExist { get; set; }
+
         public RedirectListItemModel(Redirect item)
         {
             if(item!=null)
@@ -37,6 +43,8 @@ namespace VC.Admin.Models.Redirects
                 AddedBy = item.AddedBy;
                 EditedBy = item.EditedBy;
                 StatusCode = item.StatusCode;
+                IgnoreQuery = item.IgnoreQuery;
+                FutureRedirectsExist = item.FutureRedirects.Any(p => !p.Disabled);
             }
         }
     }

@@ -30,11 +30,11 @@ using VitalChoice.Infrastructure.Identity;
 
 namespace VC.Public.Components.Tracking
 {
-    public class BaseTrackScriptsComponentHelper
+    public static class BaseTrackScriptsComponentHelper
     {
         private const string TrackScriptsBaseModel = "TrackScriptsBaseModel";
 
-        public async Task SetBaseOptions(BaseTrackScriptsModel toReturn, HttpContext context,
+        public static async Task SetBaseOptions(BaseTrackScriptsModel toReturn, HttpContext context,
             Lazy<IOrderService> orderService, Lazy<IAuthorizationService> authorizationService, Lazy<ICheckoutService> checkoutService,
             Lazy<ICustomerService> customerService,Lazy<ReferenceData> referenceData)
         {
@@ -108,7 +108,7 @@ namespace VC.Public.Components.Tracking
             });
         }
 
-        public string GetProductFullName(SkuOrdered skuOrdered)
+        public static string GetProductFullName(SkuOrdered skuOrdered)
         {
             var toReturn = skuOrdered.Sku.Product.Name ?? String.Empty;
             if (!string.IsNullOrEmpty(skuOrdered.Sku.Product.SafeData.SubTitle))

@@ -64,6 +64,11 @@ namespace VitalChoice.Business.Services
                 throw new AppValidationException("From", "Redirect with the same Source URL already exists, please use a unique URL.");
             }
 
+            if (item.IgnoreQuery && item.From.Contains("?"))
+            {
+                throw new AppValidationException("From", "From field can't contain query params if \"Ignore Query Params\" option is specified.");
+            }
+
             if (item.Id==0)
             {
                 item.IdAddedBy = item.IdEditedBy;
@@ -80,6 +85,8 @@ namespace VitalChoice.Business.Services
                     dbItem.DateEdited = DateTime.Now;
                     dbItem.From = item.From;
                     dbItem.To = item.To;
+                    dbItem.IgnoreQuery = item.IgnoreQuery;
+                    dbItem.FutureRedirectData = item.FutureRedirectData;
                     await _redirectRepository.UpdateAsync(dbItem);
                 }
             }
@@ -102,6 +109,32 @@ namespace VitalChoice.Business.Services
             }
 
             return false;
+        }
+
+        public async Task ChangeRedirectsBasedOnFutureRedirectsAsync()
+        {
+            var redirects = await _redirectRepository.Query(p => p.StatusCode == RecordStatusCode.Active && p.FutureRedirectData!=null).SelectAsync(false);
+            var now = DateTime.Now;
+            ICollection<Redirect> forUpdate=new List<Redirect>();
+
+            foreach (var redirect in redirects)
+            {
+                var futureRedirects = redirect.FutureRedirects;
+                var newRoute = futureRedirects.Where(p =>!p.Disabled && p.StartDate < now).OrderBy(p => p.StartDate).FirstOrDefault();
+                if (newRoute != null)
+                {
+                    redirect.To = newRoute.Url;
+                    newRoute.Disabled = true;
+                    redirect.FutureRedirects = futureRedirects;
+
+                    forUpdate.Add(redirect);
+                }
+            }
+
+            if (forUpdate.Count > 0)
+            {
+                await _redirectRepository.UpdateRangeAsync(forUpdate);
+            }
         }
     }
 }

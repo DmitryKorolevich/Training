@@ -43,7 +43,9 @@ using System.Reflection;
 using CsvHelper;
 using CsvHelper.Configuration;
 using VitalChoice.Business.CsvImportMaps;
+using VitalChoice.Business.Helpers;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
+using VitalChoice.Business.Services.Products;
 
 namespace VitalChoice.Business.Services.Orders
 {
@@ -57,7 +59,7 @@ namespace VitalChoice.Business.Services.Orders
         private readonly ICountryService _countryService;
         private readonly IProductService _productService;
         private readonly IProductCategoryService _productCategoryService;
-        private readonly IDiscountService _discountService;
+        private readonly DiscountService _discountService;
         private readonly IDynamicMapper<AddressDynamic, Address> _addresMapper;
         private readonly ReferenceData _referenceData;
         private readonly ITrackingService _trackingService;
@@ -77,7 +79,7 @@ namespace VitalChoice.Business.Services.Orders
             ICountryService countryService,
             IProductService productService,
             IProductCategoryService productCategoryService,
-            IDiscountService discountService,
+            DiscountService discountService,
             IDynamicMapper<AddressDynamic, Address> addresMapper,
             ITrackingService trackingService,
             BrontoService brontoService,
@@ -1623,6 +1625,28 @@ namespace VitalChoice.Business.Services.Orders
             if (removeEmailDublicates)
             {
                 toReturn.Items = toReturn.Items.GroupBy(p => p.Email).Select(x => x.First()).ToList();
+            }
+
+            return toReturn;
+        }
+
+        public async Task<PagedList<OrderDiscountReportItem>> GetOrderDiscountReportItemsAsync(OrderDiscountReportFilter filter)
+        {
+            var toReturn = await _sPEcommerceRepository.GetOrderDiscountReportItemsAsync(filter);
+
+            var discountIds = toReturn.Items.Where(p => p.IdDiscount.HasValue).Select(p => p.IdDiscount.Value).Distinct().ToList();
+            var discounts = await _discountService.SelectAsync(discountIds, 
+                includesOverride: p=>p.Include(pp=>pp.DiscountTiers));
+
+            foreach (var item in toReturn.Items.Where(p=>p.IdDiscount.HasValue))
+            {
+                var discount = discounts.FirstOrDefault(p => p.Id == item.IdDiscount.Value);
+                if (discount != null)
+                {
+                    item.DiscountCode = discount.Code;
+                    item.DiscountMessage = discount.GetDiscountMessage(item.OrderIdDiscountTier);
+                    item.DiscountInfo = discount.GetDiscountInfo(item.OrderIdDiscountTier);
+                }
             }
 
             return toReturn;

@@ -5,6 +5,7 @@ using VC.Public.Models.Cart;
 using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Business.Helpers;
 
 namespace VC.Public.ModelConverters.Order
 {
@@ -12,8 +13,7 @@ namespace VC.Public.ModelConverters.Order
     {
         public override Task DynamicToModelAsync(CartSkuModel model, SkuDynamic dynamic)
         {
-            model.InStock = dynamic.IdObjectType == (int) ProductType.EGс || dynamic.IdObjectType == (int) ProductType.Gc ||
-                            ((bool?) dynamic.SafeData.DisregardStock ?? false) || ((int?) dynamic.SafeData.Stock ?? 0) > 0;
+            model.InStock = dynamic.InStock();
             return TaskCache.CompletedTask;
         }
 

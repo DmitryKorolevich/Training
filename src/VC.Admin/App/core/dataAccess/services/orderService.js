@@ -310,6 +310,15 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	        return baseUrl + ('GetCustomerSkuUsageReportFile/{0}?buildNumber={1}')
                 .format(id, buildNumber);
 	    },
+	    getOrderDiscountReportItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetOrderDiscountReportItems', filter, getConfig(tracker));
+	    },
+	    getOrderDiscountReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + ('GetOrderDiscountReportFile?{0}buildNumber={1}')
+                .format(generateQueryParamsBasedOnFilter(filter), buildNumber);
+	    },
 
 	    //export
 	    getExportGeneralStatus: function (tracker)

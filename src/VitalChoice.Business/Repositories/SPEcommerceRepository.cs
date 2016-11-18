@@ -444,5 +444,22 @@ namespace VitalChoice.Business.Repositories
             toReturn.Items = data;
             return toReturn;
         }
+
+        public async Task<PagedList<OrderDiscountReportItem>> GetOrderDiscountReportItemsAsync(OrderDiscountReportFilter filter)
+        {
+            if (string.IsNullOrEmpty(filter.Discount))
+                filter.Discount = null;
+
+            var data = await _context.Set<OrderDiscountReportItem>().FromSql
+                ("[dbo].[SPGetOrderDiscountReport] @from={0}, @to={1}, @discount={2}, @pageindex={3}, @pagesize={4}",
+                filter.From, filter.To, filter.Discount,
+                filter.Paging?.PageIndex, filter.Paging?.PageItemCount).ToListAsync();
+
+            var toReturn = new PagedList<OrderDiscountReportItem>();
+            toReturn.Count = data.FirstOrDefault()?.TotalCount ?? 0;
+            toReturn.Items = data;
+
+            return toReturn;
+        }
     }
 }

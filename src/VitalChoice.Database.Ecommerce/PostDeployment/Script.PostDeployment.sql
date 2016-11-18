@@ -51,6 +51,7 @@ Post-Deployment Script Template
 :r .\Scripts\SPGetAAFESReport.sql
 :r .\Scripts\VCustomersWithDublicateEmails.sql
 :r .\Scripts\SPGetCustomerSkuUsageReport.sql
+:r .\Scripts\SPGetOrderDiscountReport.sql
 :r .\Scripts\OrderIndexes.sql
 :r .\Scripts\SettingOptionTypesData.sql
 :r .\Scripts\Indexes.sql

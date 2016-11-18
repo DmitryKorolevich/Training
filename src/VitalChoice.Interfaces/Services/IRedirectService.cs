@@ -14,5 +14,7 @@ namespace VitalChoice.Interfaces.Services
         Task<Redirect> UpdateRedirectAsync(Redirect item);
 
         Task<bool> DeleteRedirectAsync(int id, int idUser);
-    }
+
+	    Task ChangeRedirectsBasedOnFutureRedirectsAsync();
+	}
 }

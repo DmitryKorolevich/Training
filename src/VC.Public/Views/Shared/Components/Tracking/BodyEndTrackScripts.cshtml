@@ -91,7 +91,7 @@
     /* ]]> */
     </script>
     <script type="text/javascript">
-    document.write('<scr' + 'ipt type="text/javascript" src="' + proto + 'www.googleadservices.com/pagead/conversion.js"></scri' + 'pt>');
+        document.write('<scr' + 'ipt type="text/javascript" src="' + proto + 'www.googleadservices.com/pagead/conversion.js"></scri' + 'pt>');
     </script>
     <noscript>
         <div>
@@ -140,20 +140,21 @@ else
         (function () {
             var oldonload = window.onload;
             window.onload = function () {
-                __adroll_loaded = true;
-                var scr = document.createElement("script");
-                var host = (("https:" == document.location.protocol) ? "https://s.adroll.com" : "http://a.adroll.com");
-                scr.setAttribute('async', 'true');
-                scr.type = "text/javascript";
-                scr.src = host + "/j/roundtrip.js";
-                ((document.getElementsByTagName('head') || [null])[0] ||
-        document.getElementsByTagName('script')[0].parentNode).appendChild(scr);
-                if (oldonload) { oldonload() }
+                window.setTimeout(function () {
+                    __adroll_loaded = true;
+                    var scr = document.createElement("script");
+                    var host = (("https:" == document.location.protocol) ? "https://s.adroll.com" : "http://a.adroll.com");
+                    scr.setAttribute('async', 'true');
+                    scr.type = "text/javascript";
+                    scr.src = host + "/j/roundtrip.js";
+                    ((document.getElementsByTagName('head') || [null])[0] || document.getElementsByTagName('script')[0].parentNode).appendChild(scr);
+                }, 1);
+                if (oldonload) { oldonload(); }
             };
         } ());
 </script>
 <!-- Bronto Popup -->
-<script bronto-popup-id="352a8dc5-61a2-4f0b-92b7-06dfd854c5a3" src="https://cdn.bronto.com/popup/delivery.js"></script>
+<script bronto-popup-id="352a8dc5-61a2-4f0b-92b7-06dfd854c5a3" src="https://cdn.bronto.com/popup/delivery.js" async="async" defer="defer"></script>
 <!-- Bronto Popup -->
 <!-- MyBuys -->
 <script>
@@ -168,7 +169,7 @@ else
 </script>
 <!-- MyBuys -->
 <!-- Navistone -->
-<script src="//code.murdoog.com/onetag/C15B7CDC77A275.js"></script>
+<script src="//code.murdoog.com/onetag/C15B7CDC77A275.js" async="async" defer="defer"></script>
 <!-- Navistone -->
 @if (Model.BrontoOrderInfo != null)
 {

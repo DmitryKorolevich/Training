@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace VitalChoice.Ecommerce.Domain.Mail
 {
@@ -6,6 +7,7 @@ namespace VitalChoice.Ecommerce.Domain.Mail
     {
         public string Code { get; set; }
         public decimal Amount { get; set; }
+        public DateTime? ExpirationDate { get; set; }
         public bool ShowDots { get; set; }
     }
 

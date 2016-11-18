@@ -1,26 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using VC.Public.Models.Profile;
 using VC.Public.Models.Tracking;
 using VitalChoice.Ecommerce.Domain.Helpers;
-using VitalChoice.Infrastructure.Domain.Constants;
-using VitalChoice.Infrastructure.Domain.Entities.Users;
-using VitalChoice.Infrastructure.Identity.UserManagers;
-using VitalChoice.Interfaces.Services.Content;
-using VitalChoice.Interfaces.Services.Users;
-using Microsoft.AspNetCore.Http;
 using VitalChoice.Infrastructure.Domain.Transfer;
-using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using VitalChoice.Infrastructure.Domain.Options;
@@ -34,28 +22,26 @@ namespace VC.Public.Components.Tracking
         private readonly Lazy<ICheckoutService> _checkoutService;
         private readonly Lazy<IOrderService> _orderService;
         private readonly Lazy<ICustomerService> _customerService;
-        private readonly Lazy<IAffiliateService> _affiliateService;
         private readonly Lazy<ReferenceData> _referenceData;
-        private readonly BaseTrackScriptsComponentHelper _helper;
         private readonly Lazy<IOptions<AppOptions>> _appOptions;
 
-        public HeadTrackScriptsComponent()
+        public HeadTrackScriptsComponent(Lazy<IOptions<AppOptions>> appOptions, Lazy<ReferenceData> referenceData,
+            Lazy<ICustomerService> customerService, Lazy<IOrderService> orderService, Lazy<ICheckoutService> checkoutService,
+            Lazy<IAuthorizationService> authorizationService)
         {
-            _helper = new BaseTrackScriptsComponentHelper();
-            _authorizationService = new Lazy<IAuthorizationService>(() => HttpContext.RequestServices.GetService<IAuthorizationService>());
-            _checkoutService = new Lazy<ICheckoutService>(() => HttpContext.RequestServices.GetService<ICheckoutService>());
-            _orderService = new Lazy<IOrderService>(() => HttpContext.RequestServices.GetService<IOrderService>());
-            _customerService = new Lazy<ICustomerService>(() => HttpContext.RequestServices.GetService<ICustomerService>());
-            _affiliateService = new Lazy<IAffiliateService>(() => HttpContext.RequestServices.GetService<IAffiliateService>());
-            _referenceData = new Lazy<ReferenceData>(() => HttpContext.RequestServices.GetService<ReferenceData>());
-            _appOptions = new Lazy<IOptions<AppOptions>>(() => HttpContext.RequestServices.GetService<IOptions<AppOptions>>());
+            _appOptions = appOptions;
+            _referenceData = referenceData;
+            _customerService = customerService;
+            _orderService = orderService;
+            _checkoutService = checkoutService;
+            _authorizationService = authorizationService;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
             var toReturn = new HeadTrackScriptsModel();
 
-            await _helper.SetBaseOptions(toReturn, HttpContext, _orderService, _authorizationService, _checkoutService, _customerService,
+            await BaseTrackScriptsComponentHelper.SetBaseOptions(toReturn, HttpContext, _orderService, _authorizationService, _checkoutService, _customerService,
                 _referenceData);
 
             if (toReturn.OrderCompleteStep && toReturn.Order != null && _appOptions.Value.Value.EnableOrderTrackScripts)

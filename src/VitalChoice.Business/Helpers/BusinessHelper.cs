@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using FluentValidation.Validators;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
+using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;
@@ -74,6 +75,62 @@ namespace VitalChoice.Business.Helpers
 			}
 			return toReturn;
 		}
+
+        public static string GetDiscountInfo(this DiscountDynamic discount, int? IdTier = null)
+        {
+            string toReturn = null;
+            if (discount == null)
+                return null;
+            switch (discount.IdObjectType)
+            {
+                case (int)DiscountType.FreeShipping:
+                    toReturn = string.Empty;
+                    break;
+                case (int)DiscountType.PercentDiscount:
+                    if (discount.SafeData.Percent != null)
+                    {
+                        toReturn = $"{(decimal)discount.SafeData.Percent / 100:P0}";
+                    }
+                    break;
+                case (int)DiscountType.PriceDiscount:
+                    if (discount.SafeData.Amount != null)
+                    {
+                        toReturn = $"{discount.SafeData.Amount:C}";
+                    }
+                    break;
+                case (int)DiscountType.Threshold:
+                    if (discount.SafeData.ProductSKU != null)
+                    {
+                        toReturn = string.Empty;
+                    }
+                    break;
+                case (int)DiscountType.Tiered:
+                    if (IdTier.HasValue)
+                    {
+                        var neededTier = discount.DiscountTiers?.FirstOrDefault(p => p.Id == IdTier.Value);
+                        if (neededTier != null)
+                        {
+                            switch (neededTier.IdDiscountType)
+                            {
+                                case DiscountType.PriceDiscount:
+                                    toReturn =
+                                        $"{neededTier.Amount ?? 0:C}";
+                                    break;
+                                case DiscountType.PercentDiscount:
+                                    toReturn =
+                                        $"{(neededTier.Percent ?? 0) / 100:P0}";
+                                    break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        toReturn = "Tiered Discount";
+                    }
+                    break;
+            }
+            return toReturn;
+        }
 
         public static Dictionary<string, ImportItemValidationGenericProperty> GetAttrBaseImportValidationSettings(ICollection<PropertyInfo> modelProperties)
         {
@@ -169,6 +226,12 @@ namespace VitalChoice.Business.Helpers
                 Field = field ?? "Base",
                 Message = message,
             };
+        }
+
+        public static bool InStock(this SkuDynamic dynamic)
+        {
+            return dynamic.IdObjectType == (int)ProductType.EGс || dynamic.IdObjectType == (int)ProductType.Gc ||
+                            ((bool?)dynamic.SafeData.DisregardStock ?? false) || ((int?)dynamic.SafeData.Stock ?? 0) > 0;
         }
     }
 }

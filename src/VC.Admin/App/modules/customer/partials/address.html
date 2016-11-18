@@ -120,9 +120,8 @@
     <label for="{{::model.formName}}_model_fax" class="col-md-3 control-label">Fax</label>
     <div class="col-md-9">
         <input type="text" name="Fax" class="form-control" data-ng-model="model.Address.Fax" id="{{::model.formName}}_model_fax" placeholder="Fax" data-mask="(999) 999-9999? x99999" data-clean="true" data-ng-maxlength="100" autocomplete="off" data-ng-disabled="orderEditDisabled"/>
-        <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].Fax.$invalid">
+        <div class="error-container" ng-show="forms.submitted[model.formName] && forms[model.formName].Fax.$invalid && !forms[model.formName].Fax.$error.mask">
             <small class="error" ng-show="forms[model.formName].Fax.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Fax", "100"])}}</small>
-            <small class="error" ng-show="forms[model.formName].Fax.$error.mask">{{getValidationMessage("ValidationMessages.FieldInvalid","Fax")}}</small>
             <small class="error" ng-show="forms[model.formName].Fax.$error.server">{{serverMessages.GetMessage('Fax', model.collectionName, model.index, model.formName)}}</small>
         </div>
     </div>

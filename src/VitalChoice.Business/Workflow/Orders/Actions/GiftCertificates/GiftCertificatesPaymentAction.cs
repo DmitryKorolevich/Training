@@ -30,6 +30,14 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.GiftCertificates
             // ReSharper disable once PossibleNullReferenceException
             foreach (var gc in context.Order.GiftCertificates)
             {
+                if (gc.GiftCertificate.ExpirationDate.HasValue && gc.GiftCertificate.ExpirationDate < DateTime.Now)
+                {
+                    context.GcMessageInfos.Add(new MessageInfo
+                    {
+                        Message = $"Gift Certificate Expired {gc.GiftCertificate.ExpirationDate.Value:MM'/'dd'/'yyyy}",
+                        Field = gc.GiftCertificate.Code
+                    });
+                }
                 if (gc.GiftCertificate.StatusCode != RecordStatusCode.Active)
                 {
                     context.GcMessageInfos.Add(new MessageInfo

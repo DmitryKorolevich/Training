@@ -32,6 +32,7 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.aAFESShipReportController',
 	'app.modules.order.controllers.exportRequestDetailsController',
 	'app.modules.order.controllers.customerSkuUsageReportController',
+	'app.modules.order.controllers.orderDiscountReportController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -173,6 +174,11 @@ angular.module('app.modules.order', [
 				    url: '/report/customer-sku-usage',
 				    templateUrl: 'app/modules/order/partials/customerSkuUsageReport.html',
 				    controller: 'customerSkuUsageReportController'
-				});
+				})
+				.state('index.oneCol.orderDiscountReport', {
+				    url: '/report/order-discount-usage',
+				    templateUrl: 'app/modules/order/partials/orderDiscountReport.html',
+				    controller: 'orderDiscountReportController'
+				});;
 		}
 ]);
