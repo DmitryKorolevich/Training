@@ -311,11 +311,11 @@ INSERT INTO [dbo].[ContentItems]
                                 <div style="margin-top:155px;margin-left:30px">
                                     <table width="200" border="0" cellspacing="0" cellpadding="0" style="color: white;">
                                         <tbody><tr>
-                                            <td width="60" style="font-size: 120px;vertical-align: top;padding-top: 15px;font-family: Lucida Grande;">
+                                            <td width="60" style="font-size: 80px;vertical-align: top;padding-top: 15px;font-family: Arial;">
                                                 <div align="left">$
                                                 </div>
                                             </td>
-                                            <td width="180" style="font-size: 180px;vertical-align: top;font-family: Lucida Grande;">
+                                            <td width="180" style="font-size: 170px;vertical-align: top;font-family: Arial;">
                                                 <div align="left">@(@model.Amount.ToString("##.##"))
                                                 </div>
                                             </td>
