@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <AssemblyName>VitalChoice.Core</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="**\*.cs" />
+    <EmbeddedResource Include="**\*.resx" />
+    <EmbeddedResource Include="compiler\resources\**\*" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Avalara.Avatax.Rest\Avalara.Avatax.Rest.csproj" />
+    <ProjectReference Include="..\VitalChoice.Business\VitalChoice.Business.csproj" />
+    <ProjectReference Include="..\VitalChoice.ContentProcessing\VitalChoice.ContentProcessing.csproj" />
+    <ProjectReference Include="..\VitalChoice.Data\VitalChoice.Data.csproj" />
+    <ProjectReference Include="..\VitalChoice.Ecommerce.Domain\VitalChoice.Ecommerce.Domain.csproj" />
+    <ProjectReference Include="..\VitalChoice.Infrastructure.Domain\VitalChoice.Infrastructure.Domain.csproj" />
+    <ProjectReference Include="..\VitalChoice.DynamicData\VitalChoice.DynamicData.csproj" />
+    <ProjectReference Include="..\VitalChoice.Infrastructure\VitalChoice.Infrastructure.csproj" />
+    <ProjectReference Include="..\VitalChoice.Interfaces\VitalChoice.Interfaces.csproj" />
+    <ProjectReference Include="..\VitalChoice.Validation\VitalChoice.Validation.csproj" />
+    <ProjectReference Include="..\VitalChoice.Caching\VitalChoice.Caching.csproj" />
+    <ProjectReference Include="..\VitalChoice.Profiling\VitalChoice.Profiling.csproj" />
+    <ProjectReference Include="..\VitalChoice.Workflow\VitalChoice.Workflow.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+    <ProjectReference Include="..\Authorize.Net\Authorize.Net.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+    <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+    <ProjectReference Include="..\SendGrid\SendGrid.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+    <ProjectReference Include="..\VitalChoice.ObjectMapping\VitalChoice.ObjectMapping.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+    <ProjectReference Include="..\VitalChoice.Ecommerce\VitalChoice.Ecommerce.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Sdk">
+      <Version>1.0.0-alpha-20161104-2</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="NETStandard.Library">
+      <Version>1.6.0</Version>
+    </PackageReference>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection">
+      <Version>4.0.0-*</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Identity">
+      <Version>1.0.0.*</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore">
+      <Version>1.0.0.*</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies">
+      <Version>1.0.0-*</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Http">
+      <Version>1.0.0-*</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc">
+      <Version>1.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core">
+      <Version>1.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.TagHelpers">
+      <Version>1.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Session">
+      <Version>1.0.0-*</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Razor">
+      <Version>1.0.0-*</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics">
+      <Version>1.0.0-*</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json">
+      <Version>1.0.0-*</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging">
+      <Version>1.0.0-*</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Options">
+      <Version>1.0.0-*</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions">
+      <Version>1.0.0-*</Version>
+    </PackageReference>
+    <PackageReference Include="NLog">
+      <Version>4.3.5</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
