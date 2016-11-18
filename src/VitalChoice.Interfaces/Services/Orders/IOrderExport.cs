@@ -14,5 +14,6 @@ namespace VitalChoice.Interfaces.Services.Orders
         Task ExportOrders(OrderExportData exportData);
         IReadOnlyList<ExportResult> GetExportResults();
         void ClearDone(DateTime loadTimestamp);
+        bool GetIsOrderExporting(int id);
     }
 }
