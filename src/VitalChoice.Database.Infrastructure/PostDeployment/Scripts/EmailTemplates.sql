@@ -284,22 +284,22 @@ INSERT INTO [dbo].[ContentItems]
         </div>
         @list(Gifts){{
         <div align="center">
-            <table width="1000" border="0" cellspacing="0" cellpadding="0" style="font-family: ''Times New Roman'';">
+            <table width="600" border="0" cellspacing="0" cellpadding="0" style="font-family: ''Times New Roman'';">
               <tr>
-                <td height="442" valign="top" style="background:url(https://@(@root.Model.PublicHost)/assets/images/egift/vital-dollar-blank.jpeg);background-repeat:no-repeat;min-height:379px;">
-                    <table width="1000" border="0" cellspacing="0" cellpadding="0">
+                <td height="265" valign="top" style="background:url(https://@(@root.Model.PublicHost)/assets/images/egift/vital-dollar-blank-600px.jpg);background-repeat:no-repeat;min-height:379px;">
+                    <table width="600" border="0" cellspacing="0" cellpadding="0">
                         <tr>
-                            <td width="670" valign="top" style="min-height:442px">
-                                <div style="margin-top:315px;margin-left:115px;color: #eb451b;">
-                                    <table width="400" border="0" cellspacing="0" cellpadding="0">
+                            <td width="402" valign="top" style="min-height:265px">
+                                <div style="margin-top:185px;margin-left:120px;color:#eb451b">
+                                    <table width="100" border="0" cellspacing="0" cellpadding="0">
                                         <tbody>
                                             <tr>
-                                                <td height="30" style="font-size: 30px;font-style:italic;font-family: Lucida Grande;">
+                                                <td style="font-size:20px;font-style:italic;font-family:Lucida Grande">
                                                     <div align="center">@(Code)</div>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td style="font-size: 16px;font-style: italic;font-family: Lucida Grande;">
+                                                <td style="font-size:12px;font-style:italic;font-family:Lucida Grande">
                                                     <div align="center">Exp: @date(ExpirationDate) {{MM''/''dd''/''yy}}</div>
                                                 </td>
                                             </tr>
@@ -307,15 +307,15 @@ INSERT INTO [dbo].[ContentItems]
                                     </table>
                                 </div>
                             </td>
-                            <td width="330" valign="top">
-                                <div style="margin-top:155px;margin-left:30px">
-                                    <table width="200" border="0" cellspacing="0" cellpadding="0" style="color: white;">
+                            <td width="198" valign="top">
+                                <div style="margin-top:95px;margin-left:25px">
+                                    <table width="" border="0" cellspacing="0" cellpadding="0" style="color:white">
                                         <tbody><tr>
-                                            <td width="60" style="font-size: 120px;vertical-align: top;padding-top: 15px;font-family: Lucida Grande;">
+                                            <td width="27" style="font-size:48px;vertical-align:top;padding-top:15px;font-family:Arial">
                                                 <div align="left">$
                                                 </div>
                                             </td>
-                                            <td width="180" style="font-size: 180px;vertical-align: top;font-family: Lucida Grande;">
+                                            <td width="114" style="font-size:102px;vertical-align:top;font-family:Arial">
                                                 <div align="left">@(@model.Amount.ToString("##.##"))
                                                 </div>
                                             </td>
