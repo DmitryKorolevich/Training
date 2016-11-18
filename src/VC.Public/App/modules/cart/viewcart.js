@@ -136,17 +136,16 @@ function recalculateCart(viewModel, successCallback) {
                     viewModel.refreshing(false);
                 }
             } else {
+                $("span[data-valmsg-for]").text('');
                 if (result.Data) {
                     ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "DiscountCode", "ShippingDate"] }, viewModel.Model);
                     processServerMessages(viewModel.Model);
-                }
-                else {
-                    $("span[data-valmsg-for]").text('');
                 }
                 processErrorResponse(result);
                 viewModel.refreshing(false);
             }
         }).error(function (result) {
+            $("div.validation-summary-errors").html('');
             $("span[data-valmsg-for]").text('');
             processErrorResponse();
             viewModel.refreshing(false);
