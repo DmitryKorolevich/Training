@@ -32,6 +32,6 @@ namespace VitalChoice.Interfaces.Services.Products
 
         Task<string> GenerateGCCode();
 
-        Task<ICollection<GiftCertificate>> ImportGCsAsync(byte[] file, int idAddedBy);
+        Task<ICollection<GiftCertificate>> ImportGCsAsync(byte[] file, int idAddedBy, GCImportNotificationType? notificationType);
     }
 }

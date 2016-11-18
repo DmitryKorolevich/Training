@@ -1645,6 +1645,7 @@ namespace VitalChoice.Business.Services.Orders
                 {
                     item.DiscountCode = discount.Code;
                     item.DiscountMessage = discount.GetDiscountMessage(item.OrderIdDiscountTier);
+                    item.DiscountInfo = discount.GetDiscountInfo(item.OrderIdDiscountTier);
                 }
             }
 

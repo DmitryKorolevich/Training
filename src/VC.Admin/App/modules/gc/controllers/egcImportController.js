@@ -10,8 +10,9 @@
         $scope.options = {};
         $scope.options.IdNotificationType=null;
         $scope.options.NotificationTypes = [
-            { Key: 9, Text: 'None' },
-            { Key: 1, Text: 'Standart Notification(without expiration date)' },
+            { Key: 1, Text: 'None' },
+            { Key: 4, Text: 'Notification with expiration date' },
+            { Key: 2, Text: 'Standard Notification (without expiration date)' },
         ];
     };
 

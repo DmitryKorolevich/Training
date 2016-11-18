@@ -142,19 +142,12 @@ namespace VitalChoice.Business.Services.Products
 
         protected override async Task BeforeEntityChangesAsync(DiscountDynamic model, Discount entity, IUnitOfWorkAsync uow)
         {
-            var discountTierRepository = uow.RepositoryAsync<DiscountTier>();
 
-            await discountTierRepository.DeleteAllAsync(entity.DiscountTiers);
         }
 
         protected override async Task AfterEntityChangesAsync(DiscountDynamic model, Discount updated, IUnitOfWorkAsync uow)
         {
-            var discountTierRepository = uow.RepositoryAsync<DiscountTier>();
 
-            if (updated.IdObjectType == (int) DiscountType.Tiered && updated.DiscountTiers != null && updated.DiscountTiers.Count > 0)
-            {
-                await discountTierRepository.InsertRangeAsync(updated.DiscountTiers);
-            }
         }
 
         protected override bool LogObjectFullData { get { return true; } }

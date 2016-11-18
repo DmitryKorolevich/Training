@@ -108,12 +108,12 @@ namespace VitalChoice.Business.Services.Dynamic
                 }
                 if (dynamic.DiscountTiers != null)
                 {
-                    foreach (var item in dynamic.DiscountTiers)
+                    entity.DiscountTiers.MergeKeyed(dynamic.DiscountTiers, p=>p.Id);
+
+                    if (entity.IdObjectType != (int) DiscountType.Tiered)
                     {
-                        item.Id = 0;
-                        item.IdDiscount = dynamic.Id;
+                        entity.DiscountTiers.Clear();
                     }
-                    entity.DiscountTiers = dynamic.DiscountTiers.ToList();
                 }
             });
             return TaskCache.CompletedTask;

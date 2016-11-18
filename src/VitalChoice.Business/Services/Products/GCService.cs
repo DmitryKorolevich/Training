@@ -344,6 +344,7 @@ namespace VitalChoice.Business.Services.Products
                 item.Code = await GenerateGCCode();
                 item.IdEditedBy = model.IdEditedBy;
                 item.UserId = model.UserId;
+                item.Tag = model.Tag;
                 items.Add(item);
             }
 
@@ -430,7 +431,7 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
-        public async Task<ICollection<GiftCertificate>> ImportGCsAsync(byte[] file, int idAddedBy)
+        public async Task<ICollection<GiftCertificate>> ImportGCsAsync(byte[] file, int idAddedBy, GCImportNotificationType? notificationType)
         {
             List<GCImportItem> records = new List<GCImportItem>();
             Dictionary<string, ImportItemValidationGenericProperty> validationSettings = null;
@@ -470,7 +471,8 @@ namespace VitalChoice.Business.Services.Products
                                         tempDate = TimeZoneInfo.ConvertTime(tempDate, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local);
                                         if (tempDate < DateTime.Now)
                                         {
-                                            localMessages.Add(BusinessHelper.AddErrorMessage(expirationDateHeader, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.MustBeFutureDateError], expirationDateHeader)));
+                                            localMessages.Add(BusinessHelper.AddErrorMessage(expirationDateHeader, 
+                                                String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.MustBeFutureDateError], expirationDateHeader)));
                                         }
                                         else
                                         {
@@ -479,7 +481,16 @@ namespace VitalChoice.Business.Services.Products
                                     }
                                     else
                                     {
-                                        localMessages.Add(BusinessHelper.AddErrorMessage(expirationDateHeader, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ParseDateError], expirationDateHeader)));
+                                        localMessages.Add(BusinessHelper.AddErrorMessage(expirationDateHeader, 
+                                            String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ParseDateError], expirationDateHeader)));
+                                    }
+                                }
+                                else
+                                {
+                                    if(notificationType==GCImportNotificationType.ExpirationDateAdminEGiftEmail)
+                                    {
+                                        localMessages.Add(BusinessHelper.AddErrorMessage(expirationDateHeader, 
+                                            String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsRequired], expirationDateHeader)));
                                     }
                                 }
 
@@ -504,12 +515,14 @@ namespace VitalChoice.Business.Services.Products
                                     }
                                     else
                                     {
-                                        localMessages.Add(BusinessHelper.AddErrorMessage(amountBaseHeader, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ParseIntError], amountBaseHeader)));
+                                        localMessages.Add(BusinessHelper.AddErrorMessage(amountBaseHeader, 
+                                            String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.ParseIntError], amountBaseHeader)));
                                     }
                                 }
                                 else
                                 {
-                                    localMessages.Add(BusinessHelper.AddErrorMessage(amountBaseHeader, String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsRequired], amountBaseHeader)));
+                                    localMessages.Add(BusinessHelper.AddErrorMessage(amountBaseHeader, 
+                                        String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsRequired], amountBaseHeader)));
                                 }
 
                                 item.ErrorMessages = localMessages;

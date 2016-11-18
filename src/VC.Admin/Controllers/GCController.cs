@@ -207,10 +207,10 @@ namespace VC.Admin.Controllers
         {
             var form = await Request.ReadFormAsync();
             
-            int? idNotificationType = null;
+            GCImportNotificationType? notificationType = null;
             if (form.ContainsKey("idnotificationtype"))
             {
-                idNotificationType = Int32.Parse(form["idnotificationtype"]);
+                notificationType = (GCImportNotificationType)Int32.Parse(form["idnotificationtype"]);
             }
 
             var parsedContentDisposition = ContentDispositionHeaderValue.Parse(form.Files[0].ContentDisposition);
@@ -223,24 +223,29 @@ namespace VC.Admin.Controllers
                 var sUserId = _userManager.GetUserId(Request.HttpContext.User);
                 int userId = int.Parse(sUserId);
 
-                var gcs = await GCService.ImportGCsAsync(fileContent, userId);
+                var gcs = await GCService.ImportGCsAsync(fileContent, userId, notificationType);
 
-                if (idNotificationType == (int) GCImportNotificationType.StandartAdminEGiftEmail)
+                var models = gcs.Select(p => new GiftAdminNotificationEmail()
                 {
-                    var models = gcs.Select(p => new GiftAdminNotificationEmail()
-                    {
-                        Email = p.Email,
-                        Recipient = p.FirstName + " " + p.LastName,
-                        Gifts = new List<GiftEmailModel>()
+                    Email = p.Email,
+                    Recipient = p.FirstName + " " + p.LastName,
+                    Gifts = new List<GiftEmailModel>()
                         {
                             new GiftEmailModel()
                             {
                                 Code = p.Code,
-                                Amount = p.Balance
+                                Amount = p.Balance,
+                                ExpirationDate = p.ExpirationDate
                             }
                         },
-                    }).ToList();
+                }).ToList();
+                if (notificationType ==  GCImportNotificationType.StandartAdminEGiftEmail)
+                {
                     await _notificationService.SendGiftAdminNotificationEmailsAsync(models);
+                }
+                if (notificationType == GCImportNotificationType.ExpirationDateAdminEGiftEmail)
+                {
+                    await _notificationService.SendGiftExpirationDateAdminNotificationEmailsAsync(models);
                 }
 
                 return true;

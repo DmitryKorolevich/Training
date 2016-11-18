@@ -27,6 +27,7 @@
         public const string OrderProductReviewEmail = "OrderProductReviewEmail";
         public const string EGiftNotificationEmail = "EGiftNotificationEmail";
         public const string GiftAdminNotificationEmail = "GiftAdminNotificationEmail";
+        public const string GiftExpirationDateAdminNotificationEmail = "GiftExpirationDateAdminNotificationEmail";
 
         public const int OrderProductReviewEmailDaysCount = 10;
 
