@@ -134,7 +134,7 @@ namespace VC.Public.Controllers
                 {
                     cartModel.GiftCertificateCodes.Add(code);
                     code.ErrorMessage = "Gift Certificate not found";
-                    ModelState.AddModelError($"GiftCertificateCodes{num}", "Gift Certificate not found");
+                    ModelState.AddModelError("", "Gift Certificate not found");
                 }
                 if (!string.IsNullOrWhiteSpace(code.Value))
                 {
