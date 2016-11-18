@@ -31,9 +31,10 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
             Map(m => m.CustomerEmail).Name("Email").Index(5);
             Map(m => m.CustomerFirstName).Name("First Name").Index(6);
             Map(m => m.CustomerLastName).Name("Last Name").Index(7);
-            Map(m => m.Total).Name("Total").Index(8).TypeConverterOption("c");
+            Map(m => m.Total).Name("Order Total").Index(8).TypeConverterOption("c");
             Map(m => m.DiscountCode).Name("Discount Code").Index(9);
             Map(m => m.DiscountMessage).Name("Discount Type").Index(10);
+            Map(m => m.DiscountInfo).Name("% / $").Index(10);
             Map(m => m.DiscountTotal).Name("Discount Amount").Index(11).TypeConverterOption("c");
         }
     }

@@ -49,6 +49,8 @@ namespace VitalChoice.Business.Mailings
 
         Task SendGiftAdminNotificationEmailsAsync(ICollection<GiftAdminNotificationEmail> models);
 
+        Task SendGiftExpirationDateAdminNotificationEmailsAsync(ICollection<GiftAdminNotificationEmail> models);
+
         Task SendContentUrlNotificationForArticleAsync(string email, ContentUrlNotificationEmail model);
 
         Task SendContentUrlNotificationForRecipeAsync(string email, ContentUrlNotificationEmail model);

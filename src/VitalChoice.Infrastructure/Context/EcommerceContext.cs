@@ -180,6 +180,7 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.Ignore(f => f.DiscountCode);
                 entity.Ignore(f => f.DiscountMessage);
+                entity.Ignore(f => f.DiscountInfo);
                 entity.HasKey(f => f.Id);
             });
 

@@ -20,7 +20,7 @@ namespace VitalChoice.Business.Mailings
         private static string _сustomerServiceToEmail;
         private static string _giftListEmail;
         private static string _adminHost;
-        private static string _publicHost;
+        private static string _publicHost; 
         private static string _orderShippingNotificationBcc;
 
         public NotificationService(IEmailSender emailSender,
@@ -277,6 +277,31 @@ namespace VitalChoice.Business.Mailings
             }
 
             var items = await _emailTemplateService.GenerateEmailsAsync(EmailConstants.GiftAdminNotificationEmail, models);
+
+            if (items != null)
+            {
+                foreach (var item in items)
+                {
+                    await emailSender.SendEmailAsync(item.Key.Email, item.Value.Subject, item.Value.Body, toDisplayName: item.Key.Recipient);
+                }
+            }
+        }
+
+        public async Task SendGiftExpirationDateAdminNotificationEmailsAsync(ICollection<GiftAdminNotificationEmail> models)
+        {
+            foreach (var model in models)
+            {
+                if (model.Gifts != null)
+                {
+                    for (int i = 0; i < model.Gifts.Count; i++)
+                    {
+                        model.Gifts[i].ShowDots = i != model.Gifts.Count - 1;
+                    }
+                }
+                model.PublicHost = _publicHost;
+            }
+
+            var items = await _emailTemplateService.GenerateEmailsAsync(EmailConstants.GiftExpirationDateAdminNotificationEmail, models);
 
             if (items != null)
             {

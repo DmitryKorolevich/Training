@@ -6,7 +6,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 {
     public enum GCImportNotificationType
     {
-        StandartAdminEGiftEmail=1,
-        ExpirationDateAdminEGiftEmail = 2,
+        None = 1,
+        StandartAdminEGiftEmail =2,
+        ExpirationDateAdminEGiftEmail = 4,
     }
 }

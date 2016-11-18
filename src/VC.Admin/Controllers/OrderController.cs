@@ -62,6 +62,7 @@ using VitalChoice.Infrastructure.Extensions;
 using VitalChoice.Business.CsvExportMaps.Products;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services.Products;
+using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VC.Admin.Controllers
@@ -410,6 +411,36 @@ namespace VC.Admin.Controllers
             }
             await _orderService.OrderTypeSetup(order);
             var orderContext = await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus);
+
+            //bind gcs errors
+            if (orderContext.GcMessageInfos != null && orderContext.Order.GiftCertificates != null)
+            {
+                var orderGcs = orderContext.Order.GiftCertificates.ToList();
+                foreach (var error in orderContext.GcMessageInfos.Where(p => p.MessageLevel == MessageLevel.Error && p.MessageType == MessageType.FormField))
+                {
+                    int? index = null;
+                    for (int i = 0; i < orderGcs.Count; i++)
+                    {
+                        if (orderGcs[i].GiftCertificate?.Code == error.Field)
+                        {
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    if (index.HasValue)
+                    {
+                        orderContext.Messages.Add(new MessageInfo
+                        {
+                            MessageLevel = MessageLevel.Error,
+                            MessageType = MessageType.FormField,
+                            Field = $"GCs.i{index.Value}.Code",
+                            Message = error.Message
+                        });
+                    }
+                }
+            }
+
             if (!string.IsNullOrWhiteSpace(model.DiscountCode) && orderContext.Order.Discount == null)
             {
                 orderContext.Messages.Add(new MessageInfo

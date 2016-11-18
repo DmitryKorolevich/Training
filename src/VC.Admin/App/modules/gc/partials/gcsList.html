@@ -19,19 +19,11 @@
             <div class="col-md-4">
                 <input type="text" class="form-control" placeholder="Tag" data-ng-model="filter.Tag">
             </div>
-            <div class="col-md-4">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="NotZeroBalance" data-ng-model="filter.NotZeroBalance" />
-                        Hide $0.00 Available
-                    </label>
-                </div>
-            </div>
         </div>
         <div class="row form-group">
             <div class="col-md-4">
                 <p class="input-group">
-                    <input type="text" class="form-control" placeholder="Valid From" name="ExpirationFrom" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.ExpirationFrom" is-open="fromOpened" ng-required="true" />
+                    <input type="text" class="form-control" placeholder="From Expiration Date" name="ExpirationFrom" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.ExpirationFrom" is-open="fromOpened" ng-required="true" />
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
@@ -39,11 +31,21 @@
             </div>
             <div class="col-md-4">
                 <p class="input-group">
-                    <input type="text" class="form-control" placeholder="Valid To" name="ExpirationTo" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.ExpirationTo" is-open="toOpened" ng-required="true" />
+                    <input type="text" class="form-control" placeholder="To Expiration Date" name="ExpirationTo" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.ExpirationTo" is-open="toOpened" ng-required="true" />
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
                 </p>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-4">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="NotZeroBalance" data-ng-model="filter.NotZeroBalance" />
+                        Hide $0.00 Available
+                    </label>
+                </div>
             </div>
         </div>
         <div class="row form-group">
@@ -98,7 +100,7 @@
                             </span>
                         </th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('ExpirationDate')">
-                            <span>Valid To</span>
+                            <span>Expiration Date</span>
                             <span data-ng-if="filter.Sorting.Path == 'ExpirationDate'">
                                 <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>

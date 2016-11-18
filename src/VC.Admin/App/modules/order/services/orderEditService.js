@@ -968,7 +968,6 @@ angular.module('app.modules.order.services.orderEditService', [])
                             var items = value.Field.split(".");
                             uiScope.forms[items[0]][items[1]][items[2]].$setValidity("server", false);
                             formForShowing = items[0];
-                            openSKUs();
                         }
                         else
                         {

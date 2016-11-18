@@ -39,6 +39,8 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Reports
 
         public string DiscountCode { get; set; }
 
+        public string DiscountInfo { get; set; }
+
         public string DiscountMessage { get; set; }
     }
 }
