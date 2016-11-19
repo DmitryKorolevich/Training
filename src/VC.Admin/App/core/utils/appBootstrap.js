@@ -309,14 +309,14 @@ angular.module('app.core.utils.appBootstrap', [])
 
                         settingService.editLockPing(model)
                             .success(function (result) {
-                                setTimeout(editLockPing, 5000);
+                                setTimeout(editLockPing, 20000);
                             })
                             .error(function () {
-                                setTimeout(editLockPing, 5000);
+                                setTimeout(editLockPing, 20000);
                             });
                     }
                 }
-                setTimeout(editLockPing, 10000);
+                setTimeout(editLockPing, 20000);
             };
 
             
