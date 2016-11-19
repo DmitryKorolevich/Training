@@ -10,6 +10,7 @@ using VitalChoice.Ecommerce.Utils;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.LoadBalancing;
+using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Orders;
 
@@ -17,80 +18,57 @@ namespace VitalChoice.Business.Services.Orders
 {
     public class OrderExport : IOrderExport
     {
-        public int TotalExporting
-        {
-            get
-            {
-                var totalCount = 0;
-                lock (_exportResults)
-                {
-                    ClearExpiredList();
-                    foreach (var result in _exportResults)
-                    {
-                        lock (result)
-                        {
-                            totalCount += result.TotalCount;
-                        }
-                    }
-                }
-                return totalCount;
-            }
-        }
+        public int TotalExporting => _totalExporting;
 
-        public int TotalExported
-        {
-            get
-            {
-                var totalCount = 0;
-                lock (_exportResults)
-                {
-                    ClearExpiredList();
-                    foreach (var result in _exportResults)
-                    {
-                        lock (result)
-                        {
-                            totalCount += result.ExportedOrders.Count;
-                        }
-                    }
-                }
-                return totalCount;
-            }
-        }
+        public int TotalExported => _totalExported;
 
-        public int ExportErrors
+        public int ExportErrors => _exportErrors;
+
+        private void RefreshStatistics()
         {
-            get
+            var exportErrors = 0;
+            var totalExported = 0;
+            var totalExporting = 0;
+            lock (_exportResults)
             {
-                var totalCount = 0;
-                lock (_exportResults)
+                ClearExpiredList();
+                foreach (var result in _exportResults)
                 {
-                    ClearExpiredList();
-                    foreach (var result in _exportResults.Where(r => r.TotalCount == r.ExportedOrders.Count))
+                    lock (result)
                     {
-                        lock (result)
+                        if (result.TotalCount == result.ExportedOrders.Count)
                         {
-                            totalCount += result.ExportedOrders.Count(o => !o.Success);
+                            exportErrors += result.ExportedOrders.Count(e => !e.Success);
                         }
+                        totalExported += result.ExportedOrders.Count;
+                        totalExporting += result.TotalCount;
                     }
                 }
-                return totalCount;
             }
+            _totalExporting = totalExporting;
+            _totalExported = totalExported;
+            _exportErrors = exportErrors;
         }
 
         private readonly List<ExportResult> _exportResults = new List<ExportResult>();
         private readonly ConcurrentDictionary<int, ExportSide> _exportedOrders = new ConcurrentDictionary<int, ExportSide>();
         private readonly ILifetimeScope _rootScope;
         private readonly ExportPool _exportPool;
+        private volatile int _totalExporting;
+        private volatile int _totalExported;
+        private volatile int _exportErrors;
+        private readonly BasicTimer _timer;
 
         public OrderExport(ILifetimeScope rootScope, ILoggerFactory loggerFactory)
         {
-            _exportPool = new ExportPool(loggerFactory.CreateLogger<OrderExport>(), rootScope, _exportedOrders);
+            var logger = loggerFactory.CreateLogger<OrderExport>();
+            _exportPool = new ExportPool(logger, rootScope, _exportedOrders);
             _rootScope = rootScope;
+            _timer = new BasicTimer(RefreshStatistics, TimeSpan.FromSeconds(5), e => logger.LogError(e.ToString()));
         }
 
         public async Task ExportOrders(OrderExportData exportData)
         {
-
             foreach (var data in exportData.ExportInfo.ToArray())
             {
                 ExportSide side;
@@ -290,5 +268,7 @@ namespace VitalChoice.Business.Services.Orders
                 }
             }
         }
+
+        public void Dispose() => _timer.Dispose();
     }
 }

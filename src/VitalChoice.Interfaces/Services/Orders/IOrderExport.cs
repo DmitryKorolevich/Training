@@ -6,7 +6,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
 namespace VitalChoice.Interfaces.Services.Orders
 {
-    public interface IOrderExport
+    public interface IOrderExport: IDisposable
     {
         int TotalExporting { get; }
         int TotalExported { get; }
