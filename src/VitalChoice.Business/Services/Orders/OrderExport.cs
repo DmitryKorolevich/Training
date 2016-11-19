@@ -44,10 +44,10 @@ namespace VitalChoice.Business.Services.Orders
                         totalExporting += result.TotalCount;
                     }
                 }
+                _totalExporting = totalExporting;
+                _totalExported = totalExported;
+                _exportErrors = exportErrors;
             }
-            _totalExporting = totalExporting;
-            _totalExported = totalExported;
-            _exportErrors = exportErrors;
         }
 
         private readonly List<ExportResult> _exportResults = new List<ExportResult>();
