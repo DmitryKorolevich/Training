@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.Extensions.Logging;
@@ -45,6 +46,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             catch (Exception e)
             {
                 Logger.LogWarning(e.ToString());
+                Thread.Sleep(TimeSpan.FromSeconds(10));
                 try
                 {
                     var oldQue = Que;
@@ -85,6 +87,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             catch (Exception e)
             {
                 Logger.LogWarning(e.ToString());
+                Thread.Sleep(TimeSpan.FromSeconds(10));
                 try
                 {
                     var oldQue = Que;
