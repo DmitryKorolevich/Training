@@ -47,6 +47,7 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             catch (Exception e)
             {
                 Logger.LogWarning(e.ToString());
+                Thread.Sleep(TimeSpan.FromSeconds(10));
                 try
                 {
                     var oldQue = Que;
@@ -77,13 +78,10 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             {
                 ExecuteBatchWithCheck(action, values.Select(_messageConstructor));
             }
-            catch (MessagingEntityNotFoundException)
-            {
-                
-            }
             catch (Exception e)
             {
                 Logger.LogWarning(e.ToString());
+                Thread.Sleep(TimeSpan.FromSeconds(10));
                 try
                 {
                     var oldQue = Que;
@@ -117,20 +115,29 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             catch (Exception e)
             {
                 Logger.LogWarning(e.ToString());
-                var oldQue = Que;
-                Que = QueFactory();
+                Thread.Sleep(TimeSpan.FromSeconds(10));
                 try
                 {
-                    await ExecuteSingleWithCheckAsync(action, value);
+                    var oldQue = Que;
+                    Que = QueFactory();
+                    try
+                    {
+                        await ExecuteSingleWithCheckAsync(action, value);
+                    }
+                    finally
+                    {
+                        await oldQue.CloseAsync();
+                    }
                 }
-                finally
+                catch (Exception ex)
                 {
-                    await oldQue.CloseAsync();
+                    Logger.LogError(ex.ToString());
                 }
             }
         }
 
-        protected virtual async Task DoCollectionSendActionAsync(Func<TQue, IEnumerable<BrokeredMessage>, Task> action, ICollection<T> values)
+        protected virtual async Task DoCollectionSendActionAsync(Func<TQue, IEnumerable<BrokeredMessage>, Task> action,
+            ICollection<T> values)
         {
             try
             {
@@ -143,15 +150,23 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             catch (Exception e)
             {
                 Logger.LogWarning(e.ToString());
-                var oldQue = Que;
-                Que = QueFactory();
+                Thread.Sleep(TimeSpan.FromSeconds(10));
                 try
                 {
-                    await ExecuteBatchWithCheckAsync(action, values.Select(_messageConstructor));
+                    var oldQue = Que;
+                    Que = QueFactory();
+                    try
+                    {
+                        await ExecuteBatchWithCheckAsync(action, values.Select(_messageConstructor));
+                    }
+                    finally
+                    {
+                        await oldQue.CloseAsync();
+                    }
                 }
-                finally
+                catch (Exception ex)
                 {
-                    await oldQue.CloseAsync();
+                    Logger.LogError(ex.ToString());
                 }
             }
         }
