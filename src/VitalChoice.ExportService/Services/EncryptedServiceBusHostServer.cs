@@ -226,6 +226,7 @@ namespace VitalChoice.ExportService.Services
         {
             base.Dispose();
             _keyExchangeProvider.Dispose();
+            _exportPool.Dispose();
         }
 
         private class CommandProcessingPool : RoundRobinAbstractPool<ServiceBusCommandBase>

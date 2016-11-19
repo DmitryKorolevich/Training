@@ -411,6 +411,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
             _plainClient?.Dispose();
             _encryptedClient?.Dispose();
             EncryptionHost?.Dispose();
+            _plainPool?.Dispose();
+            _encryptedPool?.Dispose();
         }
 
         private void TrackCommand(ServiceBusCommandBase command)
