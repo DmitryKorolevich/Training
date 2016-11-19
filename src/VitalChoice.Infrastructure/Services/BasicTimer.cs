@@ -11,6 +11,9 @@ namespace VitalChoice.Infrastructure.Services
 
         public BasicTimer(Action timerAction, TimeSpan period, Action<Exception> errorHandler = null)
         {
+            if (timerAction == null)
+                throw new ArgumentNullException(nameof(timerAction));
+
             _timerAction = timerAction;
             _errorHandler = errorHandler;
             _timer = new Timer(TimerCycle, null, period, period);

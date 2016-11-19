@@ -18,38 +18,6 @@ namespace VitalChoice.Business.Services.Orders
 {
     public class OrderExport : IOrderExport
     {
-        public int TotalExporting => _totalExporting;
-
-        public int TotalExported => _totalExported;
-
-        public int ExportErrors => _exportErrors;
-
-        private void RefreshStatistics()
-        {
-            var exportErrors = 0;
-            var totalExported = 0;
-            var totalExporting = 0;
-            lock (_exportResults)
-            {
-                ClearExpiredList();
-                foreach (var result in _exportResults)
-                {
-                    lock (result)
-                    {
-                        if (result.TotalCount == result.ExportedOrders.Count)
-                        {
-                            exportErrors += result.ExportedOrders.Count(e => !e.Success);
-                        }
-                        totalExported += result.ExportedOrders.Count;
-                        totalExporting += result.TotalCount;
-                    }
-                }
-                _totalExporting = totalExporting;
-                _totalExported = totalExported;
-                _exportErrors = exportErrors;
-            }
-        }
-
         private readonly List<ExportResult> _exportResults = new List<ExportResult>();
         private readonly ConcurrentDictionary<int, ExportSide> _exportedOrders = new ConcurrentDictionary<int, ExportSide>();
         private readonly ILifetimeScope _rootScope;
@@ -66,6 +34,12 @@ namespace VitalChoice.Business.Services.Orders
             _rootScope = rootScope;
             _timer = new BasicTimer(RefreshStatistics, TimeSpan.FromSeconds(5), e => logger.LogError(e.ToString()));
         }
+
+        public int TotalExporting => _totalExporting;
+
+        public int TotalExported => _totalExported;
+
+        public int ExportErrors => _exportErrors;
 
         public async Task ExportOrders(OrderExportData exportData)
         {
@@ -152,6 +126,32 @@ namespace VitalChoice.Business.Services.Orders
         }
 
         public bool GetIsOrderExporting(int id) => _exportedOrders.ContainsKey(id);
+
+        private void RefreshStatistics()
+        {
+            var exportErrors = 0;
+            var totalExported = 0;
+            var totalExporting = 0;
+            lock (_exportResults)
+            {
+                ClearExpiredList();
+                foreach (var result in _exportResults)
+                {
+                    lock (result)
+                    {
+                        if (result.TotalCount == result.ExportedOrders.Count)
+                        {
+                            exportErrors += result.ExportedOrders.Count(e => !e.Success);
+                        }
+                        totalExported += result.ExportedOrders.Count;
+                        totalExporting += result.TotalCount;
+                    }
+                }
+                _totalExporting = totalExporting;
+                _totalExported = totalExported;
+                _exportErrors = exportErrors;
+            }
+        }
 
         private void ClearExpiredList()
         {
@@ -269,6 +269,10 @@ namespace VitalChoice.Business.Services.Orders
             }
         }
 
-        public void Dispose() => _timer.Dispose();
+        public void Dispose()
+        {
+            _timer.Dispose();
+            _exportPool.Dispose();
+        }
     }
 }
