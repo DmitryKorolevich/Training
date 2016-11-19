@@ -316,9 +316,7 @@ angular.module('app.core.utils.appBootstrap', [])
                             });
                     }
                 }
-                else {
-                    setTimeout(editLockPing, 10000);
-                }
+                setTimeout(editLockPing, 10000);
             };
 
             
