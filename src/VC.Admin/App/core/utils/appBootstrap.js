@@ -314,6 +314,7 @@ angular.module('app.core.utils.appBootstrap', [])
                             .error(function () {
                                 setTimeout(editLockPing, 20000);
                             });
+                        return;
                     }
                 }
                 setTimeout(editLockPing, 20000);
