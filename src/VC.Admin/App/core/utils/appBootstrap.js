@@ -285,23 +285,19 @@ angular.module('app.core.utils.appBootstrap', [])
                 }
             };
 
-            function editLockPing()
-            {
-                if ($rootScope.authenticated && $rootScope.currentUser && $rootScope.editLockState.Areas)
-                {
-                    var id=null;
-                    var areaName=null;
-                    $.each($rootScope.ReferenceData.EditLockAreas, function(index, item){
-                        if ($state.is(item) && Number.isInteger($state.params.id))
-                        {
+            function editLockPing() {
+                if ($rootScope.authenticated && $rootScope.currentUser && $rootScope.editLockState.Areas) {
+                    var id = null;
+                    var areaName = null;
+                    $.each($rootScope.ReferenceData.EditLockAreas, function (index, item) {
+                        if ($state.is(item) && Number.isInteger($state.params.id)) {
                             id = parseInt($state.params.id);
                             areaName = item;
                             return false;
                         }
                     });
 
-                    if(id && areaName)
-                    {
+                    if (id && areaName) {
                         var model = {
                             AreaName: areaName,
                             Id: id,
@@ -312,41 +308,33 @@ angular.module('app.core.utils.appBootstrap', [])
                         };
 
                         settingService.editLockPing(model)
-                            .success(function (result)
-                            {
+                            .success(function (result) {
                                 setTimeout(editLockPing, 5000);
                             })
-                            .error(function ()
-                            {
+                            .error(function () {
                                 setTimeout(editLockPing, 5000);
                             });
-                        
-                        return;
                     }
                 }
-                
-                setTimeout(editLockPing, 5000);
+                else {
+                    setTimeout(editLockPing, 10000);
+                }
             };
 
             
-            function editLockRequest()
-            {
-                if ($rootScope.authenticated && $rootScope.currentUser && $rootScope.editLockState.Areas)
-                {
+            function editLockRequest() {
+                if ($rootScope.authenticated && $rootScope.currentUser && $rootScope.editLockState.Areas) {
                     var id = null;
                     var areaName = null;
-                    $.each($rootScope.ReferenceData.EditLockAreas, function (index, item)
-                    {
-                        if ($state.is(item) && Number.isInteger($state.params.id))
-                        {
+                    $.each($rootScope.ReferenceData.EditLockAreas, function (index, item) {
+                        if ($state.is(item) && Number.isInteger($state.params.id)) {
                             id = parseInt($state.params.id);
                             areaName = item;
                             return false;
                         }
                     });
 
-                    if (id && areaName)
-                    {
+                    if (id && areaName) {
                         var model = {
                             AreaName: areaName,
                             Id: id,
@@ -359,16 +347,12 @@ angular.module('app.core.utils.appBootstrap', [])
                         $rootScope.editLockState.Areas[areaName].Items[id] = null;
 
                         settingService.editLockRequest(model)
-                            .success(function (result)
-                            {
-                                if (result.Data)
-                                {
-                                    if (result.Data.Avaliable)
-                                    {
+                            .success(function (result) {
+                                if (result.Data) {
+                                    if (result.Data.Avaliable) {
                                         $rootScope.editLockState.Areas[areaName].Items[id] = {};
                                     }
-                                    else
-                                    {
+                                    else {
                                         modalUtil.open('app/modules/setting/partials/infoDetailsPopup.html', 'infoDetailsPopupController', {
                                             Header: "This area is currently being viewed by {0} {1} ({2})".
                                                 format(result.Data.AgentFirstName, result.Data.AgentLastName, result.Data.Agent),
@@ -388,8 +372,7 @@ angular.module('app.core.utils.appBootstrap', [])
                                     }
                                 }
                             })
-                            .error(function ()
-                            {
+                            .error(function () {
                             });
 
                         return;

@@ -207,6 +207,7 @@
                 orderService.getExportGeneralStatus()
                     .success(function (result)
                     {
+                        $rootScope.exportStatusRefreshTimer = setTimeout(refreshExportStatus, 5000);
                         if (result.Success)
                         {
                             $scope.options.exportStatus = result.Data;
@@ -217,10 +218,10 @@
                     })
                     .error(function (result)
                     {
+                        $rootScope.exportStatusRefreshTimer = setTimeout(refreshExportStatus, 5000);
                         errorHandler(result);
                     });
             }
-            $rootScope.exportStatusRefreshTimer = setTimeout(refreshExportStatus, 5000);
         };
 
         $scope.filterGCs = function ()
