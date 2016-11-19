@@ -77,6 +77,10 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             {
                 ExecuteBatchWithCheck(action, values.Select(_messageConstructor));
             }
+            catch (MessagingEntityNotFoundException)
+            {
+                
+            }
             catch (Exception e)
             {
                 Logger.LogWarning(e.ToString());

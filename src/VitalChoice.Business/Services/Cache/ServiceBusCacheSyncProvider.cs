@@ -43,58 +43,72 @@ namespace VitalChoice.Business.Services.Cache
                 _enabled = true;
 
                 var queName = options.Value.CacheSyncOptions?.ServiceBusQueueName;
-                try
-                {
-                    var ns = NamespaceManager.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
-                    if (!ns.TopicExists(queName))
-                    {
-                        var topic = new TopicDescription(queName)
-                        {
-                            EnableExpress = true,
-                            EnablePartitioning = true,
-                            EnableBatchedOperations = true,
-                            DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
-                            RequiresDuplicateDetection = false
-                        };
 
-                        ns.CreateTopic(topic);
-                    }
-                    if (!ns.SubscriptionExists(queName, applicationEnvironment.ApplicationName))
-                    {
-                        var subscription = new SubscriptionDescription(queName, applicationEnvironment.ApplicationName)
-                        {
-                            EnableBatchedOperations = true,
-                            DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
-                            RequiresSession = false,
-                            EnableDeadLetteringOnFilterEvaluationExceptions = false,
-                            EnableDeadLetteringOnMessageExpiration = false,
-                            AutoDeleteOnIdle = TimeSpan.FromMinutes(20),
-                            MaxDeliveryCount = 1
-                        };
-                        ns.CreateSubscription(subscription);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logger.LogWarn(ex => ex.ToString(), e);
-                }
-
-                _receiverHost = new ServiceBusReceiverHost(Logger, new ServiceBusSubscriptionReceiver(() =>
-                {
-                    var factory = MessagingFactory.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
-                    return factory.CreateSubscriptionClient(queName, applicationEnvironment.ApplicationName, ReceiveMode.ReceiveAndDelete);
-                }, Logger), true);
+                _receiverHost = new ServiceBusReceiverHost(Logger,
+                    new ServiceBusSubscriptionReceiver(
+                        new SubcriptionFactory(options.Value.CacheSyncOptions?.ConnectionString, queName,
+                            applicationEnvironment.ApplicationName, ReceiveMode.ReceiveAndDelete).Create, Logger), true);
 
                 _receiverHost.ReceiveBatchEvent += ReceiveMessages;
                 _receiverHost.Start();
 
-                _sendingClient = new ServiceBusTopicSender<SyncOperation>(() =>
-                {
-                    var factory = MessagingFactory.CreateFromConnectionString(options.Value.CacheSyncOptions?.ConnectionString);
-                    return factory.CreateTopicClient(queName);
-                }, Logger, ConstructMessage);
+                _sendingClient =
+                    new ServiceBusTopicSender<SyncOperation>(
+                        new TopicFactory(options.Value.CacheSyncOptions?.ConnectionString, queName).Create, Logger, ConstructMessage);
 
                 _sendingPool = new BatchSendingPool<SyncOperation>(_sendingClient, Logger);
+            }
+        }
+
+        private class TopicFactory : TopicDefaultFactory
+        {
+            public TopicFactory(string connectionString, string queName) : base(connectionString, queName)
+            {
+            }
+
+            protected override void EnsureTopicExists()
+            {
+                var ns = NamespaceManager.CreateFromConnectionString(ConnectionString);
+                if (!ns.TopicExists(QueName))
+                {
+                    var topic = new TopicDescription(QueName)
+                    {
+                        EnableExpress = true,
+                        EnablePartitioning = true,
+                        EnableBatchedOperations = true,
+                        DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
+                        RequiresDuplicateDetection = false
+                    };
+
+                    ns.CreateTopic(topic);
+                }
+            }
+        }
+
+        private class SubcriptionFactory : SubcriptionDefaultFactory
+        {
+            public SubcriptionFactory(string connectionString, string queName, string appHostName, ReceiveMode receiveMode)
+                : base(connectionString, queName, appHostName, receiveMode)
+            {
+            }
+
+            protected override void EnsureSubscriptionExists()
+            {
+                var ns = NamespaceManager.CreateFromConnectionString(ConnectionString);
+                if (!ns.SubscriptionExists(QueName, AppHostName))
+                {
+                    var subscription = new SubscriptionDescription(QueName, AppHostName)
+                    {
+                        EnableBatchedOperations = true,
+                        DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
+                        RequiresSession = false,
+                        EnableDeadLetteringOnFilterEvaluationExceptions = false,
+                        EnableDeadLetteringOnMessageExpiration = false,
+                        AutoDeleteOnIdle = TimeSpan.FromMinutes(20),
+                        MaxDeliveryCount = 1
+                    };
+                    ns.CreateSubscription(subscription);
+                }
             }
         }
 

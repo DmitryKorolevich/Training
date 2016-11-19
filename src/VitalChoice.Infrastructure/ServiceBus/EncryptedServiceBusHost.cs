@@ -153,7 +153,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 }
                 if (command.Result.Data is T)
                 {
-                    return (T)command.Result.Data;
+                    return (T) command.Result.Data;
                 }
                 Logger.LogWarning($"Cannot cast {command.Result.Data?.GetType()} to {typeof(T)}");
                 return default(T);
@@ -181,36 +181,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
         public void Initialize(IOptions<AppOptions> appOptions, ILogger logger)
         {
-            try
-            {
-                try
-                {
-                    EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.PlainConnectionString,
-                        appOptions.Value.ExportService.PlainQueueName, LocalHostName);
-                }
-                catch
-                {
-                    Thread.Sleep(TimeSpan.FromSeconds(1));
-                    EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.PlainConnectionString,
-                        appOptions.Value.ExportService.PlainQueueName, LocalHostName);
-                }
-                try
-                {
-                    EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.EncryptedConnectionString,
-                        appOptions.Value.ExportService.EncryptedQueueName, LocalHostName);
-                }
-                catch
-                {
-                    Thread.Sleep(TimeSpan.FromSeconds(1));
-                    EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.EncryptedConnectionString,
-                        appOptions.Value.ExportService.EncryptedQueueName, LocalHostName);
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.LogCritical(e.ToString());
-            }
-
             var subscriptionPlainFactory = new SubcriptionDefaultFactory(appOptions.Value.ExportService.PlainConnectionString,
                 appOptions.Value.ExportService.PlainQueueName, LocalHostName, ReceiveMode.ReceiveAndDelete);
 
@@ -238,38 +208,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
 
             _plainClient.Start();
             _encryptedClient.Start();
-        }
-
-        private void EnsureTopicAndSubscriptionExists(string connectionString, string topicName, string subscriptionName)
-        {
-            var ns = NamespaceManager.CreateFromConnectionString(connectionString);
-            if (!ns.TopicExists(topicName))
-            {
-                TopicDescription topic = new TopicDescription(topicName)
-                {
-                    EnableExpress = true,
-                    EnablePartitioning = true,
-                    EnableBatchedOperations = true,
-                    DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
-                    RequiresDuplicateDetection = false
-                };
-
-                ns.CreateTopic(topic);
-            }
-            if (!ns.SubscriptionExists(topicName, subscriptionName))
-            {
-                SubscriptionDescription subscription = new SubscriptionDescription(topicName, subscriptionName)
-                {
-                    EnableBatchedOperations = true,
-                    DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
-                    RequiresSession = false,
-                    EnableDeadLetteringOnFilterEvaluationExceptions = false,
-                    EnableDeadLetteringOnMessageExpiration = false,
-                    AutoDeleteOnIdle = TimeSpan.FromMinutes(20),
-                    MaxDeliveryCount = 1
-                };
-                ns.CreateSubscription(subscription);
-            }
         }
 
         private void ProcessEncryptedMessage(BrokeredMessage message)
