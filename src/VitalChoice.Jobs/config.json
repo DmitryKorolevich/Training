@@ -59,7 +59,7 @@
         "HostStatusJob": "0 0/5 * * * ?",
         "AppOptionsSetupJob": "0 0 2 * * ?",
         "KPIReportJob": "0 0 3 * * ?",
-        "RedirectJob": "0 0 1 * * ?"
+        "RedirectJob": "0 1 0 * * ?"
       }
     },
     "Avatax": {
