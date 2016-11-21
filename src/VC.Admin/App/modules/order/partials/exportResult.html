@@ -2,27 +2,30 @@
     <h3>Export Result</h3>
 </div>
 <div class="modal-body">
-    <p class="text-primary"><b>Total:</b>&nbsp;{{total}}</p>
-    <p class="text-success"><b>Succeeded:</b>&nbsp;{{successCount}}</p>
+    <p class="text-primary"><b>Total:</b>&nbsp;{{total}}
+    </p>
+    <p class="text-success"><b>Succeeded:</b>&nbsp;{{successCount}}
+    </p>
     <p class="text-danger"><b>Failed:</b>&nbsp;{{errorCount}}
     </p>
     <div class="export-result-errors">
         <table class="margin-top-20px table table-striped table-hover" data-ng-if="errors.length > 0">
             <thead>
-                <tr>
-                    <th>
-                        Order Id
-                    </th>
-                    <th>
-                        Error
-                    </th>
-                </tr>
+            <tr>
+                <th>
+                    Order Id
+                </th>
+                <th>
+                    Error
+                </th>
+            </tr>
             </thead>
             <tbody>
-                <tr data-ng-repeat="error in errors">
-                    <td>{{error.Id}}</td>
-                    <td><p class="text-danger">{{error.Error}}</p></td>
-                </tr>
+            <tr data-ng-repeat="error in errors">
+                <td>{{error.Id}}</td>
+                <td>
+                    <p class="text-danger">{{error.Error}}</p></td>
+            </tr>
             </tbody>
         </table>
     </div>

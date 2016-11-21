@@ -1,51 +1,56 @@
-#if !NETSTANDARD1_5
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
 
 namespace VitalChoice.Infrastructure.ServiceBus.Base
 {
-    public class ServiceBusSubscriptionReceiver : IServiceBusReceiver
+    public class ServiceBusSubscriptionReceiver : ServiceBusAbstractReceiver<SubscriptionClient>
     {
-        private readonly SubscriptionClient _subscription;
-
-        public ServiceBusSubscriptionReceiver(SubscriptionClient subscription, Action<BrokeredMessage> receiveAction = null)
+        public ServiceBusSubscriptionReceiver(Func<SubscriptionClient> subscriptionFactory, ILogger logger): base(subscriptionFactory, logger)
         {
-            _subscription = subscription;
-            if (receiveAction != null)
+        }
+
+        public override Task<BrokeredMessage> ReceiveAsync()
+            => ReceiveUntilNotNullAsync(() => DoReadActionAsync(que => que.ReceiveAsync()));
+
+        public override BrokeredMessage Receive() => ReceiveUntilNotNull(() => DoReadAction(que => que.Receive()));
+
+        public override Task<IEnumerable<BrokeredMessage>> ReceiveBatchAsync(int count)
+            => ReceiveUntilNotNullAsync(() => DoReadActionAsync(que => que.ReceiveBatchAsync(count)));
+
+        public override IEnumerable<BrokeredMessage> ReceiveBatch(int count)
+            => ReceiveUntilNotNull(() => DoReadAction(que => que.ReceiveBatch(count)));
+
+        private async Task<T> ReceiveUntilNotNullAsync<T>(Func<Task<T>> receiveTask)
+            where T : class
+        {
+            while (true)
             {
-                _subscription.OnMessage(receiveAction, new OnMessageOptions
-                {
-                    MaxConcurrentCalls = 2
-                });
+                if (Disposed)
+                    return null;
+
+                var result = await receiveTask();
+                if (result == null)
+                    continue;
+                return result;
             }
         }
 
-        public Task<BrokeredMessage> ReceiveAsync()
+        private T ReceiveUntilNotNull<T>(Func<T> receiveTask)
+            where T : class
         {
-            return _subscription.ReceiveAsync();
-        }
+            while (true)
+            {
+                if (Disposed)
+                    return null;
 
-        public BrokeredMessage Receive()
-        {
-            return _subscription.Receive();
-        }
-
-        public Task<IEnumerable<BrokeredMessage>> ReceiveBatchAsync(int count)
-        {
-            return _subscription.ReceiveBatchAsync(count);
-        }
-
-        public IEnumerable<BrokeredMessage> ReceiveBatch(int count)
-        {
-            return _subscription.ReceiveBatch(count);
-        }
-
-        public void Dispose()
-        {
-            _subscription.Close();
+                var result = receiveTask();
+                if (result == null)
+                    continue;
+                return result;
+            }
         }
     }
 }
-#endif

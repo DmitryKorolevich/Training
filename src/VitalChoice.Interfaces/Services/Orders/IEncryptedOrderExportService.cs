@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 
 namespace VitalChoice.Interfaces.Services.Orders
 {
-    public interface IEncryptedOrderExportService
+    public interface IEncryptedOrderExportService: IDisposable
     {
         Task ExportGiftListCreditCard(GiftListExportModel model);
         bool Disabled { get; }

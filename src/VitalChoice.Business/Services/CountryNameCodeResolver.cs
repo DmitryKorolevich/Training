@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -16,7 +17,7 @@ namespace VitalChoice.Business.Services
 
         public CountryNameCodeResolver(ICountryService countryService)
         {
-            _countrySource = new Lazy<ICollection<Country>>(() => countryService.GetCountries());
+            _countrySource = new Lazy<ICollection<Country>>(() => countryService.GetCountries(), LazyThreadSafetyMode.None);
         }
 
         private Dictionary<string, Country> _countryNames;

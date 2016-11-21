@@ -11,14 +11,19 @@ namespace VitalChoice.Caching.Relational.Base
     {
         [DataMember]
         public string AppName { get; set; }
+
         [DataMember]
-        public int AveragePing { get; set; }
+        public double AveragePing { get; set; }
+
         [DataMember]
-        public DateTime SendTime { get; set; }
+        public DateTime? SendTime { get; set; }
+
         [DataMember]
         public SyncType SyncType { get; set; }
+
         [DataMember]
         public string EntityType { get; set; }
+
         [DataMember]
         public EntityKeyExportable Key { get; set; }
 

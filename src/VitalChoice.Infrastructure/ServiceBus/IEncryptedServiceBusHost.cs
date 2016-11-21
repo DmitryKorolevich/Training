@@ -1,11 +1,15 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 
 namespace VitalChoice.Infrastructure.ServiceBus
 {
     public interface IEncryptedServiceBusHost : IDisposable
     {
+        void Initialize(IOptions<AppOptions> appOptions, ILogger logger);
         bool Disabled { get; }
         bool InitSuccess { get; }
         void SendCommand(ServiceBusCommandBase command);

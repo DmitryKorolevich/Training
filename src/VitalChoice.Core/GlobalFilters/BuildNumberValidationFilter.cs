@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq;
+using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -11,6 +14,16 @@ namespace VitalChoice.Core.GlobalFilters
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
+            if (context.Controller?.GetType().GetCustomAttribute(typeof(IgnoreBuildNumberAttribute)) != null)
+            {
+                return;
+            }
+            var controllerDescriptor = context.ActionDescriptor as ControllerActionDescriptor;
+            if (controllerDescriptor?.MethodInfo.GetCustomAttribute(typeof(IgnoreBuildNumberAttribute)) != null)
+            {
+                return;
+            }
+
             var optionsAccessor = context.HttpContext.RequestServices.GetService<IOptions<AppOptions>>();
 
             var buildNumber = context.HttpContext.Request.Headers["Build-Number"];

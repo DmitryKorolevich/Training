@@ -19,8 +19,12 @@ namespace VitalChoice.Infrastructure.ServiceBus
 {
     public abstract class EncryptedServiceBusHost : IEncryptedServiceBusHost
     {
-        private ServiceBusHostOneToMany _plainClient;
-        private ServiceBusHostOneToMany _encryptedClient;
+        private ServiceBusReceiverHost _plainClient;
+        private ServiceBusReceiverHost _encryptedClient;
+        private ServiceBusTopicSender<ServiceBusCommandBase> _plainSender;
+        private ServiceBusTopicSender<ServiceBusCommandBase> _encryptedSender;
+        private SendingPool<ServiceBusCommandBase> _plainPool;
+        private SendingPool<ServiceBusCommandBase> _encryptedPool;
         private readonly ConcurrentDictionary<CommandItem, WeakReference<ServiceBusCommandBase>> _commands;
 
         protected readonly IObjectEncryptionHost EncryptionHost;
@@ -30,17 +34,19 @@ namespace VitalChoice.Infrastructure.ServiceBus
         public virtual string LocalHostName { get; }
         public string ServerHostName { get; }
 
+        public static int MaxProcessThreads { get; } = 10;
+
         protected EncryptedServiceBusHost(IOptions<AppOptions> appOptions, ILogger logger, IObjectEncryptionHost encryptionHost,
             IHostingEnvironment env)
         {
             Disabled = appOptions.Value.ExportService.Disabled;
+            _commands = new ConcurrentDictionary<CommandItem, WeakReference<ServiceBusCommandBase>>();
             if (Disabled)
                 return;
             ServerHostName = appOptions.Value.ExportService.ServerHostName;
             LocalHostName = env.ApplicationName + Guid.NewGuid().ToString("N");
             EncryptionHost = encryptionHost;
             Logger = logger;
-            _commands = new ConcurrentDictionary<CommandItem, WeakReference<ServiceBusCommandBase>>();
             try
             {
                 Initialize(appOptions, logger);
@@ -50,115 +56,6 @@ namespace VitalChoice.Infrastructure.ServiceBus
             {
                 InitSuccess = false;
                 logger.LogCritical(e.ToString());
-            }
-        }
-
-        public void Initialize(IOptions<AppOptions> appOptions, ILogger logger)
-        {
-            try
-            {
-                try
-                {
-                    EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.PlainConnectionString,
-                        appOptions.Value.ExportService.PlainQueueName, LocalHostName);
-                }
-                catch
-                {
-                    Thread.Sleep(TimeSpan.FromSeconds(1));
-                    EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.PlainConnectionString,
-                        appOptions.Value.ExportService.PlainQueueName, LocalHostName);
-                }
-                try
-                {
-                    EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.EncryptedConnectionString,
-                        appOptions.Value.ExportService.EncryptedQueueName, LocalHostName);
-                }
-                catch
-                {
-                    Thread.Sleep(TimeSpan.FromSeconds(1));
-                    EnsureTopicAndSubscriptionExists(appOptions.Value.ExportService.EncryptedConnectionString,
-                        appOptions.Value.ExportService.EncryptedQueueName, LocalHostName);
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.LogCritical(e.ToString());
-            }
-            _plainClient?.Dispose();
-            _plainClient = new ServiceBusHostOneToMany(logger, () =>
-            {
-                var plainFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.PlainConnectionString);
-                return plainFactory.CreateTopicClient(appOptions.Value.ExportService.PlainQueueName);
-            }, () =>
-            {
-                var factory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.PlainConnectionString);
-                return factory.CreateSubscriptionClient(appOptions.Value.ExportService.PlainQueueName, LocalHostName,
-                    ReceiveMode.ReceiveAndDelete);
-            }, m =>
-            {
-                try
-                {
-                    ProcessPlainMessage(m);
-                }
-                catch (Exception e)
-                {
-                    Logger.LogError(e.ToString());
-                }
-            });
-            _encryptedClient?.Dispose();
-            _encryptedClient = new ServiceBusHostOneToMany(logger, () =>
-            {
-                var plainFactory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.EncryptedConnectionString);
-                return plainFactory.CreateTopicClient(appOptions.Value.ExportService.EncryptedQueueName);
-            }, () =>
-            {
-                var factory = MessagingFactory.CreateFromConnectionString(appOptions.Value.ExportService.EncryptedConnectionString);
-                return factory.CreateSubscriptionClient(appOptions.Value.ExportService.EncryptedQueueName, LocalHostName,
-                    ReceiveMode.ReceiveAndDelete);
-            }, m =>
-            {
-                try
-                {
-                    ProcessEncryptedMessage(m);
-                }
-                catch (Exception e)
-                {
-                    Logger.LogError(e.ToString());
-                }
-            });
-            _plainClient.Start();
-            _encryptedClient.Start();
-        }
-
-        private void EnsureTopicAndSubscriptionExists(string connectionString, string topicName, string subscriptionName)
-        {
-            var ns = NamespaceManager.CreateFromConnectionString(connectionString);
-            if (!ns.TopicExists(topicName))
-            {
-                TopicDescription topic = new TopicDescription(topicName)
-                {
-                    EnableExpress = true,
-                    EnablePartitioning = true,
-                    EnableBatchedOperations = true,
-                    DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
-                    RequiresDuplicateDetection = false
-                };
-
-                ns.CreateTopic(topic);
-            }
-            if (!ns.SubscriptionExists(topicName, subscriptionName))
-            {
-                SubscriptionDescription subscription = new SubscriptionDescription(topicName, subscriptionName)
-                {
-                    EnableBatchedOperations = true,
-                    DefaultMessageTimeToLive = TimeSpan.FromMinutes(20),
-                    RequiresSession = false,
-                    EnableDeadLetteringOnFilterEvaluationExceptions = false,
-                    EnableDeadLetteringOnMessageExpiration = false,
-                    AutoDeleteOnIdle = TimeSpan.FromMinutes(20),
-                    MaxDeliveryCount = 1
-                };
-                ns.CreateSubscription(subscription);
             }
         }
 
@@ -197,6 +94,35 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 return default(T);
             }
             return default(T);
+        }
+
+        protected virtual BrokeredMessage CreatePlainMessage(ServiceBusCommandBase command)
+        {
+            return new BrokeredMessage(EncryptionHost.SignWithConvert(command))
+            {
+                TimeToLive = command.TimeToLeave,
+                CorrelationId = command.Destination
+            };
+        }
+
+        protected virtual BrokeredMessage CreateEncryptedMessage(ServiceBusCommandBase command)
+        {
+            return new BrokeredMessage(EncryptionHost.AesEncryptSign(command, command.SessionId))
+            {
+                SessionId = command.SessionId.ToString(),
+                TimeToLive = command.TimeToLeave,
+                CorrelationId = command.Destination
+            };
+        }
+
+        protected virtual bool ProcessEncryptedCommand(ServiceBusCommandBase command)
+        {
+            return false;
+        }
+
+        protected virtual bool ProcessPlainCommand(ServiceBusCommandBase command)
+        {
+            return false;
         }
 
         public void SendCommand(ServiceBusCommandBase command)
@@ -246,40 +172,42 @@ namespace VitalChoice.Infrastructure.ServiceBus
             }
         }
 
-        protected virtual BrokeredMessage CreatePlainMessage(ServiceBusCommandBase command)
-        {
-            return new BrokeredMessage(EncryptionHost.SignWithConvert(command))
-            {
-                TimeToLive = command.TimeToLeave,
-                CorrelationId = command.Destination
-            };
-        }
-
-        protected virtual BrokeredMessage CreateEncryptedMessage(ServiceBusCommandBase command)
-        {
-            return new BrokeredMessage(EncryptionHost.AesEncryptSign(command, command.SessionId))
-            {
-                SessionId = command.SessionId.ToString(),
-                TimeToLive = command.TimeToLeave,
-                CorrelationId = command.Destination
-            };
-        }
-
-        protected virtual bool ProcessEncryptedCommand(ServiceBusCommandBase command)
-        {
-            return false;
-        }
-
-        protected virtual bool ProcessPlainCommand(ServiceBusCommandBase command)
-        {
-            return false;
-        }
-
         private void CommandComplete(ServiceBusCommandBase command)
         {
             CommandItem commandItem = command;
             WeakReference<ServiceBusCommandBase> reference;
             _commands.TryRemove(commandItem, out reference);
+        }
+
+        public void Initialize(IOptions<AppOptions> appOptions, ILogger logger)
+        {
+            var subscriptionPlainFactory = new SubcriptionDefaultFactory(appOptions.Value.ExportService.PlainConnectionString,
+                appOptions.Value.ExportService.PlainQueueName, LocalHostName, ReceiveMode.ReceiveAndDelete);
+
+            var subscriptionEncryptedFactory = new SubcriptionDefaultFactory(appOptions.Value.ExportService.EncryptedConnectionString,
+                appOptions.Value.ExportService.EncryptedQueueName, LocalHostName, ReceiveMode.ReceiveAndDelete);
+
+            _plainClient = new ServiceBusReceiverHost(logger, new ServiceBusSubscriptionReceiver(subscriptionPlainFactory.Create, logger));
+            _plainClient.ReceiveEvent += ProcessPlainMessage;
+
+            _encryptedClient = new ServiceBusReceiverHost(logger,
+                new ServiceBusSubscriptionReceiver(subscriptionEncryptedFactory.Create, logger));
+            _encryptedClient.ReceiveEvent += ProcessEncryptedMessage;
+
+            var topicPlainFactory = new TopicDefaultFactory(appOptions.Value.ExportService.PlainConnectionString,
+                appOptions.Value.ExportService.PlainQueueName);
+
+            var topicEncryptedFactory = new TopicDefaultFactory(appOptions.Value.ExportService.EncryptedConnectionString,
+                appOptions.Value.ExportService.EncryptedQueueName);
+
+            _plainSender = new ServiceBusTopicSender<ServiceBusCommandBase>(topicPlainFactory.Create, logger, CreatePlainMessage);
+            _encryptedSender = new ServiceBusTopicSender<ServiceBusCommandBase>(topicEncryptedFactory.Create, logger, CreateEncryptedMessage);
+
+            _plainPool = new SendingPool<ServiceBusCommandBase>(_plainSender, logger);
+            _encryptedPool = new SendingPool<ServiceBusCommandBase>(_encryptedSender, logger);
+
+            _plainClient.Start();
+            _encryptedClient.Start();
         }
 
         private void ProcessEncryptedMessage(BrokeredMessage message)
@@ -315,26 +243,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             else
             {
                 Logger.LogInfo(cmd => $"{cmd.CommandName} received ({cmd.CommandId})", remoteCommand);
-                Task.Run(() =>
-                {
-                    try
-                    {
-                        if (ProcessEncryptedCommand(remoteCommand))
-                        {
-                            Logger.LogInfo(cmd => $"{cmd.CommandName} processing success ({cmd.CommandId})", remoteCommand);
-                        }
-                        else
-                        {
-                            Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.LogError(e.ToString());
-                        Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
-                        SendEncrypted(new ServiceBusCommandBase(remoteCommand, e.ToString()));
-                    }
-                }).ConfigureAwait(false);
+                ProcessEncryptedRemoteCommand(remoteCommand);
             }
         }
 
@@ -362,26 +271,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
                 else
                 {
                     Logger.LogInfo(cmd => $"{cmd.CommandName} received ({cmd.CommandId})", remoteCommand);
-                    Task.Run(() =>
-                    {
-                        try
-                        {
-                            if (ProcessPlainCommand(remoteCommand))
-                            {
-                                Logger.LogInfo(cmd => $"{cmd.CommandName} processing success ({cmd.CommandId})", remoteCommand);
-                            }
-                            else
-                            {
-                                Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.LogError(e.ToString());
-                            Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
-                            SendPlainCommand(new ServiceBusCommandBase(remoteCommand, e.ToString()));
-                        }
-                    }).ConfigureAwait(false);
+                    ProcessPlainRemoteCommand(remoteCommand);
                 }
             }
             else
@@ -394,13 +284,54 @@ namespace VitalChoice.Infrastructure.ServiceBus
             }
         }
 
+        private void ProcessEncryptedRemoteCommand(ServiceBusCommandBase remoteCommand)
+        {
+            try
+            {
+                if (ProcessEncryptedCommand(remoteCommand))
+                {
+                    Logger.LogInfo(cmd => $"{cmd.CommandName} processing success ({cmd.CommandId})", remoteCommand);
+                }
+                else
+                {
+                    Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
+                SendEncrypted(new ServiceBusCommandBase(remoteCommand, e.ToString()));
+            }
+        }
+
+        private void ProcessPlainRemoteCommand(ServiceBusCommandBase remoteCommand)
+        {
+            try
+            {
+                if (ProcessPlainCommand(remoteCommand))
+                {
+                    Logger.LogInfo(cmd => $"{cmd.CommandName} processing success ({cmd.CommandId})", remoteCommand);
+                }
+                else
+                {
+                    Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                Logger.LogWarning($"{remoteCommand.CommandName} processing failed ({remoteCommand.CommandId})");
+                SendPlainCommand(new ServiceBusCommandBase(remoteCommand, e.ToString()));
+            }
+        }
+
         private bool SendEncrypted(ServiceBusCommandBase command)
         {
             if (_encryptedClient == null)
                 return false;
 
-            _encryptedClient.EnqueueMessage(CreateEncryptedMessage(command));
-            _encryptedClient.SendNow();
+            _encryptedPool.EnqueueData(command);
             return true;
         }
 
@@ -409,8 +340,7 @@ namespace VitalChoice.Infrastructure.ServiceBus
             if (_plainClient == null)
                 return false;
 
-            _plainClient.EnqueueMessage(CreatePlainMessage(command));
-            _plainClient.SendNow();
+            _plainPool.EnqueueData(command);
             return true;
         }
 
@@ -419,6 +349,8 @@ namespace VitalChoice.Infrastructure.ServiceBus
             _plainClient?.Dispose();
             _encryptedClient?.Dispose();
             EncryptionHost?.Dispose();
+            _plainPool?.Dispose();
+            _encryptedPool?.Dispose();
         }
 
         private void TrackCommand(ServiceBusCommandBase command)

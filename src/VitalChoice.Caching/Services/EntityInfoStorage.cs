@@ -321,77 +321,6 @@ namespace VitalChoice.Caching.Services
             return (LambdaExpression) fullCacheAnnotation?.Value;
         }
 
-        //public IDictionary<TrackedEntityKey, InternalEntityEntry> GetTrackData(DbContext context)
-        //{
-        //    if (context == null)
-        //        return null;
-        //    var trackData = new Dictionary<TrackedEntityKey, InternalEntityEntry>();
-        //    try
-        //    {
-        //        foreach (
-        //            var group in
-        //                context.StateManager.Entries
-        //                    .Where(e => e.Entity != null && e.EntityState != EntityState.Detached)
-        //                    .GroupBy(e => e.Entity.GetType()))
-        //        {
-        //            var keyInfo = GetPrimaryKeyInfo(group.Key);
-        //            if (keyInfo == null)
-        //                continue;
-
-        //            foreach (var entry in group)
-        //            {
-        //                var key = new TrackedEntityKey(group.Key,
-        //                    keyInfo.GetPrimaryKeyValue(entry.Entity));
-        //                if (!trackData.ContainsKey(key))
-        //                    trackData.Add(key, entry);
-        //            }
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Logger.LogError(e.ToString());
-        //    }
-        //    return trackData;
-        //}
-
-        //public IDictionary<TrackedEntityKey, InternalEntityEntry> GetTrackData(DbContext context, out HashSet<object> trackedObjects)
-        //{
-        //    if (context == null)
-        //    {
-        //        trackedObjects = null;
-        //        return null;
-        //    }
-        //    var trackData = new Dictionary<TrackedEntityKey, InternalEntityEntry>();
-        //    trackedObjects = new HashSet<object>();
-        //    try
-        //    {
-        //        foreach (
-        //            var group in
-        //                context.StateManager.Entries
-        //                    .Where(e => e.Entity != null && e.EntityState != EntityState.Detached)
-        //                    .GroupBy(e => e.Entity.GetType()))
-        //        {
-        //            var keyInfo = GetPrimaryKeyInfo(group.Key);
-        //            if (keyInfo == null)
-        //                continue;
-
-        //            foreach (var entry in group)
-        //            {
-        //                trackedObjects.Add(entry.Entity);
-        //                var key = new TrackedEntityKey(group.Key,
-        //                    keyInfo.GetPrimaryKeyValue(entry.Entity));
-        //                if (!trackData.ContainsKey(key))
-        //                    trackData.Add(key, entry);
-        //            }
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Logger.LogError(e.ToString());
-        //    }
-        //    return trackData;
-        //}
-
         public bool HaveKeys(Type entityType)
         {
             return _entityInfos.ContainsKey(entityType);
@@ -422,6 +351,12 @@ namespace VitalChoice.Caching.Services
         {
             var caller = (IGetEntityCaller)Activator.CreateInstance(typeof(GetEntityCaller<>).MakeGenericType(entityType), this);
             return caller.GetEntity(pk, rootScope);
+        }
+
+        public IEnumerable<object> GetEntities(Type entityType, IEnumerable<EntityKey> pk, IServiceScopeFactory rootScope)
+        {
+            var caller = (IGetEntityCaller) Activator.CreateInstance(typeof(GetEntityCaller<>).MakeGenericType(entityType), this);
+            return caller.GetEntities(pk, rootScope);
         }
 
         public ICollection<EntityCacheableIndexInfo> GetNonUniqueIndexInfos(Type entityType)
@@ -489,7 +424,8 @@ namespace VitalChoice.Caching.Services
             return null;
         }
 
-        public T GetEntity<T>(EntityKey pk, IServiceScopeFactory rootScope) where T : class
+        public T GetEntity<T>(EntityKey pk, IServiceScopeFactory rootScope)
+            where T : class
         {
             using (var scope = rootScope.CreateScope())
             {
@@ -516,6 +452,40 @@ namespace VitalChoice.Caching.Services
                 }
             }
             return null;
+        }
+
+        public IEnumerable<T> GetEntities<T>(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope)
+            where T : class
+        {
+            using (var scope = rootScope.CreateScope())
+            {
+                var contextType = GetContextType<T>();
+                if (contextType != null)
+                {
+                    EntityInfo entityInfo;
+                    if (GetEntityInfo<T>(out entityInfo))
+                    {
+                        using (var context = scope.ServiceProvider.GetService(contextType) as DbContext)
+                        {
+                            if (context != null)
+                            {
+                                var set = context.Set<T>();
+                                ParameterExpression parameter;
+                                var conditionalExpression = GetConditionalExpression<T>(pks, entityInfo, out parameter);
+
+                                if (conditionalExpression == null)
+                                    return null;
+
+                                return
+                                    set.AsNoTracking()
+                                        .AsNonCached()
+                                        .Where(Expression.Lambda<Func<T, bool>>(conditionalExpression, parameter));
+                            }
+                        }
+                    }
+                }
+            }
+            return Enumerable.Empty<T>();
         }
 
         public EntityPrimaryKeyInfo GetPrimaryKeyInfo<T>()
@@ -641,7 +611,57 @@ namespace VitalChoice.Caching.Services
             return conditionalExpression;
         }
 
-        private static Expression GetConditionalExpression<T>(ICollection<EntityValueExportable> keyValues,
+        private static Expression GetConditionalExpression<T>(IEnumerable<EntityKey> pks, EntityInfo entityInfo,
+            out ParameterExpression parameter) where T : class
+        {
+            parameter = Expression.Parameter(typeof(T));
+            Expression conditionalExpression = null;
+            if (entityInfo.PrimaryKey.Count == 1)
+            {
+                var propertyInfo = entityInfo.PrimaryKey.Infos[0];
+
+                var genericListType = typeof(List<>).MakeGenericType(propertyInfo.PropertyType);
+
+                var list =
+                    Activator.CreateInstance(genericListType)
+                        .AsGenericCollection(propertyInfo.PropertyType);
+
+                foreach (var pk in pks)
+                {
+                    list.Add(pk.Values[0]);
+                }
+
+                conditionalExpression = Expression.Call(genericListType.GetMethod("Contains", BindingFlags.Instance | BindingFlags.Public),
+                    Expression.Constant(list.CollectionObject),
+                    Expression.MakeMemberAccess(parameter, typeof(T).GetRuntimeProperty(propertyInfo.Name)));
+            }
+            else
+            {
+                foreach (var pk in pks)
+                {
+                    Expression singlePkCondition = null;
+
+                    // ReSharper disable once LoopCanBeConvertedToQuery
+                    foreach (var keyValue in pk.Values)
+                    {
+                        var part =
+                            Expression.Equal(
+                                Expression.MakeMemberAccess(parameter, typeof(T).GetRuntimeProperty(keyValue.ValueInfo.Name)),
+                                Expression.Constant(keyValue.Value.GetValue()));
+                        singlePkCondition = singlePkCondition == null ? part : Expression.AndAlso(singlePkCondition, part);
+                    }
+                    if (singlePkCondition != null)
+                    {
+                        conditionalExpression = conditionalExpression == null
+                            ? singlePkCondition
+                            : Expression.OrElse(conditionalExpression, singlePkCondition);
+                    }
+                }
+            }
+            return conditionalExpression;
+        }
+
+        private static Expression GetConditionalExpression<T>(IEnumerable<EntityValueExportable> keyValues,
             out ParameterExpression parameter) where T : class
         {
             parameter = Expression.Parameter(typeof (T));
@@ -669,6 +689,7 @@ namespace VitalChoice.Caching.Services
         {
             object GetEntity(ICollection<EntityValueExportable> keyValues, IServiceScopeFactory rootScope);
             object GetEntity(EntityKey pk, IServiceScopeFactory rootScope);
+            IEnumerable<object> GetEntities(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope);
         }
 
         private struct GetEntityCaller<T> : IGetEntityCaller
@@ -683,14 +704,12 @@ namespace VitalChoice.Caching.Services
             }
 
             public object GetEntity(ICollection<EntityValueExportable> keyValues, IServiceScopeFactory rootScope)
-            {
-                return _infoStorage.GetEntity<T>(keyValues, rootScope);
-            }
+                => _infoStorage.GetEntity<T>(keyValues, rootScope);
 
-            public object GetEntity(EntityKey pk, IServiceScopeFactory rootScope)
-            {
-                return _infoStorage.GetEntity<T>(pk, rootScope);
-            }
+            public object GetEntity(EntityKey pk, IServiceScopeFactory rootScope) => _infoStorage.GetEntity<T>(pk, rootScope);
+
+            public IEnumerable<object> GetEntities(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope)
+                => _infoStorage.GetEntities<T>(pks, rootScope);
         }
     }
 }

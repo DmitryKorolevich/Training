@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using VitalChoice.Data.Context;
@@ -24,7 +25,7 @@ namespace VitalChoice.Data.Repositories
             this.Context = context;
             var dbContext = context as DbContext;
             if (dbContext != null)
-                _lazyDbSet = new Lazy<DbSet<TEntity>>(() => dbContext.Set<TEntity>());
+                _lazyDbSet = new Lazy<DbSet<TEntity>>(() => dbContext.Set<TEntity>(), LazyThreadSafetyMode.None);
         }
 
         public IQueryFluent<TEntity> Query()

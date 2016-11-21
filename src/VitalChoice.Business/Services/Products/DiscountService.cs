@@ -120,17 +120,23 @@ namespace VitalChoice.Business.Services.Products
                                 p => skuIds.Contains(p.Id) && p.StatusCode != (int) RecordStatusCode.Deleted)
                                 .Include(p => p.Product)
                                 .SelectAsync(false)).Select(p => new ShortSkuInfo(p)).ToDictionary(s => s.Id);
-                    foreach (var sku in entity.DiscountsToSelectedSkus)
+                    if (entity.DiscountsToSelectedSkus != null)
                     {
-                        ShortSkuInfo skuInfo;
-                        if (shortSkus.TryGetValue(sku.IdSku, out skuInfo))
-                            sku.ShortSkuInfo = skuInfo;
+                        foreach (var sku in entity.DiscountsToSelectedSkus)
+                        {
+                            ShortSkuInfo skuInfo;
+                            if (shortSkus.TryGetValue(sku.IdSku, out skuInfo))
+                                sku.ShortSkuInfo = skuInfo;
+                        }
                     }
-                    foreach (var sku in entity.DiscountsToSkus)
+                    if (entity.DiscountsToSkus != null)
                     {
-                        ShortSkuInfo skuInfo;
-                        if (shortSkus.TryGetValue(sku.IdSku, out skuInfo))
-                            sku.ShortSkuInfo = skuInfo;
+                        foreach (var sku in entity.DiscountsToSkus)
+                        {
+                            ShortSkuInfo skuInfo;
+                            if (shortSkus.TryGetValue(sku.IdSku, out skuInfo))
+                                sku.ShortSkuInfo = skuInfo;
+                        }
                     }
                 }
                 if (entity.DiscountTiers != null)
@@ -138,16 +144,6 @@ namespace VitalChoice.Business.Services.Products
                     entity.DiscountTiers = entity.DiscountTiers.OrderBy(p => p.Order).ToArray();
                 }
             }
-        }
-
-        protected override async Task BeforeEntityChangesAsync(DiscountDynamic model, Discount entity, IUnitOfWorkAsync uow)
-        {
-
-        }
-
-        protected override async Task AfterEntityChangesAsync(DiscountDynamic model, Discount updated, IUnitOfWorkAsync uow)
-        {
-
         }
 
         protected override bool LogObjectFullData { get { return true; } }

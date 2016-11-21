@@ -62,6 +62,7 @@ using VitalChoice.Infrastructure.Extensions;
 using VitalChoice.Business.CsvExportMaps.Products;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services.Products;
+using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Interfaces.Services.Products;
 
@@ -103,7 +104,7 @@ namespace VC.Admin.Controllers
         private readonly IDynamicMapper<OrderDynamic, Order> _orderMapper;
         private readonly IOrderReportService _orderReportService;
         private readonly IAvalaraTax _avalaraTax;
-        private readonly IEncryptedOrderExportService _exportService;
+        private readonly IOrderExport _exportService;
         private readonly ICountryNameCodeResolver _countryNameCodeResolver;
         private readonly ICacheProvider _cache;
         private readonly ReferenceData _referenceData;
@@ -143,7 +144,7 @@ namespace VC.Admin.Controllers
             IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodMapper,
             IDynamicMapper<CustomerPaymentMethodDynamic, CustomerPaymentMethod> customerPaymentMethodMapper,
             IDynamicMapper<AddressDynamic, Address> addressMapper, ExtendedUserManager userManager,
-            IAvalaraTax avalaraTax, IEncryptedOrderExportService exportService, ICountryNameCodeResolver countryNameCodeResolver,
+            IAvalaraTax avalaraTax, IOrderExport exportService, ICountryNameCodeResolver countryNameCodeResolver,
             ICacheProvider cache,
             ReferenceData referenceData)
         {
@@ -191,7 +192,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
-        public async Task<Result<List<OrderExportItemResult>>> ExportOrders([FromBody] List<OrderExportItem> itemsToExport)
+        public async Task<Result<bool>> ExportOrders([FromBody] List<OrderExportItem> itemsToExport)
         {
             if (!itemsToExport.Any())
             {
@@ -202,71 +203,53 @@ namespace VC.Admin.Controllers
             int userId;
             if (int.TryParse(sUserId, out userId))
             {
-                return await _exportService.ExportOrdersAsync(new OrderExportData
+                await _exportService.ExportOrders(new OrderExportData
                 {
                     ExportInfo = itemsToExport,
                     UserId = userId
                 });
             }
-            return new Result<List<OrderExportItemResult>>(false);
+            return true;
         }
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpGet]
+        [IgnoreBuildNumber]
         public Result<OrderExportGeneralStatusModel> GetExportGeneralStatus()
         {
-            var toReturn = new OrderExportGeneralStatusModel();
-            toReturn.Exported=(new Random()).Next(100);
-            toReturn.All = toReturn.Exported + 5;
-            return toReturn;
+            return new OrderExportGeneralStatusModel
+            {
+                All = _exportService.TotalExporting,
+                Exported = _exportService.TotalExported,
+                Errors = _exportService.ExportErrors
+            };
         }
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpGet]
-        public Result<ICollection<OrderExportRequestModel>> GetExportDetails()
+        [IgnoreBuildNumber]
+        public Result<OrderExportResults> GetExportDetails()
         {
-            var toReturn = new List<OrderExportRequestModel>();
-            var item = new OrderExportRequestModel();
-            item.AgentId = "VC";
-            item.DateCreated=DateTime.Now.AddHours(-1);
-            item.ExportedOrders=new List<OrderExportItemResult>()
+            var results = _exportService.GetExportResults();
+            return new OrderExportResults
             {
-                new OrderExportItemResult()
+                LoadTimestamp = results.FirstOrDefault()?.DateStarted ?? DateTime.MinValue,
+                ExportModels = results.Select(r => new OrderExportRequestModel
                 {
-                    Id = 1,
-                    Success = true,
-                },
-                new OrderExportItemResult()
-                {
-                    Id = 2,
-                    Success = false,
-                    Error = "Test error"
-                }
+                    ExportedOrders = r.ExportedOrders,
+                    AgentId = r.AgentId,
+                    TotalCount = r.TotalCount,
+                    DateCreated = r.DateStarted
+                }).ToList()
             };
-            item.All = item.ExportedOrders.Count + 5;
-            toReturn.Add(item);
+        }
 
-            item = new OrderExportRequestModel();
-            item.AgentId = "GG";
-            item.DateCreated = DateTime.Now;
-            item.ExportedOrders = new List<OrderExportItemResult>()
-            {
-                new OrderExportItemResult()
-                {
-                    Id = 3,
-                    Success = true,
-                },
-                new OrderExportItemResult()
-                {
-                    Id = 4,
-                    Success = false,
-                    Error = "Test error"
-                }
-            };
-            item.All = item.ExportedOrders.Count + 5;
-            toReturn.Add(item);
-
-            return toReturn;
+        [AdminAuthorize(PermissionType.Orders)]
+        [HttpPost]
+        public Result<bool> ClearExportDetails([FromBody]DateTime loadTimestamp)
+        {
+            _exportService.ClearDone(loadTimestamp);
+            return true;
         }
 
         #endregion
@@ -660,6 +643,11 @@ namespace VC.Admin.Controllers
                 order.NPOrderStatus == OrderStatus.Shipped || order.NPOrderStatus == OrderStatus.Cancelled || order.NPOrderStatus == OrderStatus.Exported)
             {
                 throw new AppValidationException("This operation isn't allowed for the order in the given status");
+            }
+            if (_exportService.GetIsOrderExporting(id))
+            {
+                throw new AppValidationException(
+                    "Cannot cancel order. Order is currently in export queue. Once export process is done, the order will need to be cancelled manually in Veracore.");
             }
 
             var toReturn = await _orderService.CancelOrderAsync(id);

@@ -33,34 +33,75 @@ namespace VitalChoice.Business.Services.Orders
         {
             if (!InitSuccess || Disabled)
             {
-                exportedAction(new OrderExportItemResult
-                {
-                    Error = "Cannot initialize export service client",
-                    Success = false
-                });
+                throw new ApiException("Cannot export orders, initialization failed");
             }
-            await SendCommand(
-                new ServiceBusCommandBase(Guid.NewGuid(), OrderExportServiceCommandConstants.ExportOrder, ServerHostName, LocalHostName)
-                {
-                    Data = new ServiceBusCommandData(exportData)
-                },
-                (command, o) =>
-                {
-                    if (!string.IsNullOrEmpty(o.Error))
-                    {
-                        Logger.LogError(o.Error);
-                        exportedAction(new OrderExportItemResult
+            var sentItems = new HashSet<int>(exportData.ExportInfo.Select(o => o.Id));
+            var doneAllEvent = new AsyncManualResetEvent(false);
+            var command = new ServiceBusCommandBase(Guid.NewGuid(), OrderExportServiceCommandConstants.ExportOrder, ServerHostName,
+                LocalHostName)
+            {
+                Data = new ServiceBusCommandData(exportData)
+            };
+            try
+            {
+                await
+                    SendCommand(command,
+                        (cmd, o) =>
                         {
-                            Success = false,
-                            Error = o.Error
+                            lock (sentItems)
+                            {
+                                if (!string.IsNullOrEmpty(o.Error))
+                                {
+                                    sentItems.Clear();
+                                    var result = new OrderExportItemResult
+                                    {
+                                        Error = o.Error,
+                                        Success = false
+                                    };
+                                    exportedAction(result);
+                                    Logger.LogError(o.Error);
+                                    doneAllEvent.Set();
+                                }
+                                else
+                                {
+                                    var exportResult = (OrderExportItemResult) o.Data;
+                                    if (exportResult.Id == -1)
+                                    {
+                                        doneAllEvent.Set();
+                                        return;
+                                    }
+                                    exportedAction(exportResult);
+                                    sentItems.Remove(exportResult.Id);
+                                }
+                            }
                         });
-                    }
-                    else
+            }
+            catch (Exception e)
+            {
+                // ReSharper disable once InconsistentlySynchronizedField
+                Logger.LogError(e.ToString());
+                doneAllEvent.Set();
+                command.OnComplete?.Invoke(command);
+                throw;
+            }
+            if (!await doneAllEvent.WaitAsync(TimeSpan.FromMinutes(50)))
+            {
+                if (sentItems.Count == 0)
+                {
+                    return;
+                }
+                // ReSharper disable once InconsistentlySynchronizedField
+                Logger.LogError($"Export timeout, items left: {sentItems.Count}");
+                command.OnComplete?.Invoke(command);
+                exportedAction(
+                    new OrderExportItemResult
                     {
-                        var exportResult = (OrderExportItemResult) o.Data;
-                        exportedAction(exportResult);
+                        Error = $"Export timeout, items left: {sentItems.Count}",
+                        Success = false
                     }
-                });
+                );
+            }
+            command.OnComplete?.Invoke(command);
         }
 
         public async Task<List<OrderExportItemResult>> ExportOrdersAsync(OrderExportData exportData)

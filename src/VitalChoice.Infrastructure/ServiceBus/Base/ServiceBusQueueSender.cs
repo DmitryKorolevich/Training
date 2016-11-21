@@ -1,44 +1,26 @@
-#if !NETSTANDARD1_5
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.ServiceBus.Messaging;
 
 namespace VitalChoice.Infrastructure.ServiceBus.Base
 {
-    public class ServiceBusQueueSender : IServiceBusSender
+    public class ServiceBusQueueSender<T> : ServiceBusAbstractSender<QueueClient, T>
     {
-        private readonly QueueClient _queue;
-
-        public ServiceBusQueueSender(QueueClient queue)
+        public ServiceBusQueueSender(Func<QueueClient> topicFactory, ILogger logger, Func<T, BrokeredMessage> messageConstructor)
+            : base(topicFactory, logger, messageConstructor)
         {
-            _queue = queue;
         }
 
-        public Task SendAsync(BrokeredMessage message)
-        {
-            return _queue.SendAsync(message);
-        }
+        public override Task SendAsync(T message) => DoSendActionAsync((que, msg) => que.SendAsync(msg), message);
 
-        public void Send(BrokeredMessage message)
-        {
-            _queue.Send(message);
-        }
+        public override void Send(T message) => DoSendAction((que, msg) => que.Send(msg), message);
 
-        public Task SendBatchAsync(IEnumerable<BrokeredMessage> message)
-        {
-            return _queue.SendBatchAsync(message);
-        }
+        public override Task SendBatchAsync(ICollection<T> messages)
+            => DoCollectionSendActionAsync((que, batch) => que.SendBatchAsync(batch), messages);
 
-        public void SendBatch(IEnumerable<BrokeredMessage> message)
-        {
-            _queue.SendBatch(message);
-        }
-
-        public void Dispose()
-        {
-            _queue.Close();
-        }
+        public override void SendBatch(ICollection<T> messages)
+            => DoCollectionSendAction((que, batch) => que.SendBatch(batch), messages);
     }
 }
-#endif

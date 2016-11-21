@@ -1,7 +1,6 @@
 ﻿using System.Net;
-using System.Text;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
-using VitalChoice.Core.Services;
 using VitalChoice.Validation.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -11,12 +10,8 @@ using Newtonsoft.Json;
 using Templates.Strings;
 using Templates.Strings.Core;
 using VitalChoice.Caching.Debuging;
-using VitalChoice.Caching.Extensions;
-using VitalChoice.Caching.Interfaces;
-using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Ecommerce.Domain.Exceptions;
-using Microsoft.AspNetCore.Http.Extensions;
 
 namespace VitalChoice.Core.GlobalFilters
 {

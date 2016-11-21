@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using VitalChoice.Infrastructure.Domain.Options;
 using System.ServiceModel;
 using System.Text.RegularExpressions;
+using System.Threading;
 using FluentValidation.Validators;
 using Microsoft.Extensions.Options;
 using VitalChoice.Infrastructure.Domain;
@@ -34,7 +35,7 @@ namespace VitalChoice.Business.Services.Bronto
             binding.SendTimeout =new TimeSpan(0,5,0);
             binding.ReceiveTimeout = new TimeSpan(0, 5, 0);
             EndpointAddress endpoint = new EndpointAddress(_brontoSettings.ApiUrl);
-            _lclient = new Lazy<BrontoSoapPortTypeClient>(() => new BrontoSoapPortTypeClient(binding, endpoint));
+            _lclient = new Lazy<BrontoSoapPortTypeClient>(() => new BrontoSoapPortTypeClient(binding, endpoint), LazyThreadSafetyMode.None);
         }
 
         public void PushSubscribe(string email, bool subscribe)

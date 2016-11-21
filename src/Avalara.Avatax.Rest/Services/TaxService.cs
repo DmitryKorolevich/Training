@@ -82,6 +82,10 @@ namespace Avalara.Avatax.Rest.Services
                 catch (WebException ex)
                 {
                     result = _serializer.ProcessResponse<GetTaxResult>(ex.Response);
+                    if (result == null)
+                    {
+                        throw;
+                    }
                     using (var memoryStream = new MemoryStream())
                     {
                         using (var streamWriter = new StreamWriter(memoryStream))

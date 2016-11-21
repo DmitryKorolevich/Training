@@ -193,6 +193,11 @@
                     errorHandler(result);
                 }
             });
+            if ($rootScope.exportStatusRefreshTimer != null)
+            {
+                clearTimeout($rootScope.exportStatusRefreshTimer);
+            }
+            refreshExportStatus();
         }
 
         var refreshExportStatus = function ()
@@ -202,6 +207,7 @@
                 orderService.getExportGeneralStatus()
                     .success(function (result)
                     {
+                        $rootScope.exportStatusRefreshTimer = setTimeout(refreshExportStatus, 5000);
                         if (result.Success)
                         {
                             $scope.options.exportStatus = result.Data;
@@ -212,10 +218,10 @@
                     })
                     .error(function (result)
                     {
+                        $rootScope.exportStatusRefreshTimer = setTimeout(refreshExportStatus, 5000);
                         errorHandler(result);
                     });
             }
-            $rootScope.exportStatusRefreshTimer = setTimeout(refreshExportStatus, 5000);
         };
 
         $scope.filterGCs = function ()
@@ -408,10 +414,7 @@
                     .success(function (result)
                     {
                         if (result.Success) {
-                            openExportResultModal(result.Data);
-
-                            toaster.pop('success', "Success!", "Export completed");
-                            refreshOrders();
+                            toaster.pop('success', "Success!", "Export Successfully Started");
                         } else
                         {
                             var messages = "";
@@ -422,7 +425,6 @@
                             } else {
                                 messages = "Can't export orders";
                             }
-
                             toaster.pop('error', 'Error!', messages, null, 'trustedHtml');
                         }
                     })
@@ -431,12 +433,6 @@
                         errorHandler(result);
                     });
         };
-
-        function openExportResultModal(exportRes) {
-            modalUtil.open('app/modules/order/partials/exportResult.html', 'exportResultController', {
-                exportRes: exportRes
-            });
-        }
 
         $scope.openOrder = function (id)
         {

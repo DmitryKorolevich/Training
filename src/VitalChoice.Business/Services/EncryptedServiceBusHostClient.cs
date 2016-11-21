@@ -1,5 +1,4 @@
-﻿#if !NETSTANDARD1_5
-using System;
+﻿using System;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -9,11 +8,9 @@ using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.ServiceBus;
 using VitalChoice.Interfaces.Services;
-using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using VitalChoice.Ecommerce.Domain.Exceptions;
-using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 
 namespace VitalChoice.Business.Services
@@ -130,11 +127,6 @@ namespace VitalChoice.Business.Services
             return keyExchangeProvider;
         }
 
-        protected override bool ProcessPlainCommand(ServiceBusCommandBase command)
-        {
-            return false;
-        }
-
         public override void Dispose()
         {
             base.Dispose();
@@ -142,5 +134,3 @@ namespace VitalChoice.Business.Services
         }
     }
 }
-
-#endif

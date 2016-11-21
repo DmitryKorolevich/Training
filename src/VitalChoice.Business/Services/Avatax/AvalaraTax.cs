@@ -68,7 +68,7 @@ namespace VitalChoice.Business.Services.Avatax
         }
 
         public async Task<decimal> GetTax<T>(BaseOrderContext<T> context, TaxGetType taxGetType = TaxGetType.UseBoth)
-            where T: ItemOrdered
+            where T : ItemOrdered
         {
             if (!_countryNameCode.IsState(context.Order.ShippingAddress, "us", "va") &&
                 !_countryNameCode.IsState(context.Order.ShippingAddress, "us", "wa"))
@@ -102,14 +102,21 @@ namespace VitalChoice.Business.Services.Avatax
                 return 0;
             request.Lines = lines;
 
-            var result = await _taxService.GetTax(request);
-
-            if (result.ResultCode == SeverityLevel.Success)
+            try
             {
-                return result.TotalTax;
+
+                var result = await _taxService.GetTax(request);
+
+                if (result.ResultCode == SeverityLevel.Success)
+                {
+                    return result.TotalTax;
+                }
+                _logger.LogError(string.Join("\n", result.Messages.Select(m => $"[{result.DocCode}]({m.Source}) {m.Summary}")));
             }
-            _logger.LogError(string.Join("\n",
-                result.Messages.Select(m => $"[{result.DocCode}]({m.Source}) {m.Summary}")));
+            catch (Exception e)
+            {
+                _logger.LogError(e.ToString());
+            }
             return 0;
         }
 
