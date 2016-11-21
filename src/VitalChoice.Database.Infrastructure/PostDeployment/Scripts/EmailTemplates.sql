@@ -274,7 +274,7 @@ INSERT INTO [dbo].[ContentItems]
     <div style="font-size:14px;">
         <div align="left">
             <div style="margin:20px 0px 20px 0px;">
-                Hi <strong>@(Recipient)</strong>, you''ve been given an e-gift certificate from Vital Choice! <br /><br />
+				Hi <strong>@(Recipient)</strong>, you''ve been given a Vital Dollars certificate from Vital Choice! <br /><br />
                 Lucky you! You can use it toward any of the healthy and delicious products found at <a href="https://@(PublicHost)/">@(PublicHost)</a> or in the Vital Choice catalog.<br /><br />
                 @if(Message)
                 {{
