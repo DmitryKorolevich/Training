@@ -15,6 +15,13 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
 
         public int? IdCustomerType { get; set; }
 
-        public ICollection<int> SkuIds { get; set; }
+        public IList<int> SkuIds { get; set; }
+
+
+        public string ProductName { get; set; }
+
+        public bool OnlyInStock { get; set; }
+
+        public bool OnlyActiveSku { get; set; }
     }
 }

@@ -162,5 +162,49 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    {
 	        return $http.post(baseUrl + 'GetSkuPOrderTypeFutureBreakDownReport', filter, getConfig(tracker));
 	    },
+	    getSkuAverageDailySalesBySkuReportItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetSkuAverageDailySalesBySkuReportItems', filter, getConfig(tracker));
+	    },
+	    requestSkuAverageDailySalesBySkuReportFile: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'RequestSkuAverageDailySalesBySkuReportFile', filter, getConfig(tracker));
+	    },
+	    getSkuAverageDailySalesBySkuReportFile: function (id, buildNumber)
+	    {
+	        return baseUrl + ('GetSkuAverageDailySalesBySkuReportFile/{0}?buildNumber={1}')
+                .format(id, buildNumber);
+	    },
+	    requestSkuOOSImpactBySkuReportFile: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'RequestSkuOOSImpactBySkuReportFile', filter, getConfig(tracker));
+	    },
+	    getSkuOOSImpactBySkuReportFile: function (id, buildNumber)
+	    {
+	        return baseUrl + ('GetSkuOOSImpactBySkuReportFile/{0}?buildNumber={1}')
+                .format(id, buildNumber);
+	    },
+	    getSkuAverageDailySalesByProductReportItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetSkuAverageDailySalesByProductReportItems', filter, getConfig(tracker));
+	    },
+	    requestSkuAverageDailySalesByProductReportFile: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'RequestSkuAverageDailySalesByProductReportFile', filter, getConfig(tracker));
+	    },
+	    getSkuAverageDailySalesByProductReportFile: function (id, buildNumber)
+	    {
+	        return baseUrl + ('GetSkuAverageDailySalesByProductReportFile/{0}?buildNumber={1}')
+                .format(id, buildNumber);
+	    },
+	    requestSkuOOSImpactByProductReportFile: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'RequestSkuOOSImpactByProductReportFile', filter, getConfig(tracker));
+	    },
+	    getSkuOOSImpactByProductReportFile: function (id, buildNumber)
+	    {
+	        return baseUrl + ('GetSkuOOSImpactByProductReportFile/{0}?buildNumber={1}')
+                .format(id, buildNumber);
+	    },
 	};
 }]);

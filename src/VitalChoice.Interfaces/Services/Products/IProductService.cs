@@ -24,9 +24,7 @@ namespace VitalChoice.Interfaces.Services.Products
         Dictionary<int, Dictionary<string, string>> GetProductEditDefaultSettingsAsync();
 
         IEnumerable<OptionType> GetExpandedOptionTypesWithSkuTypes();
-
-	    Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter);
-
+        
 	    Task<PagedList<ProductDynamic>> GetProductsAsync2(VProductSkuFilter filter);
 
 	    Task<ICollection<ProductListItemModel>> GetProductsOnCategoryOrderAsync(int idCategory);
@@ -132,6 +130,12 @@ namespace VitalChoice.Interfaces.Services.Products
 	    Task<SkuPOrderTypeBreakDownReport> GetSkuPOrderTypeBreakDownReportAsync(SkuPOrderTypeBreakDownReportFilter filter);
 
 	    Task<SkuPOrderTypeBreakDownReport> GetSkuPOrderTypeFutureBreakDownReportAsync(SkuPOrderTypeBreakDownReportFilter filter);
+
+	    Task<PagedList<SkuAverageDailySalesBySkuReportItem>> GetSkuAverageDailySalesBySkuReportItemsAsync(
+	        SkuAverageDailySalesReportFilter filter);
+
+	    Task<PagedList<SkuAverageDailySalesByProductReportItem>> GetSkuAverageDailySalesByProductReportItemsAsync(
+	        SkuAverageDailySalesReportFilter filter);
 
 	    #endregion
 	}

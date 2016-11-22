@@ -84,6 +84,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly IBlobStorageClient _storageClient;
         private readonly SpEcommerceRepository _sPEcommerceRepository;
         private readonly IExtendedDynamicReadServiceAsync<SkuDynamic, Sku> _skuReadServiceAsync;
+        private readonly IEcommerceRepositoryAsync<SkuOOSHistoryItem> _skuOOSHistoryItemRepository;
 
         public ProductService(VProductSkuRepository vProductSkuRepository,
             IEcommerceRepositoryAsync<Product> productRepository,
@@ -111,7 +112,8 @@ namespace VitalChoice.Business.Services.Products
             IExtendedDynamicReadServiceAsync<SkuDynamic, Sku> skuReadServiceAsync,
             IDynamicEntityOrderingExtension<Product> orderingExtension,
             ReferenceData referenceData,
-            AppSettings appSettings)
+            AppSettings appSettings,
+            IEcommerceRepositoryAsync<SkuOOSHistoryItem> skuOOSHistoryItemRepository)
             : base(
                 mapper, productRepository, productValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension
@@ -138,6 +140,7 @@ namespace VitalChoice.Business.Services.Products
             _skuReadServiceAsync = skuReadServiceAsync;
             _referenceData = referenceData;
             _appSettings = appSettings;
+            _skuOOSHistoryItemRepository = skuOOSHistoryItemRepository;
         }
 
         public async Task<ProductContent> SelectContentForTransfer(int id)
@@ -991,29 +994,6 @@ namespace VitalChoice.Business.Services.Products
         #endregion
 
         #region Products
-
-        public async Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter)
-        {
-            var toReturn = await _vProductSkuRepository.GetProductsAsync(filter);
-
-            if (toReturn.Items.Count > 0)
-            {
-                var ids = toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value).Distinct().ToList();
-                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
-                foreach (var item in toReturn.Items)
-                {
-                    foreach (var profile in profiles)
-                    {
-                        if (item.IdEditedBy == profile.Id)
-                        {
-                            item.EditedByAgentId = profile.AgentId;
-                        }
-                    }
-                }
-            }
-
-            return toReturn;
-        }
 
         public async Task<PagedList<ProductDynamic>> GetProductsAsync2(VProductSkuFilter filter)
         {
@@ -2052,6 +2032,250 @@ namespace VitalChoice.Business.Services.Products
                     usedOrderIds.Add(idOrder);
                 }
             }
+        }
+        
+        public async Task<PagedList<SkuAverageDailySalesBySkuReportItem>> GetSkuAverageDailySalesBySkuReportItemsAsync(
+            SkuAverageDailySalesReportFilter filter)
+        {
+            if (!string.IsNullOrEmpty(filter.ProductName))
+            {
+                var product = (await GetProductsAsync2(new VProductSkuFilter()
+                {
+                    SearchText = filter.ProductName,
+                    Paging = new Paging() {PageItemCount = 1}
+                })).Items.FirstOrDefault();
+                if (product != null)
+                {
+                    filter.SkuIds.AddRange(product.Skus.Select(p=>p.Id).ToList());
+                }
+            }
+
+            var tData = await _sPEcommerceRepository.GetSkuAverageDailySalesReportRawItemsAsync(filter);
+
+            var conditions = new SkuOOSHistoryItemQuery().ByDates(filter.From, filter.To).BySkuIds(filter.SkuIds);
+            var oosHistoryItems = await _skuOOSHistoryItemRepository.Query(conditions).SelectAsync(false);
+
+            var data = new List<SkuAverageDailySalesBySkuReportItem>();
+            var filterDaysRange = (filter.To - filter.From).Days;
+            foreach (var rawItem in tData)
+            {
+                SkuAverageDailySalesBySkuReportItem item=new SkuAverageDailySalesBySkuReportItem();
+                item.Id = rawItem.Id;
+                item.IdProduct = rawItem.IdProduct;
+                item.ProductCategories = rawItem.ProductCategories;
+                item.Code = rawItem.Code;
+
+                item.ProductName = $"{rawItem.Name} {rawItem.SubTitle}";
+                item.SkuName = $"{rawItem.Name} {rawItem.SubTitle} ({rawItem.QTY})";
+                item.InStock = BusinessHelper.InStock(rawItem.ProductIdObjectType, rawItem.DisregardStock, rawItem.Stock);
+
+                item.TotalAmount = Math.Round(rawItem.TotalAmount, 2);
+
+                var oosItems = oosHistoryItems.Where(p => p.IdSku == item.Id).ToList();
+                var duration = TimeSpan.Zero;
+                foreach (var skuOosHistoryItem in oosItems)
+                {
+                    var from = skuOosHistoryItem.StartDate > filter.From ? skuOosHistoryItem.StartDate : filter.From;
+                    var to = skuOosHistoryItem.EndDate.HasValue
+                        ? skuOosHistoryItem.EndDate.Value < filter.To ? skuOosHistoryItem.EndDate.Value : filter.To
+                        : filter.To;
+                    duration = duration + (to - from);
+                }
+                item.DaysOOS = duration.Days + duration.Hours >= 12 ? 1 : 0;
+
+                item.AverageDailyAmount = filterDaysRange - item.DaysOOS > 0
+                                        ? Math.Round(item.TotalAmount/(filterDaysRange - item.DaysOOS))
+                                        : 0;
+                item.TotalOOSImpactAmount = item.AverageDailyAmount*item.DaysOOS;
+
+                data.Add(item);
+            }
+
+            var toReturn=new PagedList<SkuAverageDailySalesBySkuReportItem>();
+            toReturn.Count = data.Count;
+
+            var sortOrder = filter.Sorting.SortOrder;
+            switch (filter.Sorting.Path)
+            {
+                case SkuAverageDailySalesSortPath.Id:
+                    data = sortOrder == FilterSortOrder.Asc
+                                ? data.OrderBy(y => y.Id).ToList()
+                                : data.OrderByDescending(y => y.Id).ToList();
+                    break;
+                case SkuAverageDailySalesSortPath.IdProduct:
+                    data = sortOrder == FilterSortOrder.Asc
+                                ? data.OrderBy(y => y.IdProduct).ToList()
+                                : data.OrderByDescending(y => y.IdProduct).ToList();
+                    break;
+                case SkuAverageDailySalesSortPath.Code:
+                    data = sortOrder == FilterSortOrder.Asc
+                                ? data.OrderBy(y => y.Code).ToList()
+                                : data.OrderByDescending(y => y.Code).ToList();
+                    break;
+                case SkuAverageDailySalesSortPath.InStock:
+                    data = sortOrder == FilterSortOrder.Asc
+                                ? data.OrderBy(y => y.InStock).ToList()
+                                : data.OrderByDescending(y => y.InStock).ToList();
+                    break;
+                case SkuAverageDailySalesSortPath.DaysOOS:
+                    data = sortOrder == FilterSortOrder.Asc
+                                ? data.OrderBy(y => y.DaysOOS).ToList()
+                                : data.OrderByDescending(y => y.DaysOOS).ToList();
+                    break;
+                case SkuAverageDailySalesSortPath.TotalAmount:
+                    data = sortOrder == FilterSortOrder.Asc
+                                ? data.OrderBy(y => y.TotalAmount).ToList()
+                                : data.OrderByDescending(y => y.TotalAmount).ToList();
+                    break;
+                case SkuAverageDailySalesSortPath.AverageDailyAmount:
+                    data = sortOrder == FilterSortOrder.Asc
+                                ? data.OrderBy(y => y.AverageDailyAmount).ToList()
+                                : data.OrderByDescending(y => y.AverageDailyAmount).ToList();
+                    break;
+                case SkuAverageDailySalesSortPath.TotalOOSImpactAmount:
+                    data = sortOrder == FilterSortOrder.Asc
+                                ? data.OrderBy(y => y.TotalOOSImpactAmount).ToList()
+                                : data.OrderByDescending(y => y.TotalOOSImpactAmount).ToList();
+                    break;
+            }
+
+            if (filter.Paging != null)
+            {
+                var pageNo = filter.Paging.PageIndex - 1;
+                toReturn.Items = pageNo <= 0
+                    ? data.Take(filter.Paging.PageItemCount).ToList()
+                    : data.Skip(pageNo * filter.Paging.PageItemCount).Take(filter.Paging.PageItemCount).ToList();
+            }
+            else
+            {
+                toReturn.Items = data;
+            }
+
+            return toReturn;
+        }
+
+        public async Task<PagedList<SkuAverageDailySalesByProductReportItem>> GetSkuAverageDailySalesByProductReportItemsAsync(
+            SkuAverageDailySalesReportFilter filter)
+        {
+            if (!string.IsNullOrEmpty(filter.ProductName))
+            {
+                var product = (await GetProductsAsync2(new VProductSkuFilter()
+                {
+                    SearchText = filter.ProductName,
+                    Paging = new Paging() { PageItemCount = 1 }
+                })).Items.FirstOrDefault();
+                if (product != null)
+                {
+                    filter.SkuIds.AddRange(product.Skus.Select(p => p.Id).ToList());
+                }
+            }
+
+            var tData = await _sPEcommerceRepository.GetSkuAverageDailySalesReportRawItemsAsync(filter);
+
+            var conditions = new SkuOOSHistoryItemQuery().ByDates(filter.From, filter.To).BySkuIds(filter.SkuIds);
+            var oosHistoryItems = await _skuOOSHistoryItemRepository.Query(conditions).SelectAsync(false);
+
+            var data = new List<SkuAverageDailySalesByProductReportItem>();
+            var filterDaysRange = (filter.To - filter.From).Days;
+            foreach (var productSkuGroup in tData.GroupBy(p=>p.IdProduct))
+            {
+                SkuAverageDailySalesByProductReportItem item = new SkuAverageDailySalesByProductReportItem();
+                var rawSku = productSkuGroup.FirstOrDefault();
+                item.IdProduct = rawSku.IdProduct;
+                item.ProductCategories = rawSku.ProductCategories;
+                item.ProductName = $"{rawSku.Name} {rawSku.SubTitle}";
+
+                foreach (var rawItem in productSkuGroup)
+                {
+                    var inStock = BusinessHelper.InStock(rawItem.ProductIdObjectType, rawItem.DisregardStock, rawItem.Stock);
+                    item.InStock = item.InStock || inStock;
+                    item.TotalAmount += Math.Round(rawItem.TotalAmount,2);
+
+                    var oosItems = oosHistoryItems.Where(p => p.IdSku == rawItem.Id).ToList();
+                    var duration = TimeSpan.Zero;
+                    foreach (var skuOosHistoryItem in oosItems)
+                    {
+                        var from = skuOosHistoryItem.StartDate > filter.From ? skuOosHistoryItem.StartDate : filter.From;
+                        var to = skuOosHistoryItem.EndDate.HasValue
+                            ? skuOosHistoryItem.EndDate.Value < filter.To ? skuOosHistoryItem.EndDate.Value : filter.To
+                            : filter.To;
+                        duration = duration + (to - from);
+                    }
+                    var daysOOS = duration.Days + duration.Hours >= 12 ? 1 : 0;
+                    item.DaysOOS = daysOOS > item.DaysOOS ? daysOOS : item.DaysOOS;
+
+                    item.Skus.Add(new SkuAverageDailySalesByProductSkuItem()
+                    {
+                        Code = rawItem.Code,
+                        InStock = inStock,
+                    });
+                    item.SkusLine += inStock ? rawItem.Code + ", " : $"({rawItem.Code})" + ", ";
+                }
+
+                if (item.SkusLine.EndsWith(", "))
+                {
+                    item.SkusLine = item.SkusLine.Substring(0, item.SkusLine.Length - 2);
+                }
+
+                item.AverageDailyAmount = filterDaysRange - item.DaysOOS > 0
+                                        ? Math.Round(item.TotalAmount / (filterDaysRange - item.DaysOOS))
+                                        : 0;
+                item.TotalOOSImpactAmount = item.AverageDailyAmount * item.DaysOOS;
+
+                data.Add(item);
+            }
+
+            var toReturn = new PagedList<SkuAverageDailySalesByProductReportItem>();
+            toReturn.Count = data.Count;
+
+            var sortOrder = filter.Sorting.SortOrder;
+            switch (filter.Sorting.Path)
+            {
+                case SkuAverageDailySalesSortPath.IdProduct:
+                    data = sortOrder == FilterSortOrder.Asc
+                                ? data.OrderBy(y => y.IdProduct).ToList()
+                                : data.OrderByDescending(y => y.IdProduct).ToList();
+                    break;
+                case SkuAverageDailySalesSortPath.InStock:
+                    data = sortOrder == FilterSortOrder.Asc
+                                ? data.OrderBy(y => y.InStock).ToList()
+                                : data.OrderByDescending(y => y.InStock).ToList();
+                    break;
+                case SkuAverageDailySalesSortPath.DaysOOS:
+                    data = sortOrder == FilterSortOrder.Asc
+                                ? data.OrderBy(y => y.DaysOOS).ToList()
+                                : data.OrderByDescending(y => y.DaysOOS).ToList();
+                    break;
+                case SkuAverageDailySalesSortPath.TotalAmount:
+                    data = sortOrder == FilterSortOrder.Asc
+                                ? data.OrderBy(y => y.TotalAmount).ToList()
+                                : data.OrderByDescending(y => y.TotalAmount).ToList();
+                    break;
+                case SkuAverageDailySalesSortPath.AverageDailyAmount:
+                    data = sortOrder == FilterSortOrder.Asc
+                                ? data.OrderBy(y => y.AverageDailyAmount).ToList()
+                                : data.OrderByDescending(y => y.AverageDailyAmount).ToList();
+                    break;
+                case SkuAverageDailySalesSortPath.TotalOOSImpactAmount:
+                    data = sortOrder == FilterSortOrder.Asc
+                                ? data.OrderBy(y => y.TotalOOSImpactAmount).ToList()
+                                : data.OrderByDescending(y => y.TotalOOSImpactAmount).ToList();
+                    break;
+            }
+
+            if (filter.Paging != null)
+            {
+                var pageNo = filter.Paging.PageIndex - 1;
+                toReturn.Items = pageNo <= 0
+                    ? data.Take(filter.Paging.PageItemCount).ToList()
+                    : data.Skip(pageNo * filter.Paging.PageItemCount).Take(filter.Paging.PageItemCount).ToList();
+            }
+            else
+            {
+                toReturn.Items = data;
+            }
+
+            return toReturn;
         }
 
         #endregion

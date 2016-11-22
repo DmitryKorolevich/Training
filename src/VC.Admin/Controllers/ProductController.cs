@@ -42,6 +42,7 @@ using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Services;
 using VitalChoice.Infrastructure.Domain;
+using VitalChoice.Ecommerce.Cache;
 
 namespace VC.Admin.Controllers
 {
@@ -58,10 +59,19 @@ namespace VC.Admin.Controllers
         private readonly AppSettings _appSettings;
         private readonly ICsvExportService<ProductCategoryStatisticTreeItemModel, ProductCategoryStatisticTreeItemCsvMap> productCategoryStatisticTreeItemCSVExportService;
         private readonly ICsvExportService<SkuBreakDownReportItem, SkuBreakDownReportItemCsvMap> _skuBreakDownReportItemCSVExportService;
+        private readonly ICsvExportService<SkuAverageDailySalesBySkuReportItem, SkuAverageDailySalesBySkuReportItemCsvMap> 
+            _skuAverageDailySalesBySkuReportItemCsvMapCSVExportService;
+        private readonly ICsvExportService<SkuAverageDailySalesByProductReportItem, SkuAverageDailySalesByProductReportItemCsvMap>
+            _skuAverageDailySalesProductReportItemCsvMapCSVExportService;
+        private readonly ICsvExportService<SkuAverageDailySalesBySkuReportItem, SkuOOSImpactBySkuReportItemCsvMap>
+            _skuOOSImpactBySkuReportItemCsvMapCSVExportService;
+        private readonly ICsvExportService<SkuAverageDailySalesByProductReportItem, SkuOOSImpactByProductReportItemCsvMap>
+            _skuOOSImpactByProductReportItemCsvMapCSVExportService;
         private readonly IObjectHistoryLogService objectHistoryLogService;
         private readonly ILogger logger;
         private readonly ExtendedUserManager _userManager;
         private readonly IAgentService _agentService;
+        private readonly ICacheProvider _cache;
 
         public ProductController(IProductCategoryService productCategoryService,
             IProductService productService,
@@ -73,7 +83,20 @@ namespace VC.Admin.Controllers
             IDynamicMapper<ProductDynamic, Product> mapper,
             ICsvExportService<ProductCategoryStatisticTreeItemModel, ProductCategoryStatisticTreeItemCsvMap> productCategoryStatisticTreeItemCSVExportService,
             ICsvExportService<SkuBreakDownReportItem, SkuBreakDownReportItemCsvMap> skuBreakDownReportItemCSVExportService,
-            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager, IAgentService agentService, IDynamicMapper<SkuDynamic, Sku> skuMapper, AppSettings appSettings)
+            ICsvExportService<SkuAverageDailySalesBySkuReportItem, SkuAverageDailySalesBySkuReportItemCsvMap>
+                skuAverageDailySalesBySkuReportItemCsvMapCSVExportService,
+            ICsvExportService<SkuAverageDailySalesByProductReportItem, SkuAverageDailySalesByProductReportItemCsvMap>
+                skuAverageDailySalesProductReportItemCsvMapCSVExportService,
+            ICsvExportService<SkuAverageDailySalesBySkuReportItem, SkuOOSImpactBySkuReportItemCsvMap>
+                skuOOSImpactBySkuReportItemCsvMapCSVExportService,
+            ICsvExportService<SkuAverageDailySalesByProductReportItem, SkuOOSImpactByProductReportItemCsvMap>
+                skuOOSImpactByProductReportItemCsvMapCSVExportService,
+            IObjectHistoryLogService objectHistoryLogService, 
+            ExtendedUserManager userManager,
+            IAgentService agentService,
+            IDynamicMapper<SkuDynamic, Sku> skuMapper,
+            AppSettings appSettings,
+            ICacheProvider cache)
         {
             this.productCategoryService = productCategoryService;
             this.inventoryCategoryService = inventoryCategoryService;
@@ -89,6 +112,11 @@ namespace VC.Admin.Controllers
             _skuMapper = skuMapper;
             _appSettings = appSettings;
             _mapper = mapper;
+            _skuAverageDailySalesBySkuReportItemCsvMapCSVExportService = skuAverageDailySalesBySkuReportItemCsvMapCSVExportService;
+            _skuAverageDailySalesProductReportItemCsvMapCSVExportService = skuAverageDailySalesProductReportItemCsvMapCSVExportService;
+            _skuOOSImpactBySkuReportItemCsvMapCSVExportService = skuOOSImpactBySkuReportItemCsvMapCSVExportService;
+            _skuOOSImpactByProductReportItemCsvMapCSVExportService = skuOOSImpactByProductReportItemCsvMapCSVExportService;
+            _cache = cache;
             this.logger = loggerProvider.CreateLogger<ProductController>();
         }
 
@@ -787,6 +815,7 @@ namespace VC.Admin.Controllers
             return File(result, "text/csv");
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
         public async Task<Result<SkuPOrderTypeBreakDownReport>> GetSkuPOrderTypeBreakDownReport([FromBody]SkuPOrderTypeBreakDownReportFilter filter)
         {
@@ -811,6 +840,7 @@ namespace VC.Admin.Controllers
             return toReturn;
         }
 
+        [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
         public async Task<Result<SkuPOrderTypeBreakDownReport>> GetSkuPOrderTypeFutureBreakDownReport([FromBody]SkuPOrderTypeBreakDownReportFilter filter)
         {
@@ -834,6 +864,174 @@ namespace VC.Admin.Controllers
             }
             return toReturn;
         }
+
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<PagedList<SkuAverageDailySalesBySkuReportItem>> GetSkuAverageDailySalesBySkuReportItems(
+            [FromBody]SkuAverageDailySalesReportFilter filter)
+        {
+            filter.To = filter.To.AddDays(1);
+            var toReturn = await productService.GetSkuAverageDailySalesBySkuReportItemsAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<string>> RequestSkuAverageDailySalesBySkuReportFile([FromBody]SkuAverageDailySalesReportFilter filter)
+        {
+            filter.Paging = null;
+            filter.To = filter.To.AddDays(1);
+
+            var data = await productService.GetSkuAverageDailySalesBySkuReportItemsAsync(filter);
+
+            var result = _skuAverageDailySalesBySkuReportItemCsvMapCSVExportService.ExportToCsv(data.Items);
+
+            var guid = Guid.NewGuid().ToString().ToLower();
+            _cache.SetItem(String.Format(CacheKeys.ReportFormat, guid), result);
+
+            return guid;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public FileResult GetSkuAverageDailySalesBySkuReportFile(string id)
+        {
+            var result = _cache.GetItem<byte[]>(String.Format(CacheKeys.ReportFormat, id));
+            if (result == null)
+            {
+                throw new AppValidationException("Please reload a file.");
+            }
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.AVERAGE_DAILY_SALES_BY_SKU, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<string>> RequestSkuOOSImpactBySkuReportFile([FromBody]SkuAverageDailySalesReportFilter filter)
+        {
+            filter.Paging = null;
+            filter.To = filter.To.AddDays(1);
+
+            var data = await productService.GetSkuAverageDailySalesBySkuReportItemsAsync(filter);
+
+            var result = _skuOOSImpactBySkuReportItemCsvMapCSVExportService.ExportToCsv(data.Items);
+
+            var guid = Guid.NewGuid().ToString().ToLower();
+            _cache.SetItem(String.Format(CacheKeys.ReportFormat, guid), result);
+
+            return guid;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public FileResult GetSkuOOSImpactBySkuReportFile(string id)
+        {
+            var result = _cache.GetItem<byte[]>(String.Format(CacheKeys.ReportFormat, id));
+            if (result == null)
+            {
+                throw new AppValidationException("Please reload a file.");
+            }
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.OOS_IMPACT_BY_SKU, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
+
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<PagedList<SkuAverageDailySalesByProductReportItem>> GetSkuAverageDailySalesByProductReportItems(
+            [FromBody]SkuAverageDailySalesReportFilter filter)
+        {
+            filter.To = filter.To.AddDays(1);
+            var toReturn = await productService.GetSkuAverageDailySalesByProductReportItemsAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<string>> RequestSkuAverageDailySalesByProductReportFile([FromBody]SkuAverageDailySalesReportFilter filter)
+        {
+            filter.Paging = null;
+            filter.To = filter.To.AddDays(1);
+
+            var data = await productService.GetSkuAverageDailySalesByProductReportItemsAsync(filter);
+
+            var result = _skuAverageDailySalesProductReportItemCsvMapCSVExportService.ExportToCsv(data.Items);
+
+            var guid = Guid.NewGuid().ToString().ToLower();
+            _cache.SetItem(String.Format(CacheKeys.ReportFormat, guid), result);
+
+            return guid;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public FileResult GetSkuAverageDailySalesByProductReportFile(string id)
+        {
+            var result = _cache.GetItem<byte[]>(String.Format(CacheKeys.ReportFormat, id));
+            if (result == null)
+            {
+                throw new AppValidationException("Please reload a file.");
+            }
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.AVERAGE_DAILY_SALES_BY_PRODUCT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<string>> RequestSkuOOSImpactByProductReportFile([FromBody]SkuAverageDailySalesReportFilter filter)
+        {
+            filter.Paging = null;
+            filter.To = filter.To.AddDays(1);
+
+            var data = await productService.GetSkuAverageDailySalesByProductReportItemsAsync(filter);
+
+            var result = _skuOOSImpactByProductReportItemCsvMapCSVExportService.ExportToCsv(data.Items);
+
+            var guid = Guid.NewGuid().ToString().ToLower();
+            _cache.SetItem(String.Format(CacheKeys.ReportFormat, guid), result);
+
+            return guid;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public FileResult GetSkuOOSImpactByProductReportFile(string id)
+        {
+            var result = _cache.GetItem<byte[]>(String.Format(CacheKeys.ReportFormat, id));
+            if (result == null)
+            {
+                throw new AppValidationException("Please reload a file.");
+            }
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.OOS_IMPACT_BY_PRODUCT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
 
         #endregion
     }
