@@ -184,6 +184,11 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(f => f.Id);
             });
 
+            builder.Entity<SkuAverageDailySalesReportRawItem>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+            });
+
             #endregion
 
             builder.Entity<VCustomerFavorite>(entity =>

@@ -776,6 +776,11 @@ namespace VitalChoice.Business.Services.InventorySkus
                         {
                             while (csv.Read())
                             {
+                                if (rowNumber > FileConstants.MAX_IMPORT_ROWS_COUNT)
+                                {
+                                    throw new AppValidationException($"File for import cannot contain more than { FileConstants.MAX_IMPORT_ROWS_COUNT}");
+                                }
+
                                 InventorySkuImportItem item = (InventorySkuImportItem)csv.GetRecord(recordType);
                                 item.RowNumber = rowNumber;
                                 var localMessages = new List<MessageInfo>();
@@ -1007,6 +1012,11 @@ namespace VitalChoice.Business.Services.InventorySkus
                         {
                             while (csv.Read())
                             {
+                                if (rowNumber > FileConstants.MAX_IMPORT_ROWS_COUNT)
+                                {
+                                    throw new AppValidationException($"File for import cannot contain more than { FileConstants.MAX_IMPORT_ROWS_COUNT}");
+                                }
+
                                 SkuInventoryInfoImportItem item = (SkuInventoryInfoImportItem)csv.GetRecord(recordType);
                                 item.RowNumber = rowNumber;
                                 item.ErrorMessages = new List<MessageInfo>();

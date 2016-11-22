@@ -454,6 +454,11 @@ namespace VitalChoice.Business.Services.Products
                         {
                             while (csv.Read())
                             {
+                                if (rowNumber > FileConstants.MAX_IMPORT_ROWS_COUNT)
+                                {
+                                    throw new AppValidationException($"File for import cannot contain more than { FileConstants.MAX_IMPORT_ROWS_COUNT}");
+                                }
+
                                 var item = csv.GetRecord<GCImportItem>();
                                 item.RowNumber = rowNumber;
                                 var localMessages = new List<MessageInfo>();
