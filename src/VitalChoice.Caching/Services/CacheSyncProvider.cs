@@ -32,7 +32,7 @@ namespace VitalChoice.Caching.Services
 
         public virtual void SendChanges(IEnumerable<SyncOperation> syncOperations)
         {
-
+            Logger.LogInfo(l => string.Join("\n", l), syncOperations.ToList());
         }
 
         public void AcceptChanges(IEnumerable<SyncOperation> syncOperations)

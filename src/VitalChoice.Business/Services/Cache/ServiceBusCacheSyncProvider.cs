@@ -114,10 +114,11 @@ namespace VitalChoice.Business.Services.Cache
 
         public override void SendChanges(IEnumerable<SyncOperation> syncOperations)
         {
+            var ops = syncOperations.ToArray();
             if (!_enabled)
                 return;
 
-            _sendingPool.EnqueueData(syncOperations.ToArray());
+            _sendingPool.EnqueueData(ops);
         }
 
         public static ICollection<KeyValuePair<string, double>> AverageLatency => AveragePing;
