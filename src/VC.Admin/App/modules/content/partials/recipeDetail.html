@@ -97,7 +97,9 @@
                                                     <div class="toogle-editor" data-ng-show="descriptionExpanded">
                                                         <a data-ng-click="toogleEditorState('descriptionExpanded')" class="btn btn-default">Hide</a>
                                                     </div>
-                                                    <div data-ng-show="descriptionExpanded" text-angular data-ng-model="recipe.Description"></div>
+                                                    <div data-ng-show="descriptionExpanded">
+                                                        <textarea ui-tinymce="getTinymceOptions()" ng-model="recipe.Description"></textarea>
+                                                    </div>
                                                     <div class="error-container" ng-show="forms.recipeForm.submitted && forms.recipeForm.Description.$invalid">
                                                         <small class="error" ng-show="forms.recipeForm.Description.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Description")}}</small>
                                                     </div>
@@ -115,7 +117,9 @@
                                                     <div class="toogle-editor" data-ng-show="AboutChefExpanded">
                                                         <a data-ng-click="toogleEditorState('AboutChefExpanded')" class="btn btn-default">Hide</a>
                                                     </div>
-                                                    <div data-ng-show="AboutChefExpanded" text-angular data-ng-model="recipe.AboutChef"></div>
+                                                    <div data-ng-show="AboutChefExpanded">
+                                                        <textarea ui-tinymce="getTinymceOptions()" ng-model="recipe.AboutChef"></textarea>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -130,7 +134,9 @@
                                                     <div class="toogle-editor" data-ng-show="IngredientsExpanded">
                                                         <a data-ng-click="toogleEditorState('IngredientsExpanded')" class="btn btn-default">Hide</a>
                                                     </div>
-                                                    <div data-ng-show="IngredientsExpanded" text-angular data-ng-model="recipe.Ingredients"></div>
+                                                    <div data-ng-show="IngredientsExpanded">
+                                                        <textarea ui-tinymce="getTinymceOptions()" ng-model="recipe.Ingredients"></textarea>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -145,7 +151,9 @@
                                                     <div class="toogle-editor" data-ng-show="DirectionsExpanded">
                                                         <a data-ng-click="toogleEditorState('DirectionsExpanded')" class="btn btn-default">Hide</a>
                                                     </div>
-                                                    <div data-ng-show="DirectionsExpanded" text-angular data-ng-model="recipe.Directions"></div>
+                                                    <div data-ng-show="DirectionsExpanded">
+                                                        <textarea ui-tinymce="getTinymceOptions()" ng-model="recipe.Directions"></textarea>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">

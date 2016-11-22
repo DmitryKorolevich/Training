@@ -58,7 +58,9 @@
                                                     <div class="toogle-editor" data-ng-show="descriptionExpanded">
                                                         <a data-ng-click="toogleEditorState('descriptionExpanded')" class="btn btn-default">Hide</a>
                                                     </div>
-                                                    <div data-ng-show="descriptionExpanded" text-angular data-ng-model="faq.Description"></div>
+                                                    <div data-ng-show="descriptionExpanded">
+                                                        <textarea ui-tinymce="getTinymceOptions()" ng-model="faq.Description"></textarea>
+                                                    </div>
                                                     <div class="error-container" ng-show="forms.faqForm.submitted && forms.faqForm.Description.$invalid">
                                                         <small class="error" ng-show="forms.faqForm.Description.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Description")}}</small>
                                                     </div>
