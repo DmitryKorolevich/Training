@@ -94,7 +94,9 @@
                                                     <div class="toogle-editor" data-ng-show="longDescriptionExpanded">
                                                         <a data-ng-click="toogleEditorState('longDescriptionExpanded')" class="btn btn-default">Hide</a>
                                                     </div>
-                                                    <div data-ng-show="longDescriptionExpanded" text-angular ta-unsafe-sanitizer="true" data-ng-model="productCategory.LongDescription"></div>
+                                                    <div data-ng-show="longDescriptionExpanded">
+                                                        <textarea ui-tinymce="getTinymceOptions()" ng-model="productCategory.LongDescription"></textarea>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -120,7 +122,9 @@
                                                     <div class="toogle-editor" data-ng-show="longDescriptionBottomExpanded">
                                                         <a data-ng-click="toogleEditorState('longDescriptionBottomExpanded')" class="btn btn-default">Hide</a>
                                                     </div>
-                                                    <div data-ng-show="longDescriptionBottomExpanded" text-angular data-ng-model="productCategory.LongDescriptionBottom"></div>
+                                                    <div data-ng-show="longDescriptionBottomExpanded">
+                                                        <textarea ui-tinymce="getTinymceOptions()" ng-model="productCategory.LongDescriptionBottom"></textarea>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">

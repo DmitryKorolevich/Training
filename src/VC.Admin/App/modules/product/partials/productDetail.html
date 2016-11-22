@@ -107,7 +107,9 @@
                                                     <div class="toogle-editor" data-ng-show="ShortDescriptionExpanded">
                                                         <a data-ng-click="toogleEditorState('ShortDescriptionExpanded')" class="btn btn-default">Hide</a>
                                                     </div>
-                                                    <div data-ng-show="ShortDescriptionExpanded" text-angular data-ng-model="product.ShortDescription"></div>
+                                                    <div data-ng-show="ShortDescriptionExpanded">
+                                                        <textarea ui-tinymce="getTinymceOptions()" ng-model="product.ShortDescription"></textarea>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -143,7 +145,9 @@
                                                     <div class="toogle-editor" data-ng-show="DescriptionExpanded">
                                                         <a data-ng-click="toogleEditorState('DescriptionExpanded')" class="btn btn-default">Hide</a>
                                                     </div>
-                                                    <div data-ng-show="DescriptionExpanded" text-angular data-ng-model="product.Description"></div>
+                                                    <div data-ng-show="DescriptionExpanded">
+                                                        <textarea ui-tinymce="getTinymceOptions()" ng-model="product.Description"></textarea>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group" data-ng-if="!(product.Type==3 || product.Type==4)">
@@ -177,7 +181,9 @@
                                                     <div class="toogle-editor" data-ng-show="IngredientsExpanded">
                                                         <a data-ng-click="toogleEditorState('IngredientsExpanded')" class="btn btn-default">Hide</a>
                                                     </div>
-                                                    <div data-ng-show="IngredientsExpanded" text-angular data-ng-model="product.Ingredients"></div>
+                                                    <div data-ng-show="IngredientsExpanded">
+                                                        <textarea ui-tinymce="getTinymceOptions()" ng-model="product.Ingredients"></textarea>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group" data-ng-if="!(product.Type==3 || product.Type==4)">
@@ -211,7 +217,9 @@
                                                     <div class="toogle-editor" data-ng-show="RecipesExpanded">
                                                         <a data-ng-click="toogleEditorState('RecipesExpanded')" class="btn btn-default">Hide</a>
                                                     </div>
-                                                    <div data-ng-show="RecipesExpanded" text-angular data-ng-model="product.Recipes"></div>
+                                                    <div data-ng-show="RecipesExpanded">
+                                                        <textarea ui-tinymce="getTinymceOptions()" ng-model="product.Recipes"></textarea>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group" data-ng-if="!(product.Type==3 || product.Type==4)">
@@ -245,7 +253,9 @@
                                                     <div class="toogle-editor" data-ng-show="ServingExpanded">
                                                         <a data-ng-click="toogleEditorState('ServingExpanded')" class="btn btn-default">Hide</a>
                                                     </div>
-                                                    <div data-ng-show="ServingExpanded" text-angular data-ng-model="product.Serving"></div>
+                                                    <div data-ng-show="ServingExpanded">
+                                                        <textarea ui-tinymce="getTinymceOptions()" ng-model="product.Serving"></textarea>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group" data-ng-if="!(product.Type==3 || product.Type==4)">
@@ -279,7 +289,9 @@
                                                     <div class="toogle-editor" data-ng-show="ShippingExpanded">
                                                         <a data-ng-click="toogleEditorState('ShippingExpanded')" class="btn btn-default">Hide</a>
                                                     </div>
-                                                    <div data-ng-show="ShippingExpanded" text-angular data-ng-model="product.Shipping"></div>
+                                                    <div data-ng-show="ShippingExpanded">
+                                                        <textarea ui-tinymce="getTinymceOptions()" ng-model="product.Shipping"></textarea>
+                                                    </div>
                                                 </div>
                                             </div>
 
