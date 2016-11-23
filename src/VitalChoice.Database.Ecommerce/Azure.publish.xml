@@ -4,7 +4,7 @@
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseName>VitalChoice.Ecommerce</TargetDatabaseName>
     <DeployScriptFileName>VitalChoice.Database.Ecommerce.sql</DeployScriptFileName>
-    <TargetConnectionString>Server=tcp:vw4v86cs0h.database.windows.net,1433;Database=VitalChoice.Ecommerce;User ID=multiarc@vw4v86cs0h;Password=9Ku7hGuU$B&eMs5Y@fSHWqjNP;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;</TargetConnectionString>
+    <TargetConnectionString>Server=tcp:vw4v86cs0h.database.windows.net,1433;Database=VitalChoice.Ecommerce;User ID=multiarc%40vw4v86cs0h;Password=9Ku7hGuU$B&eMs5Y@fSHWqjNP;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;</TargetConnectionString>
     <ProfileVersionNumber>1</ProfileVersionNumber>
   </PropertyGroup>
 </Project>

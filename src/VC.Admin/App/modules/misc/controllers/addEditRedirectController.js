@@ -151,7 +151,8 @@
             if (form && index.indexOf('i') == 0 && form.StartDate != undefined)
             {
                 var itemIndex = parseInt(index.replace("i", ""));
-                if ($scope.redirect.FutureRedirects[itemIndex] != undefined && $scope.redirect.FutureRedirects[itemIndex].StartDate)
+                if ($scope.redirect.FutureRedirects[itemIndex] != undefined && $scope.redirect.FutureRedirects[itemIndex].StartDate &&
+                    !$scope.redirect.FutureRedirects[itemIndex].Disabled)
                 {
                     var startDate = $scope.redirect.FutureRedirects[itemIndex].StartDate;
                     $.each($scope.redirect.FutureRedirects, function (index, item)

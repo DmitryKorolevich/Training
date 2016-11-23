@@ -123,6 +123,11 @@
             refreshItems();
         }
 
+        $scope.pageChanged = function ()
+        {
+            refreshItems();
+        };
+
         $scope.filterItems = function ()
         {
             if ($scope.forms.form.$valid)

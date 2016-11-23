@@ -2068,6 +2068,7 @@ namespace VitalChoice.Business.Services.Products
 
             var data = new List<SkuAverageDailySalesBySkuReportItem>();
             var filterDaysRange = (filter.To - filter.From).Days;
+            var now = DateTime.Now;
             foreach (var rawItem in tData)
             {
                 SkuAverageDailySalesBySkuReportItem item=new SkuAverageDailySalesBySkuReportItem();
@@ -2103,6 +2104,10 @@ namespace VitalChoice.Business.Services.Products
                     var to = skuOosHistoryItem.EndDate.HasValue
                         ? skuOosHistoryItem.EndDate.Value < filter.To ? skuOosHistoryItem.EndDate.Value : filter.To
                         : filter.To;
+                    if (to > now)
+                    {
+                        to = now;
+                    }
                     duration = duration + (to - from);
                 }
                 item.DaysOOS = duration.Days + (duration.Hours >= 12 ? 1 : 0);
@@ -2190,6 +2195,7 @@ namespace VitalChoice.Business.Services.Products
 
             var data = new List<SkuAverageDailySalesByProductReportItem>();
             var filterDaysRange = (filter.To - filter.From).Days;
+            var now = DateTime.Now;
             foreach (var productSkuGroup in tData.GroupBy(p=>p.IdProduct))
             {
                 SkuAverageDailySalesByProductReportItem item = new SkuAverageDailySalesByProductReportItem();
@@ -2213,6 +2219,10 @@ namespace VitalChoice.Business.Services.Products
                         var to = skuOosHistoryItem.EndDate.HasValue
                             ? skuOosHistoryItem.EndDate.Value < filter.To ? skuOosHistoryItem.EndDate.Value : filter.To
                             : filter.To;
+                        if (to > now)
+                        {
+                            to = now;
+                        }
                         duration = duration + (to - from);
                     }
                     var daysOOS = duration.Days + (duration.Hours >= 12 ? 1 : 0);
