@@ -209,6 +209,12 @@ namespace VitalChoice.Business.Services.Payment
                 return errors;
 
             creditCardType creditCard;
+            //TODO: temporary test card
+            if ((string)paymentMethod.Data.CardNumber == "4024007188194566" && ((DateTime) paymentMethod.Data.ExpDate).ToString("MMyy") == "1219" &&
+                securityCode == "786")
+            {
+                return errors;
+            }
             if (securityCode != null)
             {
                 creditCard = new creditCardType
