@@ -13,7 +13,7 @@ namespace VitalChoice.Business.Queries.Products
     {
         public SkuOOSHistoryItemQuery ByDates(DateTime from, DateTime to)
         {
-            Add(s => s.StartDate<=from && (!s.EndDate.HasValue || s.EndDate.Value>=to));
+            Add(s => s.StartDate<=to && (!s.EndDate.HasValue || s.EndDate.Value>=from));
             return this;
         }
 
@@ -21,7 +21,7 @@ namespace VitalChoice.Business.Queries.Products
         {
             if (ids != null && ids.Count > 0)
             {
-                Add(s => ids.Contains(s.Id));
+                Add(s => ids.Contains(s.IdSku));
             }
             return this;
         }

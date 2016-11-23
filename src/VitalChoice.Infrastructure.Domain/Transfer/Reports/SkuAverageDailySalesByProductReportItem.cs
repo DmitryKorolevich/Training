@@ -30,6 +30,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
 
         public bool InStock { get; set; }
 
+        public bool CurrentOOS { get; set; }
+
         public int DaysOOS { get; set; }
 
         public decimal TotalAmount { get; set; }

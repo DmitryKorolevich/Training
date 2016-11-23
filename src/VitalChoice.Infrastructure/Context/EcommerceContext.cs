@@ -400,6 +400,12 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasOne(e => e.Sku).WithMany().HasForeignKey(e => e.IdSku).HasPrincipalKey(s => s.Id);
             });
 
+            builder.Entity<VShortProduct>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.ToTable("VShortProducts");
+            });
+
             builder.Entity<OneTimeDiscountToCustomerUsage>(entity =>
             {
                 entity.Ignore(e => e.Id);

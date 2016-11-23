@@ -85,6 +85,7 @@ namespace VitalChoice.Business.Services.Products
         private readonly SpEcommerceRepository _sPEcommerceRepository;
         private readonly IExtendedDynamicReadServiceAsync<SkuDynamic, Sku> _skuReadServiceAsync;
         private readonly IEcommerceRepositoryAsync<SkuOOSHistoryItem> _skuOOSHistoryItemRepository;
+        private readonly IEcommerceRepositoryAsync<VShortProduct> _vShortProductRepository;
 
         public ProductService(VProductSkuRepository vProductSkuRepository,
             IEcommerceRepositoryAsync<Product> productRepository,
@@ -113,7 +114,8 @@ namespace VitalChoice.Business.Services.Products
             IDynamicEntityOrderingExtension<Product> orderingExtension,
             ReferenceData referenceData,
             AppSettings appSettings,
-            IEcommerceRepositoryAsync<SkuOOSHistoryItem> skuOOSHistoryItemRepository)
+            IEcommerceRepositoryAsync<SkuOOSHistoryItem> skuOOSHistoryItemRepository,
+            IEcommerceRepositoryAsync<VShortProduct> vShortProductRepository)
             : base(
                 mapper, productRepository, productValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension
@@ -141,6 +143,7 @@ namespace VitalChoice.Business.Services.Products
             _referenceData = referenceData;
             _appSettings = appSettings;
             _skuOOSHistoryItemRepository = skuOOSHistoryItemRepository;
+            _vShortProductRepository = vShortProductRepository;
         }
 
         public async Task<ProductContent> SelectContentForTransfer(int id)
@@ -994,6 +997,25 @@ namespace VitalChoice.Business.Services.Products
         #endregion
 
         #region Products
+
+        public async Task<PagedList<VShortProduct>> GetShortProductsAsync(FilterBase filter)
+        {
+            PagedList<VShortProduct> toReturn = null;
+            Func<IQueryable<VShortProduct>, IOrderedQueryable<VShortProduct>> sortable = x => x.OrderBy(y => y.Description);
+
+            var query = _vShortProductRepository.Query(p => p.Description.StartsWith(filter.SearchText)).OrderBy(sortable);
+            if (filter.Paging != null)
+            {
+                toReturn = await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            }
+            else
+            {
+                var items = await query.SelectAsync(false);
+                toReturn=new PagedList<VShortProduct>(items, items.Count);
+            }
+
+            return toReturn;
+        }
 
         public async Task<PagedList<ProductDynamic>> GetProductsAsync2(VProductSkuFilter filter)
         {
@@ -2037,18 +2059,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<PagedList<SkuAverageDailySalesBySkuReportItem>> GetSkuAverageDailySalesBySkuReportItemsAsync(
             SkuAverageDailySalesReportFilter filter)
         {
-            if (!string.IsNullOrEmpty(filter.ProductName))
-            {
-                var product = (await GetProductsAsync2(new VProductSkuFilter()
-                {
-                    SearchText = filter.ProductName,
-                    Paging = new Paging() {PageItemCount = 1}
-                })).Items.FirstOrDefault();
-                if (product != null)
-                {
-                    filter.SkuIds.AddRange(product.Skus.Select(p=>p.Id).ToList());
-                }
-            }
+            await AssignProductSkusForAverageDailySalesFilter(filter);
 
             var tData = await _sPEcommerceRepository.GetSkuAverageDailySalesReportRawItemsAsync(filter);
 
@@ -2061,9 +2072,10 @@ namespace VitalChoice.Business.Services.Products
             {
                 SkuAverageDailySalesBySkuReportItem item=new SkuAverageDailySalesBySkuReportItem();
                 item.InStock = BusinessHelper.InStock(rawItem.ProductIdObjectType, rawItem.DisregardStock, rawItem.Stock);
+                item.CurrentOOS = !item.InStock;
                 item.StatusCode = rawItem.StatusCode;
 
-                if (filter.OnlyInStock && !item.InStock)
+                if (filter.OnlyOOS && item.InStock)
                 {
                     continue;
                 }
@@ -2093,10 +2105,10 @@ namespace VitalChoice.Business.Services.Products
                         : filter.To;
                     duration = duration + (to - from);
                 }
-                item.DaysOOS = duration.Days + duration.Hours >= 12 ? 1 : 0;
+                item.DaysOOS = duration.Days + (duration.Hours >= 12 ? 1 : 0);
 
                 item.AverageDailyAmount = filterDaysRange - item.DaysOOS > 0
-                                        ? Math.Round(item.TotalAmount/(filterDaysRange - item.DaysOOS))
+                                        ? Math.Round(item.TotalAmount/(filterDaysRange - item.DaysOOS),2)
                                         : 0;
                 item.TotalOOSImpactAmount = item.AverageDailyAmount*item.DaysOOS;
 
@@ -2169,18 +2181,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<PagedList<SkuAverageDailySalesByProductReportItem>> GetSkuAverageDailySalesByProductReportItemsAsync(
             SkuAverageDailySalesReportFilter filter)
         {
-            if (!string.IsNullOrEmpty(filter.ProductName))
-            {
-                var product = (await GetProductsAsync2(new VProductSkuFilter()
-                {
-                    SearchText = filter.ProductName,
-                    Paging = new Paging() { PageItemCount = 1 }
-                })).Items.FirstOrDefault();
-                if (product != null)
-                {
-                    filter.SkuIds.AddRange(product.Skus.Select(p => p.Id).ToList());
-                }
-            }
+            await AssignProductSkusForAverageDailySalesFilter(filter);
 
             var tData = await _sPEcommerceRepository.GetSkuAverageDailySalesReportRawItemsAsync(filter);
 
@@ -2214,7 +2215,7 @@ namespace VitalChoice.Business.Services.Products
                             : filter.To;
                         duration = duration + (to - from);
                     }
-                    var daysOOS = duration.Days + duration.Hours >= 12 ? 1 : 0;
+                    var daysOOS = duration.Days + (duration.Hours >= 12 ? 1 : 0);
                     item.DaysOOS = daysOOS > item.DaysOOS ? daysOOS : item.DaysOOS;
 
                     item.Skus.Add(new SkuAverageDailySalesByProductSkuItem()
@@ -2230,15 +2231,16 @@ namespace VitalChoice.Business.Services.Products
                     item.SkusLine = item.SkusLine.Substring(0, item.SkusLine.Length - 2);
                 }
 
+                item.CurrentOOS = !item.InStock;
                 //at least one in stock
-                if (filter.OnlyInStock && !item.InStock)
+                if (filter.OnlyOOS && item.InStock)
                 {
                     continue;
                 }
                 //sku active not actual for this report
 
                 item.AverageDailyAmount = filterDaysRange - item.DaysOOS > 0
-                                        ? Math.Round(item.TotalAmount / (filterDaysRange - item.DaysOOS))
+                                        ? Math.Round(item.TotalAmount / (filterDaysRange - item.DaysOOS),2)
                                         : 0;
                 item.TotalOOSImpactAmount = item.AverageDailyAmount * item.DaysOOS;
 
@@ -2296,6 +2298,26 @@ namespace VitalChoice.Business.Services.Products
             }
 
             return toReturn;
+        }
+
+        private async Task AssignProductSkusForAverageDailySalesFilter(SkuAverageDailySalesReportFilter filter)
+        {
+            if (!string.IsNullOrEmpty(filter.ProductName))
+            {
+                var shortProduct = (await GetShortProductsAsync(new VProductSkuFilter()
+                {
+                    SearchText = filter.ProductName,
+                    Paging = new Paging() {PageItemCount = 1}
+                })).Items.FirstOrDefault();
+                if (shortProduct != null)
+                {
+                    var product = await SelectAsync(shortProduct.Id);
+                    if (product != null)
+                    {
+                        filter.SkuIds.AddRange(product.Skus.Select(p => p.Id).ToList());
+                    }
+                }
+            }
         }
 
         #endregion

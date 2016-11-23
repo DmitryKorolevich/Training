@@ -11,7 +11,8 @@ CREATE PROCEDURE SPGetSkuAverageDailySalesReport
 	@from datetime2,
 	@to datetime2, 
 	@skus nvarchar(MAX),
-	@idcustomertype int
+	@idcustomertype int,
+	@mode int
 AS
 BEGIN		
 		
@@ -34,6 +35,23 @@ BEGIN
 		FROM Skus s WITH(NOLOCK)
 		WHERE 
 			s.Id IN (SELECT Id FROM TFGetTableIdsByString(@skus, DEFAULT))
+
+		IF(@mode=2)--by product
+		BEGIN
+
+			INSERT INTO @skuIds
+			(Id)
+			SELECT 
+				DISTINCT al.Id
+			FROM @skuIds cs
+			JOIN Skus s ON cs.Id=s.Id
+			JOIN Skus al ON s.IdProduct=al.IdProduct
+			WHERE al.Id NOT IN 
+			(
+				SELECT Id FROM @skuIds
+			)
+
+		END
 	END
 	
 	INSERT INTO @skusStatistic

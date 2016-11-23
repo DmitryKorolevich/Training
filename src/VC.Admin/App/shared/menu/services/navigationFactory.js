@@ -73,6 +73,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    name: 'salesOrders',
 				    stateLabel: 'Sales, Orders',
 				    subMenu: [
+                        { name: 'averageDailySalesReport', stateName: 'index.oneCol.averageDailySalesReport', stateLabel: 'Average Daily Sales Report', access: 3 },
                         { name: 'skuPOrderTypeBreakDownReport', stateName: 'index.oneCol.skuPOrderTypeBreakDownReport', stateLabel: 'Breakdown Report', access: 3 },
                         //{ name: 'productCategoriesStatistic', stateName: 'index.oneCol.productCategoriesStatistic', stateLabel: 'Category Sales Report', access: 3 },
                         { name: 'orderDiscountReport', stateName: 'index.oneCol.orderDiscountReport', stateLabel: 'Discount Usage Report', access: 3 },

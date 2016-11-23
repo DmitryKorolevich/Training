@@ -7,6 +7,12 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
 {
+    public enum SkuAverageDailySalesReportMode
+    {
+        BySku=1,
+        ByProduct=2
+    }
+
     public class SkuAverageDailySalesReportFilter : FilterBase
     {
         public DateTime From { get; set; }
@@ -20,8 +26,10 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
 
         public string ProductName { get; set; }
 
-        public bool OnlyInStock { get; set; }
+        public bool OnlyOOS { get; set; }
 
         public bool OnlyActiveSku { get; set; }
+
+        public SkuAverageDailySalesReportMode Mode { get; set; }
     }
 }

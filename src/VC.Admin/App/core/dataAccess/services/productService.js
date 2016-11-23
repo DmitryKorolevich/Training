@@ -77,6 +77,10 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    getSku: function(filter,tracker) {
 	        return $http.post(baseUrl+'GetSku',filter,getConfig(tracker));
 	    },
+	    getShortProducts: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetShortProducts', filter, getConfig(tracker));
+	    },
 	    getProducts: function (filter, tracker) {
 	        return $http.post(baseUrl + 'GetProducts', filter, getConfig(tracker));
 	    },
@@ -175,15 +179,6 @@ angular.module('app.core.dataAccess.services.productService', [])
 	        return baseUrl + ('GetSkuAverageDailySalesBySkuReportFile/{0}?buildNumber={1}')
                 .format(id, buildNumber);
 	    },
-	    requestSkuOOSImpactBySkuReportFile: function (filter, tracker)
-	    {
-	        return $http.post(baseUrl + 'RequestSkuOOSImpactBySkuReportFile', filter, getConfig(tracker));
-	    },
-	    getSkuOOSImpactBySkuReportFile: function (id, buildNumber)
-	    {
-	        return baseUrl + ('GetSkuOOSImpactBySkuReportFile/{0}?buildNumber={1}')
-                .format(id, buildNumber);
-	    },
 	    getSkuAverageDailySalesByProductReportItems: function (filter, tracker)
 	    {
 	        return $http.post(baseUrl + 'GetSkuAverageDailySalesByProductReportItems', filter, getConfig(tracker));
@@ -195,15 +190,6 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    getSkuAverageDailySalesByProductReportFile: function (id, buildNumber)
 	    {
 	        return baseUrl + ('GetSkuAverageDailySalesByProductReportFile/{0}?buildNumber={1}')
-                .format(id, buildNumber);
-	    },
-	    requestSkuOOSImpactByProductReportFile: function (filter, tracker)
-	    {
-	        return $http.post(baseUrl + 'RequestSkuOOSImpactByProductReportFile', filter, getConfig(tracker));
-	    },
-	    getSkuOOSImpactByProductReportFile: function (id, buildNumber)
-	    {
-	        return baseUrl + ('GetSkuOOSImpactByProductReportFile/{0}?buildNumber={1}')
                 .format(id, buildNumber);
 	    },
 	};

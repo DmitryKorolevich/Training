@@ -27,6 +27,7 @@ angular.module('app.modules.product', [
 	'app.modules.product.controllers.skuBreakDownReportController',
 	'app.modules.product.controllers.skuPOrderTypeBreakDownReportController',
 	'app.modules.product.controllers.skuPricesController',
+	'app.modules.product.controllers.averageDailySalesReportController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -155,6 +156,11 @@ angular.module('app.modules.product', [
 				    url: '/report/breakdown',
 				    templateUrl: 'app/modules/product/partials/skuPOrderTypeBreakDownReport.html',
 				    controller: 'skuPOrderTypeBreakDownReportController'
+				})
+				.state('index.oneCol.averageDailySalesReport', {
+				    url: '/report/average-daily-sales',
+				    templateUrl: 'app/modules/product/partials/averageDailySalesReport.html',
+				    controller: 'averageDailySalesReportController'
 				});
 		}
 ]);

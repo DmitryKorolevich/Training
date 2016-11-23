@@ -63,10 +63,6 @@ namespace VC.Admin.Controllers
             _skuAverageDailySalesBySkuReportItemCsvMapCSVExportService;
         private readonly ICsvExportService<SkuAverageDailySalesByProductReportItem, SkuAverageDailySalesByProductReportItemCsvMap>
             _skuAverageDailySalesProductReportItemCsvMapCSVExportService;
-        private readonly ICsvExportService<SkuAverageDailySalesBySkuReportItem, SkuOOSImpactBySkuReportItemCsvMap>
-            _skuOOSImpactBySkuReportItemCsvMapCSVExportService;
-        private readonly ICsvExportService<SkuAverageDailySalesByProductReportItem, SkuOOSImpactByProductReportItemCsvMap>
-            _skuOOSImpactByProductReportItemCsvMapCSVExportService;
         private readonly IObjectHistoryLogService objectHistoryLogService;
         private readonly ILogger logger;
         private readonly ExtendedUserManager _userManager;
@@ -87,10 +83,6 @@ namespace VC.Admin.Controllers
                 skuAverageDailySalesBySkuReportItemCsvMapCSVExportService,
             ICsvExportService<SkuAverageDailySalesByProductReportItem, SkuAverageDailySalesByProductReportItemCsvMap>
                 skuAverageDailySalesProductReportItemCsvMapCSVExportService,
-            ICsvExportService<SkuAverageDailySalesBySkuReportItem, SkuOOSImpactBySkuReportItemCsvMap>
-                skuOOSImpactBySkuReportItemCsvMapCSVExportService,
-            ICsvExportService<SkuAverageDailySalesByProductReportItem, SkuOOSImpactByProductReportItemCsvMap>
-                skuOOSImpactByProductReportItemCsvMapCSVExportService,
             IObjectHistoryLogService objectHistoryLogService, 
             ExtendedUserManager userManager,
             IAgentService agentService,
@@ -114,8 +106,6 @@ namespace VC.Admin.Controllers
             _mapper = mapper;
             _skuAverageDailySalesBySkuReportItemCsvMapCSVExportService = skuAverageDailySalesBySkuReportItemCsvMapCSVExportService;
             _skuAverageDailySalesProductReportItemCsvMapCSVExportService = skuAverageDailySalesProductReportItemCsvMapCSVExportService;
-            _skuOOSImpactBySkuReportItemCsvMapCSVExportService = skuOOSImpactBySkuReportItemCsvMapCSVExportService;
-            _skuOOSImpactByProductReportItemCsvMapCSVExportService = skuOOSImpactByProductReportItemCsvMapCSVExportService;
             _cache = cache;
             this.logger = loggerProvider.CreateLogger<ProductController>();
         }
@@ -206,6 +196,14 @@ namespace VC.Admin.Controllers
         public async Task<Result<bool>> UpdateProductsOnCategoryOrder(int id, [FromBody]ICollection<ProductListItemModel> products)
         {
             return await productService.UpdateProductsOnCategoryOrderAsync(id, products);
+        }
+
+        [HttpPost]
+        public async Task<Result<PagedList<VShortProduct>>> GetShortProducts([FromBody] FilterBase filter)
+        {
+            var toReturn = await productService.GetShortProductsAsync(filter);
+
+            return toReturn;
         }
 
         [HttpPost]
@@ -868,10 +866,11 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
-        public async Task<PagedList<SkuAverageDailySalesBySkuReportItem>> GetSkuAverageDailySalesBySkuReportItems(
+        public async Task<Result<PagedList<SkuAverageDailySalesBySkuReportItem>>> GetSkuAverageDailySalesBySkuReportItems(
             [FromBody]SkuAverageDailySalesReportFilter filter)
         {
             filter.To = filter.To.AddDays(1);
+            filter.Mode=SkuAverageDailySalesReportMode.BySku;
             var toReturn = await productService.GetSkuAverageDailySalesBySkuReportItemsAsync(filter);
             return toReturn;
         }
@@ -882,6 +881,7 @@ namespace VC.Admin.Controllers
         {
             filter.Paging = null;
             filter.To = filter.To.AddDays(1);
+            filter.Mode = SkuAverageDailySalesReportMode.BySku;
 
             var data = await productService.GetSkuAverageDailySalesBySkuReportItemsAsync(filter);
 
@@ -914,48 +914,12 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
-        public async Task<Result<string>> RequestSkuOOSImpactBySkuReportFile([FromBody]SkuAverageDailySalesReportFilter filter)
-        {
-            filter.Paging = null;
-            filter.To = filter.To.AddDays(1);
-
-            var data = await productService.GetSkuAverageDailySalesBySkuReportItemsAsync(filter);
-
-            var result = _skuOOSImpactBySkuReportItemCsvMapCSVExportService.ExportToCsv(data.Items);
-
-            var guid = Guid.NewGuid().ToString().ToLower();
-            _cache.SetItem(String.Format(CacheKeys.ReportFormat, guid), result);
-
-            return guid;
-        }
-
-        [AdminAuthorize(PermissionType.Reports)]
-        [HttpGet]
-        public FileResult GetSkuOOSImpactBySkuReportFile(string id)
-        {
-            var result = _cache.GetItem<byte[]>(String.Format(CacheKeys.ReportFormat, id));
-            if (result == null)
-            {
-                throw new AppValidationException("Please reload a file.");
-            }
-
-            var contentDisposition = new ContentDispositionHeaderValue("attachment")
-            {
-                FileName = String.Format(FileConstants.OOS_IMPACT_BY_SKU, DateTime.Now)
-            };
-
-            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
-            return File(result, "text/csv");
-        }
-
-
-
-        [AdminAuthorize(PermissionType.Reports)]
-        [HttpPost]
-        public async Task<PagedList<SkuAverageDailySalesByProductReportItem>> GetSkuAverageDailySalesByProductReportItems(
+        public async Task<Result<PagedList<SkuAverageDailySalesByProductReportItem>>> GetSkuAverageDailySalesByProductReportItems(
             [FromBody]SkuAverageDailySalesReportFilter filter)
         {
             filter.To = filter.To.AddDays(1);
+            filter.Mode = SkuAverageDailySalesReportMode.ByProduct;
+
             var toReturn = await productService.GetSkuAverageDailySalesByProductReportItemsAsync(filter);
             return toReturn;
         }
@@ -966,6 +930,7 @@ namespace VC.Admin.Controllers
         {
             filter.Paging = null;
             filter.To = filter.To.AddDays(1);
+            filter.Mode = SkuAverageDailySalesReportMode.ByProduct;
 
             var data = await productService.GetSkuAverageDailySalesByProductReportItemsAsync(filter);
 
@@ -995,43 +960,6 @@ namespace VC.Admin.Controllers
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
             return File(result, "text/csv");
         }
-
-        [AdminAuthorize(PermissionType.Reports)]
-        [HttpPost]
-        public async Task<Result<string>> RequestSkuOOSImpactByProductReportFile([FromBody]SkuAverageDailySalesReportFilter filter)
-        {
-            filter.Paging = null;
-            filter.To = filter.To.AddDays(1);
-
-            var data = await productService.GetSkuAverageDailySalesByProductReportItemsAsync(filter);
-
-            var result = _skuOOSImpactByProductReportItemCsvMapCSVExportService.ExportToCsv(data.Items);
-
-            var guid = Guid.NewGuid().ToString().ToLower();
-            _cache.SetItem(String.Format(CacheKeys.ReportFormat, guid), result);
-
-            return guid;
-        }
-
-        [AdminAuthorize(PermissionType.Reports)]
-        [HttpGet]
-        public FileResult GetSkuOOSImpactByProductReportFile(string id)
-        {
-            var result = _cache.GetItem<byte[]>(String.Format(CacheKeys.ReportFormat, id));
-            if (result == null)
-            {
-                throw new AppValidationException("Please reload a file.");
-            }
-
-            var contentDisposition = new ContentDispositionHeaderValue("attachment")
-            {
-                FileName = String.Format(FileConstants.OOS_IMPACT_BY_PRODUCT, DateTime.Now)
-            };
-
-            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
-            return File(result, "text/csv");
-        }
-
 
         #endregion
     }

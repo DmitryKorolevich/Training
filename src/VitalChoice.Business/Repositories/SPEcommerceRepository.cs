@@ -478,9 +478,14 @@ namespace VitalChoice.Business.Repositories
                 }
             }
 
+            if (sSkuIds == null && !string.IsNullOrEmpty(filter.ProductName))
+            {
+                sSkuIds = "";
+            }
+
             var toReturn = await _context.Set<SkuAverageDailySalesReportRawItem>().FromSql
-                ("[dbo].[SPGetSkuAverageDailySalesReport] @from={0}, @to={1}, @idcustomertype={2}, @skus={3}}",
-                filter.From, filter.To, filter.IdCustomerType, sSkuIds).ToListAsync();
+                ("[dbo].[SPGetSkuAverageDailySalesReport] @from={0}, @to={1}, @idcustomertype={2}, @skus={3}, @mode={4}",
+                filter.From, filter.To, filter.IdCustomerType, sSkuIds, (int)filter.Mode).ToListAsync();
 
             return toReturn;
         }

@@ -25,14 +25,15 @@ namespace VitalChoice.Business.CsvExportMaps.Products
         {
             Map(m => m.ProductCategories).Name("Product Categories").Index(0);
             Map(m => m.IdProduct).Name("Product #").Index(1);
-            Map(m => m.ProductName).Name("Description").Index(2);
+            Map(m => m.ProductName).Name("Product Description").Index(2);
             Map(m => m.Code).Name("SKU").Index(3);
             Map(m => m.SkuName).Name("Description").Index(4);
             Map(m => m.StatusCode).Name("Active").Index(5).TypeConverter<YesNoRecordStatusConverter>();
-            Map(m => m.InStock).Name("Currently OOS").Index(6);
+            Map(m => m.CurrentOOS).Name("Currently OOS").Index(6);
             Map(m => m.DaysOOS).Name("Days OOS").Index(7);
-            Map(m => m.AverageDailyAmount).Name("Avg Daily Sales").Index(8);
-            Map(m => m.TotalOOSImpactAmount).Name("Total Sales Impact").Index(9);
+            Map(m => m.AverageDailyAmount).Name("Avg Daily Sales").Index(8).TypeConverterOption("c");
+            Map(m => m.TotalAmount).Name("Total Sales").Index(9).TypeConverterOption("c");
+            Map(m => m.TotalOOSImpactAmount).Name("Total Sales Impact").Index(10).TypeConverterOption("c");
         }
     }
 }

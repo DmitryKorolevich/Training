@@ -241,4 +241,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPGetSkuAverageDailySalesReport.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VShortProducts.sql" />
+  </ItemGroup>
 </Project>
