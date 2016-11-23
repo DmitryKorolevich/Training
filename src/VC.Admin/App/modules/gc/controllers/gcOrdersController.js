@@ -59,6 +59,7 @@
                 BillingAddress: { LastName: null },
                 Type: null,
                 StatusCode: null,
+                NotZeroBalance: false,
                 Paging: { PageIndex: 1, PageItemCount: 100 },
                 Sorting: gridSorterUtil.resolve(refresh, "Created", "Desc")
             };

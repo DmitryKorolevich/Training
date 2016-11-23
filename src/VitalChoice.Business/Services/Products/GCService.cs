@@ -160,7 +160,7 @@ namespace VitalChoice.Business.Services.Products
         public async Task<GCStatisticModel> GetGiftCertificatesWithOrderInfoAsync(GCFilter filter)
         {
             GcQuery conditions = new GcQuery().NotDeleted().WithFrom(filter.From).WithTo(filter.To).WithType(filter.Type).
-                WidthStatus(filter.StatusCode);
+                WidthStatus(filter.StatusCode).WithNotZeroBalance(filter.NotZeroBalance);
             //if (filter.ShippingAddress != null && !String.IsNullOrEmpty(filter.ShippingAddress.LastName))
             //{
             //    conditions = conditions.WithShippingAddress(filter.ShippingAddress);

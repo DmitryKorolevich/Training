@@ -41,6 +41,16 @@
                         <select class="form-control" name="ExpiredType" data-ng-model="filter.Type" ng-options="item.Key as item.Text for item in types" data-ng-change="filterChanged();"></select>
                     </div>
                 </div>
+                <div class="row form-group">
+                    <div class="col-md-4">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="NotZeroBalance" data-ng-model="filter.NotZeroBalance" />
+                                Hide $0.00 Available
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </fieldset>
         </form>
         <div class="row form-group">
