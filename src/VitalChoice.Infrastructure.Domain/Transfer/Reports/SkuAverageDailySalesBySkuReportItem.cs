@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -14,6 +15,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
         public int IdProduct { get; set; }
 
         public string ProductCategories { get; set; }
+
+        public RecordStatusCode StatusCode { get; set; }
 
         public string Code { get; set; }
 

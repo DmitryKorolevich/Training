@@ -2060,14 +2060,26 @@ namespace VitalChoice.Business.Services.Products
             foreach (var rawItem in tData)
             {
                 SkuAverageDailySalesBySkuReportItem item=new SkuAverageDailySalesBySkuReportItem();
+                item.InStock = BusinessHelper.InStock(rawItem.ProductIdObjectType, rawItem.DisregardStock, rawItem.Stock);
+                item.StatusCode = rawItem.StatusCode;
+
+                if (filter.OnlyInStock && !item.InStock)
+                {
+                    continue;
+                }
+                if (filter.OnlyActiveSku && item.StatusCode!=RecordStatusCode.Active)
+                {
+                    continue;
+                }
+
                 item.Id = rawItem.Id;
                 item.IdProduct = rawItem.IdProduct;
                 item.ProductCategories = rawItem.ProductCategories;
+                item.StatusCode = rawItem.StatusCode;
                 item.Code = rawItem.Code;
 
                 item.ProductName = $"{rawItem.Name} {rawItem.SubTitle}";
                 item.SkuName = $"{rawItem.Name} {rawItem.SubTitle} ({rawItem.QTY})";
-                item.InStock = BusinessHelper.InStock(rawItem.ProductIdObjectType, rawItem.DisregardStock, rawItem.Stock);
 
                 item.TotalAmount = Math.Round(rawItem.TotalAmount, 2);
 
@@ -2180,6 +2192,7 @@ namespace VitalChoice.Business.Services.Products
             foreach (var productSkuGroup in tData.GroupBy(p=>p.IdProduct))
             {
                 SkuAverageDailySalesByProductReportItem item = new SkuAverageDailySalesByProductReportItem();
+
                 var rawSku = productSkuGroup.FirstOrDefault();
                 item.IdProduct = rawSku.IdProduct;
                 item.ProductCategories = rawSku.ProductCategories;
@@ -2216,6 +2229,13 @@ namespace VitalChoice.Business.Services.Products
                 {
                     item.SkusLine = item.SkusLine.Substring(0, item.SkusLine.Length - 2);
                 }
+
+                //at least one in stock
+                if (filter.OnlyInStock && !item.InStock)
+                {
+                    continue;
+                }
+                //sku active not actual for this report
 
                 item.AverageDailyAmount = filterDaysRange - item.DaysOOS > 0
                                         ? Math.Round(item.TotalAmount / (filterDaysRange - item.DaysOOS))
