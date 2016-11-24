@@ -41,7 +41,7 @@ namespace VC.Public.Components.Tracking
         {
             var toReturn = new HeadTrackScriptsModel();
 
-            await BaseTrackScriptsComponentHelper.SetBaseOptions(toReturn, HttpContext, _orderService, _authorizationService, _checkoutService, _customerService,
+            await toReturn.SetBaseOptions(HttpContext, _orderService, _authorizationService, _checkoutService, _customerService,
                 _referenceData);
 
             if (toReturn.OrderCompleteStep && toReturn.Order != null && _appOptions.Value.Value.EnableOrderTrackScripts)

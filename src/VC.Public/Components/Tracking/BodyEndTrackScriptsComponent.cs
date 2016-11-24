@@ -50,7 +50,7 @@ namespace VC.Public.Components.Tracking
             var toReturn = new BodyEndTrackScriptsModel();
 
             var path = HttpContext.Request.Path.Value;
-            await BaseTrackScriptsComponentHelper.SetBaseOptions(toReturn, HttpContext, _orderService, _authorizationService, _checkoutService, _customerService,
+            await toReturn.SetBaseOptions(HttpContext, _orderService, _authorizationService, _checkoutService, _customerService,
                 _referenceData);
             OrderDynamic order = toReturn.Order;
             var referenceData = _referenceData.Value;
