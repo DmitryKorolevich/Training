@@ -10,7 +10,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Settings
 
         public int Id { get; set; }
 
-        public int IdAgent { get; set; }
+        public int? IdAgent { get; set; }
 
         public string Agent { get; set; }
 

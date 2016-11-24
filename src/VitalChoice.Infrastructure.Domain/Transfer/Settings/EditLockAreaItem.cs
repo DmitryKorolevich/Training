@@ -7,7 +7,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Settings
     {
         public DateTime Expired { get; set; }
 
-        public int IdAgent { get; set; }
+        public int? IdAgent { get; set; }
 
         public string Agent { get; set; }
 
@@ -16,5 +16,10 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Settings
         public string AgentLastName { get; set; }
 
         public string BrowserUserAgent { get; set; }
+
+
+        public string LockMessageTitle { get; set; }
+
+        public string LockMessageBody { get; set; }
     }
 }

@@ -215,19 +215,6 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Orders)]
         [HttpGet]
         [IgnoreBuildNumber]
-        public Result<OrderExportGeneralStatusModel> GetExportGeneralStatus()
-        {
-            return new OrderExportGeneralStatusModel
-            {
-                All = _exportService.TotalExporting,
-                Exported = _exportService.TotalExported,
-                Errors = _exportService.ExportErrors
-            };
-        }
-
-        [AdminAuthorize(PermissionType.Orders)]
-        [HttpGet]
-        [IgnoreBuildNumber]
         public Result<OrderExportResults> GetExportDetails()
         {
             var results = _exportService.GetExportResults();

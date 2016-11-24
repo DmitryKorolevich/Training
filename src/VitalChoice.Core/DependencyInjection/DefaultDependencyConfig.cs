@@ -660,6 +660,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<TwitterService>().As<TwitterService>().InstancePerLifetimeScope();
             builder.RegisterType<GrooveService>().As<IGrooveService>().InstancePerLifetimeScope();
             builder.RegisterType<UspsService>().As<IUspsService>().InstancePerLifetimeScope();
+            builder.RegisterType<AdminEditLockService>().As<IAdminEditLockService>().SingleInstance();
 
             builder.RegisterMappers(typeof(ProductService).GetTypeInfo().Assembly, (type, registration) =>
             {

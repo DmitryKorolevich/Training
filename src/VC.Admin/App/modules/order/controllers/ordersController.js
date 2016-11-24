@@ -1,6 +1,8 @@
 ﻿angular.module('app.modules.order.controllers.ordersController', [])
-.controller('ordersController', ['$scope', '$rootScope', '$state', '$stateParams', '$location', '$q', 'orderService', 'settingService', 'userService', 'gcService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
-    function ($scope, $rootScope, $state, $stateParams, $location, $q, orderService, settingService, userService, gcService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
+.controller('ordersController', ['$scope', '$rootScope', '$state', '$stateParams', '$location', '$q', 'orderService', 'settingService', 'userService',
+    'gcService', 'monitorService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker', 'gridSorterUtil',
+    function ($scope, $rootScope, $state, $stateParams, $location, $q, orderService, settingService, userService,
+        gcService, monitorService, toaster, modalUtil, confirmUtil, promiseTracker, gridSorterUtil)
     {
         $scope.refreshTracker = promiseTracker("refresh");
         $scope.deleteTracker = promiseTracker("delete");
@@ -204,7 +206,7 @@
         {
             if ($state.is('index.oneCol.manageOrders') || $state.is('index.oneCol.dashboard'))
             {
-                orderService.getExportGeneralStatus()
+                monitorService.getExportGeneralStatus()
                     .success(function (result)
                     {
                         $rootScope.exportStatusRefreshTimer = setTimeout(refreshExportStatus, 5000);

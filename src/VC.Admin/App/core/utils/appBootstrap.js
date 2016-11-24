@@ -5,7 +5,7 @@ angular.module('app.core.utils.appBootstrap', [])
     [
         'infrastructureService', '$rootScope', '$state', '$anchorScroll', '$location',
         'toaster', 'authenticationService',
-        'cacheService', 'settingService', 'modalUtil', 
+        'cacheService', 'settingService', 'monitorService', 'modalUtil', 
         'ngProgress', 'webStorageUtil',
         'confirmUtil', function (infrastructureService,
             $rootScope,
@@ -16,6 +16,7 @@ angular.module('app.core.utils.appBootstrap', [])
             authenticationService,
             cacheService,
             settingService,
+            monitorService,
             modalUtil,
             ngProgress,
             webStorageUtil,
@@ -307,7 +308,7 @@ angular.module('app.core.utils.appBootstrap', [])
                             AgentLastName: $rootScope.currentUser.LastName,
                         };
 
-                        settingService.editLockPing(model)
+                        monitorService.editLockPing(model)
                             .success(function (result) {
                                 setTimeout(editLockPing, 20000);
                             })
@@ -345,7 +346,7 @@ angular.module('app.core.utils.appBootstrap', [])
 
                         $rootScope.editLockState.Areas[areaName].Items[id] = null;
 
-                        settingService.editLockRequest(model)
+                        monitorService.editLockRequest(model)
                             .success(function (result) {
                                 if (result.Data) {
                                     if (result.Data.Avaliable) {
@@ -353,12 +354,10 @@ angular.module('app.core.utils.appBootstrap', [])
                                     }
                                     else {
                                         modalUtil.open('app/modules/setting/partials/infoDetailsPopup.html', 'infoDetailsPopupController', {
-                                            Header: "This area is currently being viewed by {0} {1} ({2})".
-                                                format(result.Data.AgentFirstName, result.Data.AgentLastName, result.Data.Agent),
+                                            Header: result.Data.LockMessageTitle,
                                             Messages: [
                                                 {
-                                                    Message: "This area is currently being viewed by {0} {1} ({2}). You won't be able to save your changes. Wait a few minutes then refresh or contact {0} {1} ({2}).".
-                                                        format(result.Data.AgentFirstName, result.Data.AgentLastName, result.Data.Agent)
+                                                    Message: result.Data.LockMessageBody
                                                 }
                                             ],
                                             OkButton: {

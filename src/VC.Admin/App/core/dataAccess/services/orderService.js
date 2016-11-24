@@ -321,10 +321,6 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	    },
 
 	    //export
-	    getExportGeneralStatus: function (tracker)
-	    {
-	        return $http.get(baseUrl + 'GetExportGeneralStatus', getConfig(tracker));
-	    },
 	    getExportDetails: function (tracker)
 	    {
 	        return $http.get(baseUrl + 'GetExportDetails', getConfig(tracker));
