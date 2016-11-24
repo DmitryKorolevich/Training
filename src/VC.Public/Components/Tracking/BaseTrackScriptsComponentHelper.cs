@@ -50,6 +50,7 @@ namespace VC.Public.Components.Tracking
             var path = context.Request.Path.Value;
             if (path == "/checkout/receipt")
             {
+                toReturn.Step = CheckoutStep.Receipt;
                 var idOrder = context.Session.GetInt32(CheckoutConstants.ReceiptSessionOrderId);
                 if (idOrder.HasValue)
                 {
@@ -79,6 +80,27 @@ namespace VC.Public.Components.Tracking
             }
             else
             {
+                switch (path)
+                {
+                    case "/checkout/welcome":
+                        toReturn.Step = CheckoutStep.Welcome;
+                        break;
+                    case "/checkout/addupdatebillingaddress":
+                        toReturn.Step = CheckoutStep.Billing;
+                        break;
+                    case "/checkout/addupdateshippingmethod":
+                        toReturn.Step = CheckoutStep.Shipping;
+                        break;
+                    case "/checkout/revieworder":
+                        toReturn.Step = CheckoutStep.Preview;
+                        break;
+                    case "/cart/viewcart":
+                        toReturn.Step = CheckoutStep.ViewCart;
+                        break;
+                    default:
+                        toReturn.Step = CheckoutStep.Unknown;
+                        break;
+                }
                 var existingUid = context.GetCartUid();
                 if (existingUid.HasValue)
                 {

@@ -16,6 +16,12 @@ namespace VitalChoice.Infrastructure.Domain.Constants
         public const string ExportGiftListCard = "application/export-gift-list-card";
     }
 
+    public static class OrderExportProcessCommandConstants
+    {
+        public const string OrderExportStarted = "application/export-item-started";
+        public const string OrderExportFinished = "application/export-item-finished";
+    }
+
     public static class ServiceBusCommandConstants
     {
         public const string GetPublicKey = "session/get-public-key";

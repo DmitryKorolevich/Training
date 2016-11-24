@@ -432,56 +432,41 @@ namespace VitalChoice.ExportService.Services
             }
         }
 
-        private async Task DoExportOrders(ICollection<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack, int userId)
+        private async Task DoExportOrders(IEnumerable<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack, int userId)
         {
-            var orders = exportItems.Where(i => !i.IsRefund).ToDictionary(o => o.Id);
-
-            var orderList =
-                new HashSet<OrderDynamic>(
-                    await _orderService.SelectAsync(exportItems.Where(i => !i.IsRefund).Select(o => o.Id).ToList(), true));
-            var customerList =
-                (await
-                        _customerService.SelectAsync(
-                            orderList.Select(o => o.Customer.Id).Distinct().ToList(), true))
-                    .ToDictionary(c => c.Id);
-
-            foreach (var order in orderList)
+            foreach (var item in exportItems.Where(i => !i.IsRefund))
             {
-                order.Customer = customerList.GetValueOrDefault(order.Customer.Id) ?? order.Customer;
-            }
+                var order = await _orderService.SelectAsync(item.Id, true);
 
-            var cardedOrders =
-                orderList.Where(o => o.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard).Select(o => o.Id).ToList();
-            using (var uow = new UnitOfWork(_infoContext, false))
-            {
-                var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
-                var orderPayments = (await rep.Query(o => cardedOrders.Contains(o.IdOrder)).SelectAsync(false)).ToDictionary(o => o.IdOrder);
-                foreach (var order in orderList.Where(o => o.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard).ToArray())
+                if (order == null)
+                    continue;
+
+                order.Customer = await _customerService.SelectAsync(order.Customer.Id, true);
+                if (order.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
                 {
-                    var payment = orderPayments.GetValueOrDefault(order.Id);
-                    if (payment == null)
+                    using (var uow = new UnitOfWork(_infoContext, false))
                     {
-                        exportCallBack(new OrderExportItemResult
+                        var rep = uow.RepositoryAsync<OrderPaymentMethodExport>();
+                        var payment = await rep.Query(o => o.IdOrder == order.Id).SelectFirstOrDefaultAsync(false);
+                        if (payment != null)
                         {
-                            Id = order.Id,
-                            Error = "Cannot find order credit card in encrypted store",
-                            Success = false
-                        });
-                        orderList.Remove(order);
-                    }
-                    else
-                    {
-                        order.PaymentMethod.Data.CardNumber = _encryptionHost.LocalDecrypt<string>(payment.CreditCardNumber);
+                            order.PaymentMethod.Data.CardNumber = _encryptionHost.LocalDecrypt<string>(payment.CreditCardNumber);
+                        }
+                        else
+                        {
+                            exportCallBack(new OrderExportItemResult
+                            {
+                                Id = order.Id,
+                                Error = "Cannot find order credit card in encrypted store",
+                                Success = false
+                            });
+                            continue;
+                        }
                     }
                 }
-            }
-
-
-            foreach (var order in orderList)
-            {
                 try
                 {
-                    _veraCoreExportService.ExportOrder(order, orders[order.Id].OrderType).GetAwaiter().GetResult();
+                    _veraCoreExportService.ExportOrder(order, item.OrderType).GetAwaiter().GetResult();
                     exportCallBack(new OrderExportItemResult
                     {
                         Id = order.Id,
@@ -497,7 +482,7 @@ namespace VitalChoice.ExportService.Services
                         Success = false
                     });
                 }
-                if (order.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
+                if (order.PaymentMethod.IdObjectType == (int)PaymentMethodType.CreditCard)
                 {
                     _paymentMapper.SecureObject(order.PaymentMethod);
                 }
@@ -508,7 +493,7 @@ namespace VitalChoice.ExportService.Services
                 }
                 catch (TimeoutException)
                 {
-                    //Retry once
+                    //Retry once in one minute
                     await Task.Delay(TimeSpan.FromMinutes(1));
                     await _orderService.UpdateAsync(order);
                 }
@@ -518,22 +503,15 @@ namespace VitalChoice.ExportService.Services
         private async Task DoExportRefunds(ICollection<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack,
             int userId)
         {
-            var refundList =
-                await _refundService.SelectAsync(exportItems.Where(i => i.IsRefund).Select(o => o.Id).ToList(), true);
-
-            var refundCustomerList =
-                (await
-                        _customerService.SelectAsync(
-                            refundList.Select(o => o.Customer.Id).Distinct().ToList(), true))
-                    .ToDictionary(c => c.Id);
-
-            foreach (var refund in refundList)
+            foreach (var item in exportItems.Where(i => i.IsRefund))
             {
-                refund.Customer = refundCustomerList.GetValueOrDefault(refund.Customer.Id) ?? refund.Customer;
-            }
+                var refund = await _refundService.SelectAsync(item.Id, true);
 
-            await refundList.ForEachAsync(async refund =>
-            {
+                if (refund == null)
+                    continue;
+
+                refund.Customer = await _customerService.SelectAsync(refund.Customer.Id, true);
+
                 try
                 {
                     await _veraCoreExportService.ExportRefund(refund);
@@ -554,7 +532,7 @@ namespace VitalChoice.ExportService.Services
                         Success = false
                     });
                 }
-            });
+            }
         }
 
         public void SwitchToInMemoryContext()

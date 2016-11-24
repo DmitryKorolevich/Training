@@ -56,16 +56,6 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             return default(T);
         }
 
-        //public static void AddRange(this IList results, IEnumerable items)
-        //{
-        //    if (items == null)
-        //        return;
-        //    foreach (var item in items)
-        //    {
-        //        results.Add(item);
-        //    }
-        //}
-
         public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> items)
         {
             foreach (var item in items)
@@ -245,6 +235,77 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                         updateAction(m, item);
                     }
                 }
+            }
+        }
+
+        public static void UpdateRemoveKeyed<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toSearchIn,
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Action<T1, T2> updateAction,
+            Action<ICollection<T1>> removeAction = null)
+        {
+            if (main == null)
+                throw new ArgumentNullException(nameof(main));
+            if (toSearchIn != null)
+            {
+                Dictionary<TKey, T2> searchIn = toSearchIn.ToDictionary(rightKeySelector);
+                foreach (var m in main)
+                {
+                    T2 item;
+                    if (searchIn.TryGetValue(leftKeySelector(m), out item))
+                    {
+                        updateAction(m, item);
+                    }
+                }
+                var toRemove = main.ExceptKeyedWith(toSearchIn, leftKeySelector, rightKeySelector).ToArray();
+                removeAction?.Invoke(toRemove);
+                main.RemoveAll(toRemove);
+            }
+        }
+
+        public static async Task UpdateRemoveKeyedAsync<T1, T2, TKey>(this ICollection<T1> main, ICollection<T2> toSearchIn,
+            Func<T1, TKey> leftKeySelector, Func<T2, TKey> rightKeySelector, Func<T1, T2, Task> updateAction,
+            Func<ICollection<T1>, Task> removeAction = null)
+        {
+            if (main == null)
+                throw new ArgumentNullException(nameof(main));
+            if (toSearchIn != null)
+            {
+                Dictionary<TKey, T2> searchIn = toSearchIn.ToDictionary(rightKeySelector);
+                foreach (var m in main)
+                {
+                    T2 item;
+                    if (searchIn.TryGetValue(leftKeySelector(m), out item))
+                    {
+                        await updateAction(m, item);
+                    }
+                }
+                var toRemove = main.ExceptKeyedWith(toSearchIn, leftKeySelector, rightKeySelector).ToArray();
+                if (removeAction != null)
+                {
+                    await removeAction(toRemove);
+                }
+                main.RemoveAll(toRemove);
+            }
+        }
+
+        public static void UpdateRemoveKeyed<T, TKey>(this ICollection<T> main, ICollection<T> toSearchIn,
+            Func<T, TKey> keySelector, Action<T, T> updateAction, Action<ICollection<T>> removeAction = null)
+        {
+            if (main == null)
+                throw new ArgumentNullException(nameof(main));
+            if (toSearchIn != null)
+            {
+                Dictionary<TKey, T> searchIn = toSearchIn.ToDictionary(keySelector);
+                foreach (var m in main)
+                {
+                    T item;
+                    if (searchIn.TryGetValue(keySelector(m), out item))
+                    {
+                        updateAction(m, item);
+                    }
+                }
+                var toRemove = main.ExceptKeyedWith(toSearchIn, keySelector).ToArray();
+                removeAction?.Invoke(toRemove);
+                main.RemoveAll(toRemove);
             }
         }
 

@@ -497,11 +497,18 @@ namespace VC.Public.Controllers
                 return View("EmptyCart");
             }
 
+            var cart = await GetCurrentCart();
+
+            if (cart.Order.PaymentMethod?.Address?.IdCountry == null)
+            {
+                return RedirectToAction("AddUpdateBillingAddress");
+            }
+
             var shippingMethodModel = new AddUpdateShippingMethodModel()
             {
                 AddressType = ShippingAddressType.Residential
             };
-            var cart = await GetCurrentCart();
+
             var loggedIn = await EnsureLoggedIn(cart);
             if (loggedIn != null)
             {
@@ -677,8 +684,16 @@ namespace VC.Public.Controllers
                 return View("EmptyCart");
             }
             var cart = await GetCurrentCart();
+            if (cart.Order.PaymentMethod?.Address?.IdCountry == null)
+            {
+                return RedirectToAction("AddUpdateBillingAddress");
+            }
+            if (cart.Order.ShippingAddress?.IdCountry == null)
+            {
+                return RedirectToAction("AddUpdateShippingMethod");
+            }
             var loggedIn = await EnsureLoggedIn(cart);
-            if (loggedIn != null)
+            if (loggedIn.HasValue)
             {
                 if (!loggedIn.Value)
                 {
@@ -697,6 +712,10 @@ namespace VC.Public.Controllers
         //[CustomerAuthorize]
         public async Task<Result<string>> ReviewOrder([FromBody] ViewCartModel model)
         {
+            if (await IsCartEmpty())
+            {
+                return Url.Action("ViewCart", "Cart");
+            }
             var cart = await GetCurrentCart();
             var loggedIn = await EnsureLoggedIn(cart);
             if (loggedIn != null)

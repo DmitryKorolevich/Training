@@ -183,27 +183,11 @@ namespace VC.Public.Controllers
                 model.ShippingDate = null;
             }
 
-            var existingUid = HttpContext.GetCartUid();
-            CustomerCartOrder cart;
-            if (await CustomerLoggedIn())
-            {
-                var id = GetInternalCustomerId();
-                cart = await _checkoutService.GetOrCreateCart(existingUid, id);
-            }
-            else
-            {
-                cart = await _checkoutService.GetOrCreateCart(existingUid, false);
-            }
-            HttpContext.SetCartUid(cart.CartUid);
+            var cart = await GetCurrentCart();
             if (cart.Order.Skus != null)
             {
-                await cart.Order.Skus.MergeKeyedAsync(model.Skus.Where(s => s.Quantity > 0).ToArray(), ordered => ordered.Sku.Code,
-                    skuModel => skuModel.Code, async skuModel =>
-                    {
-                        var result = await _productService.GetSkuOrderedAsync(skuModel.Code);
-                        result.Quantity = skuModel.Quantity;
-                        return result;
-                    }, (ordered, skuModel) =>
+                await cart.Order.Skus.UpdateRemoveKeyedAsync(model.Skus.Where(s => s.Quantity > 0).ToArray(), ordered => ordered.Sku.Code,
+                    skuModel => skuModel.Code, (ordered, skuModel) =>
                     {
                         ordered.Quantity = skuModel.Quantity;
                         return TaskCache.CompletedTask;
