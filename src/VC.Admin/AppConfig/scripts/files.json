@@ -195,6 +195,7 @@
     "app/modules/product/controllers/skuBreakDownReportController.js",
     "app/modules/product/controllers/skuPOrderTypeBreakDownReportController.js",
     "app/modules/product/controllers/skuPricesController.js",
+    "app/modules/product/controllers/averageDailySalesReportController.js",
     "app/modules/product/product.js",
     "app/modules/inventorysku/controllers/inventorySkuCategoriesController.js",
     "app/modules/inventorysku/controllers/inventorySkuCategoryManageController.js",

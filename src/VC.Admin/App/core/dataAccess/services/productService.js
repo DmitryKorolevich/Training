@@ -77,6 +77,10 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    getSku: function(filter,tracker) {
 	        return $http.post(baseUrl+'GetSku',filter,getConfig(tracker));
 	    },
+	    getShortProducts: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetShortProducts', filter, getConfig(tracker));
+	    },
 	    getProducts: function (filter, tracker) {
 	        return $http.post(baseUrl + 'GetProducts', filter, getConfig(tracker));
 	    },
@@ -161,6 +165,32 @@ angular.module('app.core.dataAccess.services.productService', [])
 	    getSkuPOrderTypeFutureBreakDownReport: function (filter, tracker)
 	    {
 	        return $http.post(baseUrl + 'GetSkuPOrderTypeFutureBreakDownReport', filter, getConfig(tracker));
+	    },
+	    getSkuAverageDailySalesBySkuReportItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetSkuAverageDailySalesBySkuReportItems', filter, getConfig(tracker));
+	    },
+	    requestSkuAverageDailySalesBySkuReportFile: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'RequestSkuAverageDailySalesBySkuReportFile', filter, getConfig(tracker));
+	    },
+	    getSkuAverageDailySalesBySkuReportFile: function (id, buildNumber)
+	    {
+	        return baseUrl + ('GetSkuAverageDailySalesBySkuReportFile/{0}?buildNumber={1}')
+                .format(id, buildNumber);
+	    },
+	    getSkuAverageDailySalesByProductReportItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetSkuAverageDailySalesByProductReportItems', filter, getConfig(tracker));
+	    },
+	    requestSkuAverageDailySalesByProductReportFile: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'RequestSkuAverageDailySalesByProductReportFile', filter, getConfig(tracker));
+	    },
+	    getSkuAverageDailySalesByProductReportFile: function (id, buildNumber)
+	    {
+	        return baseUrl + ('GetSkuAverageDailySalesByProductReportFile/{0}?buildNumber={1}')
+                .format(id, buildNumber);
 	    },
 	};
 }]);

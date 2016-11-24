@@ -2,6 +2,8 @@
 {
     public class FileConstants
     {
+        public const int MAX_IMPORT_ROWS_COUNT = 10000;
+
         public const string VITAL_GREEN_REPORT_FILE_NAME_FORMAT = "VitalGreenReport_{0}_{1}.csv";
         public const string AFFILIATE_CUSTOMERS_REPORT = "AffiliateCustomersReport_{0}.csv";
         public const string CATALOG_REQUESTS_REPORT = "CatalogRequests_{0}.csv";
@@ -38,5 +40,10 @@
         public const string CUSTOMER_SKU_USAGE_REPORT = "Customer_Sku_Usage_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
 
         public const string DISCOUNT_USAGE_REPORT = "Discount_Usage_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+
+        public const string AVERAGE_DAILY_SALES_BY_SKU = "Average_Daily_Sales_By_Sku_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+        public const string AVERAGE_DAILY_SALES_BY_PRODUCT = "Average_Daily_Sales_By_Product_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+        public const string OOS_IMPACT_BY_SKU = "OOS_Impact_By_Sku_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+        public const string OOS_IMPACT_BY_PRODUCT = "OOS_Impact_By_Product_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
     }
 }

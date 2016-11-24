@@ -7,6 +7,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Dynamic;
+using VitalChoice.Infrastructure.Domain.Entities.Products;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
@@ -18,15 +19,16 @@ namespace VitalChoice.Interfaces.Services.Products
 	{
         #region Products
 
+	    Task<PagedList<VShortProduct>> GetShortProductsAsync(FilterBase filter);
+
         IEnumerable<OptionType> GetProductOptionTypes(HashSet<string> names);
+
         IEnumerable<OptionType> GetSkuOptionTypes(HashSet<string> names);
 
         Dictionary<int, Dictionary<string, string>> GetProductEditDefaultSettingsAsync();
 
         IEnumerable<OptionType> GetExpandedOptionTypesWithSkuTypes();
-
-	    Task<PagedList<VProductSku>> GetProductsAsync(VProductSkuFilter filter);
-
+        
 	    Task<PagedList<ProductDynamic>> GetProductsAsync2(VProductSkuFilter filter);
 
 	    Task<ICollection<ProductListItemModel>> GetProductsOnCategoryOrderAsync(int idCategory);
@@ -132,6 +134,12 @@ namespace VitalChoice.Interfaces.Services.Products
 	    Task<SkuPOrderTypeBreakDownReport> GetSkuPOrderTypeBreakDownReportAsync(SkuPOrderTypeBreakDownReportFilter filter);
 
 	    Task<SkuPOrderTypeBreakDownReport> GetSkuPOrderTypeFutureBreakDownReportAsync(SkuPOrderTypeBreakDownReportFilter filter);
+
+	    Task<PagedList<SkuAverageDailySalesBySkuReportItem>> GetSkuAverageDailySalesBySkuReportItemsAsync(
+	        SkuAverageDailySalesReportFilter filter);
+
+	    Task<PagedList<SkuAverageDailySalesByProductReportItem>> GetSkuAverageDailySalesByProductReportItemsAsync(
+	        SkuAverageDailySalesReportFilter filter);
 
 	    #endregion
 	}

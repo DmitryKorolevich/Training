@@ -233,5 +233,11 @@ namespace VitalChoice.Business.Helpers
             return dynamic.IdObjectType == (int)ProductType.EGс || dynamic.IdObjectType == (int)ProductType.Gc ||
                             ((bool?)dynamic.SafeData.DisregardStock ?? false) || ((int?)dynamic.SafeData.Stock ?? 0) > 0;
         }
+
+        public static bool InStock(int idProductType, bool? disregardStock, int? stock)
+        {
+            return idProductType == (int)ProductType.EGс || idProductType == (int)ProductType.Gc ||
+                            (disregardStock ?? false) || (stock ?? 0) > 0;
+        }
     }
 }

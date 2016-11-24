@@ -57,3 +57,5 @@ Post-Deployment Script Template
 :r .\Scripts\Indexes.sql
 :r .\Scripts\OrderOptionTypes.sql
 :r .\Scripts\ProductOptionTypes.sql
+:r .\Scripts\SPGetSkuAverageDailySalesReport.sql
+:r .\Scripts\VShortProducts.sql

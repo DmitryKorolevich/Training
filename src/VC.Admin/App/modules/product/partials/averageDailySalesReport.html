@@ -1,0 +1,254 @@
+﻿<div class="container-fluid average-daily-sales-report">
+    <div class="well">
+        <span class="legend">Average Daily Sales Report</span>
+        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+            <fieldset>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="From" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.From.$invalid">
+                            <small class="error" ng-show="forms.form.From.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","From")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="To" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.To.$invalid">
+                            <small class="error" ng-show="forms.form.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" name="Mode" data-ng-model="filter.Mode" ng-options="item.Key as item.Text for item in modes"></select>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <select class="form-control" name="IdCustomerType" data-ng-model="filter.IdCustomerType" ng-options="item.Key as item.Text for item in customerTypes"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group autocomplete col-md-12 product-name">
+                            <input type="text" name="ProductName" class="form-control" placeholder="Product ID" data-ng-model="filter.ProductName" autocomplete="off" data-ng-minlength="3"
+                                   typeahead-min-length="1" uib-typeahead="item.Description as item.Description for item in getProductsByProduct($viewValue)" typeahead-wait-ms="200">
+                        </div>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.ProductName.$invalid">
+                            <small class="error" ng-show="forms.form.ProductName.$error.minlength">{{getValidationMessage("{0} should have at least 3 symbols","Product SKU")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="checkbox">
+                            <label class="margin-right-15px">
+                                <input type="checkbox" name="OnlyInStock" data-ng-model="filter.OnlyOOS" />
+                                Currently OOS
+                            </label>
+                            <label data-ng-if="filter.Mode==1">
+                                <input type="checkbox" name="OnlyActiveSku" data-ng-model="filter.OnlyActiveSku" />
+                                Include only Active SKU
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <span class="legend">Selected Product SKUs</span>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <div class="input-group autocomplete col-md-12">
+                            <input type="text" name="ProductSKU" class="form-control" placeholder="Product SKU" data-ng-model="options.SkuCode" autocomplete="off"
+                                   typeahead-min-length="1" typeahead-wait-ms="200"
+                                   uib-typeahead="sku.Code as sku.Code for sku in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU"
+                                   typeahead-on-select="skuChanged($index)" data-ng-blur="skuChanged($index)">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-info" data-ng-click="addSku();" type="button" data-ng-disabled="options.SkuAddDisabled">Add to Filter</button>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <div class="filtered-item" data-ng-repeat="item in filter.Skus">
+                            {{item.Code}}
+                            <button title="Remove" class="btn btn-default btn-danger btn-xs" data-ng-click="removeSku($index)">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
+                        <a target="_self" class="btn btn-primary pull-right" data-ng-click=exportClick();>Export</a>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <table id="data-grid" data-ng-if="options.UsedMode==1" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Product Categories</th>
+                        <th>Product #</th>
+                        <th>Product Description</th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('Code')">
+                            <span>SKU</span>
+                            <span data-ng-if="filter.Sorting.Path == 'Code'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th>Description</th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('StatusCode')">
+                            <span>Active</span>
+                            <span data-ng-if="filter.Sorting.Path == 'StatusCode'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('InStock')">
+                            <span>Currently OOS</span>
+                            <span data-ng-if="filter.Sorting.Path == 'InStock'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('DaysOOS')">
+                            <span>Days OOS</span>
+                            <span data-ng-if="filter.Sorting.Path == 'DaysOOS'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('AverageDailyAmount')">
+                            <span>Avg Daily Sales</span>
+                            <span data-ng-if="filter.Sorting.Path == 'AverageDailyAmount'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('TotalAmount')">
+                            <span>Total Sales</span>
+                            <span data-ng-if="filter.Sorting.Path == 'TotalAmount'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('TotalOOSImpactAmount')">
+                            <span>Total Sales Impact</span>
+                            <span data-ng-if="filter.Sorting.Path == 'TotalOOSImpactAmount'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="item in items">
+                        <td>{{::item.ProductCategories}}</td>
+                        <td>
+                            <a target="_blank" ui-sref="index.oneCol.productDetail({id:item.IdProduct})">{{::item.IdProduct}}</a>
+                        </td>
+                        <td>{{::item.ProductName}}</td>
+                        <td>{{::item.Code}}</td>
+                        <td>{{::item.SkuName}}</td>
+                        <td>
+                            <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
+                            <span data-ng-if="item.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
+                        </td>
+                        <td>
+                            <span data-ng-if="item.InStock" class="label label-success font-default">No</span>
+                            <span data-ng-if="!item.InStock" class="label label-danger font-default">Yes</span>
+                        </td>
+                        <td>{{::item.DaysOOS}}</td>
+                        <td>{{::item.AverageDailyAmount | currency}}</td>
+                        <td>{{::item.TotalAmount | currency}}</td>
+                        <td>{{::item.TotalOOSImpactAmount | currency}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table id="data-grid" data-ng-if="options.UsedMode==2" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Product Categories</th>
+                        <th>Product #</th>
+                        <th>Description</th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('InStock')">
+                            <span>Currently OOS</span>
+                            <span data-ng-if="filter.Sorting.Path == 'InStock'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('DaysOOS')">
+                            <span>Days OOS</span>
+                            <span data-ng-if="filter.Sorting.Path == 'DaysOOS'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('AverageDailyAmount')">
+                            <span>Avg Daily Sales</span>
+                            <span data-ng-if="filter.Sorting.Path == 'AverageDailyAmount'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('TotalAmount')">
+                            <span>Total Sales</span>
+                            <span data-ng-if="filter.Sorting.Path == 'TotalAmount'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('TotalOOSImpactAmount')">
+                            <span>Total Sales Impact</span>
+                            <span data-ng-if="filter.Sorting.Path == 'TotalOOSImpactAmount'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
+                        <th>Impacted SKUs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="item in items">
+                        <td>{{::item.ProductCategories}}</td>
+                        <td>
+                            <a target="_blank" ui-sref="index.oneCol.productDetail({id:item.IdProduct})">{{::item.IdProduct}}</a>
+                        </td>
+                        <td>{{::item.ProductName}}</td>
+                        <td>
+                            <span data-ng-if="item.InStock" class="label label-success font-default">No</span>
+                            <span data-ng-if="!item.InStock" class="label label-danger font-default">Yes</span>
+                        </td>
+                        <td>{{::item.DaysOOS}}</td>
+                        <td>{{::item.AverageDailyAmount | currency}}</td>
+                        <td>{{::item.TotalAmount | currency}}</td>
+                        <td>{{::item.TotalOOSImpactAmount | currency}}</td>
+                        <td>
+                            <span data-ng-repeat="sku in item.Skus">
+                                <span class="sku" data-ng-class="{'not-in-stock': !sku.InStock}">{{sku.Code}}</span>
+                                {{$last!=true ? " / " : ""}}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </spinner-overlay>
+        <uib-pagination boundary-links="true"
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        previous-text="&lsaquo;"
+                        next-text="&rsaquo;"
+                        first-text="&laquo;"
+                        last-text="&raquo;"
+                        data-ng-change="pageChanged();scrollTo('data-grid');">
+        </uib-pagination>
+    </div>
+</div>

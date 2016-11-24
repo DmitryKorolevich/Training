@@ -69,6 +69,8 @@
                                         </p>
                                         <div class="error-container " ng-show="forms.submitted && forms.form.i{{$index}}.StartDate.$invalid">
                                             <small class="error" ng-show="forms.form.i{{$index}}.StartDate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Start Date")}}</small>
+                                            <small class="error" ng-show="forms.form.i{{$index}}.StartDate.$error.exist">{{getValidationMessage("ValidationMessages.Exist","Start Date")}}</small>
+                                            <small class="error" ng-show="forms.form.i{{$index}}.StartDate.$error.future">Start Date should be future date.</small>
                                         </div>
                                     </div>
                                 </div>

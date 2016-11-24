@@ -305,6 +305,18 @@ namespace VitalChoice.Ecommerce.Context
                 entity.Ignore(d => d.IdBigString);
             });
 
+            builder.Entity<SkuOOSHistoryItem>(entity =>
+            {
+                entity.HasKey(o => o.Id);
+                entity.ToTable("SkuOOSHistoryItems");
+                entity
+                    .HasOne(v => v.Sku)
+                    .WithMany()
+                    .HasForeignKey(v => v.IdSku)
+                    .HasPrincipalKey(t => t.Id)
+                    .IsRequired();
+            });
+
             builder.Entity<ProductToCategory>(entity =>
             {
                 entity.Ignore(p => p.Id);

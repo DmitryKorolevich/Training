@@ -235,4 +235,13 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPGetOrderDiscountReport.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\SkuOOSHistoryItems.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetSkuAverageDailySalesReport.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\VShortProducts.sql" />
+  </ItemGroup>
 </Project>

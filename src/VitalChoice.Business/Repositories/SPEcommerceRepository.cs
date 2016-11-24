@@ -461,5 +461,33 @@ namespace VitalChoice.Business.Repositories
 
             return toReturn;
         }
+
+        public async Task<ICollection<SkuAverageDailySalesReportRawItem>> GetSkuAverageDailySalesReportRawItemsAsync(SkuAverageDailySalesReportFilter filter)
+        {
+            string sSkuIds = null;
+            if (filter.SkuIds != null && filter.SkuIds.Count > 0)
+            {
+                sSkuIds = string.Empty;
+                for (int i = 0; i < filter.SkuIds.Count; i++)
+                {
+                    sSkuIds += filter.SkuIds[i];
+                    if (i != filter.SkuIds.Count - 1)
+                    {
+                        sSkuIds += ",";
+                    }
+                }
+            }
+
+            if (sSkuIds == null && !string.IsNullOrEmpty(filter.ProductName))
+            {
+                sSkuIds = "";
+            }
+
+            var toReturn = await _context.Set<SkuAverageDailySalesReportRawItem>().FromSql
+                ("[dbo].[SPGetSkuAverageDailySalesReport] @from={0}, @to={1}, @idcustomertype={2}, @skus={3}, @mode={4}",
+                filter.From, filter.To, filter.IdCustomerType, sSkuIds, (int)filter.Mode).ToListAsync();
+
+            return toReturn;
+        }
     }
 }
