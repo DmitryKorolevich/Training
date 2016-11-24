@@ -5553,26 +5553,38 @@ body.view-cart-background {
             padding-left: 45px;
         }
 
-        &.checkout-blue:hover {
-            background-color: #518CA5;
-        }
-
         &.arrow-left-red {
             background: #c3392f url("/assets/images/arrow-111-24.png") 8px 3px no-repeat;
             padding-left: 40px;
-        }
 
-        &.arrow-left-red:hover {
-            background-color: #BD281E;
+            &input[disabled='disabled'] {
+                background: #C0C0C0 url("/assets/images/arrow-111-24.png") 8px 3px no-repeat;
+                cursor: not-allowed;
+                &:hover {
+                    background: #808080;
+                }
+            }
+
+            &:hover {
+                background-color: #BD281E;
+            }
         }
 
         &.arrow-right-blue {
-            background: #5c95af url("/assets/images/arrow-11-24.png") right 8px top 3px no-repeat; /*only css3 support of position right  !!!!*/
+            background: #5c95af url("/assets/images/arrow-11-24.png") right 8px top 3px no-repeat;
             padding-right: 40px;
-        }
 
-        &.arrow-right-blue:hover {
-            background-color: #518CA5;
+            &[disabled='disabled'] {
+                background: #C0C0C0 url("/assets/images/arrow-11-24.png") right 8px top 3px no-repeat;
+                cursor: not-allowed;
+                &:hover {
+                    background: #808080;
+                }
+            }
+
+            &:hover {
+                background-color: #518CA5;
+            }
         }
 
         &.minus-button-red {

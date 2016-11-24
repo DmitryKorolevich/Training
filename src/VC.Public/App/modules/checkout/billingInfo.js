@@ -76,6 +76,8 @@
 	var cardId = $("#ddCreditCardsSelection").val() === undefined ? $("#hdCreditCard").val() : $("#ddCreditCardsSelection").val();
 	checkCreditCard(cardId);
 	getBrontoIsUnsubscribed();
+
+	$("input[type=submit]").prop("disabled", false);
 });
 
 function changeSelection(selId) {

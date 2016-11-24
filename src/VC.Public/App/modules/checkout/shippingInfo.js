@@ -77,6 +77,8 @@
             $(".columns-container .overlay").hide();
         });
     }
+
+    $("input[type=submit]").prop("disabled", false);
 });
 
 function controlUpdateSavedState() {

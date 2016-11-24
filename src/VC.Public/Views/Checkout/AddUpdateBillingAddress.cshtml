@@ -54,7 +54,8 @@
                 </div>
                 <div class="form-group">
                     <div class="checkout-sections-divider"></div>
-                </div>}
+                </div>
+            }
             <div class="form-group">
                 <label class="control-label">Pay with Credit Card</label>
                 <div class="input-group checkout-acceptable-cards">
@@ -116,7 +117,7 @@
                     </label>
                 </div>
             </div>
-            @if (Model?.ShowSendCatalog==true)
+            if (Model?.ShowSendCatalog==true)
              {
                  <div class="form-group">
                      <label class="control-label"></label>
@@ -131,7 +132,7 @@
              }
             <div class="form-buttons-group">
                 @(User.Identity.IsAuthenticated ? Html.ActionLink("Back", "ViewCart", "Cart", null, new { @class = "button arrow-left-red" }) : Html.ActionLink("Back", "Welcome", "Checkout", htmlAttributes: new { @class = "button arrow-left-red" }))
-                <input class="arrow-right-blue" type="submit" value="Continue" />
+                <input class="arrow-right-blue" type="submit" value="Continue" disabled="disabled" />
             </div>
         }
     </div>

@@ -76,7 +76,7 @@ $(function () {
 
     $(".date-picker").datepicker("option", "minDate", 1);
 
-
+    $("input[type=submit]").prop("disabled", false);
 });
 
 function formatCurrency(value) {
