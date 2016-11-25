@@ -206,7 +206,7 @@ namespace VitalChoice.ExportService.Services
             orderExportService.ExportOrders(exportData.ExportInfo,
                 result => SendCommand(new ServiceBusCommandBase(command, result)),
                 idOrder =>
-                    ExecuteCommand<bool>(new ServiceBusCommandWithResult(Guid.NewGuid(),
+                    ExecuteCommand<bool>(new ServiceBusCommandWithResult(command.SessionId,
                         OrderExportProcessCommandConstants.OrderExportStarted, command.Source, command.Destination)
                     {
                         Data = new ServiceBusCommandData(idOrder)
