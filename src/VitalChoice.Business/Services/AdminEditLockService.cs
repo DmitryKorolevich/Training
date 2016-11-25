@@ -83,11 +83,11 @@ namespace VitalChoice.Business.Services
                 return model;
             }
 
-            EditLockAreaItem currentStatus;
-            EditLockRequestModel toReturn = null;
+            EditLockRequestModel toReturn;
             lock (area.LockObject)
             {
                 var now = DateTime.Now;
+                EditLockAreaItem currentStatus;
                 if (!area.Items.TryGetValue(model.Id, out currentStatus))
                 {
                     currentStatus = new EditLockAreaItem()
@@ -179,6 +179,23 @@ namespace VitalChoice.Business.Services
                     area.Items.Remove(idOrder);
                 }
             }
+        }
+
+        public bool GetIsOrderLocked(int idOrder)
+        {
+            foreach (var area in _exportOrderEditLockAreas)
+            {
+                lock (area.LockObject)
+                {
+                    EditLockAreaItem lockArea;
+                    if (area.Items.TryGetValue(idOrder, out lockArea))
+                    {
+                        return lockArea.Expired > DateTime.Now;
+                    }
+                    return false;
+                }
+            }
+            return false;
         }
 
         private string GetAgentLockMessageTitle(string agent, string agentFirstName, string agentLastName)
