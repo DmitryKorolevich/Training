@@ -22,23 +22,6 @@ namespace VitalChoice.Business.Services
             _exportOrderEditLockAreas = BaseAppConstants.EXPORT_ORDERS_LOCK_AREAS.Split(',').Select(p => new EditLockArea(p)).ToList();
         }
 
-        private bool GetIsLocked(IEnumerable<EditLockArea> lockAreas, EditLockPingModel model,
-            Func<EditLockArea, EditLockAreaItem, bool> lockCheck, out EditLockAreaItem item)
-        {
-            var area = lockAreas.FirstOrDefault(p => p.Name == model.AreaName);
-
-            if (area == null || model.Id == 0)
-            {
-                item = null;
-                return false;
-            }
-
-            lock (area.LockObject)
-            {
-                return area.Items.TryGetValue(model.Id, out item) && lockCheck(area, item);
-            }
-        }
-
         public bool AgentEditLockPing(EditLockPingModel model, string browserUserAgent)
         {
             var now = DateTime.Now;
@@ -75,46 +58,82 @@ namespace VitalChoice.Business.Services
                     IdAgent = lockItem.IdAgent,
                     LockMessageTitle = lockItem.LockMessageTitle,
                     LockMessageBody = lockItem.LockMessageBody,
-                    Avaliable = false,
+                    Avaliable = false
                 };
             }
 
-            if (GetIsLocked(_adminEditLockAreas, model, (area, item) =>
+            var adminArea = _adminEditLockAreas.FirstOrDefault(p => p.Name == model.AreaName);
+
+            if (adminArea == null || model.Id == 0)
             {
-                if (item.IdAgent == model.IdAgent && item.BrowserUserAgent == browserUserAgent)
-                {
-                    item.Expired = now.AddSeconds(agentSecCount);
-                    return false;
-                }
-                lockItem = new EditLockAreaItem
-                {
-                    Agent = model.Agent,
-                    AgentFirstName = model.AgentFirstName,
-                    AgentLastName = model.AgentLastName,
-                    IdAgent = model.IdAgent,
-                    BrowserUserAgent = browserUserAgent,
-                    LockMessageTitle = GetAgentLockMessageTitle(model.Agent, model.AgentFirstName, model.AgentLastName),
-                    LockMessageBody = GetAgentLockMessageBody(model.Agent, model.AgentFirstName, model.AgentLastName),
-                    Expired = now.AddSeconds(agentSecCount)
-                };
-                area.Items.Add(model.Id, lockItem);
                 model.Avaliable = true;
-                return true;
-            }, out lockItem))
-            {
-                return new EditLockRequestModel
-                {
-                    Agent = lockItem.Agent,
-                    AgentFirstName = lockItem.AgentFirstName,
-                    AgentLastName = lockItem.AgentLastName,
-                    IdAgent = lockItem.IdAgent,
-                    LockMessageTitle = lockItem.LockMessageTitle,
-                    LockMessageBody = lockItem.LockMessageBody,
-                    Avaliable = false,
-                };
+                return model;
             }
 
+            lock (adminArea.LockObject)
+            {
+                if (adminArea.Items.TryGetValue(model.Id, out lockItem))
+                {
+                    if (lockItem.IdAgent == model.IdAgent && lockItem.BrowserUserAgent == browserUserAgent)
+                    {
+                        lockItem.Expired = now.AddSeconds(agentSecCount);
+                        model.Avaliable = true;
+                        return model;
+                    }
+                    if (lockItem.Expired <= now)
+                    {
+                        AddLock(model, browserUserAgent, now, adminArea);
+                        model.Avaliable = true;
+                        return model;
+                    }
+                    return new EditLockRequestModel
+                    {
+                        Agent = lockItem.Agent,
+                        AgentFirstName = lockItem.AgentFirstName,
+                        AgentLastName = lockItem.AgentLastName,
+                        IdAgent = lockItem.IdAgent,
+                        LockMessageTitle = lockItem.LockMessageTitle,
+                        LockMessageBody = lockItem.LockMessageBody,
+                        Avaliable = false
+                    };
+                }
+                AddLock(model, browserUserAgent, now, adminArea);
+            }
+            model.Avaliable = true;
             return model;
+        }
+
+        private bool GetIsLocked(IEnumerable<EditLockArea> lockAreas, EditLockPingModel model,
+            Func<EditLockArea, EditLockAreaItem, bool> lockCheck, out EditLockAreaItem item)
+        {
+            var area = lockAreas.FirstOrDefault(p => p.Name == model.AreaName);
+
+            if (area == null || model.Id == 0)
+            {
+                item = null;
+                return false;
+            }
+
+            lock (area.LockObject)
+            {
+                return area.Items.TryGetValue(model.Id, out item) && lockCheck(area, item);
+            }
+        }
+
+        private void AddLock(EditLockRequestModel model, string browserUserAgent, DateTime now, EditLockArea adminArea)
+        {
+            var lockItem = new EditLockAreaItem
+            {
+                Agent = model.Agent,
+                AgentFirstName = model.AgentFirstName,
+                AgentLastName = model.AgentLastName,
+                IdAgent = model.IdAgent,
+                BrowserUserAgent = browserUserAgent,
+                LockMessageTitle = GetAgentLockMessageTitle(model.Agent, model.AgentFirstName, model.AgentLastName),
+                LockMessageBody = GetAgentLockMessageBody(model.Agent, model.AgentFirstName, model.AgentLastName),
+                Expired = now.AddSeconds(agentSecCount)
+            };
+            adminArea.Items[model.Id] = lockItem;
         }
 
         public void ExportOrderEditLockRequest(int idOrder, string lockMessageTitle, string lockMessageBody)
@@ -130,8 +149,7 @@ namespace VitalChoice.Business.Services
             {
                 lock (area.LockObject)
                 {
-                    area.Items.Remove(idOrder);
-                    area.Items.Add(idOrder, status);
+                    area.Items[idOrder] = status;
                 }
             }
         }
