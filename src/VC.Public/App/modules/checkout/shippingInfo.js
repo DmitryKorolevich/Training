@@ -78,7 +78,7 @@
         });
     }
 
-    $("input[type=submit]").prop("disabled", false);
+    $(".columns-container .overlay").hide();
 });
 
 function controlUpdateSavedState() {

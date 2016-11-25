@@ -32,7 +32,7 @@
 	<span class="checkout-notification-simple">An accurate billing address is essential to get your order to you quickly.</span>
 	<span class="checkout-notification-important">Shopping online with Vital Choice is extremely safe. All information is encrypted.</span>
     <div class="columns-container checkout-columns-container">
-        <div class="overlay hide">
+        <div class="overlay">
             <div class="loading">Loading…</div>
         </div>
         @using (Html.BeginForm("AddUpdateBillingAddress", "Checkout", null, FormMethod.Post, null, new { @class = "form-regular medium-small", role = "form" }))
@@ -132,7 +132,7 @@
              }
             <div class="form-buttons-group">
                 @(User.Identity.IsAuthenticated ? Html.ActionLink("Back", "ViewCart", "Cart", null, new { @class = "button arrow-left-red" }) : Html.ActionLink("Back", "Welcome", "Checkout", htmlAttributes: new { @class = "button arrow-left-red" }))
-                <input class="arrow-right-blue" type="submit" value="Continue" disabled="disabled" />
+                <input class="arrow-right-blue" type="submit" value="Continue" />
             </div>
         }
     </div>
