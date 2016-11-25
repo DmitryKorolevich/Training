@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace VitalChoice.Infrastructure.Domain.Constants
+﻿namespace VitalChoice.Infrastructure.Domain.Constants
 {
     public static class OrderExportServiceCommandConstants
     {
@@ -19,7 +14,6 @@ namespace VitalChoice.Infrastructure.Domain.Constants
     public static class OrderExportProcessCommandConstants
     {
         public const string OrderExportStarted = "application/export-item-started";
-        public const string OrderExportFinished = "application/export-item-finished";
     }
 
     public static class ServiceBusCommandConstants

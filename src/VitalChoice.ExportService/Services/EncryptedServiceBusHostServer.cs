@@ -194,7 +194,7 @@ namespace VitalChoice.ExportService.Services
             return true;
         }
 
-        private void ProcessExportOrders(ServiceBusCommandBase command, ILifetimeScope scope)
+        private void ProcessExportOrders(ServiceBusCommandBase command, IComponentContext scope)
         {
             var exportData = command.Data.Data as OrderExportData;
             if (exportData == null)
@@ -205,10 +205,16 @@ namespace VitalChoice.ExportService.Services
             var orderExportService = scope.Resolve<IOrderExportService>();
             orderExportService.ExportOrders(exportData.ExportInfo,
                 result => SendCommand(new ServiceBusCommandBase(command, result)),
+                idOrder =>
+                    ExecuteCommand<bool>(new ServiceBusCommandWithResult(Guid.NewGuid(),
+                        OrderExportProcessCommandConstants.OrderExportStarted, command.Source, command.Destination)
+                    {
+                        Data = new ServiceBusCommandData(idOrder)
+                    }),
                 exportData.UserId).WaitResult();
         }
 
-        private void ProcessGiftListCardExport(ServiceBusCommandBase command, ILifetimeScope scope)
+        private void ProcessGiftListCardExport(ServiceBusCommandBase command, IComponentContext scope)
         {
             var customerExportInfo = command.Data.Data as GiftListExportModel;
             if (customerExportInfo == null)

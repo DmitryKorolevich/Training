@@ -27,10 +27,10 @@ namespace VitalChoice.Business.Services.Orders
         private volatile int _exportErrors;
         private readonly BasicTimer _timer;
 
-        public OrderExport(ILifetimeScope rootScope, ILoggerFactory loggerFactory)
+        public OrderExport(ILifetimeScope rootScope, ILoggerFactory loggerFactory, IAdminEditLockService lockService)
         {
             var logger = loggerFactory.CreateLogger<OrderExport>();
-            _exportPool = new ExportPool(logger, rootScope, _exportedOrders);
+            _exportPool = new ExportPool(logger, rootScope, _exportedOrders, lockService);
             _rootScope = rootScope;
             _timer = new BasicTimer(RefreshStatistics, TimeSpan.FromSeconds(5), e => logger.LogError(e.ToString()));
         }
@@ -173,16 +173,20 @@ namespace VitalChoice.Business.Services.Orders
         private class ExportPool : RoundRobinAbstractPool<OrderExportData>
         {
             private readonly ILifetimeScope _rootScope;
+            private readonly IDictionary<int, ExportSide> _exportLockList;
+            private readonly IAdminEditLockService _lockService;
 
-            public ExportPool(ILogger logger, ILifetimeScope rootScope, IDictionary<int, ExportSide> exportLockList)
-                : base(1, logger, () => exportLockList)
+            public ExportPool(ILogger logger, ILifetimeScope rootScope, IDictionary<int, ExportSide> exportLockList,
+                IAdminEditLockService lockService)
+                : base(1, logger)
             {
                 _rootScope = rootScope;
+                _exportLockList = exportLockList;
+                _lockService = lockService;
             }
 
             protected override void ProcessingAction(OrderExportData data, object localData, object processParameter)
             {
-                var lockList = (ConcurrentDictionary<int, ExportSide>) localData;
                 var result = (ExportResult) processParameter;
                 result.DateStarted = DateTime.Now;
                 using (var scope = _rootScope.BeginLifetimeScope())
@@ -193,6 +197,11 @@ namespace VitalChoice.Business.Services.Orders
                         {
                             exportService.ExportOrdersAsync(data, r =>
                             {
+                                var order = data.ExportInfo.FirstOrDefault(o => o.Id == r.Id);
+                                if (order != null)
+                                {
+                                    ProcessOrderUnlockAfterExporting(r.Id, order.OrderType);
+                                }
                                 lock (result)
                                 {
                                     result.ExportedOrders.Add(r);
@@ -201,10 +210,9 @@ namespace VitalChoice.Business.Services.Orders
                                 if (r.Success)
                                     return;
 
-                                var order = data.ExportInfo.FirstOrDefault(o => o.Id == r.Id);
                                 if (order == null)
                                     return;
-                                ProcessFailingOrder(lockList, order);
+                                ProcessFailingOrder(order);
                             }).WaitResult();
                         }
                         catch (Exception e)
@@ -215,7 +223,8 @@ namespace VitalChoice.Business.Services.Orders
                             {
                                 foreach (var order in data.ExportInfo.Where(o => result.ExportedOrders.All(eo => eo.Id != o.Id)))
                                 {
-                                    ProcessFailingOrder(lockList, order);
+                                    ProcessOrderUnlockAfterExporting(order.Id, order.OrderType);
+                                    ProcessFailingOrder(order);
                                     result.ExportedOrders.Add(new OrderExportItemResult
                                     {
                                         Error = errorText,
@@ -229,38 +238,71 @@ namespace VitalChoice.Business.Services.Orders
                 }
             }
 
-            private static void ProcessFailingOrder(ConcurrentDictionary<int, ExportSide> lockList, OrderExportItem order)
+            private void ProcessOrderUnlockAfterExporting(int idOrder, ExportSide type)
             {
                 ExportSide side;
-                switch (order.OrderType)
+                switch (type)
                 {
                     case ExportSide.All:
-                        lockList.TryRemove(order.Id, out side);
+                        _lockService.ExportOrderEditLockRelease(idOrder);
                         break;
                     case ExportSide.Perishable:
-                        if (lockList.TryGetValue(order.Id, out side))
+                        if (_exportLockList.TryGetValue(idOrder, out side))
                         {
                             switch (side)
                             {
                                 case ExportSide.Perishable:
-                                    lockList.TryRemove(order.Id, out side);
-                                    break;
-                                case ExportSide.All:
-                                    lockList[order.Id] = ExportSide.NonPerishable;
+                                    _lockService.ExportOrderEditLockRelease(idOrder);
                                     break;
                             }
                         }
                         break;
                     case ExportSide.NonPerishable:
-                        if (lockList.TryGetValue(order.Id, out side))
+                        if (_exportLockList.TryGetValue(idOrder, out side))
                         {
                             switch (side)
                             {
                                 case ExportSide.NonPerishable:
-                                    lockList.TryRemove(order.Id, out side);
+                                    _lockService.ExportOrderEditLockRelease(idOrder);
+                                    break;
+                            }
+                        }
+                        break;
+                }
+            }
+
+            private void ProcessFailingOrder(OrderExportItem order)
+            {
+                ExportSide side;
+                switch (order.OrderType)
+                {
+                    case ExportSide.All:
+                        _exportLockList.TryRemove(order.Id, out side);
+                        break;
+                    case ExportSide.Perishable:
+                        if (_exportLockList.TryGetValue(order.Id, out side))
+                        {
+                            switch (side)
+                            {
+                                case ExportSide.Perishable:
+                                    _exportLockList.TryRemove(order.Id, out side);
                                     break;
                                 case ExportSide.All:
-                                    lockList[order.Id] = ExportSide.Perishable;
+                                    _exportLockList[order.Id] = ExportSide.NonPerishable;
+                                    break;
+                            }
+                        }
+                        break;
+                    case ExportSide.NonPerishable:
+                        if (_exportLockList.TryGetValue(order.Id, out side))
+                        {
+                            switch (side)
+                            {
+                                case ExportSide.NonPerishable:
+                                    _exportLockList.TryRemove(order.Id, out side);
+                                    break;
+                                case ExportSide.All:
+                                    _exportLockList[order.Id] = ExportSide.Perishable;
                                     break;
                             }
                         }
