@@ -43,8 +43,6 @@ namespace VitalChoice.Business.Services
 
         public EditLockRequestModel AgentEditLockRequest(EditLockRequestModel model, string browserUserAgent)
         {
-            model.Avaliable = false;
-
             var now = DateTime.Now;
 
             EditLockAreaItem lockItem;

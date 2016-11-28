@@ -19,6 +19,7 @@ using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 using VitalChoice.Infrastructure.Identity.UserManagers;
+using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Interfaces.Services.Settings;
@@ -32,6 +33,7 @@ namespace VC.Public.Controllers
         protected readonly IDynamicMapper<SkuDynamic, Sku> SkuMapper;
         protected readonly IDynamicMapper<ProductDynamic, Product> ProductMapper;
         protected readonly AppSettings AppSettings;
+        protected static readonly ObjectSemaphore<int> OrderLocks = new ObjectSemaphore<int>();
 
         protected CheckoutControllerBase(ICustomerService customerService,
             ReferenceData referenceData, IAuthorizationService authorizationService, ICheckoutService checkoutService,

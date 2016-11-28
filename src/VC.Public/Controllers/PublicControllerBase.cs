@@ -23,6 +23,7 @@ using VitalChoice.Core.Services;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Identity.UserManagers;
+using VitalChoice.Infrastructure.Services;
 
 namespace VC.Public.Controllers
 {
@@ -33,6 +34,7 @@ namespace VC.Public.Controllers
         protected readonly ICheckoutService CheckoutService;
         private readonly ExtendedUserManager _userManager;
         protected readonly ReferenceData ReferenceData;
+        protected static readonly ObjectSemaphore<Guid> CartLocks = new ObjectSemaphore<Guid>();
 
         protected PublicControllerBase(ICustomerService customerService, IAuthorizationService authorizationService,
             ICheckoutService checkoutService,
