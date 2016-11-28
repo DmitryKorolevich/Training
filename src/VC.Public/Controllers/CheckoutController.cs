@@ -280,14 +280,15 @@ namespace VC.Public.Controllers
         [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> AddUpdateBillingAddress(AddUpdateBillingAddressModel model)
         {
-            if (await IsCartEmpty())
-            {
-                return View("EmptyCart");
-            }
-            var loggedIn = await CustomerLoggedIn();
             Guid? cartUid;
             using (await LockCurrentCart(out cartUid))
             {
+                if (await IsCartEmpty())
+                {
+                    return View("EmptyCart");
+                }
+                var loggedIn = await CustomerLoggedIn();
+
                 var cart = await GetCurrentCart();
                 using (await CartLocks.LockWhenAsync(() => cartUid.HasValue && cartUid.Value != cart.CartUid, () => cart.CartUid))
                 {
@@ -560,25 +561,26 @@ namespace VC.Public.Controllers
         [CustomValidateAntiForgeryToken]
         public async Task<IActionResult> AddUpdateShippingMethod(AddUpdateShippingMethodModel model)
         {
-            if (await IsCartEmpty())
-            {
-                return View("EmptyCart");
-            }
-
-            if (model.UseBillingAddress)
-            {
-                HashSet<string> propertyNames = new HashSet<string>(typeof(AddressModel).GetRuntimeProperties().Select(p => p.Name));
-                foreach (var item in ModelState)
-                {
-                    if (propertyNames.Contains(item.Key))
-                    {
-                        ModelState.Remove(item.Key);
-                    }
-                }
-            }
             Guid? cartUid;
             using (await LockCurrentCart(out cartUid))
             {
+                if (await IsCartEmpty())
+                {
+                    return View("EmptyCart");
+                }
+
+                if (model.UseBillingAddress)
+                {
+                    HashSet<string> propertyNames = new HashSet<string>(typeof(AddressModel).GetRuntimeProperties().Select(p => p.Name));
+                    foreach (var item in ModelState)
+                    {
+                        if (propertyNames.Contains(item.Key))
+                        {
+                            ModelState.Remove(item.Key);
+                        }
+                    }
+                }
+
                 var cart = await GetCurrentCart();
                 using (await CartLocks.LockWhenAsync(() => cartUid.HasValue && cartUid.Value != cart.CartUid, () => cart.CartUid))
                 {
@@ -744,13 +746,14 @@ namespace VC.Public.Controllers
         //[CustomerAuthorize]
         public async Task<Result<string>> ReviewOrder([FromBody] ViewCartModel model)
         {
-            if (await IsCartEmpty())
-            {
-                return Url.Action("ViewCart", "Cart");
-            }
             Guid? cartUid;
             using (await LockCurrentCart(out cartUid))
             {
+                if (await IsCartEmpty())
+                {
+                    return Url.Action("ViewCart", "Cart");
+                }
+
                 var cart = await GetCurrentCart();
                 using (await CartLocks.LockWhenAsync(() => cartUid.HasValue && cartUid.Value != cart.CartUid, () => cart.CartUid))
                 {
