@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -74,6 +75,14 @@ namespace VC.Public.Controllers
             var internalId = Convert.ToInt32(_userManager.GetUserId(User));
 
             return internalId;
+        }
+
+        protected Task<IDisposable> LockCurrentCart(out Guid? cartUid)
+        {
+            var uid = HttpContext.GetCartUid();
+            cartUid = uid;
+            // ReSharper disable once PossibleInvalidOperationException
+            return CartLocks.LockWhenAsync(() => uid.HasValue, () => uid.Value);
         }
 
         protected async Task<CustomerCartOrder> GetCurrentCart(bool? loggedIn = null)
