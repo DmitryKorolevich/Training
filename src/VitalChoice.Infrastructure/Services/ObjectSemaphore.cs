@@ -138,11 +138,20 @@ namespace VitalChoice.Infrastructure.Services
         {
             foreach (var valuePair in _lockList.ToArray())
             {
-                if (Environment.TickCount - valuePair.Value.TicksUpdated > _timeout.Ticks)
+                int diff;
+                unchecked
+                {
+                    diff = Environment.TickCount - valuePair.Value.TicksUpdated;
+                }
+                if (diff > _timeout.Ticks)
                 {
                     lock (valuePair.Value.LockObject)
                     {
-                        if (Environment.TickCount - valuePair.Value.TicksUpdated > _timeout.Ticks)
+                        unchecked
+                        {
+                            diff = Environment.TickCount - valuePair.Value.TicksUpdated;
+                        }
+                        if (diff > _timeout.Ticks)
                         {
                             LockData lockData;
                             if (_lockList.TryRemove(valuePair.Key, out lockData))
