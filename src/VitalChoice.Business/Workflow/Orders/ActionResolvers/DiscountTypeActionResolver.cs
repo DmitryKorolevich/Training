@@ -66,7 +66,7 @@ namespace VitalChoice.Business.Workflow.Orders.ActionResolvers
                 });
                 noIssues = false;
             }
-            if (dataContext.Order.Discount.ExpirationDate < now.AddDays(1))
+            if (dataContext.Order.Discount.ExpirationDate < now.AddDays(-1))
             {
                 dataContext.Messages.Add(new MessageInfo
                 {
