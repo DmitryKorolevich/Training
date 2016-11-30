@@ -511,9 +511,8 @@ namespace VC.Public.Controllers
         [CustomerStatusCheck]
         public async Task<IActionResult> GetShippingAddress(int id)
         {
-            var currentCustomer = await GetCurrentCustomerDynamic();
             var cart = await GetCurrentCart();
-            var addresses = GetShippingAddresses(cart.Order, currentCustomer);
+            var addresses = GetShippingAddresses(cart.Order, cart.Order?.Customer);
             var shipping = addresses[id].Value;
 
             var shippingModel = new AddUpdateShippingMethodModel();
@@ -553,7 +552,7 @@ namespace VC.Public.Controllers
                 {
                     return RedirectToAction("AddUpdateShippingMethod");
                 }
-                var currentCustomer = await GetCurrentCustomerDynamic();
+                var currentCustomer = cart.Order.Customer;
 
                 var defaultShipping = currentCustomer.ShippingAddresses.FirstOrDefault(x => (bool?) x.SafeData.Default == true);
                 if (cart.Order.ShippingAddress != null && cart.Order.ShippingAddress.Id != 0 &&
@@ -711,7 +710,7 @@ namespace VC.Public.Controllers
                                 }
                             }
 
-                            var currentCustomer = await GetCurrentCustomerDynamic();
+                            var currentCustomer = cart.Order.Customer;
 
                             var addresses = GetShippingAddresses(cart.Order, currentCustomer);
                             var i = 0;
