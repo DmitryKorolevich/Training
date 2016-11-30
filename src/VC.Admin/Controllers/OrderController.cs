@@ -424,7 +424,7 @@ namespace VC.Admin.Controllers
                 }
 
                 orderContext.Messages.AddRange(
-                    model.GCs.Where(g => orderContext.Order.GiftCertificates.All(gc => gc.GiftCertificate.Code != g.Code))
+                    model.GCs.Where(g => !string.IsNullOrWhiteSpace(g.Code) && orderContext.Order.GiftCertificates.All(gc => gc.GiftCertificate.Code != g.Code))
                         .Select(g => new MessageInfo
                         {
                             MessageLevel = MessageLevel.Error,
