@@ -33,6 +33,7 @@ namespace VitalChoice.Ecommerce.Context
         public EcommerceContextBase(IOptions<AppOptionsBase> options, DbContextOptions contextOptions) : base(contextOptions)
         {
             Options = options;
+            Database.SetCommandTimeout(1);
         }
 
         protected readonly IOptions<AppOptionsBase> Options;
@@ -51,7 +52,7 @@ namespace VitalChoice.Ecommerce.Context
                 InitialCatalog = "VitalChoice.Ecommerce",
                 UserID = Options.Value.Connection.UserName,
                 Password = Options.Value.Connection.Password,
-                ConnectTimeout = 60
+                ConnectTimeout = 1,
             }).ConnectionString;
             builder.UseSqlServer(connectionString);
 

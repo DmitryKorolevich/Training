@@ -115,9 +115,10 @@ namespace VitalChoice.Core.GlobalFilters
                         }
                         else
 				        {
-				            var sqlException = context.Exception as SqlException;
+                            var sqlException = context.Exception as SqlException ??
+                                           (context.Exception as DbUpdateException)?.InnerException as SqlException;
                             //operation timed out
-				            if (sqlException != null && sqlException.ErrorCode == -2)
+                            if (sqlException != null && sqlException.ErrorCode == -2)
 				            {
                                 SetTimeoutError(context, result);
                                 var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
