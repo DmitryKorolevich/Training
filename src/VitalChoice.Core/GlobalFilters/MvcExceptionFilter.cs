@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -103,7 +105,7 @@ namespace VitalChoice.Core.GlobalFilters
 				    }
 				    else
 				    {
-				        var dbUpdateException = context.Exception as DbUpdateException;
+				        var dbUpdateException = context.Exception as DbUpdateConcurrencyException;
 				        if (dbUpdateException != null)
 				        {
 				            SetDataChangedError(context, result);
@@ -113,12 +115,24 @@ namespace VitalChoice.Core.GlobalFilters
                         }
                         else
 				        {
-				            result.ViewName = "Error";
-				            result.StatusCode = (int) HttpStatusCode.InternalServerError;
-                            var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
-                            var logger = loggerFactory.CreateLogger<MvcExceptionFilter>();
-                            logger.LogError($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
-                        }
+				            var sqlException = context.Exception as SqlException;
+                            //operation timed out
+				            if (sqlException != null && sqlException.ErrorCode == -2)
+				            {
+                                SetTimeoutError(context, result);
+                                var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
+                                var logger = loggerFactory.CreateLogger<MvcExceptionFilter>();
+                                logger.LogError(sqlException.ToString());
+                            }
+				            else
+				            {
+				                result.ViewName = "Error";
+				                result.StatusCode = (int) HttpStatusCode.InternalServerError;
+				                var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
+				                var logger = loggerFactory.CreateLogger<MvcExceptionFilter>();
+				                logger.LogError($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
+				            }
+				        }
                     }
 				}
 				else
@@ -188,5 +202,11 @@ namespace VitalChoice.Core.GlobalFilters
             result.StatusCode = (int) HttpStatusCode.OK;
             context.ModelState.AddModelError(string.Empty, "The data has been changed, please Reload page to see changes");
         }
-	}
+
+        private static void SetTimeoutError(ExceptionContext context, ViewResult result)
+        {
+            result.StatusCode = (int)HttpStatusCode.OK;
+            context.ModelState.AddModelError(string.Empty, "Execution Timeout Expired");
+        }
+    }
 }
