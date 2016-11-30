@@ -71,7 +71,8 @@ namespace VC.Public.Controllers
         private readonly IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> _orderPaymentMethodConverter;
         private readonly IDynamicMapper<AddressDynamic, Address> _addressConverter;
         private readonly BrontoService _brontoService;
-        private readonly ITransactionAccessor<EcommerceContext> _transactionAccessor;
+        private readonly ITransactionAccessor<EcommerceContext> _ecommerceTransactionAccessor;
+        private readonly ITransactionAccessor<VitalChoiceContext> _vitalchoiceTransactionAccessor;
         private readonly IAffiliateService _affiliateService;
         private readonly INotificationService _notificationService;
         private readonly ILogger _logger;
@@ -91,9 +92,11 @@ namespace VC.Public.Controllers
             IDynamicMapper<OrderPaymentMethodDynamic, OrderPaymentMethod> orderPaymentMethodConverter,
             IDynamicMapper<SkuDynamic, Sku> skuMapper, IDynamicMapper<ProductDynamic, Product> productMapper,
             BrontoService brontoService,
-            ITransactionAccessor<EcommerceContext> transactionAccessor, ISettingService settingService, ILoggerFactory loggerProvider,
+            ITransactionAccessor<EcommerceContext> ecommerceTransactionAccessor, ISettingService settingService,
+            ILoggerFactory loggerProvider,
             ExtendedUserManager userManager, ICountryNameCodeResolver countryNameCodeResolver, ReferenceData referenceData,
-            AppSettings appSettings, IEncryptedOrderExportService exportService, IObjectEncryptionHost encryptionHost, ITokenService tokenService)
+            AppSettings appSettings, IEncryptedOrderExportService exportService, IObjectEncryptionHost encryptionHost,
+            ITokenService tokenService, ITransactionAccessor<VitalChoiceContext> vitalchoiceTransactionAccessor)
             : base(
                 customerService, referenceData, authorizationService, checkoutService, orderService,
                 skuMapper, productMapper, settingService, userManager, appSettings)
@@ -104,11 +107,12 @@ namespace VC.Public.Controllers
             _addressConverter = addressConverter;
             _orderPaymentMethodConverter = orderPaymentMethodConverter;
             _brontoService = brontoService;
-            _transactionAccessor = transactionAccessor;
+            _ecommerceTransactionAccessor = ecommerceTransactionAccessor;
             _countryNameCodeResolver = countryNameCodeResolver;
             _exportService = exportService;
             _encryptionHost = encryptionHost;
             _tokenService = tokenService;
+            _vitalchoiceTransactionAccessor = vitalchoiceTransactionAccessor;
             _affiliateService = affiliateService;
             _notificationService = notificationService;
             _logger = loggerProvider.CreateLogger<CheckoutController>();
@@ -304,91 +308,83 @@ namespace VC.Public.Controllers
                     using (await OrderLocks.LockWhenAsync(() => cart.Order?.Id > 0, () => cart.Order.Id))
                     {
                         Func<Task<ApplicationUser>> loginTask = null;
-                        using (var transaction = _transactionAccessor.BeginTransaction())
+                        using (var userTransaction = _vitalchoiceTransactionAccessor.BeginTransaction())
                         {
-                            try
+                            using (var transaction = _ecommerceTransactionAccessor.BeginTransaction())
                             {
-                                if (loggedIn)
+                                try
                                 {
-                                    ViewBag.CreditCards = PopulateCreditCardsLookup(cart.Order.Customer);
-                                }
-                                else
-                                {
-                                    var createResult = await EnsureCustomerCreated(model, cart.Order.Customer);
-                                    cart.Order.Customer = createResult.Customer;
-                                    loginTask = createResult.LoginTask;
-                                }
-
-                                if (model.SendCatalog)
-                                {
-                                    var pnc = await _productService.GetSkuOrderedAsync(CATALOG_PRODUCT_NAME);
-                                    if (pnc != null)
+                                    if (loggedIn)
                                     {
-                                        pnc.Quantity = 1;
-                                        pnc.Amount = pnc.Sku.Price;
-                                        cart.Order.Skus.AddKeyed(Enumerable.Repeat(pnc, 1), ordered => ordered.Sku.Code);
-                                    }
-                                }
-                                else
-                                {
-                                    cart.Order.Skus.RemoveAll(s => s.Sku.Code.ToLower() == CATALOG_PRODUCT_NAME);
-                                }
-                                var statistic = await CustomerService.GetCustomerOrderStatistics(new[] {cart.Order.Customer.Id});
-                                //new custimer - add welcome letter
-                                if (statistic.FirstOrDefault() == null)
-                                {
-                                    var wl = await _productService.GetSkuOrderedAsync(ProductConstants.WELCOME_LETTER_SKU);
-                                    if (wl != null && wl.Sku.InStock())
-                                    {
-                                        wl.Quantity = 1;
-                                        wl.Amount = wl.Sku.Price;
-                                        cart.Order.Skus.AddKeyed(Enumerable.Repeat(wl, 1), ordered => ordered.Sku.Code);
-                                    }
-                                }
-
-                                if (cart.Order.PaymentMethod?.Address == null || cart.Order.PaymentMethod.Id == 0)
-                                {
-                                    cart.Order.PaymentMethod =
-                                        await _orderPaymentMethodConverter.FromModelAsync(model, (int) PaymentMethodType.CreditCard);
-                                    cart.Order.PaymentMethod.Address =
-                                        await _addressConverter.FromModelAsync(model, (int) AddressType.Billing);
-                                }
-                                else
-                                {
-                                    var orderPaymentId = cart.Order.PaymentMethod.Id;
-                                    await
-                                        _orderPaymentMethodConverter.UpdateObjectAsync(model, cart.Order.PaymentMethod,
-                                            (int) PaymentMethodType.CreditCard);
-                                    cart.Order.PaymentMethod.Id = orderPaymentId;
-                                    var idAddress = 0;
-                                    if (cart.Order.PaymentMethod.Address == null)
-                                    {
-                                        cart.Order.PaymentMethod.Address = new AddressDynamic {IdObjectType = (int) AddressType.Billing};
+                                        ViewBag.CreditCards = PopulateCreditCardsLookup(cart.Order.Customer);
                                     }
                                     else
                                     {
-                                        idAddress = cart.Order.PaymentMethod.Address.Id;
+                                        var createResult = await EnsureCustomerCreated(model, cart.Order.Customer);
+                                        cart.Order.Customer = createResult.Customer;
+                                        loginTask = createResult.LoginTask;
                                     }
-                                    await
-                                        _addressConverter.UpdateObjectAsync(model, cart.Order.PaymentMethod.Address,
-                                            (int) AddressType.Billing);
-                                    cart.Order.PaymentMethod.Address.Id = idAddress;
-                                }
-                                if (ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic),
-                                    (string) cart.Order.PaymentMethod.Data.CardNumber,
-                                    "CardNumber"))
-                                {
-                                    if (!await CustomerService.GetCustomerCardExist(cart.Order.Customer.Id, model.Id))
-                                    {
-                                        ModelState.AddModelError(string.Empty,
-                                            "For security reasons. Please enter all credit card details for this card or please select a new one to continue.");
 
-                                        model.IdCustomerType = cart.Order.Customer.IdObjectType;
-                                        return View(model);
-                                    }
-                                    if (model.Id > 0)
+                                    if (model.SendCatalog)
                                     {
-                                        if (cart.Order.Customer.CustomerPaymentMethods?.All(p => p.Id != model.Id) ?? true)
+                                        var pnc = await _productService.GetSkuOrderedAsync(CATALOG_PRODUCT_NAME);
+                                        if (pnc != null)
+                                        {
+                                            pnc.Quantity = 1;
+                                            pnc.Amount = pnc.Sku.Price;
+                                            cart.Order.Skus.AddKeyed(Enumerable.Repeat(pnc, 1), ordered => ordered.Sku.Code);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        cart.Order.Skus.RemoveAll(s => s.Sku.Code.ToLower() == CATALOG_PRODUCT_NAME);
+                                    }
+                                    var statistic = await CustomerService.GetCustomerOrderStatistics(new[] {cart.Order.Customer.Id});
+                                    //new customer - add welcome letter
+                                    if (statistic.FirstOrDefault() == null)
+                                    {
+                                        var wl = await _productService.GetSkuOrderedAsync(ProductConstants.WELCOME_LETTER_SKU);
+                                        if (wl != null && wl.Sku.InStock())
+                                        {
+                                            wl.Quantity = 1;
+                                            wl.Amount = wl.Sku.Price;
+                                            cart.Order.Skus.AddKeyed(Enumerable.Repeat(wl, 1), ordered => ordered.Sku.Code);
+                                        }
+                                    }
+
+                                    if (cart.Order.PaymentMethod?.Address == null || cart.Order.PaymentMethod.Id == 0)
+                                    {
+                                        cart.Order.PaymentMethod =
+                                            await _orderPaymentMethodConverter.FromModelAsync(model, (int) PaymentMethodType.CreditCard);
+                                        cart.Order.PaymentMethod.Address =
+                                            await _addressConverter.FromModelAsync(model, (int) AddressType.Billing);
+                                    }
+                                    else
+                                    {
+                                        var orderPaymentId = cart.Order.PaymentMethod.Id;
+                                        await
+                                            _orderPaymentMethodConverter.UpdateObjectAsync(model, cart.Order.PaymentMethod,
+                                                (int) PaymentMethodType.CreditCard);
+                                        cart.Order.PaymentMethod.Id = orderPaymentId;
+                                        var idAddress = 0;
+                                        if (cart.Order.PaymentMethod.Address == null)
+                                        {
+                                            cart.Order.PaymentMethod.Address = new AddressDynamic {IdObjectType = (int) AddressType.Billing};
+                                        }
+                                        else
+                                        {
+                                            idAddress = cart.Order.PaymentMethod.Address.Id;
+                                        }
+                                        await
+                                            _addressConverter.UpdateObjectAsync(model, cart.Order.PaymentMethod.Address,
+                                                (int) AddressType.Billing);
+                                        cart.Order.PaymentMethod.Address.Id = idAddress;
+                                    }
+                                    if (ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic),
+                                        (string) cart.Order.PaymentMethod.Data.CardNumber,
+                                        "CardNumber"))
+                                    {
+                                        if (!await CustomerService.GetCustomerCardExist(cart.Order.Customer.Id, model.Id))
                                         {
                                             ModelState.AddModelError(string.Empty,
                                                 "For security reasons. Please enter all credit card details for this card or please select a new one to continue.");
@@ -396,83 +392,98 @@ namespace VC.Public.Controllers
                                             model.IdCustomerType = cart.Order.Customer.IdObjectType;
                                             return View(model);
                                         }
-                                    }
-                                    cart.Order.PaymentMethod.IdCustomerPaymentMethod = model.Id;
-                                }
-                                else
-                                {
-                                    if (!await CustomerService.GetCustomerCardExist(cart.Order.Customer.Id, model.Id))
-                                    {
-                                        await _exportService.UpdateCustomerPaymentMethodsAsync(new List<CustomerCardData>
+                                        if (model.Id > 0)
                                         {
-                                            new CustomerCardData
+                                            if (cart.Order.Customer.CustomerPaymentMethods?.All(p => p.Id != model.Id) ?? true)
                                             {
-                                                CardNumber = (string) cart.Order.PaymentMethod.Data.CardNumber,
-                                                IdCustomer = cart.Order.Customer.Id,
-                                                IdPaymentMethod = model.Id
+                                                ModelState.AddModelError(string.Empty,
+                                                    "For security reasons. Please enter all credit card details for this card or please select a new one to continue.");
+
+                                                model.IdCustomerType = cart.Order.Customer.IdObjectType;
+                                                return View(model);
                                             }
-                                        });
-                                    }
-                                }
-                                if (!await CheckoutService.UpdateCart(cart))
-                                {
-                                    ModelState.AddModelError(string.Empty, "Cannot update order");
-                                    if (loginTask != null)
-                                    {
-                                        if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
-                                        {
-                                            await _userService.RemoveAsync(cart.Order.Customer.Id);
+                                            cart.Order.PaymentMethod.IdCustomerPaymentMethod = model.Id;
                                         }
                                     }
+                                    else
+                                    {
+                                        if (!await CustomerService.GetCustomerCardExist(cart.Order.Customer.Id, model.Id))
+                                        {
+                                            await _exportService.UpdateCustomerPaymentMethodsAsync(new List<CustomerCardData>
+                                            {
+                                                new CustomerCardData
+                                                {
+                                                    CardNumber = (string) cart.Order.PaymentMethod.Data.CardNumber,
+                                                    IdCustomer = cart.Order.Customer.Id,
+                                                    IdPaymentMethod = model.Id
+                                                }
+                                            });
+                                        }
+                                    }
+                                    if (!await CheckoutService.UpdateCart(cart))
+                                    {
+                                        ModelState.AddModelError(string.Empty, "Cannot update order");
+                                        //if (loginTask != null)
+                                        //{
+                                        //    if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
+                                        //    {
+                                        //        await _userService.RemoveAsync(cart.Order.Customer.Id);
+                                        //    }
+                                        //}
+                                        userTransaction.Rollback();
+                                        transaction.Rollback();
+                                    }
+                                    else
+                                    {
+                                        if (loginTask != null)
+                                            await loginTask();
+                                        transaction.Commit();
+                                        userTransaction.Commit();
+
+                                        if (!string.IsNullOrEmpty(model.Email))
+                                        {
+                                            _brontoService.PushSubscribe(model.Email, model.SendNews);
+                                        }
+
+                                        return RedirectToAction("AddUpdateShippingMethod");
+                                    }
+                                }
+                                catch (AppValidationException e)
+                                {
                                     transaction.Rollback();
-                                }
-                                else
-                                {
-                                    if (loginTask != null)
-                                        await loginTask();
-                                    transaction.Commit();
-
-                                    if (!string.IsNullOrEmpty(model.Email))
+                                    userTransaction.Rollback();
+                                    var newMessages = e.Messages.Select(error => new MessageInfo
                                     {
-                                        _brontoService.PushSubscribe(model.Email, model.SendNews);
-                                    }
-
-                                    return RedirectToAction("AddUpdateShippingMethod");
+                                        Field = string.Empty,
+                                        Message = error.Message,
+                                        MessageLevel = error.MessageLevel
+                                    });
+                                    //if (loginTask != null)
+                                    //{
+                                    //    if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
+                                    //    {
+                                    //        var user = await _userService.GetAsync(cart.Order.Customer.Id);
+                                    //        user.Status = UserStatus.NotActive;
+                                    //        await _userService.UpdateAsync(user);
+                                    //    }
+                                    //}
+                                    throw new AppValidationException(newMessages);
                                 }
-                            }
-                            catch (AppValidationException e)
-                            {
-                                transaction.Rollback();
-                                var newMessages = e.Messages.Select(error => new MessageInfo
+                                catch
                                 {
-                                    Field = string.Empty,
-                                    Message = error.Message,
-                                    MessageLevel = error.MessageLevel
-                                });
-                                if (loginTask != null)
-                                {
-                                    if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
-                                    {
-                                        var user = await _userService.GetAsync(cart.Order.Customer.Id);
-                                        user.Status = UserStatus.NotActive;
-                                        await _userService.UpdateAsync(user);
-                                    }
+                                    transaction.Rollback();
+                                    userTransaction.Rollback();
+                                    //if (loginTask != null)
+                                    //{
+                                    //    if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
+                                    //    {
+                                    //        var user = await _userService.GetAsync(cart.Order.Customer.Id);
+                                    //        user.Status = UserStatus.NotActive;
+                                    //        await _userService.UpdateAsync(user);
+                                    //    }
+                                    //}
+                                    throw;
                                 }
-                                throw new AppValidationException(newMessages);
-                            }
-                            catch
-                            {
-                                transaction.Rollback();
-                                if (loginTask != null)
-                                {
-                                    if (cart.Order.Customer != null && cart.Order.Customer.Id != 0)
-                                    {
-                                        var user = await _userService.GetAsync(cart.Order.Customer.Id);
-                                        user.Status = UserStatus.NotActive;
-                                        await _userService.UpdateAsync(user);
-                                    }
-                                }
-                                throw;
                             }
                         }
                     }
