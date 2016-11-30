@@ -288,12 +288,9 @@ namespace VitalChoice.ObjectMapping.Base
                     var value =
                         await
                             Converter.ConvertFromModelAsync(valueType, dynamicProperty.PropertyType, modelValue, dynamicProperty.Converter);
-                    if (value != null)
-                    {
-                        TypeValidator.ThrowIfNotValid(model.GetType(), objectType, value, pair.Key, dynamicProperty,
-                            false);
-                        dynamicProperty.SetValueDirect(obj, value);
-                    }
+                    //TypeValidator.ThrowIfNotValid(model.GetType(), objectType, value, pair.Key, dynamicProperty,
+                    //    false);
+                    dynamicProperty.SetValueDirect(obj, value);
                 }
             }
         }
@@ -338,12 +335,9 @@ namespace VitalChoice.ObjectMapping.Base
                 {
                     var value = await Converter.ConvertFromModelAsync(pair.Value.PropertyType, dynamicProperty.PropertyType,
                         pair.Value.Get?.Invoke(model), dynamicProperty.Converter);
-                    if (value != null)
-                    {
-                        TypeValidator.ThrowIfNotValid(modelType, objectType, value, mappingName, dynamicProperty,
-                            false);
-                        dynamicProperty.Set?.Invoke(obj, value);
-                    }
+                    //TypeValidator.ThrowIfNotValid(modelType, objectType, value, mappingName, dynamicProperty,
+                    //    false);
+                    dynamicProperty.Set?.Invoke(obj, value);
                 }
             }
         }
@@ -367,11 +361,8 @@ namespace VitalChoice.ObjectMapping.Base
                 {
                     var value = await Converter.ConvertToModelAsync(dynamicProperty.PropertyType, pair.Value.PropertyType,
                         dynamicProperty.Get?.Invoke(obj), dynamicProperty.Converter);
-                    if (value != null)
-                    {
-                        TypeValidator.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value, true);
-                        pair.Value.SetValueDirect(result, value);
-                    }
+                    //TypeValidator.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value, true);
+                    pair.Value.SetValueDirect(result, value);
                 }
             }
         }

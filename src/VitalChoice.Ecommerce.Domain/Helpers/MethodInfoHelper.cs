@@ -164,9 +164,22 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                 return;
             if (one.GetTypeInfo().IsValueType || toOther.GetTypeInfo().IsValueType)
             {
-                if (one == typeof (object))
+                if (one == typeof(object))
                 {
+                    //initialize value type with default if object is null
+                    var constructor = toOther.GetConstructor(new Type[0]);
+                    if (constructor == null)
+                        throw new InvalidOperationException($"{toOther} Type doesn't have parameterless constructor.");
+                    var continueControl = il.DefineLabel();
+                    var setDefault = il.DefineLabel();
+                    il.Emit(OpCodes.Dup);
+                    il.Emit(OpCodes.Ldnull);
+                    il.Emit(OpCodes.Beq_S, setDefault);
                     il.Emit(OpCodes.Unbox_Any, toOther);
+                    il.Emit(OpCodes.Br_S, continueControl);
+                    il.MarkLabel(setDefault);
+                    il.Emit(OpCodes.Newobj, constructor);
+                    il.MarkLabel(continueControl);
                     return;
                 }
                 if (toOther == typeof (object))

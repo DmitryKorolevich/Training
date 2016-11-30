@@ -433,12 +433,8 @@ namespace VitalChoice.DynamicData.Base
                             var value =
                                 await _converter.ConvertToModelAsync(dynamicValue?.GetType(), pair.Value.PropertyType, dynamicValue,
                                     pair.Value.Converter);
-                            if (value != null)
-                            {
-                                TypeValidator.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value,
-                                    true);
-                                pair.Value.Set?.Invoke(result, value);
-                            }
+                            //TypeValidator.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value, true);
+                            pair.Value.Set?.Invoke(result, value);
                         }
                     }
                 }
@@ -461,11 +457,17 @@ namespace VitalChoice.DynamicData.Base
                     var mappingName = pair.Value.Map?.Name ?? pair.Key;
                     if (!dynamicCache.Properties.ContainsKey(mappingName))
                     {
-                        var value = ObjectMapping.Base.TypeConverter.ConvertFromModelObject(pair.Value.PropertyType,
+                        var value = TypeConverter.ConvertFromModelObject(pair.Value.PropertyType,
                             pair.Value.Get?.Invoke(model));
 
                         if (value == null)
+                        {
+                            if (data.ContainsKey(mappingName))
+                            {
+                                data.Remove(mappingName);
+                            }
                             continue;
+                        }
 
                         if (!data.ContainsKey(mappingName))
                         {

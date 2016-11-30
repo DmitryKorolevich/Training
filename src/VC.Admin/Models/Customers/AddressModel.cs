@@ -44,7 +44,7 @@ namespace VC.Admin.Models.Customers
 		public string County { get; set; }
 
 		[Map("IdState")]
-		public int State { get; set; }
+		public int? State { get; set; }
 
         public string StateCode { get; set; }
 
