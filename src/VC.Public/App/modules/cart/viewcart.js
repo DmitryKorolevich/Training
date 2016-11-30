@@ -122,8 +122,8 @@ function recalculateCart(viewModel, successCallback) {
             contentType: "application/json; charset=utf-8",
             type: "POST"
         }).success(function (result) {
+            $("span[data-valmsg-for]").text('');
             if (result.Success) {
-                $("span[data-valmsg-for]").text('');
                 $("div.validation-summary-errors").html('');
                 if (successCallback) {
                     viewModel.refreshing(false);
@@ -134,7 +134,6 @@ function recalculateCart(viewModel, successCallback) {
                     viewModel.refreshing(false);
                 }
             } else {
-                $("span[data-valmsg-for]").text('');
                 if (result.Data) {
                     ko.mapping.fromJS(result.Data, { 'ignore': ["ShipAsap", "DiscountCode", "ShippingDate"] }, viewModel.Model);
                     processServerMessages(viewModel.Model);
@@ -160,9 +159,9 @@ function initCart() {
         contentType: "application/json; charset=utf-8",
         type: "GET"
     }).success(function (result) {
+        $("span[data-valmsg-for]").text('');
         var binded = false;
         if (result.Success) {
-            $("span[data-valmsg-for]").text('');
             $("div.validation-summary-errors").html('');
 
             viewModel = new Cart(result.Data);
@@ -173,9 +172,6 @@ function initCart() {
                 viewModel = new Cart(result.Data);
                 binded = true;
                 ko.applyBindings(viewModel);
-            }
-            else {
-                $("span[data-valmsg-for]").text('');
             }
             viewModel.refreshing(false);
             processErrorResponse(result);

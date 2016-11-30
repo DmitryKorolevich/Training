@@ -221,7 +221,7 @@ namespace VC.Public.Controllers
                         await _orderPaymentMethodConverter.UpdateModelAsync<BillingInfoModel>(addUpdateModel, cart.Order.PaymentMethod);
                     }
 
-                    await PopulateCreditCardsLookup();
+                    ViewBag.CreditCards = PopulateCreditCardsLookup(currentCustomer, cart.Order);
 
                     addUpdateModel.Id = firstCreditCard.Id;
                 }
@@ -296,7 +296,7 @@ namespace VC.Public.Controllers
                     {
                         if (loggedIn)
                         {
-                            await PopulateCreditCardsLookup();
+                            ViewBag.CreditCards = PopulateCreditCardsLookup(cart.Order.Customer);
                         }
                         model.IdCustomerType = cart.Order?.Customer?.IdObjectType ?? (int) CustomerType.Retail;
                         return View(model);
@@ -310,7 +310,7 @@ namespace VC.Public.Controllers
                             {
                                 if (loggedIn)
                                 {
-                                    await PopulateCreditCardsLookup();
+                                    ViewBag.CreditCards = PopulateCreditCardsLookup(cart.Order.Customer);
                                 }
                                 else
                                 {

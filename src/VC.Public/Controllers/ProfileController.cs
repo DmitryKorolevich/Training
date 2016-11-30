@@ -136,21 +136,22 @@ namespace VC.Public.Controllers
             return ordersModel;
         }
 
-        private async Task<BillingInfoModel> GetBillingDetailsInternal(int id, int orderId)
+        private async Task<Tuple<BillingInfoModel, CustomerDynamic, OrderDynamic>> GetBillingDetailsInternal(int id, int orderId)
         {
             var currentCustomer = await GetCurrentCustomerDynamic();
 
             BillingInfoModel model;
+            OrderDynamic order = null;
             if (id > 0)
             {
-                var dynamic = currentCustomer.CustomerPaymentMethods
+                var paymentMethod = currentCustomer.CustomerPaymentMethods
                 .Single(p => p.IdObjectType == (int)PaymentMethodType.CreditCard && p.Id == id);
-                model = await _addressConverter.ToModelAsync<BillingInfoModel>(dynamic.Address);
-                await _customerPaymentMethodConverter.UpdateModelAsync(model, dynamic);
+                model = await _addressConverter.ToModelAsync<BillingInfoModel>(paymentMethod.Address);
+                await _customerPaymentMethodConverter.UpdateModelAsync(model, paymentMethod);
             }
             else if (orderId > 0)
             {
-                var order = await _orderService.SelectAsync(orderId);
+                order = await _orderService.SelectAsync(orderId, true);
                 model = await _addressConverter.ToModelAsync<BillingInfoModel>(order.PaymentMethod.Address);
                 await _orderPaymentMethodConverter.UpdateModelAsync(model, order.PaymentMethod);
             }
@@ -159,7 +160,7 @@ namespace VC.Public.Controllers
                 throw new ApiException();
             }
 
-            return model;
+            return Tuple.Create(model, currentCustomer, order);
         }
 
         private async Task<PagedListEx<OrderHistoryItemModel>> PopulateOrderHistoryModel(VOrderFilter filter)
@@ -734,15 +735,10 @@ namespace VC.Public.Controllers
         public async Task<IActionResult> AutoShipBillingDetails(int orderId)
         {
             var billingInfoModel = await GetBillingDetailsInternal(0, orderId);
-
-            await PopulateCreditCardsLookup();
-
-            var dict = (Dictionary<int, string>)ViewBag.CreditCards;
-            dict.Add(orderId, "In Order");
-            ViewBag.CreditCards = dict;
+            ViewBag.CreditCards = PopulateCreditCardsLookup(billingInfoModel.Item2, billingInfoModel.Item3);
             ViewBag.OrderId = orderId;
 
-            return PartialView("_AutoShipBillingDetails", billingInfoModel);
+            return PartialView("_AutoShipBillingDetails", billingInfoModel.Item1);
         }
 
         [HttpPost]
@@ -753,7 +749,7 @@ namespace VC.Public.Controllers
                 return PartialView("_BillingDetailsInner", model);
             }
 
-            var order = await _orderService.SelectWithCustomerAsync(orderId);
+            var order = await _orderService.SelectWithCustomerAsync(orderId, true);
             if (order.Customer.Id != GetInternalCustomerId())
             {
                 throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AccessDenied], HttpStatusCode.Forbidden);
@@ -777,7 +773,7 @@ namespace VC.Public.Controllers
         {
             var billingInfoModel = await GetBillingDetailsInternal(paymentId, orderId);
 
-            return PartialView("_BillingDetailsInner", billingInfoModel);
+            return PartialView("_BillingDetailsInner", billingInfoModel.Item1);
         }
 
         [HttpPost]
