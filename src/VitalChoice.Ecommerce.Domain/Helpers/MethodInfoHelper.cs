@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 
 namespace VitalChoice.Ecommerce.Domain.Helpers
 {
@@ -10,10 +12,10 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
     {
         public static Delegate CompileStaticDelegateAccessor<TDelegate>(this MethodInfo method)
         {
-            if (!(typeof (TDelegate).GetTypeInfo().IsSubclassOf(typeof (Delegate))))
+            if (!(typeof(TDelegate).GetTypeInfo().IsSubclassOf(typeof(Delegate))))
                 throw new ArgumentException("TDelegate should be a delegate");
-            var delegateMethod = typeof (TDelegate).GetMethod("Invoke");
-            return method.GetOrCompile(method.ReturnType, typeof (TDelegate),
+            var delegateMethod = typeof(TDelegate).GetMethod("Invoke");
+            return method.GetOrCompile(method.ReturnType, typeof(TDelegate),
                 delegateMethod.GetParameters().Select(p => p.ParameterType).ToArray());
         }
 
@@ -26,38 +28,38 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
         /// <returns>Delegate to invoke method</returns>
         public static Func<TResult> CompileStaticAccessor<TResult>(this MethodInfo method)
         {
-            return (Func<TResult>) method.GetOrCompile(typeof (TResult), typeof (Func<TResult>));
+            return (Func<TResult>) method.GetOrCompile(typeof(TResult), typeof(Func<TResult>));
         }
 
         public static Action<T> CompileVoidAccessor<T>(this MethodInfo method)
         {
-            return (Action<T>) method.GetOrCompile(typeof (void), typeof (Action<T>), typeof (T));
+            return (Action<T>) method.GetOrCompile(typeof(void), typeof(Action<T>), typeof(T));
         }
 
         public static Action<T1, T2> CompileVoidAccessor<T1, T2>(this MethodInfo method)
         {
-            return (Action<T1, T2>) method.GetOrCompile(typeof (void), typeof (Action<T1, T2>), typeof (T1), typeof (T2));
+            return (Action<T1, T2>) method.GetOrCompile(typeof(void), typeof(Action<T1, T2>), typeof(T1), typeof(T2));
         }
 
         public static Action<T1, T2, T3> CompileVoidAccessor<T1, T2, T3>(this MethodInfo method)
         {
             return
-                (Action<T1, T2, T3>) method.GetOrCompile(typeof (void), typeof (Action<T1, T2, T3>), typeof (T1), typeof (T2), typeof (T3));
+                (Action<T1, T2, T3>) method.GetOrCompile(typeof(void), typeof(Action<T1, T2, T3>), typeof(T1), typeof(T2), typeof(T3));
         }
 
         public static Action<T1, T2, T3, T4> CompileVoidAccessor<T1, T2, T3, T4>(this MethodInfo method)
         {
             return
                 (Action<T1, T2, T3, T4>)
-                    method.GetOrCompile(typeof (void), typeof (Action<T1, T2, T3, T4>), typeof (T1), typeof (T2), typeof (T3), typeof (T4));
+                method.GetOrCompile(typeof(void), typeof(Action<T1, T2, T3, T4>), typeof(T1), typeof(T2), typeof(T3), typeof(T4));
         }
 
         public static Action<T1, T2, T3, T4, T5> CompileVoidAccessor<T1, T2, T3, T4, T5>(this MethodInfo method)
         {
             return
                 (Action<T1, T2, T3, T4, T5>)
-                    method.GetOrCompile(typeof (void), typeof (Action<T1, T2, T3, T4, T5>), typeof (T1), typeof (T2), typeof (T3),
-                        typeof (T4), typeof (T5));
+                method.GetOrCompile(typeof(void), typeof(Action<T1, T2, T3, T4, T5>), typeof(T1), typeof(T2), typeof(T3),
+                    typeof(T4), typeof(T5));
         }
 
         /// <summary>
@@ -69,7 +71,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
         /// <returns>Delegate to invoke method</returns>
         public static Func<T, TResult> CompileAccessor<T, TResult>(this MethodInfo method)
         {
-            return (Func<T, TResult>) method.GetOrCompile(typeof (TResult), typeof (Func<T, TResult>), typeof (T));
+            return (Func<T, TResult>) method.GetOrCompile(typeof(TResult), typeof(Func<T, TResult>), typeof(T));
         }
 
         /// <summary>
@@ -81,7 +83,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
         /// <returns>Delegate to invoke method</returns>
         public static Func<T1, T2, TResult> CompileAccessor<T1, T2, TResult>(this MethodInfo method)
         {
-            return (Func<T1, T2, TResult>) method.GetOrCompile(typeof (TResult), typeof (Func<T1, T2, TResult>), typeof (T1), typeof (T2));
+            return (Func<T1, T2, TResult>) method.GetOrCompile(typeof(TResult), typeof(Func<T1, T2, TResult>), typeof(T1), typeof(T2));
         }
 
         /// <summary>
@@ -95,7 +97,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
         {
             return
                 (Func<T1, T2, T3, TResult>)
-                    method.GetOrCompile(typeof (TResult), typeof (Func<T1, T2, T3, TResult>), typeof (T1), typeof (T2), typeof (T3));
+                method.GetOrCompile(typeof(TResult), typeof(Func<T1, T2, T3, TResult>), typeof(T1), typeof(T2), typeof(T3));
         }
 
         /// <summary>
@@ -109,8 +111,8 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
         {
             return
                 (Func<T1, T2, T3, T4, TResult>)
-                    method.GetOrCompile(typeof (TResult), typeof (Func<T1, T2, T3, T4, TResult>), typeof (T1), typeof (T2), typeof (T3),
-                        typeof (T4));
+                method.GetOrCompile(typeof(TResult), typeof(Func<T1, T2, T3, T4, TResult>), typeof(T1), typeof(T2), typeof(T3),
+                    typeof(T4));
         }
 
         /// <summary>
@@ -125,8 +127,8 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
         {
             return
                 (Func<T1, T2, T3, T4, T5, TResult>)
-                    method.GetOrCompile(typeof (TResult), typeof (Func<T1, T2, T3, T4, T5, TResult>), typeof (T1), typeof (T2), typeof (T3),
-                        typeof (T4), typeof (T5));
+                method.GetOrCompile(typeof(TResult), typeof(Func<T1, T2, T3, T4, T5, TResult>), typeof(T1), typeof(T2), typeof(T3),
+                    typeof(T4), typeof(T5));
         }
 
         // ReSharper disable UnusedParameter.Local
@@ -136,6 +138,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                 !method.IsStatic && method.GetParameters().Length + 1 != typeParameters.Length)
                 throw new ArgumentException("Method has different number of arguments");
         }
+
         // ReSharper enable UnusedParameter.Local
 
         private static DynamicMethod EmitDynamic(Type returnType, MethodInfo method, params Type[] typeParameters)
@@ -158,6 +161,8 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             return dynamic;
         }
 
+        private static T GetDefault<T>() => default(T);
+
         private static void EmitCastIfNeeded(this ILGenerator il, Type one, Type toOther)
         {
             if (one == toOther)
@@ -167,27 +172,28 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                 if (one == typeof(object))
                 {
                     //initialize value type with default if object is null
-                    var constructor = toOther.GetConstructor(new Type[0]);
-                    if (constructor == null)
-                        throw new InvalidOperationException($"{toOther} Type doesn't have parameterless constructor.");
+                    var doUnbox = il.DefineLabel();
                     var continueControl = il.DefineLabel();
-                    var setDefault = il.DefineLabel();
                     il.Emit(OpCodes.Dup);
                     il.Emit(OpCodes.Ldnull);
-                    il.Emit(OpCodes.Beq_S, setDefault);
-                    il.Emit(OpCodes.Unbox_Any, toOther);
+                    il.Emit(OpCodes.Ceq);
+                    il.Emit(OpCodes.Brfalse_S, doUnbox);
+                    il.Emit(OpCodes.Pop);
+                    il.Emit(OpCodes.Call,
+                        typeof(MethodInfoHelper).GetMethod("GetDefault", BindingFlags.Static | BindingFlags.NonPublic)
+                            .MakeGenericMethod(toOther));
                     il.Emit(OpCodes.Br_S, continueControl);
-                    il.MarkLabel(setDefault);
-                    il.Emit(OpCodes.Newobj, constructor);
+                    il.MarkLabel(doUnbox);
+                    il.Emit(OpCodes.Unbox_Any, toOther);
                     il.MarkLabel(continueControl);
                     return;
                 }
-                if (toOther == typeof (object))
+                if (toOther == typeof(object))
                 {
                     il.Emit(OpCodes.Box, one);
                     return;
                 }
-                if (toOther.IsImplementGeneric(typeof (Nullable<>)) && !one.IsImplementGeneric(typeof(Nullable<>)))
+                if (toOther.IsImplementGeneric(typeof(Nullable<>)) && !one.IsImplementGeneric(typeof(Nullable<>)))
                 {
                     var constructor = toOther.GetConstructor(new[] {toOther.UnwrapNullable()});
                     if (constructor != null)
@@ -270,10 +276,10 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             {
                 unchecked
                 {
-                    var hashCode = (_methodInfo.Name.GetHashCode() * 397) ^
+                    var hashCode = (_methodInfo.Name.GetHashCode()*397) ^
                                    (_methodInfo.DeclaringType?.GetHashCode() ?? _methodInfo.ReturnType.GetHashCode());
 
-                    hashCode = (hashCode * 397) ^ _resultType.GetHashCode();
+                    hashCode = (hashCode*397) ^ _resultType.GetHashCode();
                     // ReSharper disable once ForCanBeConvertedToForeach
                     // ReSharper disable once LoopCanBeConvertedToQuery
                     if (_parameters != null)
@@ -281,7 +287,7 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                         for (int i = 0; i < _parameters.Length; i++)
                         {
                             var type = _parameters[i];
-                            hashCode = (hashCode * 397) ^ type.GetHashCode();
+                            hashCode = (hashCode*397) ^ type.GetHashCode();
                         }
                     }
                     return hashCode;
@@ -312,16 +318,6 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
         private static Delegate GetOrCompile(this MethodInfo method, Type returnType, Type delegateType, params Type[] typeParameters)
         {
             CacheItem cacheKey = new CacheItem(method, returnType, typeParameters);
-            Delegate result;
-            lock (CompiledCache)
-            {
-                if (CompiledCache.TryGetValue(cacheKey, out result))
-                {
-                    return result;
-                }
-            }
-            var dynamic = EmitDynamic(returnType, method, typeParameters);
-            result = dynamic.CreateDelegate(delegateType);
             lock (CompiledCache)
             {
                 Delegate perminarilyResult;
@@ -329,10 +325,11 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                 {
                     return perminarilyResult;
                 }
+                var dynamic = EmitDynamic(returnType, method, typeParameters);
+                var result = dynamic.CreateDelegate(delegateType);
                 CompiledCache.Add(cacheKey, result);
                 return result;
             }
         }
-
     }
 }
