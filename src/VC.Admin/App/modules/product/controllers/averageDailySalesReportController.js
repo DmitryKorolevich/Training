@@ -93,7 +93,7 @@
             var currentDate = new Date();
             currentDate.setHours(0, 0, 0, 0);
             $scope.filter = {
-                To: currentDate.shiftDate('+1d'),
+                To: currentDate,
                 From: currentDate.shiftDate('-3m'),
                 Mode: 1,
                 IdCustomerType: null,
