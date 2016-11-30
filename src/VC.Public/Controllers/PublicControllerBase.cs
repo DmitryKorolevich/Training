@@ -144,11 +144,11 @@ namespace VC.Public.Controllers
             {
                 if ((bool?) creditCard.SafeData.Default ?? false)
                 {
-                    creditCardsList.Add(new KeyValuePair<int, string>(0, FormatCreditCardShortInfo(creditCard, "(Default)")));
+                    creditCardsList.Add(new KeyValuePair<int, string>(creditCard.Id, FormatCreditCardShortInfo(creditCard, "(Default)")));
                 }
                 else
                 {
-                    creditCardsList.Add(new KeyValuePair<int, string>(0, FormatCreditCardShortInfo(creditCard)));
+                    creditCardsList.Add(new KeyValuePair<int, string>(creditCard.Id, FormatCreditCardShortInfo(creditCard)));
                 }
             }
 

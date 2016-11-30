@@ -178,14 +178,17 @@ namespace VC.Public.Controllers
                 var currentCustomer = await GetCurrentCustomerDynamic();
 
                 var creditCard = currentCustomer.CustomerPaymentMethods
-                    .Single(p => p.IdObjectType == (int) PaymentMethodType.CreditCard && p.Id == id);
+                    .FirstOrDefault(p => p.IdObjectType == (int) PaymentMethodType.CreditCard && p.Id == id);
 
-                var billingInfoModel = await _addressConverter.ToModelAsync<AddUpdateBillingAddressModel>(creditCard.Address);
-                await _paymentMethodConverter.UpdateModelAsync<BillingInfoModel>(billingInfoModel, creditCard);
+                if (creditCard != null)
+                {
+                    var billingInfoModel = await _addressConverter.ToModelAsync<AddUpdateBillingAddressModel>(creditCard.Address);
+                    await _paymentMethodConverter.UpdateModelAsync<BillingInfoModel>(billingInfoModel, creditCard);
 
-                billingInfoModel.Email = currentCustomer.Email;
+                    billingInfoModel.Email = currentCustomer.Email;
 
-                return PartialView("_AddUpdateBillingAddress", billingInfoModel);
+                    return PartialView("_AddUpdateBillingAddress", billingInfoModel);
+                }
             }
             return PartialView("_AddUpdateBillingAddress", null);
         }
