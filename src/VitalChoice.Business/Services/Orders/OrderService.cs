@@ -93,9 +93,8 @@ namespace VitalChoice.Business.Services.Orders
         private readonly ReferenceData _referenceData;
         private readonly OrderRepository _orderRepository;
         private readonly AppSettings _appSettings;
+        private readonly IAdminEditLockService _lockService;
         private readonly ILoggerFactory _loggerFactory;
-
-        private readonly IRedirectService _redirectService;
 
         public OrderService(
             IEcommerceRepositoryAsync<VOrderWithRegionInfoItem> vOrderWithRegionInfoItemRepository,
@@ -125,8 +124,7 @@ namespace VitalChoice.Business.Services.Orders
             IEcommerceRepositoryAsync<OrderToSku> orderToSkusRepository, IDiscountService discountService,
             IEcommerceRepositoryAsync<VAutoShip> vAutoShipRepository, IEcommerceRepositoryAsync<VAutoShipOrder> vAutoShipOrderRepository,
             AffiliateOrderPaymentRepository affiliateOrderPaymentRepository, ICountryNameCodeResolver codeResolver,
-            IDynamicEntityOrderingExtension<Order> orderingExtension, ReferenceData referenceData, AppSettings appSettings,
-            IRedirectService redirectService)
+            IDynamicEntityOrderingExtension<Order> orderingExtension, ReferenceData referenceData, AppSettings appSettings, IAdminEditLockService lockService)
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension
@@ -154,13 +152,12 @@ namespace VitalChoice.Business.Services.Orders
             _codeResolver = codeResolver;
             _referenceData = referenceData;
             _appSettings = appSettings;
+            _lockService = lockService;
             _orderRepository = orderRepository;
             _addressMapper = addressMapper;
             _productService = productService;
             _notificationService = notificationService;
             _loggerFactory = loggerProvider;
-
-            _redirectService = redirectService;
         }
 
         private async Task<Order> InsertAsyncInternal(OrderDynamic model, IUnitOfWorkAsync uow)
@@ -815,8 +812,24 @@ namespace VitalChoice.Business.Services.Orders
             }
         }
 
+        protected override Task<List<MessageInfo>> ValidateDeleteAsync(int id)
+        {
+            if (_lockService.GetIsOrderLocked(id))
+            {
+                throw new AppValidationException(
+                    "This order is currently being exported. You won't be able to save your changes. Wait a few minutes then refresh.");
+            }
+            return base.ValidateDeleteAsync(id);
+        }
+
         protected override Task<List<MessageInfo>> ValidateAsync(OrderDynamic dynamic)
         {
+            if (_lockService.GetIsOrderLocked(dynamic.Id))
+            {
+                throw new AppValidationException(
+                    "This order is currently being exported. You won't be able to save your changes. Wait a few minutes then refresh.");
+            }
+
             if (dynamic.Id == 0 && dynamic.Customer.StatusCode == (int) CustomerStatus.Suspended)
             {
                 throw new CustomerSuspendException();

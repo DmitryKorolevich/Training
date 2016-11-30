@@ -15,7 +15,8 @@ namespace VitalChoice.ExportService.Services
         Task<List<MessageInfo>> AuthorizeCreditCard(OrderPaymentMethodDynamic paymentMethod);
         Task UpdateCustomerPaymentMethods(ICollection<CustomerCardData> paymentMethods);
         Task UpdateOrderPaymentMethod(OrderCardData paymentMethod);
-        Task ExportOrders(ICollection<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack, int userId);
+        Task ExportOrders(ICollection<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack,
+            Func<int, Task<bool>> exportLockRequest, int userId);
         void SwitchToInMemoryContext();
         Task SwitchToRealContext();
     }

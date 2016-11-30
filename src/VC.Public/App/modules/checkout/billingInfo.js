@@ -24,10 +24,7 @@
 	    var form = $(".columns-container form").get(0);
 	    $(".columns-container .overlay").show();
 	    ignoreCanadaNotice = true;
-	    setTimeout(function ()
-	    {
-	        form.submit();
-	    }, 100);
+	    form.submit();
 	});
 
 	$(".columns-container form").data("validator").settings.submitHandler = function (form)
@@ -64,10 +61,7 @@
 	    else
 	    {
 	        $(".columns-container .overlay").show();
-	        setTimeout(function ()
-	        {
-	            form.submit();
-	        }, 100);
+	        form.submit();
 	    }
 	};
 
@@ -76,6 +70,8 @@
 	var cardId = $("#ddCreditCardsSelection").val() === undefined ? $("#hdCreditCard").val() : $("#ddCreditCardsSelection").val();
 	checkCreditCard(cardId);
 	getBrontoIsUnsubscribed();
+
+	$(".columns-container .overlay").hide();
 });
 
 function changeSelection(selId) {

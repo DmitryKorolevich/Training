@@ -29,10 +29,7 @@
     $(".columns-container form").data("validator").settings.submitHandler = function (form)
     {
         $(".columns-container .overlay").show();
-        setTimeout(function ()
-        {
-            form.submit();
-        }, 100);
+        form.submit();
     };
 
     controlUpdateSavedState();
@@ -77,6 +74,8 @@
             $(".columns-container .overlay").hide();
         });
     }
+
+    $(".columns-container .overlay").hide();
 });
 
 function controlUpdateSavedState() {

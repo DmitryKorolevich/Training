@@ -32,7 +32,7 @@
 	<span class="checkout-notification-simple">An accurate billing address is essential to get your order to you quickly.</span>
 	<span class="checkout-notification-important">Shopping online with Vital Choice is extremely safe. All information is encrypted.</span>
     <div class="columns-container checkout-columns-container">
-        <div class="overlay hide">
+        <div class="overlay">
             <div class="loading">Loading…</div>
         </div>
         @using (Html.BeginForm("AddUpdateBillingAddress", "Checkout", null, FormMethod.Post, null, new { @class = "form-regular medium-small", role = "form" }))
@@ -54,7 +54,8 @@
                 </div>
                 <div class="form-group">
                     <div class="checkout-sections-divider"></div>
-                </div>}
+                </div>
+            }
             <div class="form-group">
                 <label class="control-label">Pay with Credit Card</label>
                 <div class="input-group checkout-acceptable-cards">
@@ -116,7 +117,7 @@
                     </label>
                 </div>
             </div>
-            @if (Model?.ShowSendCatalog==true)
+            if (Model?.ShowSendCatalog==true)
              {
                  <div class="form-group">
                      <label class="control-label"></label>

@@ -1,27 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using VC.Public.Models.Profile;
 using VC.Public.Models.Tracking;
-using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;
-using VitalChoice.Infrastructure.Domain.Entities.Users;
-using VitalChoice.Infrastructure.Identity.UserManagers;
-using VitalChoice.Interfaces.Services.Content;
-using VitalChoice.Interfaces.Services.Users;
 using Microsoft.AspNetCore.Http;
 using VitalChoice.Infrastructure.Domain.Transfer;
-using VitalChoice.Interfaces.Services.Affiliates;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
-using Microsoft.Extensions.DependencyInjection;
-using VC.Public.Helpers;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -34,28 +21,29 @@ namespace VC.Public.Components.Tracking
     {
         private const string TrackScriptsBaseModel = "TrackScriptsBaseModel";
 
-        public static async Task SetBaseOptions(BaseTrackScriptsModel toReturn, HttpContext context,
+        public static async Task SetBaseOptions(this BaseTrackScriptsModel toReturn, HttpContext context,
             Lazy<IOrderService> orderService, Lazy<IAuthorizationService> authorizationService, Lazy<ICheckoutService> checkoutService,
-            Lazy<ICustomerService> customerService,Lazy<ReferenceData> referenceData)
+            Lazy<ICustomerService> customerService, Lazy<ReferenceData> referenceData)
         {
+            toReturn.Step = GetCheckoutStep(context);
+
             if (context.Items.ContainsKey(TrackScriptsBaseModel))
             {
-                var baseModel = (BaseTrackScriptsModel)context.Items[TrackScriptsBaseModel];
+                var baseModel = (BaseTrackScriptsModel) context.Items[TrackScriptsBaseModel];
                 toReturn.Order = baseModel.Order;
                 toReturn.OrderCompleteStep = baseModel.OrderCompleteStep;
                 return;
             }
 
             OrderDynamic order;
-            var path = context.Request.Path.Value;
-            if (path == "/checkout/receipt")
+            if (toReturn.Step == CheckoutStep.Receipt)
             {
                 var idOrder = context.Session.GetInt32(CheckoutConstants.ReceiptSessionOrderId);
                 if (idOrder.HasValue)
                 {
                     var tOrderService = orderService.Value;
                     order = await orderService.Value.SelectAsync(idOrder.Value, true);
-                    if (order.IdObjectType == (int)OrderType.AutoShip)
+                    if (order.IdObjectType == (int) OrderType.AutoShip)
                     {
                         var id = (await tOrderService.SelectAutoShipOrdersAsync(idOrder.Value)).FirstOrDefault();
 
@@ -108,7 +96,32 @@ namespace VC.Public.Components.Tracking
             });
         }
 
-        public static string GetProductFullName(SkuOrdered skuOrdered)
+        public static CheckoutStep GetCheckoutStep(this HttpContext context)
+        {
+            if (context.Request.Path.HasValue)
+            {
+                switch (context.Request.Path.Value)
+                {
+                    case "/checkout/welcome":
+                        return CheckoutStep.Welcome;
+                    case "/checkout/addupdatebillingaddress":
+                        return CheckoutStep.Billing;
+                    case "/checkout/addupdateshippingmethod":
+                        return CheckoutStep.Shipping;
+                    case "/checkout/revieworder":
+                        return CheckoutStep.Preview;
+                    case "/cart/viewcart":
+                        return CheckoutStep.ViewCart;
+                    case "/checkout/receipt":
+                        return CheckoutStep.Receipt;
+                    default:
+                        return CheckoutStep.Unknown;
+                }
+            }
+            return CheckoutStep.Unknown;
+        }
+
+        public static string GetProductFullName(this SkuOrdered skuOrdered)
         {
             var toReturn = skuOrdered.Sku.Product.Name ?? String.Empty;
             if (!string.IsNullOrEmpty(skuOrdered.Sku.Product.SafeData.SubTitle))

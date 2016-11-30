@@ -75,8 +75,6 @@ $(function () {
     initCart();
 
     $(".date-picker").datepicker("option", "minDate", 1);
-
-
 });
 
 function formatCurrency(value) {

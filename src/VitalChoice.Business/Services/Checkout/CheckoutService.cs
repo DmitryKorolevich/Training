@@ -32,6 +32,7 @@ using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
+using VitalChoice.Infrastructure.Extensions;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Customers;
@@ -160,120 +161,89 @@ namespace VitalChoice.Business.Services.Checkout
                 try
                 {
                     CartExtended cart;
-                    if (uid.HasValue)
-                    {
-                        cart = await BuildIncludes(_cartRepository.Query(c => c.CartUid == uid.Value)).SelectFirstOrDefaultAsync(false);
-                        if (cart != null)
-                        {
-                            if (cart.IdCustomer == null)
-                            {
-                                var customerCart =
-                                    await
-                                        _cartRepository.Query(c => c.IdCustomer == idCustomer)
-                                            .SelectFirstOrDefaultAsync(true);
-
-                                var dbCart = await _cartRepository.Query(c => c.CartUid == cart.CartUid).SelectFirstOrDefaultAsync(true);
-
-                                if (customerCart?.IdOrder != null)
-                                {
-                                    var cartDataSource = new CustomerCartOrder
-                                    {
-                                        CartUid = cart.CartUid,
-                                        Order = await _orderService.SelectAsync(customerCart.IdOrder.Value, true)
-                                    };
-                                    cartDataSource.Order.Customer = await _customerService.SelectAsync(idCustomer, true);
-
-                                    var currentCart = await InitCartOrderModel(cart);
-
-                                    cartDataSource.CartUid = cart.CartUid;
-                                    cartDataSource.Order.Skus = currentCart.Order.Skus;
-                                    cartDataSource.Order.Discount = currentCart.Order.Discount;
-                                    cartDataSource.Order.GiftCertificates = currentCart.Order.GiftCertificates;
-                                    cartDataSource.Order.PromoSkus = currentCart.Order.PromoSkus;
-
-                                    cart.IdCustomer = idCustomer;
-                                    cart.IdOrder = customerCart.IdOrder;
-                                    dbCart.IdCustomer = idCustomer;
-                                    dbCart.IdOrder = customerCart.IdOrder;
-                                    customerCart.IdOrder = null;
-                                    customerCart.IdCustomer = null;
-
-                                    await _context.SaveChangesAsync();
-                                    cartDataSource.Order =
-                                        (await _orderService.CalculateStorefrontOrder(cartDataSource.Order, OrderStatus.Incomplete)).Order;
-                                    await _orderService.UpdateAsync(cartDataSource.Order);
-                                }
-                            }
-                            else
-                            {
-                                if (cart.IdCustomer != idCustomer && cart.IdOrder != null)
-                                {
-                                    var currectOrder = await _orderService.SelectAsync(cart.IdOrder.Value, true);
-                                    var newCart = await CreateNew(idCustomer);
-                                    var newCartOrder = await InitCartOrderModel(newCart);
-                                    newCartOrder.Order.Customer = await _customerService.SelectAsync(idCustomer, true);
-                                    newCartOrder.Order.Skus = currectOrder.Skus;
-                                    newCartOrder.Order.PromoSkus = currectOrder.PromoSkus;
-                                    newCartOrder.Order.Discount = currectOrder.Discount;
-                                    newCartOrder.Order.GiftCertificates = currectOrder.GiftCertificates;
-
-                                    newCartOrder.Order =
-                                        (await _orderService.CalculateStorefrontOrder(newCartOrder.Order, OrderStatus.Incomplete)).Order;
-
-                                    newCartOrder.Order = await _orderService.InsertAsync(newCartOrder.Order);
-
-                                    var dbCart =
-                                        await _cartRepository.Query(c => c.CartUid == newCart.CartUid).SelectFirstOrDefaultAsync(true);
-                                    dbCart.IdOrder = newCartOrder.Order.Id;
-                                    await _context.SaveChangesAsync();
-
-                                    transaction.Commit();
-
-                                    await FillProductContentDetails(newCartOrder);
-
-                                    return newCartOrder;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            cart = await CreateNew(idCustomer);
-                        }
-                        result = new CustomerCartOrder
-                        {
-                            CartUid = cart.CartUid
-                        };
-                    }
-                    else
+                    if (!uid.HasValue)
                     {
                         cart =
                             await BuildIncludes(_cartRepository.Query(c => c.IdCustomer == idCustomer)).SelectFirstOrDefaultAsync(false) ??
                             await CreateNew(idCustomer);
-                        result = new CustomerCartOrder
-                        {
-                            CartUid = cart.CartUid
-                        };
-                    }
-                    if (cart.IdOrder == null)
-                    {
-                        var anonymCart = await InitCartOrderModel(cart);
-                        var customer = await _customerService.SelectAsync(idCustomer, true);
-                        anonymCart.Order.Customer = customer;
-                        anonymCart.Order = await _orderService.InsertAsync(anonymCart.Order);
-
-                        var dbCart = await _cartRepository.Query(c => c.CartUid == cart.CartUid).SelectFirstOrDefaultAsync(true);
-                        dbCart.IdOrder = anonymCart.Order.Id;
-                        await _context.SaveChangesAsync();
-
-                        anonymCart.Order.Customer = customer;
-                        result.Order = anonymCart.Order;
                     }
                     else
                     {
-                        result.Order = await _orderService.SelectAsync(cart.IdOrder.Value, true);
-                        result.Order.Customer = await _customerService.SelectAsync(idCustomer, true);
-                        await FillProductContentDetails(result);
+                        cart = await BuildIncludes(_cartRepository.Query(c => c.CartUid == uid.Value)).SelectFirstOrDefaultAsync(false) ??
+                               await CreateNew(idCustomer);
+
+                        if (cart.IdCustomer != null)
+                        {
+                            //if customer id different than was set in cart by uid then create new cart and assign new customer into it
+                            if (cart.IdCustomer != idCustomer && cart.IdOrder != null)
+                            {
+                                var currectOrder = await _orderService.SelectAsync(cart.IdOrder.Value, true);
+                                var newCart = await CreateNew(idCustomer);
+                                var newCartOrder = await InitCartOrderModel(newCart);
+                                newCartOrder.Order.Customer = await _customerService.SelectAsync(idCustomer, true);
+                                newCartOrder.Order.Skus = currectOrder.Skus;
+                                newCartOrder.Order.PromoSkus = currectOrder.PromoSkus;
+                                newCartOrder.Order.Discount = currectOrder.Discount;
+                                newCartOrder.Order.GiftCertificates = currectOrder.GiftCertificates;
+
+                                newCartOrder.Order =
+                                    (await _orderService.CalculateStorefrontOrder(newCartOrder.Order, OrderStatus.Incomplete)).Order;
+
+                                newCartOrder.Order = await _orderService.InsertAsync(newCartOrder.Order);
+
+                                var dbCart =
+                                    await _cartRepository.Query(c => c.CartUid == newCart.CartUid).SelectFirstOrDefaultAsync(true);
+                                dbCart.IdOrder = newCartOrder.Order.Id;
+                                await _context.SaveChangesAsync();
+
+                                transaction.Commit();
+
+                                await FillProductContentDetails(newCartOrder);
+
+                                return newCartOrder;
+                            }
+                        }
+                        else
+                        {
+                            var customerCart =
+                                await
+                                    _cartRepository.Query(c => c.IdCustomer == idCustomer)
+                                        .SelectFirstOrDefaultAsync(true);
+
+                            var dbCart = await _cartRepository.Query(c => c.CartUid == cart.CartUid).SelectFirstOrDefaultAsync(true);
+
+                            if (customerCart?.IdOrder != null)
+                            {
+                                var cartDataSource = new CustomerCartOrder
+                                {
+                                    CartUid = cart.CartUid,
+                                    Order = await _orderService.SelectAsync(customerCart.IdOrder.Value, true)
+                                };
+                                cartDataSource.Order.Customer = await _customerService.SelectAsync(idCustomer, true);
+
+                                var currentCart = await InitCartOrderModel(cart);
+
+                                cartDataSource.CartUid = cart.CartUid;
+                                cartDataSource.Order.Skus = currentCart.Order.Skus;
+                                cartDataSource.Order.Discount = currentCart.Order.Discount;
+                                cartDataSource.Order.GiftCertificates = currentCart.Order.GiftCertificates;
+                                cartDataSource.Order.PromoSkus = currentCart.Order.PromoSkus;
+
+                                cart.IdCustomer = idCustomer;
+                                cart.IdOrder = customerCart.IdOrder;
+                                dbCart.IdCustomer = idCustomer;
+                                dbCart.IdOrder = customerCart.IdOrder;
+                                customerCart.IdOrder = null;
+                                customerCart.IdCustomer = null;
+
+                                await _context.SaveChangesAsync();
+                                cartDataSource.Order =
+                                    (await _orderService.CalculateStorefrontOrder(cartDataSource.Order, OrderStatus.Incomplete)).Order;
+                                await _orderService.UpdateAsync(cartDataSource.Order);
+                            }
+                        }
                     }
+                    result = await CreateCartResult(idCustomer, cart);
                     transaction.Commit();
                 }
                 catch (AppValidationException)
@@ -288,6 +258,44 @@ namespace VitalChoice.Business.Services.Checkout
                 }
             }
 
+            return result;
+        }
+
+        private async Task<CustomerCartOrder> CreateCartResult(int idCustomer, CartExtended cart)
+        {
+            var result = new CustomerCartOrder
+            {
+                CartUid = cart.CartUid
+            };
+            if (cart.IdOrder == null)
+            {
+                var anonymCart = await InitCartOrderModel(cart);
+                var customer = await _customerService.SelectAsync(idCustomer, true);
+                anonymCart.Order.Customer = customer;
+                anonymCart.Order = await _orderService.InsertAsync(anonymCart.Order);
+
+                var dbCart = await _cartRepository.Query(c => c.CartUid == cart.CartUid).SelectFirstOrDefaultAsync(true);
+                dbCart.IdOrder = anonymCart.Order.Id;
+                await _context.SaveChangesAsync();
+
+                anonymCart.Order.Customer = customer;
+                result.Order = anonymCart.Order;
+            }
+            else
+            {
+                result.Order = await _orderService.SelectAsync(cart.IdOrder.Value, true);
+                //check if order was created before cart reading happen, clear cart then
+                if (result.Order.IsAnyNotIncomplete())
+                {
+                    var dbCart = await _cartRepository.Query(c => c.CartUid == cart.CartUid).SelectFirstOrDefaultAsync(true);
+                    dbCart.IdOrder = null;
+                    await _context.SaveChangesAsync();
+
+                    return await InitCartOrderModel(dbCart);
+                }
+                result.Order.Customer = await _customerService.SelectAsync(idCustomer, true);
+                await FillProductContentDetails(result);
+            }
             return result;
         }
 

@@ -13,5 +13,7 @@ namespace VitalChoice.Interfaces.Services
         void ExportOrderEditLockRequest(int idOrder, string lockMessageTitle, string lockMessageBody);
 
         void ExportOrderEditLockRelease(int idOrder);
+
+        bool GetIsOrderLocked(int idOrder);
     }
 }

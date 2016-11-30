@@ -50,7 +50,7 @@ namespace VC.Public.Components.Tracking
             var toReturn = new BodyEndTrackScriptsModel();
 
             var path = HttpContext.Request.Path.Value;
-            await BaseTrackScriptsComponentHelper.SetBaseOptions(toReturn, HttpContext, _orderService, _authorizationService, _checkoutService, _customerService,
+            await toReturn.SetBaseOptions(HttpContext, _orderService, _authorizationService, _checkoutService, _customerService,
                 _referenceData);
             OrderDynamic order = toReturn.Order;
             var referenceData = _referenceData.Value;
@@ -116,22 +116,22 @@ namespace VC.Public.Components.Tracking
 
                     //google action scripts
                     int? step = null;
-                    switch (path)
+                    switch (toReturn.Step)
                     {
-                        case "/cart/viewcart":
-                        case "/checkout/welcome":
+                        case CheckoutStep.ViewCart:
+                        case CheckoutStep.Welcome:
                             step = 1;
                             break;
-                        case "/checkout/addupdatebillingaddress":
+                        case CheckoutStep.Billing:
                             step = 2;
                             break;
-                        case "/checkout/addupdateshippingmethod":
+                        case CheckoutStep.Shipping:
                             step = 3;
                             break;
-                        case "/checkout/revieworder":
+                        case CheckoutStep.Preview:
                             step = 4;
                             break;
-                        case "/checkout/receipt":
+                        case CheckoutStep.Receipt:
                             step = 5;
                             break;
                     }
@@ -194,7 +194,7 @@ namespace VC.Public.Components.Tracking
 
                     //criteo viewBasket
                     toReturn.CustomerEmail = order.Customer?.Email ?? string.Empty;
-                    if (path == "/cart/viewcart")
+                    if (toReturn.Step == CheckoutStep.ViewCart)
                     {
                         toReturn.CriteoViewCart = String.Empty;
                         for (int i = 0; i < skus.Length; i++)

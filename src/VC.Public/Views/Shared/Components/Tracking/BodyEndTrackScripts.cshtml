@@ -11,7 +11,7 @@
                 'event': 'checkout',
                 'ecommerce': {
                     'checkout': @Html.Raw(Model.GoogleActionCheckout)
-                }
+                    }
             });
         });
     </script>
@@ -25,7 +25,7 @@
             'event': 'purchase',
             'ecommerce': {
                 'purchase': @Html.Raw(Model.GoogleActionPurchase)
-            }
+                }
         });
     </script>
     <!-- Google Action Checkout -->
@@ -47,7 +47,7 @@
     </script>
     <!-- Criteo viewHome -->
 }
-@if (Model.CriteoOrderComplete != null && Model.Order!=null)
+@if (Model.CriteoOrderComplete != null && Model.Order != null)
 {
     <!-- Criteo trackTransaction-->
     <script type="text/javascript">
@@ -80,34 +80,34 @@
 @if (Model.OrderCompleteStep && Model.Order != null)
 {
     <script type="text/javascript">
-    /* <![CDATA[ */
-    var google_conversion_id = 1049623092;
-    var google_conversion_language = "en";
-    var google_conversion_format = "1";
-    var google_conversion_color = "ffffff";
-    var google_conversion_label = "WTwlCJz0-AEQtPS_9AM";
-    var google_conversion_value = 0;
-    var proto = (document.location.protocol == 'https:') ? 'https://' : 'http://';
-    /* ]]> */
+        /* <![CDATA[ */
+        var google_conversion_id = 1049623092;
+        var google_conversion_language = "en";
+        var google_conversion_format = "1";
+        var google_conversion_color = "ffffff";
+        var google_conversion_label = "WTwlCJz0-AEQtPS_9AM";
+        var google_conversion_value = 0;
+        var proto = (document.location.protocol == 'https:') ? 'https://' : 'http://';
+        /* ]]> */
     </script>
     <script type="text/javascript">
         document.write('<scr' + 'ipt type="text/javascript" src="' + proto + 'www.googleadservices.com/pagead/conversion.js"></scri' + 'pt>');
     </script>
     <noscript>
         <div>
-            <img height="1" width="1" style="border-style:none;" alt="" src="http://www.googleadservices.com/pagead/conversion/1049623092/?label=WTwlCJz0-AEQtPS_9AM&amp;guid=ON&amp;script=0" />
+            <img height="1" width="1" style="border-style: none;" alt="" src="http://www.googleadservices.com/pagead/conversion/1049623092/?label=WTwlCJz0-AEQtPS_9AM&amp;guid=ON&amp;script=0" />
         </div>
     </noscript>
 }
 else
 {
     <script type="text/javascript">
-    /* <![CDATA[ */
-    var google_conversion_id = 1044813415;
-    var google_conversion_label = "RSLcCO3XigUQ56ya8gM";
-    var google_custom_params = window.google_tag_params;
-    var google_remarketing_only = true;
-    /* ]]> */
+        /* <![CDATA[ */
+        var google_conversion_id = 1044813415;
+        var google_conversion_label = "RSLcCO3XigUQ56ya8gM";
+        var google_custom_params = window.google_tag_params;
+        var google_remarketing_only = true;
+        /* ]]> */
     </script>
     <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
     </script>
@@ -129,43 +129,43 @@ else
             <div class="MyBuys_ProductID">@skuOrdered.Sku.Product.Id</div>
         }
     </div>
-    <script type="text/javascript">
-        adroll_conversion_value_in_dollars = @Model.Order.Total;
-        adroll_custom_data = { "ORDER_ID": @Model.Order.Id };
-    </script>
+        <script type="text/javascript">
+            adroll_conversion_value_in_dollars = @Model.Order.Total;
+            adroll_custom_data = { "ORDER_ID": @Model.Order.Id };
+        </script>
 }
 <script type="text/javascript">
-        adroll_adv_id = "XVSDDJYFF5DU7F7F6CZF5U";
-        adroll_pix_id = "ODBEBPSLBVDCZKZQXNEJ4A";
-        (function () {
-            var oldonload = window.onload;
-            window.onload = function () {
-                window.setTimeout(function () {
-                    __adroll_loaded = true;
-                    var scr = document.createElement("script");
-                    var host = (("https:" == document.location.protocol) ? "https://s.adroll.com" : "http://a.adroll.com");
-                    scr.setAttribute('async', 'true');
-                    scr.type = "text/javascript";
-                    scr.src = host + "/j/roundtrip.js";
-                    ((document.getElementsByTagName('head') || [null])[0] || document.getElementsByTagName('script')[0].parentNode).appendChild(scr);
-                }, 1);
-                if (oldonload) { oldonload(); }
-            };
-        } ());
+    adroll_adv_id = "XVSDDJYFF5DU7F7F6CZF5U";
+    adroll_pix_id = "ODBEBPSLBVDCZKZQXNEJ4A";
+    (function () {
+        var oldonload = window.onload;
+        window.onload = function () {
+            window.setTimeout(function () {
+                __adroll_loaded = true;
+                var scr = document.createElement("script");
+                var host = (("https:" == document.location.protocol) ? "https://s.adroll.com" : "http://a.adroll.com");
+                scr.setAttribute('async', 'true');
+                scr.type = "text/javascript";
+                scr.src = host + "/j/roundtrip.js";
+                ((document.getElementsByTagName('head') || [null])[0] || document.getElementsByTagName('script')[0].parentNode).appendChild(scr);
+            }, 1);
+            if (oldonload) { oldonload(); }
+        };
+    } ());
 </script>
 <!-- Bronto Popup -->
 <script bronto-popup-id="352a8dc5-61a2-4f0b-92b7-06dfd854c5a3" src="https://cdn.bronto.com/popup/delivery.js" async="async" defer="defer"></script>
 <!-- Bronto Popup -->
 <!-- MyBuys -->
 <script>
-        (function(d,c,x,s,e) {
+    (function(d,c,x,s,e) {
         s = d.createElement(x);
         s.src = '//t.p.mybuys.com/clients/' + c + '/js/mybuys_qs.js';
         s.async = true;
         s.type = 'text/javascript';
         e = d.getElementsByTagName(x)[0];
         e.parentNode.insertBefore(s, e);
-        })(document,'VITALCHOICE','script');
+    })(document,'VITALCHOICE','script');
 </script>
 <!-- MyBuys -->
 <!-- Navistone -->
@@ -173,7 +173,7 @@ else
 <!-- Navistone -->
 @if (Model.BrontoOrderInfo != null)
 {
-    <!-- Bronto Recovery -->
+        <!-- Bronto Recovery -->
     <script type="text/javascript">
         @Html.Raw(Model.BrontoOrderInfo)
     </script>
@@ -181,23 +181,23 @@ else
         var _bsw = _bsw || [];
         _bsw.push(['_bswId', '36f13c0bd65818608293eb63b8b6c5323e1bb458b86aef2d33f510e4b7636d47']);
         (function() {
-        var bsw = document.createElement('script'); bsw.type = 'text/javascript'; bsw.async = true;
-        bsw.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'js.bronto.com/s/b.min.js';
-        var t = document.getElementsByTagName('script')[0]; t.parentNode.insertBefore(bsw, t);
+            var bsw = document.createElement('script'); bsw.type = 'text/javascript'; bsw.async = true;
+            bsw.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'js.bronto.com/s/b.min.js';
+            var t = document.getElementsByTagName('script')[0]; t.parentNode.insertBefore(bsw, t);
         })();
     </script>
-    <!-- Bronto Recovery -->
+        <!-- Bronto Recovery -->
 }
 <!-- Hotjar Tracking Code for http://www.vitalchoice.com -->
 <script>
-        (function(h,o,t,j,a,r){
-            h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-            h._hjSettings={hjid:223273,hjsv:5};
-            a=o.getElementsByTagName('head')[0];
-            r=o.createElement('script');r.async=1;
-            r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-            a.appendChild(r);
-        })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:223273,hjsv:5};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
 </script>
 <!-- Hotjar Tracking Code for http://www.vitalchoice.com -->
 <!-- Pepperjam iframe-->

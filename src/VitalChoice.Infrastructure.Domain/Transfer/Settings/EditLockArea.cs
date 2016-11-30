@@ -10,7 +10,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Settings
         public EditLockArea(string name)
         {
             Name = name;
-            Items=new Dictionary<int, EditLockAreaItem>();
+            Items = new Dictionary<int, EditLockAreaItem>();
             LockObject = new object();
         }
 

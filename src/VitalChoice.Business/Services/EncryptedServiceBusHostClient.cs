@@ -12,18 +12,21 @@ using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
+using VitalChoice.Interfaces.Services.Orders;
 
 namespace VitalChoice.Business.Services
 {
     public sealed class EncryptedServiceBusHostClient : EncryptedServiceBusHost, IEncryptedServiceBusHostClient
     {
+        private readonly IAdminEditLockService _lockService;
         private volatile RSACng _keyExchangeProvider;
         private readonly SemaphoreSlim _publicKeyLock = new SemaphoreSlim(1);
 
         public EncryptedServiceBusHostClient(IOptions<AppOptions> appOptions, ILoggerFactory loggerProvider,
-            IObjectEncryptionHost encryptionHost, IHostingEnvironment env)
+            IObjectEncryptionHost encryptionHost, IHostingEnvironment env, IAdminEditLockService lockService)
             : base(appOptions, loggerProvider.CreateLogger<EncryptedServiceBusHostClient>(), encryptionHost, env)
         {
+            _lockService = lockService;
         }
 
         private async Task<RSACng> GetKeyExchangeProvider()
@@ -107,6 +110,19 @@ namespace VitalChoice.Business.Services
             }
             Logger.LogWarning("Session keys were destroyed before actual usage");
             return await AuthenticateClient(EncryptionHost.GetSession());
+        }
+
+        protected override bool ProcessEncryptedCommand(ServiceBusCommandBase command)
+        {
+            if (command.CommandName == OrderExportProcessCommandConstants.OrderExportStarted)
+            {
+                var idOrder = (int) command.Data.Data;
+                _lockService.ExportOrderEditLockRequest(idOrder, "This Order is currently being exported",
+                    "This order is currently being exported. You won't be able to save your changes. Wait a few minutes then refresh.");
+                SendCommand(new ServiceBusCommandBase(command, true));
+                return true;
+            }
+            return base.ProcessEncryptedCommand(command);
         }
 
         private async Task<RSACng> TryGetKeyProvider()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -23,6 +24,7 @@ using VitalChoice.Core.Services;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Identity.UserManagers;
+using VitalChoice.Infrastructure.Services;
 
 namespace VC.Public.Controllers
 {
@@ -33,6 +35,7 @@ namespace VC.Public.Controllers
         protected readonly ICheckoutService CheckoutService;
         private readonly ExtendedUserManager _userManager;
         protected readonly ReferenceData ReferenceData;
+        protected static readonly ObjectSemaphore<Guid> CartLocks = new ObjectSemaphore<Guid>();
 
         protected PublicControllerBase(ICustomerService customerService, IAuthorizationService authorizationService,
             ICheckoutService checkoutService,
@@ -72,6 +75,14 @@ namespace VC.Public.Controllers
             var internalId = Convert.ToInt32(_userManager.GetUserId(User));
 
             return internalId;
+        }
+
+        protected Task<IDisposable> LockCurrentCart(out Guid? cartUid)
+        {
+            var uid = HttpContext.GetCartUid();
+            cartUid = uid;
+            // ReSharper disable once PossibleInvalidOperationException
+            return CartLocks.LockWhenAsync(() => uid.HasValue, () => uid.Value);
         }
 
         protected async Task<CustomerCartOrder> GetCurrentCart(bool? loggedIn = null)

@@ -27,7 +27,7 @@
 	<h4 class="checkout-step-heading">3. Shipping Method</h4>
 	<span class="checkout-notification-simple">Enter your Shipping Address information below.</span>
     <div class="columns-container">
-        <div class="overlay hide">
+        <div class="overlay">
             <div class="loading">Loading…</div>
         </div>
         @using (Html.BeginForm("AddUpdateShippingMethod", "Checkout", null, FormMethod.Post, null, new { @class = "form-regular medium-small", role = "form" }))
