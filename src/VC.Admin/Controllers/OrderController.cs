@@ -392,7 +392,7 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Orders)]
         [HttpPost]
-        public async Task<Result<OrderCalculateModel>> CalculateOrder([FromBody]OrderManageModel model)
+        public async Task<Result<OrderCalculateModel>> CalculateOrder([FromBody] OrderManageModel model)
         {
             var order = await _mapper.FromModelAsync(model);
             if (model == null || order == null)
@@ -405,18 +405,11 @@ namespace VC.Admin.Controllers
             //bind gcs errors
             if (orderContext.GcMessageInfos != null && orderContext.Order.GiftCertificates != null)
             {
-                var orderGcs = orderContext.Order.GiftCertificates.ToList();
-                foreach (var error in orderContext.GcMessageInfos.Where(p => p.MessageLevel == MessageLevel.Error && p.MessageType == MessageType.FormField))
+                foreach (
+                    var error in
+                    orderContext.GcMessageInfos.Where(p => p.MessageLevel == MessageLevel.Error && p.MessageType == MessageType.FormField))
                 {
-                    int? index = null;
-                    for (int i = 0; i < orderGcs.Count; i++)
-                    {
-                        if (orderGcs[i].GiftCertificate?.Code == error.Field)
-                        {
-                            index = i;
-                            break;
-                        }
-                    }
+                    var index = FindGcIndex(model.GCs, error.Field);
 
                     if (index.HasValue)
                     {
@@ -424,11 +417,21 @@ namespace VC.Admin.Controllers
                         {
                             MessageLevel = MessageLevel.Error,
                             MessageType = MessageType.FormField,
-                            Field = $"GCs.i{index.Value}.Code",
+                            Field = "Code".FormatCollectionError("GCs", index.Value),
                             Message = error.Message
                         });
                     }
                 }
+
+                orderContext.Messages.AddRange(
+                    model.GCs.Where(g => orderContext.Order.GiftCertificates.All(gc => gc.GiftCertificate.Code != g.Code))
+                        .Select(g => new MessageInfo
+                        {
+                            MessageLevel = MessageLevel.Error,
+                            MessageType = MessageType.FormField,
+                            Field = "Code".FormatCollectionError("GCs", FindGcIndex(model.GCs, g.Code) ?? 0),
+                            Message = "Gift Certificate not found"
+                        }));
             }
 
             if (!string.IsNullOrWhiteSpace(model.DiscountCode) && orderContext.Order.Discount == null)
@@ -444,6 +447,12 @@ namespace VC.Admin.Controllers
             OrderCalculateModel toReturn = new OrderCalculateModel(orderContext);
 
             return toReturn;
+        }
+
+        private static int? FindGcIndex(List<GCListItemModel> orderGcs, string code)
+        {
+            var index = orderGcs.FindIndex(g => g.Code == code);
+            return index >= 0 ? (int?) index : null;
         }
 
         [AdminAuthorize(PermissionType.Orders)]
