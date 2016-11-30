@@ -175,9 +175,27 @@ namespace VC.Public.Controllers
         {
             if (await CustomerLoggedIn())
             {
+                if (id == 0)
+                {
+                    var cart = await GetCurrentCart(true);
+                    var orderCard = cart?.Order?.PaymentMethod;
+
+                    if (orderCard != null)
+                    {
+                        var billingInfoModel = await _addressConverter.ToModelAsync<AddUpdateBillingAddressModel>(orderCard.Address);
+                        await _orderPaymentMethodConverter.UpdateModelAsync<BillingInfoModel>(billingInfoModel, orderCard);
+
+                        billingInfoModel.Email = cart.Order.Customer.Email;
+
+                        return PartialView("_AddUpdateBillingAddress", billingInfoModel);
+                    }
+
+                    return PartialView("_AddUpdateBillingAddress", null);
+                }
+
                 var currentCustomer = await GetCurrentCustomerDynamic();
 
-                var creditCard = currentCustomer.CustomerPaymentMethods
+                CustomerPaymentMethodDynamic creditCard = currentCustomer.CustomerPaymentMethods
                     .FirstOrDefault(p => p.IdObjectType == (int) PaymentMethodType.CreditCard && p.Id == id);
 
                 if (creditCard != null)
@@ -207,40 +225,32 @@ namespace VC.Public.Controllers
 
             if (loggedIn)
             {
-                var currentCustomer = await GetCurrentCustomerDynamic();
+                var currentCustomer = cart.Order.Customer;
 
-                var creditCards = currentCustomer.CustomerPaymentMethods
-                    .Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard).ToList();
-
-                var firstCreditCard = creditCards.FirstOrDefault(x => (bool?) x.SafeData.Default == true) ??
-                                      creditCards.FirstOrDefault();
-
-                if (firstCreditCard != null)
+                if (cart.Order.PaymentMethod?.Address != null && cart.Order.PaymentMethod.Id != 0)
                 {
-                    if (cart.Order.PaymentMethod?.Address == null || cart.Order.PaymentMethod.Id == 0)
-                    {
-                        await _addressConverter.UpdateModelAsync(addUpdateModel, firstCreditCard.Address);
-                        await _paymentMethodConverter.UpdateModelAsync<BillingInfoModel>(addUpdateModel, firstCreditCard);
-                    }
-                    else
-                    {
-                        await _addressConverter.UpdateModelAsync(addUpdateModel, cart.Order.PaymentMethod.Address);
-                        await _orderPaymentMethodConverter.UpdateModelAsync<BillingInfoModel>(addUpdateModel, cart.Order.PaymentMethod);
-                    }
-
-                    ViewBag.CreditCards = PopulateCreditCardsLookup(currentCustomer, cart.Order);
-
-                    addUpdateModel.Id = firstCreditCard.Id;
+                    await _addressConverter.UpdateModelAsync(addUpdateModel, cart.Order.PaymentMethod.Address);
+                    await _orderPaymentMethodConverter.UpdateModelAsync<BillingInfoModel>(addUpdateModel, cart.Order.PaymentMethod);
+                    addUpdateModel.Id = 0;
                 }
                 else
                 {
-                    if (cart.Order.PaymentMethod?.Address != null && cart.Order.PaymentMethod.Id != 0)
+                    var creditCards = currentCustomer.CustomerPaymentMethods
+                        .Where(p => p.IdObjectType == (int)PaymentMethodType.CreditCard).ToList();
+
+                    var firstCreditCard = creditCards.FirstOrDefault(x => (bool?)x.SafeData.Default == true) ??
+                                          creditCards.FirstOrDefault();
+
+                    if (firstCreditCard != null)
                     {
-                        await _addressConverter.UpdateModelAsync(addUpdateModel, cart.Order.PaymentMethod.Address);
-                        await _orderPaymentMethodConverter.UpdateModelAsync<BillingInfoModel>(addUpdateModel, cart.Order.PaymentMethod);
+                        await _addressConverter.UpdateModelAsync(addUpdateModel, firstCreditCard.Address);
+                        await _paymentMethodConverter.UpdateModelAsync<BillingInfoModel>(addUpdateModel, firstCreditCard);
+                        
+                        addUpdateModel.Id = firstCreditCard.Id;
                     }
-                    addUpdateModel.Id = 0;
                 }
+
+                ViewBag.CreditCards = PopulateCreditCardsLookup(currentCustomer, cart.Order);
 
                 addUpdateModel.Email = currentCustomer.Email;
                 addUpdateModel.IdCustomerType = currentCustomer.IdObjectType;
