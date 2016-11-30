@@ -48,10 +48,10 @@
                                 <div class="form-group">
                                     <label class="col-md-3 control-label">Redirect URL</label>
                                     <div class="col-md-7">
-                                        <input type="text" data-ng-disabled="item.Disabled" name="Url" class="form-control" placeholder="Url" data-ng-model="item.Url" required data-ng-maxlength="100">
+                                        <input type="text" data-ng-disabled="item.Disabled" name="Url" class="form-control" placeholder="Url" data-ng-model="item.Url" required data-ng-maxlength="250">
                                         <div class="error-container " ng-show="forms.submitted && forms.form.i{{$index}}.Url.$invalid">
                                             <small class="error" ng-show="forms.form.i{{$index}}.Url.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Url")}}</small>
-                                            <small class="error" ng-show="forms.form.i{{$index}}.Url.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.Url", "100"])}}</small>
+                                            <small class="error" ng-show="forms.form.i{{$index}}.Url.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.Url", "250"])}}</small>
                                         </div>
                                     </div>
                                     <div class="col-md-2">
