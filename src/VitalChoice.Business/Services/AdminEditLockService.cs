@@ -26,10 +26,7 @@ namespace VitalChoice.Business.Services
         {
             var now = DateTime.Now;
             EditLockAreaItem lockItem;
-            if (GetIsLocked(_exportOrderEditLockAreas, model, (area, item) => item.Expired <= now, out lockItem))
-            {
-                return false;
-            }
+
             return !GetIsLocked(_adminEditLockAreas, model, (area, item) =>
             {
                 if (item.IdAgent == model.IdAgent && item.BrowserUserAgent == browserUserAgent)
