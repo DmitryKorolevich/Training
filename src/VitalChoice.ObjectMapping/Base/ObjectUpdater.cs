@@ -28,8 +28,13 @@ namespace VitalChoice.ObjectMapping.Base
 
         async Task<object> IObjectUpdater.ToModelAsync(object obj, Type modelType)
         {
+            if (obj == null)
+                return null;
+
             var result = CreateInstance(modelType);
-            await (this as IObjectUpdater).UpdateModelAsync(obj, modelType, result);
+
+            await ToModelInternal(obj, result, modelType, typeof(T));
+            await ConverterService.DynamicToModelAsync(modelType, typeof(T), result, obj);
 
             return result;
         }
@@ -42,7 +47,7 @@ namespace VitalChoice.ObjectMapping.Base
             if (model == null)
                 return;
 
-            await ToModelInternal(obj, model, modelType, typeof(T));
+            await ToModelInternal(obj, model, modelType, typeof(T), true);
             await ConverterService.DynamicToModelAsync(modelType, typeof(T), model, obj);
         }
 
@@ -54,7 +59,7 @@ namespace VitalChoice.ObjectMapping.Base
             if (obj == null)
                 return;
 
-            await FromModelInternal(obj, model, modelType, typeof(T));
+            await FromModelInternal(obj, model, modelType, typeof(T), true);
             await ConverterService.ModelToDynamicAsync(modelType, typeof(T), model, obj);
         }
 
@@ -66,7 +71,9 @@ namespace VitalChoice.ObjectMapping.Base
 
             var result = new TModel();
 
-            await UpdateModelAsync(result, obj);
+            await ToModelInternal(obj, result, typeof(TModel), typeof(T));
+
+            await ConverterService.DynamicToModelAsync(result, obj);
 
             return result;
         }
@@ -79,7 +86,7 @@ namespace VitalChoice.ObjectMapping.Base
             if (model == null)
                 return;
 
-            await ToModelInternal(obj, model, typeof(TModel), typeof(T));
+            await ToModelInternal(obj, model, typeof(TModel), typeof(T), true);
 
             await ConverterService.DynamicToModelAsync(model, obj);
         }
@@ -91,7 +98,7 @@ namespace VitalChoice.ObjectMapping.Base
 
             var result = new Dictionary<string, object>();
 
-            UpdateModel(obj, result);
+            ToDictionaryInternal(obj, result, typeof(T));
 
             return result;
         }
@@ -115,7 +122,7 @@ namespace VitalChoice.ObjectMapping.Base
             if (obj == null)
                 return;
 
-            await FromModelInternal(obj, model, typeof(TModel), typeof(T));
+            await FromModelInternal(obj, model, typeof(TModel), typeof(T), true);
 
             await ConverterService.ModelToDynamicAsync(model, obj);
         }
@@ -128,7 +135,7 @@ namespace VitalChoice.ObjectMapping.Base
             if (obj == null)
                 return;
 
-            await FromDictionaryInternal(obj, model, typeof(T), caseSense);
+            await FromDictionaryInternal(obj, model, typeof(T), caseSense, true);
         }
 
         public bool IsObjectSecured(object obj)
@@ -267,7 +274,8 @@ namespace VitalChoice.ObjectMapping.Base
             return false;
         }
 
-        protected virtual async Task FromDictionaryInternal(object obj, IDictionary<string, object> model, Type objectType, bool caseSense)
+        protected virtual async Task FromDictionaryInternal(object obj, IDictionary<string, object> model, Type objectType, bool caseSense,
+            bool withNullReset = false)
         {
             if (obj == null)
                 return;
@@ -288,9 +296,16 @@ namespace VitalChoice.ObjectMapping.Base
                     var value =
                         await
                             Converter.ConvertFromModelAsync(valueType, dynamicProperty.PropertyType, modelValue, dynamicProperty.Converter);
-                    //TypeValidator.ThrowIfNotValid(model.GetType(), objectType, value, pair.Key, dynamicProperty,
-                    //    false);
-                    dynamicProperty.SetValueDirect(obj, value);
+                    if (value != null)
+                    {
+                        //TypeValidator.ThrowIfNotValid(model.GetType(), objectType, value, pair.Key, dynamicProperty,
+                        //    false);
+                        dynamicProperty.SetValueDirect(obj, value);
+                    }
+                    else if (withNullReset)
+                    {
+                        dynamicProperty.Set?.Invoke(obj, dynamicProperty.GetDefaultValue());
+                    }
                 }
             }
         }
@@ -317,7 +332,7 @@ namespace VitalChoice.ObjectMapping.Base
         }
 
         protected virtual async Task FromModelInternal(object obj, object model,
-            Type modelType, Type objectType)
+            Type modelType, Type objectType, bool withNullReset = false)
         {
             if (obj == null)
                 return;
@@ -335,15 +350,22 @@ namespace VitalChoice.ObjectMapping.Base
                 {
                     var value = await Converter.ConvertFromModelAsync(pair.Value.PropertyType, dynamicProperty.PropertyType,
                         pair.Value.Get?.Invoke(model), dynamicProperty.Converter);
-                    //TypeValidator.ThrowIfNotValid(modelType, objectType, value, mappingName, dynamicProperty,
-                    //    false);
-                    dynamicProperty.Set?.Invoke(obj, value);
+                    if (value != null)
+                    {
+                        //TypeValidator.ThrowIfNotValid(modelType, objectType, value, mappingName, dynamicProperty,
+                        //    false);
+                        dynamicProperty.Set?.Invoke(obj, value);
+                    }
+                    else if (withNullReset)
+                    {
+                        dynamicProperty.Set?.Invoke(obj, dynamicProperty.GetDefaultValue());
+                    }
                 }
             }
         }
 
         protected virtual async Task ToModelInternal(object obj, object result,
-            Type modelType, Type objectType)
+            Type modelType, Type objectType, bool withNullReset = false)
         {
             if (obj == null)
                 return;
@@ -361,8 +383,15 @@ namespace VitalChoice.ObjectMapping.Base
                 {
                     var value = await Converter.ConvertToModelAsync(dynamicProperty.PropertyType, pair.Value.PropertyType,
                         dynamicProperty.Get?.Invoke(obj), dynamicProperty.Converter);
-                    //TypeValidator.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value, true);
-                    pair.Value.SetValueDirect(result, value);
+                    if (value != null)
+                    {
+                        //TypeValidator.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value, true);
+                        pair.Value.SetValueDirect(result, value);
+                    }
+                    else if (withNullReset)
+                    {
+                        pair.Value.SetValueDirect(result, pair.Value.GetDefaultValue());
+                    }
                 }
             }
         }

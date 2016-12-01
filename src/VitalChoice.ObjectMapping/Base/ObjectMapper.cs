@@ -56,19 +56,19 @@ namespace VitalChoice.ObjectMapping.Base
     public class ObjectMapper<T> : ObjectUpdater<T>, IObjectMapper<T>
         where T : class, new()
     {
-        public ObjectMapper(ITypeConverter converter, IModelConverterService converterService): base(converter, converterService)
+        public ObjectMapper(ITypeConverter converter, IModelConverterService converterService) : base(converter, converterService)
         {
-            
+
         }
 
         public T Clone<TBase>(T obj)
         {
-            return (T)Base.TypeConverter.Clone(obj, typeof(T), typeof(TBase));
+            return (T) Base.TypeConverter.Clone(obj, typeof(T), typeof(TBase));
         }
 
         public T Clone<TBase>(T obj, Func<TBase, TBase> cloneBaseFunc)
         {
-            return (T)Base.TypeConverter.Clone(obj, typeof (T), typeof (TBase), o => cloneBaseFunc((TBase) o));
+            return (T) Base.TypeConverter.Clone(obj, typeof(T), typeof(TBase), o => cloneBaseFunc((TBase) o));
         }
 
         public async Task<object> FromDictionaryAsync(IDictionary<string, object> model, bool caseSense = true)
@@ -91,7 +91,9 @@ namespace VitalChoice.ObjectMapping.Base
 
             var result = new T();
 
-            await UpdateObjectAsync(model, result);
+            await FromModelInternal(result, model, typeof(TModel), typeof(T));
+
+            await ConverterService.ModelToDynamicAsync(model, result);
 
             return result;
         }
@@ -103,11 +105,10 @@ namespace VitalChoice.ObjectMapping.Base
 
             var result = new T();
 
-            await (this as IObjectMapper).UpdateObjectAsync(modelType, model, result);
+            await FromModelInternal(result, model, modelType, typeof(T));
+            await ConverterService.ModelToDynamicAsync(modelType, typeof(T), model, result);
 
             return result;
         }
-
-        
     }
 }
