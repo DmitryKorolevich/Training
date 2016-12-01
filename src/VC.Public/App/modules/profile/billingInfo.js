@@ -4,8 +4,8 @@ $(function () {
 	changeSaveButtonLabel($("#hdCreditCard").val());
 
 	creditCards = [];
-	if (creditCardsJson != "") {
-		creditCards = $.parseJSON(creditCardsJson);
+	if (creditCardsJson) {
+		creditCards = creditCardsJson;
 	} else {
 		$("#delSelected").hide();
 	}

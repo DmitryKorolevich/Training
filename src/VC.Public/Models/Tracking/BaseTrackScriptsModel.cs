@@ -6,9 +6,10 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 
 namespace VC.Public.Models.Tracking
 {
-    public enum CheckoutStep
+    public enum PageName
     {
         Unknown = 0,
+        ProfileBilling,
         ViewCart,
         Welcome,
         Billing,
@@ -19,7 +20,7 @@ namespace VC.Public.Models.Tracking
 
     public class BaseTrackScriptsModel
     {
-        public CheckoutStep Step { get; set; }
+        public PageName PageName { get; set; }
         public bool OrderCompleteStep { get; set; }
         public OrderDynamic Order { get; set; }
         public bool MyBuysEnabled { get; set; }

@@ -116,22 +116,22 @@ namespace VC.Public.Components.Tracking
 
                     //google action scripts
                     int? step = null;
-                    switch (toReturn.Step)
+                    switch (toReturn.PageName)
                     {
-                        case CheckoutStep.ViewCart:
-                        case CheckoutStep.Welcome:
+                        case PageName.ViewCart:
+                        case PageName.Welcome:
                             step = 1;
                             break;
-                        case CheckoutStep.Billing:
+                        case PageName.Billing:
                             step = 2;
                             break;
-                        case CheckoutStep.Shipping:
+                        case PageName.Shipping:
                             step = 3;
                             break;
-                        case CheckoutStep.Preview:
+                        case PageName.Preview:
                             step = 4;
                             break;
-                        case CheckoutStep.Receipt:
+                        case PageName.Receipt:
                             step = 5;
                             break;
                     }
@@ -194,7 +194,7 @@ namespace VC.Public.Components.Tracking
 
                     //criteo viewBasket
                     toReturn.CustomerEmail = order.Customer?.Email ?? string.Empty;
-                    if (toReturn.Step == CheckoutStep.ViewCart)
+                    if (toReturn.PageName == PageName.ViewCart)
                     {
                         toReturn.CriteoViewCart = String.Empty;
                         for (int i = 0; i < skus.Length; i++)

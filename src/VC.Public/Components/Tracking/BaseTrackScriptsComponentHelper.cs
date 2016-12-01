@@ -25,7 +25,7 @@ namespace VC.Public.Components.Tracking
             Lazy<IOrderService> orderService, Lazy<IAuthorizationService> authorizationService, Lazy<ICheckoutService> checkoutService,
             Lazy<ICustomerService> customerService, Lazy<ReferenceData> referenceData)
         {
-            toReturn.Step = GetCheckoutStep(context);
+            toReturn.PageName = GetCheckoutStep(context);
 
             if (context.Items.ContainsKey(TrackScriptsBaseModel))
             {
@@ -36,7 +36,7 @@ namespace VC.Public.Components.Tracking
             }
 
             OrderDynamic order;
-            if (toReturn.Step == CheckoutStep.Receipt)
+            if (toReturn.PageName == PageName.Receipt)
             {
                 var idOrder = context.Session.GetInt32(CheckoutConstants.ReceiptSessionOrderId);
                 if (idOrder.HasValue)
@@ -96,29 +96,31 @@ namespace VC.Public.Components.Tracking
             });
         }
 
-        public static CheckoutStep GetCheckoutStep(this HttpContext context)
+        public static PageName GetCheckoutStep(this HttpContext context)
         {
             if (context.Request.Path.HasValue)
             {
                 switch (context.Request.Path.Value)
                 {
                     case "/checkout/welcome":
-                        return CheckoutStep.Welcome;
+                        return PageName.Welcome;
                     case "/checkout/addupdatebillingaddress":
-                        return CheckoutStep.Billing;
+                        return PageName.Billing;
                     case "/checkout/addupdateshippingmethod":
-                        return CheckoutStep.Shipping;
+                        return PageName.Shipping;
                     case "/checkout/revieworder":
-                        return CheckoutStep.Preview;
+                        return PageName.Preview;
                     case "/cart/viewcart":
-                        return CheckoutStep.ViewCart;
+                        return PageName.ViewCart;
                     case "/checkout/receipt":
-                        return CheckoutStep.Receipt;
+                        return PageName.Receipt;
+                    case "/profile/changebillinginfo":
+                        return PageName.ProfileBilling;
                     default:
-                        return CheckoutStep.Unknown;
+                        return PageName.Unknown;
                 }
             }
-            return CheckoutStep.Unknown;
+            return PageName.Unknown;
         }
 
         public static string GetProductFullName(this SkuOrdered skuOrdered)

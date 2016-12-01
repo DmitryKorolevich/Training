@@ -30,7 +30,7 @@ namespace VC.Public.Components.Tracking
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var toReturn = new BodyBeginTrackScriptsModel {Step = HttpContext.GetCheckoutStep()};
+            var toReturn = new BodyBeginTrackScriptsModel {PageName = HttpContext.GetCheckoutStep()};
 
             var userId = Convert.ToInt32(_userManager.GetUserId(_actionContextAccessor.ActionContext.HttpContext.User));
 

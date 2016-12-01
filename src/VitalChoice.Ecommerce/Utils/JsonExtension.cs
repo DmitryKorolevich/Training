@@ -1,31 +1,55 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.IO;
 using Newtonsoft.Json;
 
 namespace VitalChoice.Ecommerce.Utils
 {
     public static class JsonExtension
     {
-        private static readonly JsonSerializerSettings Settings = new JsonSerializerSettings()
+        static JsonExtension()
         {
-            StringEscapeHandling = StringEscapeHandling.EscapeHtml
-        };
+            var settings = new JsonSerializerSettings
+            {
+                StringEscapeHandling = StringEscapeHandling.EscapeHtml,
+                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                DateParseHandling = DateParseHandling.DateTime,
+                DefaultValueHandling = DefaultValueHandling.Include,
+                NullValueHandling = NullValueHandling.Include
+            };
+            Serializer = JsonSerializer.Create(settings);
+        }
+
+        private static readonly JsonSerializer Serializer;
 
         public static string ToJson(this object obj)
         {
-            return JsonConvert.SerializeObject(obj, Settings);
+            using (var writer = new StringWriter())
+            {
+                Serializer.Serialize(writer, obj);
+                return writer.ToString();
+            }
         }
 
         public static T FromJson<T>(this string jsonString)
         {
-            return JsonConvert.DeserializeObject<T>(jsonString, Settings);
+            using (var reader = new StringReader(jsonString))
+            {
+                using (var jsonReader = new JsonTextReader(reader))
+                {
+                    return Serializer.Deserialize<T>(jsonReader);
+                }
+            }
         }
 
         public static object FromJson(this string jsonString, Type type)
         {
-            return JsonConvert.DeserializeObject(jsonString, type, Settings);
+            using (var reader = new StringReader(jsonString))
+            {
+                using (var jsonReader = new JsonTextReader(reader))
+                {
+                    return Serializer.Deserialize(jsonReader, type);
+                }
+            }
         }
     }
 }
