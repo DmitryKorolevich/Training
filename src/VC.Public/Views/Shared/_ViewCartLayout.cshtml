@@ -30,7 +30,7 @@
 		<title>Wild Seafood & Organics - Vital Choice</title>
 	}
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    @if (Context.Request.Path == "/cart/viewcart")
+    @if (Context.Request.Path == "/cart/viewcart" || Context.Request.Path == "/checkout/revieworder")
     {
         <!--start optimizely -->
         <script src="//cdn.optimizely.com/js/1571690011.js"></script>
