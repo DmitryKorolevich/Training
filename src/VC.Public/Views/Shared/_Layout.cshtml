@@ -317,6 +317,7 @@
             var lhnScriptSrc = lhnJsHost + 'www.livehelpnow.net/lhn/scripts/livehelpnow.aspx?lhnid=' + lhnAccountN + '&iv=' + lhnInviteEnabled + '&d=' + lhnDepartmentN + '&ver=' + lhnVersion + '&rnd=' + Math.random();
             var lhnScript = document.createElement("script");
             lhnScript.setAttribute("defer", "defer");
+            lhnScript.setAttribute("async", "async");
             lhnScript.type = "text/javascript";
             lhnScript.src = lhnScriptSrc;
         </script>
