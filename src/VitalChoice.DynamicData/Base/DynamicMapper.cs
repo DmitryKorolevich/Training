@@ -723,7 +723,11 @@ namespace VitalChoice.DynamicData.Base
 
         public virtual async Task<TDynamic> FromModelAsync<TModel>(TModel model, int idObjectType)
         {
+            if (model == null)
+                return null;
+
             var result = CreatePrototype(idObjectType);
+
             await FromModelInternal(result, model, typeof(TModel), typeof(TDynamic));
             await ConverterService.ModelToDynamicAsync(model, result);
             return result;
