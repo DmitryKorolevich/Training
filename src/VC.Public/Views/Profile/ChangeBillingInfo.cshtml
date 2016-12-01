@@ -17,7 +17,7 @@
 }
 
 <script>
-	var creditCardsJson = @Html.Raw(ViewBag.CreditCards);
+	var creditCardsJson = @(string.IsNullOrWhiteSpace(ViewBag.CreditCards)? "[]" : Html.Raw(ViewBag.CreditCards));
 	successMessage = '@ViewBag.SuccessMessage';
 </script>
 
