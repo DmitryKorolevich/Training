@@ -74,15 +74,15 @@
                         <td data-ng-if="period.OrdersCount!=0">{{::period.AverageDiscountedSubtotal | currency}}</td>
                         <td data-ng-if="period.OrdersCount==0">{{::0 | currency}}</td>
                         <td>
-                            <button title="View" class="btn btn-default btn-success btn-xs" data-ng-click="openPeriod(period.Id);">
+                            <a class="btn btn-default btn-success btn-xs" target="_blank" ui-sref="index.oneCol.healthwiseDetail({id:period.Id})">
                                 <i class="fa fa-search"></i>
-                            </button>
+                            </a>
                             <button data-ng-if="period.OrdersCount==0" title="Delete" class="btn btn-default btn-danger btn-xs" data-ng-click="deletePeriod(period.Id);">
                                 <i class="glyphicon glyphicon-remove"></i>
                             </button>
-                            <button data-ng-if="period.AllowPayment" title="Bill" class="btn btn-default btn-primary btn-xs ma" data-ng-click="openPeriod(period.Id);">
+                            <a data-ng-if="period.AllowPayment" class="btn btn-default btn-primary btn-xs ma" target="_blank" ui-sref="index.oneCol.healthwiseDetail({id:period.Id})">
                                 Bill
-                            </button>
+                            </a>
                             <span data-ng-if="period.AllowPayment && period.OrdersCount!=0" class="important">
                                 {{::period.AverageDiscountedSubtotal | currency}} <span data-ng-if="period.LastOrderDate">{{::period.LastOrderDate | date:"MM/dd/yy"}}</span>
                             </span>

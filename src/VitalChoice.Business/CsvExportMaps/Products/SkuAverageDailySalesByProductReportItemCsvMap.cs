@@ -30,8 +30,8 @@ namespace VitalChoice.Business.CsvExportMaps.Products
             Map(m => m.DaysOOS).Name("Days OOS").Index(4);
             Map(m => m.AverageDailyAmount).Name("Avg Daily Sales").Index(5).TypeConverterOption("c");
             Map(m => m.TotalAmount).Name("Total Sales").Index(3).TypeConverterOption("c");
-            Map(m => m.TotalOOSImpactAmount).Name("Total Sales Impact").Index(6).TypeConverterOption("c");
-            Map(m => m.SkusLine).Name("Impacted SKUs").Index(7);
+            Map(m => m.TotalOOSImpactAmount).Name("OOS Sales Impact").Index(6).TypeConverterOption("c");
+            Map(m => m.SkusLine).Name("Included SKUs").Index(7);
         }
     }
 }
