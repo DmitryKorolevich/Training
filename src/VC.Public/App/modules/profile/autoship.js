@@ -127,7 +127,7 @@ function billingDetailsDialog(jSelf, s) {
 			open: function () {
 				refreshCountries();
 				populateCardTypes();
-				$("#ddCreditCardsSelection").val($("#orderId").val());
+				$("#ddCreditCardsSelection").val('0');
 			},
 			buttons: [
                 {

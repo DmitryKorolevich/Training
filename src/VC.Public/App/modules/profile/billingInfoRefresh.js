@@ -9,10 +9,10 @@
 function changeSelection(selId) {
 	var orderId = 0;
 	var paymentId = 0;
-	if ($("#orderId").val() == selId) {
-		orderId = selId;
+	if (selId == 0) {
+	    orderId = $("#orderId").val();
 	} else {
-		paymentId = selId;
+	    paymentId = selId;
 	}
 
 	$("body .right-pane .overlay").show();
