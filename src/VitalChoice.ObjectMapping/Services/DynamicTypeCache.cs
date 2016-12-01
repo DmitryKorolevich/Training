@@ -44,6 +44,21 @@ namespace VitalChoice.ObjectMapping.Services
                     if (mapAttribute != null || ignoreMapAttribute)
                     {
                         var itemType = property.PropertyType.TryGetElementType(typeof(ICollection<>));
+
+                        Func<object> getDefaultValue;
+
+                        if (property.PropertyType.GetTypeInfo().IsValueType)
+                        {
+                            getDefaultValue = GetDefaultValueCache.GetOrAdd(property.PropertyType,
+                                type =>
+                                    Expression.Lambda<Func<object>>(Expression.Convert(Expression.Default(type),
+                                        typeof(object))).Compile());
+                        }
+                        else
+                        {
+                            getDefaultValue = GetDefaultValueCache.GetOrAdd(typeof(object), type => () => null);
+                        }
+
                         typeCache.Properties.Add(property.Name, new GenericProperty
                         {
                             Get = property.GetMethod?.CompileAccessor<object, object>(),
@@ -52,7 +67,8 @@ namespace VitalChoice.ObjectMapping.Services
                             PropertyType = property.PropertyType,
                             Converter = convertWithAttribute,
                             IsCollection = itemType != null,
-                            CollectionItemType = itemType
+                            CollectionItemType = itemType,
+                            GetDefaultValue = getDefaultValue
                         });
                     }
                 }
@@ -93,5 +109,8 @@ namespace VitalChoice.ObjectMapping.Services
 
         private static readonly ConcurrentDictionary<Type, TypeCache> ObjectTypeMappingCache =
             new ConcurrentDictionary<Type, TypeCache>();
+
+        private static readonly ConcurrentDictionary<Type, Func<object>> GetDefaultValueCache = 
+            new ConcurrentDictionary<Type, Func<object>>();
     }
 }

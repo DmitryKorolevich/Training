@@ -51,7 +51,7 @@ namespace VitalChoice.Ecommerce.Context
                 InitialCatalog = "VitalChoice.Ecommerce",
                 UserID = Options.Value.Connection.UserName,
                 Password = Options.Value.Connection.Password,
-                ConnectTimeout = 60
+                ConnectTimeout = 60,
             }).ConnectionString;
             builder.UseSqlServer(connectionString);
 

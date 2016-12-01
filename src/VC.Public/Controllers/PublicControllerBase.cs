@@ -126,27 +126,48 @@ namespace VC.Public.Controllers
             return customer;
         }
 
-		protected async Task PopulateCreditCardsLookup()
-		{
-			var currentCustomer = await GetCurrentCustomerDynamic();
-		    var creditCards = currentCustomer.CustomerPaymentMethods
-		        .Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard);
+        protected List<KeyValuePair<int, string>> PopulateCreditCardsLookup(CustomerDynamic currentCustomer,
+            OrderDynamic currentOrder = null)
+        {
+            List<KeyValuePair<int, string>> creditCardsList = new List<KeyValuePair<int, string>>();
 
-		    ViewBag.CreditCards = creditCards.ToDictionary(x => x.Id,
-		        y =>
-		        {
-		            var cardType = ReferenceData.CreditCardTypes.FirstOrDefault(z => y.SafeData.CardType!=null &&
-                        z.Key == (int) y.Data.CardType)?.Text;
-		            var cardNumberPart = y.SafeData.CardNumber != null ? (string)y.Data.CardNumber : string.Empty;
-		            if (cardNumberPart.Length > 4)
-		            {
-		                cardNumberPart = cardNumberPart.Substring(cardNumberPart.Length - 4);
-		            }
-		            var defaultPart = y.SafeData.Default == true ? "(Default)" : string.Empty;
-		            var toReturn = $"{cardType}, ending in {cardNumberPart} {defaultPart}";
+            var creditCards = currentCustomer.CustomerPaymentMethods.Cast<PaymentMethodDynamic>()
+                .Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard);
 
-                    return toReturn;
-		        });
-		}
-	}
+            if (currentOrder?.PaymentMethod?.Id > 0 && currentOrder.PaymentMethod?.IdObjectType == (int) PaymentMethodType.CreditCard &&
+                currentOrder.PaymentMethod?.Address?.IdCountry > 0)
+            {
+                creditCardsList.Add(new KeyValuePair<int, string>(0,
+                    FormatCreditCardShortInfo(currentOrder.PaymentMethod, "(Currently On Order)")));
+            }
+            foreach (var creditCard in creditCards.OrderByDescending(a => (bool?) a.SafeData.Default ?? false))
+            {
+                if ((bool?) creditCard.SafeData.Default ?? false)
+                {
+                    creditCardsList.Add(new KeyValuePair<int, string>(creditCard.Id, FormatCreditCardShortInfo(creditCard, "(Default)")));
+                }
+                else
+                {
+                    creditCardsList.Add(new KeyValuePair<int, string>(creditCard.Id, FormatCreditCardShortInfo(creditCard)));
+                }
+            }
+
+            return creditCardsList;
+        }
+
+        private string FormatCreditCardShortInfo(PaymentMethodDynamic y, string namePrefix = null)
+        {
+            var cardType = ReferenceData.CreditCardTypes.FirstOrDefault(z => y.SafeData.CardType != null &&
+                                                                             z.Key == (int) y.Data.CardType)?.Text;
+            var cardNumberPart = y.SafeData.CardNumber != null ? (string) y.Data.CardNumber : string.Empty;
+            if (cardNumberPart.Length > 4)
+            {
+                cardNumberPart = cardNumberPart.Substring(cardNumberPart.Length - 4);
+            }
+            var defaultPart = !string.IsNullOrEmpty(namePrefix) ? namePrefix : string.Empty;
+            var toReturn = $"{cardType}, ending in {cardNumberPart} {defaultPart}";
+
+            return toReturn;
+        }
+    }
 }

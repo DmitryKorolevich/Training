@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Data.SqlClient;
+using System.Net;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Validation.Models;
@@ -35,7 +36,7 @@ namespace VitalChoice.Core.GlobalFilters
                 {
                     var loggerFactory = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
                     var logger = loggerFactory.CreateLogger<ApiExceptionFilterAttribute>();
-                    var dbUpdateException = context.Exception as DbUpdateException;
+                    var dbUpdateException = context.Exception as DbUpdateConcurrencyException;
                     if (dbUpdateException != null)
                     {
                         result =
@@ -48,11 +49,27 @@ namespace VitalChoice.Core.GlobalFilters
                     }
                     else
                     {
-                        result = new JsonResult(ResultHelper.CreateErrorResult<object>(ApiException.GetDefaultErrorMessage))
+                        var sqlException = context.Exception as SqlException ??
+                                           (context.Exception as DbUpdateException)?.InnerException as SqlException;
+                        //operation timed out
+                        if (sqlException != null && sqlException.Number == -2)
                         {
-                            StatusCode = (int) HttpStatusCode.InternalServerError
-                        };
-                        logger.LogError($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
+                            result =
+                                new JsonResult(
+                                    ResultHelper.CreateErrorResult<object>("Execution Timeout Expired"))
+                                {
+                                    StatusCode = (int) HttpStatusCode.OK
+                                };
+                            logger.LogError(sqlException.ToString());
+                        }
+                        else
+                        {
+                            result = new JsonResult(ResultHelper.CreateErrorResult<object>(ApiException.GetDefaultErrorMessage))
+                            {
+                                StatusCode = (int) HttpStatusCode.InternalServerError
+                            };
+                            logger.LogError($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
+                        }
                     }
                 }
             }
@@ -76,7 +93,7 @@ namespace VitalChoice.Core.GlobalFilters
                     {
                         result = new JsonResult(ResultHelper.CreateErrorResult<object>(apiException.Message))
                         {
-                            StatusCode = (int)apiException.Status
+                            StatusCode = (int) apiException.Status
                         };
                     }
                 }
@@ -85,27 +102,28 @@ namespace VitalChoice.Core.GlobalFilters
             context.Result = result;
         }
 
-        internal static string FormatUpdateException(ExceptionContext context, DbUpdateException dbUpdateException)
+        internal static string FormatUpdateException(ExceptionContext context, DbUpdateConcurrencyException dbUpdateException)
         {
-            var updateIssues = CacheDebugger.ProcessDbUpdateException(dbUpdateException);
-            ExStringBuilder builder = new ExStringBuilder($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
-            builder += "\nTrace Data:";
-            var jsonSerializer = JsonSerializer.Create(new JsonSerializerSettings
-            {
-                DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                DateTimeZoneHandling = DateTimeZoneHandling.Local,
-                DateParseHandling = DateParseHandling.DateTime,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            });
+            return $"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}";
+            //var updateIssues = CacheDebugger.ProcessDbUpdateException(dbUpdateException);
+            //ExStringBuilder builder = new ExStringBuilder($"Error:{context.Exception}, URL: {context.HttpContext?.Request.GetDisplayUrl()}");
+            //builder += "\nTrace Data:";
+            //var jsonSerializer = JsonSerializer.Create(new JsonSerializerSettings
+            //{
+            //    DateFormatHandling = DateFormatHandling.IsoDateFormat,
+            //    DateTimeZoneHandling = DateTimeZoneHandling.Local,
+            //    DateParseHandling = DateParseHandling.DateTime,
+            //    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            //});
 
-            foreach (var cacheUpdateData in updateIssues)
-            {
-                WriteObject(builder, "Entity Type", jsonSerializer, cacheUpdateData.EntityType.ToString());
-                WriteObject(builder, "Updated Object", jsonSerializer, cacheUpdateData.UpdateEntity);
-                WriteObject(builder, "Cache Variants", jsonSerializer, cacheUpdateData.CachedEntities);
-                WriteObject(builder, "Actual DB Data", jsonSerializer, cacheUpdateData.ActualDbEntity);
-            }
-            return builder.ToString();
+            //foreach (var cacheUpdateData in updateIssues)
+            //{
+            //    WriteObject(builder, "Entity Type", jsonSerializer, cacheUpdateData.EntityType.ToString());
+            //    WriteObject(builder, "Updated Object", jsonSerializer, cacheUpdateData.UpdateEntity);
+            //    WriteObject(builder, "Cache Variants", jsonSerializer, cacheUpdateData.CachedEntities);
+            //    WriteObject(builder, "Actual DB Data", jsonSerializer, cacheUpdateData.ActualDbEntity);
+            //}
+            //return builder.ToString();
         }
 
         private static void WriteObject(ExStringBuilder builder, string preText, JsonSerializer jsonSerializer,

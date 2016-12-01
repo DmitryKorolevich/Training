@@ -1,22 +1,3 @@
-var lhnAccountN = 7307;
-var lhnButtonN = 5138;
-var lhnVersion = 5.3;
-var lhnJsHost = (("https:" == document.location.protocol) ? "https://" : "http://");
-var lhnInviteEnabled = 1;
-var lhnInviteChime = 0;
-var lhnWindowN = 0;
-var lhnDepartmentN = 0;
-var lhnCustomInvitation = '';
-var lhnCustom1 = '';
-var lhnCustom2 = '';
-var lhnCustom3 = '';
-var lhnTrackingEnabled = 't';
-var lhnScriptSrc = lhnJsHost + 'www.livehelpnow.net/lhn/scripts/livehelpnow.aspx?lhnid=' + lhnAccountN + '&iv=' + lhnInviteEnabled + '&d=' + lhnDepartmentN + '&ver=' + lhnVersion + '&rnd=' + Math.random();
-var lhnScript = document.createElement("script");
-lhnScript.setAttribute("defer", "defer");
-lhnScript.type = "text/javascript";
-lhnScript.src = lhnScriptSrc;
-
 var googleSearchcx = '006613472277305802095:2wviofnvpvs';
 var googleSearchFAQcx = '006613472277305802095:ne3iw8mrxlk';
 

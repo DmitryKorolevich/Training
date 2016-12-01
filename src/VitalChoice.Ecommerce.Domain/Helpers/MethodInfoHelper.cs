@@ -299,23 +299,15 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
         private static Delegate GetOrCompile(this MethodInfo method, Type returnType, Type delegateType, params Type[] typeParameters)
         {
             CacheItem cacheKey = new CacheItem(method, returnType, typeParameters);
-            Delegate result;
             lock (CompiledCache)
             {
+                Delegate result;
                 if (CompiledCache.TryGetValue(cacheKey, out result))
                 {
                     return result;
                 }
-            }
-            var dynamic = EmitDynamic(returnType, method, typeParameters);
-            result = dynamic.CreateDelegate(delegateType);
-            lock (CompiledCache)
-            {
-                Delegate perminarilyResult;
-                if (CompiledCache.TryGetValue(cacheKey, out perminarilyResult))
-                {
-                    return perminarilyResult;
-                }
+                var dynamic = EmitDynamic(returnType, method, typeParameters);
+                result = dynamic.CreateDelegate(delegateType);
                 CompiledCache.Add(cacheKey, result);
                 return result;
             }

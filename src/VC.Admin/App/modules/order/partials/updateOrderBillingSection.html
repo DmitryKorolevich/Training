@@ -159,10 +159,10 @@
                 <div class="form-group">
                     <label for="CardNumber" class="col-md-3 control-label">Card Number</label>
                     <div class="col-md-9">
-                        <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-max-characters="16" data-ng-model="order.CreditCard.CardNumber" placeholder="Card Number" data-ng-maxlength="{{paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'}}" data-ng-required="!order.OnHold" autocomplete="off" data-ng-disabled="orderEditDisabled">
+                        <input type="text" class="form-control" id="CardNumber" name="CardNumber" data-max-characters="16" data-ng-model="order.CreditCard.CardNumber" placeholder="Card Number" data-ng-maxlength="{{'16'}}" data-ng-required="!order.OnHold" autocomplete="off" data-ng-disabled="orderEditDisabled">
                         <div class="error-container" ng-show="forms.submitted['card'] && forms.card.CardNumber.$invalid">
                             <small class="error" ng-show="forms.card.CardNumber.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.CardNumber")}}</small>
-                            <small class="error" ng-show="forms.card.CardNumber.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.CardNumber", paymentInfoTab.CreditCard.CardType == 3 ? '15' : '16'])}}</small>
+                            <small class="error" ng-show="forms.card.CardNumber.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["GeneralFieldNames.CardNumber", '16'])}}</small>
                             <small class="error" ng-show="forms.card.CardNumber.$error.server">{{serverMessages.GetMessage('CardNumber', undefined, undefined, "card")}}</small>
                         </div>
                     </div>

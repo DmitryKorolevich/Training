@@ -100,10 +100,6 @@ namespace VitalChoice.DynamicData.Base
                         return new DynamicEntityPair<TDynamic, TEntity>(@dynamic, entity);
                     }).ToList();
                 await UpdateEntityRangeAsync(itemsToUpdate);
-                //foreach (var item in itemsToUpdate)
-                //{
-                //    item.Entity.StatusCode = (int)RecordStatusCode.Active;
-                //}
 
                 //Delete
                 var toDelete = entities.Where(e => dynamics.All(s => s.Id != selector(e).Id));
@@ -139,10 +135,6 @@ namespace VitalChoice.DynamicData.Base
                         return new DynamicEntityPair<TDynamic, TEntity>(@dynamic, entity);
                     }).ToList();
                 await UpdateEntityRangeAsync(itemsToUpdate);
-                //foreach (var item in itemsToUpdate)
-                //{
-                //    item.Entity.StatusCode = (int)RecordStatusCode.Active;
-                //}
 
                 //Delete
                 var toDelete = entities.Where(e => dynamics.All(s => s.Id != e.Id));
@@ -163,11 +155,6 @@ namespace VitalChoice.DynamicData.Base
                 }
             }
         }
-
-        //public virtual IQueryOptionType<TOptionType> GetOptionTypeQuery()
-        //{
-        //    return new OptionTypeQuery<TOptionType>();
-        //}
 
         public ICollection<TOptionType> OptionTypes => _optionTypes.Value;
 
@@ -370,9 +357,9 @@ namespace VitalChoice.DynamicData.Base
             return results.Select(r => r.Dynamic).ToList();
         }
 
-        protected override async Task FromDictionaryInternal(object obj, IDictionary<string, object> model, Type objectType, bool caseSense)
+        protected override async Task FromDictionaryInternal(object obj, IDictionary<string, object> model, Type objectType, bool caseSense, bool withNullReset = false)
         {
-            await base.FromDictionaryInternal(obj, model, objectType, caseSense);
+            await base.FromDictionaryInternal(obj, model, objectType, caseSense, withNullReset);
             var dynamic = obj as MappedObject;
             if (dynamic != null)
             {
@@ -383,10 +370,17 @@ namespace VitalChoice.DynamicData.Base
                 {
                     if (!dynamicCache.Properties.ContainsKey(pair.Key))
                     {
-                        var value = ObjectMapping.Base.TypeConverter.ConvertFromModelObject(pair.Value.GetType(), pair.Value);
+                        var value = TypeConverter.ConvertFromModelObject(pair.Value.GetType(), pair.Value);
                         if (value != null)
                         {
                             data.Add(pair.Key, value);
+                        }
+                        else if (withNullReset)
+                        {
+                            if (data.ContainsKey(pair.Key))
+                            {
+                                data.Remove(pair.Key);
+                            }
                         }
                     }
                 }
@@ -412,9 +406,9 @@ namespace VitalChoice.DynamicData.Base
         }
 
         protected override async Task ToModelInternal(object obj, object result,
-            Type modelType, Type objectType)
+            Type modelType, Type objectType, bool withNullReset = false)
         {
-            await base.ToModelInternal(obj, result, modelType, objectType);
+            await base.ToModelInternal(obj, result, modelType, objectType, withNullReset);
             var dynamic = obj as MappedObject;
             if (dynamic != null)
             {
@@ -435,9 +429,13 @@ namespace VitalChoice.DynamicData.Base
                                     pair.Value.Converter);
                             if (value != null)
                             {
-                                TypeValidator.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value,
-                                    true);
+                                //TypeValidator.ThrowIfNotValid(modelType, objectType, value, pair.Key, pair.Value,
+                                //    true);
                                 pair.Value.Set?.Invoke(result, value);
+                            }
+                            else if (withNullReset)
+                            {
+                                pair.Value.Set?.Invoke(result, pair.Value.GetDefaultValue());
                             }
                         }
                     }
@@ -446,9 +444,9 @@ namespace VitalChoice.DynamicData.Base
         }
 
         protected override async Task FromModelInternal(object obj, object model,
-            Type modelType, Type objectType)
+            Type modelType, Type objectType, bool withNullReset = false)
         {
-            await base.FromModelInternal(obj, model, modelType, objectType);
+            await base.FromModelInternal(obj, model, modelType, objectType, withNullReset);
             var dynamic = obj as MappedObject;
             if (dynamic != null)
             {
@@ -465,7 +463,13 @@ namespace VitalChoice.DynamicData.Base
                             pair.Value.Get?.Invoke(model));
 
                         if (value == null)
+                        {
+                            if (withNullReset && data.ContainsKey(mappingName))
+                            {
+                                data.Remove(mappingName);
+                            }
                             continue;
+                        }
 
                         if (!data.ContainsKey(mappingName))
                         {
@@ -720,7 +724,8 @@ namespace VitalChoice.DynamicData.Base
         public virtual async Task<TDynamic> FromModelAsync<TModel>(TModel model, int idObjectType)
         {
             var result = CreatePrototype(idObjectType);
-            await UpdateObjectAsync(model, result);
+            await FromModelInternal(result, model, typeof(TModel), typeof(TDynamic));
+            await ConverterService.ModelToDynamicAsync(model, result);
             return result;
         }
 

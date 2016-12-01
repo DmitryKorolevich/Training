@@ -15,8 +15,8 @@ $(function () {
 	changeSaveButtonLabel($("#hdShipping").val());
 
 	shippingAddresses = [];
-	if (shippingAddressesJson != "") {
-		shippingAddresses = $.parseJSON(shippingAddressesJson);
+	if (shippingAddressesJson) {
+		shippingAddresses = shippingAddressesJson;
 	}
 	populateAddressesSelection(shippingAddresses, false);
 

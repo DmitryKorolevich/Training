@@ -21,7 +21,7 @@
 @inject ReferenceData appInfrastructureService;
 
 <script>
-	var shippingAddressesJson = '@Html.Raw(ViewBag.ShippingAddresses)';
+	var shippingAddressesJson = @Html.Raw(ViewBag.ShippingAddresses);
 	successMessage = '@ViewBag.SuccessMessage';
 </script>
 

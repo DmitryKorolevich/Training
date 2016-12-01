@@ -296,7 +296,7 @@ namespace VC.Admin.Models.Orders
 
         public string DiscountCode { get; set; }
 
-        public IList<GCListItemModel> GCs { get; set; }
+        public List<GCListItemModel> GCs { get; set; }
 
         public decimal GiftCertificatesSubtotal { get; set; }
 

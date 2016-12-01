@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -505,25 +506,44 @@ namespace VitalChoice.ExportService.Services
                 order.IdEditedBy = userId;
                 try
                 {
-                    await _orderService.UpdateAsync(order);
-                    exportCallBack(new OrderExportItemResult
-                    {
-                        Id = order.Id,
-                        Success = true
-                    });
+                    await UpdateOrderInternal(exportCallBack, order);
                 }
                 catch (TimeoutException)
                 {
                     //Retry once in one minute
                     await Task.Delay(TimeSpan.FromMinutes(1));
-                    await _orderService.UpdateAsync(order);
-                    exportCallBack(new OrderExportItemResult
+                    await UpdateOrderInternal(exportCallBack, order);
+                }
+                catch (DbUpdateException e)
+                {
+                    var sqlException = e.InnerException as SqlException;
+                    if (sqlException != null && sqlException.Number == -2)
                     {
-                        Id = order.Id,
-                        Success = true
-                    });
+                        //Retry once in one minute
+                        await Task.Delay(TimeSpan.FromMinutes(1));
+                        await UpdateOrderInternal(exportCallBack, order);
+                    }
+                }
+                catch (SqlException e)
+                {
+                    if (e.Number == -2)
+                    {
+                        //Retry once in one minute
+                        await Task.Delay(TimeSpan.FromMinutes(1));
+                        await UpdateOrderInternal(exportCallBack, order);
+                    }
                 }
             }
+        }
+
+        private async Task UpdateOrderInternal(Action<OrderExportItemResult> exportCallBack, OrderDynamic order)
+        {
+            await _orderService.UpdateAsync(order);
+            exportCallBack(new OrderExportItemResult
+            {
+                Id = order.Id,
+                Success = true
+            });
         }
 
         private async Task DoExportRefunds(ICollection<OrderExportItem> exportItems, Action<OrderExportItemResult> exportCallBack,
@@ -573,27 +593,47 @@ namespace VitalChoice.ExportService.Services
                     continue;
                 }
 
+                refund.IdEditedBy = userId;
+
                 try
                 {
-                    refund.IdEditedBy = userId;
-                    await _refundService.UpdateAsync(refund);
-                    exportCallBack(new OrderExportItemResult
-                    {
-                        Id = refund.Id,
-                        Success = true
-                    });
+                    await UpdateRefundInternal(exportCallBack, refund);
                 }
                 catch (TimeoutException)
                 {
                     await Task.Delay(TimeSpan.FromMinutes(1));
-                    await _refundService.UpdateAsync(refund);
-                    exportCallBack(new OrderExportItemResult
+                    await UpdateRefundInternal(exportCallBack, refund);
+                }
+                catch (DbUpdateException e)
+                {
+                    var sqlException = e.InnerException as SqlException;
+                    if (sqlException != null && sqlException.Number == -2)
                     {
-                        Id = refund.Id,
-                        Success = true
-                    });
+                        //Retry once in one minute
+                        await Task.Delay(TimeSpan.FromMinutes(1));
+                        await UpdateRefundInternal(exportCallBack, refund);
+                    }
+                }
+                catch (SqlException e)
+                {
+                    if (e.Number == -2)
+                    {
+                        //Retry once in one minute
+                        await Task.Delay(TimeSpan.FromMinutes(1));
+                        await UpdateRefundInternal(exportCallBack, refund);
+                    }
                 }
             }
+        }
+
+        private async Task UpdateRefundInternal(Action<OrderExportItemResult> exportCallBack, OrderRefundDynamic refund)
+        {
+            await _refundService.UpdateAsync(refund);
+            exportCallBack(new OrderExportItemResult
+            {
+                Id = refund.Id,
+                Success = true
+            });
         }
 
         public void SwitchToInMemoryContext()

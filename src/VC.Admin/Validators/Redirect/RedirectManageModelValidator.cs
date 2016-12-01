@@ -24,16 +24,16 @@ namespace VC.Admin.Validators.Redirect
                 RuleFor(model => model.From)
                     .NotEmpty()
                     .WithMessage(model => model.From, ValidationMessages.FieldRequired)
-                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
-                    .WithMessage(model => model.From, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_EXPANDED_MAX_SIZE)
+                    .WithMessage(model => model.From, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_EXPANDED_MAX_SIZE)
                     .Matches(ValidationPatterns.RelativeUrlPattern)
                     .WithMessage(model => model.From, ValidationMessages.FieldRelativeUrlInvalidFormat);
 
                 RuleFor(model => model.To)
                     .NotEmpty()
                     .WithMessage(model => model.To, ValidationMessages.FieldRequired)
-                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
-                    .WithMessage(model => model.To, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_EXPANDED_MAX_SIZE)
+                    .WithMessage(model => model.To, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_EXPANDED_MAX_SIZE);
             }
         }
     }

@@ -19,9 +19,9 @@ namespace VitalChoice.ObjectMapping.Services
 
         public async Task DynamicToModelAsync<TModel, TDynamic>(TModel model, TDynamic dynamic)
         {
-            var baseList = typeof (TModel).GetBaseTypes();
+            var baseModelList = typeof (TModel).GetBaseTypes();
             IModelConverter converter;
-            foreach (var type in baseList.Where(t => t != typeof(object)))
+            foreach (var type in baseModelList.Where(t => t != typeof(object)))
             {
                 if (_converters.TryGetValue(new TypePair(type, typeof (TDynamic)), out converter))
                 {
