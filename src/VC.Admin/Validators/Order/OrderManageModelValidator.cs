@@ -182,6 +182,16 @@ namespace VC.Admin.Validators.Order
                                  .Must(p => p >= DateTime.Now)
                                  .When(p => p.ShipDelayDateNP.HasValue && p.ShipDelayType== ShipDelayType.PerishableAndNonPerishable)
                                  .WithMessage("Ship delay should be future date. Please review.");
+
+                            RuleFor(model => model.OrderNotes)
+                               .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                               .WithMessage(model => model.KeyCode, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
+                             RuleFor(model => model.ServiceCodeNotes)
+                               .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                               .WithMessage(model => model.KeyCode, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
+                             RuleFor(model => model.GiftMessage)
+                               .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                               .WithMessage(model => model.KeyCode, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE);
                          });
                 RuleSet("NewOrder",
                         () =>
