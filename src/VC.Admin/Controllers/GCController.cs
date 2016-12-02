@@ -85,7 +85,8 @@ namespace VC.Admin.Controllers
         [AdminAuthorize(PermissionType.Reports)]
         [HttpGet]
         public async Task<FileResult> GetGiftCertificatesWithOrderInfoReportFile([FromQuery]string from, [FromQuery]string to,
-            [FromQuery]int? type = null, [FromQuery]int? status = null, [FromQuery]string billinglastname = null, [FromQuery]string shippinglastname = null)
+            [FromQuery]int? type = null, [FromQuery]int? status = null, [FromQuery]string billinglastname = null, 
+            [FromQuery]string shippinglastname = null, [FromQuery]bool notzerobalance = false)
         {
             DateTime? dFrom = !string.IsNullOrEmpty(from) ? from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
             DateTime? dTo = !string.IsNullOrEmpty(to) ? to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
@@ -100,6 +101,7 @@ namespace VC.Admin.Controllers
                     null,
                 ShippingAddress = !String.IsNullOrEmpty(shippinglastname) ? new CustomerAddressFilter() { LastName = shippinglastname } :
                     null,
+                NotZeroBalance = notzerobalance,
             };
             filter.Paging = null;
 

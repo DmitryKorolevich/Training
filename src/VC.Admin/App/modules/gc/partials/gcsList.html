@@ -130,7 +130,7 @@
                             <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
                             <span data-ng-if="item.StatusCode == 1" class="label label-danger font-default">{{getReferenceItem(ReferenceData.RecordStatuses, item.StatusCode).Text}}</span>
                         </td>
-                        <td>{{item.ExpirationDate | date:"MM/dd/yy"}}<br />{{item.ExpirationDate | date:"h:mm a"}}</td>
+                        <td>{{item.ExpirationDate | date:"MM/dd/yy"}}</td>
                         <td>{{item.Tag}}</td>
                         <td>
                             <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="edit(item.Id);">
