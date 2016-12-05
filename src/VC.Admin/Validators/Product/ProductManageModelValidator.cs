@@ -234,8 +234,8 @@ namespace VC.Admin.Validators.Product
                     .WithMessage(model => model.Name, ValidationMessages.FieldRequired)
                     .Matches("^[A-Za-z0-9-]*")
                     .WithMessage(model => model.Name, ValidationMessages.FieldInvalid)
-                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
-                    .WithMessage(model => model.Name, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+                    .Length(0, BaseAppConstants.SKU_CODE_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.Name, ValidationMessages.FieldLength, BaseAppConstants.SKU_CODE_TEXT_FIELD_MAX_SIZE);
             }
         }
     }

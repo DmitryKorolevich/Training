@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Business.CsvExportMaps.Products;
@@ -916,6 +917,58 @@ namespace VitalChoice.Business.Services.Products
             return toReturn;
         }
 
+        public byte[] GenerateCJItemsReportFile(ICollection<ProductContentTransferEntity> products, ProductCategory productCategories)
+        {
+            byte[] toReturn = null;
+            StringBuilder builder=new StringBuilder();
+            builder.AppendLine("&CID=4311781\t");
+            builder.AppendLine("&SUBID=157245\t");
+            builder.AppendLine("&PROCESSTYPE=OVERWRITE\t");
+            builder.AppendLine("&AID=11843551\t");
+            builder.AppendLine("&PARAMETERS=NAME|KEYWORDS|DESCRIPTION|SKU|BUYURL|AVAILABLE|PRICE|IMAGEURL|\t");
+
+            ProductCategory category;
+            string availability;
+            string url;
+            string thumb;
+            foreach (var productContentTransferEntity in products.OrderBy(p=>p.ProductContent?.Url))
+            {
+                if (productContentTransferEntity.ProductDynamic.StatusCode == (int)RecordStatusCode.Active
+                    && productContentTransferEntity.ProductDynamic.IdVisibility.HasValue
+                    && (productContentTransferEntity.ProductDynamic.IdVisibility.Value == CustomerTypeCode.All ||
+                    productContentTransferEntity.ProductDynamic.IdVisibility.Value == CustomerTypeCode.Retail)
+                    && productContentTransferEntity.ProductDynamic.Skus != null)
+                {
+                    var activeSkus =
+                        productContentTransferEntity.ProductDynamic.Skus.Where(p => p.StatusCode == (int)RecordStatusCode.Active &&
+                                                                                    !p.Hidden && p.SafeData.HideFromDataFeed != true).ToArray();
+
+                    if (activeSkus.Length == 0)
+                        continue;
+
+                    foreach (var skuDynamic in activeSkus)
+                    {
+                        category = GetProductCategory(productContentTransferEntity.ProductDynamic.CategoryIds.FirstOrDefault(), productCategories);
+                        availability = skuDynamic.InStock() ? "Yes" : "No";
+                        url =!string.IsNullOrEmpty(productContentTransferEntity.ProductContent?.Url) ?
+                            $"https://{_options.Value.PublicHost}/product/{productContentTransferEntity.ProductContent?.Url}"
+                            : string.Empty;
+                        thumb = !string.IsNullOrEmpty(productContentTransferEntity.ProductDynamic.SafeData.Thumbnail) ?
+                            $"https://{_options.Value.PublicHost}{productContentTransferEntity.ProductDynamic.SafeData.Thumbnail}"
+                            : string.Empty;
+
+                        builder.AppendLine($"\"{productContentTransferEntity.ProductDynamic.SafeData.GoogleFeedTitle}\"\t\"{GetRootProductCategory(productCategories, category)?.Name}\"\t" +
+                                           $"\"{productContentTransferEntity.ProductDynamic.SafeData.GoogleFeedDescription}\"\t{skuDynamic.Code}\t{url}\t" +
+                                           $"{availability}\t{skuDynamic.Price:N2}\t{thumb}");
+                    }
+                }
+            }
+
+            toReturn = Encoding.UTF8.GetBytes(builder.ToString());
+
+            return toReturn;
+        }
+        
         public async Task UpdateSkuFeedItemsReportFiles()
         {
             try
@@ -929,6 +982,10 @@ namespace VitalChoice.Business.Services.Products
 
                 file = GenerateSkuCriteoItemsReportFile(products, productCategories);
                 await _storageClient.UploadBlobAsync(_options.Value.AzureStorage.AppFilesContainerName, FileConstants.CRITEO_PRODUCTS_FEED,
+                    file, "text/csv");
+
+                file = GenerateCJItemsReportFile(products, productCategories);
+                await _storageClient.UploadBlobAsync(_options.Value.AzureStorage.AppFilesContainerName, FileConstants.CJ_PRODUCTS_FEED,
                     file, "text/csv");
             }
             catch (Exception e)
@@ -946,6 +1003,12 @@ namespace VitalChoice.Business.Services.Products
         public async Task<byte[]> GetSkuCriteoItemsReportFile()
         {
             var blob = await _storageClient.DownloadBlobBlockAsync(_options.Value.AzureStorage.AppFilesContainerName, FileConstants.CRITEO_PRODUCTS_FEED);
+            return blob?.File;
+        }
+
+        public async Task<byte[]> GetCJItemsReportFile()
+        {
+            var blob = await _storageClient.DownloadBlobBlockAsync(_options.Value.AzureStorage.AppFilesContainerName, FileConstants.CJ_PRODUCTS_FEED);
             return blob?.File;
         }
 

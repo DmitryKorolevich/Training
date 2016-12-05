@@ -150,13 +150,18 @@ namespace VC.Public
 
             routeBuilder.MapRoute(
                 name: "GoogleProductsFeed",
-                template: "google/datafeed.csv",
+                template: "feed/datafeed.csv",
                 defaults: new { controller = "Help", action = "GoogleProductsFeed" });
 
             routeBuilder.MapRoute(
                 name: "CriteoProductsFeed",
-                template: "criteo/criteo-datafeed.csv",
+                template: "feed/criteo-datafeed.csv",
                 defaults: new { controller = "Help", action = "CriteoProductsFeed" });
+
+            routeBuilder.MapRoute(
+                name: "CJProductsFeed",
+                template: "feed/cjfeed.csv",
+                defaults: new { controller = "Help", action = "CJProductsFeed" });
 
             routeBuilder.MapRoute(
                 name: "CustomCSS",

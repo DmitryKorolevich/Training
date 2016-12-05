@@ -27,20 +27,9 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
             $scope.article.MasterContentItemId = result.Data.MasterContentItemId;
             $scope.previewUrl = $scope.baseUrl.format($scope.article.Url);
             refreshHistory();
-        } else {
-            var messages = "";
-            if (result.Messages) {
-                $scope.forms.articleForm.submitted = true;
-                $scope.detailsTab.active = true;
-                $scope.serverMessages = new ServerMessages(result.Messages);
-                $.each(result.Messages, function (index, value) {
-                    if (value.Field) {
-                        $scope.forms.articleForm[value.Field].$setValidity("server", false);
-                    }
-                    messages += value.Message + "<br />";
-                });
-            }
-            toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+        } else
+        {
+            $rootScope.fireServerValidation(result, $scope);
         }
     };
 
@@ -97,7 +86,7 @@ function ($scope, $rootScope, $state, $stateParams, appBootstrap, modalUtil, con
                         errorHandler(result);
                     });
             } else {
-                $scope.forms.articleForm.submitted = true;
+                $scope.forms.submitted = true;
                 $scope.detailsTab.active = true;
             }
         };

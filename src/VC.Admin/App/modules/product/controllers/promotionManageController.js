@@ -28,49 +28,7 @@ angular.module('app.modules.product.controllers.promotionManageController', [])
                 refreshHistory();
             } else
             {
-                var messages = "";
-                if (result.Messages)
-                {
-                    $scope.forms.submitted = true;
-                    $scope.detailsTab.active = true;
-                    $scope.serverMessages = new ServerMessages(result.Messages);
-                    $.each(result.Messages, function (index, value)
-                    {
-                        if (value.Field)
-                        {
-                            if (value.Field.indexOf('.') > -1)
-                            {
-                                var items = value.Field.split(".");
-                                $scope.forms[items[0]][items[1]][items[2]].$setValidity("server", false);
-                            }
-                            else
-                            {
-                                $.each($scope.forms, function (index, form)
-                                {
-                                    if (form && !(typeof form === 'boolean'))
-                                    {
-                                        if (form[value.Field] != undefined)
-                                        {
-                                            form[value.Field].$setValidity("server", false);
-                                            if (formForShowing == null)
-                                            {
-                                                formForShowing = index;
-                                            }
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                        else
-                        {
-                            messages += value.Message + "<br/>"
-                        }
-                    });
-                }
-                if (messages)
-                {
-                    toaster.pop('error', "Error!", messages, null, 'trustedHtml');
-                }
+                $rootScope.fireServerValidation(result, $scope);
             }
         };
 

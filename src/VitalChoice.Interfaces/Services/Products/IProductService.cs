@@ -79,11 +79,16 @@ namespace VitalChoice.Interfaces.Services.Products
         byte[] GenerateSkuCriteoItemsReportFile(ICollection<ProductContentTransferEntity> products,
 	        ProductCategory productCategories);
 
+	    byte[] GenerateCJItemsReportFile(ICollection<ProductContentTransferEntity> products,
+	        ProductCategory productCategories);
+
         Task UpdateSkuFeedItemsReportFiles();
 
 	    Task<byte[]> GetSkuGoogleItemsReportFile();
 
         Task<byte[]> GetSkuCriteoItemsReportFile();
+
+	    Task<byte[]> GetCJItemsReportFile();
 
         #endregion
 
