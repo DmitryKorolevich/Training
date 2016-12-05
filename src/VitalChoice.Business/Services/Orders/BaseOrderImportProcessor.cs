@@ -76,11 +76,8 @@ namespace VitalChoice.Business.Services.Orders
             {
                 using (var streamReader = new StreamReader(memoryStream))
                 {
-                    CsvConfiguration configuration = new CsvConfiguration();
-                    configuration.TrimFields = true;
-                    configuration.TrimHeaders = true;
-                    configuration.WillThrowOnMissingField = false;
-                    configuration.RegisterClassMap(RecordMapType);
+                    var configuration = new CsvConfiguration();
+                    configuration.ConfigureDefault(RecordMapType);
                     using (var csv = new CsvReader(streamReader, configuration))
                     {
                         PropertyInfo[] modelProperties = RecordType.GetProperties();
