@@ -12,14 +12,14 @@
                 <div class="container container-left">
                     <div class="well row">
                         <spinner-overlay data-loading="refreshTracker.active()">
-                            <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate unsaved-warning-form>
+                            <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate unsaved-warning-form>
                                 <fieldset>
                                     <span class="legend">Minimum Cart Perishable Value</span>
                                     <div class="form-group">
                                         <label for="name" class="col-md-4 control-label">Minimum Perishable</label>
                                         <div class="col-md-8">
                                             <input type="text" name="GlobalPerishableThreshold" class="form-control" placeholder="Minimum Perishable" data-ng-model="settings.GlobalPerishableThreshold" money max="100000" min="0.00" required>
-                                            <div class="error-container" ng-show="forms.form.submitted && forms.form.GlobalPerishableThreshold.$invalid">
+                                            <div class="error-container" ng-show="forms.submitted && forms.form.GlobalPerishableThreshold.$invalid">
                                                 <small class="error" ng-show="forms.form.GlobalPerishableThreshold.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Minimum Perishable")}}</small>
                                                 <small class="error" ng-show="forms.form.GlobalPerishableThreshold.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Minimum Perishable",1000)}}</small>
                                                 <small class="error" ng-show="forms.form.GlobalPerishableThreshold.$error.min">{{getValidationMessage("{0} must be over $0.00","Minimum Perishable")}}</small>

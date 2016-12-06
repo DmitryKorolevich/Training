@@ -10,33 +10,9 @@ angular.module('app.modules.inventorysku.controllers.inventorySkuManageControlle
             if (result.Success) {
                 toaster.pop('success', "Success!", "Successfully saved.");
                 $scope.inventorySku.Id = result.Data.Id;
-            } else {
-                var messages = "";
-                if (result.Messages)
-                {
-                    $scope.forms.submitted = true;
-                    $scope.detailsTab.active = true;
-                    $scope.serverMessages = new ServerMessages(result.Messages);
-
-                    $.each(result.Messages, function (index, value)
-                    {
-                        if (value.Field)
-                        {
-                            $.each($scope.forms, function (index, form)
-                            {
-                                if (form && !(typeof form === 'boolean'))
-                                {
-                                    if (form[value.Field] != undefined)
-                                    {
-                                        form[value.Field].$setValidity("server", false);
-                                        return false;
-                                    }
-                                }
-                            });
-                        }
-                    });
-                }
-                toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+            } else
+            {
+                $rootScope.fireServerValidation(result, $scope);
             }
         };
 

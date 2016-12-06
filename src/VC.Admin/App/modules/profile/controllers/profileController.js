@@ -50,19 +50,9 @@ angular.module('app.modules.profile.controllers.profileController', [])
                             $rootScope.currentUser.FirstName = $scope.profile.FirstName;
                             $rootScope.currentUser.LastName = $scope.profile.LastName;
                             $rootScope.currentUser.Email = $scope.profile.Email;
-                        } else {
-                            var messages = "";
-                            if (result.Messages) {
-                                $scope.form.profileForm.submitted = true;
-                                $scope.serverMessages = new ServerMessages(result.Messages);
-                                $.each(result.Messages, function (index, value) {
-                                    if (value.Field && $scope.form.profileForm[value.Field]) {
-                                        $scope.form.profileForm[value.Field].$setValidity("server", false);
-                                    }
-                                    messages += value.Message + "<br />";
-                                });
-                            }
-                            toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+                        } else
+                        {
+                            $rootScope.fireServerValidation(result, $scope);
                         }
 
                         refreshProfile();
@@ -72,7 +62,7 @@ angular.module('app.modules.profile.controllers.profileController', [])
                         refreshProfile();
                     });
             } else {
-                $scope.form.profileForm.submitted = true;
+                $scope.form.submitted = true;
             }
         };
 

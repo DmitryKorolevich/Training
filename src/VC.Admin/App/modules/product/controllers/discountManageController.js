@@ -30,36 +30,9 @@ angular.module('app.modules.product.controllers.discountManageController', [])
                 $scope.discount.Id = result.Data.Id;
                 $scope.discount.DiscountTiers = result.Data.DiscountTiers;
                 refreshHistory();
-            } else {
-                var messages = "";
-                if (result.Messages) {
-                    $scope.forms.submitted = true;
-                    $scope.forms.discountTiersSubmitted = true;
-                    $scope.detailsTab.active = true;
-                    $scope.serverMessages = new ServerMessages(result.Messages);
-
-                    $.each(result.Messages, function (index, value) {
-                        if (value.Field) {
-                            if (value.Field.indexOf('.') > -1) {
-                                var items = value.Field.split(".");
-                                $scope.forms[items[0]][items[1]][items[2]].$setValidity("server", false);
-                            }
-                            else {
-                                $.each($scope.forms, function (index, form) {
-                                    if (form && !(typeof form === 'boolean')) {
-                                        if (form[value.Field] != undefined) {
-                                            form[value.Field].$setValidity("server", false);
-                                            if (formForShowing == null) {
-                                                formForShowing = index;
-                                            }
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    });
-                }
-                toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+            } else
+            {
+                $rootScope.fireServerValidation(result, $scope);
             }
         };
 
@@ -89,6 +62,7 @@ angular.module('app.modules.product.controllers.discountManageController', [])
             };
 
             $scope.forms = {};
+            $scope.forms.discountTiersSubmitted = false;
             $scope.detailsTab = {
                 active: true
             };

@@ -15,7 +15,7 @@
                 <div class="container container-left">
                     <div class="well row">
                         <spinner-overlay data-loading="refreshTracker.active()">
-                            <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate unsaved-warning-form>
+                            <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate unsaved-warning-form>
                                 <fieldset>
                                     <span class="legend">HealthWise Details</span>
                                     <div class="form-group">
@@ -43,7 +43,7 @@
                                                 <span class="input-group-addon">$</span>
                                                 <input type="text" name="Amount" class="form-control" placeholder="Amount" money min="0.01" max="100000" data-ng-model="payment.Amount" required>
                                             </div>
-                                            <div class="error-container" ng-show="forms.form.submitted && forms.form.Amount.$invalid">
+                                            <div class="error-container" ng-show="forms.submitted && forms.form.Amount.$invalid">
                                                 <small class="error" ng-show="forms.form.Amount.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Amount")}}</small>
                                                 <small class="error" ng-show="forms.form.Amount.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Amount")}}</small>
                                                 <small class="error" ng-show="forms.form.Amount.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","GeneralFieldNames.Amount",1000000)}}</small>
@@ -61,7 +61,7 @@
                                                     <button type="button" class="btn btn-default" ng-click="stopPropagation($event); dateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                                                 </span>
                                             </p>
-                                            <div class="error-container" ng-show="forms.form.submitted && forms.form.Date.$invalid">
+                                            <div class="error-container" ng-show="forms.submitted && forms.form.Date.$invalid">
                                                 <small class="error" ng-show="forms.form.Date.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Date")}}</small>
                                                 <small class="error" ng-show="forms.form.Date.$error.server">{{serverMessages.GetMessage('Date')}}</small>
                                             </div>

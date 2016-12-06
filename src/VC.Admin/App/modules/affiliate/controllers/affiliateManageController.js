@@ -50,38 +50,7 @@ angular.module('app.modules.affiliate.controllers.affiliateManageController', []
                 }
             } else
             {
-                var messages = "";
-                if (result.Messages)
-                {
-                    $scope.forms.submitted = true;
-                    $scope.detailsTab.active = true;
-                    $scope.serverMessages = new ServerMessages(result.Messages);
-
-                    $.each(result.Messages, function (index, value)
-                    {
-                        if (value.Field)
-                        {
-                            $.each($scope.forms, function (index, form)
-                            {
-                                if (form && !(typeof form === 'boolean'))
-                                {
-                                    if (form[value.Field] != undefined)
-                                    {
-                                        form[value.Field].$setValidity("server", false);
-                                        return false;
-                                    }
-                                }
-                            });
-                        }
-                        else
-                        {
-                            messages += value.Message + "<br />";
-                        }
-                    });
-                }
-                if (messages == "")
-                    messages = "Validation errors, please correct field values.";
-                toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+                $rootScope.fireServerValidation(result, $scope);
             }
         };
 

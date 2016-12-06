@@ -28,20 +28,9 @@ function ($scope, $rootScope, $state, $stateParams, contentService, settingServi
             $scope.faq.MasterContentItemId = result.Data.MasterContentItemId;
             $scope.previewUrl = $scope.baseUrl.format($scope.faq.Url);
             refreshHistory();
-        } else {
-            var messages = "";
-            if (result.Messages) {
-                $scope.forms.faqForm.submitted = true;
-                $scope.detailsTab.active = true;
-                $scope.serverMessages = new ServerMessages(result.Messages);
-                $.each(result.Messages, function (index, value) {
-                    if (value.Field) {
-                        $scope.forms.faqForm[value.Field].$setValidity("server", false);
-                    }
-                    messages += value.Message + "<br />";
-                });
-            }
-            toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+        } else
+        {
+            $rootScope.fireServerValidation(result, $scope);
         }
     };
 
@@ -85,7 +74,7 @@ function ($scope, $rootScope, $state, $stateParams, contentService, settingServi
                         errorHandler(result);
                     });
             } else {
-                $scope.forms.faqForm.submitted = true;
+                $scope.forms.submitted = true;
                 $scope.detailsTab.active = true;
             }
         };

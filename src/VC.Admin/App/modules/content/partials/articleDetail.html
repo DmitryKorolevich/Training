@@ -116,13 +116,19 @@
                                             <div class="form-group">
                                                 <label for="meta_title" class="col-md-3 control-label">Meta Title</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Meta Title" data-ng-model="article.Title">
+                                                    <input type="text" class="form-control" placeholder="Meta Title" name="Title" data-ng-model="article.Title">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.articleForm.Title.$invalid">
+                                                        <small class="error" ng-show="forms.articleForm.Title.$error.server">{{serverMessages.GetMessage('Title')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="meta_description" class="col-md-3 control-label">Meta Description</label>
                                                 <div class="col-md-9">
-                                                    <textarea type="text" class="form-control" placeholder="Meta Description" rows="10" data-ng-model="article.MetaDescription"></textarea>
+                                                    <textarea type="text" class="form-control" placeholder="Meta Description" name="MetaDescription" rows="10" data-ng-model="article.MetaDescription"></textarea>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.articleForm.MetaDescription.$invalid">
+                                                        <small class="error" ng-show="forms.articleForm.MetaDescription.$error.server">{{serverMessages.GetMessage('MetaDescription')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </fieldset>
