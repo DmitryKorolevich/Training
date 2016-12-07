@@ -22,7 +22,13 @@ BEGIN
 
 	DECLARE @orders AS TABLE
     (
-        IdOrder int NOT NULL, ShipDelayDate DATETIME2 NULL, ShipDelayDateP DATETIME2 NULL, ShipDelayDateNP DATETIME2 NULL, POrderType int NULL
+        IdOrder int NOT NULL, 
+		ShipDelayDate DATETIME2 NULL, 
+		ShipDelayDateP DATETIME2 NULL, 
+		ShipDelayDateNP DATETIME2 NULL,
+		POrderType int NULL,
+		POrderStatus int NULL,
+		NPOrderStatus int NULL
     );
 
 	DECLARE @skus AS TABLE
@@ -47,11 +53,22 @@ BEGIN
 
 	INSERT INTO @orders
 	(
-		IdOrder, ShipDelayDate, ShipDelayDateP, ShipDelayDateNP, POrderType
+		IdOrder,
+		ShipDelayDate,
+		ShipDelayDateP, 
+		ShipDelayDateNP, 
+		POrderType,		
+		POrderStatus,
+		NPOrderStatus
 	)
 	(SELECT 
-		o.Id, CONVERT(DATETIME2,sdval.Value,126), CONVERT(DATETIME2,sdpval.Value,126), CONVERT(DATETIME2,sdnpval.Value,126),
-		CAST(pval.Value as INT)
+		o.Id, 
+		CONVERT(DATETIME2,sdval.Value,126),
+		CONVERT(DATETIME2,sdpval.Value,126), 
+		CONVERT(DATETIME2,sdnpval.Value,126),
+		CAST(pval.Value as INT),
+		o.POrderStatus,
+		o.NPOrderStatus
 		FROM Orders o WITH(NOLOCK)
 		LEFT JOIN OrderOptionTypes AS popt WITH(NOLOCK) ON popt.Name = N'POrderType'
 		LEFT JOIN OrderOptionValues AS pval WITH(NOLOCK) ON pval.IdOrder = o.Id AND pval.IdOptionType = popt.Id	
@@ -100,11 +117,28 @@ BEGIN
 					o.IdOrder, o.ShipDelayDate, o.ShipDelayDateP, o.ShipDelayDateNP, o.POrderType, os.IdSku, os.Quantity
 					FROM @orders o
 					JOIN OrderToSkus os WITH(NOLOCK) ON o.IdOrder=os.IdOrder
+					JOIN Skus s WITH(NOLOCK) ON os.IdSku=s.Id
+					JOIN Products p WITH(NOLOCK) ON s.IdProduct=p.Id
+					WHERE 
+						(o.POrderStatus IS NULL AND o.NPOrderStatus IS NULL) OR
+						(
+							(o.POrderStatus!=4 OR (o.POrderStatus=4 AND (p.IdObjectType=1 OR p.IdObjectType=3 OR p.IdObjectType=4))) AND
+							(o.NPOrderStatus!=4 OR (o.NPOrderStatus=4 AND (p.IdObjectType=2)))
+						)
 				UNION ALL
 				SELECT 
 					o.IdOrder, o.ShipDelayDate, o.ShipDelayDateP, o.ShipDelayDateNP, o.POrderType, op.IdSku, op.Quantity
 					FROM @orders o
-					JOIN OrderToPromos op WITH(NOLOCK) ON o.IdOrder=op.IdOrder AND op.Disabled=0) tempInner
+					JOIN OrderToPromos op WITH(NOLOCK) ON o.IdOrder=op.IdOrder AND op.Disabled=0
+					JOIN Skus s WITH(NOLOCK) ON op.IdSku=s.Id
+					JOIN Products p WITH(NOLOCK) ON s.IdProduct=p.Id
+					WHERE 
+						(o.POrderStatus IS NULL AND o.NPOrderStatus IS NULL) OR
+						(
+							(o.POrderStatus!=4 OR (o.POrderStatus=4 AND (p.IdObjectType=1 OR p.IdObjectType=3 OR p.IdObjectType=4))) AND
+							(o.NPOrderStatus!=4 OR (o.NPOrderStatus=4 AND (p.IdObjectType=2)))
+						)
+			) tempInner
 			GROUP BY tempInner.IdOrder,tempInner.IdSku)	temp	
 		JOIN Skus s ON temp.IdSku=s.Id	
 		JOIN Products p ON s.IdProduct=p.Id	

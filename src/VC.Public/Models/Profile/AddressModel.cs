@@ -55,7 +55,7 @@ namespace VC.Public.Models.Profile
 		public string County { get; set; }
 
 		[Required]
-		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+		[MaxLength(BaseAppConstants.ZIP_MAX_SIZE)]
 		[Display(Name = "Postal Code")]
 		[Map("Zip")]
 		public string PostalCode { get; set; }

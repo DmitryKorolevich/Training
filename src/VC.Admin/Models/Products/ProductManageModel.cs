@@ -241,6 +241,8 @@ namespace VC.Admin.Models.Products
         [Map]
         public int? InventoryCategoryId { get; set; }
 
+        public int? SourceId { get; set; }
+
         public ProductManageModel()
         {
             SKUs = new List<SKUManageModel>();

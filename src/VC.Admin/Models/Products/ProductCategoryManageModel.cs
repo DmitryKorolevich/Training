@@ -63,6 +63,8 @@ namespace VC.Admin.Models.Products
 
         public ProductCategoryViewType ViewType { get; set; }
 
+        public int? SourceId { get; set; }
+
         public ProductCategoryManageModel()
         {
         }

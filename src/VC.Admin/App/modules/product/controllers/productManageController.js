@@ -224,7 +224,13 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 });
         };
 
-        function loadProduct() {
+        function loadProduct()
+        {
+            if (!$scope.id && $stateParams.source)
+            {
+                $scope.id = $stateParams.source;
+            }
+
             productService.getProduct($scope.id, $scope.refreshTracker)
 			    .success(function (result) {
 			        if (result.Success) {
@@ -258,7 +264,6 @@ angular.module('app.modules.product.controllers.productManageController', [])
 			                });
 			            }
 
-			            refreshHistory();
 			            setSelected($scope.rootCategory, $scope.product.CategoryIds);
 			            //setInventorySelected($scope.rootInventoryCategory, $scope.product.InventoryCategoryId);
 			            $scope.updateSalesCategoriesCollapsed(true);
@@ -266,6 +271,14 @@ angular.module('app.modules.product.controllers.productManageController', [])
 			            setProductTypeWatch();
 			            initCrossses();
 			            initVideos();
+
+			            if ($stateParams.source)
+			            {
+			                $scope.id = 0;
+			                $scope.product.Id = 0;
+			                $scope.product.SourceId = $stateParams.source;
+			            }
+			            refreshHistory();
 			        } else {
 			            errorHandler(result);
 			        }
