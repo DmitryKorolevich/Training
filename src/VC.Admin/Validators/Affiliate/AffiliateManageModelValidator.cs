@@ -115,7 +115,7 @@ namespace VC.Admin.Validators.Affiliate
                     .NotEmpty()
                     .WithMessage(model => model.Zip, ValidationMessages.FieldRequired)
                     .Length(0, BaseAppConstants.ZIP_MAX_SIZE)
-                    .WithMessage(model => model.Zip, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+                    .WithMessage(model => model.Zip, ValidationMessages.FieldLength, BaseAppConstants.ZIP_MAX_SIZE);
 
                 RuleFor(model => model.Phone)
                     .NotEmpty()
