@@ -25,6 +25,7 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
                 toaster.pop('success', "Success!", "Successfully saved.");
                 $scope.id = result.Data.Id;
                 $scope.productCategory.Id = result.Data.Id;
+                $scope.productCategory.SourceId = null;
                 $scope.productCategory.MasterContentItemId = result.Data.MasterContentItemId;
                 $scope.previewUrl = $scope.baseUrl.format($scope.productCategory.Url);
                 refreshHistory();
@@ -63,6 +64,11 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
 
         function refreshCategory()
         {
+            if (!$scope.id && $stateParams.source)
+            {
+                $scope.id = $stateParams.source;
+            }
+
             productService.getCategory($scope.id, $scope.refreshTracker)
                 .success(function (result)
                 {
@@ -83,6 +89,12 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
                         };
                         setUIstatus($scope.productCategory);
                         $scope.loaded = true;
+                        if ($stateParams.source)
+                        {
+                            $scope.id = 0;
+                            $scope.productCategory.Id = 0;
+                            $scope.productCategory.SourceId = $stateParams.source;
+                        }
                         refreshHistory();
                     } else
                     {
@@ -97,7 +109,7 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
 
         function refreshMasters()
         {
-            contentService.getMasterContentItems({ Type: 9 })//productCategory
+            contentService.getMasterContentItems({ Type: 9 }, $scope.refreshTracker)//productCategory
                 .success(function (result)
                 {
                     if (result.Success)

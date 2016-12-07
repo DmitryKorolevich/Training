@@ -41,7 +41,7 @@ angular.module('app.modules.product', [
 		            controller: 'productCategoriesController',
 		        })
 		        .state('index.oneCol.addNewProductCategory', {
-		            url: '/products/categories/add?{categoryid:int}',
+		            url: '/products/categories/add?{categoryid:int}{source:int}',
 		            templateUrl: 'app/modules/product/partials/productCategoryDetail.html',
 		            controller: 'productCategoryManageController'
 		        })
@@ -68,7 +68,7 @@ angular.module('app.modules.product', [
 		            controller: 'productsController'
 		        })
 		        .state('index.oneCol.addNewProduct', {
-		            url: '/products/add?{type:int}',
+		            url: '/products/add?{type:int}{source:int}',
 		            templateUrl: 'app/modules/product/partials/productDetail.html',
 		            controller: 'productManageController'
 		        })
