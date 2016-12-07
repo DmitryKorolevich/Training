@@ -10,6 +10,7 @@
                     <input type="text" name="Name" class="form-control" placeholder="Name" data-ng-model="category.Name" required>
                     <div class="error-container" ng-show="forms.submitted && forms.form.Name.$invalid">
                         <small class="error" ng-show="forms.form.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Name")}}</small>
+                        <small class="error" ng-show="forms.form.Name.$error.server">{{serverMessages.GetMessage('Name')}}</small>
                     </div>
                 </div>
             </div>

@@ -5,14 +5,9 @@
     $scope.editTracker = promiseTracker("edit");
     $scope.deleteTracker = promiseTracker("delete");
 
-    function errorHandler(result) {
-        var messages = "";
-        if (result.Messages) {
-            $.each(result.Messages, function (index, value) {
-                messages += value.Message + "<br />";
-            });
-        }
-        toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+    function errorHandler(result)
+    {
+        $rootScope.fireServerValidation(result, $scope);
     };
 
     function loadCategories() {

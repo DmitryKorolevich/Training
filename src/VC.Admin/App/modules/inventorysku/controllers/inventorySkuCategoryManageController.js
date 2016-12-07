@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.inventorysku.controllers.inventorySkuCategoryManageController', [])
-.controller('inventorySkuCategoryManageController', ['$scope', '$uibModalInstance', 'data', 'inventorySkuService', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $uibModalInstance, data, inventorySkuService, toaster, confirmUtil, promiseTracker)
+.controller('inventorySkuCategoryManageController', ['$scope', '$rootScope', '$uibModalInstance', 'data', 'inventorySkuService', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $rootScope, $uibModalInstance, data, inventorySkuService, toaster, confirmUtil, promiseTracker)
     {
         $scope.refreshTracker = promiseTracker("get");
         $scope.editTracker = promiseTracker("edit");
@@ -14,19 +14,9 @@ angular.module('app.modules.inventorysku.controllers.inventorySkuCategoryManageC
                 $scope.category.Id = result.Data.Id;
                 data.thenCallback($scope.category);
                 $uibModalInstance.close();
-            } else {
-                var messages = "";
-                if (result.Messages) {
-                    $scope.forms.submitted = true;
-                    $scope.serverMessages = new ServerMessages(result.Messages);
-                    $.each(result.Messages, function (index, value) {
-                        if (value.Field) {
-                            $scope.forms.form[value.Field].$setValidity("server", false);
-                        }
-                        messages += value.Message + "<br />";
-                    });
-                }
-                toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+            } else
+            {
+                $rootScope.fireServerValidation(result, $scope);
             }
         };
 

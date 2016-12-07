@@ -11,14 +11,9 @@ angular.module('app.modules.affiliate.controllers.affiliatePayCommissionsControl
 		    toaster.pop('success', "Success!", "Successfully paid");
 		    $uibModalInstance.close();
 		    data.thenCallback();
-		} else {
-			var messages = "";
-			if (result.Messages) {
-				$.each(result.Messages, function(index, value) {
-					messages += value.Message + "<br />";
-				});
-			}
-			toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+		} else
+		{
+		    $rootScope.fireServerValidation(result, $scope);
 		}
 	};
 

@@ -191,7 +191,12 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'manageBugTickets', stateName: 'index.oneCol.manageBugTickets', stateLabel: 'Manage Bug Tickets', access: 11 },
 				//{ name: 'viewWiki', stateName: 'index.oneCol.viewWiki', stateLabel: 'View Wiki', access: 11 },
 				{ name: 'manageLogs', stateName: 'index.oneCol.manageLogs', stateLabel: 'View Logs', access: 15 },
-			    { name: 'manageProfileScopes', stateName: 'index.oneCol.manageProfileScopes', stateLabel: 'Profile Scopes', access: 15 }
+			    { name: 'manageProfileScopes', stateName: 'index.oneCol.manageProfileScopes', stateLabel: 'Profile Scopes', access: 15 },
+			    {
+			        name: 'productPedia',
+			        href: 'https://vitalchoice.sharepoint.com/_layouts/OneNote.aspx?id=%2FCustomer%20Service%2FProductPedia',
+			        stateLabel: 'ProductPedia (external)'
+			    }
 			]
 		}
 	];

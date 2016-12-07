@@ -23,15 +23,16 @@
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="refreshTracker.active()">
-                                    <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+                                    <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.submitted}" novalidate>
                                         <fieldset>
                                             <span class="legend">Article Category Details</span>
                                             <div class="form-group">
                                                 <label for="name" class="col-md-3 control-label">Name</label>
                                                 <div class="col-md-9">
                                                     <input type="text" name="Name" class="form-control" placeholder="Name" data-ng-model="articleCategory.Name" required>
-                                                    <div class="error-container" ng-show="forms.form.submitted && forms.form.Name.$invalid">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.form.Name.$invalid">
                                                         <small class="error" ng-show="forms.form.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Name")}}</small>
+                                                        <small class="error" ng-show="forms.form.Name.$error.server">{{serverMessages.GetMessage('Name')}}</small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -39,7 +40,7 @@
                                                 <label for="url" class="col-md-3 control-label">URL</label>
                                                 <div class="col-md-9">
                                                     <input type="text" name="Url" class="form-control" placeholder="URL" data-ng-model="articleCategory.Url" ng-pattern='/^[A-Za-z0-9]{1}[A-Za-z0-9-_]{3}[A-Za-z0-9-_]*$/' required>
-                                                    <div class="error-container" ng-show="forms.form.submitted && forms.form.Url.$invalid">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.form.Url.$invalid">
                                                         <small class="error" ng-show="forms.form.Url.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Url")}}</small>
                                                         <small class="error" ng-show="forms.form.Url.$error.pattern">{{getValidationMessage("ValidationMessages.FieldContentUrlInvalidFormat","GeneralFieldNames.Url")}}</small>
                                                         <small class="error" ng-show="forms.form.Url.$error.server">{{serverMessages.GetMessage('Url')}}</small>
@@ -51,13 +52,19 @@
                                             <div class="form-group">
                                                 <label for="meta_title" class="col-md-3 control-label">Meta Title</label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class="form-control" placeholder="Meta Title" data-ng-model="articleCategory.Title">
+                                                    <input type="text" class="form-control" placeholder="Meta Title" name="Title" data-ng-model="articleCategory.Title">
+                                                    <div class="error-container" ng-show="forms.submitted && forms.form.Title.$invalid">
+                                                        <small class="error" ng-show="forms.form.Title.$error.server">{{serverMessages.GetMessage('Title')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label for="meta_description" class="col-md-3 control-label">Meta Description</label>
                                                 <div class="col-md-9">
-                                                    <textarea type="text" class="form-control" placeholder="Meta Description" rows="10" data-ng-model="articleCategory.MetaDescription"></textarea>
+                                                    <textarea type="text" class="form-control" placeholder="Meta Description" name="MetaDescription" rows="10" data-ng-model="articleCategory.MetaDescription"></textarea>
+                                                    <div class="error-container" ng-show="forms.submitted && forms.form.MetaDescription.$invalid">
+                                                        <small class="error" ng-show="forms.form.MetaDescription.$error.server">{{serverMessages.GetMessage('MetaDescription')}}</small>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </fieldset>

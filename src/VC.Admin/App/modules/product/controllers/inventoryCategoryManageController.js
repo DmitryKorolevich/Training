@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.product.controllers.inventoryCategoryManageController', [])
-.controller('inventoryCategoryManageController', ['$scope', '$uibModalInstance', 'data', 'productService', 'toaster', 'confirmUtil', 'promiseTracker',
-    function ($scope, $uibModalInstance, data, productService, toaster, confirmUtil, promiseTracker) {
+.controller('inventoryCategoryManageController', ['$scope', '$rootScope', '$uibModalInstance', 'data', 'productService', 'toaster', 'confirmUtil', 'promiseTracker',
+    function ($scope, $rootScope, $uibModalInstance, data, productService, toaster, confirmUtil, promiseTracker) {
         $scope.refreshTracker = promiseTracker("get");
         $scope.editTracker = promiseTracker("edit");
 
@@ -13,19 +13,9 @@ angular.module('app.modules.product.controllers.inventoryCategoryManageControlle
                 $scope.category.Id = result.Data.Id;
                 data.thenCallback($scope.category);
                 $uibModalInstance.close();
-            } else {
-                var messages = "";
-                if (result.Messages) {
-                    $scope.forms.submitted = true;
-                    $scope.serverMessages = new ServerMessages(result.Messages);
-                    $.each(result.Messages, function (index, value) {
-                        if (value.Field) {
-                            $scope.forms.form[value.Field].$setValidity("server", false);
-                        }
-                        messages += value.Message + "<br />";
-                    });
-                }
-                toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+            } else
+            {
+                $rootScope.fireServerValidation(result, $scope);
             }
         };
 

@@ -382,7 +382,7 @@ angular.module('app.core.utils.appBootstrap', [])
 
             function fireServerValidation(result, uiScope, additionalFormNameHandler, additionalItemOpenHandler, customSetInitSubmitHanlder, customFieldFormatHandler)
             {
-                if (!result.Success)
+                if (result && !result.Success)
                 {
                     var messages = "";
                     if (result.Messages)

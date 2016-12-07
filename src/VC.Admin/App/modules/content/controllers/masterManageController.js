@@ -47,16 +47,7 @@ function ($scope, $rootScope, $stateParams, contentService, settingService, toas
             refreshHistory();
         } else
         {
-            var messages = "";
-            if (result.Messages)
-            {
-                $scope.detailsTab.active = true;
-                $.each(result.Messages, function (index, value)
-                {
-                    messages += value.Message + "<br />";
-                });
-            }
-            toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+            $rootScope.fireServerValidation(result, $scope);
         }
     };
 
@@ -145,7 +136,7 @@ function ($scope, $rootScope, $stateParams, contentService, settingService, toas
                 });
         } else
         {
-            $scope.forms.masterForm.submitted = true;
+            $scope.forms.submitted = true;
             $scope.detailsTab.active = true;
         }
     };

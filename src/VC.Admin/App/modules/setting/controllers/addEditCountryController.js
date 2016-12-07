@@ -9,19 +9,9 @@
 	        $scope.country = result.Data;
 	        data.thenCallback($scope.country);
 	        $uibModalInstance.close();
-	    } else {
-	        var messages = "";
-	        if (result.Messages) {
-	            $scope.forms.form.submitted = true;
-	            $scope.serverMessages = new ServerMessages(result.Messages);
-	            $.each(result.Messages, function (index, value) {
-	                if (value.Field) {
-	                    $scope.forms.form[value.Field].$setValidity("server", false);
-	                }
-	                messages += value.Message + "<br />";
-	            });
-	        }
-	        toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+	    } else
+	    {
+	        $rootScope.fireServerValidation(result, $scope);
 	    }
 	};
 
@@ -69,7 +59,7 @@
                     errorHandler(result);
                 });
 		    } else {
-		        $scope.forms.form.submitted = true;
+		        $scope.forms.submitted = true;
 			}
 		};
 

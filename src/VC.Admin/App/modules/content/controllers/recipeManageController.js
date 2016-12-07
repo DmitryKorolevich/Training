@@ -28,45 +28,28 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
                 $scope.recipe.MasterContentItemId = result.Data.MasterContentItemId;
                 $scope.previewUrl = $scope.baseUrl.format($scope.recipe.Url);
                 refreshHistory();
-            } else {
-                var messages = "";
-                if (result.Messages) {
-                	$scope.forms.recipeForm.submitted = true;
-                	$scope.forms.crossessubmitted = true;
-                	$scope.forms.relatedsubmitted = true;
-
-                	$scope.serverMessages = new ServerMessages(result.Messages);
-                	var formForShowing = null;
-                	$.each(result.Messages, function (index, value) {
-                		if (value.Field) {
-                			if (value.Field.indexOf('.') > -1) {
-                				var items = value.Field.split(".");
-                				$scope.forms[items[0]][items[1]][items[2]].$setValidity("server", false);
-                				formForShowing = items[0];
-                			}
-                			else {
-                				$.each($scope.forms, function (index, form) {
-                					if (form && !(typeof form === 'boolean')) {
-                						if (form[value.Field] != undefined) {
-                							form[value.Field].$setValidity("server", false);
-                							if (formForShowing == null) {
-                								formForShowing = index;
-                							}
-                							return false;
-                						}
-                					}
-                				});
-                			}
-                		}
-                		messages += value.Message + "<br />";
-                	});
-
-                	if (formForShowing) {
-                		activateTab(formForShowing);
-                	}
-				}
-				toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+            } else
+            {
+                $rootScope.fireServerValidation(result, $scope,serverValidationFormNameHandler);
             }
+        };
+
+        var serverValidationFormNameHandler = function (formName)
+        {
+            if (formName.indexOf('recipeForm') == 0)
+            {
+                formName = 'details';
+            }
+            if (formName.indexOf('CrossSellRecipes') == 0)
+            {
+                formName = 'crossSellRelatedRecipes';
+            }
+            if (formName.indexOf('RelatedRecipes') == 0)
+            {
+                formName = 'crossSellRelatedRecipes';
+            }
+
+            return formName;
         };
 
         function errorHandler(result) {
@@ -142,7 +125,7 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
 	            	if (form && !(typeof form === 'boolean')) {
 	            		if (!form.$valid && index != 'submitted' && index != 'crossessubmitted' && index != 'relatedsubmitted') {
 	            			valid = false;
-	            			activateTab(index);
+	            			$rootScope.activateTab($scope, index, serverValidationFormNameHandler);
 	            			return false;
 	            		}
 	            	}
@@ -338,26 +321,6 @@ angular.module('app.modules.content.controllers.recipeManageController', [])
                 notifyAboutAddBlockIds('RecipesToProducts');
             });
             notifyAboutAddBlockIds('RecipesToProducts');
-        };
-
-        function activateTab(formName) {
-        	$.each($scope.tabs, function (index, item) {
-		        var temp = "";
-        		if (formName.indexOf('recipeForm') == 0) {
-        			temp = 'details';
-        		}
-        		if (formName.indexOf('CrossSellRecipes') == 0) {
-        			temp = 'crossSellRelatedRecipes';
-        		}
-        		if (formName.indexOf('RelatedRecipes') == 0) {
-        			temp = 'crossSellRelatedRecipes';
-        		}
-        		if (item.formName == temp)
-        		{
-        		    $scope.options.activeTabIndex = item.index;
-        			return false;
-        		}
-        	});
         };
 
         $scope.deleteRecipesToProducts = function (index) {

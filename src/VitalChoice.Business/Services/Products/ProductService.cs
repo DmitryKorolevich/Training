@@ -1066,7 +1066,7 @@ namespace VitalChoice.Business.Services.Products
             PagedList<VShortProduct> toReturn = null;
             Func<IQueryable<VShortProduct>, IOrderedQueryable<VShortProduct>> sortable = x => x.OrderBy(y => y.Description);
 
-            var query = _vShortProductRepository.Query(p => p.Description.StartsWith(filter.SearchText)).OrderBy(sortable);
+            var query = _vShortProductRepository.Query(p => p.Description.Contains(filter.SearchText)).OrderBy(sortable);
             if (filter.Paging != null)
             {
                 toReturn = await query.SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);

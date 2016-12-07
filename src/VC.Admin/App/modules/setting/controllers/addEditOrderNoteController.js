@@ -8,19 +8,9 @@ angular.module('app.modules.setting.controllers.addEditOrderNoteController', [])
 		if (result.Success) {
 			toaster.pop('success', "Success!", "Successfully saved");
 			$uibModalInstance.close();
-		} else {
-			var messages = "";
-			if (result.Messages) {
-				$scope.orderNoteForm.submitted = true;
-				$scope.serverMessages = new ServerMessages(result.Messages);
-				$.each(result.Messages, function(index, value) {
-					if (value.Field && $scope.orderNoteForm[value.Field.toLowerCase()]) {
-						$scope.orderNoteForm[value.Field.toLowerCase()].$setValidity("server", false);
-					}
-					messages += value.Message + "<br />";
-				});
-			}
-			toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+		} else
+		{
+		    $rootScope.fireServerValidation(result, $scope);
 		}
 		data.thenCallback();
 	};
@@ -30,7 +20,10 @@ angular.module('app.modules.setting.controllers.addEditOrderNoteController', [])
 		data.thenCallback();
 	};
 
-	function initialize() {
+	function initialize()
+	{
+	    $scope.forms = {};
+
 		$scope.orderNote = data.orderNote;
 
 	    $scope.editMode = data.editMode;
@@ -62,7 +55,7 @@ angular.module('app.modules.setting.controllers.addEditOrderNoteController', [])
 				}
 
 			} else {
-				$scope.orderNoteForm.submitted = true;
+				$scope.forms.submitted = true;
 			}
 		};
 
