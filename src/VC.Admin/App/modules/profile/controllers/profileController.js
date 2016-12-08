@@ -5,7 +5,7 @@ angular.module('app.modules.profile.controllers.profileController', [])
         $scope.profileTracker = promiseTracker('profile');
     
         function initialize() {
-            $scope.form = {};
+            $scope.forms = {};
 
             refreshProfile();
         };
@@ -33,13 +33,15 @@ angular.module('app.modules.profile.controllers.profileController', [])
         }
 
         $scope.save = function() {
-            $.each($scope.form.profileForm, function (index, element) {
+            $.each($scope.forms.profileForm, function (index, element)
+            {
             	if (element && element.$name == index) {
                     element.$setValidity("server", true);
                 }
             });
 
-            if ($scope.form.profileForm.$valid) {
+            if ($scope.forms.profileForm.$valid)
+            {
                 profileService.updateProfile($scope.profile, $scope.profileTracker)
                     .success(function(result) {
                         if (result.Success) {
@@ -62,7 +64,7 @@ angular.module('app.modules.profile.controllers.profileController', [])
                         refreshProfile();
                     });
             } else {
-                $scope.form.submitted = true;
+                $scope.forms.submitted = true;
             }
         };
 
