@@ -42,6 +42,7 @@
         public const string CUSTOMER_SKU_USAGE_REPORT = "Customer_Sku_Usage_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
 
         public const string DISCOUNT_USAGE_REPORT = "Discount_Usage_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+        public const string DISCOUNTS_REPORT = "Discounts_{0:MM_dd_yyyy_hh_mm_ss}.csv";
 
         public const string AVERAGE_DAILY_SALES_BY_SKU = "Average_Daily_Sales_By_Sku_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
         public const string AVERAGE_DAILY_SALES_BY_PRODUCT = "Average_Daily_Sales_By_Product_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";

@@ -14,7 +14,7 @@
             toaster.pop('error', "Error!", messages, null, 'trustedHtml');
         };
 
-        function refreshDiscounts()
+        function getFilterData()
         {
             var data = {};
             angular.copy($scope.filter, data);
@@ -35,7 +35,13 @@
                 data.SearchByAssigned = true;
             }
 
-            discountService.getDiscounts(data, $scope.refreshTracker)
+            return data;
+        };
+
+        function refreshDiscounts()
+        {
+            $scope.options.exportUrl = discountService.getDiscountsReportFile(getFilterData(), $rootScope.buildNumber);
+            discountService.getDiscounts(getFilterData(), $scope.refreshTracker)
                 .success(function (result) {
                     if (result.Success) {
                         $scope.discounts = result.Data.Items;
@@ -49,7 +55,10 @@
                 });
         };
 
-        function initialize() {
+        function initialize()
+        {
+            $scope.options = {};
+
             $scope.activeFilterOptions = $rootScope.ReferenceData.ActiveFilterOptions;
 
             $scope.customerTypes = angular.copy($rootScope.ReferenceData.CustomerTypes);
@@ -68,6 +77,7 @@
                 Sorting: gridSorterUtil.resolve(refreshDiscounts, "Code", "Asc")
             };
 
+            $scope.options.exportUrl = discountService.getDiscountsReportFile(getFilterData(), $rootScope.buildNumber);
             refreshDiscounts();
         }
 
@@ -84,6 +94,19 @@
 
         $scope.pageChanged = function () {
             refreshDiscounts();
+        };
+
+        $scope.filterChanged = function ()
+        {
+            if ($scope.filter.ValidFrom > $scope.filter.ValidTo)
+            {
+                toaster.pop('error', "Error!", "'Valid To' date can't be less than 'Valid From' date.", null, 'trustedHtml');
+                return;
+            }
+            else
+            {
+                $scope.options.exportUrl = discountService.getDiscountsReportFile(getFilterData(), $rootScope.buildNumber);
+            }
         };
 
         $scope.open = function (id) {

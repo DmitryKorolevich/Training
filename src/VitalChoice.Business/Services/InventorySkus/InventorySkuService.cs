@@ -307,7 +307,11 @@ namespace VitalChoice.Business.Services.InventorySkus
                     inventorySku.TotalUnitOfMeasureAmount = (inventorySkuUsageRawReportItem.UnitOfMeasureAmount ?? 0) * inventorySku.TotalInvSkuQuantity;
                     inventorySku.PurchaseUnitOfMeasure = inventorySkuUsageRawReportItem.PurchaseUnitOfMeasure;
                     inventorySku.PurchaseUnitOfMeasureAmount = inventorySkuUsageRawReportItem.PurchaseUnitOfMeasureAmount ?? 0;
-
+                    
+                    inventorySku.PurchasingUnits = (inventorySkuUsageRawReportItem.UnitOfMeasureAmount ?? 1)!=0
+                        ? inventorySku.TotalInvSkuQuantity / (inventorySkuUsageRawReportItem.UnitOfMeasureAmount ?? 1)
+                        : 0;
+                    
                     item.InventorySkus.Add(inventorySku);
                 }
             }

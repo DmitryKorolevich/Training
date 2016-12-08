@@ -12,10 +12,35 @@ angular.module('app.core.dataAccess.services.discountService', [])
 	    return config;
 	};
 
+	function generateQueryParamsBasedOnFilter(filter)
+	{
+	    var url = '';
+	    $.each(filter, function (index, item)
+	    {
+	        if (index != 'Paging' && index != 'Sorting')
+	        {
+	            url += '{0}={1}&'.format(index.toLowerCase(), item);
+	        }
+	        if (index == 'Sorting')
+	        {
+	            $.each(item, function (sortingIndex, sortingItem)
+	            {
+	                url += '{0}={1}&'.format(sortingIndex.toLowerCase(), sortingItem);
+	            });
+	        }
+	    });
+	    return url;
+	}
+
 	return {
 	    //discounts  
 	    getDiscounts: function (filter, tracker) {
 	        return $http.post(baseUrl + 'GetDiscounts', filter, getConfig(tracker));
+	    },
+	    getDiscountsReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + ('GetDiscountsReportFile?{0}buildNumber={1}')
+                .format(generateQueryParamsBasedOnFilter(filter), buildNumber);
 	    },
 	    getDiscount: function (id, tracker) {
 	        return $http.get(baseUrl + 'GetDiscount/' + id, getConfig(tracker));

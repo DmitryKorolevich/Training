@@ -3,22 +3,22 @@
         <span class="legend">Manage Discounts</span>
         <div class="row form-group">
             <div class="col-md-3">
-                <input type="text" class="form-control" placeholder="Code, Description" data-ng-model="filter.SearchText">
+                <input type="text" class="form-control" data-ng-change="filterChanged();" placeholder="Code, Description" data-ng-model="filter.SearchText">
             </div>
             <div class="col-md-3">
-                <select class="form-control" name="Status" data-ng-model="filter.Status" ng-options="activeFilterOption.Key as activeFilterOption.Text for activeFilterOption in activeFilterOptions"></select>
+                <select class="form-control" name="Status" data-ng-change="filterChanged();" data-ng-model="filter.Status" ng-options="activeFilterOption.Key as activeFilterOption.Text for activeFilterOption in activeFilterOptions"></select>
             </div>
             <div class="col-md-3">
-                <select class="form-control" name="ExpiredType" data-ng-model="filter.DateStatus" ng-options="item.Key as item.Text for item in ReferenceData.DateStatuses"></select>
+                <select class="form-control" name="ExpiredType" data-ng-change="filterChanged();" data-ng-model="filter.DateStatus" ng-options="item.Key as item.Text for item in ReferenceData.DateStatuses"></select>
             </div>
             <div class="col-md-3">
-                <select class="form-control" name="Assigned" data-ng-model="filter.Assigned" ng-options="item.Key as item.Text for item in customerTypes"></select>
+                <select class="form-control" name="Assigned" data-ng-change="filterChanged();" data-ng-model="filter.Assigned" ng-options="item.Key as item.Text for item in customerTypes"></select>
             </div>
         </div>
         <div class="row form-group">
             <div class="col-md-3">
                 <p class="input-group">
-                    <input type="text" name="test" class="form-control" placeholder="Valid From" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.ValidFrom" is-open="fromOpened"/>
+                    <input type="text" name="test" class="form-control" data-ng-change="filterChanged();" placeholder="Valid From" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.ValidFrom" is-open="fromOpened"/>
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
@@ -26,7 +26,7 @@
             </div>
             <div class="col-md-3">
                 <p class="input-group">
-                    <input type="text" name="test" class="form-control" placeholder="Valid To" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.ValidTo" is-open="toOpened"/>
+                    <input type="text" name="test" class="form-control" data-ng-change="filterChanged();" placeholder="Valid To" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.ValidTo" is-open="toOpened"/>
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
@@ -34,8 +34,9 @@
             </div>
         </div>
         <div class="row form-group">
-            <div class="col-md-4">
+            <div class="col-md-12">
                 <button class="btn btn-info" data-ng-click="filterDiscounts();" type="button">Filter</button>
+                <a target="_self" class="btn btn-primary pull-right" data-ng-href="{{options.exportUrl}}">Export</a>
             </div>
         </div>
         <hr />

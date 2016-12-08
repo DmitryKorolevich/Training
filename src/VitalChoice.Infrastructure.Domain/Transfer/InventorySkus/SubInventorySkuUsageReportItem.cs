@@ -25,5 +25,7 @@
         public int? PurchaseUnitOfMeasure { get; set; }
 
         public int PurchaseUnitOfMeasureAmount { get; set; }
+
+        public decimal PurchasingUnits { get; set; }
     }
 }

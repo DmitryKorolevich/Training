@@ -1,4 +1,4 @@
-﻿namespace VitalChoice.Infrastructure.Domain.Transfer.Disocunts
+﻿namespace VitalChoice.Infrastructure.Domain.Transfer.Discounts
 {
     public static class DiscountSortPath
     {

@@ -1,14 +1,12 @@
 ﻿using System;
-using VitalChoice.Business.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Infrastructure.Domain.Dynamic;
-using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Products
+namespace VitalChoice.Infrastructure.Domain.Transfer.Discounts
 {
-    public class DiscountListItemModel : BaseModel
+    public class DiscountListItemModel
     {
         public int Id { get; set; }
 
@@ -44,7 +42,6 @@ namespace VC.Admin.Models.Products
                 StatusCode = item.StatusCode;
                 Assigned = item.Assigned;
                 DiscountType = (DiscountType)item.IdObjectType;
-                DiscountTypeName = LookupHelper.GetDiscountTypeName((DiscountType)item.IdObjectType);
                 StartDate = item.StartDate;
                 ExpirationDate = item.ExpirationDate;
                 DateCreated = item.DateCreated;

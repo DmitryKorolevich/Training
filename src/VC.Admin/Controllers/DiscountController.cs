@@ -18,15 +18,22 @@ using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using VitalChoice.Interfaces.Services.Settings;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using VC.Admin.Models.Products;
+using VitalChoice.Business.CsvExportMaps.Products;
+using VitalChoice.Business.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain;
+using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.Discounts;
+using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 using VitalChoice.Infrastructure.Services;
 
 namespace VC.Admin.Controllers
@@ -39,6 +46,7 @@ namespace VC.Admin.Controllers
         private readonly IObjectHistoryLogService _objectHistoryLogService;
         private readonly ExtendedUserManager _userManager;
         private readonly ReferenceData _referenceData;
+        private readonly ICsvExportService<DiscountListItemModel, DiscountListItemExportCsvMap> _discountListItemExportCsvMapСSVExportService;
         private readonly ILogger _logger;
 
         public DiscountController(
@@ -46,7 +54,10 @@ namespace VC.Admin.Controllers
             IProductService productService,
             ILoggerFactory loggerProvider,
             IDynamicMapper<DiscountDynamic, Discount> mapper,
-            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager, ReferenceData referenceData)
+            IObjectHistoryLogService objectHistoryLogService, 
+            ExtendedUserManager userManager,
+            ReferenceData referenceData,
+            ICsvExportService<DiscountListItemModel, DiscountListItemExportCsvMap> discountListItemExportCsvMapСSVExportService)
         {
             _discountService = discountService;
             _productService = productService;
@@ -54,6 +65,7 @@ namespace VC.Admin.Controllers
             _userManager = userManager;
             _referenceData = referenceData;
             _mapper = mapper;
+            _discountListItemExportCsvMapСSVExportService = discountListItemExportCsvMapСSVExportService;
             _logger = loggerProvider.CreateLogger<DiscountController>();
         }
 
@@ -69,8 +81,56 @@ namespace VC.Admin.Controllers
                 Items = result.Items.Select(p => new DiscountListItemModel(p)).ToList(),
                 Count = result.Count,
             };
+            foreach (var discountListItemModel in toReturn.Items)
+            {
+                discountListItemModel.DiscountTypeName =
+                    LookupHelper.GetDiscountTypeName(discountListItemModel.DiscountType);
+            }
 
             return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<FileResult> GetDiscountsReportFile([FromQuery]string validfrom, [FromQuery]string validto,
+            [FromQuery]int? status = null, [FromQuery]string searchtext = null, [FromQuery]int? datestatus = null, [FromQuery]bool searchbyassigned = false,
+            [FromQuery]int? assigned = null, [FromQuery]string path = null, [FromQuery]string sortorder = null)
+        {
+            DateTime? dValidFrom = !string.IsNullOrEmpty(validfrom) ? validfrom.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
+            DateTime? dValidTo = !string.IsNullOrEmpty(validto) ? validto.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo) : null;
+
+            DiscountFilter filter = new DiscountFilter()
+            {
+                ValidFrom = dValidFrom,
+                ValidTo = dValidTo,
+                Status = (RecordStatusCode?)status,
+                SearchText = searchtext,
+                DateStatus = (DateStatus?)datestatus,
+                SearchByAssigned = searchbyassigned,
+                Assigned = (CustomerType?)assigned,
+            };
+            filter.Paging = null;
+            if (!string.IsNullOrEmpty(path) && !string.IsNullOrEmpty(sortorder))
+            {
+                filter.Sorting=new SortFilter()
+                {
+                    Path = path,
+                    SortOrder =sortorder== Enum.GetName(typeof(FilterSortOrder), FilterSortOrder.Asc) ? FilterSortOrder.Asc :
+                        FilterSortOrder.Desc,
+                };
+            }
+
+            var data = await _discountService.GetDiscountsAsync(filter);
+
+            var result = _discountListItemExportCsvMapСSVExportService.ExportToCsv(data.Items.Select(p=>new DiscountListItemModel(p)).ToList());
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.DISCOUNTS_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
         }
 
         [HttpGet]

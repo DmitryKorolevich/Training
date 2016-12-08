@@ -54,7 +54,9 @@
 </head>
 <body class="view-cart-layout view-cart-background order-info-section-fonts">
     @await Component.InvokeAsync("BodyBeginTrackScripts")
-    @RenderSection("TopAlert", false)
+    <div class="view-cart-alert-banner">
+        @await Component.InvokeAsync("Area", new { name = "View Cart Only Above All Elements Alert" })
+    </div>
 <div class="view-cart-main">
     <header>
         <div class="logo-holder">
