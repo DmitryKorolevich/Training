@@ -1,6 +1,6 @@
 ﻿<div class="container-fluid inventory-usage-report">
     <div class="well">
-        <span class="legend">Parts Usage Report</span>
+        <span class="legend">Shipped Inventory Usage Report</span>
         <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
             <fieldset>
                 <div class="row form-group">
@@ -91,15 +91,15 @@
                 <thead>
                     <tr>
                         <th>Product SKU</th>
-                        <th>Quantity</th>
+                        <th>SKUs Shipped</th>
                         <th>Assemble</th>
                         <th>Channel</th>
                         <th>Born Date</th>
-                        <th>Inventory SKU</th>
-                        <th>Inventory Quantity</th>
+                        <th>Inventory Part</th>
+                        <th>Inventory Parts Shipped</th>
                         <th>Inventory Description</th>
                         <th>Inventory Unit of Measure</th>
-                        <th>Inventory Unit Amount</th>
+                        <th>Purchasing Units Shipped</th>
                         <th>Purchase Unit of Measure</th>
                         <th>Product Source</th>
                         <th>Category</th>
@@ -123,7 +123,7 @@
                         <td>{{inventorySku.TotalInvQuantityWithInvCorrection}}</td>
                         <td>{{inventorySku.InvDescription}}</td>
                         <td>{{getReferenceItem(lookups.inventorySkuUnitOfMeasures, inventorySku.UnitOfMeasure).Text}}</td>
-                        <td>{{inventorySku.TotalUnitOfMeasureAmount}}</td>
+                        <td>{{inventorySku.PurchasingUnits}}</td>
                         <td>{{getReferenceItem(lookups.inventorySkuPurchaseUnitOfMeasures, inventorySku.PurchaseUnitOfMeasure).Text}}</td>
                         <td>{{getReferenceItem(lookups.inventorySkuProductSources, inventorySku.ProductSource).Text}}</td>
                         <td>{{inventorySku.InventorySkuCategory}}</td>

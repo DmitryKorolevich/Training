@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using VC.Public.DataAnnotations;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Validation.Models;
@@ -9,7 +10,7 @@ namespace VC.Public.Models.Auth
 	{
 		[Required]
 		[EmailAddress]
-		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+		[CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
 		[Map]
 		public string Email { get; set; }
 	}

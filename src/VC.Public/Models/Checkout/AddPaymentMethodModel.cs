@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using VC.Public.DataAnnotations;
 using VC.Public.Models.Profile;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -15,7 +16,7 @@ namespace VC.Public.Models.Checkout
 		public int CardType { get; set; }
 
 		[Required]
-		[MaxLength(BaseAppConstants.CREDIT_CARD_MAX_LENGTH)]
+		[CustomMaxLength(BaseAppConstants.CREDIT_CARD_MAX_LENGTH)]
 		[Display(Name = "Card Number")]
 		[Map]
 		public string CardNumber { get; set; }
@@ -35,7 +36,7 @@ namespace VC.Public.Models.Checkout
 		public string SecurityCode { get; set; }
 
 		[Required]
-		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+		[CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
 		[Display(Name = "Name on Card")]
 		[Map]
 		public string NameOnCard { get; set; }

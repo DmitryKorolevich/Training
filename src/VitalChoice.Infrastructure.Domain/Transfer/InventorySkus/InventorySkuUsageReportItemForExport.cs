@@ -35,6 +35,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.InventorySkus
 
         public decimal? TotalUnitOfMeasureAmount { get; set; }
 
+        public decimal? PurchasingUnits { get; set; }
+
         public string PurchaseUnitOfMeasure { get; set; }
 
         public int? PurchaseUnitOfMeasureAmount { get; set; }

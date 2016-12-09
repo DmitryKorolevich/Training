@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using VC.Public.DataAnnotations;
 using VC.Public.Models.Profile;
 using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Ecommerce.Domain.Attributes;
@@ -18,7 +19,7 @@ namespace VC.Public.Models.Checkout
 	    }
 
 	    [EmailAddress]
-		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+		[CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
 		[Required]
 		[Map]
 		public string Email { get; set; }

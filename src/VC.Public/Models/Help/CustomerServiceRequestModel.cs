@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using VC.Public.DataAnnotations;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Validation.Models;
 
@@ -14,18 +15,18 @@ namespace VC.Public.Models.Help
         public ICollection<SelectListItem> Types { get; set; }
 
         [Required]
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "Name")]
         public string Name {get;set;}
 
         [Required]
         [EmailAddress]
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "Email")]
         public string Email { get; set; }
 
         [Required]
-		[MaxLength(BaseAppConstants.DEFAULT_BIG_TEXT_FIELD_MAX_SIZE)]
+		[CustomMaxLength(BaseAppConstants.DEFAULT_BIG_TEXT_FIELD_MAX_SIZE)]
 		[Display(Name = "Comment")]
 		public string Comment { get; set; }
     }

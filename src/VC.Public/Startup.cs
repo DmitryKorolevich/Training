@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Net;
+using System.Resources;
 using System.Threading.Tasks;
 using VitalChoice.Interfaces.Services;
 using Autofac;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using VC.Public.DataAnnotations;
 
 namespace VC.Public.Models.Checkout
 {
@@ -21,16 +22,16 @@ namespace VC.Public.Models.Checkout
         [Display(Name = "Recipient Email")]
         [EmailAddress]
         [Required]
-        [MaxLength(250)]
+        [CustomMaxLength(250)]
         public string Email { get; set; }
 
         [Display(Name = "Recipient Name")]
         [Required]
-        [MaxLength(250)]
+        [CustomMaxLength(250)]
         public string Recipient { get; set; }
 
         [Display(Name = "Message")]
-        [MaxLength(500)]
+        [CustomMaxLength(500)]
         public string Message { get; set; }
 
         [Display(Name = "All")]

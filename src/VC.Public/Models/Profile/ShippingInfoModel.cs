@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using VC.Public.DataAnnotations;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
@@ -15,7 +16,7 @@ namespace VC.Public.Models.Profile
 	    public int Id { get; set; }
 
 		[Map]
-		[MaxLength(60)]
+		[CustomMaxLength(60)]
 		[Display(Name = "Delivery Instructions")]
 		public string DeliveryInstructions { get; set; }
 

@@ -19,6 +19,8 @@ namespace VC.Public.DataAnnotations
                     new RegularExpressionAttributeAdapter((RegularExpressionAttribute) attribute, stringLocalizer));
             AdapterConstructors.Add(typeof(MaxLengthAttribute),
                 (attribute, stringLocalizer) => new MaxLengthAttributeAdapter((MaxLengthAttribute) attribute, stringLocalizer));
+            AdapterConstructors.Add(typeof(CustomMaxLengthAttribute),
+                (attribute, stringLocalizer) => new MaxLengthAttributeAdapter((MaxLengthAttribute)attribute, stringLocalizer));
             AdapterConstructors.Add(typeof(RequiredAttribute),
                 (attribute, stringLocalizer) => new RequiredAttributeAdapter((RequiredAttribute) attribute, stringLocalizer));
             AdapterConstructors.Add(typeof(CompareAttribute),

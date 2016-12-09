@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using VC.Public.DataAnnotations;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Infrastructure.Domain.Constants;
@@ -15,13 +16,13 @@ namespace VC.Public.Models.Profile
 		public int Id { get; set; }
 
 		[Required]
-		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+		[CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
 		[Display(Name = "Name on Card")]
 		[Map]
 		public string NameOnCard { get; set; }
 
 		[Required]
-		[MaxLength(BaseAppConstants.CREDIT_CARD_MAX_LENGTH)]
+		[CustomMaxLength(BaseAppConstants.CREDIT_CARD_MAX_LENGTH)]
 		[Display(Name = "Card Number")]
 		[Map]
 		public string CardNumber { get; set; }
