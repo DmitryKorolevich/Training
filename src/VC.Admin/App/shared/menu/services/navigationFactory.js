@@ -87,10 +87,10 @@ angular.module('app.shared.menu.services.navigationFactory', [])
                         { name: 'KPIReport', stateLabel: 'KPI Report (APIs)', href: '/api/report/kpi', access: null },
                         { name: 'orderSKUAddressReport', stateName: 'index.oneCol.orderSKUAddressReport', stateLabel: 'Order SKU and Address Report', access: 3 },
                         { name: 'orderSkuCountReport', stateName: 'index.oneCol.orderSkuCountReport', stateLabel: 'Order SKU Counts', access: 3 },
-                        { name: 'inventorySkusUsageReport', stateName: 'index.oneCol.inventorySkusUsageReport', stateLabel: 'Parts Usage Report', access: 3 },
                         { name: 'ordersRegionStatistic', stateName: 'index.oneCol.ordersRegionStatistic', stateLabel: 'Regional Sales Summary', access: 3 },
                         { name: 'shippedViaSummaryReport', stateName: 'index.oneCol.shippedViaSummaryReport', stateLabel: 'Shipped Via Report', access: 3 },
                         { name: 'skuBreakDownReport', stateName: 'index.oneCol.skuBreakDownReport', stateLabel: 'SKU Breakdown Report', access: 3 },
+                        { name: 'inventorySkusUsageReport', stateName: 'index.oneCol.inventorySkusUsageReport', stateLabel: 'SKUs Shipped', access: 3 },
                         { name: 'ordersSummarySalesReport', stateName: 'index.oneCol.ordersSummarySalesReport', stateLabel: 'Summary Sales Report', access: 3 },
                         { name: 'transactionsAndRefundsReport', stateName: 'index.oneCol.transactionsAndRefundsReport', stateLabel: 'Transaction & Refund Report', access: 3 },
 				    ]

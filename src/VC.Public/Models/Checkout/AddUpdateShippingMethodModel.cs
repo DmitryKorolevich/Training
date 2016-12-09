@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using VC.Public.DataAnnotations;
 using VC.Public.Models.Profile;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
@@ -12,7 +13,7 @@ namespace VC.Public.Models.Checkout
 		public bool IsGiftOrder { get; set; }
 
 		[Display(Name = "Gift Message")]
-		[MaxLength(255)]
+		[CustomMaxLength(255)]
         [Map]
 		public string GiftMessage { get; set; }
 

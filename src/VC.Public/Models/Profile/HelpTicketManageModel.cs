@@ -6,6 +6,7 @@ using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models.Interfaces;
 using VitalChoice.DynamicData.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using VC.Public.DataAnnotations;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Help;
@@ -30,12 +31,12 @@ namespace VC.Public.Models.Profile
         public DateTime DateEdited { get; set; }
 
         [Required]
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "Summary")]
         public string Summary { get; set; }
 
         [Required]
-        [MaxLength(BaseAppConstants.DEFAULT_BIG_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_BIG_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "Description")]
         public string Description { get; set; }
 

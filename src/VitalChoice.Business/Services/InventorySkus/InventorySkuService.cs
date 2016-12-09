@@ -309,7 +309,7 @@ namespace VitalChoice.Business.Services.InventorySkus
                     inventorySku.PurchaseUnitOfMeasureAmount = inventorySkuUsageRawReportItem.PurchaseUnitOfMeasureAmount ?? 0;
                     
                     inventorySku.PurchasingUnits = (inventorySkuUsageRawReportItem.UnitOfMeasureAmount ?? 1)!=0
-                        ? inventorySku.TotalInvSkuQuantity / (inventorySkuUsageRawReportItem.UnitOfMeasureAmount ?? 1)
+                        ? Math.Round(inventorySku.TotalInvSkuQuantity / (inventorySkuUsageRawReportItem.UnitOfMeasureAmount ?? 1), 2)
                         : 0;
                     
                     item.InventorySkus.Add(inventorySku);
@@ -372,6 +372,7 @@ namespace VitalChoice.Business.Services.InventorySkus
 
                     item.TotalInvQuantityWithInvCorrection = subInventorySkuUsageReportItem.TotalInvQuantityWithInvCorrection;
                     item.TotalUnitOfMeasureAmount = subInventorySkuUsageReportItem.TotalUnitOfMeasureAmount;
+                    item.PurchasingUnits = subInventorySkuUsageReportItem.PurchasingUnits;
                     item.PurchaseUnitOfMeasureAmount = subInventorySkuUsageReportItem.PurchaseUnitOfMeasureAmount;
 
                     toReturn.Add(item);

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using VC.Public.DataAnnotations;
 using VC.Public.Validators.Affiliate;
 using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Ecommerce.Domain.Attributes;
@@ -19,23 +20,23 @@ namespace VC.Public.Models.Affiliate
         public string CurrentEmail { get; set; }
 
         [EmailAddress]
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "Email")]
         [Map]
         public string Email { get; set; }
 
         [EmailAddress]
         [Compare("Email")]
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "Email Confirm")]
         public string ConfirmEmail { get; set; }
 
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [AllowXss]
         public string Password { get; set; }
 
 		[Compare("Password")]
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "Password Confirm")]
         [AllowXss]
         public string ConfirmPassword { get; set; }
@@ -104,23 +105,23 @@ namespace VC.Public.Models.Affiliate
 
 
         [Required]
-		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+		[CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
 		[Display(Name = "Name")]
 		[Map]
 		public string Name { get; set; }
 
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "Checks payable to")]
         [Map]
         public string ChecksPayableTo { get; set; }
 
         [Required]
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "Tax ID / SSN")]
         [Map]
         public string TaxID { get; set; }
 
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
 		[Display(Name = "Company")]
 		[Map]
 		public string Company { get; set; }
@@ -135,44 +136,44 @@ namespace VC.Public.Models.Affiliate
 		public int IdState { get; set; }
 
 		[Required]
-		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+		[CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
 		[Display(Name = "Address")]
 		[Map]
 		public string Address1 { get; set; }
 
-		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+		[CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
 		[Map]
 		public string Address2 { get; set; }
 
 		[Required]
-		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+		[CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
 		[Display(Name = "City")]
 		[Map]
 		public string City { get; set; }
 
 		[Display(Name = "State/Province")]
-		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+		[CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
 		[Map]
 		public string County { get; set; }
 
 		[Required]
-		[MaxLength(BaseAppConstants.ZIP_MAX_SIZE)]
+		[CustomMaxLength(BaseAppConstants.ZIP_MAX_SIZE)]
 		[Display(Name = "Postal Code")]
 		[Map("Zip")]
 		public string PostalCode { get; set; }
 
 		[Required]
-		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+		[CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
 		[Display(Name = "Phone")]
 		[Map]
 		public string Phone { get; set; }
 
-		[MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+		[CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
 		[Display(Name = "Fax")]
 		[Map]
 		public string Fax { get; set; }
 
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         [Display(Name = "How did you hear about Vital Choice?")]
         [Map]
         public string HearAbout { get; set; }

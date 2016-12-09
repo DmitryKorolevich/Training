@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using VC.Public.DataAnnotations;
 using VC.Public.Validators;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.VitalGreen;
@@ -12,26 +13,26 @@ namespace VC.Public.Models
     {
         [Display(Name = "First Name")]
         [Required]
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         public string FirstName { get; set; }
 
         [Display(Name = "Last Name")]
         [Required]
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         public string LastName { get; set; }
 
         [Display(Name = "Address")]
         [Required]
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         public string Address { get; set; }
 
         [Display(Name = "Address2")]
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         public string Address2 { get; set; }
 
         [Display(Name = "City")]
         [Required]
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         public string City { get; set; }
 
         [Display(Name = "State")]
@@ -40,18 +41,18 @@ namespace VC.Public.Models
 
         [Display(Name = "Zip")]
         [Required]
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         public string Zip { get; set; }
 
         [Display(Name = "Email")]
         [Required]
         [EmailAddress]
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         public string Email { get; set; }
 
         [Display(Name = "Phone")]
         [Required]
-        [MaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
+        [CustomMaxLength(BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)]
         public string Phone { get; set; }
 
         public VitalGreenRequest Convert()
