@@ -18,7 +18,7 @@ namespace VitalChoice.Infrastructure.Services
             _timerAction = timerAction;
             _period = period;
             _errorHandler = errorHandler;
-            _thread = new Thread(TimerCycle);
+            _thread = new Thread(TimerCycle) {IsBackground = true};
             _thread.Start();
         }
 

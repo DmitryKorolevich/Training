@@ -22,7 +22,7 @@ namespace VitalChoice.Infrastructure.LoadBalancing
         private readonly object _lock = new object();
         private readonly ThreadStartData[] _threadData;
 
-        protected RoundRobinAbstractPool(byte maxThreads, ILogger logger, Func<object> threadLocalFactory = null, RoundRobinTlsBehaviour behaviour = RoundRobinTlsBehaviour.PerThread)
+        protected RoundRobinAbstractPool(byte maxThreads, ILogger logger, Func<object> threadLocalFactory = null, RoundRobinTlsBehaviour behaviour = RoundRobinTlsBehaviour.PerThread, bool isBackground = true)
         {
             if (maxThreads == 0)
                 throw new ArgumentException("Max Thread should be > 0", nameof(maxThreads));
@@ -55,7 +55,7 @@ namespace VitalChoice.Infrastructure.LoadBalancing
                             };
                         break;
                 }
-                pool[i] = new Thread(ProcessThread);
+                pool[i] = new Thread(ProcessThread) {IsBackground = isBackground};
                 pool[i].Start(_threadData[i]);
             }
         }

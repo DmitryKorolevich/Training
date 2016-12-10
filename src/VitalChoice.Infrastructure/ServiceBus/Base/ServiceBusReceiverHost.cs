@@ -25,12 +25,12 @@ namespace VitalChoice.Infrastructure.ServiceBus.Base
             if (enableBatching)
             {
                 _batchReceivingPool = new BatchReceivingPool(maxConcurrentProcessors, logger, OnReceiveBatchEvent);
-                _scanThread = new Thread(QueueNextBatch);
+                _scanThread = new Thread(QueueNextBatch) {IsBackground = true};
             }
             else
             {
                 _receivingPool = new ReceivingPool(maxConcurrentProcessors, logger, OnReceiveEvent);
-                _scanThread = new Thread(QueueNextMessage);
+                _scanThread = new Thread(QueueNextMessage) {IsBackground = true};
             }
         }
 
