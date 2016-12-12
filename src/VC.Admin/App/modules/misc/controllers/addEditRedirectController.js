@@ -1,6 +1,6 @@
 ﻿angular.module('app.modules.misc.controllers.addEditRedirectController', [])
-.controller('addEditRedirectController', ['$scope', '$uibModalInstance', 'data', 'redirectService', 'toaster', 'promiseTracker', '$rootScope',
-    function ($scope, $uibModalInstance, data, redirectService, toaster, promiseTracker, $rootScope)
+.controller('addEditRedirectController', ['$scope', '$rootScope', '$uibModalInstance', 'data', 'redirectService', 'toaster', 'promiseTracker', '$rootScope',
+    function ($scope, $rootScope, $uibModalInstance, data, redirectService, toaster, promiseTracker, $rootScope)
 {
     $scope.saveTracker = promiseTracker("save");
 
@@ -10,19 +10,9 @@
 
             data.thenCallback();
             $uibModalInstance.close();
-        } else {
-            var messages = "";
-            if (result.Messages) {
-                $scope.forms.submitted = true;
-                $scope.serverMessages = new ServerMessages(result.Messages);
-                $.each(result.Messages, function (index, value) {
-                    if (value.Field) {
-                        $scope.forms.form[value.Field].$setValidity("server", false);
-                    }
-                    messages += value.Message + "<br />";
-                });
-            }
-            toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+        } else
+        {
+            $rootScope.fireServerValidation(result, $scope);
         }
     };
 

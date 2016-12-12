@@ -44,56 +44,28 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 $scope.product.MasterContentItemId = result.Data.MasterContentItemId;
                 refreshPossiableProductTypes();
                 refreshHistory();
-            } else {
-                var messages = "";
-                if (result.Messages) {
-                    $scope.forms.submitted = true;
-                    $scope.forms.skussubmitted = true;
-                    $scope.forms.crossessubmitted = true;
-                    $scope.forms.videossubmitted = true;
-                    $scope.serverMessages = new ServerMessages(result.Messages);
-                    var formForShowing = null;
-                    $.each(result.Messages, function (index, value) {
-                        if (value.Field)
-                        {
-                            if (value.Field.indexOf('.') > -1)
-                            {
-                                var items = value.Field.split(".");
-                                $scope.forms[items[0]][items[1]][items[2]].$setValidity("server", false);
-                                formForShowing = items[0];
-                                openSKUs();
-                            }
-                            else
-                            {
-                                $.each($scope.forms, function (index, form)
-                                {
-                                    if (form && !(typeof form === 'boolean'))
-                                    {
-                                        if (form[value.Field] != undefined)
-                                        {
-                                            form[value.Field].$setValidity("server", false);
-                                            if (formForShowing == null)
-                                            {
-                                                formForShowing = index;
-                                            }
-                                            return false;
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                        else
-                        {
-                            messages += value.Message+ "<br/>";
-                        }
-                    });
-
-                    if (formForShowing) {
-                        activateTab(formForShowing);
-                    }
-                }
-                toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+            } else
+            {
+                $rootScope.fireServerValidation(result, $scope, serverValidationFormNameHandler, openSKUs);
             }
+        };
+
+        var serverValidationFormNameHandler = function (formName)
+        {
+            if (formName.indexOf('SKUs') == 0 || formName == 'skusDetails')
+            {
+                formName = 'SKUs';
+            }
+            if (formName.indexOf('CrossSellProducts') == 0)
+            {
+                formName = 'crossSellProductsAndVideos';
+            }
+            if (formName.indexOf('Videos') == 0)
+            {
+                formName = 'crossSellProductsAndVideos';
+            }
+
+            return formName;
         };
 
         function errorHandler(result) {
@@ -104,6 +76,11 @@ angular.module('app.modules.product.controllers.productManageController', [])
             $scope.id = $stateParams.id ? $stateParams.id : 0;
 
             $scope.forms = {};
+            $scope.forms.submitted = false;
+            $scope.forms.skussubmitted = false;
+            $scope.forms.crossessubmitted = false;
+            $scope.forms.videossubmitted = false;
+
             $scope.youTubeBaseUrl = 'https://www.youtube.com/watch?v={0}'
             $scope.basePreviewUrl = 'http://' + $rootScope.ReferenceData.PublicHost + '/product/{0}?preview=true';
             $scope.previewUrl = null;
@@ -247,7 +224,13 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 });
         };
 
-        function loadProduct() {
+        function loadProduct()
+        {
+            if (!$scope.id && $stateParams.source)
+            {
+                $scope.id = $stateParams.source;
+            }
+
             productService.getProduct($scope.id, $scope.refreshTracker)
 			    .success(function (result) {
 			        if (result.Success) {
@@ -281,7 +264,6 @@ angular.module('app.modules.product.controllers.productManageController', [])
 			                });
 			            }
 
-			            refreshHistory();
 			            setSelected($scope.rootCategory, $scope.product.CategoryIds);
 			            //setInventorySelected($scope.rootInventoryCategory, $scope.product.InventoryCategoryId);
 			            $scope.updateSalesCategoriesCollapsed(true);
@@ -289,6 +271,14 @@ angular.module('app.modules.product.controllers.productManageController', [])
 			            setProductTypeWatch();
 			            initCrossses();
 			            initVideos();
+
+			            if ($stateParams.source)
+			            {
+			                $scope.id = 0;
+			                $scope.product.Id = 0;
+			                $scope.product.SourceId = $stateParams.source;
+			            }
+			            refreshHistory();
 			        } else {
 			            errorHandler(result);
 			        }
@@ -336,7 +326,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 if (form && !(typeof form === 'boolean')) {
                     if (!form.$valid && index != 'submitted' && index != 'skussubmitted' && index != 'crossessubmitted' && index != 'videossubmitted') {
                         valid = false;
-                        activateTab(index);
+                        $rootScope.activateTab($scope, index, serverValidationFormNameHandler);
                         return false;
                     }
                 }
@@ -379,7 +369,7 @@ angular.module('app.modules.product.controllers.productManageController', [])
                 $scope.forms.skussubmitted = true;
                 $scope.forms.crossessubmitted = true;
                 $scope.forms.videossubmitted = true;
-                toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
+                toaster.pop('error', "Error!", $rootScope.baseValidationMessage, null, 'trustedHtml');
             }
         };
 
@@ -593,25 +583,6 @@ angular.module('app.modules.product.controllers.productManageController', [])
 
             return foundScopesPath;
         }
-
-        function activateTab(formName) {
-            $.each($scope.tabs, function (index, item) {
-                if (formName.indexOf('SKUs') == 0 || formName == 'skusDetails')
-                {
-                    formName = 'SKUs';
-                }
-                if (formName.indexOf('CrossSellProducts') == 0) {
-                    formName = 'crossSellProductsAndVideos';
-                }
-                if (formName.indexOf('Videos') == 0) {
-                    formName = 'crossSellProductsAndVideos';
-                }
-                if (item.formName == formName) {
-                    $scope.options.activeTabIndex = item.index;
-                    return false;
-                }
-            });
-        };
 
         $scope.setCustomVideo = function (item) {
             item.VideoUse = true;

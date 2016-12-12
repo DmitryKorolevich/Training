@@ -6,6 +6,7 @@
         public const int CREDIT_CARD_AM_EXPRESS_MAX_LENGTH = 15;
         public const int DEFAULT_LIST_TAKE_COUNT = 100;
         public const int DEFAULT_AUTO_COMPLETE_TAKE_COUNT = 20;
+        public const int SKU_CODE_TEXT_FIELD_MAX_SIZE = 20;
         public const int DEFAULT_TEXT_FIELD_MAX_SIZE = 100;
         public const int DEFAULT_TEXT_FIELD_EXPANDED_MAX_SIZE = 250;
         public const int ZIP_MAX_SIZE = 10;

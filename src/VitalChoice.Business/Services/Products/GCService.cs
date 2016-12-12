@@ -439,11 +439,8 @@ namespace VitalChoice.Business.Services.Products
             {
                 using (var streamReader = new StreamReader(memoryStream))
                 {
-                    CsvConfiguration configuration = new CsvConfiguration();
-                    configuration.TrimFields = true;
-                    configuration.TrimHeaders = true;
-                    configuration.WillThrowOnMissingField = false;
-                    configuration.RegisterClassMap<GCImportItemCsvMap>();
+                    var configuration = new CsvConfiguration();
+                    configuration.ConfigureDefault<GCImportItemCsvMap>();
                     using (var csv = new CsvReader(streamReader, configuration))
                     {
                         PropertyInfo[] modelProperties = typeof(GCImportItem).GetProperties();

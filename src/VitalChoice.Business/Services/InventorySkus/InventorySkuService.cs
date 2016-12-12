@@ -307,7 +307,11 @@ namespace VitalChoice.Business.Services.InventorySkus
                     inventorySku.TotalUnitOfMeasureAmount = (inventorySkuUsageRawReportItem.UnitOfMeasureAmount ?? 0) * inventorySku.TotalInvSkuQuantity;
                     inventorySku.PurchaseUnitOfMeasure = inventorySkuUsageRawReportItem.PurchaseUnitOfMeasure;
                     inventorySku.PurchaseUnitOfMeasureAmount = inventorySkuUsageRawReportItem.PurchaseUnitOfMeasureAmount ?? 0;
-
+                    
+                    inventorySku.PurchasingUnits = (inventorySkuUsageRawReportItem.UnitOfMeasureAmount ?? 1)!=0
+                        ? inventorySku.TotalInvSkuQuantity / (inventorySkuUsageRawReportItem.UnitOfMeasureAmount ?? 1)
+                        : 0;
+                    
                     item.InventorySkus.Add(inventorySku);
                 }
             }
@@ -761,11 +765,8 @@ namespace VitalChoice.Business.Services.InventorySkus
             {
                 using (var streamReader = new StreamReader(memoryStream))
                 {
-                    CsvConfiguration configuration = new CsvConfiguration();
-                    configuration.TrimFields = true;
-                    configuration.TrimHeaders = true;
-                    configuration.WillThrowOnMissingField = false;
-                    configuration.RegisterClassMap<InventorySkuImportItemCsvMap>();
+                    var configuration = new CsvConfiguration();
+                    configuration.ConfigureDefault<InventorySkuImportItemCsvMap>();
                     using (var csv = new CsvReader(streamReader, configuration))
                     {
                         PropertyInfo[] modelProperties = recordType.GetProperties();
@@ -997,11 +998,8 @@ namespace VitalChoice.Business.Services.InventorySkus
             {
                 using (var streamReader = new StreamReader(memoryStream))
                 {
-                    CsvConfiguration configuration = new CsvConfiguration();
-                    configuration.TrimFields = true;
-                    configuration.TrimHeaders = true;
-                    configuration.WillThrowOnMissingField = false;
-                    configuration.RegisterClassMap<SkuInventoryInfoImportItemCsvMap>();
+                    var configuration = new CsvConfiguration();
+                    configuration.ConfigureDefault<SkuInventoryInfoImportItemCsvMap>();
                     using (var csv = new CsvReader(streamReader, configuration))
                     {
                         PropertyInfo[] modelProperties = recordType.GetProperties();

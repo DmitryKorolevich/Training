@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using VitalChoice.Core.Base;
 using Microsoft.Extensions.Logging;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -239,6 +240,20 @@ namespace VC.Public.Controllers
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileName = FileConstants.CRITEO_PRODUCTS_FEED
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(data, "text/csv");
+        }
+
+        [HttpGet]
+        public async Task<FileResult> CJProductsFeed()
+        {
+            var data = await _productService.GetCJItemsReportFile();
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.CJ_PRODUCTS_FEED_WITH_DATE_FORMAT, DateTime.Now)
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());

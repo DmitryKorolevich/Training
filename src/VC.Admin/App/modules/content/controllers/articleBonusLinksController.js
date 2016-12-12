@@ -6,15 +6,7 @@
 
         function errorHandler(result)
         {
-            var messages = "";
-            if (result.Messages)
-            {
-                $.each(result.Messages, function (index, value)
-                {
-                    messages += value.Message + "<br />";
-                });
-            }
-            toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+            $rootScope.fireServerValidation(result, $scope);
         };
 
         function refreshItems()

@@ -52,6 +52,8 @@ namespace VitalChoice.Core.Base
         [NonAction]
         public bool Validate(BaseModel model)
         {
+            if (model == null)
+                return false;
             var controlMode = GetControlMode();
             if (controlMode != null)
             {

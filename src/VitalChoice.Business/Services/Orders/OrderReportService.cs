@@ -1513,11 +1513,8 @@ namespace VitalChoice.Business.Services.Orders
             {
                 using (var streamReader = new StreamReader(memoryStream))
                 {
-                    CsvConfiguration configuration = new CsvConfiguration();
-                    configuration.TrimFields = true;
-                    configuration.TrimHeaders = true;
-                    configuration.WillThrowOnMissingField = false;
-                    configuration.RegisterClassMap<AfiiliateOrderItemImportExportCsvMap>();
+                    var configuration = new CsvConfiguration();
+                    configuration.ConfigureDefault<AfiiliateOrderItemImportExportCsvMap>();
                     using (var csv = new CsvReader(streamReader, configuration))
                     {
                         try

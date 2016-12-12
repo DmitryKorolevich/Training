@@ -76,7 +76,7 @@
                                                     <div class="form-group">
                                                         <label for="website" class="col-md-3 control-label">Website</label>
                                                         <div class="col-md-9">
-                                                            <input type="text" name="Website" class="form-control" id="website" data-ng-model="currentCustomer.Website" placeholder="Website" required data-ng-maxlength="100" autocomplete="off">
+                                                            <input type="text" name="Website" class="form-control" id="website" data-ng-model="currentCustomer.Website" placeholder="Website" required  data-ng-maxlength="100" autocomplete="off">
                                                             <div class="error-container" ng-show="forms.submitted['profile'] && forms.profile.Website.$invalid">
                                                                 <small class="error" ng-show="forms.profile.Website.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Website")}}</small>
                                                                 <small class="error" ng-show="forms.profile.Website.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Website", "100"])}}</small>
@@ -630,14 +630,14 @@
                             <div class="container container-left">
                                 <div class="well row">
                                     <spinner-overlay data-loading="addEditTracker.active()">
-                                        <form class="form-horizontal" name="forms.uploadOrderType" data-ng-class="{submitted: forms.submitted['uploadOrderType']}" novalidate>
+                                        <form class="form-horizontal" name="forms.uploadOrderType" data-ng-class="{submitted: forms.fileUploaded}" novalidate>
                                             <fieldset>
                                                 <span class="legend">Import Orders</span>
                                                 <div class="form-group">
                                                     <label for="UploadOrdersType" class="col-md-3 control-label">Upload Type</label>
                                                     <div class="col-md-9">
                                                         <select class="form-control" id="Type" name="Type" data-ng-model="options.UploadOrderType" ng-options="item.Key as item.Text for item in uploadOrderTypes" required autocomplete="off"></select>
-                                                        <div class="error-container" ng-show="forms.submitted['uploadOrderType'] && forms.uploadOrderType.Type.$invalid">
+                                                        <div class="error-container" ng-show="forms.fileUploaded && forms.uploadOrderType.Type.$invalid">
                                                             <small class="error" ng-show="forms.uploadOrderType.Type.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Upload Type")}}</small>
                                                         </div>
                                                     </div>
@@ -646,7 +646,7 @@
                                                     <label for="CreditCard" class="col-md-3 control-label">Credit Card</label>
                                                     <div class="col-md-9">
                                                         <select class="form-control" id="CreditCard" name="CreditCard" data-ng-model="options.UploadOrderCreditCard" ng-options="item.Key as item.Text for item in uploadOrderCreditCards" required autocomplete="off"></select>
-                                                        <div class="error-container" ng-show="forms.submitted['uploadOrderType'] && forms.uploadOrderType.CreditCard.$invalid">
+                                                        <div class="error-container" ng-show="forms.fileUploaded && forms.uploadOrderType.CreditCard.$invalid">
                                                             <small class="error" ng-show="forms.uploadOrderType.CreditCard.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Credit Card")}}</small>
                                                         </div>
                                                     </div>

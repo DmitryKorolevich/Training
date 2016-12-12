@@ -42,14 +42,20 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'manageInventorySkus', stateName: 'index.oneCol.manageInventorySkus', stateLabel: 'Manage Parts', access: 17 },
 				{
 				    name: 'downloadGoogleFeed', 
-				    href: $rootScope.PublicHost != null ? 'https://{0}/google/datafeed.csv'.format($rootScope.PublicHost) : '',
+				    href: $rootScope.PublicHost != null ? 'https://{0}/feed/datafeed.csv'.format($rootScope.PublicHost) : '',
 			        stateLabel: 'Download Google Data Feed',
 			        access: 4
 				},
 				{
 				    name: 'downloadCriteoFeed',
-				    href: $rootScope.PublicHost != null ? 'https://{0}/criteo/criteo-datafeed.csv'.format($rootScope.PublicHost) : '',
+				    href: $rootScope.PublicHost != null ? 'https://{0}/feed/criteo-datafeed.csv'.format($rootScope.PublicHost) : '',
 				    stateLabel: 'Download Criteo Data Feed',
+				    access: 4
+				},
+				{
+				    name: 'downloadCJFeed',
+				    href: $rootScope.PublicHost != null ? 'https://{0}/feed/cjfeed.csv'.format($rootScope.PublicHost) : '',
+				    stateLabel: 'Download CJ Data Feed',
 				    access: 4
 				},
 				{ name: 'manageSkuPrices', stateName: 'index.oneCol.manageSkuPrices', stateLabel: 'Bulk Product Price Update', access: 4 },
@@ -185,7 +191,12 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'manageBugTickets', stateName: 'index.oneCol.manageBugTickets', stateLabel: 'Manage Bug Tickets', access: 11 },
 				//{ name: 'viewWiki', stateName: 'index.oneCol.viewWiki', stateLabel: 'View Wiki', access: 11 },
 				{ name: 'manageLogs', stateName: 'index.oneCol.manageLogs', stateLabel: 'View Logs', access: 15 },
-			    { name: 'manageProfileScopes', stateName: 'index.oneCol.manageProfileScopes', stateLabel: 'Profile Scopes', access: 15 }
+			    { name: 'manageProfileScopes', stateName: 'index.oneCol.manageProfileScopes', stateLabel: 'Profile Scopes', access: 15 },
+			    {
+			        name: 'productPedia',
+			        href: 'https://vitalchoice.sharepoint.com/_layouts/OneNote.aspx?id=%2FCustomer%20Service%2FProductPedia',
+			        stateLabel: 'ProductPedia (external)'
+			    }
 			]
 		}
 	];

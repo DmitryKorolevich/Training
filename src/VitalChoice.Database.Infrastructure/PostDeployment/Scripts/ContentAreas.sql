@@ -76,3 +76,18 @@ END
 
 GO
 
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[ContentAreas] WHERE [Name]='View Cart Only Above All Elements Alert')
+BEGIN
+
+	INSERT INTO [dbo].[ContentAreas]
+	([Name], [Template], [StatusCode], [Created], [Updated])
+	VALUES
+	(N'View Cart Only Above All Elements Alert', N'<div class="center-block" style="width:984px">
+        <img src="/assets/images/storm-alert-checkout-12-2016.jpg">
+    </div>', 2, GETDATE(), GETDATE())
+
+END
+
+GO
+
+

@@ -167,7 +167,16 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 
 				$scope.forms = {};
 
-				$scope.forms.submitted = [];
+				$scope.forms.submitted = {};
+				$scope.forms.submitted['profile'] = false;
+				$scope.forms.submitted['shipping'] = false;
+				$scope.forms.submitted['card'] = false;
+				$scope.forms.submitted['oac'] = false;
+				$scope.forms.submitted['check'] = false;
+				$scope.forms.submitted['wiretransfer'] = false;
+				$scope.forms.submitted['marketing'] = false;
+				$scope.forms.submitted['vcwellness'] = false;
+				$scope.forms.submitted['nc'] = false;
 
 				$q.all({ countriesCall: customerService.getCountries($scope.addEditTracker) }).then(function(result) {
 				    if (result.countriesCall.data.Success)
@@ -304,96 +313,54 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			        $scope.currentCustomer.ActivatePending = false;
 			        refreshHistory();
 					toaster.pop('success', "Success!", "Successfully saved");
-				} else {
-					var messages = "";
-					if (result.Messages) {
-						$scope.forms.submitted['profile'] = true;
-						$scope.forms.submitted['shipping'] = true;
-						$scope.forms.submitted['card'] = true;
-						$scope.forms.submitted['oac'] = true;
-						$scope.forms.submitted['check'] = true;
-						$scope.forms.submitted['wiretransfer'] = true;
-						$scope.forms.submitted['marketing'] = true;
-						$scope.forms.submitted['vcwellness'] = true;
-						$scope.forms.submitted['nc'] = true;
-						$scope.serverMessages = new ServerMessages(result.Messages);
-						var formForShowing = null;
-						var form;
-						$.each(result.Messages, function(index, value) {
-							if (value.Field) {
-								if (value.Field.indexOf("::") >= 0) {
-									var arr = value.Field.split("::");
-									var formName = arr[0];
-									var fieldName = arr[1];
-									if (fieldName.indexOf(".") >= 0) {
-									    arr = fieldName.split('.');
-									    var collectionName = arr[0];
-									    var indexWithName = arr[1];
-									    switch(collectionName)
-									    {
-									        case 'Shipping':
-									            var collectionIndex = indexWithName.split('i')[1];
-									            $scope.shippingAddressTab.AddressIndex = collectionIndex;
-									            form = $scope.forms[formName];
-									            fieldName = arr[2];
-									            if (form[fieldName] != undefined) {
-									                form[fieldName].$setValidity("server", false);
-									                if (formForShowing == null) {
-									                    formForShowing = formName;
-									                }
-									            }
-									            break;
-									        case 'CreditCards':
-									            var collectionIndex = indexWithName.split('i')[1];
-									            $scope.paymentInfoTab.CreditCardIndex = collectionIndex;
-									            form = $scope.forms[formName];
-									            fieldName = arr[2];
-									            if (form[fieldName] != undefined) {
-									                form[fieldName].$setValidity("server", false);
-									                if (formForShowing == null) {
-									                    formForShowing = formName;
-									                }
-									            }
-									            break;
-									    }
-									}
-									form = $scope.forms[formName];
-									if (form[fieldName] != undefined) {
-										form[fieldName].$setValidity("server", false);
-										if (formForShowing == null) {
-											formForShowing = formName;
-										}
-									}
-								} else {
-									$.each($scope.forms, function(index, form) {
-										if (form && index !== "submitted") {
-											if (form[value.Field] != undefined) {
-												form[value.Field].$setValidity("server", false);
-												if (formForShowing == null) {
-													formForShowing = index;
-												}
-											}
-										}
-									});
-								}
-							}
+			    } else
+			    {
+			        $rootScope.fireServerValidation(result, $scope, null, null, null, function (value)
+			        {
+			            if (value.Field)
+			            {
+			                if (value.Field.indexOf("::") >= 0)
+			                {
+			                    var arr = value.Field.split("::");
+			                    var formName = arr[0];
+			                    var fieldName = arr[1];
+			                    var form;
+			                    if (fieldName.indexOf(".") >= 0)
+			                    {
+			                        arr = fieldName.split('.');
+			                        var collectionName = arr[0];
+			                        var indexWithName = arr[1];
+			                        switch (collectionName)
+			                        {
+			                            case 'Shipping':
+			                                var collectionIndex = indexWithName.split('i')[1];
+			                                $scope.shippingAddressTab.AddressIndex = collectionIndex;
+			                                form = $scope.forms[formName];
+			                                fieldName = arr[2];
+			                                if (form[fieldName] != undefined)
+			                                {
+			                                    form[fieldName].$setValidity("server", false);
+			                                    return formName;
+			                                }
+			                                break;
+			                            case 'CreditCards':
+			                                var collectionIndex = indexWithName.split('i')[1];
+			                                $scope.paymentInfoTab.CreditCardIndex = collectionIndex;
+			                                form = $scope.forms[formName];
+			                                fieldName = arr[2];
+			                                if (form[fieldName] != undefined)
+			                                {
+			                                    form[fieldName].$setValidity("server", false);
+			                                    return formName;
+			                                }
+			                                break;
+			                        }
+			                    }
+			                }
+			            }
 
-							if (!value.Field)
-							{
-							    messages += value.Message + "<br />";
-							}
-						});
-
-						if (formForShowing)
-						{
-						    activateTab(formForShowing);
-						}
-					}
-					if (messages == "" && result.Messages && result.Messages.length > 0)
-					{
-					    messages = baseValidationMessage;
-					}
-					toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+			            return null;
+			        });
 			    }
 			};
 
@@ -426,8 +393,8 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 				    if (form && !(typeof form === 'boolean') && index != 'uploadOrderType')
 				    {
 						if (!form.$valid && index != 'submitted') {
-							valid = false;
-							activateTab(index);
+						    valid = false;
+						    $rootScope.activateTab($scope, index);
 							return false;
 						}
 					}
@@ -629,7 +596,7 @@ angular.module('app.modules.customer.controllers.addEditCustomerController', [])
 			    }
 			    else
 			    {
-			        $scope.forms.submitted['uploadOrderType'] = true;
+			        $scope.forms.fileUploaded = true;
 			    }
 			};
 

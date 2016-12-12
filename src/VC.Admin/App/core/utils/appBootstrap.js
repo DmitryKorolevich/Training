@@ -378,6 +378,183 @@ angular.module('app.core.utils.appBootstrap', [])
                 };
             };
 
+            var baseValidationMessage = "Validation errors, please correct field values.";
+
+            function fireServerValidation(result, uiScope, additionalFormNameHandler, additionalItemOpenHandler, customSetInitSubmitHanlder, customFieldFormatHandler)
+            {
+                if (result && !result.Success)
+                {
+                    var messages = "";
+                    if (result.Messages)
+                    {
+                        if (customSetInitSubmitHanlder)
+                        {
+                            customSetInitSubmitHanlder();
+                        }
+                        else
+                        {
+                            if (uiScope.forms)
+                            {
+                                if (uiScope.forms.submitted)
+                                {
+                                    if (!(typeof uiScope.forms.submitted === 'boolean'))
+                                    {
+                                        $.each(uiScope.forms.submitted, function (index, item)
+                                        {
+                                            uiScope.forms.submitted[index] = true;
+                                        });
+                                    }
+                                    else
+                                    {
+                                        uiScope.forms.submitted = true;
+                                    }
+                                }
+                                else
+                                {
+                                    uiScope.forms.submitted = true;
+                                }
+
+                                $.each(uiScope.forms, function (index, item)
+                                {
+                                    if (index && index.indexOf('submitted') > -1 && index != 'submitted')
+                                    {
+                                        uiScope.forms[index] = true;
+                                    }
+                                });
+                            }
+                        }
+
+                        uiScope.serverMessages = new ServerMessages(result.Messages);
+                        var formForShowing = null;
+                        $.each(result.Messages, function (index, value)
+                        {
+                            if (value.Field)
+                            {
+                                var currentFormForShowing = null;
+                                if (customFieldFormatHandler)
+                                {
+                                    var fieldResult = customFieldFormatHandler(value);
+                                    if (fieldResult)
+                                    {
+                                        currentFormForShowing = fieldResult;
+                                        formForShowing = currentFormForShowing;
+                                    }
+                                }
+                                if (!currentFormForShowing)
+                                {
+                                    //with form name
+                                    if (value.Field.indexOf("::") > -1)
+                                    {
+                                        var arr = value.Field.split("::");
+                                        var formName = arr[0];
+                                        var fieldName = arr[1];
+                                        //only for single forms
+                                        if (fieldName.indexOf(".") == -1)
+                                        {
+                                            var form = uiScope.forms[formName];
+                                            if (form[fieldName] != undefined)
+                                            {
+                                                form[fieldName].$setValidity("server", false);
+                                                if (formForShowing == null)
+                                                {
+                                                    formForShowing = formName;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //without form name for single forms
+                                        if (value.Field.indexOf('.') > -1)
+                                        {
+                                            var items = value.Field.split(".");
+                                            uiScope.forms[items[0]][items[1]][items[2]].$setValidity("server", false);
+                                            formForShowing = items[0];
+                                            if (additionalItemOpenHandler)
+                                            {
+                                                additionalItemOpenHandler();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            //without form name for lists
+                                            $.each(uiScope.forms, function (index, form)
+                                            {
+                                                if (form && !(typeof form === 'boolean'))
+                                                {
+                                                    if (form[value.Field] != undefined)
+                                                    {
+                                                        form[value.Field].$setValidity("server", false);
+                                                        if (formForShowing == null)
+                                                        {
+                                                            formForShowing = index;
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                messages += value.Message + "<br />";
+                            }
+                        });
+
+                        if (formForShowing)
+                        {
+                            activateTab(uiScope, formForShowing, additionalFormNameHandler);
+                        }
+                    }
+
+                    if (messages == "" && result.Messages && result.Messages.length > 0)
+                    {
+                        messages = baseValidationMessage;
+                    }
+                    toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+                }
+            };
+
+            function activateTab(uiScope, formName, additionalFormNameHandler)
+            {
+                if (uiScope.tabs)
+                {
+                    if (additionalFormNameHandler)
+                    {
+                        formName = additionalFormNameHandler(formName);
+                    }
+                    $.each(uiScope.tabs, function (index, item)
+                    {
+                        var itemForActive = null;
+                        if (item.formName == formName)
+                        {
+                            itemForActive = item;
+                        }
+                        if (item.formNames)
+                        {
+                            $.each(item.formNames, function (index, form)
+                            {
+                                if (form == formName)
+                                {
+                                    itemForActive = item;
+                                    return false;
+                                }
+                            });
+                        }
+                        if (itemForActive)
+                        {
+                            if (!uiScope.options)
+                            {
+                                uiScope.options = {};
+                            }
+                            uiScope.options.activeTabIndex = itemForActive.index;
+                            return false;
+                        }
+                    });
+                }
+            };
+
             function initialize()
             {
                 bindRootScope();
@@ -450,6 +627,9 @@ angular.module('app.core.utils.appBootstrap', [])
                 $rootScope.editLockState={};
                 $rootScope.initEditLock = initEditLock;
                 $rootScope.getTinymceOptions = getTinymceOptions;
+                $rootScope.fireServerValidation = fireServerValidation;
+                $rootScope.activateTab = activateTab;
+                $rootScope.baseValidationMessage = baseValidationMessage;
             }
 
             function bindRootScope()

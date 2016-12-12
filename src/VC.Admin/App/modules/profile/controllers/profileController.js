@@ -5,7 +5,7 @@ angular.module('app.modules.profile.controllers.profileController', [])
         $scope.profileTracker = promiseTracker('profile');
     
         function initialize() {
-            $scope.form = {};
+            $scope.forms = {};
 
             refreshProfile();
         };
@@ -33,13 +33,15 @@ angular.module('app.modules.profile.controllers.profileController', [])
         }
 
         $scope.save = function() {
-            $.each($scope.form.profileForm, function (index, element) {
+            $.each($scope.forms.profileForm, function (index, element)
+            {
             	if (element && element.$name == index) {
                     element.$setValidity("server", true);
                 }
             });
 
-            if ($scope.form.profileForm.$valid) {
+            if ($scope.forms.profileForm.$valid)
+            {
                 profileService.updateProfile($scope.profile, $scope.profileTracker)
                     .success(function(result) {
                         if (result.Success) {
@@ -50,19 +52,9 @@ angular.module('app.modules.profile.controllers.profileController', [])
                             $rootScope.currentUser.FirstName = $scope.profile.FirstName;
                             $rootScope.currentUser.LastName = $scope.profile.LastName;
                             $rootScope.currentUser.Email = $scope.profile.Email;
-                        } else {
-                            var messages = "";
-                            if (result.Messages) {
-                                $scope.form.profileForm.submitted = true;
-                                $scope.serverMessages = new ServerMessages(result.Messages);
-                                $.each(result.Messages, function (index, value) {
-                                    if (value.Field && $scope.form.profileForm[value.Field]) {
-                                        $scope.form.profileForm[value.Field].$setValidity("server", false);
-                                    }
-                                    messages += value.Message + "<br />";
-                                });
-                            }
-                            toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+                        } else
+                        {
+                            $rootScope.fireServerValidation(result, $scope);
                         }
 
                         refreshProfile();
@@ -72,7 +64,7 @@ angular.module('app.modules.profile.controllers.profileController', [])
                         refreshProfile();
                     });
             } else {
-                $scope.form.profileForm.submitted = true;
+                $scope.forms.submitted = true;
             }
         };
 

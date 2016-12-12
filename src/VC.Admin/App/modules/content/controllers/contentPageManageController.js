@@ -28,20 +28,9 @@ angular.module('app.modules.content.controllers.contentPageManageController', []
                 $scope.contentPage.MasterContentItemId = result.Data.MasterContentItemId;
                 $scope.previewUrl = $scope.baseUrl.format($scope.contentPage.Url);
                 refreshHistory();
-            } else {
-                var messages = "";
-                if (result.Messages) {
-                    $scope.forms.contentPageForm.submitted = true;
-                    $scope.detailsTab.active = true;
-                    $scope.serverMessages = new ServerMessages(result.Messages);
-                    $.each(result.Messages, function (index, value) {
-                        if (value.Field) {
-                            $scope.forms.contentPageForm[value.Field].$setValidity("server", false);
-                        }
-                        messages += value.Message + "<br />";
-                    });
-                }
-                toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+            } else
+            {
+                $rootScope.fireServerValidation(result, $scope);
             }
         };
 
@@ -88,7 +77,7 @@ angular.module('app.modules.content.controllers.contentPageManageController', []
                             errorHandler(result);
                         });
                 } else {
-                    $scope.forms.contentPageForm.submitted = true;
+                    $scope.forms.submitted = true;
                     $scope.detailsTab.active = true;
                 }
             };

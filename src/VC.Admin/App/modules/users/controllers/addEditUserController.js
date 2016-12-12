@@ -1,7 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.users.controllers.addEditUserController', [])
-.controller('addEditUserController', ['$scope', '$uibModalInstance', 'data', 'userService', 'toaster', 'promiseTracker', '$rootScope', function ($scope, $uibModalInstance, data, userService, toaster, promiseTracker, $rootScope)
+.controller('addEditUserController', ['$scope', '$uibModalInstance', 'data', 'userService', 'toaster', 'promiseTracker', '$rootScope',
+    function ($scope, $uibModalInstance, data, userService, toaster, promiseTracker, $rootScope)
 {
     $scope.refreshTracker = promiseTracker("refresh");
     $scope.saveTracker = promiseTracker("save");
@@ -19,18 +20,7 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 			    $rootScope.currentUser.LastName = $scope.user.LastName;
 			}
 		} else {
-			var messages = "";
-			if (result.Messages) {
-				$scope.forms.userForm.submitted = true;
-				$scope.serverMessages = new ServerMessages(result.Messages);
-				$.each(result.Messages, function(index, value) {
-					if (value.Field && $scope.forms.userForm[value.Field.toLowerCase()]) {
-						$scope.forms.userForm[value.Field.toLowerCase()].$setValidity("server", false);
-					}
-					messages += value.Message + "<br />";
-				});
-			}
-			toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+		    $rootScope.fireServerValidation(result, $scope);
 		}
 		data.thenCallback();
 	};
@@ -96,7 +86,7 @@ angular.module('app.modules.users.controllers.addEditUserController', [])
 
 	        } else
 	        {
-	            $scope.forms.userForm.submitted = true;
+	            $scope.forms.submitted = true;
 	        }
 	    };
 

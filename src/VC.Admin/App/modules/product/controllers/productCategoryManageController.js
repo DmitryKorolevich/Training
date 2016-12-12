@@ -25,23 +25,13 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
                 toaster.pop('success', "Success!", "Successfully saved.");
                 $scope.id = result.Data.Id;
                 $scope.productCategory.Id = result.Data.Id;
+                $scope.productCategory.SourceId = null;
                 $scope.productCategory.MasterContentItemId = result.Data.MasterContentItemId;
                 $scope.previewUrl = $scope.baseUrl.format($scope.productCategory.Url);
                 refreshHistory();
-            } else {
-                var messages = "";
-                if (result.Messages) {
-                    $scope.forms.form.submitted = true;
-                    $scope.detailsTab.active = true;
-                    $scope.serverMessages = new ServerMessages(result.Messages);
-                    $.each(result.Messages, function (index, value) {
-                        if (value.Field) {
-                            $scope.forms.form[value.Field].$setValidity("server", false);
-                        }
-                        messages += value.Message + "<br />";
-                    });
-                }
-                toaster.pop('error', "Error!", messages, null, 'trustedHtml');
+            } else
+            {
+                $rootScope.fireServerValidation(result, $scope);
             }
         };
 
@@ -74,6 +64,11 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
 
         function refreshCategory()
         {
+            if (!$scope.id && $stateParams.source)
+            {
+                $scope.id = $stateParams.source;
+            }
+
             productService.getCategory($scope.id, $scope.refreshTracker)
                 .success(function (result)
                 {
@@ -94,6 +89,12 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
                         };
                         setUIstatus($scope.productCategory);
                         $scope.loaded = true;
+                        if ($stateParams.source)
+                        {
+                            $scope.id = 0;
+                            $scope.productCategory.Id = 0;
+                            $scope.productCategory.SourceId = $stateParams.source;
+                        }
                         refreshHistory();
                     } else
                     {
@@ -108,7 +109,7 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
 
         function refreshMasters()
         {
-            contentService.getMasterContentItems({ Type: 9 })//productCategory
+            contentService.getMasterContentItems({ Type: 9 }, $scope.refreshTracker)//productCategory
                 .success(function (result)
                 {
                     if (result.Success)
@@ -153,7 +154,7 @@ angular.module('app.modules.product.controllers.productCategoryManageController'
                         errorHandler(result);
                     });
             } else {
-                $scope.forms.form.submitted = true;
+                $scope.forms.submitted = true;
                 $scope.detailsTab.active = true;
             }
         };

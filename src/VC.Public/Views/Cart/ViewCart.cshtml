@@ -16,6 +16,11 @@
 @section Meta {
 	<title>Wild Seafood & Organics - Vital Choice</title>
 }
+@section ViewCartTopAlert {
+    <div class="view-cart-alert-banner">
+        @await Component.InvokeAsync("Area", new { name = "View Cart Only Above All Elements Alert" })
+    </div>
+}
 <div class="cart-content-top" data-bind="visible: Model.FreeShipDifference() && Model.FreeShipAmount()">
 	<span class="cart-head-text">IMPORTANT NOTICE</span>
     <span class="cart-subhead-text">You are only <span data-bind="text: formatCurrency(Model.FreeShipDifference())">@((Model.FreeShipDifference ?? 0).ToString("C2"))</span> from Free Shipping.</span>

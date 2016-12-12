@@ -311,6 +311,17 @@ namespace VC.Admin.Controllers
                 product.IdEditedBy = userId;
             }
 
+            if (model.SourceId.HasValue)
+            {
+                if (product.Skus?.Count > 0)
+                {
+                    foreach (var productSku in product.Skus)
+                    {
+                        productSku.Id = 0;
+                    }
+                }
+            }
+
             ProductContentTransferEntity transferEntity = new ProductContentTransferEntity();
             ProductContent content = new ProductContent();
             content.Id = model.Id;
@@ -482,6 +493,15 @@ namespace VC.Admin.Controllers
                 item.UserId = userId;
             }
             item = await productCategoryService.UpdateCategoryAsync(item);
+
+            if (model.SourceId.HasValue)
+            {
+                var assignedProducts = await productService.GetProductsOnCategoryOrderAsync(model.SourceId.Value);
+                if (assignedProducts.Count > 0)
+                {
+                    await productService.UpdateProductsOnCategoryOrderAsync(item.Id, assignedProducts);
+                }
+            }
 
             return new ProductCategoryManageModel(item);
         }

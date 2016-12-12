@@ -9,6 +9,9 @@
                 <a data-ng-if="!previewUrl" class="btn btn-info width-80px">View</a>
                 <button cancel-button-default-state="index.oneCol.manageProducts" cancel-button class="btn btn-default width-80px" unsaved-warning-clear>Cancel</button>
             </div>
+            <div class="btn-group margin-top-10px" data-ng-if="product.Id">
+                <a class="btn btn-purple width-160px" ui-sref="index.oneCol.addNewProduct({source: product.Id})">Clone</a>
+            </div>
             <div class="margin-top-10px">
                 <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageProducts">Manage All</button>
             </div>

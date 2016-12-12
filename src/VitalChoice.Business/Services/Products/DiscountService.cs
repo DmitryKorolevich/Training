@@ -32,7 +32,7 @@ using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Customers;
 using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Transfer;
-using VitalChoice.Infrastructure.Domain.Transfer.Disocunts;
+using VitalChoice.Infrastructure.Domain.Transfer.Discounts;
 using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.ObjectMapping.Base;
 
@@ -236,8 +236,18 @@ namespace VitalChoice.Business.Services.Products
                     break;
             }
 
-            var result = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
-            foreach(var item in result.Items)
+            PagedList<Discount> result;
+            if (filter.Paging != null)
+            {
+                result = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            }
+            else
+            {
+                var items = await query.OrderBy(sortable).SelectAsync(false);
+                result=new PagedList<Discount>(items, items.Count);
+            }
+
+            foreach (var item in result.Items)
             {
                 item.OptionValues = new List<DiscountOptionValue>();
                 item.OptionTypes = new List<DiscountOptionType>();

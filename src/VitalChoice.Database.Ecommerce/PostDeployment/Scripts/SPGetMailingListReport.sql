@@ -33,355 +33,293 @@ BEGIN
 	
 	DECLARE @count INT
 	SET @count=0
+	DECLARE @sql NVARCHAR(MAX), @params NVARCHAR(4000)
 
-	DECLARE @customers AS TABLE
-    (
-		Id INT,
-		Email NVARCHAR(250),
-		CustomerIdObjectType INT,
-		FirstOrderDateCreated DATETIME2 NULL,
-		FirstKeyCode NVARCHAR(250) NULL,
-		FirstDiscountCode NVARCHAR(250) NULL,
-		LastOrderDateCreated DATETIME2 NULL,
-		LastOrderTotal MONEY NULL,
-		LastOrderIdPaymentMethod INT NULL,
-		OrdersCount INT,
-		OrdersTotal MONEY,
-		DoNotMail BIT,
-		DoNotRent BIT,
-		IdCustomerOrderSource INT NULL
-    );
+	DECLARE @dnmId INT, @dnrId INT, @sourceId INT
+	
+	SELECT @dnmId = Id FROM CustomerOptionTypes WITH(NOLOCK) 
+	WHERE Name = N'DoNotMail'
+
+	SELECT @dnrId = Id FROM CustomerOptionTypes WITH(NOLOCK) 
+	WHERE Name = N'DoNotRent'
+
+	SELECT @sourceId = Id FROM CustomerOptionTypes WITH(NOLOCK) 
+	WHERE Name = N'Source'
 	
 	IF(@pageindex IS NOT NULL)
 	BEGIN
-		SET @count =
-			(SELECT 
-				COUNT(*)
-			FROM
-				(
-				SELECT 
-					c.Id,
-					MIN(c.Email) Email,
-					MIN(c.IdObjectType) CustomerIdObjectType,
-					(SELECT TOP 1
-								oin.DateCreated
-							FROM Orders oin WITH(NOLOCK)
-							WHERE 
-								oin.IdCustomer=c.Id AND oin.StatusCode!=3 AND oin.IdObjectType NOT IN (2,5,6) AND 
-								(
-									(oin.OrderStatus IS NOT NULL AND oin.OrderStatus !=1 AND oin.OrderStatus !=4) 
-									OR (oin.OrderStatus IS NULL AND oin.POrderStatus !=1 AND oin.POrderStatus !=4 AND oin.NPOrderStatus !=1 AND oin.NPOrderStatus !=4)
-								)
-							ORDER BY oin.DateCreated ASC
-					) FirstOrderDateCreated,
-					(SELECT TOP 1
-								kcval.Value
-							FROM Orders oin WITH(NOLOCK)
-							JOIN OrderOptionTypes AS kcopt WITH(NOLOCK) ON kcopt.Name = N'KeyCode' AND kcopt.IdObjectType = oin.IdObjectType
-							JOIN OrderOptionValues AS kcval WITH(NOLOCK) ON kcval.IdOrder = oin.Id AND kcval.IdOptionType = kcopt.Id
-							WHERE 
-								oin.IdCustomer=c.Id AND oin.StatusCode!=3 AND oin.IdObjectType NOT IN (2,5,6) AND 
-								(
-									(oin.OrderStatus IS NOT NULL AND oin.OrderStatus !=1 AND oin.OrderStatus !=4) 
-									OR (oin.OrderStatus IS NULL AND oin.POrderStatus !=1 AND oin.POrderStatus !=4 AND oin.NPOrderStatus !=1 AND oin.NPOrderStatus !=4)
-								)
-							ORDER BY oin.DateCreated ASC
-					) FirstKeyCode,
-					(SELECT TOP 1
-								d.Code
-							FROM Orders oin WITH(NOLOCK)		
-							JOIN Discounts d WITH(NOLOCK) ON oin.IdDiscount=d.Id
-							WHERE 
-								oin.IdCustomer=c.Id AND oin.StatusCode!=3 AND oin.IdObjectType NOT IN (2,5,6) AND 
-								(
-									(oin.OrderStatus IS NOT NULL AND oin.OrderStatus !=1 AND oin.OrderStatus !=4) 
-									OR (oin.OrderStatus IS NULL AND oin.POrderStatus !=1 AND oin.POrderStatus !=4 AND oin.NPOrderStatus !=1 AND oin.NPOrderStatus !=4)
-								)
-							ORDER BY oin.DateCreated ASC
-					) FirstDiscountCode,
-					(SELECT TOP 1
-								oin.DateCreated
-							FROM Orders oin WITH(NOLOCK)
-							WHERE 
-								oin.IdCustomer=c.Id AND oin.StatusCode!=3 AND oin.IdObjectType NOT IN (2,5,6) AND 
-								(
-									(oin.OrderStatus IS NOT NULL AND oin.OrderStatus !=1 AND oin.OrderStatus !=4) 
-									OR (oin.OrderStatus IS NULL AND oin.POrderStatus !=1 AND oin.POrderStatus !=4 AND oin.NPOrderStatus !=1 AND oin.NPOrderStatus !=4)
-								)
-							ORDER BY oin.DateCreated DESC
-					) LastOrderDateCreated,
-					(SELECT TOP 1
-								oin.Total
-							FROM Orders oin WITH(NOLOCK)
-							WHERE 
-								oin.IdCustomer=c.Id AND oin.StatusCode!=3 AND oin.IdObjectType NOT IN (2,5,6) AND 
-								(
-									(oin.OrderStatus IS NOT NULL AND oin.OrderStatus !=1 AND oin.OrderStatus !=4) 
-									OR (oin.OrderStatus IS NULL AND oin.POrderStatus !=1 AND oin.POrderStatus !=4 AND oin.NPOrderStatus !=1 AND oin.NPOrderStatus !=4)
-								)
-							ORDER BY oin.DateCreated DESC
-					) LastOrderTotal,
-					(SELECT COUNT(*)
-							FROM Orders oin WITH(NOLOCK)
-							WHERE 
-								oin.IdCustomer=c.Id AND oin.StatusCode!=3 AND oin.IdObjectType NOT IN (2,5,6) AND 
-								(
-									(oin.OrderStatus IS NOT NULL AND oin.OrderStatus !=1 AND oin.OrderStatus !=4) 
-									OR (oin.OrderStatus IS NULL AND oin.POrderStatus !=1 AND oin.POrderStatus !=4 AND oin.NPOrderStatus !=1 AND oin.NPOrderStatus !=4)
-								)
-					) OrdersCount,
-					MIN(cmval.Value) DoNotMail,
-					MIN(crval.Value) DoNotRent,
-					MIN(sval.Value) IdCustomerOrderSource
-				FROM Orders o WITH(NOLOCK)
-				JOIN Customers c WITH(NOLOCK) ON o.IdCustomer = c.Id
-				LEFT JOIN CustomerOptionTypes AS cmopt WITH(NOLOCK) ON cmopt.Name = N'DoNotMail'
-				LEFT JOIN CustomerOptionValues AS cmval WITH(NOLOCK) ON cmval.IdCustomer = c.Id AND cmval.IdOptionType = cmopt.Id
-				LEFT JOIN CustomerOptionTypes AS cropt WITH(NOLOCK) ON cropt.Name = N'DoNotRent'
-				LEFT JOIN CustomerOptionValues AS crval WITH(NOLOCK) ON crval.IdCustomer = c.Id AND crval.IdOptionType = cropt.Id
-				LEFT JOIN CustomerOptionTypes AS sopt WITH(NOLOCK) ON sopt.Name = N'Source'
-				LEFT JOIN CustomerOptionValues AS sval WITH(NOLOCK) ON sval.IdCustomer = c.Id AND sval.IdOptionType = sopt.Id
-				WHERE
-					o.StatusCode!=3 AND o.IdObjectType NOT IN (2,5,6) AND 
-					(
-						(o.OrderStatus IS NOT NULL AND o.OrderStatus !=1 AND o.OrderStatus !=4) 
-						OR (o.OrderStatus IS NULL AND o.POrderStatus !=1 AND o.POrderStatus !=4 AND o.NPOrderStatus !=1 AND o.NPOrderStatus !=4)
-					) AND
-					(@from IS NULL OR o.DateCreated >= @from) AND 
-					(@to IS NULL OR o.DateCreated <= @to)
-				GROUP BY c.Id
-				) temp
-			WHERE 
-				(@idcustomertype IS NULL OR temp.CustomerIdObjectType = @idcustomertype) AND
-				(@fromordercount IS NULL OR temp.OrdersCount >= @fromordercount) AND
-				(@toordercount IS NULL OR temp.OrdersCount <= @toordercount) AND
-				(@fromfirst IS NULL OR temp.FirstOrderDateCreated >= @fromfirst) AND
-				(@tofirst IS NULL OR temp.FirstOrderDateCreated <= @tofirst) AND
-				(@fromlast IS NULL OR temp.LastOrderDateCreated >= @fromlast) AND
-				(@tolast IS NULL OR temp.LastOrderDateCreated <= @tolast) AND
-				(@lastfromtotal IS NULL OR temp.LastOrderTotal >= @lastfromtotal) AND
-				(@lasttototal IS NULL OR temp.LastOrderTotal <= @lasttototal) AND
-				(@dnm IS NULL OR temp.DoNotMail = @dnm) AND
-				(@dnr IS NULL OR temp.DoNotRent = @dnr) AND
-				(@idcustomerordersource IS NULL OR temp.IdCustomerOrderSource = @idcustomerordersource) AND
-				(@keycodefirst IS NULL OR temp.FirstKeyCode = @keycodefirst) AND
-				(@discountcodefirst IS NULL OR temp.FirstDiscountCode = @discountcodefirst)				
-			)
-	END
+		SET @params = N'@from datetime2,
+			@to datetime2,
+			@idcustomertype int,
+			@fromordercount int,
+			@toordercount int,
+			@fromfirst datetime2,
+			@tofirst datetime2,
+			@fromlast datetime2,
+			@tolast datetime2,
+			@lastfromtotal decimal,
+			@lasttototal decimal,
+			@dnm bit,
+			@dnr bit,
+			@idcustomerordersource INT,
+			@keycodefirst nvarchar(250),
+			@discountcodefirst nvarchar(250),
+			@pageindex int,
+			@pagesize int,
+			@count INT OUTPUT'
 
-	INSERT 
-	INTO @customers
+		SET @sql = 
+
+		N'WITH orderList
+		AS
 		(
-		Id,
-		Email,
-		CustomerIdObjectType,
-		FirstOrderDateCreated,
-		FirstKeyCode,
-		FirstDiscountCode,
-		LastOrderDateCreated,
-		LastOrderTotal,
-		LastOrderIdPaymentMethod,
-		OrdersCount,
-		OrdersTotal,
-		DoNotMail,
-		DoNotRent,
-		IdCustomerOrderSource
-		)
-	(
-	SELECT
-		tempOuter.Id,
-		tempOuter.Email,
-		tempOuter.CustomerIdObjectType,
-		tempOuter.FirstOrderDateCreated,
-		tempOuter.FirstKeyCode,
-		tempOuter.FirstDiscountCode,
-		tempOuter.LastOrderDateCreated,
-		tempOuter.LastOrderTotal,
-		tempOuter.LastOrderIdPaymentMethod,
-		tempOuter.OrdersCount,
-		tempOuter.OrdersTotal,
-		CASE WHEN tempOuter.DoNotMail='True' THEN 1 ELSE 0 END,
-		CASE WHEN tempOuter.DoNotRent='True' THEN 1 ELSE 0 END,
-		tempOuter.IdCustomerOrderSource
-	FROM
-		(
-		SELECT 
-			ROW_NUMBER() OVER (ORDER BY temp.Id) as RowNumber,
-			temp.Id,
-			temp.Email,
-			temp.CustomerIdObjectType,
-			temp.FirstOrderDateCreated,
-			temp.FirstKeyCode,
-			temp.FirstDiscountCode,
-			temp.LastOrderDateCreated,
-			temp.LastOrderTotal,
-			temp.LastOrderIdPaymentMethod,
-			temp.OrdersCount,
-			temp.OrdersTotal,
-			temp.DoNotMail,
-			temp.DoNotRent,
-			temp.IdCustomerOrderSource
-		FROM
-			(
-			SELECT 
-				c.Id,
-				MIN(c.Email) Email,
-				MIN(c.IdObjectType) CustomerIdObjectType,
-				(SELECT TOP 1
-							oin.DateCreated
-						FROM Orders oin WITH(NOLOCK)
-						WHERE 
-							oin.IdCustomer=c.Id AND oin.StatusCode!=3 AND oin.IdObjectType NOT IN (2,5,6) AND 
-							(
-								(oin.OrderStatus IS NOT NULL AND oin.OrderStatus !=1 AND oin.OrderStatus !=4) 
-								OR (oin.OrderStatus IS NULL AND oin.POrderStatus !=1 AND oin.POrderStatus !=4 AND oin.NPOrderStatus !=1 AND oin.NPOrderStatus !=4)
-							)
-						ORDER BY oin.DateCreated ASC
-				) FirstOrderDateCreated,
-				(SELECT TOP 1
-							kcval.Value
-						FROM Orders oin WITH(NOLOCK)
-						JOIN OrderOptionTypes AS kcopt WITH(NOLOCK) ON kcopt.Name = N'KeyCode' AND kcopt.IdObjectType = oin.IdObjectType
-						JOIN OrderOptionValues AS kcval WITH(NOLOCK) ON kcval.IdOrder = oin.Id AND kcval.IdOptionType = kcopt.Id
-						WHERE 
-							oin.IdCustomer=c.Id AND oin.StatusCode!=3 AND oin.IdObjectType NOT IN (2,5,6) AND 
-							(
-								(oin.OrderStatus IS NOT NULL AND oin.OrderStatus !=1 AND oin.OrderStatus !=4) 
-								OR (oin.OrderStatus IS NULL AND oin.POrderStatus !=1 AND oin.POrderStatus !=4 AND oin.NPOrderStatus !=1 AND oin.NPOrderStatus !=4)
-							)
-						ORDER BY oin.DateCreated ASC
-				) FirstKeyCode,
-				(SELECT TOP 1
-							d.Code
-						FROM Orders oin WITH(NOLOCK)		
-						JOIN Discounts d WITH(NOLOCK) ON oin.IdDiscount=d.Id
-						WHERE 
-							oin.IdCustomer=c.Id AND oin.StatusCode!=3 AND oin.IdObjectType NOT IN (2,5,6) AND 
-							(
-								(oin.OrderStatus IS NOT NULL AND oin.OrderStatus !=1 AND oin.OrderStatus !=4) 
-								OR (oin.OrderStatus IS NULL AND oin.POrderStatus !=1 AND oin.POrderStatus !=4 AND oin.NPOrderStatus !=1 AND oin.NPOrderStatus !=4)
-							)
-						ORDER BY oin.DateCreated ASC
-				) FirstDiscountCode,
-				(SELECT TOP 1
-							oin.DateCreated
-						FROM Orders oin WITH(NOLOCK)
-						WHERE 
-							oin.IdCustomer=c.Id AND oin.StatusCode!=3 AND oin.IdObjectType NOT IN (2,5,6) AND 
-							(
-								(oin.OrderStatus IS NOT NULL AND oin.OrderStatus !=1 AND oin.OrderStatus !=4) 
-								OR (oin.OrderStatus IS NULL AND oin.POrderStatus !=1 AND oin.POrderStatus !=4 AND oin.NPOrderStatus !=1 AND oin.NPOrderStatus !=4)
-							)
-						ORDER BY oin.DateCreated DESC
-				) LastOrderDateCreated,
-				(SELECT TOP 1
-							oin.Total
-						FROM Orders oin WITH(NOLOCK)
-						WHERE 
-							oin.IdCustomer=c.Id AND oin.StatusCode!=3 AND oin.IdObjectType NOT IN (2,5,6) AND 
-							(
-								(oin.OrderStatus IS NOT NULL AND oin.OrderStatus !=1 AND oin.OrderStatus !=4) 
-								OR (oin.OrderStatus IS NULL AND oin.POrderStatus !=1 AND oin.POrderStatus !=4 AND oin.NPOrderStatus !=1 AND oin.NPOrderStatus !=4)
-							)
-						ORDER BY oin.DateCreated DESC
-				) LastOrderTotal,
-				(SELECT TOP 1
-							oin.IdPaymentMethod
-						FROM Orders oin WITH(NOLOCK)
-						WHERE 
-							oin.IdCustomer=c.Id AND oin.StatusCode!=3 AND oin.IdObjectType NOT IN (2,5,6) AND 
-							(
-								(oin.OrderStatus IS NOT NULL AND oin.OrderStatus !=1 AND oin.OrderStatus !=4) 
-								OR (oin.OrderStatus IS NULL AND oin.POrderStatus !=1 AND oin.POrderStatus !=4 AND oin.NPOrderStatus !=1 AND oin.NPOrderStatus !=4)
-							)
-						ORDER BY oin.DateCreated DESC
-				) LastOrderIdPaymentMethod,
-				(SELECT COUNT(*)
-						FROM Orders oin WITH(NOLOCK)
-						WHERE 
-							oin.IdCustomer=c.Id AND oin.StatusCode!=3 AND oin.IdObjectType NOT IN (2,5,6) AND 
-							(
-								(oin.OrderStatus IS NOT NULL AND oin.OrderStatus !=1 AND oin.OrderStatus !=4) 
-								OR (oin.OrderStatus IS NULL AND oin.POrderStatus !=1 AND oin.POrderStatus !=4 AND oin.NPOrderStatus !=1 AND oin.NPOrderStatus !=4)
-							)
-				) OrdersCount,
-				(SELECT SUM(oin.Total)
-						FROM Orders oin WITH(NOLOCK)
-						WHERE 
-							oin.IdCustomer=c.Id AND oin.StatusCode!=3 AND oin.IdObjectType NOT IN (2,5,6) AND 
-							(
-								(oin.OrderStatus IS NOT NULL AND oin.OrderStatus !=1 AND oin.OrderStatus !=4) 
-								OR (oin.OrderStatus IS NULL AND oin.POrderStatus !=1 AND oin.POrderStatus !=4 AND oin.NPOrderStatus !=1 AND oin.NPOrderStatus !=4)
-							)
-				) OrdersTotal,
-				MIN(cmval.Value) DoNotMail,
-				MIN(crval.Value) DoNotRent,
-				MIN(sval.Value) IdCustomerOrderSource
-			FROM Orders o WITH(NOLOCK)
-			JOIN Customers c WITH(NOLOCK) ON o.IdCustomer = c.Id
-			LEFT JOIN CustomerOptionTypes AS cmopt WITH(NOLOCK) ON cmopt.Name = N'DoNotMail'
-			LEFT JOIN CustomerOptionValues AS cmval WITH(NOLOCK) ON cmval.IdCustomer = c.Id AND cmval.IdOptionType = cmopt.Id
-			LEFT JOIN CustomerOptionTypes AS cropt WITH(NOLOCK) ON cropt.Name = N'DoNotRent'
-			LEFT JOIN CustomerOptionValues AS crval WITH(NOLOCK) ON crval.IdCustomer = c.Id AND crval.IdOptionType = cropt.Id
-			LEFT JOIN CustomerOptionTypes AS sopt WITH(NOLOCK) ON sopt.Name = N'Source'
-			LEFT JOIN CustomerOptionValues AS sval WITH(NOLOCK) ON sval.IdCustomer = c.Id AND sval.IdOptionType = sopt.Id
+			SELECT o.Id, o.IdCustomer, o.DateCreated, o.IdObjectType, Total, IdPaymentMethod, IdDiscount FROM Orders AS o
 			WHERE
 				o.StatusCode!=3 AND o.IdObjectType NOT IN (2,5,6) AND 
 				(
-					(o.OrderStatus IS NOT NULL AND o.OrderStatus !=1 AND o.OrderStatus !=4) 
-					OR (o.OrderStatus IS NULL AND o.POrderStatus !=1 AND o.POrderStatus !=4 AND o.NPOrderStatus !=1 AND o.NPOrderStatus !=4)
-				) AND
-				(@from IS NULL OR o.DateCreated >= @from) AND 
-				(@to IS NULL OR o.DateCreated <= @to)
-			GROUP BY c.Id
-			) temp
-		WHERE 
-			(@idcustomertype IS NULL OR temp.CustomerIdObjectType = @idcustomertype) AND
-			(@fromordercount IS NULL OR temp.OrdersCount >= @fromordercount) AND
-			(@toordercount IS NULL OR temp.OrdersCount <= @toordercount) AND
-			(@fromfirst IS NULL OR temp.FirstOrderDateCreated >= @fromfirst) AND
-			(@tofirst IS NULL OR temp.FirstOrderDateCreated <= @tofirst) AND
-			(@fromlast IS NULL OR temp.LastOrderDateCreated >= @fromlast) AND
-			(@tolast IS NULL OR temp.LastOrderDateCreated <= @tolast) AND
-			(@lastfromtotal IS NULL OR temp.LastOrderTotal >= @lastfromtotal) AND
-			(@lasttototal IS NULL OR temp.LastOrderTotal <= @lasttototal) AND
-			(@dnm IS NULL OR temp.DoNotMail = @dnm) AND
-			(@dnr IS NULL OR temp.DoNotRent = @dnr) AND
-			(@idcustomerordersource IS NULL OR temp.IdCustomerOrderSource = @idcustomerordersource) AND
-			(@keycodefirst IS NULL OR temp.FirstKeyCode = @keycodefirst) AND
-			(@discountcodefirst IS NULL OR temp.FirstDiscountCode = @discountcodefirst)
-		) tempOuter
-		WHERE 
-			@pageindex is NULL OR (tempOuter.RowNumber>(@pageindex-1)*@pagesize AND tempOuter.RowNumber<=@pageindex*@pagesize)
-	)
+					(o.OrderStatus IS NOT NULL AND o.OrderStatus NOT IN (1, 4)) 
+					OR (o.POrderStatus IS NOT NULL AND o.POrderStatus NOT IN (1, 4) AND o.NPOrderStatus NOT IN (1, 4))
+				)
+		)
+		SELECT
+			@count = COUNT(c.Id)
+		FROM Customers c WITH(NOLOCK)
+		INNER JOIN (
+			SELECT DISTINCT
+				cc.Id,
+				MIN(o.DateCreated) OVER (PARTITION BY cc.Id) AS FirstOrderDateCreated,
+				FIRST_VALUE(kcval.Value) OVER (PARTITION BY cc.Id ORDER BY o.DateCreated ASC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS FirstKeyCode,
+				FIRST_VALUE(d.Code) OVER (PARTITION BY cc.Id ORDER BY o.DateCreated ASC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS FirstDiscountCode,
+				MAX(o.DateCreated) OVER (PARTITION BY cc.Id) AS LastOrderDateCreated,
+				FIRST_VALUE(o.Total) OVER (PARTITION BY cc.Id ORDER BY o.DateCreated DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS LastOrderTotal,
+				FIRST_VALUE(o.IdPaymentMethod) OVER (PARTITION BY cc.Id ORDER BY o.DateCreated DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS LastOrderIdPaymentMethod,
+				COUNT(o.Id) OVER (PARTITION BY cc.Id) AS OrdersCount
+			FROM Customers AS cc WITH (NOLOCK)
+			LEFT JOIN orderList AS o WITH(NOLOCK) ON o.IdCustomer=cc.Id
+			LEFT JOIN OrderOptionTypes AS kcopt WITH(NOLOCK) ON kcopt.Name = N''KeyCode'' AND kcopt.IdObjectType = o.IdObjectType
+			LEFT JOIN OrderOptionValues AS kcval WITH(NOLOCK) ON kcval.IdOrder = o.Id AND kcval.IdOptionType = kcopt.Id
+			LEFT JOIN Discounts AS d WITH(NOLOCK) ON d.Id = o.IdDiscount'
+			IF @from IS NOT NULL AND @to IS NOT NULL
+				SET @sql = @sql + N'
+				WHERE
+					cc.Id IN (
+						SELECT IdCustomer FROM orderList AS o
+						WHERE 
+							o.DateCreated >= @from AND 
+							o.DateCreated <= @to
+					)'
+			ELSE IF @from IS NOT NULL
+				SET @sql = @sql + N'
+				WHERE
+					cc.Id IN (
+						SELECT IdCustomer FROM orderList AS o
+						WHERE 
+							o.DateCreated >= @from
+					)'
+			ELSE IF @to IS NOT NULL
+				SET @sql = @sql + N'
+				WHERE
+					cc.Id IN (
+						SELECT IdCustomer FROM orderList AS o
+						WHERE 
+							o.DateCreated <= @to
+					)'
+			ELSE
+				SET @sql = @sql + N'
+				WHERE
+					cc.Id IN (
+						SELECT IdCustomer FROM orderList
+					)
+				'
+			
+			IF @idcustomertype IS NOT NULL
+				SET @sql = @sql + N'
+				AND cc.IdObjectType = @idcustomertype'
 
-	SELECT 
-		c.Id,
-		c.Email,
-		c.CustomerIdObjectType,
-		c.FirstOrderDateCreated,
-		c.FirstKeyCode,
-		c.FirstDiscountCode,
-		c.LastOrderDateCreated,
-		c.LastOrderTotal,
-		c.LastOrderIdPaymentMethod,
-		c.OrdersCount,
-		c.OrdersTotal,
-		c.DoNotMail,
-		c.DoNotRent,
-		c.IdCustomerOrderSource,
-		options.FirstName,
-		options.LastName,
-		options.Address1,
-		options.Address2,
-		options.City,
-		options.Phone,
-		options.Zip,
-		a.IdCountry,
-		a.IdState,
-		@count Count
-	FROM @customers c
-	LEFT JOIN OrderPaymentMethods pm ON c.LastOrderIdPaymentMethod=pm.Id
+		SET @sql = @sql + N') AS cd ON cd.Id = c.Id
+				LEFT JOIN CustomerOptionValues AS cmval WITH(NOLOCK) ON cmval.IdCustomer = c.Id AND cmval.IdOptionType = '+CAST(@dnmId AS nvarchar(25))+'
+				LEFT JOIN CustomerOptionValues AS crval WITH(NOLOCK) ON crval.IdCustomer = c.Id AND crval.IdOptionType = '+CAST(@dnrId AS nvarchar(25))+'
+				LEFT JOIN CustomerOptionValues AS sval WITH(NOLOCK) ON sval.IdCustomer = c.Id AND sval.IdOptionType = '+CAST(@sourceId AS nvarchar(25))+'WHERE 1=1'
+		
+		IF @fromordercount IS NOT NULL
+			SET @sql = @sql + N'
+			AND cd.OrdersCount >= @fromordercount'
+		
+		IF @toordercount IS NOT NULL
+			SET @sql = @sql + N'
+			AND cd.OrdersCount <= @toordercount'
+
+		IF @fromfirst IS NOT NULL
+			SET @sql = @sql + N'
+			AND cd.FirstOrderDateCreated >= @fromfirst'
+
+		IF @tofirst IS NOT NULL
+			SET @sql = @sql + N'
+			AND cd.FirstOrderDateCreated <= @tofirst'
+
+		IF @fromlast IS NOT NULL
+			SET @sql = @sql + N'
+			AND cd.LastOrderDateCreated >= @fromlast'
+
+		IF @tolast IS NOT NULL
+			SET @sql = @sql + N'
+			AND cd.LastOrderDateCreated <= @tolast'
+
+		IF @lastfromtotal IS NOT NULL
+			SET @sql = @sql + N'
+			AND cd.LastOrderTotal >= @lastfromtotal'
+
+		IF @lasttototal IS NOT NULL
+			SET @sql = @sql + N'
+			AND cd.LastOrderTotal <= @lasttototal'
+
+		IF @keycodefirst IS NOT NULL
+			SET @sql = @sql + N'
+			AND cd.FirstKeyCode = @keycodefirst'
+
+		IF @discountcodefirst IS NOT NULL
+			SET @sql = @sql + N'
+			AND cd.FirstDiscountCode = @discountcodefirst'
+
+		IF @dnm IS NOT NULL
+			SET @sql = @sql + N'
+			AND cmval.Value = '''+CASE @dnm WHEN 1 THEN N'True' ELSE N'False' END+''''
+
+		IF @dnr IS NOT NULL
+			SET @sql = @sql + N'
+			AND crval.Value = '''+CASE @dnr WHEN 1 THEN N'True' ELSE N'False' END+''''
+
+		IF @idcustomerordersource IS NOT NULL
+			SET @sql = @sql + N'
+			AND sval.Value = '''+CAST(@idcustomerordersource AS nvarchar(25))+''''
+
+		SET @sql = @sql + N'
+		OPTION(RECOMPILE)'
+
+		EXEC sp_executesql @sql, @params, 
+			@from, 
+			@to,
+			@idcustomertype,
+			@fromordercount,
+			@toordercount,
+			@fromfirst,
+			@tofirst,
+			@fromlast,
+			@tolast,
+			@lastfromtotal,
+			@lasttototal,
+			@dnm,
+			@dnr,
+			@idcustomerordersource,
+			@keycodefirst,
+			@discountcodefirst,
+			@pageindex,
+			@pagesize,
+			@count = @count OUTPUT;
+	END
+
+	SET @sql = N'
+		
+		WITH orderList
+		AS
+		(
+			SELECT o.Id, o.IdCustomer, o.DateCreated, o.IdObjectType, Total, IdPaymentMethod, IdDiscount FROM Orders AS o
+			WHERE
+				o.StatusCode!=3 AND o.IdObjectType NOT IN (2,5,6) AND 
+				(
+					(o.OrderStatus IS NOT NULL AND o.OrderStatus NOT IN (1, 4)) 
+					OR (o.POrderStatus IS NOT NULL AND o.POrderStatus NOT IN (1, 4) AND o.NPOrderStatus NOT IN (1, 4))
+				)
+		)
+		SELECT
+			c.Id,
+			c.Email,
+			c.IdObjectType AS CustomerIdObjectType,
+			cd.FirstOrderDateCreated,
+			cd.FirstKeyCode,
+			cd.FirstDiscountCode,
+			cd.LastOrderDateCreated,
+			cd.LastOrderTotal,
+			cd.LastOrderIdPaymentMethod,
+			cd.OrdersCount,
+			cd.OrdersTotal,
+			CAST(CASE cmval.Value WHEN N''True'' THEN 1 ELSE 0 END AS BIT) AS DoNotMail,
+			CAST(CASE crval.Value WHEN N''True'' THEN 1 ELSE 0 END AS BIT) AS DoNotRent,
+			CAST(sval.Value AS INT) AS IdCustomerOrderSource,
+			options.FirstName,
+			options.LastName,
+			options.Address1,
+			options.Address2,
+			options.City,
+			options.Phone,
+			options.Zip,
+			a.IdCountry,
+			a.IdState,
+			@count AS [Count]
+			FROM Customers c WITH(NOLOCK)'
+
+	SET @sql = @sql + N'
+	INNER JOIN (
+		SELECT DISTINCT
+			cc.Id,
+			MIN(o.DateCreated) OVER (PARTITION BY cc.Id) AS FirstOrderDateCreated,
+			FIRST_VALUE(kcval.Value) OVER (PARTITION BY cc.Id ORDER BY o.DateCreated ASC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS FirstKeyCode,
+			FIRST_VALUE(d.Code) OVER (PARTITION BY cc.Id ORDER BY o.DateCreated ASC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS FirstDiscountCode,
+			MAX(o.DateCreated) OVER (PARTITION BY cc.Id) AS LastOrderDateCreated,
+			FIRST_VALUE(o.Total) OVER (PARTITION BY cc.Id ORDER BY o.DateCreated DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS LastOrderTotal,
+			FIRST_VALUE(o.IdPaymentMethod) OVER (PARTITION BY cc.Id ORDER BY o.DateCreated DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS LastOrderIdPaymentMethod,
+			COUNT(o.Id) OVER (PARTITION BY cc.Id) AS OrdersCount,
+			SUM(o.Total) OVER (PARTITION BY cc.Id) AS OrdersTotal
+		FROM Customers AS cc WITH (NOLOCK)
+		LEFT JOIN orderList AS o WITH(NOLOCK) ON o.IdCustomer=cc.Id
+		LEFT JOIN OrderOptionTypes AS kcopt WITH(NOLOCK) ON kcopt.Name = N''KeyCode'' AND kcopt.IdObjectType = o.IdObjectType
+		LEFT JOIN OrderOptionValues AS kcval WITH(NOLOCK) ON kcval.IdOrder = o.Id AND kcval.IdOptionType = kcopt.Id
+		LEFT JOIN Discounts AS d WITH(NOLOCK) ON d.Id = o.IdDiscount'
+		IF @from IS NOT NULL AND @to IS NOT NULL
+				SET @sql = @sql + N'
+				WHERE
+					cc.Id IN (
+						SELECT IdCustomer FROM orderList AS o
+						WHERE 
+							o.DateCreated >= @from AND 
+							o.DateCreated <= @to
+					)
+				'
+			ELSE IF @from IS NOT NULL
+				SET @sql = @sql + N'
+				WHERE
+					cc.Id IN (
+						SELECT IdCustomer FROM orderList AS o
+						WHERE 
+							o.DateCreated >= @from
+					)
+				'
+			ELSE IF @to IS NOT NULL
+				SET @sql = @sql + N'
+				WHERE
+					cc.Id IN (
+						SELECT IdCustomer FROM orderList AS o
+						WHERE 
+							o.DateCreated <= @to
+					)
+				'
+			ELSE
+				SET @sql = @sql + N'
+				WHERE
+					cc.Id IN (
+						SELECT IdCustomer FROM orderList
+					)
+				'
+			IF @idcustomertype IS NOT NULL
+				SET @sql = @sql + N'
+				AND cc.IdObjectType = @idcustomertype'
+	SET @sql = @sql +
+		N'
+	) AS cd ON cd.Id = c.Id
+	LEFT JOIN CustomerOptionValues AS cmval WITH(NOLOCK) ON cmval.IdCustomer = c.Id AND cmval.IdOptionType = '+CAST(@dnmId AS nvarchar(25))+'
+	LEFT JOIN CustomerOptionValues AS crval WITH(NOLOCK) ON crval.IdCustomer = c.Id AND crval.IdOptionType = '+CAST(@dnrId AS nvarchar(25))+'
+	LEFT JOIN CustomerOptionValues AS sval WITH(NOLOCK) ON sval.IdCustomer = c.Id AND sval.IdOptionType = '+CAST(@sourceId AS nvarchar(25))+'
+	LEFT JOIN OrderPaymentMethods pm ON cd.LastOrderIdPaymentMethod=pm.Id
 	LEFT JOIN OrderAddresses a ON pm.IdAddress = a.Id
 	LEFT OUTER JOIN 
 		(
@@ -408,7 +346,112 @@ BEGIN
 				MIN([Value]) FOR [Name] IN ([FirstName], [LastName], [Address1], [Address2], [City], [Phone], [Zip])
 			) AS piv
 		) AS options ON a.Id = options.IdOrderAddress
+	WHERE 1=1
+	'
 
+	IF @fromordercount IS NOT NULL
+		SET @sql = @sql + N'
+		AND cd.OrdersCount >= @fromordercount'
+		
+	IF @toordercount IS NOT NULL
+		SET @sql = @sql + N'
+		AND cd.OrdersCount <= @toordercount'
+
+	IF @fromfirst IS NOT NULL
+		SET @sql = @sql + N'
+		AND cd.FirstOrderDateCreated >= @fromfirst'
+
+	IF @tofirst IS NOT NULL
+		SET @sql = @sql + N'
+		AND cd.FirstOrderDateCreated <= @tofirst'
+
+	IF @fromlast IS NOT NULL
+		SET @sql = @sql + N'
+		AND cd.LastOrderDateCreated >= @fromlast'
+
+	IF @tolast IS NOT NULL
+		SET @sql = @sql + N'
+		AND cd.LastOrderDateCreated <= @tolast'
+
+	IF @lastfromtotal IS NOT NULL
+		SET @sql = @sql + N'
+		AND cd.LastOrderTotal >= @lastfromtotal'
+
+	IF @lasttototal IS NOT NULL
+		SET @sql = @sql + N'
+		AND cd.LastOrderTotal <= @lasttototal'
+
+	IF @keycodefirst IS NOT NULL
+		SET @sql = @sql + N'
+		AND cd.FirstKeyCode = @keycodefirst'
+
+	IF @discountcodefirst IS NOT NULL
+		SET @sql = @sql + N'
+		AND cd.FirstDiscountCode = @discountcodefirst'
+
+	IF @dnm IS NOT NULL
+		SET @sql = @sql + N'
+		AND cmval.Value = '''+CASE @dnm WHEN 1 THEN N'True' ELSE N'False' END+''''
+
+	IF @dnr IS NOT NULL
+		SET @sql = @sql + N'
+		AND crval.Value = '''+CASE @dnr WHEN 1 THEN N'True' ELSE N'False' END+''''
+
+	IF @idcustomerordersource IS NOT NULL
+		SET @sql = @sql + N'
+		AND sval.Value = '''+CAST(@idcustomerordersource AS nvarchar(25))+''''
+	
+	SET @sql = @sql + N'
+		ORDER BY c.Id'
+	IF @pageindex IS NOT NULL
+	BEGIN
+		SET @sql = @sql + N'
+			OFFSET '+CAST((@pageindex-1)*@pagesize AS nvarchar(25))+N' ROWS FETCH NEXT '+CAST(@pagesize AS nvarchar(25))+N' ROWS ONLY'
+	END
+
+	SET @sql = @sql + N'
+		OPTION(RECOMPILE)'
+
+	SET @params = N'@from datetime2,
+		@to datetime2,
+		@idcustomertype int,
+		@fromordercount int,
+		@toordercount int,
+		@fromfirst datetime2,
+		@tofirst datetime2,
+		@fromlast datetime2,
+		@tolast datetime2,
+		@lastfromtotal decimal,
+		@lasttototal decimal,
+		@dnm bit,
+		@dnr bit,
+		@idcustomerordersource INT,
+		@keycodefirst nvarchar(250),
+		@discountcodefirst nvarchar(250),
+		@pageindex int,
+		@pagesize int,
+		@count INT'
+
+	EXEC sp_executesql @sql, @params, 
+		@from, 
+		@to,
+		@idcustomertype,
+		@fromordercount,
+		@toordercount,
+		@fromfirst,
+		@tofirst,
+		@fromlast,
+		@tolast,
+		@lastfromtotal,
+		@lasttototal,
+		@dnm,
+		@dnr,
+		@idcustomerordersource,
+		@keycodefirst,
+		@discountcodefirst,
+		@pageindex,
+		@pagesize,
+		@count;
 END
 
 GO
