@@ -497,7 +497,6 @@ namespace VitalChoice.ExportService.Services
                         Id = order.Id,
                         Success = false
                     });
-                    continue;
                 }
                 if (order.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
                 {
