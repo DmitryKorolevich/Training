@@ -1,22 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using VitalChoice.Data.Helpers;
 using VitalChoice.Data.UOW;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
-using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Avatax;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Orders;
-using VitalChoice.Infrastructure.Domain.Mail;
-using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
-using VitalChoice.Infrastructure.Domain.Transfer.GiftCertificates;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 
 namespace VitalChoice.Interfaces.Services.Orders
@@ -29,7 +21,8 @@ namespace VitalChoice.Interfaces.Services.Orders
         Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false);
 	    Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus);
 	    Task<OrderDataContext> CalculateStorefrontOrder(OrderDynamic order, OrderStatus combinedStatus);
-        Task<OrderDynamic> SelectLastOrderAsync(int customerId);
+	    Task<OrderDataContext> CalculateOrderForExport(OrderDynamic order, OrderStatus combinedStatus);
+	    Task<OrderDynamic> SelectLastOrderAsync(int customerId);
 
         OrderDynamic CreateNewNormalOrder(OrderStatus status);
         

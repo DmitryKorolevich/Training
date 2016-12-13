@@ -626,6 +626,33 @@ namespace VitalChoice.Business.Services.Orders
             return context;
         }
 
+        public async Task<OrderDataContext> CalculateOrderForExport(OrderDynamic order, OrderStatus combinedStatus)
+        {
+            var context = new OrderDataContext(combinedStatus)
+            {
+                Order = order
+            };
+            IWorkflowTreeExecutor<OrderDataContext, decimal> tree;
+            switch ((OrderType) order.IdObjectType)
+            {
+                case OrderType.Normal:
+                case OrderType.AutoShip:
+                case OrderType.DropShip:
+                case OrderType.GiftList:
+                case OrderType.AutoShipOrder:
+                    tree = await _treeFactory.CreateTreeAsync<OrderDataContext, decimal>("ExportOrder");
+                    break;
+                case OrderType.Reship:
+                    tree = await _treeFactory.CreateTreeAsync<OrderDataContext, decimal>("Reship");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            await tree.ExecuteAsync(context);
+            UpdateOrderFromCalculationContext(order, context);
+            return context;
+        }
+
         public async Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus)
         {
             var context = new OrderDataContext(combinedStatus)
