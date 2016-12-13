@@ -520,6 +520,11 @@ namespace VitalChoice.ExportService.Services
                             await _orderService.UpdateAsync(order);
                         }
                     }
+                    // ReSharper disable once EmptyGeneralCatchClause
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex.ToString());
+                    }
                     exportCallBack(new OrderExportItemResult
                     {
                         Error = e.ToString(),

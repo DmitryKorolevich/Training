@@ -1,0 +1,1 @@
+powershell -ExecutionPolicy unrestricted -File prepeare-for-live-export.ps1
