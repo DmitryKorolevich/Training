@@ -491,12 +491,42 @@ namespace VitalChoice.ExportService.Services
                 }
                 catch (Exception e)
                 {
+                    try
+                    {
+                        await _orderService.UpdateAsync(order);
+                    }
+                    catch (TimeoutException)
+                    {
+                        //Retry once in one minute
+                        await Task.Delay(TimeSpan.FromMinutes(1));
+                        await _orderService.UpdateAsync(order);
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                        var sqlException = ex.InnerException as SqlException;
+                        if (sqlException != null && sqlException.Number == -2)
+                        {
+                            //Retry once in one minute
+                            await Task.Delay(TimeSpan.FromMinutes(1));
+                            await _orderService.UpdateAsync(order);
+                        }
+                    }
+                    catch (SqlException ex)
+                    {
+                        if (ex.Number == -2)
+                        {
+                            //Retry once in one minute
+                            await Task.Delay(TimeSpan.FromMinutes(1));
+                            await _orderService.UpdateAsync(order);
+                        }
+                    }
                     exportCallBack(new OrderExportItemResult
                     {
                         Error = e.ToString(),
                         Id = order.Id,
                         Success = false
                     });
+                    continue;
                 }
                 if (order.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
                 {
