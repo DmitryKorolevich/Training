@@ -491,6 +491,40 @@ namespace VitalChoice.ExportService.Services
                 }
                 catch (Exception e)
                 {
+                    try
+                    {
+                        await _orderService.UpdateAsync(order);
+                    }
+                    catch (TimeoutException)
+                    {
+                        //Retry once in one minute
+                        await Task.Delay(TimeSpan.FromMinutes(1));
+                        await _orderService.UpdateAsync(order);
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                        var sqlException = ex.InnerException as SqlException;
+                        if (sqlException != null && sqlException.Number == -2)
+                        {
+                            //Retry once in one minute
+                            await Task.Delay(TimeSpan.FromMinutes(1));
+                            await _orderService.UpdateAsync(order);
+                        }
+                    }
+                    catch (SqlException ex)
+                    {
+                        if (ex.Number == -2)
+                        {
+                            //Retry once in one minute
+                            await Task.Delay(TimeSpan.FromMinutes(1));
+                            await _orderService.UpdateAsync(order);
+                        }
+                    }
+                    // ReSharper disable once EmptyGeneralCatchClause
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex.ToString());
+                    }
                     exportCallBack(new OrderExportItemResult
                     {
                         Error = e.ToString(),

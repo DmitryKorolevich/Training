@@ -56,8 +56,7 @@ namespace VC.Admin.Validators.ContentManagement
 
                 RuleFor(model => model.Description)
                     .NotEmpty()
-                    .WithMessage(model => model.Description, ValidationMessages.FieldRequired)
-                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_EXPANDED_MAX_SIZE);
+                    .WithMessage(model => model.Description, ValidationMessages.FieldRequired);
 
                 RuleFor(model => model.YoutubeVideo)
 				   .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_EXPANDED_MAX_SIZE)

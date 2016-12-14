@@ -46,6 +46,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Users;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Ecommerce.Domain.Transfer;
+using VitalChoice.Ecommerce.Utils;
 using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -91,6 +92,7 @@ namespace VitalChoice.Business.Services.Customers
         private readonly IEcommerceRepositoryAsync<VOrderCountOnCustomer> _vOrderCountOnCustomerRepositoryAsync;
         private readonly IEcommerceRepositoryAsync<VCustomerWithDublicateEmail> _vCustomerWithDublicateEmailRepositoryAsync;
         private readonly SpEcommerceRepository _sPEcommerceRepository;
+        private readonly ITransactionAccessor<VitalChoiceContext> _vctransactionAccessor;
         private readonly ReferenceData _referenceData;
         private readonly CustomerPaymentMethodMapper _customerPaymentMethodMapper;
 
@@ -117,6 +119,7 @@ namespace VitalChoice.Business.Services.Customers
             IEcommerceRepositoryAsync<VCustomerWithDublicateEmail> vCustomerWithDublicateEmailRepositoryAsync,
             SpEcommerceRepository sPEcommerceRepository,
             ITransactionAccessor<EcommerceContext> transactionAccessor,
+            ITransactionAccessor<VitalChoiceContext> vctransactionAccessor,
             IDynamicEntityOrderingExtension<Customer> orderingExtension, ReferenceData referenceData,
             IEcommerceRepositoryAsync<CustomerPaymentMethod> customerPaymentMethodRepositoryAsync,
             CustomerPaymentMethodMapper customerPaymentMethodMapper)
@@ -145,6 +148,7 @@ namespace VitalChoice.Business.Services.Customers
             _vOrderCountOnCustomerRepositoryAsync = vOrderCountOnCustomerRepositoryAsync;
             _vCustomerWithDublicateEmailRepositoryAsync = vCustomerWithDublicateEmailRepositoryAsync;
             _sPEcommerceRepository = sPEcommerceRepository;
+            _vctransactionAccessor = vctransactionAccessor;
             _referenceData = referenceData;
             _customerPaymentMethodRepositoryAsync = customerPaymentMethodRepositoryAsync;
             _customerPaymentMethodMapper = customerPaymentMethodMapper;
@@ -794,84 +798,86 @@ namespace VitalChoice.Business.Services.Customers
             var suspendedCustomer = (int) CustomerStatus.Suspended;
 
             Customer entity;
-
-            using (var transaction = uow.BeginTransaction())
+            using (var vctransaction = _vctransactionAccessor.BeginTransaction())
             {
-                try
+                using (var transaction = uow.BeginTransaction())
                 {
-                    if (!string.IsNullOrWhiteSpace(password))
+                    try
                     {
-                        appUser.IsConfirmed = true;
-                        appUser.Status = model.StatusCode == suspendedCustomer
-                            ? UserStatus.Disabled
-                            : UserStatus.Active;
-                    }
-                    else
-                    {
-                        appUser.Status = model.StatusCode == suspendedCustomer
-                            ? UserStatus.Disabled
-                            : UserStatus.NotActive;
-                    }
-
-                    appUser = await _storefrontUserService.CreateAsync(appUser, roles, false, false, password);
-
-                    model.Id = appUser.Id;
-
-                    var paymentCopies =
-                        model.CustomerPaymentMethods.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard)
-                            .Select(method => new
-                            {
-                                method.SafeData.CardNumber,
-                                Model = method
-                            }).ToArray();
-                    int[] index = {0};
-                    await model.CustomerPaymentMethods.ForEachAsync(async method =>
-                    {
-                        var errors = await _paymentMethodService.AuthorizeCreditCard(method);
-                        errors.Select(error => new MessageInfo
+                        if (!string.IsNullOrWhiteSpace(password))
                         {
-                            Field =
-                                error.Field.FormatCollectionError("CreditCards", index[0]).FormatErrorWithForm("card"),
-                            Message = error.Message,
-                            MessageLevel = error.MessageLevel
-                        }).ToList().Raise();
-                        index[0]++;
-                    });
+                            appUser.IsConfirmed = true;
+                            appUser.Status = model.StatusCode == suspendedCustomer
+                                ? UserStatus.Disabled
+                                : UserStatus.Active;
+                        }
+                        else
+                        {
+                            appUser.Status = model.StatusCode == suspendedCustomer
+                                ? UserStatus.Disabled
+                                : UserStatus.NotActive;
+                        }
 
-                    entity = await base.InsertAsync(model, uow);
+                        appUser = await _storefrontUserService.CreateAsync(appUser, roles, false, false, password);
 
-                    model.CustomerPaymentMethods.ForEach(p => p.IdCustomer = entity.Id);
+                        model.Id = appUser.Id;
 
-                    var updatePaymentsTask =
-                        _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(
-                            paymentCopies.Select(p => new CustomerCardData
+                        var paymentCopies =
+                            model.CustomerPaymentMethods.Where(p => p.IdObjectType == (int) PaymentMethodType.CreditCard)
+                                .Select(method => new
+                                {
+                                    method.SafeData.CardNumber,
+                                    Model = method
+                                }).ToArray();
+                        int[] index = {0};
+                        await model.CustomerPaymentMethods.ForEachAsync(async method =>
+                        {
+                            var errors = await _paymentMethodService.AuthorizeCreditCard(method);
+                            errors.Select(error => new MessageInfo
                             {
-                                CardNumber = p.CardNumber,
-                                IdPaymentMethod = p.Model.Id,
-                                IdCustomer = p.Model.IdCustomer,
-                                IdCustomerSource = p.Model.IdCustomerSource,
-                                IdPaymentMethodSource = p.Model.IdPaymentMethodSource
-                            }).ToArray());
+                                Field =
+                                    error.Field.FormatCollectionError("CreditCards", index[0]).FormatErrorWithForm("card"),
+                                Message = error.Message,
+                                MessageLevel = error.MessageLevel
+                            }).ToList().Raise();
+                            index[0]++;
+                        });
 
-                    if (!await updatePaymentsTask)
-                    {
-                        throw new ApiException("Cannot update customer payment info on remote.");
+                        entity = await base.InsertAsync(model, uow);
+
+                        model.CustomerPaymentMethods.ForEach(p => p.IdCustomer = entity.Id);
+
+                        var updatePaymentsTask =
+                            _encryptedOrderExportService.UpdateCustomerPaymentMethodsAsync(
+                                paymentCopies.Select(p => new CustomerCardData
+                                {
+                                    CardNumber = p.CardNumber,
+                                    IdPaymentMethod = p.Model.Id,
+                                    IdCustomer = p.Model.IdCustomer,
+                                    IdCustomerSource = p.Model.IdCustomerSource,
+                                    IdPaymentMethodSource = p.Model.IdPaymentMethodSource
+                                }).ToArray());
+
+                        if (!await updatePaymentsTask)
+                        {
+                            throw new ApiException("Cannot update customer payment info on remote.");
+                        }
+
+                        transaction.Commit();
+                        vctransaction.Commit();
+                        return entity;
                     }
-
-                    transaction.Commit();
-                }
-                catch
-                {
-                    if (appUser.Id > 0)
+                    catch when (
+                        ExceptionFilter.SkipFilter(vctransaction, transaction, (tran1, tran2) =>
+                        {
+                            tran1.Rollback();
+                            tran2.Rollback();
+                        }))
                     {
-                        await _storefrontUserService.DeleteAsync(appUser);
+                        throw;
                     }
-
-                    transaction.Rollback();
-                    throw;
                 }
             }
-            return entity;
         }
 
         public async Task<string> GetNewOrderNotesBasedOnCustomer(int idCustomer)
