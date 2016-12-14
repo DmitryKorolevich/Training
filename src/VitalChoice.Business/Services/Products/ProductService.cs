@@ -2268,6 +2268,11 @@ namespace VitalChoice.Business.Services.Products
                 item.ProductCategories = rawSku.ProductCategories;
                 item.ProductName = $"{rawSku.Name} {rawSku.SubTitle}";
 
+                if (filter.OnlyActiveProduct && rawSku.ProductStatusCode != RecordStatusCode.Active)
+                {
+                    continue;
+                }
+
                 foreach (var rawItem in productSkuGroup)
                 {
                     var inStock = BusinessHelper.InStock(rawItem.ProductIdObjectType, rawItem.DisregardStock, rawItem.Stock);

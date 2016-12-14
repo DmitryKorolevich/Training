@@ -30,6 +30,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
 
         public bool OnlyActiveSku { get; set; }
 
+        public bool OnlyActiveProduct { get; set; }
+
         public SkuAverageDailySalesReportMode Mode { get; set; }
     }
 }
