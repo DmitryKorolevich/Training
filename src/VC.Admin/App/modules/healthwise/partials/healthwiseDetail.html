@@ -72,10 +72,33 @@
                                         <div class="col-md-9">
                                             <div class="checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="PayAsGC" data-ng-model="payment.PayAsGC"/>
+                                                    <input type="checkbox" name="PayAsGC" data-ng-model="payment.PayAsGC" />
                                                     <strong>Generate And Send GC</strong>
                                                 </label>
                                             </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </form>
+                            <form class="form-horizontal" name="forms.changeDatesForm" data-ng-class="{submitted: forms.changeDates}" novalidate unsaved-warning-form>
+                                <fieldset>
+                                    <span class="legend">Change Period Dates</span>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Start Date</label>
+                                        <div class="col-md-3">
+                                            <p class="input-group">
+                                                <input type="text" name="StartDate" class="form-control" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="options.StartDate" is-open="dateOpened" required />
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); dateOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                </span>
+                                            </p>
+                                            <div class="error-container" ng-show="forms.changeDates && forms.changeDatesForm.StartDate.$invalid">
+                                                <small class="error" ng-show="forms.changeDatesForm.StartDate.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Start Date")}}</small>
+                                                <small class="error" ng-show="forms.changeDatesForm.StartDate.$error.server">{{serverMessages.GetMessage('StartDate')}}</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <button data-ng-click="updateDates();" class="btn btn-success">Update</button>
                                         </div>
                                     </div>
                                 </fieldset>

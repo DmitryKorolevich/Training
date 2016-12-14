@@ -99,6 +99,19 @@ namespace VC.Admin.Controllers
 
         [AdminAuthorize(PermissionType.Reports)]
         [HttpPost]
+        public async Task<Result<HealthwisePeriodListItemModel>> UpdateHealthwisePeriodDates([FromBody]HealthwiseDatesManageModel model)
+        {
+            var result = await _healthwiseService.UpdatePeriodDatesAsync(model.Id, model.StartDate);
+            if (result)
+            {
+                return new HealthwisePeriodListItemModel(await _healthwiseService.GetVHealthwisePeriodAsync(model.Id));
+            }
+
+            return null;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
         public async Task<Result<bool>> DeleteHealthwisePeriod(int id)
         {
             var toReturn = await _healthwiseService.DeleteHealthwisePeriod(id);

@@ -232,7 +232,8 @@
                         <td>{{::item.TotalOOSImpactAmount | currency}}</td>
                         <td>
                             <span data-ng-repeat="sku in item.Skus">
-                                <span class="sku" data-ng-class="{'not-in-stock': !sku.InStock}">{{sku.Code}}</span>
+                                <span data-ng-if="sku.StatusCode!=1" class="sku" data-ng-class="{'not-in-stock': !sku.InStock}">{{sku.Code}}</span>
+                                <span data-ng-if="sku.StatusCode==1" class="sku" data-ng-class="{'not-in-stock': !sku.InStock}">{{sku.Code}} (NA)</span>
                                 {{$last!=true ? " / " : ""}}
                             </span>
                         </td>
