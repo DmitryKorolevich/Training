@@ -99,6 +99,7 @@
                 IdCustomerType: null,
                 OnlyActiveSku: true,
                 OnlyOOS: false,
+                OnlyActiveProduct: false,
                 ProductName: null,
                 Skus: [],
                 Paging: { PageIndex: 1, PageItemCount: 100 },

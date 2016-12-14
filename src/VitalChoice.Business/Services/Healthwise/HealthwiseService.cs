@@ -323,6 +323,21 @@ namespace VitalChoice.Business.Services.Healthwise
             return true;
         }
 
+        public async Task<bool> UpdatePeriodDatesAsync(int id, DateTime startDate)
+        {
+            var item = await _healthwisePeriodRepository.Query(p=>p.Id== id).SelectFirstOrDefaultAsync(true);
+            if (item != null)
+            {
+                item.StartDate = startDate;
+                item.EndDate = item.StartDate.AddYears(1);
+                await _healthwisePeriodRepository.UpdateAsync(item);
+
+                return true;
+            }
+
+            return false;
+        }
+
         public async Task<HealthwisePeriod> AddPeriodAsync(int idCustomer)
         {
             HealthwisePeriod period = new HealthwisePeriod();

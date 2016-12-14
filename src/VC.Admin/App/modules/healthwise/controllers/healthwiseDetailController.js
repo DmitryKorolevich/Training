@@ -40,7 +40,7 @@ function ($scope, $rootScope, $state, $stateParams, healthwiseService, toaster, 
         $scope.forms = {};
         $scope.options = {};
         $scope.payment = {
-            AllowPayment:false,
+            AllowPayment: false,
         };
 
         loadHealthwise();
@@ -73,28 +73,34 @@ function ($scope, $rootScope, $state, $stateParams, healthwiseService, toaster, 
                 if (result.Success)
                 {
                     var data = result.Data;
-                    if(data)
+                    if (data)
                     {
-                        $scope.options.FirstName=data.FirstName;
+                        $scope.options.FirstName = data.FirstName;
                         $scope.options.LastName = data.LastName;
                         $scope.options.IdCustomer = data.Id;
-                        if(data.Periods && data.Periods.length==1)
+                        if (data.Periods && data.Periods.length == 1)
                         {
-                            if(data.Periods[0].AllowPayment)
+                            if (data.Periods[0].AllowPayment)
                             {
                                 $scope.payment.Id = data.Periods[0].Id;
-                                $scope.payment.AllowPayment=true;
+                                $scope.payment.AllowPayment = true;
                                 $scope.payment.Amount = data.Periods[0].AverageDiscountedSubtotal;
                                 $scope.payment.Date = Date.parseDateTime(data.Periods[0].LastOrderDate);
                                 $scope.payment.Date.setHours(0);
                                 $scope.payment.Date.setMinutes(0);
                                 $scope.payment.Date.setSeconds(0);
                                 $scope.payment.Date.setMilliseconds(0);
-                                $scope.payment.PayAsGC=true;
+                                $scope.payment.PayAsGC = true;
                             }
                             $scope.options.PaidAmount = data.Periods[0].PaidAmount;
                             $scope.options.PaidDate = data.Periods[0].PaidDate;
-                            $scope.options.AllowMove = data.Periods[0].PaidDate==null;
+                            $scope.options.AllowMove = data.Periods[0].PaidDate == null;
+
+                            $scope.options.IdPayment = data.Periods[0].Id;
+                            if (data.Periods[0].StartDate)
+                            {
+                                $scope.options.StartDate = Date.parseDateTime(data.Periods[0].StartDate);
+                            }
                         }
                     }
                     loadOrders();
@@ -107,6 +113,42 @@ function ($scope, $rootScope, $state, $stateParams, healthwiseService, toaster, 
             {
                 errorHandler(result);
             });
+    };
+
+    $scope.updateDates = function ()
+    {
+        confirmUtil.confirm(function ()
+        {
+            if ($scope.forms.changeDatesForm.$valid)
+            {
+                var data = {};
+                data.Id = $scope.options.IdPayment;
+                if ($scope.options.StartDate)
+                {
+                    data.StartDate = $scope.options.StartDate.toServerDateTime();
+                }
+                healthwiseService.updateHealthwisePeriodDates(data, $scope.deleteTracker)
+                    .success(function (result)
+                    {
+                        if (result.Success)
+                        {
+                            $scope.forms.changeDates = false;
+                            toaster.pop('success', "Success!", "Dates successfully updated.");
+                        } else
+                        {
+                            errorHandler(result);
+                        }
+                    })
+                    .error(function (result)
+                    {
+                        errorHandler(result);
+                    });
+            }
+            else
+            {
+                $scope.forms.changeDates = true;
+            }
+        }, 'Are you sure you want to change period dates?');
     };
 
     $scope.save = function ()
@@ -140,7 +182,7 @@ function ($scope, $rootScope, $state, $stateParams, healthwiseService, toaster, 
         }
     };
 
-    $scope.openMovePopup = function()
+    $scope.openMovePopup = function ()
     {
         var ids = [];
         $.each($scope.items, function (index, item)
@@ -168,15 +210,16 @@ function ($scope, $rootScope, $state, $stateParams, healthwiseService, toaster, 
         });
     };
 
-    $scope.allSelectCall = function()
+    $scope.allSelectCall = function ()
     {
-        $.each($scope.items, function(index, item)
+        $.each($scope.items, function (index, item)
         {
             item.IsSelected = $scope.options.allSelected;
         });
     };
 
-    $scope.openOrder = function (id) {
+    $scope.openOrder = function (id)
+    {
         $state.go('index.oneCol.orderDetail', { id: id });
     };
 

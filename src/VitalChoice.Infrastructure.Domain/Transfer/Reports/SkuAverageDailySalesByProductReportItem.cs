@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -10,6 +11,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
     public class SkuAverageDailySalesByProductSkuItem
     {
         public string Code { get; set; }
+
+        public RecordStatusCode StatusCode { get; set; }
 
         public bool InStock { get; set; }
     }

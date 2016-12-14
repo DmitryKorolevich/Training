@@ -22,6 +22,10 @@ angular.module('app.core.dataAccess.services.healthwiseService', [])
 	    {
 	        return $http.get(baseUrl + 'GetHealthwisePeriod/'+id, getConfig(tracker));
 	    },
+	    updateHealthwisePeriodDates: function (model, tracker)
+	    {
+	        return $http.post(baseUrl + 'UpdateHealthwisePeriodDates', model, getConfig(tracker));
+	    },
 	    deleteHealthwisePeriod: function (id, tracker)
 	    {
 	        return $http.post(baseUrl + 'DeleteHealthwisePeriod/'+id, null, getConfig(tracker));

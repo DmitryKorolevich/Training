@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Autofac;
+using VitalChoice.Business.Workflow.Export;
 using VitalChoice.Business.Workflow.Orders;
 using VitalChoice.Business.Workflow.Orders.ActionResolvers;
 using VitalChoice.Business.Workflow.Orders.Actions;
@@ -19,7 +20,6 @@ using ReductionType = VitalChoice.Business.Workflow.Orders.ActionResolvers.Reduc
 using VitalChoice.Business.Workflow.Refunds.Actions.Discounts;
 using VitalChoice.Business.Workflow.Refunds.Actions.Products;
 using VitalChoice.Business.Workflow.Reships;
-using VitalChoice.Business.Workflow.Reships.Actions;
 
 namespace VitalChoice.Workflow.Configuration
 {
@@ -429,6 +429,210 @@ namespace VitalChoice.Workflow.Configuration
                 });
 
                 reship.Action<ShippingSurchargeOverrideAction>("SurchargeOverride", action =>
+                {
+                    action.Dependency<ShippingSurchargeResolver>();
+                });
+            });
+
+            #endregion
+
+            #region Export Order
+
+            orderContextTreeSetup.Tree<ExportTree>("ExportOrder", exportOrder =>
+            {
+                exportOrder.Action<TotalAction>("Total", action =>
+                {
+                    action.Dependency<GiftCertificatesBuyAction>();
+                    action.Dependency<AffiliateCommissionAction>();
+
+                    action.Aggregate<PayableTotalAction>();
+                    action.Aggregate<GiftCertificatesPaymentAction>();
+                });
+
+                exportOrder.Action<AffiliateCommissionAction>("AffiliateCommission", action =>
+                {
+                    action.Dependency<ProductsWithPromoAction>();
+                    action.Dependency<ReductionTypeActionResolver>();
+                });
+
+                exportOrder.Action<PayableTotalAction>("PayableTotal", action =>
+                {
+                    action.Dependency<PerishableProductsAction>();
+
+                    action.Aggregate<GetTaxAction>();
+                    action.Aggregate<OrderSubTotalAction>();
+                });
+
+                exportOrder.Action<GetTaxAction>("TaxTotal", action =>
+                {
+                    action.Dependency<OrderSubTotalAction>();
+                    action.Dependency<ProductsSplitAction>();
+                });
+
+                exportOrder.Action<OrderSubTotalAction>("SubTotal", action =>
+                {
+                    action.Aggregate<ProductsWithPromoAction>();
+                    action.Aggregate<ReductionTypeActionResolver>();
+                    action.Aggregate<ShippingStandardResolver>();
+                    action.Aggregate<ShippingSurchargeResolver>();
+                    action.Aggregate<ShippingUpgradesActionResolver>();
+                    action.Aggregate<ShippingOverrideAction>();
+                    action.Aggregate<ShippingSurchargeOverrideAction>();
+                });
+
+                exportOrder.Action<GiftCertificatesBuyAction>("BuyGiftCertificates", action =>
+                {
+                    action.Dependency<ProductsWithPromoAction>();
+                });
+
+                exportOrder.Action<ExportSetupPromoAction>("PromoSetup");
+
+                exportOrder.Action<GiftCertificatesPaymentAction>("GiftCertificates", action =>
+                {
+                    action.Dependency<PayableTotalAction>();
+                });
+
+                exportOrder.Action<ProductAction>("Products", action =>
+                {
+                    action.Dependency<ExportSetupPromoAction>();
+                });
+
+                exportOrder.Action<ProductsWithPromoAction>("PromoProducts", action =>
+                {
+                    action.Dependency<ReductionTypeActionResolver>();
+                    action.Dependency<ExportSetupPromoAction>();
+                    action.Aggregate<ProductAction>();
+                });
+
+                exportOrder.Action<DiscountPercentAction>("PercentDiscount", action =>
+                {
+                    action.Dependency<DiscountableProductsAction>();
+                });
+
+                exportOrder.Action<DiscountPriceAction>("PriceDiscount", action =>
+                {
+                    action.Dependency<DiscountableProductsAction>();
+                });
+
+                exportOrder.Action<DiscountableProductsAction>("DiscountableSubtotal", action =>
+                {
+                    action.Dependency<ProductAction>();
+                });
+
+                exportOrder.Action<DiscountTieredAction>("TieredDiscount", action =>
+                {
+                    action.Dependency<DiscountableProductsAction>();
+                });
+
+                exportOrder.Action<DiscountFreeShippingAction>("FreeShippingDiscount");
+
+                exportOrder.Action<DiscountThresholdAction>("ThresholdDiscount", action =>
+                {
+                    action.Dependency<DiscountableProductsAction>();
+                });
+
+                exportOrder.Action<PerishableProductsAction>("PerishableSubtotal", action =>
+                {
+                    action.Dependency<ProductAction>();
+                });
+
+                exportOrder.Action<DeliveredProductsAction>("DeliveredAmount", action =>
+                {
+                    action.Dependency<ProductsWithPromoAction>();
+                });
+
+                exportOrder.Action<StandardShippingUsWholesaleAction>("StandardWholesaleShipping", action =>
+                {
+                    action.Dependency<ProductsWithPromoAction>();
+                    action.Dependency<DeliveredProductsAction>();
+                });
+
+                exportOrder.Action<StandardShippingUsCaRetailAction>("StandardRetailShipping", action =>
+                {
+                    action.Dependency<ProductsWithPromoAction>();
+                    action.Dependency<DeliveredProductsAction>();
+                });
+
+                exportOrder.Action<ShippingSurchargeUsAkHiAction>("ShippingSurchargeUs", action =>
+                {
+                    action.Dependency<ProductsSplitAction>();
+                    action.Dependency<DeliveredProductsAction>();
+                });
+
+                exportOrder.Action<ShippingSurchargeCaAction>("ShippingSurchargeCa", action =>
+                {
+                    action.Dependency<DeliveredProductsAction>();
+                });
+
+                exportOrder.Action<ProductsSplitAction>("SplitAction", action =>
+                {
+                    action.Dependency<ProductsWithPromoAction>();
+                });
+
+                exportOrder.Action<ShippingUpgradesUsCaAction>("ShippingUpgradeUsCa");
+
+                exportOrder.ActionResolver<ShippingUpgradesActionResolver>("ShippingUpgrade", action =>
+                {
+                    action.Dependency<ProductsSplitAction>();
+
+                    action.ResolvePath<ShippingUpgradesUsCaAction>((int) ShippingUpgradeGroup.UsCa, "ShippingUpgradeUsCa");
+                });
+
+                exportOrder.ActionResolver<ShippingSurchargeResolver>("ShippingSurcharge", action =>
+                {
+                    action.ResolvePath<ShippingSurchargeUsAkHiAction>((int) SurchargeType.AlaskaHawaii,
+                        "ShippingSurchargeUs");
+                    action.ResolvePath<ShippingSurchargeCaAction>((int) SurchargeType.Canada,
+                        "ShippingSurchargeCa");
+                });
+
+                exportOrder.ActionResolver<ReductionTypeActionResolver>("Discount", action =>
+                {
+                    action.Dependency<HealthwiseSetupAction>();
+
+                    action.ResolvePath<AutoShipDiscountAction>((int) ReductionType.AutoShip, "AutoShipDiscount");
+                    action.ResolvePath<DiscountTypeActionResolver>((int) ReductionType.Discount, "NormalDiscount");
+                });
+
+                exportOrder.Action<HealthwiseSetupAction>("HealthwiseSetup");
+
+                exportOrder.Action<AutoShipDiscountAction>("AutoShipDiscount", action =>
+                {
+                    action.Dependency<DiscountableProductsAction>();
+                });
+
+                exportOrder.ActionResolver<DiscountTypeActionResolver>("NormalDiscount", action =>
+                {
+                    action.Dependency<PerishableProductsAction>();
+
+                    action.ResolvePath<DiscountPercentAction>((int) DiscountType.PercentDiscount, "PercentDiscount");
+                    action.ResolvePath<DiscountPriceAction>((int) DiscountType.PriceDiscount, "PriceDiscount");
+                    action.ResolvePath<DiscountTieredAction>((int) DiscountType.Tiered, "TieredDiscount");
+                    action.ResolvePath<DiscountFreeShippingAction>((int) DiscountType.FreeShipping, "FreeShippingDiscount");
+                    action.ResolvePath<DiscountThresholdAction>((int) DiscountType.Threshold, "ThresholdDiscount");
+                });
+
+                exportOrder.Action<StandardShippingDropship>("StandardShippingDropship", action =>
+                {
+                    action.Dependency<ProductsWithPromoAction>();
+                    action.Dependency<DeliveredProductsAction>();
+                });
+
+                exportOrder.ActionResolver<ShippingStandardResolver>("StandardShipping", action =>
+                {
+                    action.Dependency<ReductionTypeActionResolver>();
+                    action.ResolvePath<StandardShippingDropship>((int)StandardShippingType.Dropship, "StandardDropshipShipping");
+                    action.ResolvePath<StandardShippingUsWholesaleAction>((int) StandardShippingType.Wholesale, "StandardWholesaleShipping");
+                    action.ResolvePath<StandardShippingUsCaRetailAction>((int) StandardShippingType.Retail, "StandardRetailShipping");
+                });
+
+                exportOrder.Action<ShippingOverrideAction>("ShippingOverride", action =>
+                {
+                    action.Dependency<ShippingStandardResolver>();
+                    action.Dependency<ShippingUpgradesActionResolver>();
+                });
+
+                exportOrder.Action<ShippingSurchargeOverrideAction>("SurchargeOverride", action =>
                 {
                     action.Dependency<ShippingSurchargeResolver>();
                 });

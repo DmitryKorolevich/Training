@@ -30,7 +30,7 @@ namespace VitalChoice.Caching.GC
             _maxSize = options.Value.CacheSettings.MaxProcessHeapsSizeBytes;
             _latestTimeFrame = TimeSpan.FromSeconds(options.Value.CacheSettings.CacheTimeToLeaveSeconds);
             _scanPeriod = TimeSpan.FromSeconds(options.Value.CacheSettings.CacheScanPeriodSeconds);
-            _thread = new Thread(ProcessObjects);
+            _thread = new Thread(ProcessObjects) {IsBackground = true};
             _thread.Start();
         }
 

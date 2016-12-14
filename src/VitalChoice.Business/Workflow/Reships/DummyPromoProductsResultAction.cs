@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
 
-namespace VitalChoice.Business.Workflow.Reships.Actions
+namespace VitalChoice.Business.Workflow.Reships
 {
     public class DummyPromoProductsResultAction : ComputableAction<OrderDataContext>
     {
