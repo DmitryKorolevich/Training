@@ -35,6 +35,8 @@ namespace VitalChoice.Business.CsvExportMaps.Products
             Map(m => m.DateStatus).Name("Status").Index(8).TypeConverter<DateStatusConverter>();
             Map(m => m.DateCreated).Name("Created").Index(9).TypeConverterOption(CultureInfo.InvariantCulture).TypeConverterOption("MM/dd/yyyy hh:mm tt");
             Map(m => m.AddedByAgentId).Name("Created By").Index(10);
+            Map(m => m.DateEdited).Name("Updated").Index(11).TypeConverterOption(CultureInfo.InvariantCulture).TypeConverterOption("MM/dd/yyyy hh:mm tt");
+            Map(m => m.EditedByAgentId).Name("Updated By").Index(12);
         }
     }
 }

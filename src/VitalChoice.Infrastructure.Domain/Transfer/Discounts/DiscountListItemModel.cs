@@ -30,6 +30,10 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Discounts
 
         public string AddedByAgentId { get; set; }
 
+        public DateTime DateEdited { get; set; }
+
+        public string EditedByAgentId { get; set; }
+
         public DateStatus DateStatus { get; set; }
 
         public DiscountListItemModel(DiscountDynamic item)
@@ -48,6 +52,11 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Discounts
                 if(item.DictionaryData.ContainsKey("AddedByAgentId"))
                 {
                     AddedByAgentId = (string)item.DictionaryData["AddedByAgentId"];
+                }
+                DateEdited = item.DateEdited;
+                if (item.DictionaryData.ContainsKey("EditedByAgentId"))
+                {
+                    EditedByAgentId = (string)item.DictionaryData["EditedByAgentId"];
                 }
                 ExpirationDate = ExpirationDate;
                 DateTime now = DateTime.Now;

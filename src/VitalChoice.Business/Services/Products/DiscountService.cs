@@ -234,6 +234,13 @@ namespace VitalChoice.Business.Services.Products
                                 ? x.OrderBy(y => y.DateCreated)
                                 : x.OrderByDescending(y => y.DateCreated);
                     break;
+                case DiscountSortPath.DateEdited:
+                    sortable =
+                        (x) =>
+                            sortOrder == FilterSortOrder.Asc
+                                ? x.OrderBy(y => y.DateEdited)
+                                : x.OrderByDescending(y => y.DateEdited);
+                    break;
             }
 
             PagedList<Discount> result;
@@ -255,7 +262,9 @@ namespace VitalChoice.Business.Services.Products
             PagedList<DiscountDynamic> toReturn = new PagedList<DiscountDynamic>(result.Items.Select(p => _mapper.FromEntity(p)).ToList(), result.Count);
             if (toReturn.Items.Count > 0)
             {
-                var ids = result.Items.Where(p => p.IdAddedBy.HasValue).Select(p => p.IdAddedBy.Value).Distinct().ToList();
+                var ids = result.Items.Where(p => p.IdAddedBy.HasValue).Select(p => p.IdAddedBy.Value).ToList();
+                ids.AddRange(result.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy.Value));
+                ids = ids.Distinct().ToList();
                 var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
                 foreach (var item in toReturn.Items)
                 {
@@ -264,6 +273,10 @@ namespace VitalChoice.Business.Services.Products
                         if (item.IdAddedBy == profile.Id)
                         {
                             item.Data.AddedByAgentId = profile.AgentId;
+                        }
+                        if (item.IdEditedBy == profile.Id)
+                        {
+                            item.Data.EditedByAgentId = profile.AgentId;
                         }
                     }
                 }
