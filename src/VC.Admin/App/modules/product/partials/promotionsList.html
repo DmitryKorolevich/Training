@@ -90,6 +90,13 @@
                                 <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
                             </span>
                         </th>
+                        <th class="sortable-column" data-ng-click="filter.Sorting.applySort('DateEdited')">
+                            <span>Updated</span>
+                            <span data-ng-if="filter.Sorting.Path == 'DateEdited'">
+                                <i class='glyphicon glyphicon-chevron-up' data-ng-if="filter.Sorting.SortOrder == 'Asc'"></i>
+                                <i class='glyphicon glyphicon-chevron-down' data-ng-if="filter.Sorting.SortOrder == 'Desc'"></i>
+                            </span>
+                        </th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -116,6 +123,7 @@
                             <span data-ng-if="item.DateStatus == 3" class="label label-future font-default">Future</span>
                         </td>
                         <td>{{item.DateCreated | date:"MM/dd/yy"}}<br />{{item.DateCreated | date:"h:mm a"}}<br />{{item.AddedByAgentId}}</td>
+                        <td>{{item.DateEdited | date:"MM/dd/yy"}}<br />{{item.DateEdited | date:"h:mm a"}}<br />{{item.EditedByAgentId}}</td>
                         <td>
                             <button title="Edit" class="btn btn-default btn-success btn-xs" data-ng-click="open(item.Id);">
                                 <i class="glyphicon glyphicon-edit"></i>
