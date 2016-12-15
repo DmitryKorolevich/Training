@@ -1635,15 +1635,18 @@ namespace VitalChoice.Business.Services.Orders
             var discounts = await _discountService.SelectAsync(discountIds, 
                 includesOverride: p=>p.Include(pp=>pp.DiscountTiers));
 
-            foreach (var item in toReturn.Items.Where(p=>p.IdDiscount.HasValue))
+            foreach (var item in toReturn.Items)
             {
-                var discount = discounts.FirstOrDefault(p => p.Id == item.IdDiscount.Value);
-                if (discount != null)
+                DiscountDynamic discount = null;
+                if (item.IdDiscount.HasValue)
                 {
-                    item.DiscountCode = discount.Code;
-                    item.DiscountMessage = discount.GetDiscountMessage(item.OrderIdDiscountTier);
-                    item.DiscountInfo = discount.GetDiscountInfo(item.OrderIdDiscountTier);
+                    discount = discounts.FirstOrDefault(p => p.Id == item.IdDiscount.Value);
                 }
+                item.DiscountCode = discount?.Code;
+                item.DiscountMessage = BusinessHelper.GetDiscountMessage(discount, item.OrderIdDiscountTier,
+                    item.AutoShipDiscountPercent);
+                item.DiscountInfo = BusinessHelper.GetDiscountInfo(discount, item.OrderIdDiscountTier,
+                    item.AutoShipDiscountPercent);
             }
 
             return toReturn;

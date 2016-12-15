@@ -35,6 +35,8 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Reports
 
         public int? OrderIdDiscountTier { get; set; }
 
+        public decimal? AutoShipDiscountPercent { get; set; }
+
         public int? TotalCount { get; set; }
 
         public string DiscountCode { get; set; }

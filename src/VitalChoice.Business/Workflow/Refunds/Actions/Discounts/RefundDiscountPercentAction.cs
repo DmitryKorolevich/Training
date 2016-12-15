@@ -14,7 +14,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Discounts
 
         public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, ITreeContext executionContext)
         {
-            context.DiscountMessage = context.RefundOrder.Discount.GetDiscountMessage();
+            context.DiscountMessage = BusinessHelper.GetDiscountMessage(context.RefundOrder.Discount);
             decimal discountPercent = context.RefundOrder.Discount.Data.Percent;
 
             context.SplitInfo.PerishableDiscount = discountPercent*context.SplitInfo.DiscountablePerishable/100;

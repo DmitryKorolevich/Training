@@ -80,7 +80,8 @@ namespace VC.Admin.ModelConverters
                 if (dynamic.OriginalOrder.Discount != null)
                 {
                     model.DiscountCode = dynamic.OriginalOrder.Discount.Code;
-                    model.DiscountMessage = dynamic.OriginalOrder.Discount.GetDiscountMessage((int?) dynamic.SafeData.IdDiscountTier);
+                    model.DiscountMessage = BusinessHelper.GetDiscountMessage(dynamic.Discount, (int?)dynamic.SafeData.IdDiscountTier,
+                        (decimal?)dynamic.SafeData.AutoShipDiscountPercent);
                     model.DiscountedSubtotal -= model.DiscountTotal;
                 }
 

@@ -65,8 +65,10 @@ namespace VC.Admin.ModelConverters
             if(dynamic.Discount!=null)
             {
                 model.DiscountCode = dynamic.Discount.Code;
-                model.DiscountMessage = dynamic.Discount.GetDiscountMessage((int?)dynamic.SafeData.IdDiscountTier);
+                model.DiscountMessage =BusinessHelper.GetDiscountMessage(dynamic.Discount, (int?)dynamic.SafeData.IdDiscountTier,
+                    (decimal?)dynamic.SafeData.AutoShipDiscountPercent);
             }
+
             model.DiscountedSubtotal = model.ProductsSubtotal - model.DiscountTotal;
             model.TotalShipping = model.ShippingTotal;
             if (model.ShippingOverride.HasValue)

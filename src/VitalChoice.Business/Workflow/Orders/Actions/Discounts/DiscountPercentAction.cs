@@ -14,7 +14,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
 
         public override Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
-            context.DiscountMessage = context.Order.Discount.GetDiscountMessage();
+            context.DiscountMessage = BusinessHelper.GetDiscountMessage(context.Order.Discount);
             context.FreeShipping = context.Order.Discount.Data.FreeShipping;
 
             decimal discountPercent = context.Order.Discount.Data.Percent;

@@ -15,7 +15,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
 
         public override Task<decimal> ExecuteActionAsync(OrderDataContext dataContext, ITreeContext executionContext)
         {
-            dataContext.DiscountMessage = dataContext.Order.Discount.GetDiscountMessage();
+            dataContext.DiscountMessage =BusinessHelper.GetDiscountMessage(dataContext.Order.Discount);
             dataContext.FreeShipping = true;
             return TaskCache<decimal>.DefaultCompletedTask;
         }
