@@ -19,16 +19,13 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
                 (decimal?) context.SkuOrdereds.FirstOrDefault(s => (bool?) s.Sku.SafeData.AutoShipProduct ?? false)?.Sku.Data.OffPercent ??
                 0;
 
-            if (discountPercent > 0)
-            {
-                context.DiscountMessage = $"Percent Discount ({discountPercent/100:P0})";
-            }
+            context.DiscountMessage = BusinessHelper.GetDiscountMessage(null, null, discountPercent);
             context.FreeShipping = true;
 
-            context.SplitInfo.PerishableDiscount = discountPercent*context.SplitInfo.DiscountablePerishable/100;
-            context.SplitInfo.NonPerishableDiscount = discountPercent*context.SplitInfo.DiscountableNonPerishable/100;
+            context.SplitInfo.PerishableDiscount = discountPercent * context.SplitInfo.DiscountablePerishable / 100;
+            context.SplitInfo.NonPerishableDiscount = discountPercent * context.SplitInfo.DiscountableNonPerishable / 100;
 
-            return Task.FromResult(-discountPercent*(decimal) context.Data.DiscountableSubtotal/100);
+            return Task.FromResult(-discountPercent * (decimal) context.Data.DiscountableSubtotal / 100);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace VitalChoice.Business.Helpers
 {
     public static class BusinessHelper
     {
-        public static string GetDiscountMessage(DiscountDynamic discount, int? IdTier = null, decimal? autoShipDiscountPercent=null)
+        public static string GetDiscountMessage(this DiscountDynamic discount, int? idTier = null, decimal? autoShipDiscountPercent=null)
 		{
 			string toReturn = null;
 
@@ -28,13 +28,10 @@ namespace VitalChoice.Business.Helpers
 		    {
 		        if (autoShipDiscountPercent.HasValue)
 		        {
-                    toReturn= $"Percent Discount ({autoShipDiscountPercent.Value / 100:P0})";
+		            return $"Percent Discount ({autoShipDiscountPercent.Value / 100:P0})";
+		        }
 
-                }
-		        else
-                {
-                    return null;
-                }
+		        return null;
 		    }
 
 		    switch (discount.IdObjectType)
@@ -61,9 +58,9 @@ namespace VitalChoice.Business.Helpers
 					}
 					break;
 				case (int)DiscountType.Tiered:
-					if (IdTier.HasValue)
+					if (idTier.HasValue)
 					{
-						var neededTier = discount.DiscountTiers?.FirstOrDefault(p => p.Id == IdTier.Value);
+						var neededTier = discount.DiscountTiers?.FirstOrDefault(p => p.Id == idTier.Value);
 						if (neededTier != null)
 						{
 							switch (neededTier.IdDiscountType)
