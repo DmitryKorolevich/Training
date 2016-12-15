@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Ecommerce.Domain.Exceptions;
@@ -34,6 +35,11 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
             {
                 item.Quantity = 1;
                 item.Amount = 0;
+                var existingItem = dataContext.PromoSkus.FirstOrDefault(p => (p.Sku?.Id ?? 0) == (item.Sku?.Id ?? -1));
+                if (existingItem != null)
+                {
+                    dataContext.PromoSkus.Remove(existingItem);
+                }
                 dataContext.PromoSkus.Add(new PromoOrdered(item, null, true));
             }
             return TaskCache<decimal>.DefaultCompletedTask;

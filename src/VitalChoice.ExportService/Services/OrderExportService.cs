@@ -487,10 +487,15 @@ namespace VitalChoice.ExportService.Services
                 }
                 try
                 {
-                    _veraCoreExportService.ExportOrder(order, item.OrderType).GetAwaiter().GetResult();
+                    await _veraCoreExportService.ExportOrder(order, item.OrderType);
                 }
                 catch (Exception e)
                 {
+                    if (order.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
+                    {
+                        _paymentMapper.SecureObject(order.PaymentMethod);
+                    }
+                    order.IdEditedBy = userId;
                     try
                     {
                         await _orderService.UpdateAsync(order);
@@ -499,7 +504,7 @@ namespace VitalChoice.ExportService.Services
                     {
                         //Retry once in one minute
                         await Task.Delay(TimeSpan.FromMinutes(1));
-                        await _orderService.UpdateAsync(order);
+                        await UpdateOrderInternalWithChecksWithoutSuccessSend(exportCallBack, order);
                     }
                     catch (DbUpdateException ex)
                     {
@@ -508,7 +513,7 @@ namespace VitalChoice.ExportService.Services
                         {
                             //Retry once in one minute
                             await Task.Delay(TimeSpan.FromMinutes(1));
-                            await _orderService.UpdateAsync(order);
+                            await UpdateOrderInternalWithChecksWithoutSuccessSend(exportCallBack, order);
                         }
                     }
                     catch (SqlException ex)
@@ -517,7 +522,7 @@ namespace VitalChoice.ExportService.Services
                         {
                             //Retry once in one minute
                             await Task.Delay(TimeSpan.FromMinutes(1));
-                            await _orderService.UpdateAsync(order);
+                            await UpdateOrderInternalWithChecksWithoutSuccessSend(exportCallBack, order);
                         }
                     }
                     // ReSharper disable once EmptyGeneralCatchClause
@@ -546,7 +551,7 @@ namespace VitalChoice.ExportService.Services
                 {
                     //Retry once in one minute
                     await Task.Delay(TimeSpan.FromMinutes(1));
-                    await UpdateOrderInternal(exportCallBack, order);
+                    await UpdateOrderInternalWithChecks(exportCallBack, order);
                 }
                 catch (DbUpdateException e)
                 {
@@ -555,7 +560,17 @@ namespace VitalChoice.ExportService.Services
                     {
                         //Retry once in one minute
                         await Task.Delay(TimeSpan.FromMinutes(1));
-                        await UpdateOrderInternal(exportCallBack, order);
+                        await UpdateOrderInternalWithChecks(exportCallBack, order);
+                    }
+                    else
+                    {
+                        _logger.LogError(e.ToString());
+                        exportCallBack(new OrderExportItemResult
+                        {
+                            Error = e.ToString(),
+                            Id = order.Id,
+                            Success = false
+                        });
                     }
                 }
                 catch (SqlException e)
@@ -564,10 +579,65 @@ namespace VitalChoice.ExportService.Services
                     {
                         //Retry once in one minute
                         await Task.Delay(TimeSpan.FromMinutes(1));
-                        await UpdateOrderInternal(exportCallBack, order);
+                        await UpdateOrderInternalWithChecks(exportCallBack, order);
+                    }
+                    else
+                    {
+                        _logger.LogError(e.ToString());
+                        exportCallBack(new OrderExportItemResult
+                        {
+                            Error = e.ToString(),
+                            Id = order.Id,
+                            Success = false
+                        });
                     }
                 }
+                catch (Exception e)
+                {
+                    _logger.LogError(e.ToString());
+                    exportCallBack(new OrderExportItemResult
+                    {
+                        Error = e.ToString(),
+                        Id = order.Id,
+                        Success = false
+                    });
+                }
             }
+        }
+
+        private async Task UpdateOrderInternalWithChecksWithoutSuccessSend(Action<OrderExportItemResult> exportCallBack, OrderDynamic order)
+        {
+            try
+            {
+                await _orderService.UpdateAsync(order);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.ToString());
+            }
+        }
+
+        private async Task UpdateOrderInternalWithChecks(Action<OrderExportItemResult> exportCallBack, OrderDynamic order)
+        {
+            try
+            {
+                await _orderService.UpdateAsync(order);
+            }
+            catch (Exception e)
+            {
+                exportCallBack(new OrderExportItemResult
+                {
+                    Error = e.ToString(),
+                    Id = order.Id,
+                    Success = false
+                });
+                return;
+            }
+            exportCallBack(new OrderExportItemResult
+            {
+                Id = order.Id,
+                Success = true
+            });
         }
 
         private async Task UpdateOrderInternal(Action<OrderExportItemResult> exportCallBack, OrderDynamic order)
@@ -636,7 +706,7 @@ namespace VitalChoice.ExportService.Services
                 catch (TimeoutException)
                 {
                     await Task.Delay(TimeSpan.FromMinutes(1));
-                    await UpdateRefundInternal(exportCallBack, refund);
+                    await UpdateRefundInternalWithChecks(exportCallBack, refund);
                 }
                 catch (DbUpdateException e)
                 {
@@ -645,7 +715,17 @@ namespace VitalChoice.ExportService.Services
                     {
                         //Retry once in one minute
                         await Task.Delay(TimeSpan.FromMinutes(1));
-                        await UpdateRefundInternal(exportCallBack, refund);
+                        await UpdateRefundInternalWithChecks(exportCallBack, refund);
+                    }
+                    else
+                    {
+                        _logger.LogError(e.ToString());
+                        exportCallBack(new OrderExportItemResult
+                        {
+                            Error = e.ToString(),
+                            Id = refund.Id,
+                            Success = false
+                        });
                     }
                 }
                 catch (SqlException e)
@@ -654,10 +734,53 @@ namespace VitalChoice.ExportService.Services
                     {
                         //Retry once in one minute
                         await Task.Delay(TimeSpan.FromMinutes(1));
-                        await UpdateRefundInternal(exportCallBack, refund);
+                        await UpdateRefundInternalWithChecks(exportCallBack, refund);
+                    }
+                    else
+                    {
+                        _logger.LogError(e.ToString());
+                        exportCallBack(new OrderExportItemResult
+                        {
+                            Error = e.ToString(),
+                            Id = refund.Id,
+                            Success = false
+                        });
                     }
                 }
+                catch (Exception e)
+                {
+                    _logger.LogError(e.ToString());
+                    exportCallBack(new OrderExportItemResult
+                    {
+                        Error = e.ToString(),
+                        Id = refund.Id,
+                        Success = false
+                    });
+                }
             }
+        }
+
+        private async Task UpdateRefundInternalWithChecks(Action<OrderExportItemResult> exportCallBack, OrderRefundDynamic refund)
+        {
+            try
+            {
+                await _refundService.UpdateAsync(refund);
+            }
+            catch (Exception e)
+            {
+                exportCallBack(new OrderExportItemResult
+                {
+                    Error = e.ToString(),
+                    Id = refund.Id,
+                    Success = false
+                });
+                return;
+            }
+            exportCallBack(new OrderExportItemResult
+            {
+                Id = refund.Id,
+                Success = true
+            });
         }
 
         private async Task UpdateRefundInternal(Action<OrderExportItemResult> exportCallBack, OrderRefundDynamic refund)
