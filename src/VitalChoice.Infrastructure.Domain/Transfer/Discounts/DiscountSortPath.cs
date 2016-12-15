@@ -9,5 +9,6 @@
 	    public const string StartDate = "StartDate";
         public const string ExpirationDate = "ExpirationDate";
         public const string DateCreated = "DateCreated";
+        public const string DateEdited = "DateEdited";
     }
 }
