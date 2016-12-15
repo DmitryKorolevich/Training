@@ -16,7 +16,7 @@ namespace VitalChoice.Workflow.Core
         public abstract TResult AggregateResult(TResult result, TResult currentValue, string actionName);
         public abstract Task<TResult> ExecuteActionAsync(TContext context, ITreeContext executionContext);
 
-        public override async Task<TResult> ExecuteAsync(TContext context, ITreeContext executionContext)
+        public sealed override async Task<TResult> ExecuteAsync(TContext context, ITreeContext executionContext)
         {
             TResult result;
             if (Tree.TryGetActionResult(Name, context, out result))

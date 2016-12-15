@@ -526,7 +526,7 @@ namespace VitalChoice.Workflow.Configuration
 
                 exportOrder.Action<DiscountFreeShippingAction>("FreeShippingDiscount");
 
-                exportOrder.Action<DiscountThresholdAction>("ThresholdDiscount", action =>
+                exportOrder.Action<ExportDiscountThresholdAction>("ThresholdDiscount", action =>
                 {
                     action.Dependency<DiscountableProductsAction>();
                 });
@@ -609,7 +609,7 @@ namespace VitalChoice.Workflow.Configuration
                     action.ResolvePath<DiscountPriceAction>((int) DiscountType.PriceDiscount, "PriceDiscount");
                     action.ResolvePath<DiscountTieredAction>((int) DiscountType.Tiered, "TieredDiscount");
                     action.ResolvePath<DiscountFreeShippingAction>((int) DiscountType.FreeShipping, "FreeShippingDiscount");
-                    action.ResolvePath<DiscountThresholdAction>((int) DiscountType.Threshold, "ThresholdDiscount");
+                    action.ResolvePath<ExportDiscountThresholdAction>((int) DiscountType.Threshold, "ThresholdDiscount");
                 });
 
                 exportOrder.Action<StandardShippingDropship>("StandardShippingDropship", action =>
