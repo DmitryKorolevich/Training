@@ -15,7 +15,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Discounts
 
         public override Task<decimal> ExecuteActionAsync(OrderRefundDataContext context, ITreeContext executionContext)
         {
-            context.DiscountMessage = context.RefundOrder.Discount.GetDiscountMessage();
+            context.DiscountMessage = BusinessHelper.GetDiscountMessage(context.RefundOrder.Discount);
 
             decimal totalDiscount = Math.Min(context.Data.RefundDiscountableSubtotal, context.RefundOrder.Discount.Data.Amount);
 

@@ -25,7 +25,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
                 if (discountableSubtotal >= tier.From && (tier.To == null || discountableSubtotal <= tier.To))
                 {
                     context.Order.Data.IdDiscountTier = tier.Id;
-                    context.DiscountMessage = context.Order.Discount.GetDiscountMessage(tier.Id);
+                    context.DiscountMessage = BusinessHelper.GetDiscountMessage(context.Order.Discount, tier.Id);
                     switch (tier.IdDiscountType)
                     {
                         case DiscountType.PriceDiscount:

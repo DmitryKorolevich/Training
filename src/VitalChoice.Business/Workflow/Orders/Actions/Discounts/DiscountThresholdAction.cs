@@ -29,7 +29,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Discounts
                 });
                 return TaskCache<decimal>.DefaultCompletedTask;
             }
-            dataContext.DiscountMessage = dataContext.Order.Discount.GetDiscountMessage();
+            dataContext.DiscountMessage = BusinessHelper.GetDiscountMessage(dataContext.Order.Discount);
             var item = (SkuOrdered) dataContext.Order.Discount.SafeData.ThresholdSku;
             if (item != null)
             {

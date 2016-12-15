@@ -24,7 +24,7 @@ namespace VitalChoice.Business.Workflow.Refunds.Actions.Discounts
                 if (discountableSubtotal >= tier.From && (tier.To == null || discountableSubtotal <= tier.To))
                 {
                     context.RefundOrder.Data.IdDiscountTier = tier.Id;
-                    context.DiscountMessage = context.RefundOrder.Discount.GetDiscountMessage(tier.Id);
+                    context.DiscountMessage = BusinessHelper.GetDiscountMessage(context.RefundOrder.Discount, tier.Id);
                     switch (tier.IdDiscountType)
                     {
                         case DiscountType.PriceDiscount:

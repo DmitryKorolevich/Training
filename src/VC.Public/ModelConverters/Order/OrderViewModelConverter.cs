@@ -122,7 +122,8 @@ namespace VC.Public.ModelConverters.Order
             if (dynamic.Discount != null)
             {
                 model.DiscountCode = dynamic.Discount.Code;
-                model.DiscountCodeMessage = dynamic.Discount.GetDiscountMessage((int?)dynamic.SafeData.IdDiscountTier);
+                model.DiscountCodeMessage = BusinessHelper.GetDiscountMessage(dynamic.Discount, (int?)dynamic.SafeData.IdDiscountTier,
+                        (decimal?)dynamic.SafeData.AutoShipDiscountPercent);
             }
 
             model.GCs = dynamic.GiftCertificates?.Select(item => new GCInvoiceEntity()

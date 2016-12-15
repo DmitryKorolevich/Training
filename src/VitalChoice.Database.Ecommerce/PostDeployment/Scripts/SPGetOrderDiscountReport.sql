@@ -67,6 +67,7 @@ BEGIN
 			cadfval.Value as CustomerFirstName,
 			cadlval.Value as CustomerLastName,
 			CAST(otval.Value as INT) OrderIdDiscountTier,
+			CAST(aspval.Value as decimal(6,2)) AutoShipDiscountPercent,
 			@count TotalCount
 		FROM Orders o WITH(NOLOCK)
 			INNER JOIN Customers c WITH(NOLOCK) ON o.IdCustomer=c.Id
@@ -76,6 +77,8 @@ BEGIN
 			LEFT JOIN AddressOptionValues AS cadlval WITH(NOLOCK) ON cadlval.IdAddress = c.IdProfileAddress AND cadlval.IdOptionType = cadlopt.Id
 			LEFT JOIN OrderOptionTypes AS otopt WITH(NOLOCK) ON otopt.Name = N'IdDiscountTier'
 			LEFT JOIN OrderOptionValues AS otval WITH(NOLOCK) ON otval.IdOrder = o.Id AND otval.IdOptionType = otopt.Id
+			LEFT JOIN OrderOptionTypes AS aspopt WITH(NOLOCK) ON aspopt.Name = N'AutoShipDiscountPercent'
+			LEFT JOIN OrderOptionValues AS aspval WITH(NOLOCK) ON aspval.IdOrder = o.Id AND aspval.IdOptionType = aspopt.Id
 		WHERE
 			o.DateCreated>=@from AND o.DateCreated<@to AND
 			o.StatusCode!=3 AND o.IdObjectType NOT IN (2,5,6) AND 
@@ -112,6 +115,7 @@ BEGIN
 			cadfval.Value as CustomerFirstName,
 			cadlval.Value as CustomerLastName,
 			CAST(otval.Value as INT) OrderIdDiscountTier,
+			CAST(aspval.Value as decimal(6,2)) AutoShipDiscountPercent,
 			@count TotalCount
 		FROM Orders o WITH(NOLOCK)
 			INNER JOIN Customers c WITH(NOLOCK) ON o.IdCustomer=c.Id
@@ -121,6 +125,8 @@ BEGIN
 			LEFT JOIN AddressOptionValues AS cadlval WITH(NOLOCK) ON cadlval.IdAddress = c.IdProfileAddress AND cadlval.IdOptionType = cadlopt.Id
 			LEFT JOIN OrderOptionTypes AS otopt WITH(NOLOCK) ON otopt.Name = N'IdDiscountTier'
 			LEFT JOIN OrderOptionValues AS otval WITH(NOLOCK) ON otval.IdOrder = o.Id AND otval.IdOptionType = otopt.Id
+			LEFT JOIN OrderOptionTypes AS aspopt WITH(NOLOCK) ON aspopt.Name = N'AutoShipDiscountPercent'
+			LEFT JOIN OrderOptionValues AS aspval WITH(NOLOCK) ON aspval.IdOrder = o.Id AND aspval.IdOptionType = aspopt.Id
 		WHERE
 			o.DateCreated>=@from AND o.DateCreated<@to AND
 			o.StatusCode!=3 AND o.IdObjectType NOT IN (2,5,6) AND 
