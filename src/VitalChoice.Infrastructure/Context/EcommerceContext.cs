@@ -352,6 +352,7 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(t => t.Id);
                 entity.ToTable("VHealthwisePeriods");
+                entity.NonCached();
             });
 
             builder.Entity<CatalogRequestAddress>(entity =>
