@@ -300,13 +300,13 @@ namespace VitalChoice.Caching.Services.Cache
         {
             if (cacheIterator.AggregatedResult != CacheGetResult.Found)
             {
-                return _internalCache.CanAddUpCache() ? cacheIterator.AggregatedResult : CacheGetResult.NotFound;
+                return cacheIterator.AggregatedResult;
             }
             if (cacheIterator.HasResults)
             {
                 return CacheGetResult.Found;
             }
-            return _internalCache.CanAddUpCache() ? CacheGetResult.Update : CacheGetResult.NotFound;
+            return CacheGetResult.Update;
         }
 
         private void AttachGraph(object entity, RelationInfo relationInfo)

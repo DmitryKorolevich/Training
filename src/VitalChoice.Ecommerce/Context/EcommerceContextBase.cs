@@ -106,6 +106,7 @@ namespace VitalChoice.Ecommerce.Context
             {
                 entity.HasKey(p => p.Id);
                 entity.ToTable("PromotionTypes");
+                entity.NotCollectiable();
             });
 
             builder.Entity<PromotionOptionType>(entity =>
@@ -119,6 +120,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
                 entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
+                entity.NotCollectiable();
             });
 
             builder.Entity<PromotionOptionValue>(entity =>
@@ -192,6 +194,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(o => o.IdEditedBy)
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
+                entity.NotCollectiable();
             });
 
             #endregion
@@ -226,6 +229,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
                 entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
+                entity.NotCollectiable();
             });
 
 
@@ -253,6 +257,7 @@ namespace VitalChoice.Ecommerce.Context
             {
                 entity.HasKey(t => t.Id);
                 entity.ToTable("ProductTypes");
+                entity.NotCollectiable();
             });
 
             SkuToInventorySku(builder);
@@ -288,6 +293,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
                 entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
+                entity.NotCollectiable();
             });
 
             builder.Entity<SkuOptionValue>(entity =>
@@ -392,12 +398,14 @@ namespace VitalChoice.Ecommerce.Context
             {
                 entity.HasKey(p => p.Id);
                 entity.ToTable("Lookups");
+                entity.NotCollectiable();
             });
 
             builder.Entity<LookupVariant>(entity =>
             {
                 entity.HasKey(p => new { p.Id, p.IdLookup });
                 entity.ToTable("LookupVariants");
+                entity.NotCollectiable();
             });
 
             builder.Entity<Lookup>(entity =>
@@ -407,6 +415,7 @@ namespace VitalChoice.Ecommerce.Context
                     .WithOne(p => p.Lookup)
                     .HasForeignKey(p => p.IdLookup)
                     .HasPrincipalKey(p => p.Id);
+                entity.NotCollectiable();
             });
 
 
@@ -421,6 +430,7 @@ namespace VitalChoice.Ecommerce.Context
                 entity.Ignore(p => p.States);
                 entity.CacheListWhen(c => c.StatusCode != RecordStatusCode.Deleted);
                 entity.CacheUniqueIndex(c => c.CountryCode);
+                entity.NotCollectiable();
             });
 
 
@@ -430,6 +440,7 @@ namespace VitalChoice.Ecommerce.Context
                 entity.ToTable("States");
                 entity.CacheListWhen(c => c.StatusCode != RecordStatusCode.Deleted);
                 entity.CacheUniqueIndex(c => new {c.StateCode, c.CountryCode});
+                entity.NotCollectiable();
             });
 
 
@@ -554,6 +565,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
                 entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
+                entity.NotCollectiable();
             });
 
 
@@ -622,6 +634,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
                 entity.CacheUniqueIndex(e => e.Name);
+                entity.NotCollectiable();
             });
 
             builder.Entity<CustomerNoteOptionValue>(entity =>
@@ -658,6 +671,7 @@ namespace VitalChoice.Ecommerce.Context
                     .WithOne(p => p.CustomerType)
                     .HasForeignKey(p => p.IdCustomerType)
                     .HasPrincipalKey(p => p.Id);
+
             });
 
 
@@ -724,6 +738,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
                 entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
+                entity.NotCollectiable();
             });
 
 
@@ -747,6 +762,7 @@ namespace VitalChoice.Ecommerce.Context
             {
                 entity.HasKey(p => p.Id);
                 entity.ToTable("AddressTypes");
+                entity.NotCollectiable();
             });
 
 
@@ -865,6 +881,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
                 entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
+                entity.NotCollectiable();
             });
 
             builder.Entity<CustomerPaymentMethodOptionValue>(entity =>
@@ -891,6 +908,7 @@ namespace VitalChoice.Ecommerce.Context
             {
                 entity.HasKey(t => t.Id);
                 entity.ToTable("OrderTypes");
+                entity.NotCollectiable();
             });
 
             builder.Entity<Order>(entity =>
@@ -980,6 +998,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey<Lookup>(l => l.Id)
                     .IsRequired(false);
                 entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
+                entity.NotCollectiable();
             });
 
             builder.Entity<OrderToPromoToInventorySku>(entity =>
@@ -1078,6 +1097,7 @@ namespace VitalChoice.Ecommerce.Context
             {
                 entity.HasKey(s => s.Id);
                 entity.ToTable("OrderStatuses");
+                entity.NotCollectiable();
             });
 
             builder.Entity<OrderPaymentMethod>(entity =>
@@ -1210,6 +1230,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
                 entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
+                entity.NotCollectiable();
             });
 
             #endregion
@@ -1244,6 +1265,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
                 entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
+                entity.NotCollectiable();
             });
 
             builder.Entity<Affiliate>(entity =>
@@ -1632,6 +1654,7 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(p => p.Id)
                     .IsRequired(false);
                 entity.CacheUniqueIndex(e => new {e.Name, e.IdObjectType});
+                entity.NotCollectiable();
             });
         }
 
@@ -1759,6 +1782,7 @@ namespace VitalChoice.Ecommerce.Context
                 entity.HasKey(f => f.Id);
                 entity.Property(f => f.TypeName).HasMaxLength(250);
                 entity.ToTable("FieldTypes");
+                entity.NotCollectiable();
             });
         }
 
@@ -1769,6 +1793,7 @@ namespace VitalChoice.Ecommerce.Context
             builder.Entity<AppOption>().Property(p => p.OptionValue).HasMaxLength(250);
             builder.Entity<AppOption>().Ignore(f => f.Id);
             builder.Entity<AppOption>().ToTable("AppOptions");
+            builder.Entity<AppOption>().NotCollectiable();
         }
     }
 }

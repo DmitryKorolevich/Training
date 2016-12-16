@@ -22,7 +22,7 @@ using VitalChoice.Caching.Debuging;
 
 namespace VitalChoice.Caching.Services
 {
-    public class EntityInfoStorage : IEntityInfoStorage
+    public class EntityInfoStorage : IEntityInfoStorage, IDisposable
     {
         protected readonly IOptions<AppOptionsBase> Options;
         private readonly ILoggerFactory _loggerFactory;
@@ -31,7 +31,7 @@ namespace VitalChoice.Caching.Services
         private Dictionary<Type, EntityInfo> _entityInfos;
         private readonly HashSet<Type> _parsedEntities = new HashSet<Type>();
         private static readonly object SyncRoot = new object();
-        private IEntityCollectorInfo _gcCollector;
+        private EntityCollector _gcCollector;
 
         public EntityInfoStorage(IOptions<AppOptionsBase> options, ILoggerFactory loggerFactory, IContextTypeContainer contextTypeContainer)
         {
@@ -75,6 +75,8 @@ namespace VitalChoice.Caching.Services
                         parsed.Add(entityType.ClrType);
                         entityInfos.AddOrUpdate(entityType.ClrType, () => new EntityInfo
                         {
+                            CanCollect =
+                                entityType.GetAnnotations().All(a => a.Name != EntityBuilderExtensions.NotCollectiableAnnotationName),
                             EntityType = entityType.ClrType,
                             EfPrimaryKey = entityType.FindPrimaryKey(),
                             NonUniqueIndexes = nonUniqueIndexes,
@@ -85,6 +87,8 @@ namespace VitalChoice.Caching.Services
                             CacheCondition = cacheCondition
                         }, info =>
                         {
+                            info.CanCollect =
+                                entityType.GetAnnotations().All(a => a.Name != EntityBuilderExtensions.NotCollectiableAnnotationName);
                             info.EntityType = entityType.ClrType;
                             info.EfPrimaryKey = entityType.FindPrimaryKey();
                             if (info.ForeignKeys == null)
@@ -153,12 +157,13 @@ namespace VitalChoice.Caching.Services
                 entityType.GetIndexes()
                     .Where(
                         index =>
-                            index.IsUnique && index.GetAnnotations().Any(a => a.Name == EntityBuilderExtensions.UniqueIndexAnnotationName));
+                            index.IsUnique &&
+                            index.GetAnnotations().Any(a => a.Name == EntityBuilderExtensions.UniqueIndexAnnotationName));
 
             var uniqueIndex =
                 indexes.Select(
-                    index =>
-                        new EntityCacheableIndexInfo(CreateValueInfos(index.Properties)))
+                        index =>
+                                new EntityCacheableIndexInfo(CreateValueInfos(index.Properties)))
                     .FirstOrDefault();
             return uniqueIndex;
         }
@@ -278,10 +283,10 @@ namespace VitalChoice.Caching.Services
                 return info;
             }));
             relationalReferences.ForEach(external => entityInfos.AddOrUpdate(external.Key, () => new EntityInfo
-            {
-                RelationReferences =
-                    new Dictionary<string, EntityRelationalReferenceInfo> {{external.Value.Key, external.Value.Value}}
-            },
+                {
+                    RelationReferences =
+                        new Dictionary<string, EntityRelationalReferenceInfo> {{external.Value.Key, external.Value.Value}}
+                },
                 info =>
                 {
                     if (info.RelationReferences == null)
@@ -343,13 +348,13 @@ namespace VitalChoice.Caching.Services
 
         public object GetEntity(Type entityType, ICollection<EntityValueExportable> keyValues, IServiceScopeFactory rootScope)
         {
-            var caller = (IGetEntityCaller) Activator.CreateInstance(typeof (GetEntityCaller<>).MakeGenericType(entityType), this);
+            var caller = (IGetEntityCaller) Activator.CreateInstance(typeof(GetEntityCaller<>).MakeGenericType(entityType), this);
             return caller.GetEntity(keyValues, rootScope);
         }
 
         public object GetEntity(Type entityType, EntityKey pk, IServiceScopeFactory rootScope)
         {
-            var caller = (IGetEntityCaller)Activator.CreateInstance(typeof(GetEntityCaller<>).MakeGenericType(entityType), this);
+            var caller = (IGetEntityCaller) Activator.CreateInstance(typeof(GetEntityCaller<>).MakeGenericType(entityType), this);
             return caller.GetEntity(pk, rootScope);
         }
 
@@ -381,13 +386,13 @@ namespace VitalChoice.Caching.Services
 
         public bool GetEntityInfo<T>(out EntityInfo info)
         {
-            return _entityInfos.TryGetValue(typeof (T), out info);
+            return _entityInfos.TryGetValue(typeof(T), out info);
         }
 
         public Type GetContextType<T>()
         {
             EntityInfo info;
-            if (_entityInfos.TryGetValue(typeof (T), out info))
+            if (_entityInfos.TryGetValue(typeof(T), out info))
             {
                 return info.ContextType;
             }
@@ -491,7 +496,7 @@ namespace VitalChoice.Caching.Services
         public EntityPrimaryKeyInfo GetPrimaryKeyInfo<T>()
         {
             EntityInfo entityInfo;
-            if (_entityInfos.TryGetValue(typeof (T), out entityInfo))
+            if (_entityInfos.TryGetValue(typeof(T), out entityInfo))
             {
                 return entityInfo.PrimaryKey;
             }
@@ -501,7 +506,7 @@ namespace VitalChoice.Caching.Services
         public EntityCacheableIndexInfo GetIndexInfo<T>()
         {
             EntityInfo entityInfo;
-            if (_entityInfos.TryGetValue(typeof (T), out entityInfo))
+            if (_entityInfos.TryGetValue(typeof(T), out entityInfo))
             {
                 return entityInfo.CacheableIndex;
             }
@@ -511,7 +516,7 @@ namespace VitalChoice.Caching.Services
         public ICollection<EntityConditionalIndexInfo> GetConditionalIndexInfos<T>()
         {
             EntityInfo entityInfo;
-            if (_entityInfos.TryGetValue(typeof (T), out entityInfo))
+            if (_entityInfos.TryGetValue(typeof(T), out entityInfo))
             {
                 return entityInfo.ConditionalIndexes;
             }
@@ -521,7 +526,7 @@ namespace VitalChoice.Caching.Services
         public ICollection<EntityForeignKeyInfo> GetForeignKeyInfos<T>()
         {
             EntityInfo entityInfo;
-            if (_entityInfos.TryGetValue(typeof (T), out entityInfo))
+            if (_entityInfos.TryGetValue(typeof(T), out entityInfo))
             {
                 return entityInfo.ForeignKeys;
             }
@@ -531,7 +536,7 @@ namespace VitalChoice.Caching.Services
         public ICollection<EntityCacheableIndexInfo> GetNonUniqueIndexInfos<T>()
         {
             EntityInfo entityInfo;
-            if (_entityInfos.TryGetValue(typeof (T), out entityInfo))
+            if (_entityInfos.TryGetValue(typeof(T), out entityInfo))
             {
                 return entityInfo.NonUniqueIndexes;
             }
@@ -541,7 +546,7 @@ namespace VitalChoice.Caching.Services
         public ICollection<KeyValuePair<Type, EntityCacheableIndexRelationInfo>> GetDependentTypes<T>()
         {
             EntityInfo entityInfo;
-            if (_entityInfos.TryGetValue(typeof (T), out entityInfo))
+            if (_entityInfos.TryGetValue(typeof(T), out entityInfo))
             {
                 return entityInfo.DependentTypes;
             }
@@ -590,21 +595,16 @@ namespace VitalChoice.Caching.Services
 
         public IEnumerable<Type> TrackedTypes => _entityInfos.Keys;
 
-        public bool CanAddUpCache()
-        {
-            return _gcCollector.CanAddUpCache();
-        }
-
         private static Expression GetConditionalExpression<T>(EntityKey pk, out ParameterExpression parameter) where T : class
         {
-            parameter = Expression.Parameter(typeof (T));
+            parameter = Expression.Parameter(typeof(T));
             Expression conditionalExpression = null;
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var keyValue in pk.Values)
             {
                 var part =
                     Expression.Equal(
-                        Expression.MakeMemberAccess(parameter, typeof (T).GetRuntimeProperty(keyValue.ValueInfo.Name)),
+                        Expression.MakeMemberAccess(parameter, typeof(T).GetRuntimeProperty(keyValue.ValueInfo.Name)),
                         Expression.Constant(keyValue.Value.GetValue()));
                 conditionalExpression = conditionalExpression == null ? part : Expression.AndAlso(conditionalExpression, part);
             }
@@ -664,14 +664,14 @@ namespace VitalChoice.Caching.Services
         private static Expression GetConditionalExpression<T>(IEnumerable<EntityValueExportable> keyValues,
             out ParameterExpression parameter) where T : class
         {
-            parameter = Expression.Parameter(typeof (T));
+            parameter = Expression.Parameter(typeof(T));
             Expression conditionalExpression = null;
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var keyValue in keyValues)
             {
                 var part =
                     Expression.Equal(
-                        Expression.MakeMemberAccess(parameter, typeof (T).GetRuntimeProperty(keyValue.Name)),
+                        Expression.MakeMemberAccess(parameter, typeof(T).GetRuntimeProperty(keyValue.Name)),
                         Expression.Constant(keyValue.Value));
                 conditionalExpression = conditionalExpression == null ? part : Expression.AndAlso(conditionalExpression, part);
             }
@@ -711,5 +711,7 @@ namespace VitalChoice.Caching.Services
             public IEnumerable<object> GetEntities(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope)
                 => _infoStorage.GetEntities<T>(pks, rootScope);
         }
+
+        public void Dispose() => _gcCollector.Dispose();
     }
 }

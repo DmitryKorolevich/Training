@@ -68,26 +68,20 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<LocalizationItem>(entity =>
             {
                 entity.HasKey(p => new {p.GroupId, p.ItemId});
-            });
-
-            builder.Entity<LocalizationItemData>(entity =>
-            {
-                entity.HasKey(p => new {p.GroupId, p.ItemId, p.CultureId});
-            });
-
-            builder.Entity<LocalizationItem>(entity =>
-            {
                 entity
                     .HasMany(p => p.LocalizationItemDatas)
                     .WithOne(p => p.LocalizationItem)
                     .HasForeignKey(p => new {p.GroupId, p.ItemId})
                     .HasPrincipalKey(p => new {p.GroupId, p.ItemId});
                 entity.Ignore(x => x.Id);
+                entity.NotCollectiable();
             });
 
             builder.Entity<LocalizationItemData>(entity =>
             {
+                entity.HasKey(p => new {p.GroupId, p.ItemId, p.CultureId});
                 entity.Ignore(x => x.Id);
+                entity.NotCollectiable();
             });
 
 
@@ -105,6 +99,7 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(p => p.Id);
                 entity.ToTable("ContentTypes");
+                entity.NotCollectiable();
             });
 
 
@@ -538,6 +533,7 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(p => p.Id);
                 entity.ToTable("AppSettings");
+                entity.NotCollectiable();
             });
 
 

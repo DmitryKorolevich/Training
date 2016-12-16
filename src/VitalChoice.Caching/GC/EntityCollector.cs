@@ -5,12 +5,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
-using VitalChoice.Caching.Relational;
 using VitalChoice.Ecommerce.Domain.Options;
 
 namespace VitalChoice.Caching.GC
 {
-    public class EntityCollector : IEntityCollectorInfo, IDisposable
+    public class EntityCollector : IDisposable
     {
         private readonly ManualResetEvent _disposingEvent = new ManualResetEvent(false);
         private readonly IEntityInfoStorage _entityInfoStorage;
@@ -34,11 +33,6 @@ namespace VitalChoice.Caching.GC
             _thread.Start();
         }
 
-        public bool CanAddUpCache()
-        {
-            return System.GC.GetTotalMemory(false) < _maxSize;
-        }
-
         ~EntityCollector()
         {
             Dispose();
@@ -60,10 +54,6 @@ namespace VitalChoice.Caching.GC
                     {
                         continue;
                     }
-                    if (System.GC.GetTotalMemory(true) < _maxSize)
-                    {
-                        continue;
-                    }
                     var now = DateTime.Now;
                     foreach (var entityType in _entityInfoStorage.TrackedTypes)
                     {
@@ -71,6 +61,10 @@ namespace VitalChoice.Caching.GC
                             continue;
 
                         var internalCache = _cacheFactory.GetCache(entityType);
+                        
+                        if (!internalCache.EntityInfo.CanCollect)
+                            continue;
+
                         foreach (var cache in internalCache.GetAllCaches())
                         {
                             lock (cache)
@@ -79,7 +73,7 @@ namespace VitalChoice.Caching.GC
                                 {
                                     foreach (
                                         var cached in cache.GetAllUntyped().Where(entity => now - entity.CreatedDate < _latestTimeFrame)
-                                        )
+                                    )
                                     {
                                         using (cached.Lock())
                                         {
@@ -93,7 +87,7 @@ namespace VitalChoice.Caching.GC
                                 {
                                     foreach (
                                         var cached in cache.GetAllUntyped().Where(entity => now - entity.CreatedDate < _latestTimeFrame)
-                                        )
+                                    )
                                     {
                                         using (cached.Lock())
                                         {
@@ -107,6 +101,7 @@ namespace VitalChoice.Caching.GC
                             }
                         }
                     }
+                    System.GC.Collect();
                 }
                 catch (Exception e)
                 {

@@ -435,11 +435,6 @@ namespace VitalChoice.Caching.Services.Cache
             CacheStorage.Dispose();
         }
 
-        public bool CanAddUpCache()
-        {
-            return CacheFactory.CanAddUpCache();
-        }
-
         private ICollection<EntityKey> MarkForAddInternal<TItem>(ICollection<TItem> entities, object dbContext)
         {
             List<EntityKey> pks = new List<EntityKey>();

@@ -7,7 +7,7 @@ using VitalChoice.Ecommerce.Domain;
 
 namespace VitalChoice.Caching.Interfaces
 {
-    public interface IInternalEntityCacheFactory: IEntityCollectorInfo
+    public interface IInternalEntityCacheFactory
     {
         bool CanCache(Type entityType);
         bool CacheExist(Type entityType);

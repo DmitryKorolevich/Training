@@ -8,7 +8,7 @@ using VitalChoice.Caching.Services.Cache.Base;
 
 namespace VitalChoice.Caching.Interfaces
 {
-    public interface IEntityInfoStorage: IEntityCollectorInfo
+    public interface IEntityInfoStorage
     {
         void Initialize(DbContext context);
 

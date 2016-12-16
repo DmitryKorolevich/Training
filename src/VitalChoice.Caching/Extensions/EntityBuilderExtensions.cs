@@ -9,6 +9,7 @@ namespace VitalChoice.Caching.Extensions
 {
     public static class EntityBuilderExtensions
     {
+        public const string NotCollectiableAnnotationName = "NotCollectible";
         public const string NonCachedAnnotationName = "NonCachedAnnotation";
         public const string UniqueIndexAnnotationName = "CacheUniqueIndexAnnotation";
         public const string ConditionallyUniqueIndexAnnotationName = "CacheIndexUniquenessCondition";
@@ -38,6 +39,12 @@ namespace VitalChoice.Caching.Extensions
             where T : class
         {
             return typeBuilder.HasAnnotation(NonCachedAnnotationName, typeof(T));
+        }
+
+        public static EntityTypeBuilder<T> NotCollectiable<T>(this EntityTypeBuilder<T> typeBuilder)
+            where T : class
+        {
+            return typeBuilder.HasAnnotation(NotCollectiableAnnotationName, typeof(T));
         }
 
         public static IndexBuilder CacheUniqueIndex<T>(this EntityTypeBuilder<T> typeBuilder, Expression<Func<T, object>> index)

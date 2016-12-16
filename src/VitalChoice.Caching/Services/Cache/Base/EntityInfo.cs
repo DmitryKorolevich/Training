@@ -8,6 +8,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
 {
     public class EntityInfo
     {
+        public bool CanCollect;
         public Type EntityType;
         public IKey EfPrimaryKey;
         public IDictionary<string, EntityRelationalReferenceInfo> RelationReferences;
