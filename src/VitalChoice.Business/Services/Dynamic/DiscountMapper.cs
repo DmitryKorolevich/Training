@@ -114,6 +114,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         a.To = b.To;
                         a.Amount = b.Amount;
                         a.Percent = b.Percent;
+                        a.IdDiscountType = b.IdDiscountType;
                     });
 
                     if (entity.IdObjectType != (int) DiscountType.Tiered)

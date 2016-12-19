@@ -226,15 +226,13 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
                 throw new ArgumentNullException(nameof(main));
             if (toSearchIn != null)
             {
-                foreach (var mainItem in main)
+                Dictionary<TKey, T> searchIn = toSearchIn.ToDictionary(keySelector);
+                foreach (var m in main)
                 {
-                    foreach (var newItem in toSearchIn)
+                    T item;
+                    if (searchIn.TryGetValue(keySelector(m), out item))
                     {
-                        if (keySelector(mainItem).Equals(keySelector(newItem)))
-                        {
-                            updateAction(mainItem, newItem);
-                            break;
-                        } 
+                        updateAction(m, item);
                     }
                 }
             }
