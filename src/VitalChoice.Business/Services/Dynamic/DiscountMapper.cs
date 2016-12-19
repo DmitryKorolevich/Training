@@ -108,7 +108,13 @@ namespace VitalChoice.Business.Services.Dynamic
                 }
                 if (dynamic.DiscountTiers != null)
                 {
-                    entity.DiscountTiers.MergeKeyed(dynamic.DiscountTiers, p=>p.Id);
+                    entity.DiscountTiers.MergeKeyed(dynamic.DiscountTiers, p => p.Id, (a, b) =>
+                    {
+                        a.From = b.From;
+                        a.To = b.To;
+                        a.Amount = b.Amount;
+                        a.Percent = b.Percent;
+                    });
 
                     if (entity.IdObjectType != (int) DiscountType.Tiered)
                     {
