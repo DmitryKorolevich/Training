@@ -108,7 +108,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 }
                 if (dynamic.DiscountTiers != null)
                 {
-                    entity.DiscountTiers.MergeKeyed(dynamic.DiscountTiers, p => p.Id, (a, b) =>
+                    entity.DiscountTiers.UpdateRemoveKeyed(dynamic.DiscountTiers.Where(p=>p.Id!=0).ToList(), p => p.Id, (a, b) =>
                     {
                         a.From = b.From;
                         a.To = b.To;
@@ -116,6 +116,7 @@ namespace VitalChoice.Business.Services.Dynamic
                         a.Percent = b.Percent;
                         a.IdDiscountType = b.IdDiscountType;
                     });
+                    entity.DiscountTiers.AddRange(dynamic.DiscountTiers.Where(p => p.Id == 0));
 
                     if (entity.IdObjectType != (int) DiscountType.Tiered)
                     {
