@@ -220,19 +220,21 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
         }
 
         public static void UpdateKeyed<T, TKey>(this ICollection<T> main, IEnumerable<T> toSearchIn,
-            Func<T, TKey> keySelector, Action<T, T> updateAction)
+            Func<T, TKey> keySelector, Action<T, T> updateAction) 
         {
             if (main == null)
                 throw new ArgumentNullException(nameof(main));
             if (toSearchIn != null)
             {
-                Dictionary<TKey, T> searchIn = toSearchIn.ToDictionary(keySelector);
-                foreach (var m in main)
+                foreach (var mainItem in main)
                 {
-                    T item;
-                    if (searchIn.TryGetValue(keySelector(m), out item))
+                    foreach (var newItem in toSearchIn)
                     {
-                        updateAction(m, item);
+                        if (keySelector(mainItem).Equals(keySelector(newItem)))
+                        {
+                            updateAction(mainItem, newItem);
+                            break;
+                        } 
                     }
                 }
             }
