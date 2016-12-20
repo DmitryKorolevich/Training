@@ -560,7 +560,7 @@ $(function () {
 	    });
 	};
 
-	$(".top-menu > li").click(function ()
+	$(".top-menu > li").click(function (event)
 	{
 	    if (!$(event.target).closest('.dropdown_2columns').length)
 	    {
@@ -573,6 +573,11 @@ $(function () {
 	    }
 	});
 
+	$(".top-menu > li > a").click(function (event)
+	{
+	    event.preventDefault();
+	});
+
 	$(document).click(function (event)
 	{
 	    if (!$(event.target).closest('.top-menu').length)
@@ -581,7 +586,7 @@ $(function () {
 	    }
 	});
 
-	$(".top-menu > li .close-button").click(function (e)
+	$(".top-menu > li .close-button").click(function (event)
 	{
 	    $(".top-menu > li").removeClass("opened");
 	    event.stopPropagation();
