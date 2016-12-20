@@ -132,7 +132,7 @@ namespace VitalChoice.Business.Services.Bronto
                     {
                         using (var reader = new StreamReader(responseStream))
                         {
-                            await reader.ReadToEndAsync();
+                            var result = await reader.ReadToEndAsync();
                         }
                         return true;
                     }
@@ -144,6 +144,47 @@ namespace VitalChoice.Business.Services.Bronto
             }
             return false;
         }
+
+        public async Task<bool> SubscribeArticles(string email)
+        {
+            if (!email.IsValidEmail())
+                return false;
+
+            try
+            {
+                HttpWebRequest request =
+                    (HttpWebRequest)WebRequest.Create(_brontoSettings.PublicFormUrl);
+                string toSend =
+                    _brontoSettings.PublicFormArticlesSubscribeData +
+                    email;
+                request.Method = "POST";
+                request.ContentType = "application/x-www-form-urlencoded";
+                using (var stream = await request.GetRequestStreamAsync())
+                {
+                    using (var writer = new StreamWriter(stream))
+                    {
+                        await writer.WriteAsync(toSend);
+                    }
+
+                    WebResponse response = await request.GetResponseAsync();
+                    var responseStream = response.GetResponseStream();
+                    if (responseStream != null)
+                    {
+                        using (var reader = new StreamReader(responseStream))
+                        {
+                            var result = await reader.ReadToEndAsync();
+                        }
+                        return true;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.ToString());
+            }
+            return false;
+        }
+
 
         public async Task<bool> Unsubscribe(string email)
         {

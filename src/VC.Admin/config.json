@@ -97,7 +97,8 @@
       "ApiUrl": "https://api.bronto.com/v4",
       "PublicFormUrl": "http://news.vitalchoice.com/public/webform/process/",
       "PublicFormSendData": "fid=hmgt3y8oy6qmzpv2rh4j51zg5l7tu&sid=09dcaffa5c9971f4be87813780496171&delid=&subid=&36429%5B338758%5D=true&36423=",
-      "PublicFormSubscribeData": "fid=0tfbcxet2mwy7gfrsgmrq6hlovv9n&sid=09dcaffa5c9971f4be87813780496171&delid=&subid=&73567%5B18487127%5D=true&73323="
+      "PublicFormSubscribeData": "fid=0tfbcxet2mwy7gfrsgmrq6hlovv9n&sid=09dcaffa5c9971f4be87813780496171&delid=&subid=&73567%5B18487127%5D=true&73323=",
+      "PublicFormArticlesSubscribeData": "fid=4888hjjdrsep9whycaouz1s1pupj2&sid=09dcaffa5c9971f4be87813780496171&delid=&subid=&85701%5B18878097%5D=true&85695="
     },
     "Twitter": {
       "ConsumerKey": "CZMIK5M6cuqmgz4vovfaXQ",

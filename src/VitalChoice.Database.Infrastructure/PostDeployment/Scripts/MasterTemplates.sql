@@ -601,176 +601,6 @@ END
 
 GO
 
-IF NOT EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Article Individual - 2016 2 Column Layout')
-BEGIN
-
-	INSERT [dbo].[MasterContentItems]
-	(Name,TypeId,Created,Updated,StatusCode,IdEditedBy, Template)
-	VALUES
-	('Article Individual - 2016 2 Column Layout',4, getdate(),getdate(), 2, NULL,
-	'@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Articles}}
-@using() {{System.Collections.Generic}}
-@model() {{dynamic}}
-
-<%
-
-<center>
-{{
-	<div class="center-content-pane article printable">
-	    @if(@!string.IsNullOrEmpty(model.Model.FileUrl))
-        {{
-            <div>
-                <img class="main-img" src="@(@model.Model.FileUrl)"/>
-            </div>
-        }}
-        <div class="top-section">
-            <span class="title">@(@model.Model.Name)</span>
-            <br/>
-            <span class="sub-title">@(@model.Model.SubTitle)</span>
-            <br/>
-            <br/>
-            <span class="date">@date(@model.Model.PublishedDate) {{MM''/''dd''/''yyyy}}</span>
-            <span class="author">@(@model.Model.Author)</span>
-            <div class="icons-bar not-printable">
-        	    <a target="_blank" href="http://www.facebook.com/sharer.php?u=@(@model.ViewContext.AbsoluteUrl)&t=@(@model.Model.Name)" class="margin-right-medium small-window-open-link">
-                    <img src="/assets/images/articles/facebook.jpg">
-                </a>
-                <a target="_blank" href="http://twitter.com/share?text=@(@model.Model.Name)&url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
-                    <img src="/assets/images/articles/twitter.jpg">
-                </a>
-                <a target="_blank" href="https://plus.google.com/share?url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
-                    <img src="/assets/images/articles/google.jpg">
-                </a>
-                <a href="#" data-content-type="1" data-title="Email Article" data-content-name="@(@model.Model.Name)" data-absolute-url="@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium email-button">
-                    <img src="/assets/images/articles/email.jpg">
-                </a>
-                <a target="_blank" href="#" class="print-button margin-right-medium">
-                    <img src="/assets/images/articles/print.jpg">
-                </a>
-                <a href="http://www.addthis.com/bookmark.php?v=300&pubid=xa-509854151b0dec32" class="small-window-open-link">
-                    <img src="/assets/images/articles/more.jpg">
-                </a>
-            </div>
-        </div>
-        <div class="body">   
-            @(@model.Model.ContentItem.Description)
-        </div>
-	</div>
-}}
-
-<right_top>
-{{
-	@if(ArticleBonusLink){{
-    <div class="right-wrapper">
-        <a href="@(ArticleBonusLink.Url)"><img src="/assets/images/articles/bonuses.jpg"></a>
-    </div>
-    }}
-    <div class="right-wrapper">
-        <a href="/products/top-sellers"><img src="/assets/images/articles/top-sellers.jpg"></a>
-    </div>
-    <div class="right-wrapper newsletter-block">
-        <div class="header">Vital Choices Newsletter</div>
-        <div class="body">
-            <span>
-                Sign-up for special offers, recipes, nutrition and eco news
-            </span>
-            <br>
-            <div class="input-wrapper">
-                <form method="post" name="search" onsubmit="return brontoSignupValidateEmail(event)" action="https://app.bronto.com/public/webform/process/">
-                		<input type="hidden" value="98fbmg41k7lrzlevfi29oph85r7l8" name="fid"/>
-    					<input type="hidden" value="09dcaffa5c9971f4be87813780496171" name="sid"/>
-    					<input type="hidden" value="" name="delid"/>
-    					<input type="hidden" value="" name="subid"/>
-                        <input type="hidden" name="td" value="">
-                        <input type="hidden" name="formtype" value="addcontact">
-    					<input type="hidden" value="true" name="74699[291714]"/>
-                        <input type="text" name="74686" autocomplete="off" class="bronto-email" placeholder="Enter email here">
-                        <input class="yellow" type="submit" value="Go">
-                        <div class="sugnup-bubble" style="left:-82px;">
-                            Please enter a valid email address
-                        </div>
-                    </form>
-            </div>
-            <a href="http://hosting-source.bm23.com/26468/public/PAGES/VC-NEWS-2-4-13-A.html" target="_blank">Recent Issues</a>
-        </div>
-    </div>
-    <a class="block-link" href="/articles">
-        <div class="right-wrapper more-articles">
-            More Articles >
-        </div>
-    </a>
-}}
-
-<right_recent_articles>
-{{
-    <strong>RECENT ARTICLES</strong>
-    <br/>
-    <br/>
-    @list(@model)
-    {{
-        <a href="@(Url)">@(Name)</a>
-        <br/>
-        <br/>
-    }}
-}}
-
-<right_recent_recipes>
-{{
-    @list(@model)
-    {{
-        <a href="@(Url)">@(Name)</a>
-        <br/>
-        <br/>
-    }}
-}}
-
-<right>
-{{
-	<div class="right-content-pane">
-    	@right_top()
-	</div>
-}}
-
-<default> -> ()
-{{
-    @script(){{
-        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-        <script src="/app/modules/help/sendContentUrlNotification.js"></script>
-    }}
-    @if(@model.Model.FileUrl!=null){{
-        @socialmeta(){{
-            <meta property="og:image" content="https://@(@root.AppOptions.PublicHost)@(@model.Model.FileUrl)">
-            <meta itemprop="image" content="https://@(@root.AppOptions.PublicHost)@(@model.Model.FileUrl)" />
-            <link rel="image_src" href="https://@(@root.AppOptions.PublicHost)@(@model.Model.FileUrl)" />
-        }}
-    }}
-    <div class="working-area-holder content-page article-page-2-column">
-        <div class="header-block">
-            <img usemap="#ArticleHeader" src="/assets/images/articles/article-page-header.jpg">
-            <map name="ArticleHeader" id="ArticleHeader">
-			    <area shape="rect" coords="780,22,808,50" href="https://www.youtube.com/user/VitalChoiceSeafood" alt="Youtube" target="_blank">
-				<area shape="rect" coords="814,22,842,50" href="https://pinterest.com/vitalchoice/" alt="Pintrest" target="_blank">
-				<area shape="rect" coords="848,22,876,50" href="https://www.facebook.com/vitalchoice" alt="Facebook" target="_blank">
-				<area shape="rect" coords="882,22,910,50" href="https://twitter.com/vitalchoice" alt="Twitter" target="_blank">
-			</map>
-        </div>
-    	@center()
-    	@right()
-	</div>
-}}
-%>')
-
-	INSERT MasterContentItemsToContentProcessors
-	(MasterContentItemId,ContentProcessorId)
-	VALUES
-	((SELECT TOP 1 Id FROM MasterContentItems WHERE Name = 'Article Individual - 2016 2 Column Layout')
-	,(SELECT TOP 1 Id FROM ContentProcessors WHERE Type = 'ArticleBonusLinkProcessor'))
-
-
-END
-
-GO
-
 IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Product sub categories' AND Updated<'2016-10-29 00:00:00.000')
 BEGIN
 
@@ -977,6 +807,800 @@ BEGIN
 }}:: TtlCategoryModel 
 %>'
 	WHERE Name = 'Product sub categories'
+
+END
+
+GO
+
+
+
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Article Individual - 2016 2 Column Layout' AND Updated<'2016-12-20 00:00:00.000')
+BEGIN
+
+	UPDATE [dbo].[MasterContentItems]
+	SET Template = '@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Articles}}
+@using() {{System.Collections.Generic}}
+@model() {{dynamic}}
+
+<%
+
+<center>
+{{
+	<div class="center-content-pane article printable">
+	    @if(@!string.IsNullOrEmpty(model.Model.FileUrl))
+        {{
+            <div>
+                <img class="main-img" src="@(@model.Model.FileUrl)"/>
+            </div>
+        }}
+        <div class="top-section">
+            <span class="title">@(@model.Model.Name)</span>
+            <br/>
+            <span class="sub-title">@(@model.Model.SubTitle)</span>
+            <br/>
+            <br/>
+            <span class="date">@date(@model.Model.PublishedDate) {{MM''/''dd''/''yyyy}}</span>
+            <span class="author">@(@model.Model.Author)</span>
+            <div class="icons-bar not-printable">
+        	    <a target="_blank" href="http://www.facebook.com/sharer.php?u=@(@model.ViewContext.AbsoluteUrl)&t=@(@model.Model.Name)" class="margin-right-medium small-window-open-link">
+                    <img src="/assets/images/articles/facebook.jpg">
+                </a>
+                <a target="_blank" href="http://twitter.com/share?text=@(@model.Model.Name)&url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
+                    <img src="/assets/images/articles/twitter.jpg">
+                </a>
+                <a target="_blank" href="https://plus.google.com/share?url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
+                    <img src="/assets/images/articles/google.jpg">
+                </a>
+                <a href="#" data-content-type="1" data-title="Email Article" data-content-name="@(@model.Model.Name)" data-absolute-url="@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium email-button">
+                    <img src="/assets/images/articles/email.jpg">
+                </a>
+                <a target="_blank" href="#" class="print-button margin-right-medium">
+                    <img src="/assets/images/articles/print.jpg">
+                </a>
+                <a href="http://www.addthis.com/bookmark.php?v=300&pubid=xa-509854151b0dec32" class="small-window-open-link">
+                    <img src="/assets/images/articles/more.jpg">
+                </a>
+            </div>
+        </div>
+        <div class="body">   
+            @(@model.Model.ContentItem.Description)
+        </div>
+	</div>
+}}
+
+<right_top>
+{{
+	@if(ArticleBonusLink){{
+    <div class="right-wrapper">
+        <a href="@(ArticleBonusLink.Url)"><img src="/assets/images/articles/bonuses.jpg"></a>
+    </div>
+    }}
+    <div class="right-wrapper">
+        <a href="/products/top-sellers"><img src="/assets/images/articles/top-sellers.jpg"></a>
+    </div>
+    <div class="right-wrapper newsletter-block">
+        <div class="header">Vital Choices Newsletter</div>
+        <div class="body">
+            <span>
+                Sign-up for special offers, recipes, nutrition and eco news
+            </span>
+            <br>
+            <div class="input-wrapper">
+                <form method="post" name="search" onsubmit="return brontoSignupValidateEmail(event)" action="https://app.bronto.com/public/webform/process/">
+                		<input type="hidden" value="98fbmg41k7lrzlevfi29oph85r7l8" name="fid"/>
+    					<input type="hidden" value="09dcaffa5c9971f4be87813780496171" name="sid"/>
+    					<input type="hidden" value="" name="delid"/>
+    					<input type="hidden" value="" name="subid"/>
+                        <input type="hidden" name="td" value="">
+                        <input type="hidden" name="formtype" value="addcontact">
+    					<input type="hidden" value="true" name="74699[291714]"/>
+                        <input type="text" name="74686" autocomplete="off" class="bronto-email" placeholder="Enter email here">
+                        <input class="yellow" type="submit" value="Go">
+                        <div class="sugnup-bubble" style="left:-82px;">
+                            Please enter a valid email address
+                        </div>
+                    </form>
+            </div>
+            <a href="http://hosting-source.bm23.com/26468/public/PAGES/VC-NEWS-2-4-13-A.html" target="_blank">Recent Issues</a>
+        </div>
+    </div>
+    <a class="block-link" href="/articles">
+        <div class="right-wrapper more-articles">
+            More Articles >
+        </div>
+    </a>
+}}
+
+<right_recent_articles>
+{{
+    <strong>RECENT ARTICLES</strong>
+    <br/>
+    <br/>
+    @list(@model)
+    {{
+        <a href="@(Url)">@(Name)</a>
+        <br/>
+        <br/>
+    }}
+}}
+
+<right_recent_recipes>
+{{
+    @list(@model)
+    {{
+        <a href="@(Url)">@(Name)</a>
+        <br/>
+        <br/>
+    }}
+}}
+
+<right>
+{{
+	<div class="right-content-pane">
+    	@right_top()
+	</div>
+}}
+
+<default> -> ()
+{{
+    <style>
+    .center-content-pane.article.printable div.body * {
+    font-family: ''Myriad Pro'', Verdana, Tahoma, Helvetica, Arial, sans-serif !important;
+    font-size:16px !important;
+    line-height: 18px !important;
+    }
+    </style>
+    
+    @script(){{
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        <script src="/app/modules/help/sendContentUrlNotification.js"></script>
+    }}
+    @if(@model.Model.FileUrl!=null){{
+        @socialmeta(){{
+            <meta property="og:image" content="https://@(@root.AppOptions.PublicHost)@(@model.Model.FileUrl)">
+            <meta itemprop="image" content="https://@(@root.AppOptions.PublicHost)@(@model.Model.FileUrl)" />
+            <link rel="image_src" href="https://@(@root.AppOptions.PublicHost)@(@model.Model.FileUrl)" />
+        }}
+    }}
+    <div class="bronto-subscribe-artiles-bottom-wrapper">
+        <form class="bronto-form" onsubmit="return false;">
+            <span>Get special offers, recipes, health news, PLUS our FREE seafood cooking guide!</span>
+            <div class="email-input-container">
+                <input placeholder="Email Address" class="txtEmail bronto-sub-email" type="text" />
+                <div class="bubble">
+                    Please enter a valid email address
+                </div>
+            </div>
+            <a href="javascript:void(0);" class="btnPostEmail">I''m on Board</a>
+            <a class="close-form" href="javascript:void(0);">Hide&nbsp;<img src="/Assets/images/cart/close-button.png" /></a>
+        </form>
+        <div class="bronto-form-success">
+			<span>Got it, thanks! <a class="orange" href="/Assets/miscellaneous/Vital-Choice-In-the-Kitchen-2016.pdf" target="_blank">Click here</a> for your FREE seafood cooking guide & recipes e-booklet.<a class="close-form pull-right margin-right-small" href="javascript:void(0);">Hide&nbsp;<img src="/Assets/images/cart/close-button.png" /></a></span>
+        </div>
+	</div>
+    <div class="working-area-holder content-page article-page-2-column">
+        <div class="header-block">
+            <img usemap="#ArticleHeader" src="/assets/images/articles/article-page-header.jpg">
+            <map name="ArticleHeader" id="ArticleHeader">
+			    <area shape="rect" coords="780,22,808,50" href="https://www.youtube.com/user/VitalChoiceSeafood" alt="Youtube" target="_blank">
+				<area shape="rect" coords="814,22,842,50" href="https://pinterest.com/vitalchoice/" alt="Pintrest" target="_blank">
+				<area shape="rect" coords="848,22,876,50" href="https://www.facebook.com/vitalchoice" alt="Facebook" target="_blank">
+				<area shape="rect" coords="882,22,910,50" href="https://twitter.com/vitalchoice" alt="Twitter" target="_blank">
+			</map>
+        </div>
+    	@center()
+    	@right()
+	</div>
+}}
+%>'
+	WHERE [Name]='Article Individual - 2016 2 Column Layout'
+
+END
+
+GO
+
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Article Sub Category' AND Updated<'2016-12-20 00:00:00.000')
+BEGIN
+
+	UPDATE [dbo].[MasterContentItems]
+	SET Template = '@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Articles}}
+@model() {{dynamic}}
+
+<%
+    
+<left>
+{{
+    @if(@(model.Model.ParentId))
+    {{
+        <strong>@(@model.Model.Name)</strong>
+    }}
+    @ifnot(@(model.Model.ParentId)) {{
+        <strong>Articles by Date</strong>
+    }}
+	<br/>
+	<br/>
+	@list(@(model.Articles.Items))
+    {{
+        <div class="article-line">
+            @if(PublishedDate)
+            {{
+            <div class="date">
+            @date(PublishedDate) {{MM''/''dd''/''yyyy}}
+            </div>
+            }}
+            <a href="@(Url)">@(Name)</a>
+        </div>
+		<br/>
+    }}
+    @if(@!string.IsNullOrEmpty(model.Articles.PreviousLink))
+    {{
+        <a href="@(@model.Articles.PreviousLink)"><< View the previous 50 articles</a>
+    }}
+    @if(@!string.IsNullOrEmpty(model.Articles.NextLink))
+    {{
+        <a class="pull-right" href="@(@model.Articles.NextLink)">View the next 50 articles >></a>
+    }}
+}}
+
+<center>
+{{
+	<span>
+	    <strong>ARTICLES BY TOPIC</strong>&nbsp;
+        @if(@!string.IsNullOrEmpty(model.ShowAllLink)) {{
+	    <a href="@(ShowAllLink)">Show all</a>
+	    }}
+	</span>
+	<br/>
+	<br/>
+	@list(Categories)
+    {{
+        <strong>@(Name)</strong><br/>
+        @if(SubCategories)
+        {{
+            @list(SubCategories)
+            {{
+                <a href="@(Url)">@(Name)</a><br/>
+            }}
+        }}
+        <br/>
+    }}
+}} :: TtlArticleCategoriesModel
+
+<rightwrapper>
+{{
+    <div class="right-wrapper">
+        @out()
+    </div>
+}}
+
+<right>
+{{
+    @rightwrapper(){{
+	    <a href="/content/newsletter-sign-up"><img src="/assets/images/news-baby-spot-8-29-13a-210x157px.png"></a>
+	}}
+	@if(ArticleBonusLink){{
+	@rightwrapper(){{
+	    <a href="@(ArticleBonusLink.Url)"><img src="/assets/images/bonus-tile-10-30-12A.jpg"></a>
+	}}
+	}}
+    @rightwrapper(){{
+	    <a href="/content/the-vital-choice-guarantee"><img src="/assets/images/guarantee-spot-8-29-13-210px.jpg"></a>
+	}}
+}}
+
+<default> -> ()
+{{
+    
+    <div class="bronto-subscribe-artiles-bottom-wrapper">
+        <form class="bronto-form" onsubmit="return false;">
+            <span>Get special offers, recipes, health news, PLUS our FREE seafood cooking guide!</span>
+            <div class="email-input-container">
+                <input placeholder="Email Address" class="txtEmail bronto-sub-email" type="text" />
+                <div class="bubble">
+                    Please enter a valid email address
+                </div>
+            </div>
+            <a href="javascript:void(0);" class="btnPostEmail">I''m on Board</a>
+            <a class="close-form" href="javascript:void(0);">Hide&nbsp;<img src="/Assets/images/cart/close-button.png" /></a>
+        </form>
+        <div class="bronto-form-success">
+			<span>Got it, thanks! <a class="orange" href="/Assets/miscellaneous/Vital-Choice-In-the-Kitchen-2016.pdf" target="_blank">Click here</a> for your FREE seafood cooking guide & recipes e-booklet.<a class="close-form pull-right margin-right-small" href="javascript:void(0);">Hide&nbsp;<img src="/Assets/images/cart/close-button.png" /></a></span>
+        </div>
+	</div>
+    <div class="working-area-holder article-categories-page">
+        <div class="header-block">
+            <img src="/assets/images/article-master-header-10-25-13A.png">
+            <h2>Vital Choices Newsletter Article Archive: find articles by date or topic</h4>
+        </div>
+        <div class="left-content-pane">
+            @left()
+        </div>
+        <div class="center-content-pane">
+    	    @center(ArticleCategories)
+    	</div>
+    	<div class="right-content-pane">
+        	@right()
+    	</div>
+	</div>
+}}
+%>'
+	WHERE [Name]='Article Sub Category'
+
+END
+
+GO
+
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Recipe Individual' AND Updated<'2016-12-20 00:00:00.000')
+BEGIN
+
+	UPDATE [dbo].[MasterContentItems]
+	SET Template = '@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Recipes}}
+@model() {{dynamic}}
+
+<%
+    
+<category>
+{{
+    @if(@model.SubCategories.Count>0)
+    {{
+        <ul class="drop-menu sub-menu collapsed">
+        @list(@model.SubCategories)
+        {{
+            <li>
+                @if(@model.SubCategories.Count>0)
+                {{
+                <a class="trigger" href="#">@(Name)</a>
+                }}
+                @if(@model.SubCategories.Count==0)
+                {{
+                <a href="@(Url)">@(Name)</a>
+                }}
+                @category()
+            </li>
+        }}
+        </ul>
+    }}
+}}
+    
+<left_bottom>
+{{
+    <div>
+        <a href="/content/newsletter-sign-up">
+            <img src="/assets/images/newsletter-recipes-spot-4-2-14-214px-b.png">
+        </a>
+	</div>
+}}
+    
+<left>
+{{
+	<div class="left-content-pane">
+		    <div class="panel left-wrapper">
+        	<div class="sub-title">Chef Recipe Videos</div>
+            <ul class="drop-menu">
+                @list(ChefCategories)
+                {{
+                    <li>
+                        <a class="trigger" href="#">@(Name)</a>
+                        <ul class="drop-menu sub-menu collapsed">
+                        @list(Recipes)
+                        {{
+                            <li>
+                                <a href="@(Url)">@(Name)</a>
+                            </li>
+                        }}
+                        </ul>
+                    </li>
+                }}
+            </ul>
+	    </div>
+	    <div class="panel left-wrapper">
+        	<div class="sub-title">Recipes by Category</div>
+            <ul class="drop-menu">
+                @list(AllCategories)
+                {{
+                    <li>
+                        <a class="trigger" href="#">@(Name)</a>
+                        @category()
+                    </li>
+                }}
+            </ul>
+	    </div>
+        @left_bottom()
+	</div>
+}} :: TtlRecipeCategoriesModel
+
+<center>
+{{
+	<div class="center-content-pane printable">
+        <strong class="title">@(@model.Model.Name)</strong>
+        <br/>
+        <span class="sub-title-italic">@(@model.Model.Subtitle)</span>
+        <br/>
+        <br/>
+            <div class="icons-bar not-printable">
+        	    <a target="_blank" href="http://www.facebook.com/sharer.php?u=@(@model.ViewContext.AbsoluteUrl)&t=@(@model.Model.Name)" class="margin-right-medium small-window-open-link">
+                    <img src="/assets/images/icons/fb.png">
+                    <span>FACEBOOK</span>
+                </a>
+                <a target="_blank" href="http://twitter.com/share?text=@(@model.Model.Name)&url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
+                    <img src="/assets/images/icons/tw.png">
+                    <span>TWITTER</span>
+                </a>
+                <a target="_blank" href="https://plus.google.com/share?url=@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium small-window-open-link">
+                    <img src="/assets/images/icons/g.png">
+                    <span>GOOGLE+</span>
+                </a>
+                <a href="#" data-content-type="2" data-title="Email Recipe" data-content-name="@(@model.Model.Name)" data-absolute-url="@(@model.ViewContext.AbsoluteUrl)" class="margin-right-medium email-button">
+                    <i class="fa fa-envelope"></i>
+                    <span>E-MAIL</span>
+                </a>
+                <a target="_blank" href="http://www.addthis.com/bookmark.php?v=300&pubid=xa-509854151b0dec32" class="margin-right-medium small-window-open-link">
+                    <img src="/assets/images/icons/ad.png">
+                    <span>SHARE</span>
+                </a>
+                <a href="#" class="print-button">
+                    <i class="fa fa-print"></i>
+                    <span>PRINT</span>
+                </a>
+            </div>
+        <div class="body">
+            <div class="margin-bottom-medium">
+                @if(@!string.IsNullOrEmpty(model.Model.YoutubeVideo))
+                {{
+                <div class="video margin-right-small not-printable">
+                <iframe width="470" height="265" src="https://www.youtube.com/embed/@(@model.Model.YoutubeVideo)?rel=0&amp;enablejsapi=1" frameborder="0"></iframe>
+                </div>
+                }}
+                @if(@!string.IsNullOrEmpty(model.Model.AboutChef))
+                {{
+                <div class="panel panel-border chef">
+                    @(Model.AboutChef)
+                </div>
+                }}
+            </div>
+            <div class="description">
+                @(@model.Model.ContentItem.Description)
+            </div>
+            @if(@!string.IsNullOrEmpty(model.Model.Ingredients))
+            {{
+            <div class="part-sub-title margin-bottom-medium margin-top-medium">
+                <div class="text">
+                    Ingredients
+                </div>
+                <div class="hr-wrapper">
+                    <hr/>
+                </div>
+            </div>
+            <div class="clear"></div>
+            @if(@model.Model.CrossSells.Count>0)
+            {{
+            <div class="cross-sell-products-wrapper">
+                <div class="cross-sell-products">
+                    <div class="header">Shop for Key Ingredients</div>
+                    <hr/>
+                    @list(Model.CrossSells){{
+                    <div class="item-line">
+        	            <div class="left-part">
+            	            <a href="@(Url)">
+            	                <img src="@(Image)">
+            	            </a>
+        	            </div>
+        	            <div class="right-part">
+            	            <a href="@(Url)">
+            	                <strong class="cross-sell-title">@(Title)</strong><br/>
+            	                <span class="cross-sell-sub-title">@(Subtitle)</span>
+            	            </a>
+        	            </div>
+    	            </div>
+    	            }}
+                </div>
+            </div>
+            <div class="ingredients cross-sell-products-left-part">
+            }}
+            @ifnot(@model.Model.CrossSells.Count>0)
+            {{
+            <div class="ingredients">
+            }}
+                @(@model.Model.Ingredients)
+            </div>
+            }}
+            @if(@model.Model.CrossSells.Count>0)
+            {{
+            <div class="clear"></div>
+            }}
+            @if(@!string.IsNullOrEmpty(model.Model.Directions))
+            {{
+            <div class="part-sub-title margin-bottom-medium margin-top-medium">
+                <div class="text">
+                    Directions
+                </div>
+                <div class="hr-wrapper">
+                    <hr/>
+                </div>
+            </div>
+            <div class="clear"></div>
+            <div class="directions">
+                @(@model.Model.Directions)
+            </div>
+            }}
+            <div class="part-sub-title margin-bottom-medium margin-top-medium">
+                <div class="text">
+                    Check out these customer favorites
+                </div>
+                <div class="hr-wrapper">
+                    <hr/>
+                </div>
+            </div>
+            <div class="clear"></div>
+            <div class="customer-favorites-section">
+                @list(Model.RelatedRecipes){{
+                    <div class="item">
+                        <a class="content-link" href="@(Url)">
+                            <img src="@(Image)"/>
+                            <div class="item-title">@(Title)</div>
+                        </a>
+                    </div>
+                }}
+            </div>
+        </div>
+	</div>
+}}
+
+<default> -> ()
+{{
+    @script(){{
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        <script src="/app/modules/help/sendContentUrlNotification.js"></script>
+    }}
+    @if(@model.Model.FileUrl!=null){{
+        @socialmeta(){{
+            <meta property="og:image" content="https://@(@root.AppOptions.PublicHost)@(@model.Model.FileUrl)">
+            <meta itemprop="image" content="https://@(@root.AppOptions.PublicHost)@(@model.Model.FileUrl)" />
+            <link rel="image_src" href="https://@(@root.AppOptions.PublicHost)@(@model.Model.FileUrl)" />
+        }}
+    }}
+    <div class="bronto-subscribe-artiles-bottom-wrapper">
+        <form class="bronto-form" onsubmit="return false;">
+            <span>Get special offers, recipes, health news, PLUS our FREE seafood cooking guide!</span>
+            <div class="email-input-container">
+                <input placeholder="Email Address" class="txtEmail bronto-sub-email" type="text" />
+                <div class="bubble">
+                    Please enter a valid email address
+                </div>
+            </div>
+            <a href="javascript:void(0);" class="btnPostEmail">I''m on Board</a>
+            <a class="close-form" href="javascript:void(0);">Hide&nbsp;<img src="/Assets/images/cart/close-button.png" /></a>
+        </form>
+        <div class="bronto-form-success">
+			<span>Got it, thanks! <a class="orange" href="/Assets/miscellaneous/Vital-Choice-In-the-Kitchen-2016.pdf" target="_blank">Click here</a> for your FREE seafood cooking guide & recipes e-booklet.<a class="close-form pull-right margin-right-small" href="javascript:void(0);">Hide&nbsp;<img src="/Assets/images/cart/close-button.png" /></a></span>
+        </div>
+	</div>
+    <div class="working-area-holder content-page recipe-page">
+        <div class="header-block">
+            <img src="/assets/images/itk-header-2015.jpg" />
+        </div>
+        @left(RecipeCategories)
+    	@center()
+	</div>
+}}
+%>'
+	WHERE [Name]='Recipe Individual'
+
+END
+
+GO
+
+IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Recipe Sub Category' AND Updated<'2016-12-20 00:00:00.000')
+BEGIN
+
+	UPDATE [dbo].[MasterContentItems]
+	SET Template = '@using() {{VitalChoice.Infrastructure.Domain.Transfer.TemplateModels.Recipes}}
+@model() {{dynamic}}
+
+<%
+    
+<category>
+{{
+    @if(@model.SubCategories.Count>0)
+    {{
+        <ul class="drop-menu sub-menu collapsed">
+        @list(@model.SubCategories)
+        {{
+            <li>
+                @if(@model.SubCategories.Count>0)
+                {{
+                <a class="trigger" href="#">@(Name)</a>
+                }}
+                @if(@model.SubCategories.Count==0)
+                {{
+                <a href="@(Url)">@(Name)</a>
+                }}
+                @category()
+            </li>
+        }}
+        </ul>
+    }}
+}}
+    
+<left_bottom>
+{{
+    <div>
+        <a href="/content/newsletter-sign-up">
+            <img src="/assets/images/newsletter-recipes-spot-4-2-14-214px-b.png">
+        </a>
+	</div>
+}}
+    
+<left>
+{{
+	<div class="left-content-pane">
+		    <div class="panel left-wrapper">
+        	<div class="sub-title">Chef Recipe Videos</div>
+            <ul class="drop-menu">
+                @list(ChefCategories)
+                {{
+                    <li>
+                        <a class="trigger" href="#">@(Name)</a>
+                        <ul class="drop-menu sub-menu collapsed">
+                        @list(Recipes)
+                        {{
+                            <li>
+                                <a href="@(Url)">@(Name)</a>
+                            </li>
+                        }}
+                        </ul>
+                    </li>
+                }}
+            </ul>
+	    </div>
+	    <div class="panel left-wrapper">
+        	<div class="sub-title">Recipes by Category</div>
+            <ul class="drop-menu">
+                @list(AllCategories)
+                {{
+                    <li>
+                        <a class="trigger" href="#">@(Name)</a>
+                        @category()
+                    </li>
+                }}
+            </ul>
+	    </div>
+        @left_bottom()
+	</div>
+}} :: TtlRecipeCategoriesModel
+
+<center>
+{{
+	<div class="center-content-pane">
+        <strong class="title">
+        @if(@model.Model.ParentId) {{
+		    @(Model.Name)
+		}}
+		@ifnot(@model.Model.ParentId) {{
+		    Recipes by Category
+		}}
+        </strong>
+        <br/>
+        <div class="clear margin-bottom-small"></div>
+        @ifnot(@model.Model.ParentId) {{
+            @list(RecipeCategories.AllCategories){{
+                <div class="categories-group margin-bottom-small">
+    	            <div class="sub-title">@(Name)</div>
+                    @list(SubCategories){{
+                        <a href="@(Url)">@(Name)</a><br/>
+                    }}
+                </div>
+            }}
+        }}
+		@if(@model.Model.ParentId) {{
+		    @if(@model.RecipeCategories.SubCategories.Count>0){{
+		        @list(RecipeCategories.SubCategories){{
+                    <div class="categories-group margin-bottom-small">
+                        <a href="@(Url)">@(Name)</a><br/>
+                    </div>
+                }}
+		    }}
+		    @if(@model.RecipeCategories.SubCategories.Count==0){{
+		        @list(Recipes){{
+		            <div class="margin-bottom-small">
+                        <a href="@(Url)">@(Name)</a><br/>
+                    </div>
+		        }}
+		    }}
+		}}
+	</div>
+}}
+
+
+<right>
+{{
+	<div class="right-content-pane">
+    	<div class="right-wrapper">
+            <a href="/content/in-the-kitchen">
+                <img src="/assets/images/return-to-itk-banner-6-13-2014-blue.png">
+            </a>
+    	</div>
+    	<div class="right-wrapper panel panel-border">
+    	    <div class="sub-title">Seafood Basics</div><br/>
+    	    <div class="seafood-basics">
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="/recipe/how-to-broil-salmon" class="tooltip-v tooltipstered" data-tooltip-title="How to Broil Salmon" data-tooltip-body="Many don&#8217;t realize how incredibly simple it is to broil wild Alaskan silver salmon perfectly, until seeing this short guide by Chef Becky Selengut.">
+        	                <img src="/assets/images/broiling-salmon-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">
+    	                How to Broil Silver Salmon
+    	            </div>
+    	        </div>
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="/recipe/how-to-saut-salmon" class="tooltip-v tooltipstered" data-tooltip-title="How to Saut&eacute; Salmon" data-tooltip-body="Using only seafood marinade and organic olive oil, Chef Becky Selengut shows just how simple it is to cook salmon beautifully in a frying pan.">
+        	                <img src="/assets/images/saute-sockeye-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">
+    	                How to Sauté Sockeye Salmon
+    	            </div>
+    	        </div>
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="/recipe/steamed-wild-halibut" class="tooltip-v tooltipstered" data-tooltip-title="Steamed Wild Halibut" data-tooltip-body="A remarkably simple yet highly sophisticated recipe for wild Alaskan halibut using caviar, spinach, carrots and sesame seeds, by Chef Becky Selengut.">
+        	                <img src="/assets/images/steam-halibut-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">
+    	                How to Steam Halibut
+    	            </div>
+    	        </div>
+    	        <div class="item-line">
+    	            <div class="left-part">
+        	            <a href="/recipe/how-to-clean-spot-prawns" class="tooltip-v tooltipstered" data-tooltip-title="How to Saut&eacute; Salmon" data-tooltip-body="Chef Becky Selengut demystifies the process of cleaning spot prawns, demonstrating how to de-vein and shell these delicacies for cooking.">
+        	                <img src="/assets/images/clean-prawns-video-thumb-6-6-14a.jpg">
+        	            </a>
+    	            </div>
+    	            <div class="right-part captions-block">
+    	                How to Clean Spot Prawns
+    	            </div>
+    	        </div>
+    	    </div>
+    	    <div class="clear"></div>
+        </div>
+    	<div class="right-wrapper">
+	        <a href="#"><img src="/assets/images/new-king-salmon-banner-288px-a.jpg"></a>
+        </div>
+	</div>
+}}
+
+<default> -> ()
+{{
+    <div class="bronto-subscribe-artiles-bottom-wrapper">
+        <form class="bronto-form" onsubmit="return false;">
+            <span>Get special offers, recipes, health news, PLUS our FREE seafood cooking guide!</span>
+            <div class="email-input-container">
+                <input placeholder="Email Address" class="txtEmail bronto-sub-email" type="text" />
+                <div class="bubble">
+                    Please enter a valid email address
+                </div>
+            </div>
+            <a href="javascript:void(0);" class="btnPostEmail">I''m on Board</a>
+            <a class="close-form" href="javascript:void(0);">Hide&nbsp;<img src="/Assets/images/cart/close-button.png" /></a>
+        </form>
+        <div class="bronto-form-success">
+			<span>Got it, thanks! <a class="orange" href="/Assets/miscellaneous/Vital-Choice-In-the-Kitchen-2016.pdf" target="_blank">Click here</a> for your FREE seafood cooking guide & recipes e-booklet.<a class="close-form pull-right margin-right-small" href="javascript:void(0);">Hide&nbsp;<img src="/Assets/images/cart/close-button.png" /></a></span>
+        </div>
+	</div>
+    <div class="working-area-holder content-page recipe-categories-page">
+        <div class="header-block">
+            <img src="/assets/images/itk-header-2015.jpg">
+        </div>
+        @left(RecipeCategories)
+    	@center()
+    	@right()
+	</div>
+}}
+%>'
+	WHERE [Name]='Recipe Sub Category'
 
 END
 

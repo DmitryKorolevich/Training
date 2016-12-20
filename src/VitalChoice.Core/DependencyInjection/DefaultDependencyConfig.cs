@@ -456,6 +456,7 @@ namespace VitalChoice.Core.DependencyInjection
                 PublicFormUrl = section["PublicFormUrl"],
                 PublicFormSendData = section["PublicFormSendData"],
                 PublicFormSubscribeData = section["PublicFormSubscribeData"],
+                PublicFormArticlesSubscribeData = section["PublicFormArticlesSubscribeData"],
             };
             section = configuration.GetSection("App:VeraCoreSettings");
             if (section["ServerHost"]!=null)

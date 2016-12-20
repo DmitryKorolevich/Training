@@ -421,7 +421,7 @@ $(function () {
 	    return false;
 	});
 
-	if ($('.bronto-subscribe-top-wrapper').length == 1)
+	if ($('.bronto-subscribe-top-wrapper').length == 1 && $('.bronto-subscribe-artiles-bottom-wrapper').length==0)
 	{
 	    var header = $('header');
 	    if (Cookies.get('bronto-signup') !== "hidden")
@@ -432,13 +432,13 @@ $(function () {
 	            header.find(".bronto-form").show();
 	        }, 1000);
 	    }
-	    $(".btnPostEmail").click(function ()
+	    header.find(".btnPostEmail").click(function ()
 	    {
 	        if (header.find(".bronto-form").is(":visible"))
 	        {
 	            if (header.find(".txtEmail").val() !== "")
 	            {
-	                $.get("/Help/SubscribeBronto/" + encodeURIComponent(header.find("#bronto-subEmail").val()), null, function (data, status, xhr)
+	                $.get("/Help/SubscribeBronto/" + encodeURIComponent(header.find(".bronto-sub-email").val()), null, function (data, status, xhr)
 	                {
 	                    if (!data.Data)
 	                    {
@@ -449,12 +449,6 @@ $(function () {
 	                        header.find(".bronto-form").hide();
 	                        header.find(".bronto-form-success").show();
 
-	                        //setTimeout(function ()
-	                        //{
-	                        //    header.find(".bronto-form-success").slideUp(400, function() {
-	                        //        header.find(".bronto-subscribe-top-wrapper").hide();
-	                        //    });
-	                        //}, 5000);
 	                        Cookies.set("bronto-signup", "hidden", { expires: 1 });
 	                    }
 	                });
@@ -495,6 +489,103 @@ $(function () {
 	        Cookies.set("bronto-signup", "hidden", { expires: 1 });
 	    });
 	};
+
+	if ($('.bronto-subscribe-artiles-bottom-wrapper').length == 1)
+	{
+	    var wrapper = $('.bronto-subscribe-artiles-bottom-wrapper');
+	    if (Cookies.get('bronto-artiles-signup') !== "hidden")
+	    {
+	        setTimeout(function ()
+	        {
+	            wrapper.show();
+	            wrapper.find(".bronto-form").show();
+	        }, 1000);
+	    }
+	    wrapper.find(".btnPostEmail").click(function ()
+	    {
+	        if (wrapper.find(".bronto-form").is(":visible"))
+	        {
+	            if (wrapper.find(".txtEmail").val() !== "")
+	            {
+	                $.get("/Help/SubscribeArticlesBronto/" + encodeURIComponent(wrapper.find(".bronto-sub-email").val()), null, function (data, status, xhr)
+	                {
+	                    if (!data.Data)
+	                    {
+	                        wrapper.find(".bubble").show();
+	                    }
+	                    else
+	                    {
+	                        wrapper.find(".bronto-form").hide();
+	                        wrapper.find(".bronto-form-success").show();
+
+	                        Cookies.set("bronto-artiles-signup", "hidden", { expires: 1 });
+	                    }
+	                });
+	            }
+	            else
+	            {
+	                wrapper.find(".bubble").show();
+	            }
+	        }
+	    });
+
+	    wrapper.find(".txtEmail").click(function ()
+	    {
+	        if (wrapper.find(".bubble").is(":visible"))
+	        {
+	            wrapper.find(".bubble").hide();
+	        }
+	    });
+	    wrapper.find(".txtEmail").keydown(function (ev)
+	    {
+	        if (ev.keyCode === 13)
+	        {
+	            if (wrapper.find(".txtEmail").val() !== "")
+	            {
+	                wrapper.find(".btnPostEmail").click();
+	            }
+	            else
+	            {
+	                wrapper.find(".bubble").show();
+	            }
+	        }
+	    });
+	    wrapper.find(".close-form").click(function ()
+	    {
+	        wrapper.find(".bronto-form").slideUp(400, function ()
+	        {
+	            wrapper.hide();
+	        });
+	        Cookies.set("bronto-artiles-signup", "hidden", { expires: 1 });
+	    });
+	};
+
+	$(".top-menu > li").click(function ()
+	{
+	    if (!$(event.target).closest('.dropdown_2columns').length)
+	    {
+	        var opened = $(this).hasClass("opened");
+	        $(".top-menu > li").removeClass("opened");
+	        if (!opened)
+	        {
+	            $(this).addClass("opened");
+	        }
+	    }
+	});
+
+	$(document).click(function (event)
+	{
+	    if (!$(event.target).closest('.top-menu').length)
+	    {
+	        $(".top-menu > li").removeClass("opened");
+	    }
+	});
+
+	$(".top-menu > li .close-button").click(function (e)
+	{
+	    $(".top-menu > li").removeClass("opened");
+	    event.stopPropagation();
+	});
 });
 
 var YouTubeModalPopup = {

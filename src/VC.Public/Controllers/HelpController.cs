@@ -266,5 +266,12 @@ namespace VC.Public.Controllers
             var toReturn = await _brontoService.Subscribe(id);
             return toReturn;
         }
+
+        [HttpGet]
+        public async Task<Result<bool>> SubscribeArticlesBronto(string id)
+        {
+            var toReturn = await _brontoService.SubscribeArticles(id);
+            return toReturn;
+        }
     }
 }

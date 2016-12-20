@@ -12,5 +12,6 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public string PublicFormUrl { get; set; }
         public string PublicFormSendData { get; set; }
         public string PublicFormSubscribeData { get; set; }
+        public string PublicFormArticlesSubscribeData { get; set; }
     }
 }
