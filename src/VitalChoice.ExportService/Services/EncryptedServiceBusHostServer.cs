@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VitalChoice.Ecommerce.Utils;
+using VitalChoice.Infrastructure.Crypto;
 using VitalChoice.Infrastructure.Domain;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
@@ -13,7 +14,6 @@ using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.LoadBalancing;
 using VitalChoice.Infrastructure.ServiceBus;
-using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 
 namespace VitalChoice.ExportService.Services
 {

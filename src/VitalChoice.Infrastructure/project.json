@@ -13,8 +13,9 @@
   "frameworks": {
     "net462": {
       "dependencies": {
-        "WindowsAzure.ServiceBus": "3.3.2",
-        "Microsoft.WindowsAzure.ConfigurationManager": "3.2.1",
+        "WindowsAzure.ServiceBus": "3.4.*",
+        "RabbitMQ.Client":"4.1.*",
+        "Microsoft.WindowsAzure.ConfigurationManager": "3.2.3",
         "NLog": "4.3.5"
       }
     }

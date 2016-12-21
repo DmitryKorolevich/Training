@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
-using VitalChoice.Infrastructure.Domain.ServiceBus;
-using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Ecommerce.Domain.Exceptions;
-using VitalChoice.Infrastructure.Domain.Options;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Crypto;
+using VitalChoice.Infrastructure.Domain.Options;
+using VitalChoice.Infrastructure.Domain.ServiceBus;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
+using VitalChoice.Infrastructure.RabbitMQ.Base;
+using VitalChoice.Infrastructure.ServiceBus;
 
-namespace VitalChoice.Infrastructure.ServiceBus
+namespace VitalChoice.Infrastructure.RabbitMQ
 {
     public abstract class EncryptedServiceBusHost : IEncryptedServiceBusHost
     {

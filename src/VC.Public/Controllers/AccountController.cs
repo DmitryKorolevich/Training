@@ -26,7 +26,7 @@ using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Checkout;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Core.Infrastructure.Helpers;
-using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
+using VitalChoice.Infrastructure.Crypto;
 using VitalChoice.Interfaces.Services;
 
 namespace VC.Public.Controllers

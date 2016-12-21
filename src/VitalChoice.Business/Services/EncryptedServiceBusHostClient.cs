@@ -11,7 +11,7 @@ using VitalChoice.Interfaces.Services;
 using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using VitalChoice.Ecommerce.Domain.Exceptions;
-using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
+using VitalChoice.Infrastructure.Crypto;
 using VitalChoice.Interfaces.Services.Orders;
 
 namespace VitalChoice.Business.Services

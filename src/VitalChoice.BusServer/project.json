@@ -1,0 +1,14 @@
+﻿{
+    "version": "1.0.0-*",
+    "description": "VitalChoice.BusServer Class Library",
+    "authors": [ "multi_000" ],
+    "dependencies": {
+    },
+    "frameworks": {
+        "net462": {
+            "frameworkAssemblies": {
+                "System.Reflection": ""
+            }
+        }
+    }
+}

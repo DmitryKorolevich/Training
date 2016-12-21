@@ -10,9 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 using VitalChoice.CreditCards.Entities;
 using Microsoft.EntityFrameworkCore;
 using VitalChoice.CreditCards.Services;
+using VitalChoice.Infrastructure.Crypto;
 using VitalChoice.Infrastructure.Domain.ServiceBus.DataContracts;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
-using VitalChoice.Infrastructure.ServiceBus.Base.Crypto;
 
 namespace VitalChoice.CreditCards
 {

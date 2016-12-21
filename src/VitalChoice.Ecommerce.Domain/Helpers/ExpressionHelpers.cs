@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace VitalChoice.Ecommerce.Domain.Helpers
 {
@@ -8,6 +11,15 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
     {
         private static readonly ConcurrentDictionary<MemberAccessInfo, Func<object, object>> MemberAccessCache =
             new ConcurrentDictionary<MemberAccessInfo, Func<object, object>>();
+
+        public static IEnumerable<KeyValuePair<Type, string>> GetSubMembers(this MemberExpression expression)
+        {
+            while (expression.Expression is MemberExpression)
+            {
+                expression = (MemberExpression) expression.Expression;
+                yield return new KeyValuePair<Type, string>(expression.Type, expression.Member.Name);
+            }
+        }
 
         public static object GetValue(this Expression expression)
         {
