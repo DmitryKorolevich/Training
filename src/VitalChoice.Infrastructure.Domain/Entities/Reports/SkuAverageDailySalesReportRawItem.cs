@@ -9,6 +9,8 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Reports
     { 
         public decimal TotalAmount { get; set; }
 
+        public int TotalQuantity { get; set; }
+
         public string ProductCategories { get; set; }
 
         public string Code { get; set; }

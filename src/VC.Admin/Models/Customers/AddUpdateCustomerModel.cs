@@ -98,6 +98,11 @@ namespace VC.Admin.Models.Customer
 
 	    public bool LoginLocked { get; set; }
 
+        [Map]
+        public bool IgnoreAbusePolicy { get; set; }
+
+        public bool ForReview { get; set; }
+
         public AddressModel ProfileAddress { get; set; }
 
         public IList<AddressModel> Shipping { get; set; }

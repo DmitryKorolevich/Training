@@ -35,5 +35,7 @@ namespace VC.Admin.Models.Customer
         public int TotalOrders { get; set; }
 
 		public int StatusCode { get; set; }
+
+	    public bool ForReview { get; set; }
 	}
 }

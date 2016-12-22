@@ -24,7 +24,8 @@ BEGIN
 	DECLARE @skusStatistic AS TABLE
     (
         Id int NOT NULL,
-		TotalAmount money NOT NULL
+		TotalAmount money NOT NULL,
+		TotalQuantity INT NOT NULL
     );
 	
 	IF(@skus IS NOT NULL)
@@ -57,17 +58,20 @@ BEGIN
 	INSERT INTO @skusStatistic
 	(
 		Id,
-		TotalAmount
+		TotalAmount,
+		TotalQuantity
 	)
 	(
 		SELECT 
 			temp.IdSku,
-			SUM(temp.Amount) TotalAmount
+			SUM(temp.Amount) TotalAmount,
+			SUM(temp.Quantity) TotalQuantity
 		FROM 
 		(
 			SELECT 
 				os.IdSku,
-				os.Quantity*os.Amount Amount
+				os.Quantity*os.Amount Amount,
+				os.Quantity Quantity
 			FROM Orders o WITH(NOLOCK)
 			JOIN Customers c WITH(NOLOCK) ON o.IdCustomer=c.Id
 			JOIN OrderToSkus os WITH(NOLOCK) ON o.Id=os.IdOrder
@@ -90,7 +94,8 @@ BEGIN
 			UNION ALL
 			SELECT 
 				op.IdSku,
-				op.Quantity*op.Amount Amount
+				op.Quantity*op.Amount Amount,
+				op.Quantity Quantity
 			FROM Orders o WITH(NOLOCK)
 			JOIN Customers c WITH(NOLOCK) ON o.IdCustomer=c.Id
 			JOIN OrderToPromos op WITH(NOLOCK) ON o.Id=op.IdOrder AND op.Disabled=0
@@ -117,6 +122,7 @@ BEGIN
 	SELECT
 		st.Id,
 		st.TotalAmount,
+		st.TotalQuantity,
 		STUFF
 		(
 			(

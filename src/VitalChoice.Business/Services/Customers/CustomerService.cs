@@ -599,6 +599,11 @@ namespace VitalChoice.Business.Services.Customers
             return await _orderRepository.GetCustomerOrderStatistics(ids);
         }
 
+        public async Task<ICollection<int>> GetCustomersForReviewAsync(IList<int> ids)
+        {
+            return await _sPEcommerceRepository.GetCustomersForReviewAsync(ids, DateTime.Now.AddMonths(-6), DateTime.Now);
+        }
+
         public async Task<string> UploadFileAsync(byte[] file, string fileName, Guid customerPublicId,
             string contentType = null)
         {

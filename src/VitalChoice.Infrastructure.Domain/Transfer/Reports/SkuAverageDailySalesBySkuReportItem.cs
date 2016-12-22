@@ -32,7 +32,11 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
 
         public decimal TotalAmount { get; set; }
 
+        public int TotalQuantity { get; set; }
+
         public decimal AverageDailyAmount { get; set; }
+
+        public decimal AverageDailyQuantity { get; set; }
 
         public decimal TotalOOSImpactAmount { get; set; }
     }

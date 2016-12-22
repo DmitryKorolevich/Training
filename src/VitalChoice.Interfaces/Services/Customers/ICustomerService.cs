@@ -31,6 +31,8 @@ namespace VitalChoice.Interfaces.Services.Customers
 
         Task<ICollection<CustomerOrderStatistic>> GetCustomerOrderStatistics(ICollection<int> ids);
 
+	    Task<ICollection<int>> GetCustomersForReviewAsync(IList<int> ids);
+
         Task<string> UploadFileAsync(byte[] file, string fileName, Guid customerPublicId, string contentType = null);
 
 		Task<Blob> DownloadFileAsync(string fileName, string customerPublicId);
