@@ -555,6 +555,26 @@ namespace VitalChoice.Business.Repositories
             return toReturn.Select(p=>p.Id).ToList();
         }
 
+        public async Task<IList<OrderAbuseReportRawItem>> GetOrderAbuseReportRawItemsAsync(OrdersAbuseReportFilter filter)
+        {
+            var toReturn = await _context.Value.Set<OrderAbuseReportRawItem>().FromSql
+            ("[dbo].[SPGetOrdersAbuseReport] @from={0}, @to={1}, @reships={2}, @refunds={3}, @reshipsorrefunds={4}," +
+                "@idservicecode={5}, @idcustomer={6}",
+                filter.From, filter.To, filter.Reships, filter.Refunds, filter.ReshipsOrRefunds,
+                filter.IdServiceCode, filter.IdCustomer).ToListAsync();
+            return toReturn;
+        }
+
+        public async Task<IList<CustomerOrderAbuseReportRawItem>> GetCustomerOrdersAbuseRawItemsAsync(OrdersAbuseReportFilter filter)
+        {
+            var toReturn = await _context.Value.Set<CustomerOrderAbuseReportRawItem>().FromSql
+            ("[dbo].[SPGetCustomersAbuseReport] @from={0}, @to={1}, @reships={2}, @refunds={3}, @reshipsorrefunds={4}," +
+                "@idservicecode={5}, @idcustomer={6}",
+                filter.From, filter.To, filter.Reships, filter.Refunds, filter.ReshipsOrRefunds,
+                filter.IdServiceCode, filter.IdCustomer).ToListAsync();
+            return toReturn;
+        }
+
         public void Dispose()
         {
             if (_context.IsValueCreated)

@@ -63,5 +63,9 @@ namespace VitalChoice.Interfaces.Services.Orders
             bool removeEmailDublicates=false);
 
 	    Task<PagedList<OrderDiscountReportItem>> GetOrderDiscountReportItemsAsync(OrderDiscountReportFilter filter);
+
+	    Task<PagedList<OrderAbuseReportRawItem>> GetOrderAbuseReportItemsAsync(OrdersAbuseReportFilter filter);
+
+	    Task<PagedList<CustomerAbuseReportItem>> GetCustomerAbuseItemsAsync(OrdersAbuseReportFilter filter);
 	}
 }

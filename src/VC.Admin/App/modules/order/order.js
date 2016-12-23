@@ -33,6 +33,7 @@ angular.module('app.modules.order', [
 	'app.modules.order.controllers.exportRequestDetailsController',
 	'app.modules.order.controllers.customerSkuUsageReportController',
 	'app.modules.order.controllers.orderDiscountReportController',
+	'app.modules.order.controllers.orderAbuseReportController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -179,6 +180,11 @@ angular.module('app.modules.order', [
 				    url: '/report/order-discount-usage',
 				    templateUrl: 'app/modules/order/partials/orderDiscountReport.html',
 				    controller: 'orderDiscountReportController'
-				});;
+				})
+				.state('index.oneCol.orderAbuseReport', {
+				    url: '/report/reship-refund-abuse',
+				    templateUrl: 'app/modules/order/partials/orderAbuseReport.html',
+				    controller: 'orderAbuseReportController'
+				});
 		}
 ]);

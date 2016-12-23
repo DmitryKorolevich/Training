@@ -319,6 +319,24 @@ angular.module('app.core.dataAccess.services.orderService', [])
 	        return baseUrl + ('GetOrderDiscountReportFile?{0}buildNumber={1}')
                 .format(generateQueryParamsBasedOnFilter(filter), buildNumber);
 	    },
+	    getOrderAbuseReportItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetOrderAbuseReportItems', filter, getConfig(tracker));
+	    },
+	    getOrderAbuseReportItemsReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + ('GetOrderAbuseReportItemsReportFile?{0}buildNumber={1}')
+                .format(generateQueryParamsBasedOnFilter(filter), buildNumber);
+	    },
+	    getCustomerAbuseItems: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetCustomerAbuseItems', filter, getConfig(tracker));
+	    },
+	    getCustomerAbuseItemsReportFile: function (filter, buildNumber)
+	    {
+	        return baseUrl + ('GetCustomerAbuseItemsReportFile?{0}buildNumber={1}')
+                .format(generateQueryParamsBasedOnFilter(filter), buildNumber);
+	    },
 
 	    //export
 	    getExportDetails: function (tracker)

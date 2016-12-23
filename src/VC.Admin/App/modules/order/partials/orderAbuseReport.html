@@ -1,0 +1,146 @@
+﻿<div class="container-fluid abuse-report">
+    <div class="well">
+        <span class="legend">Customer Account Refund/Reship Reportt</span>
+        <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
+            <fieldset>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="From" data-ng-change="filterChanged();" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.From" is-open="fromOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); fromOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.From.$invalid">
+                            <small class="error" ng-show="forms.form.From.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","From")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="input-group">
+                            <input type="text" class="form-control" name="To" data-ng-change="filterChanged();" uib-datepicker-popup="{{UIOptions.DatepickerFormat}}" ng-model="filter.To" is-open="toOpened" ng-required="true" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-disabled="false" ng-click="stopPropagation($event); toOpened =true;"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </p>
+                        <div class="error-container" ng-show="forms.form.submitted && forms.form.To.$invalid">
+                            <small class="error" ng-show="forms.form.To.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","To")}}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" name="IdServiceCode" data-ng-change="filterChanged();" data-ng-model="filter.IdServiceCode" ng-options="item.Key as item.Text for item in options.ServiceCodes"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="IdCustomer" data-ng-change="filterChanged();" class="form-control" placeholder="Customer #" data-ng-model="filter.IdCustomer" numbers-only>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <select class="form-control" name="Mode" data-ng-change="filterChanged();" data-ng-model="filter.CountMode" ng-options="item.Key as item.Text for item in options.CountModes"></select>
+                    </div>
+                    <div data-ng-if="filter.CountMode==1" class="col-md-3">
+                        <input type="text" name="Reships" class="form-control" placeholder="Reships" data-ng-change="filterChanged();" data-ng-model="filter.Reships" numbers-only>
+                    </div>
+                    <div data-ng-if="filter.CountMode==2" class="col-md-3">
+                        <input type="text" name="Refunds" class="form-control" placeholder="Refunds" data-ng-change="filterChanged();" data-ng-model="filter.Refunds" numbers-only>
+                    </div>
+                    <div data-ng-if="filter.CountMode==3" class="col-md-3">
+                        <input type="text" name="ReshipsOrRefunds" class="form-control" placeholder="Reships or Refunds" data-ng-change="filterChanged();" data-ng-model="filter.ReshipsOrRefunds" numbers-only>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" name="Mode" data-ng-change="filterChanged();" data-ng-model="filter.Mode" ng-options="item.Key as item.Text for item in options.Modes"></select>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-12">
+                        <button class="btn btn-info" data-ng-click="filterItems();" type="button">Filter</button>
+                        <a target="_self" class="btn btn-primary pull-right" data-ng-href={{options.exportUrl}}>Export</a>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <spinner-overlay data-loading="refreshTracker.active()">
+            <table id="data-grid" data-ng-if="options.UsedMode==1" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Customer #</th>
+                        <th>Customer Name</th>
+                        <th>Original Order #</th>
+                        <th>Original Order Date</th>
+                        <th>Original Order Total</th>
+                        <th>Refund Order #</th>
+                        <th>Refund Date</th>
+                        <th>Refund Value</th>
+                        <th>Reship Order #</th>
+                        <th>Reship Date</th>
+                        <th>Service Code</th>
+                        <th>Service Code Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="item in items">
+                        <td>
+                            <a ui-sref="index.oneCol.customerDetail({id:item.IdCustomer})">{{::item.IdCustomer}}</a>
+                        </td>
+                        <td>
+                            <a ui-sref="index.oneCol.customerDetail({id:item.IdCustomer})">{{::item.CustomerFirstName}} {{::item.CustomerLastName}}</a>
+                        </td>
+                        <td>
+                            <a ui-sref="index.oneCol.orderDetail({id: item.IdOrderSource })">{{::item.IdOrderSource}}</a>
+                        </td>
+                        <td>{{::item.OrderSourceDateCreated | date:"MM/dd/yy"}}<br />{{::item.OrderSourceDateCreated | date:"h:mm a"}}</td>
+                        <td>{{::item.OrderSourceProductsSubtotal | currency}}</td>
+                        <td>
+                            <a ui-sref="index.oneCol.orderRefundDetail({id: item.IdRefund })">{{::item.IdRefund}}</a>
+                        </td>
+                        <td>{{::item.RefundDateCreated | date:"MM/dd/yy"}}<br />{{::item.RefundDateCreated | date:"h:mm a"}}</td>
+                        <td>({{::item.RefundTotal | currency}})</td>
+                        <td>
+                            <a ui-sref="index.oneCol.orderReshipDetail({id: item.IdReship })">{{::item.IdReship}}</a>
+                        </td>
+                        <td>{{::item.ReshipDateCreated | date:"MM/dd/yy"}}<br />{{::item.ReshipDateCreated | date:"h:mm a"}}</td>
+                        <td>{{::item.ServiceCodeName}}</td>
+                        <td class="big-text">{{::item.ServiceCodeNotes}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table id="data-grid" data-ng-if="options.UsedMode==2" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Customer #</th>
+                        <th>Customer Name</th>
+                        <th>Total Orders</th>
+                        <th>Last Order Date</th>
+                        <th>Total Reship</th>
+                        <th>Total Refunds<th>
+                        <th>Service Codes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="item in items">
+                        <td>
+                            <a ui-sref="index.oneCol.customerDetail({id:item.IdCustomer})">{{::item.IdCustomer}}</a>
+                        </td>
+                        <td>
+                            <a ui-sref="index.oneCol.customerDetail({id:item.IdCustomer})">{{::item.CustomerFirstName}} {{::item.CustomerLastName}}</a>
+                        </td>
+                        <td>{{::item.TotalOrders}}</td>
+                        <td>{{::item.LastOrderDateCreated | date:"MM/dd/yy"}}<br />{{::item.LastOrderDateCreated | date:"h:mm a"}}</td>
+                        <td>{{::item.TotalReships}}</td>
+                        <td>{{::item.TotalRefunds}}</td>
+                        <td class="big-text">{{::item.ServiceCodes}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </spinner-overlay>
+        <uib-pagination boundary-links="true"
+                        total-items="totalItems"
+                        items-per-page="filter.Paging.PageItemCount"
+                        data-ng-model="filter.Paging.PageIndex"
+                        previous-text="&lsaquo;"
+                        next-text="&rsaquo;"
+                        first-text="&laquo;"
+                        last-text="&raquo;"
+                        data-ng-change="pageChanged();scrollTo('data-grid');">
+        </uib-pagination>
+    </div>
+</div>

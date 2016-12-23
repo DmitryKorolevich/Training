@@ -97,6 +97,8 @@ namespace VC.Admin.Controllers
         private readonly ICsvExportService<AfiiliateOrderItemImportExportModel, AfiiliateOrderItemImportExportCsvMap> _afiiliateOrderItemImportExportСSVExportService;
         private readonly ICsvExportService<CustomerSkuUsageReportRawItem, CustomerSkuUsageReportRawItemExportCsvMap> _customerSkuUsageReportRawItemExportСSVExportService;
         private readonly ICsvExportService<OrderDiscountReportItem, OrderDiscountReportItemExportCsvMap> _orderDiscountReportItemExportCsvMapСSVExportService;
+        private readonly ICsvExportService<OrderAbuseReportRawItem, OrderAbuseReportItemCsvMap> _orderAbuseReportRawItemCSVExportService;
+        private readonly ICsvExportService<CustomerAbuseReportItem, CustomerAbuseReportItemCsvMap> _customerAbuseReportItemCSVExportService;
         private readonly INotificationService _notificationService;
         private readonly BrontoService _brontoService;
         private readonly IDynamicMapper<SkuDynamic, Sku> _skuMapper;
@@ -135,6 +137,8 @@ namespace VC.Admin.Controllers
             ICsvExportService<AfiiliateOrderItemImportExportModel, AfiiliateOrderItemImportExportCsvMap> afiiliateOrderItemImportExportСSVExportService,
             ICsvExportService<CustomerSkuUsageReportRawItem, CustomerSkuUsageReportRawItemExportCsvMap> customerSkuUsageReportRawItemExportСSVExportService,
             ICsvExportService<OrderDiscountReportItem, OrderDiscountReportItemExportCsvMap> orderDiscountReportItemExportCsvMapСSVExportService,
+            ICsvExportService<OrderAbuseReportRawItem, OrderAbuseReportItemCsvMap> orderAbuseReportRawItemCSVExportService,
+            ICsvExportService<CustomerAbuseReportItem, CustomerAbuseReportItemCsvMap> customerAbuseReportItemCSVExportService,
             INotificationService notificationService,
             BrontoService brontoService,
             IOrderReportService orderReportService,
@@ -169,6 +173,8 @@ namespace VC.Admin.Controllers
             _afiiliateOrderItemImportExportСSVExportService = afiiliateOrderItemImportExportСSVExportService;
             _customerSkuUsageReportRawItemExportСSVExportService = customerSkuUsageReportRawItemExportСSVExportService;
             _orderDiscountReportItemExportCsvMapСSVExportService = orderDiscountReportItemExportCsvMapСSVExportService;
+            _orderAbuseReportRawItemCSVExportService = orderAbuseReportRawItemCSVExportService;
+            _customerAbuseReportItemCSVExportService = customerAbuseReportItemCSVExportService;
             _notificationService = notificationService;
             _brontoService = brontoService;
             _orderReportService = orderReportService;
@@ -1970,6 +1976,101 @@ namespace VC.Admin.Controllers
             var contentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileName = String.Format(FileConstants.DISCOUNT_USAGE_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<PagedList<OrderAbuseReportRawItem>>> GetOrderAbuseReportItems([FromBody]OrdersAbuseReportFilter filter)
+        {
+            filter.To = filter.To.AddDays(1);
+            var toReturn = await _orderReportService.GetOrderAbuseReportItemsAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<FileResult> GetOrderAbuseReportItemsReportFile([FromQuery]string from, [FromQuery]string to,
+            [FromQuery]int? reships = null, [FromQuery]int? refunds = null, [FromQuery]int? reshipsorrefunds = null,
+            [FromQuery]int? idservicecode = null, [FromQuery]int? idcustomer = null)
+        {
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+
+            OrdersAbuseReportFilter filter = new OrdersAbuseReportFilter()
+            {
+                From = dFrom.Value,
+                To = dTo.Value.AddDays(1),
+                Reships = reships,
+                Refunds = refunds,
+                ReshipsOrRefunds = reshipsorrefunds,
+                IdServiceCode = idservicecode,
+                IdCustomer = idcustomer,
+            };
+            filter.Paging = null;
+
+            var data = await _orderReportService.GetOrderAbuseReportItemsAsync(filter);
+
+            var result = _orderAbuseReportRawItemCSVExportService.ExportToCsv(data.Items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.ORDERS_REFUND_RESHIP_ABUSE_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpPost]
+        public async Task<Result<PagedList<CustomerAbuseReportItem>>> GetCustomerAbuseItems([FromBody]OrdersAbuseReportFilter filter)
+        {
+            filter.To = filter.To.AddDays(1);
+            var toReturn = await _orderReportService.GetCustomerAbuseItemsAsync(filter);
+            return toReturn;
+        }
+
+        [AdminAuthorize(PermissionType.Reports)]
+        [HttpGet]
+        public async Task<FileResult> GetCustomerAbuseItemsReportFile([FromQuery]string from, [FromQuery]string to,
+            [FromQuery]int? reships = null, [FromQuery]int? refunds = null, [FromQuery]int? reshipsorrefunds = null,
+            [FromQuery]int? idservicecode = null, [FromQuery]int? idcustomer = null)
+        {
+            var dFrom = from.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            var dTo = to.GetDateFromQueryStringInPst(TimeZoneHelper.PstTimeZoneInfo);
+            if (!dFrom.HasValue || !dTo.HasValue)
+            {
+                return null;
+            }
+
+            OrdersAbuseReportFilter filter = new OrdersAbuseReportFilter()
+            {
+                From = dFrom.Value,
+                To = dTo.Value.AddDays(1),
+                Reships = reships,
+                Refunds = refunds,
+                ReshipsOrRefunds = reshipsorrefunds,
+                IdServiceCode = idservicecode,
+                IdCustomer = idcustomer,
+            };
+            filter.Paging = null;
+
+            var data = await _orderReportService.GetCustomerAbuseItemsAsync(filter);
+
+            var result = _customerAbuseReportItemCSVExportService.ExportToCsv(data.Items);
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.CUSTOMERS_REFUND_RESHIP_ABUSE_REPORT, DateTime.Now)
             };
 
             Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
