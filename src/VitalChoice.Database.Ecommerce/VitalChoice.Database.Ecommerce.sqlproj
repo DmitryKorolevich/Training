@@ -244,4 +244,10 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\VShortProducts.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPGetCustomersForReview.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\CustomerOptionTypes.sql" />
+  </ItemGroup>
 </Project>

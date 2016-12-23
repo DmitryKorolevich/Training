@@ -533,6 +533,28 @@ namespace VitalChoice.Business.Repositories
             return toReturn;
         }
 
+        public async Task<ICollection<int>> GetCustomersForReviewAsync(IList<int> ids, DateTime from, DateTime to)
+        {
+            string sIds = string.Empty;
+            if (ids != null)
+            {
+                ids = ids.Distinct().ToList();
+                for (int i = 0; i < ids.Count; i++)
+                {
+                    sIds += ids[i];
+                    if (i != ids.Count - 1)
+                    {
+                        sIds += ",";
+                    }
+                }
+            }
+
+            var toReturn = await _context.Value.Set<IdModel>().FromSql
+            ("[dbo].[SPGetCustomersForReview] @from={0}, @to={1}, @customerids={2}",
+                from, to, sIds).ToListAsync();
+            return toReturn.Select(p=>p.Id).ToList();
+        }
+
         public void Dispose()
         {
             if (_context.IsValueCreated)

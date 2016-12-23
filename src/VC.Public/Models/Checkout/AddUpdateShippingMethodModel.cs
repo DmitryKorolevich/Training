@@ -13,7 +13,7 @@ namespace VC.Public.Models.Checkout
 		public bool IsGiftOrder { get; set; }
 
 		[Display(Name = "Gift Message")]
-		[CustomMaxLength(255)]
+		[CustomMaxLength(250)]
         [Map]
 		public string GiftMessage { get; set; }
 

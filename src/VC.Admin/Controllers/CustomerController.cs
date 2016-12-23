@@ -394,6 +394,8 @@ namespace VC.Admin.Controllers
             }
             toReturn.ProductReviewEmailEnabled = addUpdateCustomerModel.ProductReviewEmailEnabled;
 
+            toReturn.ForReview = (await _customerService.GetCustomersForReviewAsync(new int[] { toReturn.Id })).Any();
+
             return toReturn;
         }
 
@@ -437,6 +439,17 @@ namespace VC.Admin.Controllers
                         customer.TotalOrders = statisticItem.TotalOrders;
                         customer.FirstOrderPlaced = statisticItem.FirstOrderPlaced;
                         customer.LastOrderPlaced = statisticItem.LastOrderPlaced;
+                    }
+                }
+
+                var customerIdsForReview = await _customerService.GetCustomersForReviewAsync(
+                    toReturn.Items.Select(p => p.Id).ToList());
+                foreach (var id in customerIdsForReview)
+                {
+                    var customer = toReturn.Items.FirstOrDefault(p => p.Id == id);
+                    if (customer != null)
+                    {
+                        customer.ForReview = true;
                     }
                 }
             }
@@ -514,6 +527,8 @@ namespace VC.Admin.Controllers
             {
                 customerModel.ProductReviewEmailEnabled = !await _notificationService.IsEmailUnsubscribedAsync(EmailConstants.ProductReviewIdNewsletter, customerModel.Email);
             }
+
+            customerModel.ForReview = (await _customerService.GetCustomersForReviewAsync(new int[] {customerModel.Id})).Any();
 
             return customerModel;
         }

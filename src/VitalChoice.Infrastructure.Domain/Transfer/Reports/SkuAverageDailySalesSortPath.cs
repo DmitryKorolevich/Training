@@ -16,6 +16,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Reports
         public const string DaysOOS = "DaysOOS";
         public const string TotalAmount = "TotalAmount";
         public const string AverageDailyAmount = "AverageDailyAmount";
+        public const string AverageDailyQuantity = "AverageDailyQuantity";
         public const string TotalOOSImpactAmount = "TotalOOSImpactAmount";
     }
 }
