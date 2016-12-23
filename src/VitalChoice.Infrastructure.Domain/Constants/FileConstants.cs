@@ -48,5 +48,8 @@
         public const string AVERAGE_DAILY_SALES_BY_PRODUCT = "Average_Daily_Sales_By_Product_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
         public const string OOS_IMPACT_BY_SKU = "OOS_Impact_By_Sku_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
         public const string OOS_IMPACT_BY_PRODUCT = "OOS_Impact_By_Product_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+
+        public const string ORDERS_REFUND_RESHIP_ABUSE_REPORT = "Orders_Refund_Reship_Abuse_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+        public const string CUSTOMERS_REFUND_RESHIP_ABUSE_REPORT = "Customers_Refund_Reship_Abuse_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
     }
 }

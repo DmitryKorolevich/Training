@@ -28,7 +28,7 @@ BEGIN
 		cadlval.Value CustomerLastName,
 		temp.DateCreated,
 		temp.Total,
-		temp.ServiceCode,
+		temp.IdServiceCode,
 		scnval.Value ServiceCodeNotes,
 		temp.IdOrderSource,
 		os.DateCreated OrderSourceDateCreated,
@@ -41,7 +41,7 @@ BEGIN
 			o.IdCustomer,
 			o.DateCreated,
 			o.Total,
-			CAST(scval.Value as INT) as ServiceCode,
+			CAST(scval.Value as INT) as IdServiceCode,
 			o.IdOrderSource,
 			(
 				SELECT 
@@ -66,7 +66,7 @@ BEGIN
 					(ino.NPOrderStatus!=1 AND ino.NPOrderStatus!=4))) 
 			) Refunds
 		FROM Orders o WITH(NOLOCK)
-		LEFT JOIN OrderOptionTypes AS scopt WITH(NOLOCK) ON scopt.Name = N'ServiceCode' AND scopt.IdObjectType = o.Id
+		LEFT JOIN OrderOptionTypes AS scopt WITH(NOLOCK) ON scopt.Name = N'ServiceCode' AND scopt.IdObjectType = o.IdObjectType
 		LEFT JOIN OrderOptionValues AS scval WITH(NOLOCK) ON scval.IdOrder = o.Id AND scval.IdOptionType = scopt.Id
 		WHERE 
 			o.DateCreated>=@from AND o.DateCreated<@to AND
@@ -83,7 +83,7 @@ BEGIN
 	LEFT JOIN AddressOptionTypes AS cadlopt WITH(NOLOCK) ON cadlopt.Name = N'LastName'
 	LEFT JOIN AddressOptionValues AS cadlval WITH(NOLOCK) ON cadlval.IdAddress = c.IdProfileAddress AND cadlval.IdOptionType = cadlopt.Id
 	JOIN Orders os WITH(NOLOCK) ON temp.IdOrderSource=os.Id
-	LEFT JOIN OrderOptionTypes AS scnopt WITH(NOLOCK) ON scnopt.Name = N'ServiceCodeNotes' AND scnopt.IdObjectType = temp.Id
+	LEFT JOIN OrderOptionTypes AS scnopt WITH(NOLOCK) ON scnopt.Name = N'ServiceCodeNotes' AND scnopt.IdObjectType = temp.IdObjectType
 	LEFT JOIN OrderOptionValues AS scnval WITH(NOLOCK) ON scnval.IdOrder = temp.Id AND scnval.IdOptionType = scnopt.Id
 	WHERE 
 		(@reships IS NULL OR temp.Reships >= @reships) AND
@@ -166,7 +166,7 @@ BEGIN
 				SELECT 
 					 DISTINCT o.IdCustomer
 				FROM Orders o WITH(NOLOCK)
-				LEFT JOIN OrderOptionTypes AS scopt WITH(NOLOCK) ON scopt.Name = N'ServiceCode' AND scopt.IdObjectType = o.Id
+				LEFT JOIN OrderOptionTypes AS scopt WITH(NOLOCK) ON scopt.Name = N'ServiceCode' AND scopt.IdObjectType = o.IdObjectType
 				LEFT JOIN OrderOptionValues AS scval WITH(NOLOCK) ON scval.IdOrder = o.Id AND scval.IdOptionType = scopt.Id
 				WHERE 
 					o.DateCreated>=@from AND o.DateCreated<@to AND
@@ -196,14 +196,14 @@ BEGIN
 		c.IdCustomer,
 		c.CustomerFirstName,
 		c.CustomerLastName,
-		CAST(scval.Value as INT) as ServiceCode
+		CAST(scval.Value as INT) as IdServiceCode
 	FROM @customers c
 	JOIN Orders o WITH(NOLOCK) ON c.IdCustomer=o.IdCustomer
-	LEFT JOIN OrderOptionTypes AS scopt WITH(NOLOCK) ON scopt.Name = N'ServiceCode' AND scopt.IdObjectType = o.Id
+	LEFT JOIN OrderOptionTypes AS scopt WITH(NOLOCK) ON scopt.Name = N'ServiceCode' AND scopt.IdObjectType = o.IdObjectType
 	LEFT JOIN OrderOptionValues AS scval WITH(NOLOCK) ON scval.IdOrder = o.Id AND scval.IdOptionType = scopt.Id
 	WHERE
 		o.DateCreated>=@from AND o.DateCreated<@to AND
-		o.StatusCode!=3 AND
+		o.StatusCode!=3 AND o.IdObjectType!=2 AND
 		((o.OrderStatus IS NOT NULL AND o.OrderStatus!=1 AND o.OrderStatus!=4) OR 
 		(o.OrderStatus IS NULL AND (o.POrderStatus!=1 AND o.POrderStatus!=4) OR
 		(o.NPOrderStatus!=1 AND o.NPOrderStatus!=4)))
