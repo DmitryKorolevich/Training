@@ -120,9 +120,9 @@ BEGIN
 	)
 
 	SELECT
-		st.Id,
-		st.TotalAmount,
-		st.TotalQuantity,
+		s.Id,
+		ISNULL(st.TotalAmount, 0.00) TotalAmount,
+		ISNULL(st.TotalQuantity, 0) TotalQuantity,
 		STUFF
 		(
 			(
@@ -147,8 +147,8 @@ BEGIN
 		CAST(sqval.Value as INT) as QTY,
 		CAST(sdsval.Value as BIT) as DisregardStock,
 		CAST(ssval.Value as INT) as Stock
-	FROM @skusStatistic st
-	JOIN Skus s WITH(NOLOCK) ON st.Id=s.Id
+	FROM Skus s WITH(NOLOCK)
+	LEFT JOIN @skusStatistic st ON s.Id=st.Id
 	JOIN Products p WITH(NOLOCK) ON s.IdProduct=p.Id
 	LEFT JOIN ProductOptionTypes AS psopt WITH(NOLOCK) ON psopt.Name = N'SubTitle' AND psopt.IdObjectType = p.IdObjectType
 	LEFT JOIN ProductOptionValues AS psval WITH(NOLOCK) ON psval.IdProduct = p.Id AND psval.IdOptionType = psopt.Id		
@@ -158,6 +158,8 @@ BEGIN
 	LEFT JOIN SkuOptionValues AS sdsval WITH(NOLOCK) ON sdsval.IdSku = s.Id AND sdsval.IdOptionType = sdsopt.Id		
 	LEFT JOIN SkuOptionTypes AS ssopt WITH(NOLOCK) ON ssopt.Name = N'Stock' AND ssopt.IdObjectType = p.IdObjectType
 	LEFT JOIN SkuOptionValues AS ssval WITH(NOLOCK) ON ssval.IdSku = s.Id AND ssval.IdOptionType = ssopt.Id	
+	WHERE s.StatusCode!=3
+	OPTION(RECOMPILE)
 
 END
 

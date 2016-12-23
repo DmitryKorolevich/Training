@@ -250,4 +250,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\CustomerOptionTypes.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PostDeployment\Scripts\SPsForCustomerAbuseReport.sql" />
+  </ItemGroup>
 </Project>

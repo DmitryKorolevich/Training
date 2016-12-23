@@ -2147,6 +2147,11 @@ namespace VitalChoice.Business.Services.Products
                 {
                     continue;
                 }
+                //ignore skus withot sales if it is in stock
+                if (rawItem.TotalAmount == 0 && item.InStock)
+                {
+                    continue;
+                }
 
                 item.Id = rawItem.Id;
                 item.IdProduct = rawItem.IdProduct;
@@ -2327,6 +2332,12 @@ namespace VitalChoice.Business.Services.Products
                     continue;
                 }
                 //sku active not actual for this report
+                
+                //ignore products withot sales if all skus are in stock
+                if (item.TotalAmount == 0 && item.InStock)
+                {
+                    continue;
+                }
 
                 item.AverageDailyAmount = filterDaysRange - item.DaysOOS > 0
                                         ? Math.Round(item.TotalAmount / (filterDaysRange - item.DaysOOS),2)
