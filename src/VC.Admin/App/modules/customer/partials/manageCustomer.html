@@ -55,6 +55,25 @@
                                                         <span>{{currentCustomer.Id}}</span>
                                                     </div>
                                                 </div>
+                                                <div data-ng-if="currentCustomer.Id">
+                                                    <div class="form-group">
+                                                        <label for="" class="col-md-3 control-label">Abuse Refund/Reship</label>
+                                                        <div class="col-md-9 form-control-static">
+                                                            <i data-ng-if="currentCustomer.ForReview" class="fa fa-chevron-circle-down warning-icon"></i>
+                                                            <i data-ng-if="!currentCustomer.ForReview" class="fa fa-chevron-circle-down success-icon"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="ignorePolicy" class="col-md-3 control-label">Ignore Abuse Policy</label>
+                                                        <div class="col-md-9">
+                                                            <div class="checkbox">
+                                                                <label>
+                                                                    <input type="checkbox" id="ignorePolicy" data-ng-model="currentCustomer.IgnoreAbusePolicy">
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <span class="legend">Customer Type</span>
                                                 <div class="form-group">
                                                     <div class="col-md-3"></div>

@@ -2158,6 +2158,7 @@ namespace VitalChoice.Business.Services.Products
                 item.SkuName = $"{rawItem.Name} {rawItem.SubTitle} ({rawItem.QTY})";
 
                 item.TotalAmount = Math.Round(rawItem.TotalAmount, 2);
+                item.TotalQuantity = rawItem.TotalQuantity;
 
                 var oosItems = oosHistoryItems.Where(p => p.IdSku == item.Id).ToList();
                 var duration = TimeSpan.Zero;
@@ -2178,6 +2179,9 @@ namespace VitalChoice.Business.Services.Products
                 item.AverageDailyAmount = filterDaysRange - item.DaysOOS > 0
                                         ? Math.Round(item.TotalAmount/(filterDaysRange - item.DaysOOS),2)
                                         : 0;
+                item.AverageDailyQuantity = filterDaysRange - item.DaysOOS > 0
+                        ? Math.Round((decimal)item.TotalQuantity / (filterDaysRange - item.DaysOOS), 2)
+                        : 0;
                 item.TotalOOSImpactAmount = item.AverageDailyAmount*item.DaysOOS;
 
                 data.Add(item);
@@ -2223,6 +2227,11 @@ namespace VitalChoice.Business.Services.Products
                     data = sortOrder == FilterSortOrder.Asc
                                 ? data.OrderBy(y => y.AverageDailyAmount).ToList()
                                 : data.OrderByDescending(y => y.AverageDailyAmount).ToList();
+                    break;
+                case SkuAverageDailySalesSortPath.AverageDailyQuantity:
+                    data = sortOrder == FilterSortOrder.Asc
+                                ? data.OrderBy(y => y.AverageDailyQuantity).ToList()
+                                : data.OrderByDescending(y => y.AverageDailyQuantity).ToList();
                     break;
                 case SkuAverageDailySalesSortPath.TotalOOSImpactAmount:
                     data = sortOrder == FilterSortOrder.Asc
