@@ -1651,5 +1651,131 @@ namespace VitalChoice.Business.Services.Orders
 
             return toReturn;
         }
+
+        public async Task<PagedList<OrderAbuseReportRawItem>> GetOrderAbuseReportItemsAsync(OrdersAbuseReportFilter filter)
+        {
+            PagedList<OrderAbuseReportRawItem> toReturn = new PagedList<OrderAbuseReportRawItem>();
+
+            var data = await _sPEcommerceRepository.GetOrderAbuseReportRawItemsAsync(filter);
+            foreach (var orderAbuseReportRawItem in data)
+            {
+                orderAbuseReportRawItem.ServiceCodeName = orderAbuseReportRawItem.IdServiceCode.HasValue
+                    ? _referenceData.ServiceCodes.FirstOrDefault(pp => orderAbuseReportRawItem.IdServiceCode.Value == pp.Key)?.Text
+                    : null;
+                if (orderAbuseReportRawItem.IdObjectType == OrderType.Reship)
+                {
+                    orderAbuseReportRawItem.IdReship = orderAbuseReportRawItem.Id;
+                    orderAbuseReportRawItem.ReshipDateCreated = orderAbuseReportRawItem.DateCreated;
+                }
+                if (orderAbuseReportRawItem.IdObjectType == OrderType.Refund)
+                {
+                    orderAbuseReportRawItem.IdRefund = orderAbuseReportRawItem.Id;
+                    orderAbuseReportRawItem.RefundDateCreated = orderAbuseReportRawItem.DateCreated;
+                    orderAbuseReportRawItem.RefundTotal = orderAbuseReportRawItem.Total;
+                }
+            }
+            toReturn.Count = data.Count;
+
+            if (filter.Paging != null)
+            {
+                var pageNo = filter.Paging.PageIndex - 1;
+                toReturn.Items = pageNo <= 0
+                    ? data.Take(filter.Paging.PageItemCount).ToList()
+                    : data.Skip(pageNo * filter.Paging.PageItemCount).Take(filter.Paging.PageItemCount).ToList();
+            }
+            else
+            {
+                toReturn.Items = data;
+            }
+
+            return toReturn;
+        }
+
+        public async Task<PagedList<CustomerAbuseReportItem>> GetCustomerAbuseItemsAsync(OrdersAbuseReportFilter filter)
+        {
+            PagedList<CustomerAbuseReportItem> toReturn = new PagedList<CustomerAbuseReportItem>();
+            List<CustomerAbuseReportItem> items =new List<CustomerAbuseReportItem>();
+
+            var data = await _sPEcommerceRepository.GetCustomerOrdersAbuseRawItemsAsync(filter);
+            foreach (var group in data.GroupBy(p => p.IdCustomer))
+            {
+                CustomerAbuseReportItem item=new CustomerAbuseReportItem();
+                var firstItem = group.FirstOrDefault();
+                // ReSharper disable once PossibleNullReferenceException
+                item.IdCustomer = firstItem.IdCustomer;
+                item.CustomerFirstName = firstItem.CustomerFirstName;
+                item.CustomerLastName = firstItem.CustomerLastName;
+                Dictionary<int,int> serviceCodeIds =new Dictionary<int, int>();
+
+                foreach (var customerOrderAbuseReportRawItem in group)
+                {
+                    if (customerOrderAbuseReportRawItem.IdObjectType == OrderType.Reship)
+                    {
+                        item.TotalReships++;
+                    }
+                    else if (customerOrderAbuseReportRawItem.IdObjectType == OrderType.Refund)
+                    {
+                        item.TotalRefunds++;
+                    }
+                    else if (customerOrderAbuseReportRawItem.IdObjectType != OrderType.AutoShip)
+                    {
+                        item.TotalOrders++;
+
+                        if (!item.LastOrderDateCreated.HasValue ||
+                            item.LastOrderDateCreated < customerOrderAbuseReportRawItem.DateCreated)
+                        {
+                            item.LastOrderDateCreated = customerOrderAbuseReportRawItem.DateCreated;
+                        }
+                    }
+
+                    if (customerOrderAbuseReportRawItem.IdServiceCode.HasValue)
+                    {
+                        if (!serviceCodeIds.ContainsKey(customerOrderAbuseReportRawItem.IdServiceCode.Value))
+                        {
+                            serviceCodeIds.Add(customerOrderAbuseReportRawItem.IdServiceCode.Value, 1);
+                        }
+                        else
+                        {
+                            serviceCodeIds[customerOrderAbuseReportRawItem.IdServiceCode.Value]++;
+                        }
+                    }
+                }
+
+                item.ServiceCodes = string.Empty;
+                foreach (var serviceCodeIdItem in serviceCodeIds)
+                {
+                    var serviceCodeName = _referenceData.ServiceCodes.FirstOrDefault(pp => serviceCodeIdItem.Key == pp.Key)?.Text;
+                    if (serviceCodeIdItem.Value > 1)
+                    {
+                        item.ServiceCodes += $"{serviceCodeName} ({serviceCodeIdItem.Value}), ";
+                    }
+                    else
+                    {
+                        item.ServiceCodes += $"{serviceCodeName}, ";
+                    }
+                }
+                if (item.ServiceCodes.EndsWith(", "))
+                {
+                    item.ServiceCodes = item.ServiceCodes.Substring(0, item.ServiceCodes.Length - 2);
+                }
+
+                items.Add(item);
+            }
+
+            toReturn.Count = items.Count;
+            if (filter.Paging != null)
+            {
+                var pageNo = filter.Paging.PageIndex - 1;
+                toReturn.Items = pageNo <= 0
+                    ? items.Take(filter.Paging.PageItemCount).ToList()
+                    : items.Skip(pageNo * filter.Paging.PageItemCount).Take(filter.Paging.PageItemCount).ToList();
+            }
+            else
+            {
+                toReturn.Items = items;
+            }
+
+            return toReturn;
+        }
     }
 }

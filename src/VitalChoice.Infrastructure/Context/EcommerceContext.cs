@@ -189,6 +189,22 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(f => f.Id);
             });
 
+            builder.Entity<OrderAbuseReportRawItem>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+                entity.Ignore(f => f.ServiceCodeName);
+                entity.Ignore(f => f.IdRefund);
+                entity.Ignore(f => f.RefundDateCreated);
+                entity.Ignore(f => f.RefundTotal);
+                entity.Ignore(f => f.IdReship);
+                entity.Ignore(f => f.ReshipDateCreated);
+            });
+
+            builder.Entity<CustomerOrderAbuseReportRawItem>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+            });
+
             #endregion
 
             builder.Entity<VCustomerFavorite>(entity =>

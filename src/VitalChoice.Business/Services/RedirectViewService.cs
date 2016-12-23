@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Ecommerce.Domain.Entities;
-using VitalChoice.Ecommerce.Domain.Exceptions;
-using VitalChoice.Ecommerce.Domain.Transfer;
-using VitalChoice.Infrastructure.Context;
 using VitalChoice.Infrastructure.Domain.Entities;
-using VitalChoice.Infrastructure.Domain.Entities.Users;
-using VitalChoice.Infrastructure.Domain.Options;
-using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services
@@ -23,7 +15,7 @@ namespace VitalChoice.Business.Services
 
         private static volatile RedirectData _latestData;
 
-        private static long _nextUpdateDate;
+        private static object _nextUpdateDate = DateTime.MinValue;
 
         private class RedirectData
         {
@@ -37,13 +29,13 @@ namespace VitalChoice.Business.Services
         private RedirectData GetRedirectData()
         {
             var now = DateTime.Now;
-            if (_latestData == null || now > new DateTime(Interlocked.Read(ref _nextUpdateDate)))
+            if (_latestData == null || now > (DateTime) _nextUpdateDate)
             {
                 lock (LockObj)
                 {
-                    if (_latestData == null || now > new DateTime(_nextUpdateDate))
+                    if (_latestData == null || now > (DateTime) _nextUpdateDate)
                     {
-                        _nextUpdateDate = now.AddMinutes(5).Ticks;
+                        _nextUpdateDate = now.AddMinutes(5);
                         var items = _redirectRepository.Query().Select(false);
                         items = items.Where(p => p.StatusCode == RecordStatusCode.Active).ToList();
 
