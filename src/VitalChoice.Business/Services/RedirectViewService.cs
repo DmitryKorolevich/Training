@@ -15,7 +15,7 @@ namespace VitalChoice.Business.Services
 
         private static volatile RedirectData _latestData;
 
-        private static object _nextUpdateDate = DateTime.MinValue;
+        private static volatile object _nextUpdateDate = DateTime.MinValue;
 
         private class RedirectData
         {
@@ -35,10 +35,8 @@ namespace VitalChoice.Business.Services
                 {
                     if (_latestData == null || now > (DateTime) _nextUpdateDate)
                     {
-                        _nextUpdateDate = now.AddMinutes(5);
                         var items = _redirectRepository.Query().Select(false);
                         items = items.Where(p => p.StatusCode == RecordStatusCode.Active).ToList();
-
                         _latestData = new RedirectData
                         {
                             PathQueryMap = items.Where(p => !p.IgnoreQuery)
@@ -46,6 +44,7 @@ namespace VitalChoice.Business.Services
                             PathMap = items.Where(p => p.IgnoreQuery)
                                 .ToDictionary(p => p.From, x => x.To, StringComparer.InvariantCultureIgnoreCase)
                         };
+                        _nextUpdateDate = now.AddMinutes(5);
                     }
                 }
             }
