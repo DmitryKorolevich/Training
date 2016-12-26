@@ -27,7 +27,7 @@ namespace VitalChoice.ContentProcessing.Extensions
             return base.InitStart(initContext, parent, chainedType, null);
         }
 
-        public override object ProcessData(Scope scope)
+        public override object ProcessData(ref Scope scope)
         {
             var contentViewContext = scope.CallerData as ContentViewContext;
             if (contentViewContext == null)
@@ -37,7 +37,8 @@ namespace VitalChoice.ContentProcessing.Extensions
             try
             {
                 var viewEngine = contentViewContext.ActionContext.HttpContext.RequestServices.GetRequiredService<ICompositeViewEngine>();
-                var viewName = GetInnerResult(scope.Parent());
+                var parentData = scope.Parent();
+                var viewName = GetInnerResult(ref parentData);
                 var result = viewEngine.GetView(null, viewName, false);
                 if (!result.Success)
                 {

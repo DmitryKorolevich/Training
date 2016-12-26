@@ -31,7 +31,7 @@ namespace VitalChoice.ContentProcessing.Extensions
             return new ExType(typeof(Type));
         }
 
-        public override object ProcessData(Scope scope)
+        public override object ProcessData(ref Scope scope)
         {
             if (_type == null)
             {

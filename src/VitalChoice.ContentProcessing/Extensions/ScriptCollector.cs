@@ -16,10 +16,10 @@ namespace VitalChoice.ContentProcessing.Extensions
     [ExtensionName("script")]
     public class ScriptCollector : AbstractExtension
     {
-        public override object ProcessData(Scope scope)
+        public override object ProcessData(ref Scope scope)
         {
             var viewContext = scope.CallerData as ContentViewContext;
-            string scripts = GetInnerResult(scope);
+            string scripts = GetInnerResult(ref scope);
             if (viewContext != null)
             {
                 viewContext.AppendScript(scripts);
