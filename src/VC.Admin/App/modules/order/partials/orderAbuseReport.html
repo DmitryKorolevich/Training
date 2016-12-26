@@ -93,7 +93,7 @@
                             <a ui-sref="index.oneCol.orderRefundDetail({id: item.IdRefund })">{{::item.IdRefund}}</a>
                         </td>
                         <td>{{::item.RefundDateCreated | date:"MM/dd/yy"}}<br />{{::item.RefundDateCreated | date:"h:mm a"}}</td>
-                        <td>({{::item.RefundTotal | currency}})</td>
+                        <td><span data-ng-if="item.RefundTotal">({{::item.RefundTotal | currency}})</span></td>
                         <td>
                             <a ui-sref="index.oneCol.orderReshipDetail({id: item.IdReship })">{{::item.IdReship}}</a>
                         </td>
