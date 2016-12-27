@@ -33,7 +33,7 @@ namespace VC.Public
         protected override void FinishCustomRegistrations(ContainerBuilder builder)
         {
             builder.RegisterType<PaginationLinkBuilder>().As<IBuildPaginationLinks>().SingleInstance();
-            builder.RegisterType<RedirectViewService>().As<IRedirectViewService>().InstancePerLifetimeScope();
+            builder.RegisterType<RedirectViewService>().As<IRedirectViewService>().SingleInstance();
         }
 
         protected override void PopulateCookieIdentityOptions(CookieAuthenticationOptions options)
