@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Autofac;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using VitalChoice.Data.Repositories;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Entities;
+using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services;
 
 namespace VitalChoice.Business.Services
 {
     public class RedirectViewService : IRedirectViewService
     {
-        private static readonly object LockObj = new object();
-
+        private readonly ILifetimeScope _rootScope;
         private static volatile RedirectData _latestData;
-
-        private static volatile object _nextUpdateDate = DateTime.MinValue;
+        private readonly BasicTimer _timer;
 
         private class RedirectData
         {
@@ -24,36 +25,29 @@ namespace VitalChoice.Business.Services
             public Dictionary<string, string> PathMap { get; set; }
         }
 
-        private readonly IRepositoryAsync<Redirect> _redirectRepository;
-
         private RedirectData GetRedirectData()
         {
-            var now = DateTime.Now;
-            if (_latestData == null || now > (DateTime) _nextUpdateDate)
+            using (var scope = _rootScope.BeginLifetimeScope())
             {
-                lock (LockObj)
+                var redirectRepo = scope.Resolve<IRepositoryAsync<Redirect>>();
+                var items = redirectRepo.Query().Select(false);
+                items = items.Where(p => p.StatusCode == RecordStatusCode.Active).ToList();
+                return new RedirectData
                 {
-                    if (_latestData == null || now > (DateTime) _nextUpdateDate)
-                    {
-                        var items = _redirectRepository.Query().Select(false);
-                        items = items.Where(p => p.StatusCode == RecordStatusCode.Active).ToList();
-                        _latestData = new RedirectData
-                        {
-                            PathQueryMap = items.Where(p => !p.IgnoreQuery)
-                                .ToDictionary(p => p.From, x => x.To, StringComparer.InvariantCultureIgnoreCase),
-                            PathMap = items.Where(p => p.IgnoreQuery)
-                                .ToDictionary(p => p.From, x => x.To, StringComparer.InvariantCultureIgnoreCase)
-                        };
-                        _nextUpdateDate = now.AddMinutes(5);
-                    }
-                }
+                    PathQueryMap = items.Where(p => !p.IgnoreQuery)
+                        .ToDictionary(p => p.From, x => x.To, StringComparer.InvariantCultureIgnoreCase),
+                    PathMap = items.Where(p => p.IgnoreQuery)
+                        .ToDictionary(p => p.From, x => x.To, StringComparer.InvariantCultureIgnoreCase)
+                };
             }
-            return _latestData;
         }
 
-        public RedirectViewService(IRepositoryAsync<Redirect> redirectRepository)
+        public RedirectViewService(ILifetimeScope rootScope, ILoggerFactory loggerFactory)
         {
-            _redirectRepository = redirectRepository;
+            var logger = loggerFactory.CreateLogger<RedirectViewService>();
+            _rootScope = rootScope;
+            _timer = new BasicTimer(() => _latestData = GetRedirectData(), TimeSpan.FromMinutes(5),
+                exception => logger.LogError(exception.ToString()));
         }
 
         public bool CheckRedirects(HttpContext context)
@@ -76,7 +70,7 @@ namespace VitalChoice.Business.Services
             }
             else
             {
-                var options = GetRedirectData();
+                var options = _latestData;
 
                 var queryPart = context.Request.QueryString.ToUriComponent();
                 var fullPath = pagePath + queryPart;
@@ -98,6 +92,11 @@ namespace VitalChoice.Business.Services
                 }
                 return false;
             }
+        }
+
+        public void Dispose()
+        {
+            _timer?.Dispose();
         }
     }
 }
