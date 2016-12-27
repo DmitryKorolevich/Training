@@ -46,13 +46,15 @@ namespace VitalChoice.Business.Services
         {
             var logger = loggerFactory.CreateLogger<RedirectViewService>();
             _rootScope = rootScope;
+            _latestData = GetRedirectData();
             _timer = new BasicTimer(() => _latestData = GetRedirectData(), TimeSpan.FromMinutes(5),
                 exception => logger.LogError(exception.ToString()));
         }
 
         public bool CheckRedirects(HttpContext context)
         {
-            if (!context.Request.Path.HasValue)
+            // ReSharper disable once UseNullPropagationWhenPossible
+            if (context?.Request?.Path == null)
                 return false;
 
             var pagePath = context.Request.Path.ToUriComponent();
