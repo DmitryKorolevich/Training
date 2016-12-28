@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using VitalChoice.Caching.Extensions;
@@ -13,7 +14,7 @@ namespace VitalChoice.Caching.Debuging
 
         public object UpdateEntity { get; set; }
 
-        public ICollection<object> CachedEntities { get; set; }
+        public IList CachedEntities { get; set; }
 
         public object ActualDbEntity { get; set; }
     }

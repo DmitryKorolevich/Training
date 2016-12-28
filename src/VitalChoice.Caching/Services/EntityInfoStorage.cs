@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -163,7 +164,7 @@ namespace VitalChoice.Caching.Services
             var uniqueIndex =
                 indexes.Select(
                         index =>
-                                new EntityCacheableIndexInfo(CreateValueInfos(index.Properties)))
+                            new EntityCacheableIndexInfo(CreateValueInfos(index.Properties)))
                     .FirstOrDefault();
             return uniqueIndex;
         }
@@ -358,7 +359,7 @@ namespace VitalChoice.Caching.Services
             return caller.GetEntity(pk, rootScope);
         }
 
-        public IEnumerable<object> GetEntities(Type entityType, IEnumerable<EntityKey> pk, IServiceScopeFactory rootScope)
+        public IList GetEntities(Type entityType, IEnumerable<EntityKey> pk, IServiceScopeFactory rootScope)
         {
             var caller = (IGetEntityCaller) Activator.CreateInstance(typeof(GetEntityCaller<>).MakeGenericType(entityType), this);
             return caller.GetEntities(pk, rootScope);
@@ -459,7 +460,7 @@ namespace VitalChoice.Caching.Services
             return null;
         }
 
-        public IEnumerable<T> GetEntities<T>(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope)
+        public List<T> GetEntities<T>(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope)
             where T : class
         {
             using (var scope = rootScope.CreateScope())
@@ -484,13 +485,13 @@ namespace VitalChoice.Caching.Services
                                 return
                                     set.AsNoTracking()
                                         .AsNonCached()
-                                        .Where(Expression.Lambda<Func<T, bool>>(conditionalExpression, parameter));
+                                        .Where(Expression.Lambda<Func<T, bool>>(conditionalExpression, parameter)).ToList();
                             }
                         }
                     }
                 }
             }
-            return Enumerable.Empty<T>();
+            return new List<T>();
         }
 
         public EntityPrimaryKeyInfo GetPrimaryKeyInfo<T>()
@@ -682,14 +683,14 @@ namespace VitalChoice.Caching.Services
         {
             return properties.Select(
                 property =>
-                        new EntityValueInfo(property.Name, property.GetGetter(), property.GetSetter(), property.ClrType));
+                    new EntityValueInfo(property.Name, property.GetGetter(), property.GetSetter(), property.ClrType));
         }
 
         private interface IGetEntityCaller
         {
             object GetEntity(ICollection<EntityValueExportable> keyValues, IServiceScopeFactory rootScope);
             object GetEntity(EntityKey pk, IServiceScopeFactory rootScope);
-            IEnumerable<object> GetEntities(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope);
+            IList GetEntities(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope);
         }
 
         private struct GetEntityCaller<T> : IGetEntityCaller
@@ -708,7 +709,7 @@ namespace VitalChoice.Caching.Services
 
             public object GetEntity(EntityKey pk, IServiceScopeFactory rootScope) => _infoStorage.GetEntity<T>(pk, rootScope);
 
-            public IEnumerable<object> GetEntities(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope)
+            public IList GetEntities(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope)
                 => _infoStorage.GetEntities<T>(pks, rootScope);
         }
 
