@@ -9,19 +9,19 @@ namespace VitalChoice.Caching.Interfaces
     public interface IInternalEntityCache : IDisposable
     {
         CachedEntity Update(RelationInfo relations, object entity, object dbContext);
-        IEnumerable<CachedEntity> Update(RelationInfo relations, IEnumerable<object> entity, object dbContext);
-        bool Update(IEnumerable<object> entities, RelationInfo relationInfo, object dbContext);
+        IEnumerable<CachedEntity> UpdateList(RelationInfo relations, IEnumerable<object> entity, object dbContext);
+        bool UpdateList(IEnumerable<object> entities, RelationInfo relationInfo, object dbContext);
         bool Update(object entity, RelationInfo relationInfo, object dbContext);
         bool Update(object entity, DbContext context, object dbContext);
         bool UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo, object dbContext);
         EntityKey MarkForUpdate(object entity, object dbContext);
-        ICollection<EntityKey> MarkForUpdate(IEnumerable<object> entities, object dbContext);
-        void SetNull(IEnumerable<EntityKey> keys, RelationInfo relationInfo);
+        ICollection<EntityKey> MarkForUpdateList(IEnumerable<object> entities, object dbContext);
+        void SetNullList(IEnumerable<EntityKey> keys, RelationInfo relationInfo);
         void SetNull(EntityKey key, RelationInfo relationInfo);
         void MarkForUpdateByPrimaryKey(EntityKey pk, object dbContext, string hasRelation = null);
-        void MarkForUpdateByPrimaryKey(ICollection<EntityKey> pks, object dbContext, string hasRelation = null);
+        void MarkForUpdateListByPrimaryKey(ICollection<EntityKey> pks, object dbContext, string hasRelation = null);
         EntityKey MarkForAdd(object entity, object dbContext);
-        ICollection<EntityKey> MarkForAdd(ICollection<object> entities, object dbContext);
+        ICollection<EntityKey> MarkForAddList(ICollection<object> entities, object dbContext);
         bool TryRemove(object entity);
         bool TryRemove(EntityKey pk);
         bool ItemExistWithoutRelations(EntityKey pk);
@@ -61,7 +61,7 @@ namespace VitalChoice.Caching.Interfaces
 
         IEnumerable<CacheResult<T>> TryRemoveWithResult(T entity, ICacheStateManager stateManager, bool tracked);
 
-        bool Update(IEnumerable<T> entities, RelationInfo relationInfo, object dbContext);
+        bool UpdateList(IEnumerable<T> entities, RelationInfo relationInfo, object dbContext);
 
         bool Update(T entity, RelationInfo relationInfo, object dbContext);
 
@@ -69,16 +69,16 @@ namespace VitalChoice.Caching.Interfaces
 
         CachedEntity<T> Update(RelationInfo relations, T entity, object dbContext);
 
-        IEnumerable<CachedEntity<T>> Update(RelationInfo relations, IEnumerable<T> entities, object dbContext);
+        IEnumerable<CachedEntity<T>> UpdateList(RelationInfo relations, IEnumerable<T> entities, object dbContext);
 
         bool UpdateAll(IEnumerable<T> entities, RelationInfo relationInfo, object dbContext);
 
         EntityKey MarkForUpdate(T entity, object dbContext);
 
-        ICollection<EntityKey> MarkForUpdate(IEnumerable<T> entities, object dbContext);
+        ICollection<EntityKey> MarkForUpdateList(IEnumerable<T> entities, object dbContext);
 
         EntityKey MarkForAdd(T entity, object dbContext);
 
-        ICollection<EntityKey> MarkForAdd(ICollection<T> entities, object dbContext);
+        ICollection<EntityKey> MarkForAddList(ICollection<T> entities, object dbContext);
     }
 }
