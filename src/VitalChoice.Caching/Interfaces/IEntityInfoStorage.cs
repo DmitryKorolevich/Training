@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,7 @@ namespace VitalChoice.Caching.Interfaces
         Type GetContextType(Type entityType);
         object GetEntity(Type entityType, ICollection<EntityValueExportable> keyValues, IServiceScopeFactory rootScope);
         object GetEntity(Type entityType, EntityKey pk, IServiceScopeFactory rootScope);
-        IEnumerable<object> GetEntities(Type entityType, IEnumerable<EntityKey> pk, IServiceScopeFactory rootScope);
+        IList GetEntities(Type entityType, IEnumerable<EntityKey> pk, IServiceScopeFactory rootScope);
 
         EntityPrimaryKeyInfo GetPrimaryKeyInfo(Type entityType);
         EntityCacheableIndexInfo GetIndexInfo(Type entityType);
@@ -33,7 +34,7 @@ namespace VitalChoice.Caching.Interfaces
         T GetEntity<T>(EntityKey pk, IServiceScopeFactory rootScope)
             where T : class;
 
-        IEnumerable<T> GetEntities<T>(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope)
+        List<T> GetEntities<T>(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope)
             where T : class;
 
         EntityPrimaryKeyInfo GetPrimaryKeyInfo<T>();

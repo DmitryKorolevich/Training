@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -290,7 +291,7 @@ namespace VitalChoice.Caching.Services.Cache
             return pk;
         }
 
-        public ICollection<EntityKey> MarkForAddList(ICollection<T> entities, object dbContext)
+        public List<EntityKey> MarkForAddList(List<T> entities, object dbContext)
         {
             return MarkForAddInternal(entities, dbContext);
         }
@@ -342,7 +343,7 @@ namespace VitalChoice.Caching.Services.Cache
             return MarkForUpdate((T) entity, dbContext);
         }
 
-        public ICollection<EntityKey> MarkForUpdateList(IEnumerable<object> entities, object dbContext)
+        public List<EntityKey> MarkForUpdateList(IEnumerable<object> entities, object dbContext)
         {
             var pks = entities.Select(e => EntityInfo.PrimaryKey.GetPrimaryKeyValue(e)).ToList();
             MarkForUpdateListByPrimaryKey(pks, dbContext, null);
@@ -378,7 +379,7 @@ namespace VitalChoice.Caching.Services.Cache
             return MarkForAdd((T) entity, dbContext);
         }
 
-        public ICollection<EntityKey> MarkForAddList(ICollection<object> entities, object dbContext)
+        public List<EntityKey> MarkForAddList(IList entities, object dbContext)
         {
             return MarkForAddInternal(entities, dbContext);
         }
@@ -434,9 +435,9 @@ namespace VitalChoice.Caching.Services.Cache
             CacheStorage.Dispose();
         }
 
-        private ICollection<EntityKey> MarkForAddInternal<TItem>(ICollection<TItem> entities, object dbContext)
+        private List<EntityKey> MarkForAddInternal(IList entities, object dbContext)
         {
-            List<EntityKey> pks = new List<EntityKey>();
+            var pks = new List<EntityKey>();
             if (entities.Count == 0)
                 return pks;
             foreach (var data in CacheStorage.AllCacheDatas)

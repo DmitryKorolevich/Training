@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using VitalChoice.Caching.Relational;
@@ -15,13 +16,13 @@ namespace VitalChoice.Caching.Interfaces
         bool Update(object entity, DbContext context, object dbContext);
         bool UpdateAll(IEnumerable<object> entities, RelationInfo relationInfo, object dbContext);
         EntityKey MarkForUpdate(object entity, object dbContext);
-        ICollection<EntityKey> MarkForUpdateList(IEnumerable<object> entities, object dbContext);
+        List<EntityKey> MarkForUpdateList(IEnumerable<object> entities, object dbContext);
         void SetNullList(IEnumerable<EntityKey> keys, RelationInfo relationInfo);
         void SetNull(EntityKey key, RelationInfo relationInfo);
         void MarkForUpdateByPrimaryKey(EntityKey pk, object dbContext, string hasRelation = null);
         void MarkForUpdateListByPrimaryKey(ICollection<EntityKey> pks, object dbContext, string hasRelation = null);
         EntityKey MarkForAdd(object entity, object dbContext);
-        ICollection<EntityKey> MarkForAddList(ICollection<object> entities, object dbContext);
+        List<EntityKey> MarkForAddList(IList entities, object dbContext);
         bool TryRemove(object entity);
         bool TryRemove(EntityKey pk);
         bool ItemExistWithoutRelations(EntityKey pk);
@@ -79,6 +80,6 @@ namespace VitalChoice.Caching.Interfaces
 
         EntityKey MarkForAdd(T entity, object dbContext);
 
-        ICollection<EntityKey> MarkForAddList(ICollection<T> entities, object dbContext);
+        List<EntityKey> MarkForAddList(List<T> entities, object dbContext);
     }
 }

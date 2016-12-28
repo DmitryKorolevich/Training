@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using VitalChoice.Caching.Interfaces;
@@ -61,8 +62,8 @@ namespace VitalChoice.Caching.Extensions
             return new EntityForeignKey(GetValues(entity, pkInfo));
         }
 
-        public static IDictionary<EntityForeignKeyInfo, HashSet<EntityForeignKey>> GetForeignKeysValues<T>(
-            this IEnumerable<EntityForeignKeyInfo> indexInfos, ICollection<T> entities)
+        public static IDictionary<EntityForeignKeyInfo, HashSet<EntityForeignKey>> GetForeignKeysValues(
+            this IEnumerable<EntityForeignKeyInfo> indexInfos, IList entities)
         {
             var result = new Dictionary<EntityForeignKeyInfo, HashSet<EntityForeignKey>>();
             foreach (var indexInfo in indexInfos ?? Enumerable.Empty<EntityForeignKeyInfo>())
@@ -73,7 +74,7 @@ namespace VitalChoice.Caching.Extensions
             return result;
         }
 
-        private static HashSet<EntityForeignKey> GetForeignKeySets<T>(IEnumerable<T> entities, EntityForeignKeyInfo indexInfo)
+        private static HashSet<EntityForeignKey> GetForeignKeySets(IEnumerable entities, EntityForeignKeyInfo indexInfo)
         {
             var keySet = new HashSet<EntityForeignKey>();
             foreach (var entity in entities)

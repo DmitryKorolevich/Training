@@ -130,7 +130,7 @@ namespace VitalChoice.Caching.Services
             foreach (var addOp in addList)
             {
                 var entities = KeyStorage.GetEntities(addOp.EntityType, addOp.PkList, ScopeContainer.ScopeFactory);
-                addOp.Cache.MarkForAddList(entities.ToList(), null);
+                addOp.Cache.MarkForAddList(entities, null);
             }
         }
 
