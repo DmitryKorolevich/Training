@@ -628,7 +628,7 @@ namespace VitalChoice.Caching.Services
 
                 foreach (var pk in pks)
                 {
-                    list.Add(pk.Values[0]);
+                    list.Add(pk.Values[0].Value.GetValue());
                 }
 
                 conditionalExpression = Expression.Call(genericListType.GetMethod("Contains", BindingFlags.Instance | BindingFlags.Public),

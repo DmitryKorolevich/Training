@@ -15,19 +15,17 @@ namespace VitalChoice.Caching.Extensions
         where TSyncProvider : class, ICacheSyncProvider
     {
         private readonly ICacheServiceScopeFactoryContainer _serviceScopeFactoryContainer;
-        private readonly IServiceCollection _services;
+        private readonly Action<IServiceCollection> _serviceBuilder;
 
         public CacheContextExtension(ICacheServiceScopeFactoryContainer serviceScopeFactoryContainer,
             Action<IServiceCollection> serviceBuilder = null)
         {
             _serviceScopeFactoryContainer = serviceScopeFactoryContainer;
-            _services = new ServiceCollection();
-            serviceBuilder?.Invoke(_services);
+            _serviceBuilder = serviceBuilder;
         }
 
         public void ApplyServices(IServiceCollection services)
         {
-            services.TryAddEnumerable(_services);
             services.Replace(ServiceDescriptor.Scoped<IStateManager, CacheStateManager>());
             services.Replace(ServiceDescriptor.Scoped<IAsyncQueryProvider, CacheEntityQueryProvider>());
             services.AddSingleton<IQueryParserFactory, QueryParserFactory>();
@@ -36,6 +34,7 @@ namespace VitalChoice.Caching.Extensions
             services.AddSingleton<IEntityInfoStorage, EntityInfoStorage>();
             services.AddSingleton<IContextTypeContainer>(sp => new ContextTypeContainer());
             services.AddSingleton(_serviceScopeFactoryContainer);
+            _serviceBuilder?.Invoke(services);
         }
     }
 }

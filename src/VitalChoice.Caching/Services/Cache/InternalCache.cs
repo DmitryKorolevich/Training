@@ -272,7 +272,6 @@ namespace VitalChoice.Caching.Services.Cache
 
         public EntityKey MarkForAdd(T entity, object dbContext)
         {
-
             foreach (var data in CacheStorage.AllCacheDatas)
             {
                 lock (data)
