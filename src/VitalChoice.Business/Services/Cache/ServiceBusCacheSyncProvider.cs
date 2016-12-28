@@ -44,6 +44,12 @@ namespace VitalChoice.Business.Services.Cache
 
                 var queName = options.Value.CacheSyncOptions?.ServiceBusQueueName;
 
+                _sendingClient =
+                    new ServiceBusTopicSender<SyncOperation>(
+                        new TopicFactory(options.Value.CacheSyncOptions?.ConnectionString, queName).Create, Logger, ConstructMessage);
+
+                _sendingPool = new BatchSendingPool<SyncOperation>(_sendingClient, Logger);
+
                 _receiverHost = new ServiceBusReceiverHost(Logger,
                     new ServiceBusSubscriptionReceiver(
                         new SubcriptionFactory(options.Value.CacheSyncOptions?.ConnectionString, queName,
@@ -51,12 +57,6 @@ namespace VitalChoice.Business.Services.Cache
 
                 _receiverHost.ReceiveBatchEvent += ReceiveMessages;
                 _receiverHost.Start();
-
-                _sendingClient =
-                    new ServiceBusTopicSender<SyncOperation>(
-                        new TopicFactory(options.Value.CacheSyncOptions?.ConnectionString, queName).Create, Logger, ConstructMessage);
-
-                _sendingPool = new BatchSendingPool<SyncOperation>(_sendingClient, Logger);
             }
         }
 

@@ -57,9 +57,6 @@ namespace VitalChoice.Caching.Services
                 }
             }).GroupBy(s => s.EntityType);
 
-            var updateList = new List<UpdateOp>();
-            var addList = new List<UpdateOp>();
-
             foreach (var group in syncGroups)
             {
                 var type = group.Key;
@@ -67,8 +64,6 @@ namespace VitalChoice.Caching.Services
                 if (pkInfo == null)
                     continue;
                 var internalCache = CacheFactory.GetCache(type);
-                var localUpdateList = new Lazy<List<EntityKey>>(() => new List<EntityKey>(), LazyThreadSafetyMode.None);
-                var localAddList = new Lazy<List<EntityKey>>(() => new List<EntityKey>(), LazyThreadSafetyMode.None);
                 foreach (var op in group)
                 {
                     try
@@ -79,10 +74,6 @@ namespace VitalChoice.Caching.Services
                             case SyncType.Update:
                                 pk = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
                                 internalCache.MarkForUpdateByPrimaryKey(pk, null);
-                                if (internalCache.ItemExistWithoutRelations(pk))
-                                {
-                                    localUpdateList.Value.Add(pk);
-                                }
                                 break;
                             case SyncType.Delete:
                                 pk = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
@@ -91,7 +82,7 @@ namespace VitalChoice.Caching.Services
                                 break;
                             case SyncType.Add:
                                 pk = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
-                                localAddList.Value.Add(pk);
+                                internalCache.MarkForAddByPrimaryKey(pk, null);
                                 break;
                         }
                     }
@@ -100,37 +91,6 @@ namespace VitalChoice.Caching.Services
                         Logger.LogError(e.ToString());
                     }
                 }
-                if (localUpdateList.IsValueCreated)
-                {
-                    updateList.Add(new UpdateOp
-                    {
-                        Cache = internalCache,
-                        EntityType = type,
-                        PkList = localUpdateList.Value
-                    });
-                }
-                if (localAddList.IsValueCreated)
-                {
-                    addList.Add(new UpdateOp
-                    {
-                        Cache = internalCache,
-                        EntityType = type,
-                        PkList = localAddList.Value
-                    });
-                }
-            }
-            foreach (var updateOp in updateList)
-            {
-                var entities = KeyStorage.GetEntities(updateOp.EntityType, updateOp.PkList, ScopeContainer.ScopeFactory);
-                foreach (var entity in entities)
-                {
-                    updateOp.Cache.Update(entity, (DbContext) null, null);
-                }
-            }
-            foreach (var addOp in addList)
-            {
-                var entities = KeyStorage.GetEntities(addOp.EntityType, addOp.PkList, ScopeContainer.ScopeFactory);
-                addOp.Cache.MarkForAddList(entities, null);
             }
         }
 
@@ -142,13 +102,6 @@ namespace VitalChoice.Caching.Services
         {
             public Type EntityType;
             public SyncOperation SyncOperation;
-        }
-
-        private struct UpdateOp
-        {
-            public Type EntityType;
-            public List<EntityKey> PkList;
-            public IInternalEntityCache Cache;
         }
     }
 }

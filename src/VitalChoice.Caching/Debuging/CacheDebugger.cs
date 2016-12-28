@@ -55,7 +55,7 @@ namespace VitalChoice.Caching.Debuging
                             yield return new CacheUpdateData
                             {
                                 EntityType = type,
-                                ActualDbEntity = EntityInfo.GetEntity(type, pk, ScopeFactoryContainer.ScopeFactory),
+                                //ActualDbEntity = EntityInfo.GetEntity(type, pk, ScopeFactoryContainer.ScopeFactory),
                                 CachedEntities = cachedList,
                                 UpdateEntity = entry.Entity
                             };
