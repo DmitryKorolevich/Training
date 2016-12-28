@@ -198,6 +198,7 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(f => f.RefundTotal);
                 entity.Ignore(f => f.IdReship);
                 entity.Ignore(f => f.ReshipDateCreated);
+                entity.Ignore(f => f.OrderSourceAddedBy);
             });
 
             builder.Entity<CustomerOrderAbuseReportRawItem>(entity =>
