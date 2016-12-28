@@ -121,7 +121,7 @@ namespace VitalChoice.Caching.Extensions
             var items = entityInfo.PrimaryKey.Infos;
             for (int i = 0; i < itemsCount; i++)
             {
-                items[i].SetClrValue(result, pk.Values[i]);
+                items[i].SetClrValue(result, pk.Values[i].Value.GetValue());
             }
             return result;
         }

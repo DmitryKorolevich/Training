@@ -249,7 +249,7 @@ namespace VitalChoice.Caching.Services
                     switch (ops.Key)
                     {
                         case EntityState.Modified:
-                            foreach (var opPair in ops.SimpleJoin(cache.MarkForUpdate(ops.Select(op => op.Entity), null)))
+                            foreach (var opPair in ops.SimpleJoin(cache.MarkForUpdateList(ops.Select(op => op.Entity), null)))
                             {
                                 var op = opPair.Key;
                                 var pk = opPair.Value;
@@ -270,7 +270,7 @@ namespace VitalChoice.Caching.Services
                             }
                             break;
                         case EntityState.Deleted:
-                            foreach (var opPair in ops.SimpleJoin(cache.MarkForUpdate(ops.Select(op => op.Entity), null)))
+                            foreach (var opPair in ops.SimpleJoin(cache.MarkForUpdateList(ops.Select(op => op.Entity), null)))
                             {
                                 var pk = opPair.Value;
                                 if (pk.IsValid)
@@ -286,7 +286,7 @@ namespace VitalChoice.Caching.Services
                             }
                             break;
                         case EntityState.Added:
-                            foreach (var opPair in ops.SimpleJoin(cache.MarkForAdd(ops.Select(op => op.Entity).ToArray(), null)))
+                            foreach (var opPair in ops.SimpleJoin(cache.MarkForAddList(ops.Select(op => op.Entity).ToArray(), null)))
                             {
                                 var op = opPair.Key;
                                 var pk = opPair.Value;
@@ -331,7 +331,7 @@ namespace VitalChoice.Caching.Services
                     switch (ops.Key)
                     {
                         case EntityState.Modified:
-                            foreach (var opPair in ops.SimpleJoin(cache.MarkForUpdate(ops.Select(op => op.Entity), null)))
+                            foreach (var opPair in ops.SimpleJoin(cache.MarkForUpdateList(ops.Select(op => op.Entity), null)))
                             {
                                 var op = opPair.Key;
                                 var pk = opPair.Value;
@@ -346,7 +346,7 @@ namespace VitalChoice.Caching.Services
                             }
                             break;
                         case EntityState.Deleted:
-                            foreach (var opPair in ops.SimpleJoin(cache.MarkForUpdate(ops.Select(op => op.Entity), null)))
+                            foreach (var opPair in ops.SimpleJoin(cache.MarkForUpdateList(ops.Select(op => op.Entity), null)))
                             {
                                 var pk = opPair.Value;
                                 if (pk.IsValid)
@@ -356,7 +356,7 @@ namespace VitalChoice.Caching.Services
                             }
                             break;
                         case EntityState.Added:
-                            foreach (var opPair in ops.SimpleJoin(cache.MarkForAdd(ops.Select(op => op.Entity).ToArray(), null)))
+                            foreach (var opPair in ops.SimpleJoin(cache.MarkForAddList(ops.Select(op => op.Entity).ToArray(), null)))
                             {
                                 var op = opPair.Key;
                                 var pk = opPair.Value;

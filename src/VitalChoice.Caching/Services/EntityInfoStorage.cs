@@ -628,11 +628,11 @@ namespace VitalChoice.Caching.Services
 
                 foreach (var pk in pks)
                 {
-                    list.Add(pk.Values[0]);
+                    list.Add(pk.Values[0].Value.GetValue());
                 }
 
-                conditionalExpression = Expression.Call(genericListType.GetMethod("Contains", BindingFlags.Instance | BindingFlags.Public),
-                    Expression.Constant(list.CollectionObject),
+                conditionalExpression = Expression.Call(Expression.Constant(list.CollectionObject),
+                    genericListType.GetMethod("Contains", BindingFlags.Instance | BindingFlags.Public),
                     Expression.MakeMemberAccess(parameter, typeof(T).GetRuntimeProperty(propertyInfo.Name)));
             }
             else

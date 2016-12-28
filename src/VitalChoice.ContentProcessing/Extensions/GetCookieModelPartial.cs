@@ -32,7 +32,7 @@ namespace VitalChoice.ContentProcessing.Extensions
             return ExType.Dynamic;
         }
 
-        public override object ProcessData(Scope scope)
+        public override object ProcessData(ref Scope scope)
         {
             object toReturn = null;
             var contentViewContext = scope.CallerData as ContentViewContext;

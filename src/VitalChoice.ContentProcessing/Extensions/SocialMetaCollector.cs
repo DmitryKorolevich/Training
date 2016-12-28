@@ -16,10 +16,10 @@ namespace VitalChoice.ContentProcessing.Extensions
     [ExtensionName("socialmeta")]
     public class SocialMetaCollector : AbstractExtension
     {
-        public override object ProcessData(Scope scope)
+        public override object ProcessData(ref Scope scope)
         {
             var viewContext = scope.CallerData as ContentViewContext;
-            string meta = GetInnerResult(scope);
+            string meta = GetInnerResult(ref scope);
             if (viewContext != null)
             {
                 viewContext.AppendSocialMeta(meta);

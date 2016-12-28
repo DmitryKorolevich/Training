@@ -129,15 +129,16 @@ namespace VitalChoice.Core.DependencyInjection
             ConfigureAppOptions(configuration, newOptions);
             var tableLogsClient = new TableLogsClient(new OptionsWrapper<AppOptions>(newOptions),
                 appEnv);
-            services.AddSingleton<ITableLogsClient>(tableLogsClient);
-
             AzureTablesTarget.InitalizeTableClient(tableLogsClient);
             ConfigurationItemFactory.Default.Targets.RegisterDefinition("AzureTables", typeof(AzureTablesTarget));
-
+            services.AddSingleton<ITableLogsClient>(tableLogsClient)
+                .AddSingleton<ILoggerProvider>(sp => new LoggerProviderExtended(appEnv))
+                .AddSingleton<LoggerProviderExtended>()
+                .AddSingleton(sp => sp.GetRequiredService<LoggerProviderExtended>().Factory);
             // Add EF services to the services container.
             var scopeContainer = new CacheServiceScopeFactoryContainer();
 #if !NETSTANDARD1_5
-            ConfigureDatabases(configuration, services, appEnv, enableCache, scopeContainer, enableProfiler);
+            ConfigureDatabases(configuration, services, appEnv, enableCache, scopeContainer, tableLogsClient, enableProfiler);
 #else
             services.AddEntityFramework()
                 .AddDbContext<VitalChoiceContext>()
@@ -185,11 +186,6 @@ namespace VitalChoice.Core.DependencyInjection
                 builder.Populate(services);
             }
             builder.RegisterInstance(configuration).As<IConfiguration>();
-            builder.RegisterType<LoggerProviderExtended>()
-                .As<ILoggerProvider>()
-                .AsSelf()
-                .SingleInstance();
-            builder.Register(cc => cc.Resolve<LoggerProviderExtended>().Factory).As<ILoggerFactory>().SingleInstance();
 
             //TODO: omit ILogger override in config parameter
             builder.Register((cc, pp) => cc.Resolve<LoggerProviderExtended>().CreateLogger("Root")).As<ILogger>();
@@ -211,7 +207,7 @@ namespace VitalChoice.Core.DependencyInjection
         }
 
         protected virtual void ConfigureDatabases(IConfiguration configuration, IServiceCollection services,
-            IHostingEnvironment appEnv, bool enableCache, CacheServiceScopeFactoryContainer scopeContainer, bool enableProfiler = false)
+            IHostingEnvironment appEnv, bool enableCache, CacheServiceScopeFactoryContainer scopeContainer, ITableLogsClient tableLogsClient, bool enableProfiler = false)
         {
             if (enableCache)
             {
@@ -219,27 +215,27 @@ namespace VitalChoice.Core.DependencyInjection
                 {
                     services.AddEntityFramework()
                         .AddDbContext<VitalChoiceContext>(
-                            options =>
-                                options.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
-                                    serviceCollection =>
-                                    {
-                                        serviceCollection.AddSingleton(appEnv)
-                                            .AddSingleton(new LoggerProviderExtended(appEnv).Factory)
-                                            .InjectProfiler()
-                                            .Configure<AppOptionsBase>(
-                                                appOptions => ConfigureBaseOptions(configuration, appOptions));
-                                    }))
+                            optionsBuilder =>
+                                optionsBuilder.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
+                                    sc => sc.AddSingleton(appEnv)
+                                        .AddSingleton(tableLogsClient)
+                                        .AddSingleton<ILoggerProvider>(sp => new LoggerProviderExtended(appEnv))
+                                        .AddSingleton<LoggerProviderExtended>()
+                                        .AddSingleton(sp => sp.GetRequiredService<LoggerProviderExtended>().Factory)
+                                        .InjectProfiler()
+                                        .Configure<AppOptionsBase>(
+                                            appOptions => ConfigureBaseOptions(configuration, appOptions))))
                         .AddDbContext<EcommerceContext>(
-                            options =>
-                                options.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
-                                    serviceCollection =>
-                                    {
-                                        serviceCollection.AddSingleton(appEnv)
-                                            .AddSingleton(new LoggerProviderExtended(appEnv).Factory)
-                                            .InjectProfiler()
-                                            .Configure<AppOptionsBase>(
-                                                appOptions => ConfigureBaseOptions(configuration, appOptions));
-                                    }))
+                            optionsBuilder =>
+                                optionsBuilder.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
+                                    sc => sc.AddSingleton(appEnv)
+                                        .AddSingleton(tableLogsClient)
+                                        .AddSingleton<ILoggerProvider>(sp => new LoggerProviderExtended(appEnv))
+                                        .AddSingleton<LoggerProviderExtended>()
+                                        .AddSingleton(sp => sp.GetRequiredService<LoggerProviderExtended>().Factory)
+                                        .InjectProfiler()
+                                        .Configure<AppOptionsBase>(
+                                            appOptions => ConfigureBaseOptions(configuration, appOptions))))
                         .AddDbContext<LogsContext>()
                         .AddEntityFrameworkSqlServer();
                 }
@@ -247,25 +243,25 @@ namespace VitalChoice.Core.DependencyInjection
                 {
                     services.AddEntityFramework()
                         .AddDbContext<VitalChoiceContext>(
-                            options =>
-                                options.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
-                                    serviceCollection =>
-                                    {
-                                        serviceCollection.AddSingleton(appEnv)
-                                            .AddSingleton(new LoggerProviderExtended(appEnv).Factory)
-                                            .Configure<AppOptionsBase>(
-                                                appOptions => ConfigureBaseOptions(configuration, appOptions));
-                                    }))
+                            optionsBuilder =>
+                                optionsBuilder.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
+                                    sc => sc.AddSingleton(appEnv)
+                                        .AddSingleton(tableLogsClient)
+                                        .AddSingleton<ILoggerProvider>(sp => new LoggerProviderExtended(appEnv))
+                                        .AddSingleton<LoggerProviderExtended>()
+                                        .AddSingleton(sp => sp.GetRequiredService<LoggerProviderExtended>().Factory)
+                                        .Configure<AppOptionsBase>(
+                                            appOptions => ConfigureBaseOptions(configuration, appOptions))))
                         .AddDbContext<EcommerceContext>(
-                            options =>
-                                options.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
-                                    serviceCollection =>
-                                    {
-                                        serviceCollection.AddSingleton(appEnv)
-                                            .AddSingleton(new LoggerProviderExtended(appEnv).Factory)
-                                            .Configure<AppOptionsBase>(
-                                                appOptions => ConfigureBaseOptions(configuration, appOptions));
-                                    }))
+                            optionsBuilder =>
+                                optionsBuilder.UseCache<ServiceBusCacheSyncProvider>(scopeContainer,
+                                    sc => sc.AddSingleton(appEnv)
+                                        .AddSingleton(tableLogsClient)
+                                        .AddSingleton<ILoggerProvider>(sp => new LoggerProviderExtended(appEnv))
+                                        .AddSingleton<LoggerProviderExtended>()
+                                        .AddSingleton(sp => sp.GetRequiredService<LoggerProviderExtended>().Factory)
+                                        .Configure<AppOptionsBase>(
+                                            appOptions => ConfigureBaseOptions(configuration, appOptions))))
                         .AddDbContext<LogsContext>()
                         .AddEntityFrameworkSqlServer();
                 }
