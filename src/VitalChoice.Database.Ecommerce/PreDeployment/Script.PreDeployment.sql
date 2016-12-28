@@ -14,3 +14,4 @@
 :r .\Scripts\OrderShippingPackages.sql
 :r .\Scripts\GCs.sql
 :r .\Scripts\SkuOOSHistoryItems.sql
+:r .\Scripts\OrderReviewRules.sql
