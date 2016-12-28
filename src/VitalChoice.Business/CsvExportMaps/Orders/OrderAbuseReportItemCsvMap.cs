@@ -36,8 +36,9 @@ namespace VitalChoice.Business.CsvExportMaps.Orders
             Map(m => m.RefundTotal).Name("Refund Value").Index(8).TypeConverterOption("c");
             Map(m => m.IdReship).Name("Reship Order #").Index(9);
             Map(m => m.ReshipDateCreated).Name("Reship Date").Index(10);
-            Map(m => m.ServiceCodeName).Name("Service Code").Index(11);
-            Map(m => m.ServiceCodeNotes).Name("Service Code Notes").Index(12);
+            Map(m => m.OrderSourceAddedBy).Name("Original Agent ID").Index(11);
+            Map(m => m.ServiceCodeName).Name("Service Code").Index(12);
+            Map(m => m.ServiceCodeNotes).Name("Service Code Notes").Index(13);
         }
     }
 }

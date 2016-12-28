@@ -32,7 +32,8 @@ BEGIN
 		scnval.Value ServiceCodeNotes,
 		temp.IdOrderSource,
 		os.DateCreated OrderSourceDateCreated,
-		os.ProductsSubtotal OrderSourceProductsSubtotal
+		os.ProductsSubtotal OrderSourceProductsSubtotal,
+		os.IdAddedBy OrderSourceIdAddedBy
 	FROM
 	(
 		SELECT

@@ -72,6 +72,7 @@
                         <th>Refund Value</th>
                         <th>Reship Order #</th>
                         <th>Reship Date</th>
+                        <th>Original Agent ID</th>
                         <th>Service Code</th>
                         <th>Service Code Notes</th>
                     </tr>
@@ -98,6 +99,7 @@
                             <a ui-sref="index.oneCol.orderReshipDetail({id: item.IdReship })">{{::item.IdReship}}</a>
                         </td>
                         <td>{{::item.ReshipDateCreated | date:"MM/dd/yy"}}<br />{{::item.ReshipDateCreated | date:"h:mm a"}}</td>
+                        <td>{{::item.OrderSourceAddedBy}}</td>
                         <td>{{::item.ServiceCodeName}}</td>
                         <td class="big-text">{{::item.ServiceCodeNotes}}</td>
                     </tr>
