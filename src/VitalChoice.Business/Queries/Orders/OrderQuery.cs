@@ -194,7 +194,8 @@ namespace VitalChoice.Business.Queries.Orders
             return this;
         }
 
-        public OrderQuery WithOrderDynamicValues(int? idOrderSource, int? pOrderType, int? idShippingMethod)
+        public OrderQuery WithOrderDynamicValues(int? idOrderSource, int? pOrderType, int? idShippingMethod,
+            ReviewType? reviewType)
         {
             if (idOrderSource.HasValue)
             {
@@ -208,6 +209,14 @@ namespace VitalChoice.Business.Queries.Orders
                 Add(c => c.WhenValues(new
                 {
                     POrderType = pOrderType.Value
+                }, ValuesFilterType.And, CompareBehaviour.Equals));
+            }
+            if (reviewType.HasValue)
+            {
+                int value = (int)reviewType.Value;
+                Add(c => c.WhenValues(new
+                {
+                    Review = value
                 }, ValuesFilterType.And, CompareBehaviour.Equals));
             }
             if (idShippingMethod.HasValue && idShippingMethod.Value == 1) //upgraded

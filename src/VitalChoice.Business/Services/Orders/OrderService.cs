@@ -1553,7 +1553,8 @@ namespace VitalChoice.Business.Services.Orders
                 .WithIdSku(filter.IdSku)
                 .WithIdAddedBy(filter.IdAddedBy)
                 .WithShipState(filter.IdShipState)
-                .WithOrderDynamicValues(filter.IdOrderSource, filter.POrderType, filter.IdShippingMethod)
+                .WithOrderDynamicValues(filter.IdOrderSource, filter.POrderType, filter.IdShippingMethod,
+                filter.ForReview ? ReviewType.ForReview : (ReviewType?)null)
                 .WithCustomerDynamicValues(filter.CustomerFirstName, filter.CustomerLastName, filter.CustomerCompany)
                 .NotAutoShip();
 
@@ -1639,6 +1640,7 @@ namespace VitalChoice.Business.Services.Orders
                     ShipTo = item.ShippingAddress?.SafeData.FirstName + " " + item.ShippingAddress?.SafeData.LastName,
                     PreferredShipMethod = item.ShippingAddress?.SafeData.PreferredShipMethod,
                     Healthwise = (bool?) item.SafeData.IsHealthwise ?? false,
+                    Review = (int?)item.SafeData.Review ?? null,
                 };
                 await DynamicMapper.UpdateModelAsync(newItem, item);
 

@@ -62,6 +62,8 @@ namespace VC.Admin.Models.Orders
 
         public int? PreferredShipMethod { get; set; }
 
+        public int? Review { get; set; }
+
         public OrderListItemModel(VOrder item)
         {
             if(item!=null)
@@ -124,6 +126,7 @@ namespace VC.Admin.Models.Orders
                 StateCode = item.StateCode;
                 ShipTo = item.ShipTo;
                 PreferredShipMethod = item.PreferredShipMethod;
+                Review = item.Review;
             }
         }
     }

@@ -71,7 +71,7 @@ BEGIN
 	INSERT INTO [dbo].[OrderOptionTypes]
 	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
 	VALUES
-	(N'Review', 5, NULL, NULL, 'False')
+	(N'Review', 3, NULL, NULL, NULL)
 
 END
 GO
