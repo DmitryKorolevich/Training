@@ -47,7 +47,7 @@ namespace VitalChoice.Caching.Services
             Logger = loggerFactory.CreateLogger<CacheStateManager>();
         }
 
-        public void AcceptTrackData() => ContextualCacheDatas.Value.AddRange(TemporaryContextualCacheDatas);
+        public void AcceptTrackData() => ContextualCacheDatas.Value.MergeRange(TemporaryContextualCacheDatas);
 
         public void RejectTrackData() => TemporaryContextualCacheDatas = null;
 
