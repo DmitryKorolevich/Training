@@ -15,8 +15,8 @@ BEGIN
 	(N'CompareAddressesType', 3, NULL, NULL, NULL),
 	(N'ReshipsRefundsCheck', 5, NULL, NULL, 'False'),
 	(N'ReshipsRefundsQTY', 3, NULL, NULL, NULL),	
-	(N'ReshipsRefundsCheck', 5, NULL, NULL, NULL),
-	(N'ReshipsRefundsMonthCount', 5, NULL, NULL, NULL)
+	(N'ReshipsRefundsCheckType', 3, NULL, NULL, NULL),
+	(N'ReshipsRefundsMonthCount', 3, NULL, NULL, NULL)
 
 END
 GO

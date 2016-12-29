@@ -1,0 +1,202 @@
+﻿<div class="container-fluid">
+    <div class="left-pane-controls">
+        <div class="well container-fluid">
+            <div data-ng-show="state==1">
+                <button class="btn btn-success width-160px" ladda="refreshTracker.active()" data-ng-click="save()" unsaved-warning-clear>Save</button>
+            </div>
+            <div class="btn-group margin-top-10px">
+                <button cancel-button-default-state="index.oneCol.manageOrderReviewRules" cancel-button unsaved-warning-clear class="btn btn-default width-160px">Cancel</button>
+            </div>
+            <div class="margin-top-10px">
+                <button class="btn btn-primary width-160px" ui-sref="index.oneCol.manageOrderReviewRules">Manage All</button>
+            </div>
+        </div>
+    </div>
+    <div class="right-pane-main">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="container container-left">
+                    <div class="well row">
+                        <spinner-overlay data-loading="refreshTracker.active()">
+                            <form class="form-horizontal" name="forms.form" data-ng-class="{submitted: forms.submitted}" novalidate unsaved-warning-form>
+                                <fieldset>
+                                    <span class="legend">Base Options</span>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Name</label>
+                                        <div class="col-md-9">
+                                            <input type="text" name="Name" class="form-control" placeholder="Name" data-ng-model="rule.Name" required>
+                                            <div class="error-container" ng-show="forms.submitted && forms.form.Name.$invalid">
+                                                <small class="error" ng-show="forms.form.Name.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","GeneralFieldNames.Name")}}</small>
+                                                <small class="error" ng-show="forms.form.Name.$error.server">{{serverMessages.GetMessage('Name')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="type" class="col-md-3 control-label">Apply Type</label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" name="ApplyType" data-ng-model="rule.ApplyType" ng-options="item.Key as item.Text for item in options.ApplyTypes"></select>
+                                            <div class="error-container" ng-show="forms.submitted && forms.form.ApplyType.$invalid">
+                                                <small class="error" ng-show="forms.form.ApplyType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Apply Type")}}</small>
+                                                <small class="error" ng-show="forms.form.ApplyType.$error.server">{{serverMessages.GetMessage('ApplyType')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <span class="legend">Conditions</span>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"></label>
+                                        <div class="col-md-9">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" data-ng-model="rule.Guest">
+                                                    Is the order from Guest Checkout
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="type" class="col-md-3 control-label">Min Sales Order Value</label>
+                                        <div class="col-md-9">
+                                            <input type="text" name="MinOrderTotal" class="form-control" placeholder="Order Value" money max="100000" min="0.01" data-ng-model="rule.MinOrderTotal">
+                                            <div class="error-container" ng-show="forms.submitted && forms.form.MinOrderTotal.$invalid">
+                                                <small class="error" ng-show="forms.form.MinOrderTotal.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","Order Value")}}</small>
+                                                <small class="error" ng-show="forms.form.MinOrderTotal.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","Order Value",1000000)}}</small>
+                                                <small class="error" ng-show="forms.form.MinOrderTotal.$error.min">{{getValidationMessage("{0} must be over $0.00","Order Value")}}</small>
+                                                <small class="error" ng-show="forms.form.MinOrderTotal.$error.server">{{serverMessages.GetMessage('MinOrderTotal')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Delivery Instruction</label>
+                                        <div class="col-md-9">
+                                            <input type="text" name="DeliveryInstructionForSearch" class="form-control" placeholder="Delivery Instruction"
+                                                    data-ng-model="rule.DeliveryInstructionForSearch">
+                                            <div class="error-container" ng-show="forms.submitted && forms.form.DeliveryInstructionForSearch.$invalid">
+                                                <small class="error" ng-show="forms.form.DeliveryInstructionForSearch.$error.server">{{serverMessages.GetMessage('DeliveryInstructionForSearch')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Zip</label>
+                                        <div class="col-md-9">
+                                            <input type="text" name="ZipForSearch" class="form-control" placeholder="Zip"
+                                                   data-ng-model="rule.ZipForSearch">
+                                            <div class="error-container" ng-show="forms.submitted && forms.form.ZipForSearch.$invalid">
+                                                <small class="error" ng-show="forms.form.ZipForSearch.$error.server">{{serverMessages.GetMessage('ZipForSearch')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Product SKU</label>
+                                        <div class="col-md-9">
+                                            <input type="text" name="SkuForSearch" class="form-control" placeholder="Product SKU"
+                                                   data-ng-model="rule.SkuForSearch">
+                                            <div class="error-container" ng-show="forms.submitted && forms.form.SkuForSearch.$invalid">
+                                                <small class="error" ng-show="forms.form.SkuForSearch.$error.server">{{serverMessages.GetMessage('SkuForSearch')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"></label>
+                                        <div class="col-md-9">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" data-ng-model="rule.CompareNames">
+                                                    Enable Names Comparing
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="type" class="col-md-3 control-label">Compare Name Type</label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" name="CompareNamesType" data-ng-disabled="!rule.CompareNames" data-ng-required="rule.CompareNames"
+                                                    data-ng-model="rule.CompareNamesType" ng-options="item.Key as item.Text for item in options.CompareTypes"></select>
+                                            <div class="error-container" ng-show="forms.submitted && forms.form.CompareNamesType.$invalid">
+                                                <small class="error" ng-show="forms.form.CompareNamesType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Compare Name Type")}}</small>
+                                                <small class="error" ng-show="forms.form.CompareNamesType.$error.server">{{serverMessages.GetMessage('CompareNamesType')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"></label>
+                                        <div class="col-md-9">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" data-ng-model="rule.CompareAddresses">
+                                                    Enable Addresses Comparing
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="type" class="col-md-3 control-label">Compare Address Type</label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" name="CompareAddressesType" data-ng-disabled="!rule.CompareAddresses" data-ng-required="rule.CompareAddresses"
+                                                    data-ng-model="rule.CompareAddressesType" ng-options="item.Key as item.Text for item in options.CompareTypes"></select>
+                                            <div class="error-container" ng-show="forms.submitted && forms.form.CompareAddressesType.$invalid">
+                                                <small class="error" ng-show="forms.form.CompareAddressesType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Compare Address Type")}}</small>
+                                                <small class="error" ng-show="forms.form.CompareAddressesType.$error.server">{{serverMessages.GetMessage('CompareAddressesType')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"></label>
+                                        <div class="col-md-9">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" data-ng-model="rule.ReshipsRefundsCheck">
+                                                    Refunds/Reships Per Customer Check
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Order Type</label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" name="ReshipsRefundsCheckType" data-ng-disabled="!rule.ReshipsRefundsCheck" data-ng-required="rule.ReshipsRefundsCheck"
+                                                    data-ng-model="rule.ReshipsRefundsCheckType" ng-options="item.Key as item.Text for item in options.OrderTypes"></select>
+                                            <div class="error-container" ng-show="forms.submitted && forms.form.ReshipsRefundsCheckType.$invalid">
+                                                <small class="error" ng-show="forms.form.ReshipsRefundsCheckType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Order Type")}}</small>
+                                                <small class="error" ng-show="forms.form.ReshipsRefundsCheckType.$error.server">{{serverMessages.GetMessage('ReshipsRefundsCheckType')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="type" class="col-md-3 control-label">QTY</label>
+                                        <div class="col-md-9">
+                                            <input type="text" name="ReshipsRefundsQTY" data-ng-disabled="!rule.ReshipsRefundsCheck" data-ng-required="rule.ReshipsRefundsCheck"
+                                                    class="form-control" placeholder="QTY" max="15" min="1" data-ng-model="rule.ReshipsRefundsQTY" numbers-only>
+                                            <div class="error-container" ng-show="forms.submitted && forms.form.ReshipsRefundsQTY.$invalid">
+                                                <small class="error" ng-show="forms.form.ReshipsRefundsQTY.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","QTY")}}</small>
+                                                <small class="error" ng-show="forms.form.ReshipsRefundsQTY.$error.parse">{{getValidationMessage("ValidationMessages.FieldRequired","QTY")}}</small>
+                                                <small class="error" ng-show="forms.form.ReshipsRefundsQTY.$error.max">{{getValidationMessage("ValidationMessages.FieldMax","QTY",15)}}</small>
+                                                <small class="error" ng-show="forms.form.ReshipsRefundsQTY.$error.min">{{getValidationMessage("{0} must be over 1","QTY")}}</small>
+                                                <small class="error" ng-show="forms.form.ReshipsRefundsQTY.$error.server">{{serverMessages.GetMessage('QTY')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Date Range</label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" data-ng-disabled="!rule.ReshipsRefundsCheck" data-ng-required="rule.ReshipsRefundsCheck"
+                                                     name="ReshipsRefundsMonthCount" data-ng-model="rule.ReshipsRefundsMonthCount" ng-options="item.Key as item.Text for item in options.DatePeriods"></select>
+                                            <div class="error-container" ng-show="forms.submitted && forms.form.ApplyType.$invalid">
+                                                <small class="error" ng-show="forms.form.ReshipsRefundsMonthCount.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Date Range")}}</small>
+                                                <small class="error" ng-show="forms.form.ReshipsRefundsMonthCount.$error.server">{{serverMessages.GetMessage('ReshipsRefundsMonthCount')}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </form>
+                        </spinner-overlay>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

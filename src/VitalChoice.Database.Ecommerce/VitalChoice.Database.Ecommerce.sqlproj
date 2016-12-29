@@ -253,4 +253,8 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\SPsForCustomerAbuseReport.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\OrderReviewRules.sql" />
+    <None Include="PostDeployment\Scripts\OrderReviewRules.sql" />
+  </ItemGroup>
 </Project>

@@ -95,5 +95,23 @@ angular.module('app.core.dataAccess.services.settingService', [])
 	    {
 	        return $http.post(baseUrl + 'DeleteCatalogRequests', null, getConfig(tracker));
 	    },
+
+	    //discounts  
+	    getOrderReviewRules: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'GetOrderReviewRules', filter, getConfig(tracker));
+	    },
+	    getOrderReviewRule: function (id, tracker)
+	    {
+	        return $http.get(baseUrl + 'GetOrderReviewRule/' + id, getConfig(tracker));
+	    },
+	    updateOrderReviewRule: function (model, tracker)
+	    {
+	        return $http.post(baseUrl + 'UpdateOrderReviewRule', model, getConfig(tracker));
+	    },
+	    deleteOrderReviewRule: function (id, tracker)
+	    {
+	        return $http.post(baseUrl + 'DeleteOrderReviewRule/' + id, null, getConfig(tracker));
+	    },
 	};
 }]);
