@@ -6,7 +6,13 @@ namespace VitalChoice.Caching.Services.Cache.Base
 {
     internal class ContextTypeContainer : IContextTypeContainer
     {
-        public HashSet<Type> ContextTypes { get; set; }
+        private volatile HashSet<Type> _contextTypes;
+
+        public HashSet<Type> ContextTypes
+        {
+            get { return _contextTypes; }
+            set { _contextTypes = value; }
+        }
 
         public ContextTypeContainer()
         {
