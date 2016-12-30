@@ -502,7 +502,8 @@ namespace VitalChoice.Caching.Services.Cache
             return pks;
         }
 
-        private void MarkForUpdateInternal(ICollection<EntityKey> pks, IEnumerable<ICacheData<T>> cacheDatas, string markRelated, object dbContext)
+        private void MarkForUpdateInternal(ICollection<EntityKey> pks, IEnumerable<ICacheData<T>> cacheDatas, string markRelated,
+            object dbContext)
         {
             if (pks.Count == 0)
                 return;
@@ -512,8 +513,8 @@ namespace VitalChoice.Caching.Services.Cache
                 var lockList = cachedList.Where(c => c != null).Select(c => c.Lock()).ToArray();
                 try
                 {
-                    Dictionary<EntityForeignKeyInfo, HashSet<EntityForeignKey>> foreignKeys =
-                        new Dictionary<EntityForeignKeyInfo, HashSet<EntityForeignKey>>();
+                    var foreignKeys =
+                        new List<KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>>();
                     lock (data)
                     {
                         foreach (var cached in cachedList)
@@ -547,7 +548,7 @@ namespace VitalChoice.Caching.Services.Cache
                         {
                             var keySet = new HashSet<EntityForeignKey>();
                             keySet.AddRange(group.Select(g => g.Value));
-                            foreignKeys.Add(group.Key, keySet);
+                            foreignKeys.Add(new KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>(group.Key, keySet));
                         }
                         MarkForUpdateForeignKeys(foreignKeys, dbContext);
                     }
@@ -638,7 +639,8 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        private void MarkForUpdateForeignKeys(IDictionary<EntityForeignKeyInfo, HashSet<EntityForeignKey>> foreignKeys, object dbContext)
+        private void MarkForUpdateForeignKeys(IEnumerable<KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>> foreignKeys,
+            object dbContext)
         {
             if (foreignKeys == null)
                 return;

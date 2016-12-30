@@ -211,7 +211,7 @@ namespace VC.Public.Controllers
             if (creditCards.Count > 0)
             {
                 model = (selectedId > 0
-                            ? creditCards.FirstOrDefault(x => x.Id == selectedId)
+                            ? creditCards.Single(x => x.Id == selectedId)
                             : creditCards.FirstOrDefault(x => x.Default)) ?? creditCards.FirstOrDefault() ?? new BillingInfoModel();
                 ViewBag.CreditCards = creditCards.ToJson();
             }
@@ -238,7 +238,7 @@ namespace VC.Public.Controllers
             if (shippingAddresses.Count > 0)
             {
                 model = (selectedId > 0
-                            ? shippingAddresses.FirstOrDefault(x => x.Id == selectedId)
+                            ? shippingAddresses.Single(x => x.Id == selectedId)
                             : shippingAddresses.First(x => x.Default)) ?? new ShippingInfoModel();
                 ViewBag.ShippingAddresses = shippingAddresses.ToJson();
             }

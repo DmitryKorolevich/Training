@@ -44,7 +44,7 @@ namespace VitalChoice.Caching.Services
                     return new SyncOp
                     {
                         SyncOperation = op,
-                        EntityType = ReflectionHelper.ResolveType(op.EntityType)
+                        EntityType = ReflectionHelper.ResolveType(op.Key.EntityType)
                     };
                 }
                 catch
@@ -82,7 +82,7 @@ namespace VitalChoice.Caching.Services
                                 break;
                             case SyncType.Add:
                                 pk = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
-                                internalCache.MarkForAddByPrimaryKey(pk, null);
+                                internalCache.MarkForAddByPrimaryKey(pk, op.SyncOperation.ForeignKeys, null);
                                 break;
                         }
                     }

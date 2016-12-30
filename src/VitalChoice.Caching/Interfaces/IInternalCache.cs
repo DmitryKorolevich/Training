@@ -23,8 +23,14 @@ namespace VitalChoice.Caching.Interfaces
         void MarkForUpdateListByPrimaryKey(ICollection<EntityKey> pks, object dbContext, string hasRelation = null);
         EntityKey MarkForAdd(object entity, object dbContext);
         List<EntityKey> MarkForAddList(IList entities, object dbContext);
-        void MarkForAddByPrimaryKey(EntityKey pk, object dbContext);
-        void MarkForAddListByPrimaryKey(ICollection<EntityKey> pks, object dbContext);
+
+        void MarkForAddByPrimaryKey(EntityKey pk, ICollection<KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>> foreignKeys,
+            object dbContext);
+
+        void MarkForAddListByPrimaryKey(
+            ICollection<KeyValuePair<EntityKey, ICollection<KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>>>> pks,
+            object dbContext);
+
         bool TryRemove(object entity);
         bool TryRemove(EntityKey pk);
         bool ItemExistWithoutRelations(EntityKey pk);

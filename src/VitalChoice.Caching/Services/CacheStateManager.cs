@@ -263,8 +263,7 @@ namespace VitalChoice.Caching.Services
                                     yield return new SyncOperation
                                     {
                                         Key = pk.ToExportable(group.Key),
-                                        SyncType = SyncType.Update,
-                                        EntityType = group.Key.FullName
+                                        SyncType = SyncType.Update
                                     };
                                 }
                             }
@@ -279,8 +278,7 @@ namespace VitalChoice.Caching.Services
                                     yield return new SyncOperation
                                     {
                                         Key = pk.ToExportable(group.Key),
-                                        SyncType = SyncType.Delete,
-                                        EntityType = group.Key.FullName
+                                        SyncType = SyncType.Delete
                                     };
                                 }
                             }
@@ -300,8 +298,7 @@ namespace VitalChoice.Caching.Services
                                     yield return new SyncOperation
                                     {
                                         Key = pk.ToExportable(group.Key),
-                                        SyncType = SyncType.Add,
-                                        EntityType = group.Key.FullName
+                                        SyncType = SyncType.Add
                                     };
                                 }
                             }
