@@ -58,9 +58,12 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
 
         public static void MergeRange<TKey, TValue>(this IDictionary<TKey, TValue> toMergeIn, IDictionary<TKey, TValue> toMergeFrom)
         {
-            foreach (var value in toMergeFrom)
+            if (toMergeFrom != null)
             {
-                toMergeIn[value.Key] = value.Value;
+                foreach (var value in toMergeFrom)
+                {
+                    toMergeIn[value.Key] = value.Value;
+                }
             }
         }
 
