@@ -57,6 +57,11 @@ namespace VC.Admin.ModelConverters
 
         public override async Task DynamicToModelAsync(OrderManageModel model, OrderDynamic dynamic)
         {
+            if (dynamic.SafeData.Review == (int)ReviewType.ForReview)
+            {
+                model.AllowSetAsReviewed = true;
+            }
+
             if(dynamic.Customer!=null)
             {
                 model.IdCustomer = dynamic.Customer.Id;
@@ -227,6 +232,11 @@ namespace VC.Admin.ModelConverters
 
         public override async Task ModelToDynamicAsync(OrderManageModel model, OrderDynamic dynamic)
         {
+            if (model.Reviewed)
+            {
+                dynamic.Data.Review = (int)ReviewType.Reviewed;
+            }
+
             if (!string.IsNullOrEmpty(model.DiscountCode))
             {
                 dynamic.Discount = await _discountService.GetByCode(model.DiscountCode);

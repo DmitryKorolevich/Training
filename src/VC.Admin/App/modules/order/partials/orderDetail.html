@@ -44,6 +44,9 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="options-row form-horizontal">
+                                                <label data-ng-if="order.AllowSetAsReviewed" class="checkbox-inline error">
+                                                    <input type="checkbox" data-ng-model="order.Reviewed">Mark As Reviewed
+                                                </label>
                                                 <label data-ng-if="order.IdObjectType!=2" class="checkbox-inline">
                                                     <input type="checkbox" data-ng-model="order.OnHold" data-ng-disabled="orderEditDisabled">Hold Order
                                                     <i class="fa fa-pause"></i>
@@ -56,7 +59,7 @@
                                                         </label>
                                                         <div data-ng-if="autoShipOrderOptionShow" class="auto-ship-frequency">
                                                             <select data-ng-if="order.IdObjectType == 2" data-ng-change="requestRecalculate()" class="form-control margin-top-15px" name="AutoShipFrequency" data-ng-model="order.AutoShipFrequency" ng-options="autoShipOrderFrequency.Key as autoShipOrderFrequency.Text for autoShipOrderFrequency in autoShipOrderFrequencies" required data-ng-disabled="orderEditDisabled">
-                                                                <option value="" selected hidden />
+                                                                <option value="" selected hidden/>
                                                             </select>
                                                             <div class="error-container" ng-show="forms.topForm.submitted && forms.topForm.AutoShipFrequency.$invalid">
                                                                 <small class="error" ng-show="forms.topForm.AutoShipFrequency.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Frequency")}}</small>
