@@ -44,7 +44,7 @@ namespace VitalChoice.Caching.Services
                     return new SyncOp
                     {
                         SyncOperation = op,
-                        EntityType = ReflectionHelper.ResolveType(op.EntityType)
+                        EntityType = ReflectionHelper.ResolveType(op.Key.EntityType)
                     };
                 }
                 catch
@@ -64,6 +64,8 @@ namespace VitalChoice.Caching.Services
                 if (pkInfo == null)
                     continue;
                 var internalCache = CacheFactory.GetCache(type);
+                var toAdd = new List<EntityKey>();
+                var toAddForeignKeys = new List<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>>();
                 foreach (var op in group)
                 {
                     try
@@ -82,7 +84,26 @@ namespace VitalChoice.Caching.Services
                                 break;
                             case SyncType.Add:
                                 pk = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
-                                internalCache.MarkForAddByPrimaryKey(pk, null);
+                                toAdd.Add(pk);
+                                if (op.SyncOperation.ForeignKeys?.Count > 0)
+                                {
+                                    var foreignValues = new List<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>>();
+                                    foreach (var foreignExportable in op.SyncOperation.ForeignKeys)
+                                    {
+                                        var dependentType = ReflectionHelper.ResolveType(foreignExportable.DependentType);
+                                        var info = internalCache.EntityInfo.ForeignKeys.FirstOrDefault(
+                                            f =>
+                                                f.DependentType == dependentType &&
+                                                foreignExportable.Values.Select(v => v.Name)
+                                                    .All(n => f.InfoDictionary.ContainsKey(n)));
+                                        if (info != null)
+                                        {
+                                            foreignValues.Add(new KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>(
+                                                info, foreignExportable.ToForeignKey(info)));
+                                        }
+                                    }
+                                    toAddForeignKeys.AddRange(foreignValues);
+                                }
                                 break;
                         }
                     }
@@ -91,6 +112,22 @@ namespace VitalChoice.Caching.Services
                         Logger.LogError(e.ToString());
                     }
                 }
+                if (toAdd.Count > 0)
+                {
+                    internalCache.MarkForAddListByPrimaryKey(toAdd, GetKeyList(toAddForeignKeys), null);
+                }
+            }
+        }
+
+        private IEnumerable<KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>> GetKeyList(
+            IEnumerable<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>>
+                toAdd)
+        {
+            foreach (var item in toAdd.GroupBy(v => v.Key))
+            {
+                var keys = new HashSet<EntityForeignKey>();
+                keys.AddRange(item.Select(g => g.Value));
+                yield return new KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>(item.Key, keys);
             }
         }
 

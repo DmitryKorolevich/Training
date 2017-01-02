@@ -62,14 +62,14 @@ namespace VitalChoice.Caching.Extensions
             return new EntityForeignKey(GetValues(entity, pkInfo));
         }
 
-        public static IDictionary<EntityForeignKeyInfo, HashSet<EntityForeignKey>> GetForeignKeysValues(
+        public static ICollection<KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>> GetForeignKeysValues(
             this IEnumerable<EntityForeignKeyInfo> indexInfos, IList entities)
         {
-            var result = new Dictionary<EntityForeignKeyInfo, HashSet<EntityForeignKey>>();
+            var result = new List<KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>>();
             foreach (var indexInfo in indexInfos ?? Enumerable.Empty<EntityForeignKeyInfo>())
             {
                 var keySet = GetForeignKeySets(entities, indexInfo);
-                result.Add(indexInfo, keySet);
+                result.Add(new KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>(indexInfo, keySet));
             }
             return result;
         }
@@ -82,6 +82,16 @@ namespace VitalChoice.Caching.Extensions
                 keySet.Add(indexInfo.GetForeignKeyValue(entity));
             }
             return keySet;
+        }
+
+        public static IEnumerable<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>> GetForeignKeys(
+            this IEnumerable<EntityForeignKeyInfo> indexInfos, object entity)
+        {
+            return
+                indexInfos?.Select(
+                    info =>
+                        new KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>(info,
+                            info.GetForeignKeyValue(entity)));
         }
 
         public static Dictionary<EntityForeignKeyInfo, EntityForeignKey> GetForeignKeyValues(

@@ -22,14 +22,14 @@ namespace VitalChoice.Caching.Relational.Base
         public SyncType SyncType { get; set; }
 
         [DataMember]
-        public string EntityType { get; set; }
+        public EntityKeyExportable Key { get; set; }
 
         [DataMember]
-        public EntityKeyExportable Key { get; set; }
+        public ICollection<EntityForeignKeyExportable> ForeignKeys { get; set; }
 
         public override string ToString()
         {
-            return $"[{SyncType}:{EntityType}]{Key}";
+            return $"[{SyncType}:{Key.EntityType}]{Key}";
         }
     }
 
