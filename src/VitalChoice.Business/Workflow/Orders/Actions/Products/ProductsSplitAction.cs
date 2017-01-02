@@ -17,7 +17,7 @@ namespace VitalChoice.Business.Workflow.Orders.Actions.Products
 
         public override Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
-            var products = context.SkuOrdereds.Union(context.PromoSkus.Where(p => p.Enabled)).ToArray();
+            var products = context.SkuOrdereds.Concat(context.PromoSkus.Where(p => p.Enabled)).ToArray();
             var perishableProducts =
                 products.Where(s => s.Sku.IdObjectType == (int) ProductType.Perishable).ToArray();
             var nonPerishableProducts =

@@ -186,7 +186,7 @@ namespace VitalChoice.Caching.Services.Cache
                 foreach (var indexPair in conditionalIndexes.Where(c => c.Value != null))
                 {
                     var enumerable = _internalCache.TryGetEntities(indexPair.Value, indexPair.Key, query.RelationInfo, _stateManager, query.Tracked);
-                    result = result?.Union(enumerable) ?? enumerable;
+                    result = result?.Concat(enumerable) ?? enumerable;
                 }
                 if (result == null)
                 {

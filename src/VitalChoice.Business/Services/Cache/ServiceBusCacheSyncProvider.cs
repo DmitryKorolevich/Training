@@ -134,7 +134,7 @@ namespace VitalChoice.Business.Services.Cache
                     AveragePing = averagePing,
                     SendTime = DateTime.UtcNow
                 }
-            }, 1).Union(syncOperations).ToArray();
+            }, 1).Concat(syncOperations).ToArray();
             if (!_enabled)
                 return;
 

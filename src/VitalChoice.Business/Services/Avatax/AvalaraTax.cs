@@ -268,7 +268,7 @@ namespace VitalChoice.Business.Services.Avatax
                         $"Invalid shipping amount. Standard part: {((decimal?) context.SafeData.StandardShipping ?? 0) - ((decimal?) context.SafeData.ShippingOverride ?? 0):C}, Special handling: {((decimal?) context.SafeData.ShippingSurcharge ?? 0) - ((decimal?) context.SafeData.SurchargeOverride ?? 0):C}");
                 }
             }
-            return lines.Union(Enumerable.Repeat(
+            return lines.Concat(Enumerable.Repeat(
                 new Line
                 {
                     Amount = shippingTotal,
@@ -344,7 +344,7 @@ namespace VitalChoice.Business.Services.Avatax
                 if (taxGetType.HasFlag(TaxGetType.NonPerishable))
                 {
                     items =
-                        items.Union(order.BaseSplitInfo.GetNonPerishablePartProducts());
+                        items.Concat(order.BaseSplitInfo.GetNonPerishablePartProducts());
                 }
             }
             return items.Select(

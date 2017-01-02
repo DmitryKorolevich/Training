@@ -39,7 +39,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
             PromoSkus = new List<PromoOrdered>();
             SkuOrdereds = new List<SkuOrdered>();
             GcMessageInfos = new List<MessageInfo>();
-            SplitInfo = new SplitInfo<SkuOrdered>(() => SkuOrdereds.Union(PromoSkus));
+            SplitInfo = new SplitInfo<SkuOrdered>(() => SkuOrdereds.Concat(PromoSkus));
         }
 
         public decimal AlaskaHawaiiSurcharge { get; set; }
@@ -88,7 +88,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 
         public SplitInfo<SkuOrdered> SplitInfo { get; set; }
 
-        public override IEnumerable<SkuOrdered> ItemsOrdered => SkuOrdereds.Union(PromoSkus.Where(p => p.Enabled));
+        public override IEnumerable<SkuOrdered> ItemsOrdered => SkuOrdereds.Concat(PromoSkus.Where(p => p.Enabled));
 
         public override SplitInfoBase<SkuOrdered> BaseSplitInfo => SplitInfo;
 

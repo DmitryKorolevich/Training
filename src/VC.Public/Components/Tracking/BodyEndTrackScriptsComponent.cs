@@ -88,7 +88,7 @@ namespace VC.Public.Components.Tracking
                         info.taxAmount = order.TaxTotal;
                     }
 
-                    var skus = order.Skus.Union(order.PromoSkus.Where(p => p.Enabled)).ToArray();
+                    var skus = order.Skus.Concat(order.PromoSkus.Where(p => p.Enabled)).ToArray();
                     foreach (var skuOrdered in skus)
                     {
                         BrontoOrderItemInfo item = new BrontoOrderItemInfo

@@ -629,7 +629,7 @@ namespace VC.Admin.ModelConverters
                     sku.Amount = item?.Price ?? 0;
                     sku.Quantity = item?.QTY ?? 0;
                 }
-                dynamic.Skus = new List<SkuOrdered>(validSkus.Union(notValidSkus));
+                dynamic.Skus = new List<SkuOrdered>(validSkus.Concat(notValidSkus));
             }
         }
 
