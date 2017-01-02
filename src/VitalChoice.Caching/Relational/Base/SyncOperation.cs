@@ -40,6 +40,9 @@ namespace VitalChoice.Caching.Relational.Base
     }
 
     [DataContract]
+    [KnownType(typeof(PingSyncData))]
+    [KnownType(typeof(AddSyncData))]
+    [KnownType(typeof(UpdateDeleteSyncData))]
     public class SyncOperation
     {
         [DataMember]
