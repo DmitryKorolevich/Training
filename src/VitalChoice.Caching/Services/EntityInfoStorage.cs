@@ -54,6 +54,9 @@ namespace VitalChoice.Caching.Services
 
             lock (SyncRoot)
             {
+                if (_contextTypeContainer.ContextTypes.Contains(contextType))
+                    return;
+
                 var parsed = new HashSet<Type>(_parsedEntities);
                 var entityInfos = new Dictionary<Type, EntityInfo>();
                 foreach (var entityType in context.Model.GetEntityTypes())
