@@ -82,6 +82,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer
         public IList<LookupItem<int>> OacFob { get; set; }
         public IList<LookupItem<int>> CreditCardTypes { get; set; }
         public IList<LookupItem<int>> MarketingPromotionTypes { get; set; }
+        public IList<LookupItem<int>> MarketingPromotionTypesNotHidden { get; set; }
         public IList<LookupItem<int>> ProductSellers { get; set; }
         public IList<LookupItem<int>> GoogleCategories { get; set; }
 

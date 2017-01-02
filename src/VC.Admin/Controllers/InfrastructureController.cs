@@ -72,6 +72,7 @@ namespace VC.Admin.Controllers
                     OacFob = referenceData.OacFob,
                     OacTerms = referenceData.OacTerms,
                     MarketingPromotionTypes = referenceData.MarketingPromotionTypes,
+                    MarketingPromotionTypesNotHidden = referenceData.MarketingPromotionTypesNotHidden,
                     OrderSources = referenceData.OrderSources,
                     OrderSourcesCelebrityHealthAdvocate = referenceData.OrderSourcesCelebrityHealthAdvocate,
                     OrderPreferredShipMethod = referenceData.OrderPreferredShipMethod,
