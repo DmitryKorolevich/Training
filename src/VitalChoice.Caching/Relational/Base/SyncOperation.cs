@@ -25,7 +25,7 @@ namespace VitalChoice.Caching.Relational.Base
         public EntityKeyExportable Key { get; set; }
 
         [DataMember]
-        public ICollection<EntityForeignKeysExportable> ForeignKeys { get; set; }
+        public ICollection<EntityForeignKeyExportable> ForeignKeys { get; set; }
 
         public override string ToString()
         {

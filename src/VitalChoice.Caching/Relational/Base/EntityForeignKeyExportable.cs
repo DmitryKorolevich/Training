@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace VitalChoice.Caching.Relational.Base
 {
     [DataContract]
-    public class EntityForeignKeysExportable
+    public class EntityForeignKeyExportable
     {
         [DataMember]
         public string DependentType { get; set; }

@@ -274,7 +274,8 @@ namespace VitalChoice.Caching.Services.Cache
         public EntityKey MarkForAdd(T entity, object dbContext)
         {
             var pk = EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
-            MarkForAddByPrimaryKey(pk, dbContext);
+            MarkForAddSelf(pk, dbContext);
+            MarkForUpdateDependent(pk, dbContext);
             Update(entity, (DbContext) null, dbContext);
             var foreignKeys = EntityInfo.ForeignKeys.GetForeignKeyValues(entity);
             MarkForUpdateForeignKeys(foreignKeys, dbContext);
@@ -364,7 +365,24 @@ namespace VitalChoice.Caching.Services.Cache
             MarkForUpdateInternal(pks, cacheDatas, hasRelation, dbContext);
         }
 
-        public void MarkForAddByPrimaryKey(EntityKey pk, object dbContext)
+        public void MarkForAddListByPrimaryKey(IEnumerable<EntityKey> pks, IEnumerable<KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>> foreignKeys, object dbContext)
+        {
+            foreach (var pk in pks)
+            {
+                MarkForAddSelf(pk, dbContext);
+                MarkForUpdateDependent(pk, dbContext);
+            }
+            MarkForUpdateForeignKeys(foreignKeys, dbContext);
+        }
+
+        public void MarkForAddByPrimaryKey(EntityKey pk, IEnumerable<KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>> foreignKeys, object dbContext)
+        {
+            MarkForAddSelf(pk, dbContext);
+            MarkForUpdateForeignKeys(foreignKeys, dbContext);
+            MarkForUpdateDependent(pk, dbContext);
+        }
+
+        private void MarkForAddSelf(EntityKey pk, object dbContext)
         {
             foreach (var data in CacheStorage.AllCacheDatas)
             {
@@ -376,7 +394,6 @@ namespace VitalChoice.Caching.Services.Cache
                     }
                     if (pk.IsValid)
                     {
-
                     }
                     var cached = data.Get(pk);
                     using (cached?.Lock())
@@ -384,39 +401,6 @@ namespace VitalChoice.Caching.Services.Cache
                         cached?.SetNeedUpdate(true, dbContext);
                     }
                 }
-            }
-            MarkForUpdateDependent(pk, dbContext);
-        }
-
-        public void MarkForAddListByPrimaryKey(ICollection<EntityKey> pks, object dbContext)
-        {
-            foreach (var data in CacheStorage.AllCacheDatas)
-            {
-                lock (data)
-                {
-                    if (data.FullCollection)
-                    {
-                        data.NeedUpdate = true;
-                    }
-                    var cachedList = pks.Where(p => p.IsValid).Select(pk => data.Get(pk)).ToArray();
-                    var lockList = cachedList.Where(c => c != null).Select(c => c.Lock()).ToArray();
-                    try
-                    {
-                        foreach (var cached in cachedList)
-                        {
-                            cached?.SetNeedUpdate(true, dbContext);
-                        }
-                    }
-                    finally
-                    {
-                        lockList.ForEach(l => l.Dispose());
-                    }
-                }
-            }
-
-            foreach (var pk in pks)
-            {
-                MarkForUpdateDependent(pk, dbContext);
             }
         }
 
@@ -489,10 +473,11 @@ namespace VitalChoice.Caching.Services.Cache
 
             foreach (var entity in entities)
             {
-                pks.Add(EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity));
+                var pk = EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
+                pks.Add(pk);
+                MarkForAddSelf(pk, dbContext);
+                MarkForUpdateDependent(pk, dbContext);
             }
-            MarkForAddListByPrimaryKey(pks, dbContext);
-
             var foreignKeys = EntityInfo.ForeignKeys.GetForeignKeysValues(entities);
             foreach (var entity in entities)
             {

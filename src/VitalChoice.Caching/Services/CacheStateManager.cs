@@ -298,6 +298,10 @@ namespace VitalChoice.Caching.Services
                                     yield return new SyncOperation
                                     {
                                         Key = pk.ToExportable(group.Key),
+                                        ForeignKeys =
+                                            cache.EntityInfo.ForeignKeys.GetForeignKeys(op.Entity)?
+                                                .AsExportable()
+                                                .ToArray(),
                                         SyncType = SyncType.Add
                                     };
                                 }
