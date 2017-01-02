@@ -9,6 +9,7 @@ using VitalChoice.Caching.Extensions;
 using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational;
 using VitalChoice.Caching.Relational.Base;
+using VitalChoice.Caching.Services.Cache.Base;
 using VitalChoice.Ecommerce.Domain.Helpers;
 
 namespace VitalChoice.Caching.Services
@@ -37,33 +38,16 @@ namespace VitalChoice.Caching.Services
 
         public void AcceptChanges(IEnumerable<SyncOperation> syncOperations)
         {
-            var syncGroups = syncOperations.Select(op =>
+            foreach (var group in syncOperations.GroupBy(s => ((UpdateDeleteSyncData)s.Data).Key.EntityType))
             {
-                try
+                var typeName = group.Key;
+                EntityInfo info;
+                if (!KeyStorage.GetEntityInfo(typeName, out info))
                 {
-                    return new SyncOp
-                    {
-                        SyncOperation = op,
-                        EntityType = ReflectionHelper.ResolveType(op.Key.EntityType)
-                    };
-                }
-                catch
-                {
-                    return new SyncOp
-                    {
-                        SyncOperation = op,
-                        EntityType = typeof(object)
-                    };
-                }
-            }).GroupBy(s => s.EntityType);
-
-            foreach (var group in syncGroups)
-            {
-                var type = group.Key;
-                var pkInfo = KeyStorage.GetPrimaryKeyInfo(type);
-                if (pkInfo == null)
                     continue;
-                var internalCache = CacheFactory.GetCache(type);
+                }
+                var pkInfo = info.PrimaryKey;
+                var internalCache = CacheFactory.GetCache(typeName);
                 var toAdd = new List<EntityKey>();
                 var toAddForeignKeys = new List<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>>();
                 foreach (var op in group)
@@ -71,35 +55,36 @@ namespace VitalChoice.Caching.Services
                     try
                     {
                         EntityKey pk;
-                        switch (op.SyncOperation.SyncType)
+                        switch (op.SyncType)
                         {
                             case SyncType.Update:
-                                pk = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
+                                pk = ((UpdateDeleteSyncData)op.Data).Key.ToPrimaryKey(pkInfo);
                                 internalCache.MarkForUpdateByPrimaryKey(pk, null);
                                 break;
                             case SyncType.Delete:
-                                pk = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
+                                pk = ((UpdateDeleteSyncData)op.Data).Key.ToPrimaryKey(pkInfo);
                                 internalCache.MarkForUpdateByPrimaryKey(pk, null);
                                 internalCache.TryRemove(pk);
                                 break;
                             case SyncType.Add:
-                                pk = op.SyncOperation.Key.ToPrimaryKey(pkInfo);
+                                var addData = (AddSyncData) op.Data;
+                                pk = addData.Key.ToPrimaryKey(pkInfo);
                                 toAdd.Add(pk);
-                                if (op.SyncOperation.ForeignKeys?.Count > 0)
+                                if (addData.ForeignKeys?.Count > 0)
                                 {
                                     var foreignValues = new List<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>>();
-                                    foreach (var foreignExportable in op.SyncOperation.ForeignKeys)
+                                    foreach (var foreignExportable in addData.ForeignKeys)
                                     {
                                         var dependentType = ReflectionHelper.ResolveType(foreignExportable.DependentType);
-                                        var info = internalCache.EntityInfo.ForeignKeys.FirstOrDefault(
+                                        var fkInfo = internalCache.EntityInfo.ForeignKeys.FirstOrDefault(
                                             f =>
                                                 f.DependentType == dependentType &&
                                                 foreignExportable.Values.Select(v => v.Name)
                                                     .All(n => f.InfoDictionary.ContainsKey(n)));
-                                        if (info != null)
+                                        if (fkInfo != null)
                                         {
                                             foreignValues.Add(new KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>(
-                                                info, foreignExportable.ToForeignKey(info)));
+                                                fkInfo, foreignExportable.ToForeignKey(fkInfo)));
                                         }
                                     }
                                     toAddForeignKeys.AddRange(foreignValues);
@@ -133,12 +118,6 @@ namespace VitalChoice.Caching.Services
 
         public virtual void Dispose()
         {
-        }
-
-        private struct SyncOp
-        {
-            public Type EntityType;
-            public SyncOperation SyncOperation;
         }
     }
 }

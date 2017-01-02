@@ -249,7 +249,9 @@ namespace VitalChoice.Caching.Services
                     switch (ops.Key)
                     {
                         case EntityState.Modified:
-                            foreach (var opPair in ops.SimpleJoin(cache.MarkForUpdateList(ops.Select(op => op.Entity), null)))
+                            foreach (
+                                var opPair in ops.SimpleJoin(cache.MarkForUpdateList(ops.Select(op => op.Entity), null))
+                            )
                             {
                                 var op = opPair.Key;
                                 var pk = opPair.Value;
@@ -262,14 +264,19 @@ namespace VitalChoice.Caching.Services
                                     });
                                     yield return new SyncOperation
                                     {
-                                        Key = pk.ToExportable(group.Key),
+                                        Data = new UpdateDeleteSyncData
+                                        {
+                                            Key = pk.ToExportable(group.Key)
+                                        },
                                         SyncType = SyncType.Update
                                     };
                                 }
                             }
                             break;
                         case EntityState.Deleted:
-                            foreach (var opPair in ops.SimpleJoin(cache.MarkForUpdateList(ops.Select(op => op.Entity), null)))
+                            foreach (
+                                var opPair in ops.SimpleJoin(cache.MarkForUpdateList(ops.Select(op => op.Entity), null))
+                            )
                             {
                                 var pk = opPair.Value;
                                 if (pk.IsValid)
@@ -277,14 +284,19 @@ namespace VitalChoice.Caching.Services
                                     cache.TryRemove(pk);
                                     yield return new SyncOperation
                                     {
-                                        Key = pk.ToExportable(group.Key),
+                                        Data = new UpdateDeleteSyncData
+                                        {
+                                            Key = pk.ToExportable(group.Key)
+                                        },
                                         SyncType = SyncType.Delete
                                     };
                                 }
                             }
                             break;
                         case EntityState.Added:
-                            foreach (var opPair in ops.SimpleJoin(cache.MarkForAddList(ops.Select(op => op.Entity).ToArray(), null)))
+                            foreach (
+                                var opPair in
+                                ops.SimpleJoin(cache.MarkForAddList(ops.Select(op => op.Entity).ToArray(), null)))
                             {
                                 var op = opPair.Key;
                                 var pk = opPair.Value;
@@ -297,11 +309,14 @@ namespace VitalChoice.Caching.Services
                                     });
                                     yield return new SyncOperation
                                     {
-                                        Key = pk.ToExportable(group.Key),
-                                        ForeignKeys =
-                                            cache.EntityInfo.ForeignKeys.GetForeignKeys(op.Entity)?
-                                                .AsExportable()
-                                                .ToArray(),
+                                        Data = new AddSyncData
+                                        {
+                                            Key = pk.ToExportable(group.Key),
+                                            ForeignKeys =
+                                                cache.EntityInfo.ForeignKeys.GetForeignKeys(op.Entity)?
+                                                    .AsExportable()
+                                                    .ToArray()
+                                        },
                                         SyncType = SyncType.Add
                                     };
                                 }

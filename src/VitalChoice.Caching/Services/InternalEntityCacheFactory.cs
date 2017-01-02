@@ -51,5 +51,22 @@ namespace VitalChoice.Caching.Services
                 return null;
             return (IInternalCache<T>) _entityCaches.GetOrAdd(typeof(T), cache => new InternalCache<T>(info, this, _loggerFactory));
         }
+
+        public bool CanCache(string entityType)
+        {
+            return _keyStorage.HaveKeys(entityType);
+        }
+
+        public IInternalEntityCache GetCache(string entityType)
+        {
+            EntityInfo info;
+            if (!_keyStorage.GetEntityInfo(entityType, out info))
+                return null;
+            return _entityCaches.GetOrAdd(info.EntityType,
+                cache =>
+                    (IInternalEntityCache)
+                    Activator.CreateInstance(typeof(InternalCache<>).MakeGenericType(info.EntityType), info, this,
+                        _loggerFactory));
+        }
     }
 }

@@ -30,6 +30,7 @@ namespace VitalChoice.Caching.Services
         protected readonly ILogger Logger;
         private readonly IContextTypeContainer _contextTypeContainer;
         private Dictionary<Type, EntityInfo> _entityInfos;
+        private Dictionary<string, EntityInfo> _entityInfosByTypeName;
         private readonly HashSet<Type> _parsedEntities = new HashSet<Type>();
         private static readonly object SyncRoot = new object();
         private EntityCollector _gcCollector;
@@ -122,6 +123,7 @@ namespace VitalChoice.Caching.Services
                 if (_entityInfos == null)
                 {
                     _entityInfos = entityInfos;
+                    _entityInfosByTypeName = entityInfos.ToDictionary(t => t.Key.FullName, t => t.Value);
                     _gcCollector = new EntityCollector(this, new InternalEntityCacheFactory(this, _loggerFactory), Options, Logger);
                 }
                 else
@@ -129,6 +131,7 @@ namespace VitalChoice.Caching.Services
                     var results = new Dictionary<Type, EntityInfo>(_entityInfos);
                     results.AddRange(entityInfos);
                     _entityInfos = results;
+                    _entityInfosByTypeName = results.ToDictionary(t => t.Key.FullName, t => t.Value);
                 }
                 CacheDebugger.EntityInfo = this;
                 _contextTypeContainer.ContextTypes = new HashSet<Type>(_contextTypeContainer.ContextTypes) {contextType};
@@ -717,5 +720,24 @@ namespace VitalChoice.Caching.Services
         }
 
         public void Dispose() => _gcCollector.Dispose();
+        public bool HaveKeys(string entityType)
+        {
+            return _entityInfosByTypeName.ContainsKey(entityType);
+        }
+
+        public bool GetEntityInfo(string entityType, out EntityInfo info)
+        {
+            return _entityInfosByTypeName.TryGetValue(entityType, out info);
+        }
+
+        public Type GetContextType(string entityType)
+        {
+            EntityInfo info;
+            if (_entityInfosByTypeName.TryGetValue(entityType, out info))
+            {
+                return info.ContextType;
+            }
+            return null;
+        }
     }
 }

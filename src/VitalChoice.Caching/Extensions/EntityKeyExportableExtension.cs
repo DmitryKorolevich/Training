@@ -21,7 +21,7 @@ namespace VitalChoice.Caching.Extensions
         public static IEnumerable<EntityForeignKeyExportable> AsExportable(
             this IEnumerable<KeyValuePair<EntityForeignKeyInfo, EntityForeignKey>> keys)
         {
-            return keys.Select(fk => new EntityForeignKeyExportable
+            return keys.Where(fk => fk.Value.IsValid).Select(fk => new EntityForeignKeyExportable
             {
                 DependentType = fk.Key.DependentType.FullName,
                 Values =

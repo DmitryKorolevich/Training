@@ -12,10 +12,12 @@ namespace VitalChoice.Caching.Interfaces
     public interface IEntityInfoStorage
     {
         void Initialize(DbContext context);
-
         bool HaveKeys(Type entityType);
+        bool HaveKeys(string entityType);
         bool GetEntityInfo(Type entityType, out EntityInfo info);
+        bool GetEntityInfo(string entityType, out EntityInfo info);
         Type GetContextType(Type entityType);
+        Type GetContextType(string entityType);
         object GetEntity(Type entityType, ICollection<EntityValueExportable> keyValues, IServiceScopeFactory rootScope);
         object GetEntity(Type entityType, EntityKey pk, IServiceScopeFactory rootScope);
         IList GetEntities(Type entityType, IEnumerable<EntityKey> pk, IServiceScopeFactory rootScope);

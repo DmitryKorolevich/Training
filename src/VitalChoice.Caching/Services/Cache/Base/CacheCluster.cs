@@ -38,15 +38,7 @@ namespace VitalChoice.Caching.Services.Cache.Base
 
         public void AddOrUpdate(TKey pk, CachedEntity<T> newCached)
         {
-            CachedEntity<T> cached;
-            if (_cluster.TryGetValue(pk, out cached))
-            {
-                _cluster.TryUpdate(pk, newCached, cached);
-            }
-            else
-            {
-                _cluster.TryAdd(pk, newCached);
-            }
+            _cluster.AddOrUpdate(pk, newCached, (key, existing) => newCached);
         }
 
         public CachedEntity<T> Get(TKey pk)
