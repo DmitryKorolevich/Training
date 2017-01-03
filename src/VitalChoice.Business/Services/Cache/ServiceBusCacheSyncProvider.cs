@@ -41,10 +41,10 @@ namespace VitalChoice.Business.Services.Cache
             ICacheServiceScopeFactoryContainer scopeFactoryContainer)
             : base(cacheFactory, keyStorage, loggerFactory, scopeFactoryContainer)
         {
-            _pingRefreshTimer = new BasicTimer(PingRefresh, TimeSpan.FromSeconds(10), ex => Logger.LogError(ex.ToString()));
             _applicationEnvironment = applicationEnvironment;
             if (options.Value.CacheSyncOptions?.Enabled ?? false)
             {
+                _pingRefreshTimer = new BasicTimer(PingRefresh, TimeSpan.FromSeconds(10), ex => Logger.LogError(ex.ToString()));
                 _enabled = true;
 
                 var queName = options.Value.CacheSyncOptions?.ServiceBusQueueName;
