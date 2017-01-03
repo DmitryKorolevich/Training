@@ -18,7 +18,7 @@ namespace VitalChoice.Business.Services.Cache
 {
     public class ServiceBusCacheSyncProvider : CacheSyncProvider
     {
-        public const int PingAverageMaxCount = 50;
+        public const int PingAverageMaxCount = 10;
 
         private readonly IHostingEnvironment _applicationEnvironment;
         private readonly bool _enabled;
