@@ -214,7 +214,8 @@ namespace VitalChoice.Business.Services.Cache
                 {
                     Logger.LogError(e.ToString());
                 }
-                if (syncOp != null && syncOp.SyncType != SyncType.Ping && syncOp.SyncType != SyncType.Invalid)
+                if (syncOp != null &&
+                    (syncOp.SyncType == SyncType.Add || syncOp.SyncType == SyncType.Delete || syncOp.SyncType == SyncType.Update))
                 {
                     yield return syncOp;
                 }
