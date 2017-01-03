@@ -37,9 +37,9 @@ namespace VitalChoice.Business.Services.Cache
             ICacheServiceScopeFactoryContainer scopeFactoryContainer)
             : base(cacheFactory, keyStorage, loggerFactory, scopeFactoryContainer)
         {
+            _applicationEnvironment = applicationEnvironment;
             if (options.Value.CacheSyncOptions?.Enabled ?? false)
             {
-                _applicationEnvironment = applicationEnvironment;
                 _enabled = true;
 
                 var queName = options.Value.CacheSyncOptions?.ServiceBusQueueName;
