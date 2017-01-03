@@ -76,7 +76,7 @@ namespace VitalChoice.Business.Services.Workflow
                             ActionType = WorkflowActionType.Action,
                             Name = type.Value.Name,
                             ImplementationType = type.Key.FullName
-                        }).Union(t.Value.ActionResolvers.Select(type => new WorkflowExecutor
+                        }).Concat(t.Value.ActionResolvers.Select(type => new WorkflowExecutor
                         {
                             ActionType = WorkflowActionType.ActionResolver,
                             Name = type.Value.Name,

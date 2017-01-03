@@ -11,6 +11,7 @@
         public const int DEFAULT_TEXT_FIELD_EXPANDED_MAX_SIZE = 250;
         public const int ZIP_MAX_SIZE = 10;
         public const int DEFAULT_TEXTAREA_FIELD_MAX_SIZE = 250;
+        public const int MARKETING_COMMENT_TEXTAREA_FIELD_MAX_SIZE = 45;
         public const int DELIVERY_INSTRUCTIONS_MAX_SIZE = 60;
         public const int DEFAULT_BIG_TEXT_FIELD_MAX_SIZE = 1000;
         public const int DEFAULT_EMAIL_FIELD_MAX_SIZE = 1000;

@@ -117,8 +117,8 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    subMenu: [
                         { name: 'aAFESShipReport', stateName: 'index.oneCol.aAFESShipReport', stateLabel: 'AAFES Ship Report', access: 3 },
                         { name: 'orderAgentsStatistic', stateName: 'index.oneCol.orderAgentsStatistic', stateLabel: 'Agents Report', access: null },
-                        { name: 'inventoriesSummaryUsageReport', stateName: 'index.oneCol.inventoriesSummaryUsageReport', stateLabel: 'Inventory Shipment Summary', access: 3 },
                         { name: 'orderAbuseReport', stateName: 'index.oneCol.orderAbuseReport', stateLabel: 'Customer Account Refund/Reship Report', access: 3 },
+                        { name: 'inventoriesSummaryUsageReport', stateName: 'index.oneCol.inventoriesSummaryUsageReport', stateLabel: 'Inventory Shipment Summary', access: 3 },
                         { name: 'productQualitySalesReport', stateName: 'index.oneCol.productQualitySalesReport', stateLabel: 'Product Quality Issues Report', access: 3 },
                         { name: 'vitalGreen', stateName: 'index.oneCol.vitalGreen', stateLabel: 'Review VitalGreen Statistics', access: 3 },
                         { name: 'serviceCodesStatistic', stateName: 'index.oneCol.serviceCodesStatistic', stateLabel: 'Service Codes Report', access: 3 },

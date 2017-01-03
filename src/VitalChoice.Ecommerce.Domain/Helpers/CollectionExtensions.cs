@@ -56,6 +56,17 @@ namespace VitalChoice.Ecommerce.Domain.Helpers
             return default(T);
         }
 
+        public static void MergeRange<TKey, TValue>(this IDictionary<TKey, TValue> toMergeIn, IDictionary<TKey, TValue> toMergeFrom)
+        {
+            if (toMergeFrom != null)
+            {
+                foreach (var value in toMergeFrom)
+                {
+                    toMergeIn[value.Key] = value.Value;
+                }
+            }
+        }
+
         public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> items)
         {
             foreach (var item in items)

@@ -35,7 +35,7 @@ namespace VitalChoice.DynamicData.Validation
         {
             if (results?.Count > 0)
                 throw new AppValidationException(results.Aggregate(Enumerable.Empty<MessageInfo>(),
-                    (current, next) => current.Union(next.Build())));
+                    (current, next) => current.Concat(next.Build())));
         }
 
         public static void Raise<T>(this IErrorResult result)
@@ -48,7 +48,7 @@ namespace VitalChoice.DynamicData.Validation
         {
             if (results?.Count > 0)
                 throw new AppValidationException(results.Aggregate(Enumerable.Empty<MessageInfo>(),
-                    (current, next) => current.Union(next.Error(error).Build())));
+                    (current, next) => current.Concat(next.Error(error).Build())));
         }
 
         public static void Raise<T>(this IErrorResult result, string error)

@@ -289,7 +289,16 @@ namespace VitalChoice.Business.Services
                     .Select(x => new LookupItem<int>()
                     {
                         Key = x.Id,
-                        Text = x.ValueVariant
+                        Text = x.ValueVariant,
+                        Hidden = x.Hidden
+                    }).ToList();
+            referenceData.MarketingPromotionTypesNotHidden =
+                lookupVariants[marketingPromotionTypesLookup].
+                    Where(p=>!p.Hidden).Select(x => new LookupItem<int>()
+                    {
+                        Key = x.Id,
+                        Text = x.ValueVariant,
+                        Hidden = x.Hidden
                     }).ToList();
             referenceData.OrderSources = lookupVariants[orderSourcesLookup]
                 .Select(x => new LookupItem<int>()

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -207,7 +208,7 @@ namespace VitalChoice.Caching.Services.Cache
             return TryRemove(pk);
         }
 
-        public bool Update(IEnumerable<T> entities, RelationInfo relationInfo, object dbContext)
+        public bool UpdateList(IEnumerable<T> entities, RelationInfo relationInfo, object dbContext)
         {
             var data = CacheStorage.GetCacheData(relationInfo);
             return data.Update(entities, dbContext);
@@ -244,7 +245,7 @@ namespace VitalChoice.Caching.Services.Cache
             return data.Update(entity, dbContext);
         }
 
-        public IEnumerable<CachedEntity<T>> Update(RelationInfo relations, IEnumerable<T> entities, object dbContext)
+        public IEnumerable<CachedEntity<T>> UpdateList(RelationInfo relations, IEnumerable<T> entities, object dbContext)
         {
             var data = CacheStorage.GetCacheData(relations);
             return entities.Select(entity => data.Update(entity, dbContext));
@@ -263,35 +264,25 @@ namespace VitalChoice.Caching.Services.Cache
             return pk;
         }
 
-        public ICollection<EntityKey> MarkForUpdate(IEnumerable<T> entities, object dbContext)
+        public ICollection<EntityKey> MarkForUpdateList(IEnumerable<T> entities, object dbContext)
         {
             var pks = new HashSet<EntityKey>(entities.Select(e => EntityInfo.PrimaryKey.GetPrimaryKeyValue(e)));
-            MarkForUpdateByPrimaryKey(pks, dbContext, null);
+            MarkForUpdateListByPrimaryKey(pks, dbContext, null);
             return pks;
         }
 
         public EntityKey MarkForAdd(T entity, object dbContext)
         {
-
-            foreach (var data in CacheStorage.AllCacheDatas)
-            {
-                lock (data)
-                {
-                    if (data.FullCollection)
-                    {
-                        data.NeedUpdate = true;
-                    }
-                }
-            }
-            Update(entity, (DbContext) null, dbContext);
             var pk = EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
+            MarkForAddSelf(pk, dbContext);
+            MarkForUpdateDependent(pk, dbContext);
+            Update(entity, (DbContext) null, dbContext);
             var foreignKeys = EntityInfo.ForeignKeys.GetForeignKeyValues(entity);
             MarkForUpdateForeignKeys(foreignKeys, dbContext);
-            MarkForUpdateDependent(pk, dbContext);
             return pk;
         }
 
-        public ICollection<EntityKey> MarkForAdd(ICollection<T> entities, object dbContext)
+        public List<EntityKey> MarkForAddList(List<T> entities, object dbContext)
         {
             return MarkForAddInternal(entities, dbContext);
         }
@@ -301,14 +292,14 @@ namespace VitalChoice.Caching.Services.Cache
             return Update(relations, (T) entity, dbContext);
         }
 
-        public IEnumerable<CachedEntity> Update(RelationInfo relations, IEnumerable<object> entity, object dbContext)
+        public IEnumerable<CachedEntity> UpdateList(RelationInfo relations, IEnumerable<object> entity, object dbContext)
         {
-            return Update(relations, entity.Cast<T>(), dbContext);
+            return UpdateList(relations, entity.Cast<T>(), dbContext);
         }
 
-        public bool Update(IEnumerable<object> entities, RelationInfo relationInfo, object dbContext)
+        public bool UpdateList(IEnumerable<object> entities, RelationInfo relationInfo, object dbContext)
         {
-            return Update(entities.Cast<T>(), relationInfo, dbContext);
+            return UpdateList(entities.Cast<T>(), relationInfo, dbContext);
         }
 
         public bool Update(object entity, RelationInfo relationInfo, object dbContext)
@@ -321,7 +312,7 @@ namespace VitalChoice.Caching.Services.Cache
             return Update((T) entity, context, dbContext);
         }
 
-        public void SetNull(IEnumerable<EntityKey> keys, RelationInfo relationInfo)
+        public void SetNullList(IEnumerable<EntityKey> keys, RelationInfo relationInfo)
         {
             var data = CacheStorage.GetCacheData(relationInfo);
             data.SetNull(keys);
@@ -343,10 +334,10 @@ namespace VitalChoice.Caching.Services.Cache
             return MarkForUpdate((T) entity, dbContext);
         }
 
-        public ICollection<EntityKey> MarkForUpdate(IEnumerable<object> entities, object dbContext)
+        public List<EntityKey> MarkForUpdateList(IEnumerable<object> entities, object dbContext)
         {
             var pks = entities.Select(e => EntityInfo.PrimaryKey.GetPrimaryKeyValue(e)).ToList();
-            MarkForUpdateByPrimaryKey(pks, dbContext, null);
+            MarkForUpdateListByPrimaryKey(pks, dbContext, null);
             return pks;
         }
 
@@ -362,7 +353,7 @@ namespace VitalChoice.Caching.Services.Cache
             MarkForUpdateInternal(pk, cacheDatas, hasRelation, dbContext);
         }
 
-        public void MarkForUpdateByPrimaryKey(ICollection<EntityKey> pks, object dbContext, string hasRelation)
+        public void MarkForUpdateListByPrimaryKey(ICollection<EntityKey> pks, object dbContext, string hasRelation)
         {
             if (pks == null)
                 return;
@@ -374,12 +365,51 @@ namespace VitalChoice.Caching.Services.Cache
             MarkForUpdateInternal(pks, cacheDatas, hasRelation, dbContext);
         }
 
+        public void MarkForAddListByPrimaryKey(IEnumerable<EntityKey> pks, IEnumerable<KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>> foreignKeys, object dbContext)
+        {
+            foreach (var pk in pks)
+            {
+                MarkForAddSelf(pk, dbContext);
+                MarkForUpdateDependent(pk, dbContext);
+            }
+            MarkForUpdateForeignKeys(foreignKeys, dbContext);
+        }
+
+        public void MarkForAddByPrimaryKey(EntityKey pk, IEnumerable<KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>> foreignKeys, object dbContext)
+        {
+            MarkForAddSelf(pk, dbContext);
+            MarkForUpdateForeignKeys(foreignKeys, dbContext);
+            MarkForUpdateDependent(pk, dbContext);
+        }
+
+        private void MarkForAddSelf(EntityKey pk, object dbContext)
+        {
+            foreach (var data in CacheStorage.AllCacheDatas)
+            {
+                lock (data)
+                {
+                    if (data.FullCollection)
+                    {
+                        data.NeedUpdate = true;
+                    }
+                    if (pk.IsValid)
+                    {
+                    }
+                    var cached = data.Get(pk);
+                    using (cached?.Lock())
+                    {
+                        cached?.SetNeedUpdate(true, dbContext);
+                    }
+                }
+            }
+        }
+
         public EntityKey MarkForAdd(object entity, object dbContext)
         {
             return MarkForAdd((T) entity, dbContext);
         }
 
-        public ICollection<EntityKey> MarkForAdd(ICollection<object> entities, object dbContext)
+        public List<EntityKey> MarkForAddList(IList entities, object dbContext)
         {
             return MarkForAddInternal(entities, dbContext);
         }
@@ -435,50 +465,30 @@ namespace VitalChoice.Caching.Services.Cache
             CacheStorage.Dispose();
         }
 
-        private ICollection<EntityKey> MarkForAddInternal<TItem>(ICollection<TItem> entities, object dbContext)
+        private List<EntityKey> MarkForAddInternal(IList entities, object dbContext)
         {
-            List<EntityKey> pks = new List<EntityKey>();
+            var pks = new List<EntityKey>();
             if (entities.Count == 0)
                 return pks;
-            foreach (var data in CacheStorage.AllCacheDatas)
+
+            foreach (var entity in entities)
             {
-                lock (data)
-                {
-                    if (data.FullCollection)
-                    {
-                        data.NeedUpdate = true;
-                    }
-                    var cachedList = pks.Where(p => p.IsValid).Select(pk => data.Get(pk)).ToArray();
-                    var lockList = cachedList.Where(c => c != null).Select(c => c.Lock()).ToArray();
-                    try
-                    {
-                        foreach (var cached in cachedList)
-                        {
-                            cached?.SetNeedUpdate(true, dbContext);
-                        }
-                    }
-                    finally
-                    {
-                        lockList.ForEach(l => l.Dispose());
-                    }
-                }
+                var pk = EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity);
+                pks.Add(pk);
+                MarkForAddSelf(pk, dbContext);
+                MarkForUpdateDependent(pk, dbContext);
             }
             var foreignKeys = EntityInfo.ForeignKeys.GetForeignKeysValues(entities);
             foreach (var entity in entities)
             {
                 Update(entity, (DbContext) null, dbContext);
-                pks.Add(EntityInfo.PrimaryKey.GetPrimaryKeyValue(entity));
             }
-
             MarkForUpdateForeignKeys(foreignKeys, dbContext);
-            foreach (var pk in pks)
-            {
-                MarkForUpdateDependent(pk, dbContext);
-            }
             return pks;
         }
 
-        private void MarkForUpdateInternal(ICollection<EntityKey> pks, IEnumerable<ICacheData<T>> cacheDatas, string markRelated, object dbContext)
+        private void MarkForUpdateInternal(ICollection<EntityKey> pks, IEnumerable<ICacheData<T>> cacheDatas, string markRelated,
+            object dbContext)
         {
             if (pks.Count == 0)
                 return;
@@ -488,8 +498,8 @@ namespace VitalChoice.Caching.Services.Cache
                 var lockList = cachedList.Where(c => c != null).Select(c => c.Lock()).ToArray();
                 try
                 {
-                    Dictionary<EntityForeignKeyInfo, HashSet<EntityForeignKey>> foreignKeys =
-                        new Dictionary<EntityForeignKeyInfo, HashSet<EntityForeignKey>>();
+                    var foreignKeys =
+                        new List<KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>>();
                     lock (data)
                     {
                         foreach (var cached in cachedList)
@@ -523,7 +533,7 @@ namespace VitalChoice.Caching.Services.Cache
                         {
                             var keySet = new HashSet<EntityForeignKey>();
                             keySet.AddRange(group.Select(g => g.Value));
-                            foreignKeys.Add(group.Key, keySet);
+                            foreignKeys.Add(new KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>(group.Key, keySet));
                         }
                         MarkForUpdateForeignKeys(foreignKeys, dbContext);
                     }
@@ -602,7 +612,7 @@ namespace VitalChoice.Caching.Services.Cache
                                     cachedItems.Where(c => !c.NeedUpdateEntity)
                                         .Select(cached => cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(cached.EntityUntyped))
                                         .ToArray();
-                                cache.MarkForUpdateByPrimaryKey(itemsList, dbContext, dependentType.Value.Name);
+                                cache.MarkForUpdateListByPrimaryKey(itemsList, dbContext, dependentType.Value.Name);
                             }
                             finally
                             {
@@ -614,7 +624,8 @@ namespace VitalChoice.Caching.Services.Cache
             }
         }
 
-        private void MarkForUpdateForeignKeys(IDictionary<EntityForeignKeyInfo, HashSet<EntityForeignKey>> foreignKeys, object dbContext)
+        private void MarkForUpdateForeignKeys(IEnumerable<KeyValuePair<EntityForeignKeyInfo, ICollection<EntityForeignKey>>> foreignKeys,
+            object dbContext)
         {
             if (foreignKeys == null)
                 return;
@@ -623,7 +634,7 @@ namespace VitalChoice.Caching.Services.Cache
             {
                 var cache = CacheFactory.GetCache(keyGroup.Key.DependentType);
                 var itemPks = keyGroup.Value.Select(fk => keyGroup.Key.KeyMapping.MapForeignToPrincipal(fk));
-                cache.MarkForUpdateByPrimaryKey(itemPks.ToArray(), dbContext, keyGroup.Key.Name);
+                cache.MarkForUpdateListByPrimaryKey(itemPks.ToArray(), dbContext, keyGroup.Key.Name);
             }
         }
 

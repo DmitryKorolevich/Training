@@ -40,5 +40,9 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Reports
         public decimal? RefundTotal { get; set; }
 
         public string ServiceCodeNotes { get; set; }
+
+        public int? OrderSourceIdAddedBy { get; set; }
+
+        public string OrderSourceAddedBy { get; set; }
     }
 }

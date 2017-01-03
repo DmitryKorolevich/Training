@@ -9,5 +9,7 @@
 	    public string ValueVariant { get; set; }
 
         public int Order { get; set; }
+
+        public bool Hidden { get; set; }
     }
 }

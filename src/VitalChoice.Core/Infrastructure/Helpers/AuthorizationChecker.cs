@@ -41,8 +41,8 @@ namespace VitalChoice.Core.Infrastructure.Helpers
         public static bool HasRole(this ReferenceData reference, ClaimsPrincipal user, RoleType role)
         {
             var roleLookup =
-                reference.CustomerRoles.Union(reference.AffiliateRoles)
-                    .Union(reference.AdminRoles)
+                reference.CustomerRoles.Concat(reference.AffiliateRoles)
+                    .Concat(reference.AdminRoles)
                     .FirstOrDefault(r => r.Key == (int) role);
             return roleLookup != null && user.IsInRole(roleLookup.Text.Normalize());
         }

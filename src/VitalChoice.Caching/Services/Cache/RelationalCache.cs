@@ -144,7 +144,7 @@ namespace VitalChoice.Caching.Services.Cache
                 return _internalCache.UpdateAll(entities, query.RelationInfo, _context);
             }
 
-            return _internalCache.Update(entities, query.RelationInfo, _context);
+            return _internalCache.UpdateList(entities, query.RelationInfo, _context);
         }
 
         public bool Update(QueryData<T> queryData, T entity)
@@ -164,7 +164,7 @@ namespace VitalChoice.Caching.Services.Cache
 
             if (entity == null && queryData.PrimaryKeys != null)
             {
-                _internalCache.SetNull(queryData.PrimaryKeys, queryData.RelationInfo);
+                _internalCache.SetNullList(queryData.PrimaryKeys, queryData.RelationInfo);
                 return true;
             }
             if (entity == null && queryData.PrimaryKeys == null)
@@ -186,7 +186,7 @@ namespace VitalChoice.Caching.Services.Cache
                 foreach (var indexPair in conditionalIndexes.Where(c => c.Value != null))
                 {
                     var enumerable = _internalCache.TryGetEntities(indexPair.Value, indexPair.Key, query.RelationInfo, _stateManager, query.Tracked);
-                    result = result?.Union(enumerable) ?? enumerable;
+                    result = result?.Concat(enumerable) ?? enumerable;
                 }
                 if (result == null)
                 {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -28,7 +29,8 @@ namespace VitalChoice.Caching.Services
         private readonly ILoggerFactory _loggerFactory;
         protected readonly ILogger Logger;
         private readonly IContextTypeContainer _contextTypeContainer;
-        private Dictionary<Type, EntityInfo> _entityInfos;
+        private Dictionary<Type, EntityInfo> _entityInfos = new Dictionary<Type, EntityInfo>();
+        private Dictionary<string, EntityInfo> _entityInfosByTypeName = new Dictionary<string, EntityInfo>();
         private readonly HashSet<Type> _parsedEntities = new HashSet<Type>();
         private static readonly object SyncRoot = new object();
         private EntityCollector _gcCollector;
@@ -53,6 +55,9 @@ namespace VitalChoice.Caching.Services
 
             lock (SyncRoot)
             {
+                if (_contextTypeContainer.ContextTypes.Contains(contextType))
+                    return;
+
                 var parsed = new HashSet<Type>(_parsedEntities);
                 var entityInfos = new Dictionary<Type, EntityInfo>();
                 foreach (var entityType in context.Model.GetEntityTypes())
@@ -115,16 +120,19 @@ namespace VitalChoice.Caching.Services
                             info.Value.RelationReferences?.Where(r => r.Value != info.Value.PrimaryKey).Select(r => r.Key) ??
                             Enumerable.Empty<string>());
                 }
-                if (_entityInfos == null)
+                if (_entityInfos.Count == 0)
                 {
                     _entityInfos = entityInfos;
-                    _gcCollector = new EntityCollector(this, new InternalEntityCacheFactory(this, _loggerFactory), Options, Logger);
+                    _entityInfosByTypeName = entityInfos.ToDictionary(t => t.Key.FullName, t => t.Value);
+                    _gcCollector = new EntityCollector(this, new InternalEntityCacheFactory(this, _loggerFactory),
+                        Options, Logger);
                 }
                 else
                 {
                     var results = new Dictionary<Type, EntityInfo>(_entityInfos);
                     results.AddRange(entityInfos);
                     _entityInfos = results;
+                    _entityInfosByTypeName = results.ToDictionary(t => t.Key.FullName, t => t.Value);
                 }
                 CacheDebugger.EntityInfo = this;
                 _contextTypeContainer.ContextTypes = new HashSet<Type>(_contextTypeContainer.ContextTypes) {contextType};
@@ -163,7 +171,7 @@ namespace VitalChoice.Caching.Services
             var uniqueIndex =
                 indexes.Select(
                         index =>
-                                new EntityCacheableIndexInfo(CreateValueInfos(index.Properties)))
+                            new EntityCacheableIndexInfo(CreateValueInfos(index.Properties)))
                     .FirstOrDefault();
             return uniqueIndex;
         }
@@ -358,7 +366,7 @@ namespace VitalChoice.Caching.Services
             return caller.GetEntity(pk, rootScope);
         }
 
-        public IEnumerable<object> GetEntities(Type entityType, IEnumerable<EntityKey> pk, IServiceScopeFactory rootScope)
+        public IList GetEntities(Type entityType, IEnumerable<EntityKey> pk, IServiceScopeFactory rootScope)
         {
             var caller = (IGetEntityCaller) Activator.CreateInstance(typeof(GetEntityCaller<>).MakeGenericType(entityType), this);
             return caller.GetEntities(pk, rootScope);
@@ -459,7 +467,7 @@ namespace VitalChoice.Caching.Services
             return null;
         }
 
-        public IEnumerable<T> GetEntities<T>(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope)
+        public List<T> GetEntities<T>(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope)
             where T : class
         {
             using (var scope = rootScope.CreateScope())
@@ -484,13 +492,13 @@ namespace VitalChoice.Caching.Services
                                 return
                                     set.AsNoTracking()
                                         .AsNonCached()
-                                        .Where(Expression.Lambda<Func<T, bool>>(conditionalExpression, parameter));
+                                        .Where(Expression.Lambda<Func<T, bool>>(conditionalExpression, parameter)).ToList();
                             }
                         }
                     }
                 }
             }
-            return Enumerable.Empty<T>();
+            return new List<T>();
         }
 
         public EntityPrimaryKeyInfo GetPrimaryKeyInfo<T>()
@@ -628,11 +636,11 @@ namespace VitalChoice.Caching.Services
 
                 foreach (var pk in pks)
                 {
-                    list.Add(pk.Values[0]);
+                    list.Add(pk.Values[0].Value.GetValue());
                 }
 
-                conditionalExpression = Expression.Call(genericListType.GetMethod("Contains", BindingFlags.Instance | BindingFlags.Public),
-                    Expression.Constant(list.CollectionObject),
+                conditionalExpression = Expression.Call(Expression.Constant(list.CollectionObject),
+                    genericListType.GetMethod("Contains", BindingFlags.Instance | BindingFlags.Public),
                     Expression.MakeMemberAccess(parameter, typeof(T).GetRuntimeProperty(propertyInfo.Name)));
             }
             else
@@ -682,14 +690,14 @@ namespace VitalChoice.Caching.Services
         {
             return properties.Select(
                 property =>
-                        new EntityValueInfo(property.Name, property.GetGetter(), property.GetSetter(), property.ClrType));
+                    new EntityValueInfo(property.Name, property.GetGetter(), property.GetSetter(), property.ClrType));
         }
 
         private interface IGetEntityCaller
         {
             object GetEntity(ICollection<EntityValueExportable> keyValues, IServiceScopeFactory rootScope);
             object GetEntity(EntityKey pk, IServiceScopeFactory rootScope);
-            IEnumerable<object> GetEntities(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope);
+            IList GetEntities(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope);
         }
 
         private struct GetEntityCaller<T> : IGetEntityCaller
@@ -708,10 +716,29 @@ namespace VitalChoice.Caching.Services
 
             public object GetEntity(EntityKey pk, IServiceScopeFactory rootScope) => _infoStorage.GetEntity<T>(pk, rootScope);
 
-            public IEnumerable<object> GetEntities(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope)
+            public IList GetEntities(IEnumerable<EntityKey> pks, IServiceScopeFactory rootScope)
                 => _infoStorage.GetEntities<T>(pks, rootScope);
         }
 
         public void Dispose() => _gcCollector.Dispose();
+        public bool HaveKeys(string entityType)
+        {
+            return _entityInfosByTypeName.ContainsKey(entityType);
+        }
+
+        public bool GetEntityInfo(string entityType, out EntityInfo info)
+        {
+            return _entityInfosByTypeName.TryGetValue(entityType, out info);
+        }
+
+        public Type GetContextType(string entityType)
+        {
+            EntityInfo info;
+            if (_entityInfosByTypeName.TryGetValue(entityType, out info))
+            {
+                return info.ContextType;
+            }
+            return null;
+        }
     }
 }

@@ -231,6 +231,7 @@ namespace VitalChoice.Caching.Relational
             private readonly Func<TEntity, TRelation> _getFunc;
             private readonly Action<TEntity, TRelation> _setFunc;
             private readonly Type _genericCollectionType;
+            private readonly Type _genericCollectionItemType;
 
             public RelationAccessor(Expression<Func<TEntity, TRelation>> getExpression)
             {
@@ -244,6 +245,7 @@ namespace VitalChoice.Caching.Relational
                 var elementType = typeof(TRelation).TryGetElementType(typeof(ICollection<>));
                 if (elementType != null)
                 {
+                    _genericCollectionItemType = elementType;
                     _genericCollectionType = typeof(GenericCollection<>).MakeGenericType(elementType);
                 }
             }
@@ -267,13 +269,13 @@ namespace VitalChoice.Caching.Relational
                 }
                 else if (_genericCollectionType != null)
                 {
-                    if (_genericCollectionType == null || !(relation is IEnumerable))
+                    if (!(relation is IEnumerable))
                         return;
 
                     var reference = _getFunc((TEntity) entity);
                     if (reference != null)
                     {
-                        var collection = reference.AsGenericCollection(_genericCollectionType);
+                        var collection = reference.AsGenericCollection(_genericCollectionItemType);
                         collection.Clear();
                         foreach (var item in (IEnumerable) relation)
                         {
@@ -295,7 +297,7 @@ namespace VitalChoice.Caching.Relational
                 var reference = _getFunc((TEntity) entity);
                 if (reference != null)
                 {
-                    var collection = reference.AsGenericCollection(_genericCollectionType);
+                    var collection = reference.AsGenericCollection(_genericCollectionItemType);
                     foreach (var item in (IEnumerable) relatedCollection)
                     {
                         collection.Add(item);

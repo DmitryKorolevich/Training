@@ -1657,6 +1657,23 @@ namespace VitalChoice.Business.Services.Orders
             PagedList<OrderAbuseReportRawItem> toReturn = new PagedList<OrderAbuseReportRawItem>();
 
             var data = await _sPEcommerceRepository.GetOrderAbuseReportRawItemsAsync(filter);
+            if (data.Count > 0)
+            {
+                var ids = new HashSet<int>(data.Where(p => p.OrderSourceIdAddedBy.HasValue).
+                    Select(p => p.OrderSourceIdAddedBy.Value));
+                var profiles = await _adminProfileRepository.Query(p => ids.Contains(p.Id)).SelectAsync(false);
+                foreach (var item in data)
+                {
+                    foreach (var profile in profiles)
+                    {
+                        if (item.OrderSourceIdAddedBy == profile.Id)
+                        {
+                            item.OrderSourceAddedBy = profile.AgentId;
+                        }
+                    }
+                }
+            }
+
             foreach (var orderAbuseReportRawItem in data)
             {
                 orderAbuseReportRawItem.ServiceCodeName = orderAbuseReportRawItem.IdServiceCode.HasValue

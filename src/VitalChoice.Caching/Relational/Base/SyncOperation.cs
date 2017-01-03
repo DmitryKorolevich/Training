@@ -7,7 +7,13 @@ using System.Threading.Tasks;
 namespace VitalChoice.Caching.Relational.Base
 {
     [DataContract]
-    public class SyncOperation
+    public class SyncData
+    {
+        
+    }
+
+    [DataContract]
+    public class PingSyncData : SyncData
     {
         [DataMember]
         public string AppName { get; set; }
@@ -17,20 +23,33 @@ namespace VitalChoice.Caching.Relational.Base
 
         [DataMember]
         public DateTime? SendTime { get; set; }
+    }
 
+    [DataContract]
+    public class UpdateDeleteSyncData : SyncData
+    {
+        [DataMember]
+        public EntityKeyExportable Key { get; set; }
+    }
+
+    [DataContract]
+    public class AddSyncData : UpdateDeleteSyncData
+    {
+        [DataMember]
+        public ICollection<EntityForeignKeyExportable> ForeignKeys { get; set; }
+    }
+
+    [DataContract]
+    [KnownType(typeof(PingSyncData))]
+    [KnownType(typeof(AddSyncData))]
+    [KnownType(typeof(UpdateDeleteSyncData))]
+    public class SyncOperation
+    {
         [DataMember]
         public SyncType SyncType { get; set; }
 
         [DataMember]
-        public string EntityType { get; set; }
-
-        [DataMember]
-        public EntityKeyExportable Key { get; set; }
-
-        public override string ToString()
-        {
-            return $"[{SyncType}:{EntityType}]{Key}";
-        }
+        public SyncData Data { get; set; }
     }
 
     public enum SyncType

@@ -28,9 +28,9 @@ namespace VC.Admin.Validators.Customer
             RuleFor(model => model.PaymentComment)
                 .NotEmpty()
                 .WithMessage(model => model.PaymentComment, ValidationMessages.FieldRequired)
-                .Length(0, BaseAppConstants.DEFAULT_TEXTAREA_FIELD_MAX_SIZE)
+                .Length(0, BaseAppConstants.MARKETING_COMMENT_TEXTAREA_FIELD_MAX_SIZE)
                 .WithMessage(model => model.PaymentComment, ValidationMessages.FieldLength,
-                    BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+                    BaseAppConstants.MARKETING_COMMENT_TEXTAREA_FIELD_MAX_SIZE);
 
             RuleFor(model => model.MarketingPromotionType)
                 .Must(p => p.HasValue)

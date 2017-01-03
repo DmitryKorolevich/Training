@@ -1185,7 +1185,7 @@
                                                         <div class="form-group">
                                                             <label for="marketingPromotionType" class="col-md-3 control-label">Type:</label>
                                                             <div class="col-md-9">
-                                                                <select class="form-control" id="marketingPromotionType" name="MarketingPromotionType" data-ng-model="currentCustomer.Marketing.MarketingPromotionType" data-ng-options="term.Key as term.Text for term in ReferenceData.MarketingPromotionTypes" data-ng-disabled="orderEditDisabled" data-ng-required="!order.OnHold || order.UpdateMarketingForCustomer">
+                                                                <select class="form-control" id="marketingPromotionType" name="MarketingPromotionType" data-ng-model="currentCustomer.Marketing.MarketingPromotionType" data-ng-options="term.Key as term.Text for term in ReferenceData.MarketingPromotionTypesNotHidden" data-ng-disabled="orderEditDisabled" data-ng-required="!order.OnHold || order.UpdateMarketingForCustomer">
                                                                     <option value="" selected hidden />
                                                                 </select>
                                                                 <div class="error-container" ng-show="forms.submitted['marketing'] && forms.marketing.MarketingPromotionType.$invalid">
@@ -1197,10 +1197,10 @@
                                                         <div class="form-group">
                                                             <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
                                                             <div class="col-md-9">
-                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="currentCustomer.Marketing.PaymentComment" placeholder="Payment Comment" rows="3" data-ng-required="!order.OnHold || order.UpdateMarketingForCustomer" data-ng-maxlength="250" data-ng-disabled="orderEditDisabled"></textarea>
+                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="currentCustomer.Marketing.PaymentComment" placeholder="Payment Comment" rows="3" data-ng-required="!order.OnHold || order.UpdateMarketingForCustomer" data-ng-maxlength="45" data-ng-disabled="orderEditDisabled"></textarea>
                                                                 <div class="error-container" ng-show="forms.submitted['marketing'] && forms.marketing.PaymentComment.$invalid">
                                                                     <small class="error" ng-show="forms.marketing.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
-                                                                    <small class="error" ng-show="forms.marketing.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
+                                                                    <small class="error" ng-show="forms.marketing.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "45"])}}</small>
                                                                     <small class="error" ng-show="forms.marketing.PaymentComment.$error.server">{{serverMessages.GetMessage('PaymentComment', undefined, undefined, "marketing")}}</small>
                                                                 </div>
                                                             </div>
