@@ -29,8 +29,8 @@ namespace VitalChoice.Caching.Services
         private readonly ILoggerFactory _loggerFactory;
         protected readonly ILogger Logger;
         private readonly IContextTypeContainer _contextTypeContainer;
-        private Dictionary<Type, EntityInfo> _entityInfos;
-        private Dictionary<string, EntityInfo> _entityInfosByTypeName;
+        private Dictionary<Type, EntityInfo> _entityInfos = new Dictionary<Type, EntityInfo>();
+        private Dictionary<string, EntityInfo> _entityInfosByTypeName = new Dictionary<string, EntityInfo>();
         private readonly HashSet<Type> _parsedEntities = new HashSet<Type>();
         private static readonly object SyncRoot = new object();
         private EntityCollector _gcCollector;
@@ -120,11 +120,12 @@ namespace VitalChoice.Caching.Services
                             info.Value.RelationReferences?.Where(r => r.Value != info.Value.PrimaryKey).Select(r => r.Key) ??
                             Enumerable.Empty<string>());
                 }
-                if (_entityInfos == null)
+                if (_entityInfos.Count == 0)
                 {
                     _entityInfos = entityInfos;
                     _entityInfosByTypeName = entityInfos.ToDictionary(t => t.Key.FullName, t => t.Value);
-                    _gcCollector = new EntityCollector(this, new InternalEntityCacheFactory(this, _loggerFactory), Options, Logger);
+                    _gcCollector = new EntityCollector(this, new InternalEntityCacheFactory(this, _loggerFactory),
+                        Options, Logger);
                 }
                 else
                 {
