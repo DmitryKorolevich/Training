@@ -505,10 +505,10 @@ namespace VitalChoice.ExportService.Services
                     switch ((MarketingPromotionType) order.PaymentMethod.SafeData.MarketingPromotionType)
                     {
                         case MarketingPromotionType.Promotion:
-                            exportOrder.Payment.PaymentType.Description = MarketingPromoDescription;
+                            exportOrder.Payment.PaymentType.Description = "MKT-PROMO";
                             break;
                         case MarketingPromotionType.Donation:
-                            exportOrder.Payment.PaymentType.Description = MarketingDonationDescription;
+                            exportOrder.Payment.PaymentType.Description = "MKT-DON";
                             break;
                         case MarketingPromotionType.DonationtoNonProfit:
                             exportOrder.Payment.PaymentType.Description = "MKT-DON";
