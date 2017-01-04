@@ -17,6 +17,7 @@ using VitalChoice.Infrastructure.Domain.Avatax;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer.PaymentMethod;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 using VitalChoice.Interfaces.Services.Avatax;
 using VitalChoice.Interfaces.Services.Orders;
@@ -232,7 +233,8 @@ namespace VitalChoice.ExportService.Services
             veraCoreOrder.Header.InsertDate = DateTime.Now;
         }
 
-        private async Task ParseBillingInfo(OrderPaymentMethodDynamic paymentMethod, CustomerDynamic customer, VeraCoreExportOrder veracoreOrder)
+        private async Task ParseBillingInfo(OrderPaymentMethodDynamic paymentMethod, CustomerDynamic customer,
+            VeraCoreExportOrder veracoreOrder)
         {
             var address = paymentMethod.Address;
             if (address != null)
@@ -465,6 +467,7 @@ namespace VitalChoice.ExportService.Services
                 default:
                     throw new ArgumentOutOfRangeException(nameof(exportSide), exportSide, null);
             }
+            exportOrder.Payment.ARReference = order.PaymentMethod.SafeData.PaymentComment;
             switch ((PaymentMethodType) order.PaymentMethod.IdObjectType)
             {
                 case PaymentMethodType.CreditCard:
@@ -473,7 +476,7 @@ namespace VitalChoice.ExportService.Services
                     //NOTBUG: revisit manual CC payment, we not using manual payment anymore
                     exportOrder.Payment.PaymentType.Description =
                         FormatCcType((CreditCardType) order.PaymentMethod.Data.CardType);
-                    exportOrder.Payment.CCExpirationDate = $"{expDate.Month:D2}{expDate.Year%100:D2}";
+                    exportOrder.Payment.CCExpirationDate = $"{expDate.Month:D2}{expDate.Year % 100:D2}";
                     exportOrder.Payment.CCNumber = order.PaymentMethod.Data.CardNumber;
                     exportOrder.Payment.PaymentAmount = chargeAmount;
                     break;
@@ -499,10 +502,39 @@ namespace VitalChoice.ExportService.Services
                     break;
                 case PaymentMethodType.Marketing:
                     exportOrder.Payment.PaymentType.Sequence = 1;
-                    exportOrder.Payment.PaymentType.Description =
-                        (int) order.PaymentMethod.Data.MarketingPromotionType == 1
-                            ? MarketingPromoDescription
-                            : MarketingDonationDescription;
+                    switch ((MarketingPromotionType) order.PaymentMethod.SafeData.MarketingPromotionType)
+                    {
+                        case MarketingPromotionType.Promotion:
+                            exportOrder.Payment.PaymentType.Description = MarketingPromoDescription;
+                            break;
+                        case MarketingPromotionType.Donation:
+                            exportOrder.Payment.PaymentType.Description = MarketingDonationDescription;
+                            break;
+                        case MarketingPromotionType.DonationtoNonProfit:
+                            exportOrder.Payment.PaymentType.Description = "MKT-DON";
+                            break;
+                        case MarketingPromotionType.CorporateGiftfromVc:
+                            exportOrder.Payment.PaymentType.Description = "MKT-GIFT-C";
+                            break;
+                        case MarketingPromotionType.MarketingGiftfromVc:
+                            exportOrder.Payment.PaymentType.Description = "MKT-GIFT-M";
+                            break;
+                        case MarketingPromotionType.CompanyEvent:
+                            exportOrder.Payment.PaymentType.Description = "MKT-CO-EVT";
+                            break;
+                        case MarketingPromotionType.VendorEventRelationship:
+                            exportOrder.Payment.PaymentType.Description = "MKT-VENDOR";
+                            break;
+                        case MarketingPromotionType.ProductDevelopment:
+                            exportOrder.Payment.PaymentType.Description = "MKT-PR_DEV";
+                            break;
+                        case MarketingPromotionType.TradeshowConfSeminar:
+                            exportOrder.Payment.PaymentType.Description = "MKT-SHOW";
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+
                     break;
                 case PaymentMethodType.VCWellnessEmployeeProgram:
                     exportOrder.Payment.PaymentType.Sequence = 1;
