@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 angular.module('app.modules.setting.controllers.orderReviewRuleDetailController', [])
-.controller('orderReviewRuleDetailController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', 'settingService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker',
-function ($scope, $rootScope, $state, $stateParams, $timeout, settingService, toaster, modalUtil, confirmUtil, promiseTracker)
+.controller('orderReviewRuleDetailController', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout', 'settingService', 'productService', 'toaster', 'modalUtil', 'confirmUtil', 'promiseTracker',
+function ($scope, $rootScope, $state, $stateParams, $timeout, settingService, productService, toaster, modalUtil, confirmUtil, promiseTracker)
 {
     $scope.refreshTracker = promiseTracker("get");
 
@@ -53,6 +53,11 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, settingService, to
             { Key: 24, Text: '2 years' },
         ];
 
+        $scope.skusFilter = {
+            Code: '',
+            Paging: { PageIndex: 1, PageItemCount: 20 },
+        };
+
         settingService.getOrderReviewRule($stateParams.id ? $stateParams.id : 0, $scope.refreshTracker).success(function (result)
         {
             if (result.Success)
@@ -65,6 +70,22 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, settingService, to
         }).error(function (result) {
             errorHandler(result);
         });
+    };
+
+    $scope.getSKUsBySKU = function (val)
+    {
+        if (val)
+        {
+            $scope.skusFilter.Code = val;
+            return productService.getSkus($scope.skusFilter)
+                .then(function (result)
+                {
+                    return result.data.Data.map(function (item)
+                    {
+                        return item;
+                    });
+                });
+        }
     };
 
     $scope.save = function () {
@@ -83,8 +104,10 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, settingService, to
             error(function (result) {
                 errorHandler(result);
             });
-        } else {
+        } else
+        {
             $scope.forms.submitted = true;
+            toaster.pop('error', "Error!", $rootScope.baseValidationMessage, null, 'trustedHtml');
         }
     };
 
