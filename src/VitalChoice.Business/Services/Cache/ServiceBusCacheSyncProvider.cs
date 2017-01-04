@@ -6,6 +6,7 @@ using VitalChoice.Caching.Interfaces;
 using VitalChoice.Caching.Relational.Base;
 using VitalChoice.Caching.Services;
 using System.Collections.Concurrent;
+using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.ServiceBus;
@@ -13,6 +14,7 @@ using Microsoft.ServiceBus.Messaging;
 using VitalChoice.Ecommerce.Domain.Options;
 using VitalChoice.Infrastructure.ServiceBus.Base;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Services;
 
 namespace VitalChoice.Business.Services.Cache
 {
@@ -30,6 +32,8 @@ namespace VitalChoice.Business.Services.Cache
         private int _totalMessagesReceived;
         private readonly BatchSendingPool<SyncOperation> _sendingPool;
         private readonly ServiceBusTopicSender<SyncOperation> _sendingClient;
+        private long _averagePing;
+        private readonly BasicTimer _pingRefreshTimer;
 
         public ServiceBusCacheSyncProvider(IInternalEntityCacheFactory cacheFactory, IEntityInfoStorage keyStorage,
             ILoggerFactory loggerFactory,
@@ -40,6 +44,7 @@ namespace VitalChoice.Business.Services.Cache
             _applicationEnvironment = applicationEnvironment;
             if (options.Value.CacheSyncOptions?.Enabled ?? false)
             {
+                _pingRefreshTimer = new BasicTimer(PingRefresh, TimeSpan.FromSeconds(10), ex => Logger.LogError(ex.ToString()));
                 _enabled = true;
 
                 var queName = options.Value.CacheSyncOptions?.ServiceBusQueueName;
@@ -112,7 +117,7 @@ namespace VitalChoice.Business.Services.Cache
             }
         }
 
-        public override void SendChanges(IEnumerable<SyncOperation> syncOperations)
+        private void PingRefresh()
         {
             double[] pings;
             lock (_lockObject)
@@ -125,13 +130,18 @@ namespace VitalChoice.Business.Services.Cache
                 averagePing = pings.Average();
             }
             AveragePing.AddOrUpdate(_applicationEnvironment.ApplicationName, averagePing, (s, i) => averagePing);
+            Interlocked.CompareExchange(ref _averagePing, (long) (averagePing * 100.0), _averagePing);
+        }
+
+        public override void SendChanges(IEnumerable<SyncOperation> syncOperations)
+        {
             var ops = Enumerable.Repeat(new SyncOperation
             {
                 SyncType = SyncType.Ping,
                 Data = new PingSyncData
                 {
                     AppName = _applicationEnvironment.ApplicationName,
-                    AveragePing = averagePing,
+                    AveragePing = Interlocked.Read(ref _averagePing) / 100.0,
                     SendTime = DateTime.UtcNow
                 }
             }, 1).Concat(syncOperations).ToArray();
@@ -149,6 +159,7 @@ namespace VitalChoice.Business.Services.Cache
             _receiverHost.Dispose();
             _sendingPool.Dispose();
             _sendingClient.Dispose();
+            _pingRefreshTimer.Dispose();
         }
 
         private void ReceiveMessages(IEnumerable<BrokeredMessage> incomingItems)
@@ -203,7 +214,8 @@ namespace VitalChoice.Business.Services.Cache
                 {
                     Logger.LogError(e.ToString());
                 }
-                if (syncOp != null && syncOp.SyncType != SyncType.Ping && syncOp.SyncType != SyncType.Invalid)
+                if (syncOp != null &&
+                    (syncOp.SyncType == SyncType.Add || syncOp.SyncType == SyncType.Delete || syncOp.SyncType == SyncType.Update))
                 {
                     yield return syncOp;
                 }
