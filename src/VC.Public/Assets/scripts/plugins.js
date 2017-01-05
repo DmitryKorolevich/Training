@@ -329,10 +329,6 @@ $(function () {
 		notifySuccess(successMessage);
 	}
 
-	if (document.getElementById('lhnContainer')) {
-		initLiveHelp();
-	}
-
 	$.each($("textarea[charcount=true]"), function (index, elem)
 	{
 		processCharcount({ target: elem });
@@ -648,27 +644,6 @@ function processCharcount(ev) {
 	} else {
 		var char = max - len;
 		$(elem).next().html('<b>' + char + '</b> characters remaining');
-	}
-}
-
-function initLiveHelp() {
-	if (window.addEventListener) {
-	    window.addEventListener('load',
-	        function() {
-	            setTimeout(function() {
-	                document.getElementById('lhnContainer').appendChild(lhnScript);
-	            }, 1);
-	        },
-	        false);
-	}
-	else if (window.attachEvent) {
-	    window.attachEvent('onload',
-	        function() {
-	            setTimeout(function() {
-	                    document.getElementById('lhnContainer').appendChild(lhnScript);
-	                },
-	                1);
-	        });
 	}
 }
 
