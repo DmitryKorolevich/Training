@@ -1120,7 +1120,7 @@ angular.module('app.modules.order.services.orderEditService', [])
             }
         }
 
-        if (uiScope.order.Marketing.MarketingPromotionType && !uiScope.orderEditDisabled)
+        if (uiScope.order && uiScope.order.Marketing && uiScope.order.Marketing.MarketingPromotionType && !uiScope.orderEditDisabled)
         {
             var options = $.grep($rootScope.ReferenceData.MarketingPromotionTypesNotHidden, function (item, index)
             {
