@@ -174,7 +174,8 @@ angular.module('app.core.utils.appBootstrap', [])
 
                 return path.indexOf("/authentication/activate") > -1 ||
                     path.indexOf("/authentication/login") > -1 ||
-                    path.indexOf("/authentication/passwordreset") > -1;
+                    path.indexOf("/authentication/passwordreset") > -1 ||
+                    path.indexOf("/public/") > -1;
             };
 
             function cacheStatus()

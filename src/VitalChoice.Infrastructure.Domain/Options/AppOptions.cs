@@ -18,6 +18,7 @@ namespace VitalChoice.Infrastructure.Domain.Options
         public string CustomerFeedbackToEmail { get; set; }
         public string OrderShippingNotificationBcc { get; set; }
         public string AffiliateEmailBcc { get; set; }
+        public string EmailOrderNotificationEmail { get; set; }
         public string FilesRelativePath { get; set; }
         public string FilesPath { get; set; }
         public bool EnableOrderTrackScripts { get; set; }

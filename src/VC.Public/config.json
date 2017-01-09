@@ -13,6 +13,7 @@
     "OrderShippingNotificationBcc": "",
     //cdbdf92c@trustpilotservice.com
     "AffiliateEmailBcc": "affiliatesupport@vitalchoice.com",
+    "EmailOrderNotificationEmail": "gary@g2designgroup.com",
 
     "EnableOrderTrackScripts": false,
     "GenerateLowercaseUrls": true,

@@ -20,3 +20,37 @@ BEGIN
 
 END
 GO
+
+IF NOT EXISTS(SELECT * FROM Lookups WHERE Name = 'EmailOrderRequestors')
+BEGIN
+
+	INSERT Lookups
+	(LookupValueType,Name,Description)
+	VALUES
+	('string','EmailOrderRequestors','Email Order Requestors')
+
+	INSERT LookupVariants
+	(Id,IdLookup,ValueVariant,[Order])
+	VALUES
+	(1, (SELECT TOP 1 Id FROM Lookups WHERE Name = 'EmailOrderRequestors'),'First' ,1),
+	(2, (SELECT TOP 1 Id FROM Lookups WHERE Name = 'EmailOrderRequestors'),'Second' ,2)
+
+END
+GO
+
+IF NOT EXISTS(SELECT * FROM Lookups WHERE Name = 'EmailOrderReasons')
+BEGIN
+
+	INSERT Lookups
+	(LookupValueType,Name, Description)
+	VALUES
+	('string','EmailOrderReasons','Email Order Reasons')
+
+	INSERT LookupVariants
+	(Id,IdLookup,ValueVariant,[Order])
+	VALUES
+	(1, (SELECT TOP 1 Id FROM Lookups WHERE Name = 'EmailOrderReasons'),'Donation to Non-Profit (501c3)' ,1),
+	(2, (SELECT TOP 1 Id FROM Lookups WHERE Name = 'EmailOrderReasons'),'Corporate Gift from VC' ,2)
+
+END
+GO

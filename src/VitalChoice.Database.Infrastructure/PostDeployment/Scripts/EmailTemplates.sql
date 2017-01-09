@@ -380,3 +380,125 @@ INSERT INTO [dbo].[EmailTemplates]
 END
 
 GO
+
+IF NOT EXISTS(SELECT [Id] FROM [dbo].[EmailTemplates] WHERE [Name] = 'EmailOrderEmail')
+BEGIN
+
+DECLARE @contentItemId int
+
+INSERT INTO [dbo].[ContentItems]
+           ([Created]
+           ,[Updated]
+           ,[Template]
+           ,[Description]
+           ,[Title]
+           ,[MetaKeywords]
+           ,[MetaDescription])
+     VALUES
+           (GETDATE()
+           ,GETDATE()
+           ,'<%
+<body:body>
+{{
+    <div>
+        Submitted on <strong class="date">@(DateCreatedDatePart)</strong> at <strong class="date">@(DateCreatedTimePart)</strong>
+        <br/>
+        <br/>
+    </div>
+    <div>
+        <strong>- Order Details -</strong>
+        <br/>
+        <br/>
+        <strong>Products:</strong>
+        <br/>
+        @list(Skus){{
+            @(Code) / @(QTY) / @money(Price)
+        }}
+        <br/>
+        <br/>
+        <strong>Requestor:</strong> @(Requestor)
+        <br/>
+        <strong>Reason for Order:</strong> @(Reason)
+        <br/>
+        <strong>Details on the event:</strong>
+        <br/>
+        @(DetailsOnEvent)
+        <br/>
+        <strong>Special Instructions: </strong>
+        <br/>
+        @(Instuction)
+        <br/>
+        <br/>
+    </div>
+    <div>
+        <strong>- Shipping Address -</strong>
+        <br/>
+        <br/>
+        <strong>Company:</strong> @(Shipping.Company)
+        <br/>
+        <strong>First Name:</strong> @(Shipping.FirstName)
+        <br/>
+        <strong>Last Name:</strong> @(Shipping.LastName)
+        <br/>
+        <strong>Address 1:</strong> @(Shipping.Address1)
+        <br/>
+        <strong>Address 2:</strong> @(Shipping.Address2)
+        <br/>
+        <strong>City:</strong> @(Shipping.Company)
+        <br/>
+        <strong>Country:</strong> @(Shipping.Country)
+        <br/>
+        <strong>State:</strong> @(Shipping.State)
+        <br/>
+        <strong>Zip:</strong> @(Shipping.Zip)
+        <br/>
+        <strong>Phone:</strong> @(Shipping.Phone)
+        <br/>
+        <strong>Fax:</strong> @(Shipping.Fax)
+        <br/>
+        <br/>
+    </div>
+    <div>
+        <strong>- Payment Details -</strong>
+        <br/>
+        <br/>
+        <strong>Payment Method:</strong> @(PaymentMethodType)
+        <br/>
+        <strong>Type:</strong> @(MarketingPromotionType)
+        <br/>
+        <strong>Payment Comments:</strong>
+        <br/>
+        @(PaymentComment)
+        <br/>
+        <br/>
+    </div>
+    
+}} :: VitalChoice.Infrastructure.Domain.Mail.EmailOrderEmail
+%>'
+           ,''
+           ,'New Internal Marketing Order Submission - Submitted on @(DateCreatedDatePart) at @(DateCreatedTimePart)'
+           ,NULL
+           ,NULL)
+
+SET @contentItemId=@@identity
+
+INSERT INTO [dbo].[EmailTemplates]
+           ([Name]
+           ,[ContentItemId]
+           ,[MasterContentItemId]
+           ,[StatusCode]
+           ,[UserId]
+           ,[ModelType]
+           ,[EmailDescription])
+     VALUES
+           ('EmailOrderEmail'
+           ,@contentItemId
+           ,(SELECT Id FROM MasterContentItems WHERE Name='Admin Email Template')
+           ,2
+           ,NULL
+           ,'VitalChoice.Infrastructure.Domain.Mail.EmailOrderEmail'
+           ,'Email Order Notification')
+
+END
+
+GO

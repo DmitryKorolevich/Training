@@ -69,6 +69,7 @@
     "app/core/dataAccess/services/serviceCodeService.js",
     "app/core/dataAccess/services/templateService.js",
     "app/core/dataAccess/services/monitorService.js",
+    "app/core/dataAccess/services/publicService.js",
     "app/core/dataAccess/dataAccess.js",
     "app/core/utils/httpInterceptor.js",
     "app/core/utils/modalUtil.js",
@@ -286,6 +287,8 @@
     "app/modules/healthwise/controllers/markCustomerOrdersController.js",
     "app/modules/healthwise/controllers/healthwiseDetailController.js",
     "app/modules/healthwise/controllers/moveToPeriodController.js",
-    "app/modules/healthwise/healthwise.js"
+    "app/modules/healthwise/healthwise.js",
+    "app/modules/public/controllers/emailOrderManageController.js",
+    "app/modules/public/public.js"
   ]
 }

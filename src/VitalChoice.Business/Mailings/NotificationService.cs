@@ -20,8 +20,9 @@ namespace VitalChoice.Business.Mailings
         private static string _сustomerServiceToEmail;
         private static string _giftListEmail;
         private static string _adminHost;
-        private static string _publicHost; 
+        private static string _publicHost;
         private static string _orderShippingNotificationBcc;
+        private static string _emailOrderNotificationEmail;
 
         public NotificationService(IEmailSender emailSender,
             IEmailTemplateService emailTemplateService,
@@ -37,6 +38,7 @@ namespace VitalChoice.Business.Mailings
             _adminHost = appOptions.Value.AdminHost;
             _publicHost = appOptions.Value.PublicHost;
             _orderShippingNotificationBcc = appOptions.Value.OrderShippingNotificationBcc;
+            _emailOrderNotificationEmail = appOptions.Value.EmailOrderNotificationEmail;
         }
 
         #region SendEmails
@@ -385,6 +387,16 @@ namespace VitalChoice.Business.Mailings
                 {
                     await emailSender.SendEmailAsync(item.Key.Email, item.Value.Subject, item.Value.Body);
                 }
+            }
+        }
+
+        public async Task SendEmailOrderEmailAsync(EmailOrderEmail model)
+        {
+            var generatedEmail = await _emailTemplateService.GenerateEmailAsync(EmailConstants.EmailOrderEmail, model);
+
+            if (generatedEmail != null)
+            {
+                await emailSender.SendEmailAsync(_emailOrderNotificationEmail, generatedEmail.Subject, generatedEmail.Body);
             }
         }
 
