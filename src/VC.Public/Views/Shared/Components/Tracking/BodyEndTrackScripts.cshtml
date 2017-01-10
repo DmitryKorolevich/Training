@@ -201,11 +201,20 @@
         a.appendChild(r);
     })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
 </script>
-    <!-- Hotjar Tracking Code for http://www.vitalchoice.com -->
-    <!-- Pepperjam iframe-->
     if (!string.IsNullOrEmpty(Model.PepperjamQuery))
     {
+        <!-- Hotjar Tracking Code for http://www.vitalchoice.com -->
+        <!-- Pepperjam iframe-->
         <iframe src="https://t.pepperjamnetwork.com/track?@Html.Raw(Model.PepperjamQuery)" width="1" height="1" frameborder="0"></iframe>
+        <!-- Pepperjam iframe-->
     }
-    <!-- Pepperjam iframe-->
+
+    if (Model.PageName != PageName.Receipt)
+    {
+        <img src='https://rdcdn.com/rt?aid=2233&e=1&img=1' height='1' width='1'/>
+    }
+    else
+    {
+        <img src='https://rdcdn.com/ct?aid=2233&e=1' height='1' width='1' />
+    }
 }
