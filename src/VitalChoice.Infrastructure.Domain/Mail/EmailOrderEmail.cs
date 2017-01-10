@@ -33,8 +33,6 @@ namespace VitalChoice.Infrastructure.Domain.Mail
 
         public string Reason { get; set; }
 
-        public string MarketingPromotionType { get; set; }
-
         public string PaymentComment { get; set; }
 
         public AddressBaseModel Shipping { get; set; }

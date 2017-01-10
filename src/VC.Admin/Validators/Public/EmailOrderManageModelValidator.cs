@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using FluentValidation;
+using VC.Admin.Models.Customers;
 using VC.Admin.Models.Orders;
 using VC.Admin.Models.Public;
 using VC.Admin.Validators.Customer;
@@ -20,7 +21,7 @@ namespace VC.Admin.Validators.Public
         {
             ValidationErrors.Clear();
             var addressValidator = ValidatorsFactory.GetValidator<AddressModelRules>();
-            var marketingPaymentModelValidator = ValidatorsFactory.GetValidator<MarketingModelRules>();
+            var marketingPaymentModelValidator = ValidatorsFactory.GetValidator<EmailOrderMarketingModelRules>();
             var NCPaymentModelValidator = ValidatorsFactory.GetValidator<NCPaymentModelRules>();
             ParseResults(ValidatorsFactory.GetValidator<EmailOrderModelValidator>().Validate(value, ruleSet: "Main"));
             ParseResults(addressValidator.Validate(value.Shipping), "shipping");
@@ -34,6 +35,19 @@ namespace VC.Admin.Validators.Public
                 {
                     ParseResults(NCPaymentModelValidator.Validate(value.NC), "nc");
                 }
+            }
+        }
+
+        public class EmailOrderMarketingModelRules : AbstractValidator<MarketingPaymentModel>
+        {
+            public EmailOrderMarketingModelRules()
+            {
+                RuleFor(model => model.PaymentComment)
+                    .NotEmpty()
+                    .WithMessage(model => model.PaymentComment, ValidationMessages.FieldRequired)
+                    .Length(0, BaseAppConstants.MARKETING_COMMENT_TEXTAREA_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.PaymentComment, ValidationMessages.FieldLength,
+                        BaseAppConstants.MARKETING_COMMENT_TEXTAREA_FIELD_MAX_SIZE);
             }
         }
 

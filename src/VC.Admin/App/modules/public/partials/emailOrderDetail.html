@@ -195,19 +195,6 @@
                                                 <fieldset>
                                                     <div data-ng-if="order.IdPaymentMethodType == 7 && order.Marketing">
                                                         <div class="form-group">
-                                                            <label for="marketingPromotionType" class="col-md-3 control-label">Type:</label>
-                                                            <div class="col-md-9">
-                                                                <select class="form-control" id="marketingPromotionType" name="MarketingPromotionType" data-ng-model="order.Marketing.MarketingPromotionType"
-                                                                        data-ng-options="term.Key as term.Text for term in ReferenceData.MarketingPromotionTypesNotHidden" required="">
-                                                                    <option value="" selected hidden />
-                                                                </select>
-                                                                <div class="error-container" ng-show="forms.submitted['marketing'] && forms.marketing.MarketingPromotionType.$invalid">
-                                                                    <small class="error" ng-show="forms.marketing.MarketingPromotionType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Type")}}</small>
-                                                                    <small class="error" ng-show="forms.marketing.MarketingPromotionType.$error.server">{{serverMessages.GetMessage('MarketingPromotionType', undefined, undefined, "marketing")}}</small>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group">
                                                             <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
                                                             <div class="col-md-9">
                                                                 <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="order.Marketing.PaymentComment" placeholder="Payment Comment" rows="3" required="" data-ng-maxlength="45"></textarea>

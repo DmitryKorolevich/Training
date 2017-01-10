@@ -65,7 +65,9 @@ namespace VC.Admin.Controllers
             {
                 Shipping = new AddressModel() { Country = new CountryListItemModel(defaultCountry) },
                 SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) },
-                IdPaymentMethodType = (int)PaymentMethodType.Marketing
+                IdPaymentMethodType = (int)PaymentMethodType.Marketing,
+                Marketing = new MarketingPaymentModel(),
+                NC = new NCPaymentModel()
             };
 
             return toReturn;
@@ -115,10 +117,6 @@ namespace VC.Admin.Controllers
             email.DateCreatedTimePart = email.DateCreated.ToString("hh:mm tt");
             if (model.IdPaymentMethodType == (int)PaymentMethodType.Marketing && model.Marketing != null)
             {
-                email.MarketingPromotionType = model.Marketing.MarketingPromotionType.HasValue
-                    ? _referenceData.MarketingPromotionTypesNotHidden.FirstOrDefault(
-                        p => p.Key == model.Marketing.MarketingPromotionType.Value)?.Text
-                    : null;
                 email.PaymentComment = model.Marketing.PaymentComment;
             }
             if (model.IdPaymentMethodType == (int)PaymentMethodType.NoCharge && model.NC != null)

@@ -464,8 +464,6 @@ INSERT INTO [dbo].[ContentItems]
         <br/>
         <strong>Payment Method:</strong> @(PaymentMethodType)
         <br/>
-        <strong>Type:</strong> @(MarketingPromotionType)
-        <br/>
         <strong>Payment Comments:</strong>
         <br/>
         @(PaymentComment)
