@@ -66,16 +66,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             formName: 'shipping',
             ShippingEditModels: {}
         };
-        $scope.paymentInfoTab = {
-            index: 4,
-            formNames: ['marketing', 'nc'],
-            AddressEditModels: {}
-        };
         $scope.options.activeTabIndex = $scope.mainTab.index;
         var tabs = [];
         tabs.push($scope.mainTab);
         tabs.push($scope.shippingAddressTab);
-        tabs.push($scope.paymentInfoTab);
         $scope.tabs = tabs;
 
         loadSettings();
@@ -164,39 +158,26 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                 return;
             }
 
-            var billingErrorMessages = '';
-            if ($scope.order.IdPaymentMethodType == 7)
-            {
-                if ($scope.order.Marketing == null)
-                {
-                    billingErrorMessages += "Marketing payment info is required. ";
-                }
-            }
-            if ($scope.order.IdPaymentMethodType == 4)
-            {
-                if ($scope.order.NC == null)
-                {
-                    billingErrorMessages += "No Charge is required. ";
-                }
-            }
-            if (billingErrorMessages)
-            {
-                toaster.pop('error', 'Error!', billingErrorMessages, null, 'trustedHtml');
-                $scope.options.activeTabIndex = $scope.paymentInfoTab.index;
-                return;
-            }
-
             var data = angular.copy($scope.order);
 
-            publicService.sendEmailOrder(data, $scope.addEditTracker)
-                .success(function (result)
-                {
-                    successSaveHandler(result);
-                }).
-                error(function (result)
-                {
-                    errorHandler(result);
-                });
+            modalUtil.open('app/modules/setting/partials/recaptchaConfirmPopup.html', 'recaptchaConfirmPopupController', {
+                OkButton: {
+                    Label: 'Submit',
+                    Handler: function (token)
+                    {
+                        data.Token = token;
+                        publicService.sendEmailOrder(data, $scope.addEditTracker)
+                            .success(function (result)
+                            {
+                                successSaveHandler(result);
+                            }).
+                            error(function (result)
+                            {
+                                errorHandler(result);
+                            });
+                    }
+                },
+            }, { size: 'xxs', backdrop: false });
         } else
         {
             if ($scope.forms.topForm != null)
@@ -205,8 +186,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             }
             $scope.forms.mainForm.submitted = true;
             $scope.forms.submitted['shipping'] = true;
-            $scope.forms.submitted['marketing'] = true;
-            $scope.forms.submitted['nc'] = true;
             toaster.pop('error', "Error!", "Validation errors, please correct field values.", null, 'trustedHtml');
         }
     };
@@ -465,135 +444,6 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         }
         $scope.shippingAddressTab.OrderShippingEditModel.disableValidation = false;
         return $scope.shippingAddressTab.OrderShippingEditModel;
-    };
-
-    $scope.makeShippingAsBillingAddressOrder = function ()
-    {
-        var address;
-        switch (String($scope.order.IdPaymentMethodType))
-        {
-            case "4":
-                if ($scope.order.NC.Address)
-                {
-                    address = $scope.order.NC.Address;
-                }
-                break;
-            case "7":
-                if ($scope.order.Marketing.Address)
-                {
-                    address = $scope.order.Marketing.Address;
-                }
-                break;
-        }
-        if (address)
-        {
-            var activeShipping = $scope.buildOrderShippingAddressForPartial();
-            if (activeShipping)
-            {
-                for (var key in address)
-                {
-                    activeShipping.Address[key] = address[key];
-                }
-                address.AddressType = 3;
-            }
-        }
-    };
-
-    $scope.makeBillingAsShippingAddressOrder = function ()
-    {
-        var address;
-        switch (String($scope.order.IdPaymentMethodType))
-        {
-            case "4":
-                address = $scope.order.NC.Address;
-                break;
-            case "7":
-                address = $scope.order.Marketing.Address;
-                break;
-        }
-        if (address)
-        {
-            var activeShipping = $scope.buildOrderShippingAddressForPartial();
-            if (activeShipping)
-            {
-                for (var key in activeShipping.Address)
-                {
-                    address[key] = activeShipping.Address[key];
-                }
-
-                address.AddressType = 2;
-            }
-        }
-    };
-
-    $scope.setNewMarketing = function (callback)
-    {
-        if ($scope.forms.marketing.$valid)
-        {
-            customerService.createMarketingPrototype($scope.addEditTracker)
-                .success(function (result)
-                {
-                    if (result.Success)
-                    {
-                        $scope.order.Marketing = result.Data;
-                        syncCountry($scope, result.Data.Address);
-                        $scope.order.Marketing.formName = 'marketing';
-                        if (callback)
-                            callback(result.Data);
-                    } else
-                    {
-                        successHandler(result);
-                    }
-                }).
-                error(function (result)
-                {
-                    errorHandler(result);
-                })
-                .then(function ()
-                {
-                    $scope.forms.submitted['marketing'] = false;
-                });
-        }
-        else
-        {
-            $scope.forms.submitted['marketing'] = true;
-        }
-        return false;
-    };
-
-    $scope.setNewNC = function (callback)
-    {
-        if ($scope.forms.nc.$valid)
-        {
-            customerService.createNCPrototype($scope.addEditTracker)
-                .success(function (result)
-                {
-                    if (result.Success)
-                    {
-                        $scope.order.NC = result.Data;
-                        syncCountry($scope, result.Data.Address);
-                        $scope.order.NC.formName = 'nc';
-                        if (callback)
-                            callback(result.Data);
-                    } else
-                    {
-                        successHandler(result);
-                    }
-                }).
-                error(function (result)
-                {
-                    errorHandler(result);
-                })
-                .then(function ()
-                {
-                    $scope.forms.submitted['nc'] = false;
-                });
-        }
-        else
-        {
-            $scope.forms.submitted['nc'] = true;
-        }
-        return false;
     };
 
     var syncCountry = function (scope, addressItem)

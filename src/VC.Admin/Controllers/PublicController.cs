@@ -14,6 +14,7 @@ using VC.Admin.Models.Setting;
 using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Mailings;
 using VitalChoice.Core.Base;
+using VitalChoice.Core.Infrastructure.Helpers.ReCaptcha;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain.Constants;
@@ -36,17 +37,20 @@ namespace VC.Admin.Controllers
         private readonly INotificationService _notificationService;
         private readonly ReferenceData _referenceData;
         private readonly ICountryNameCodeResolver _countryNameCodeResolver;
+        private readonly ReCaptchaValidator _reCaptchaValidator;
 
         public PublicController(
             ISettingService settingService,
             INotificationService notificationServic,
             ReferenceData referenceData,
-            ICountryNameCodeResolver countryNameCodeResolver)
+            ICountryNameCodeResolver countryNameCodeResolver,
+            ReCaptchaValidator reCaptchaValidator)
         {
             _notificationService = notificationServic;
             _settingService = settingService;
             _referenceData = referenceData;
             _countryNameCodeResolver = countryNameCodeResolver;
+            _reCaptchaValidator = reCaptchaValidator;
         }
 
         [HttpGet]
@@ -66,8 +70,6 @@ namespace VC.Admin.Controllers
                 Shipping = new AddressModel() { Country = new CountryListItemModel(defaultCountry) },
                 SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) },
                 IdPaymentMethodType = (int)PaymentMethodType.Marketing,
-                Marketing = new MarketingPaymentModel(),
-                NC = new NCPaymentModel()
             };
 
             return toReturn;
@@ -79,6 +81,12 @@ namespace VC.Admin.Controllers
             if (!Validate(model))
                 return false;
 
+            if (!await _reCaptchaValidator.Validate(model.Token))
+            {
+                ModelState.AddModelError(string.Empty, ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.WrongCaptcha]);
+                return false;
+            }
+
             var lookups = await _settingService.GetLookupsAsync(SettingConstants.EMAIL_ORDER_LOOKUP_NAMES.Split(','));
             var requestorsLookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.EMAIL_ORDER_REQUESTOR_LOOKUP_NAME);
             var reasonsLookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.EMAIL_ORDER_REASON_LOOKUP_NAME);
@@ -88,9 +96,6 @@ namespace VC.Admin.Controllers
                 DateCreated = DateTime.Now,
                 DetailsOnEvent = model.DetailsOnEvent,
                 Instuction = model.Instuction,
-                PaymentMethodType = model.IdPaymentMethodType.HasValue ?
-                                LookupHelper.GetShortPaymentMethodName((PaymentMethodType)model.IdPaymentMethodType.Value)
-                                : null,
                 Requestor = model.IdRequestor.HasValue ?
                             requestorsLookup.LookupVariants.FirstOrDefault(p=>p.Id==model.IdRequestor.Value)?.ValueVariant
                             : null,
@@ -115,14 +120,6 @@ namespace VC.Admin.Controllers
             };
             email.DateCreatedDatePart = email.DateCreated.ToString("MM/dd/yyyy");
             email.DateCreatedTimePart = email.DateCreated.ToString("hh:mm tt");
-            if (model.IdPaymentMethodType == (int)PaymentMethodType.Marketing && model.Marketing != null)
-            {
-                email.PaymentComment = model.Marketing.PaymentComment;
-            }
-            if (model.IdPaymentMethodType == (int)PaymentMethodType.NoCharge && model.NC != null)
-            {
-                email.PaymentComment = model.NC.PaymentComment;
-            }
             email.Skus = model.SkuOrdereds?.Where(p=>!string.IsNullOrEmpty(p.Code) && p.QTY.HasValue && p.Price.HasValue).Select(p => new EmailOrderSku()
                          {
                              Code = p.Code,

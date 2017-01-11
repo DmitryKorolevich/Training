@@ -16,6 +16,7 @@ angular.module('app.modules.setting', [
 	'app.modules.setting.controllers.lookupsController',
 	'app.modules.setting.controllers.lookupDetailController',
 	'app.modules.setting.controllers.profileScopesController',
+	'app.modules.setting.controllers.recaptchaConfirmPopupController',
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',

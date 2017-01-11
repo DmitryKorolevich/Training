@@ -418,9 +418,9 @@ INSERT INTO [dbo].[ContentItems]
         <br/>
         <strong>Requestor:</strong> @(Requestor)
         <br/>
-        <strong>Reason for Order:</strong> @(Reason)
+        <strong>Internal Order Reason:</strong> @(Reason)
         <br/>
-        <strong>Details on the event:</strong>
+        <strong>Internal Order Comments:</strong>
         <br/>
         @(DetailsOnEvent)
         <br/>
@@ -444,7 +444,7 @@ INSERT INTO [dbo].[ContentItems]
         <br/>
         <strong>Address 2:</strong> @(Shipping.Address2)
         <br/>
-        <strong>City:</strong> @(Shipping.Company)
+        <strong>City:</strong> @(Shipping.City)
         <br/>
         <strong>Country:</strong> @(Shipping.Country)
         <br/>
@@ -455,18 +455,6 @@ INSERT INTO [dbo].[ContentItems]
         <strong>Phone:</strong> @(Shipping.Phone)
         <br/>
         <strong>Fax:</strong> @(Shipping.Fax)
-        <br/>
-        <br/>
-    </div>
-    <div>
-        <strong>- Payment Details -</strong>
-        <br/>
-        <br/>
-        <strong>Payment Method:</strong> @(PaymentMethodType)
-        <br/>
-        <strong>Payment Comments:</strong>
-        <br/>
-        @(PaymentComment)
         <br/>
         <br/>
     </div>

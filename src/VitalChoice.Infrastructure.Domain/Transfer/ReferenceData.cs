@@ -27,6 +27,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer
 
         public string PublicHost { get; set; }
 
+        public string GoogleCaptchaPublicKey { get; set; }
+
         public IList<LookupItem<int?>> VisibleOptions { get; set; }
 
         public IList<LookupItem<string>> ContentItemStatusNames { get; set; }

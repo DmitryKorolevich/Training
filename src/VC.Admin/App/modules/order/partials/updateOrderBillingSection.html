@@ -91,13 +91,13 @@
             <div class="radio">
                 <label class="control-label">
                     <input type="radio" class="" data-ng-model="paymentInfoTab.PaymentMethodType" value="7" id="marketing" data-ng-disabled="orderEditDisabled">
-                    Marketing
+                    Internal Order
                 </label>
             </div>
         </div>
         <div class="col-md-6">
             <div data-ng-if="paymentInfoTab.PaymentMethodType == 7 && currentCustomer.ApprovedPaymentMethods.length > 0 && !order.Marketing">
-                <button class="btn btn-info" data-ng-click="setNewMarketing();">Add New Marketing</button>
+                <button class="btn btn-info" data-ng-click="setNewMarketing();">Add New</button>
             </div>
         </div>
     </div>
@@ -308,7 +308,7 @@
         <fieldset>
             <div data-ng-if="paymentInfoTab.PaymentMethodType == 7 && currentCustomer.ApprovedPaymentMethods.length > 0 && order.Marketing">
                 <div class="form-group">
-                    <label for="marketingPromotionType" class="col-md-3 control-label">Type:</label>
+                    <label for="marketingPromotionType" class="col-md-3 control-label">Internal Order Reason:</label>
                     <div class="col-md-9">
                         <select data-ng-if="!orderEditDisabled" class="form-control" id="marketingPromotionType" name="MarketingPromotionType" data-ng-model="order.Marketing.MarketingPromotionType" 
                                 data-ng-options="term.Key as term.Text for term in ReferenceData.MarketingPromotionTypesNotHidden" data-ng-disabled="orderEditDisabled" data-ng-required="!order.OnHold">
@@ -325,7 +325,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
+                    <label for="paymentComment" class="col-md-3 control-label">Internal Order Comments:</label>
                     <div class="col-md-9">
                         <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="order.Marketing.PaymentComment" placeholder="Payment Comment" rows="3" data-ng-required="!order.OnHold" data-ng-maxlength="45" data-ng-disabled="orderEditDisabled"></textarea>
                         <div class="error-container" ng-show="forms.submitted['marketing'] && forms.marketing.PaymentComment.$invalid">

@@ -209,11 +209,11 @@
         <!-- Pepperjam iframe-->
     }
 
-    if (Model.PageName != PageName.Receipt)
+    if (Model.PageName != PageName.Receipt && Model.PageName!=PageName.Billing)
     {
         <img src='https://rdcdn.com/rt?aid=2233&e=1&img=1' height='1' width='1'/>
     }
-    else
+    if (Model.PageName == PageName.Receipt)
     {
         <img src='https://rdcdn.com/ct?aid=2233&e=1' height='1' width='1' />
     }

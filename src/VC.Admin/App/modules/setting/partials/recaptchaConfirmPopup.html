@@ -1,0 +1,10 @@
+﻿<div class="modal-header">
+	<h3 class="modal-title">{{Header}}</h3>
+</div>
+<div class="modal-body">
+    <div class="google-captcha" id="googleCaptcha"></div>
+</div>
+<div class="modal-footer">
+    <button data-ng-if="OkButton" class="btn btn-success" data-ng-click="ok()">{{OkButton.Label}}</button>
+	<button data-ng-if="CancelButtom" class="btn btn-default" data-ng-click="cancel()">{{CancelButtom.Label}}</button>
+</div>

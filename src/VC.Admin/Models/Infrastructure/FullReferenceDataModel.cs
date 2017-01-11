@@ -15,6 +15,7 @@ namespace VC.Admin.Models.Infrastructure
         public IList<ContentProcessorEntity> ContentProcessors { get; set; }
         public IList<LookupItem<int>> Months { get; set; }
         public string PublicHost { get; set; }
+        public string GoogleCaptchaPublicKey { get; set; }
         public IList<LookupItem<int?>> VisibleOptions { get; set; }
         public IList<LookupItem<string>> ContentItemStatusNames { get; set; }
         public IList<LookupItem<string>> ProductCategoryStatusNames { get; set; }

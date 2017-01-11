@@ -170,6 +170,7 @@
     "app/modules/setting/controllers/lookupsController.js",
     "app/modules/setting/controllers/lookupDetailController.js",
     "app/modules/setting/controllers/profileScopesController.js",
+    "app/modules/setting/controllers/recaptchaConfirmPopupController.js",
     "app/modules/setting/setting.js",
     "app/modules/product/controllers/productCategoriesController.js",
     "app/modules/product/controllers/productCategoryManageController.js",

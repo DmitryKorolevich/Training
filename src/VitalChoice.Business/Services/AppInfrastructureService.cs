@@ -167,6 +167,7 @@ namespace VitalChoice.Business.Services
             referenceData.PublicHost = !String.IsNullOrEmpty(_appOptionsAccessor.Value.PublicHost)
                 ? _appOptionsAccessor.Value.PublicHost
                 : "http://notdefined/";
+            referenceData.GoogleCaptchaPublicKey = _appOptionsAccessor.Value.GoogleCaptcha.PublicKey;
             referenceData.VisibleOptions = LookupHelper.GetVisibleOptions();
             referenceData.ContentItemStatusNames = LookupHelper.GetContentItemStatusNames().Select(x => new LookupItem<string>
             {

@@ -24,10 +24,6 @@ namespace VC.Admin.Models.Public
     {
         public AddressModel Shipping { get; set; }
 
-        public MarketingPaymentModel Marketing { get; set; }
-
-        public NCPaymentModel NC { get; set; }
-
         public int? IdPaymentMethodType { get; set; }
 
         public string DetailsOnEvent { get; set; }
@@ -39,6 +35,8 @@ namespace VC.Admin.Models.Public
         public int? IdReason { get; set; }
 
         public IList<SkuOrderedManageModel> SkuOrdereds { get; set; }
+
+        public string Token { get; set; }
 
         public EmailOrderManageModel()
         {

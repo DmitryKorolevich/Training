@@ -23,8 +23,6 @@ namespace VitalChoice.Infrastructure.Domain.Mail
 
         public string DateCreatedTimePart { get; set; }
 
-        public string PaymentMethodType { get; set; }
-
         public string DetailsOnEvent { get; set; }
 
         public string Instuction { get; set; }
@@ -32,8 +30,6 @@ namespace VitalChoice.Infrastructure.Domain.Mail
         public string Requestor { get; set; }
 
         public string Reason { get; set; }
-
-        public string PaymentComment { get; set; }
 
         public AddressBaseModel Shipping { get; set; }
 

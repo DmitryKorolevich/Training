@@ -42,6 +42,7 @@ namespace VC.Admin.Controllers
                     ContentProcessors = referenceData.ContentProcessors,
                     Months = referenceData.Months,
                     PublicHost = referenceData.PublicHost,
+                    GoogleCaptchaPublicKey = referenceData.GoogleCaptchaPublicKey,
                     VisibleOptions = referenceData.VisibleOptions,
                     ContentItemStatusNames = referenceData.ContentItemStatusNames,
                     ProductCategoryStatusNames = referenceData.ProductCategoryStatusNames,

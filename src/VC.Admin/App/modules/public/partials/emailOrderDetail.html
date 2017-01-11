@@ -10,7 +10,7 @@
         <div class="container-fluid">
             <div class="row">
                 <span class="legend top">
-                    <span class="item">Submit New Marketing Order</span>
+                    <span class="item">Submit New Internal Order</span>
                 </span>
             </div>
             <div class="row">
@@ -98,7 +98,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-md-3 control-label">Reason for Order</label>
+                                                        <label class="col-md-3 control-label">Internal Order Reason</label>
                                                         <div class="col-md-9">
                                                             <select class="form-control" name="IdReason" data-ng-model="order.IdReason" ng-options="item.Key as item.Text for item in options.EmailOrderReasons" required>
                                                                 <option value="" selected hidden />
@@ -110,7 +110,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label class="col-md-12 control-label left">Details On The Event</label>
+                                                        <label class="col-md-12 control-label left">Internal Order Comments</label>
                                                         <div class="col-md-12">
                                                             <textarea type="text" name="DetailsOnEvent" class="form-control" placeholder="Details on the event / name of the Company For Donation" rows="5" 
                                                                       data-ng-model="order.DetailsOnEvent"></textarea>
@@ -149,84 +149,6 @@
                                             </div>
                                         </fieldset>
                                     </form>
-                                </spinner-overlay>
-                            </div>
-                        </div>
-                    </uib-tab>
-                    <uib-tab heading="Payment Information" index="paymentInfoTab.index">
-                        <div class="container container-left">
-                            <div class="well row">
-                                <spinner-overlay data-loading="addEditTracker.active()">
-                                    <div class="form-horizontal">
-                                        <span class="legend">Select Payment Method</span>
-                                        <div>
-                                            <div class="form-group">
-                                                <div class="col-md-3">
-                                                    <div class="radio">
-                                                        <label class="control-label">
-                                                            <input type="radio" class="" data-ng-model="order.IdPaymentMethodType" value="7" id="marketing">
-                                                            Marketing
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div data-ng-if="order.IdPaymentMethodType == 7 && !order.Marketing">
-                                                        <button class="btn btn-info" data-ng-click="setNewMarketing();">Add New Marketing</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="col-md-3">
-                                                    <div class="radio">
-                                                        <label class="control-label">
-                                                            <input type="radio" class="" data-ng-model="order.IdPaymentMethodType" value="4" id="noCharge">
-                                                            No Charge
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div data-ng-if="order.IdPaymentMethodType == 4 && !order.NC">
-                                                        <button class="btn btn-info" data-ng-click="setNewNC();">Add New NC</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <hr />
-                                            <form class="form-horizontal" name="forms.marketing" data-ng-class="{submitted: forms.submitted['marketing']}" novalidate unsaved-warning-form>
-                                                <fieldset>
-                                                    <div data-ng-if="order.IdPaymentMethodType == 7 && order.Marketing">
-                                                        <div class="form-group">
-                                                            <label for="paymentComment" class="col-md-3 control-label">Payment Comment:</label>
-                                                            <div class="col-md-9">
-                                                                <textarea type="text" id="paymentComment" name="PaymentComment" class="form-control" data-ng-model="order.Marketing.PaymentComment" placeholder="Payment Comment" rows="3" required="" data-ng-maxlength="45"></textarea>
-                                                                <div class="error-container" ng-show="forms.submitted['marketing'] && forms.marketing.PaymentComment.$invalid">
-                                                                    <small class="error" ng-show="forms.marketing.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
-                                                                    <small class="error" ng-show="forms.marketing.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "45"])}}</small>
-                                                                    <small class="error" ng-show="forms.marketing.PaymentComment.$error.server">{{serverMessages.GetMessage('PaymentComment', undefined, undefined, "marketing")}}</small>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </fieldset>
-                                            </form>
-                                            <form class="form-horizontal" name="forms.nc" data-ng-class="{submitted: forms.submitted['nc']}" novalidate unsaved-warning-form>
-                                                <fieldset>
-                                                    <div data-ng-if="order.IdPaymentMethodType == 4 && order.NC">
-                                                        <div class="form-group">
-                                                            <label for="paymentComment2" class="col-md-3 control-label">Payment Comment:</label>
-                                                            <div class="col-md-9">
-                                                                <textarea type="text" id="paymentComment2" name="PaymentComment" class="form-control" data-ng-model="order.NC.PaymentComment" placeholder="Payment Comment" rows="3" data-ng-maxlength="250" required=""></textarea>
-                                                                <div class="error-container" ng-show="forms.submitted['nc'] && forms.nc.PaymentComment.$invalid">
-                                                                    <small class="error" ng-show="forms.nc.PaymentComment.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Payment Comment")}}</small>
-                                                                    <small class="error" ng-show="forms.nc.PaymentComment.$error.maxlength">{{getValidationMessage("ValidationMessages.FieldLength", ["Payment Comment", "250"])}}</small>
-                                                                    <small class="error" ng-show="forms.nc.PaymentComment.$error.server">{{serverMessages.GetMessage('PaymentComment', undefined, undefined, "nc")}}</small>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </fieldset>
-                                            </form>
-                                        </div>
-                                    </div>
                                 </spinner-overlay>
                             </div>
                         </div>
