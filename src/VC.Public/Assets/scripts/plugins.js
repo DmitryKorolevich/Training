@@ -330,10 +330,10 @@ $(function () {
 	}
 
     //old live support code
-	//if (document.getElementById('lhnContainer'))
-	//{
-	//    initLiveHelp();
-	//}
+	if (document.getElementById('lhnContainer'))
+	{
+	    initLiveHelp();
+	}
 
 	$.each($("textarea[charcount=true]"), function (index, elem)
 	{
@@ -654,33 +654,33 @@ function processCharcount(ev) {
 }
 
 //<!-- old live support code -->
-//function initLiveHelp()
-//{
-//    if (window.addEventListener)
-//    {
-//        window.addEventListener('load',
-//	        function ()
-//	        {
-//	            setTimeout(function ()
-//	            {
-//	                document.getElementById('lhnContainer').appendChild(lhnScript);
-//	            }, 1);
-//	        },
-//	        false);
-//    }
-//    else if (window.attachEvent)
-//    {
-//        window.attachEvent('onload',
-//	        function ()
-//	        {
-//	            setTimeout(function ()
-//	            {
-//	                document.getElementById('lhnContainer').appendChild(lhnScript);
-//	            },
-//	                1);
-//	        });
-//    }
-//}
+function initLiveHelp()
+{
+    if (window.addEventListener)
+    {
+        window.addEventListener('load',
+	        function ()
+	        {
+	            setTimeout(function ()
+	            {
+	                document.getElementById('lhnContainer').appendChild(lhnScript);
+	            }, 1);
+	        },
+	        false);
+    }
+    else if (window.attachEvent)
+    {
+        window.attachEvent('onload',
+	        function ()
+	        {
+	            setTimeout(function ()
+	            {
+	                document.getElementById('lhnContainer').appendChild(lhnScript);
+	            },
+	                1);
+	        });
+    }
+}
 
 function confirmAction(successCallback, errorCallback, text) {
 	var message = "Are you sure?";
