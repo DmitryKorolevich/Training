@@ -112,7 +112,7 @@
                                                     <div class="form-group">
                                                         <label class="col-md-12 control-label left">Internal Order Comments</label>
                                                         <div class="col-md-12">
-                                                            <textarea type="text" name="DetailsOnEvent" class="form-control" placeholder="Details on the event / name of the Company For Donation" rows="5" 
+                                                            <textarea type="text" name="DetailsOnEvent" class="form-control" placeholder="Please identify the event or recipient and provide relevant details." rows="5" 
                                                                       data-ng-model="order.DetailsOnEvent"></textarea>
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.DetailsOnEvent.$invalid">
                                                                 <small class="error" ng-show="forms.mainForm.DetailsOnEvent.$error.server">{{serverMessages.GetMessage('DetailsOnEvent')}}</small>
@@ -122,7 +122,7 @@
                                                     <div class="form-group">
                                                         <label class="col-md-12 control-label left">Special Instuctions</label>
                                                         <div class="col-md-12">
-                                                            <textarea type="text" name="Instuction" class="form-control" placeholder="Any collateral to be included or special instuctions. Be specific." rows="5"
+                                                            <textarea type="text" name="Instuction" class="form-control" placeholder="Any collateral to be included or special instructions. Be specific." rows="5"
                                                                       data-ng-model="order.Instuction"></textarea>
                                                             <div class="error-container" ng-show="forms.mainForm.submitted && forms.mainForm.Instuction.$invalid">
                                                                 <small class="error" ng-show="forms.mainForm.Instuction.$error.server">{{serverMessages.GetMessage('Instuction')}}</small>
