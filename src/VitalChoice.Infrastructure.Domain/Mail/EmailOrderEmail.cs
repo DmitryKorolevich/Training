@@ -31,6 +31,8 @@ namespace VitalChoice.Infrastructure.Domain.Mail
 
         public string Reason { get; set; }
 
+        public string EmailOrderShippingType { get; set; }
+
         public AddressBaseModel Shipping { get; set; }
 
         public ICollection<EmailOrderSku> Skus { get; set; }

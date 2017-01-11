@@ -34,6 +34,8 @@ namespace VC.Admin.Models.Public
 
         public int? IdReason { get; set; }
 
+        public int? IdEmailOrderShippingType { get; set; }
+
         public IList<SkuOrderedManageModel> SkuOrdereds { get; set; }
 
         public string Token { get; set; }

@@ -6,7 +6,7 @@ angular.module('app.modules.setting.controllers.recaptchaConfirmPopupController'
 {
     function initialize()
     {
-        $scope.Header = "I'm not a robot";
+        $scope.Header = "Captcha Challenge";
         if (data.Header)
         {
             $scope.Header = data.Header;

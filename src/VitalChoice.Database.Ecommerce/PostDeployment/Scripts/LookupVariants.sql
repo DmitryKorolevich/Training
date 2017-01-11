@@ -54,3 +54,21 @@ BEGIN
 
 END
 GO
+
+IF NOT EXISTS(SELECT * FROM Lookups WHERE Name = 'EmailOrderShippingTypes')
+BEGIN
+
+	INSERT Lookups
+	(LookupValueType,Name, Description)
+	VALUES
+	('string','EmailOrderShippingTypes','Email Order Shipping Types')
+
+	INSERT LookupVariants
+	(Id,IdLookup,ValueVariant,[Order])
+	VALUES
+	(1, (SELECT TOP 1 Id FROM Lookups WHERE Name = 'EmailOrderShippingTypes'),'Will Call' ,1),
+	(2, (SELECT TOP 1 Id FROM Lookups WHERE Name = 'EmailOrderShippingTypes'),'Local Delivery' ,2),
+	(4, (SELECT TOP 1 Id FROM Lookups WHERE Name = 'EmailOrderShippingTypes'),'Ship by Carrier' ,4)
+
+END
+GO

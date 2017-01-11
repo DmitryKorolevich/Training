@@ -104,6 +104,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     {
                         $scope.options.EmailOrderReasons = lookup.Items;
                     }
+                    if (lookup.Name == 'EmailOrderShippingTypes')
+                    {
+                        $scope.options.EmailOrderShippingTypes = lookup.Items;
+                    }
                 });
                 loadEmailOrder();
             }

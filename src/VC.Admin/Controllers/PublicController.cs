@@ -90,6 +90,7 @@ namespace VC.Admin.Controllers
             var lookups = await _settingService.GetLookupsAsync(SettingConstants.EMAIL_ORDER_LOOKUP_NAMES.Split(','));
             var requestorsLookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.EMAIL_ORDER_REQUESTOR_LOOKUP_NAME);
             var reasonsLookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.EMAIL_ORDER_REASON_LOOKUP_NAME);
+            var shippingTypeLookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.EMAIL_ORDER_SHIPPING_TYPE_LOOKUP_NAME);
 
             var email = new EmailOrderEmail()
             {
@@ -101,6 +102,9 @@ namespace VC.Admin.Controllers
                             : null,
                 Reason = model.IdReason.HasValue ?
                             reasonsLookup.LookupVariants.FirstOrDefault(p => p.Id == model.IdReason.Value)?.ValueVariant
+                            : null,
+                EmailOrderShippingType = model.IdEmailOrderShippingType.HasValue ?
+                            shippingTypeLookup.LookupVariants.FirstOrDefault(p => p.Id == model.IdEmailOrderShippingType.Value)?.ValueVariant
                             : null,
                 Shipping = new AddressBaseModel()
                 {

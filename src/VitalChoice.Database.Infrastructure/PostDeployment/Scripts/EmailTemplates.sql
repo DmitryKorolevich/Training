@@ -413,6 +413,7 @@ INSERT INTO [dbo].[ContentItems]
         <br/>
         @list(Skus){{
             @(Code) / @(QTY) / @money(Price)
+            <br/>
         }}
         <br/>
         <br/>
@@ -430,7 +431,10 @@ INSERT INTO [dbo].[ContentItems]
         <br/>
         <br/>
     </div>
-    <div>
+    <div> 
+	    <strong>Shipping Type:</strong> @(EmailOrderShippingType)
+        <br/>
+        <br/>
         <strong>- Shipping Address -</strong>
         <br/>
         <br/>

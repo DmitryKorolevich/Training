@@ -137,12 +137,24 @@
                             </div>
                         </div>
                     </uib-tab>
-                    <uib-tab heading="Shipping Address" index="shippingAddressTab.index">
+                    <uib-tab heading="Shipping" index="shippingAddressTab.index">
                         <div class="container container-left">
                             <div class="well row">
                                 <spinner-overlay data-loading="addEditTracker.active()">
                                     <form class="form-horizontal" name="forms.shipping" data-ng-class="{submitted: forms.submitted['shipping']}" novalidate unsaved-warning-form>
                                         <fieldset>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Shipping Type</label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" name="IdEmailOrderShippingType" data-ng-model="order.IdEmailOrderShippingType" ng-options="item.Key as item.Text for item in options.EmailOrderShippingTypes" required>
+                                                        <option value="" selected hidden />
+                                                    </select>
+                                                    <div class="error-container" ng-show="forms.submitted['shipping'] && forms.shipping.IdEmailOrderShippingType.$invalid">
+                                                        <small class="error" ng-show="forms.shipping.IdEmailOrderShippingType.$error.required">{{getValidationMessage("ValidationMessages.FieldRequired","Shipping Type")}}</small>
+                                                        <small class="error" ng-show="forms.shipping.IdEmailOrderShippingType.$error.server">{{serverMessages.GetMessage('IdEmailOrderShippingType')}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <span class="legend">Shipping Address</span>
                                             <div data-ng-repeat="model in [buildOrderShippingAddressForPartial()]">
                                                 <div data-ng-include="'app/modules/customer/partials/address.html'"></div>
