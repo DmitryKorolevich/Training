@@ -170,6 +170,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
                     Handler: function (token)
                     {
                         data.Token = token;
+                        if (!data.Shipping.State)
+                        {
+                            data.Shipping.State = 0;
+                        }
                         publicService.sendEmailOrder(data, $scope.addEditTracker)
                             .success(function (result)
                             {
