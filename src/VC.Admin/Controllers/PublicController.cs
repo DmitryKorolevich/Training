@@ -22,6 +22,7 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Customers;
+using VitalChoice.Infrastructure.Domain.Transfer.Public;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services;
 using VitalChoice.Interfaces.Services.Settings;
@@ -91,6 +92,18 @@ namespace VC.Admin.Controllers
             var requestorsLookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.EMAIL_ORDER_REQUESTOR_LOOKUP_NAME);
             var reasonsLookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.EMAIL_ORDER_REASON_LOOKUP_NAME);
             var shippingTypeLookup = lookups.FirstOrDefault(p => p.Name == SettingConstants.EMAIL_ORDER_SHIPPING_TYPE_LOOKUP_NAME);
+            if (model.IdEmailOrderShippingType != null &&
+                model.IdEmailOrderShippingType.Value == (int) EmailOrderShippingType.WillCall)
+            {
+                model.Shipping.Address1 = null;
+                model.Shipping.Address2 = null;
+                model.Shipping.City = null;
+                model.Shipping.County = null;
+                model.Shipping.Country = null;
+                model.Shipping.Zip = null;
+                model.Shipping.Fax = null;
+                model.Shipping.Phone = null;
+            }
 
             var email = new EmailOrderEmail()
             {

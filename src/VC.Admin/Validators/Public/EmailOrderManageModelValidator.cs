@@ -11,6 +11,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
+using VitalChoice.Infrastructure.Domain.Transfer.Public;
 using VitalChoice.Validation.Logic;
 
 namespace VC.Admin.Validators.Public
@@ -21,8 +22,44 @@ namespace VC.Admin.Validators.Public
         {
             ValidationErrors.Clear();
             var addressValidator = ValidatorsFactory.GetValidator<AddressModelRules>();
+            var shippingWillCallAddressModelRules = ValidatorsFactory.GetValidator<ShippingWillCallAddressModelRules>();
             ParseResults(ValidatorsFactory.GetValidator<EmailOrderModelValidator>().Validate(value, ruleSet: "Main"));
-            ParseResults(addressValidator.Validate(value.Shipping), "shipping");
+            if (value.IdEmailOrderShippingType.HasValue)
+            {
+                if (value.IdEmailOrderShippingType.Value == (int) EmailOrderShippingType.WillCall)
+                {
+                    ParseResults(shippingWillCallAddressModelRules.Validate(value.Shipping), "shipping");
+                }
+                else
+                {
+                    ParseResults(addressValidator.Validate(value.Shipping), "shipping");
+                }
+            }
+        }
+
+        public class ShippingWillCallAddressModelRules : AbstractValidator<AddressModel>
+        {
+            public ShippingWillCallAddressModelRules()
+            {
+                RuleFor(model => model.Company)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.Company, ValidationMessages.FieldLength,
+                        BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+
+                RuleFor(model => model.FirstName)
+                    .NotEmpty()
+                    .WithMessage(model => model.FirstName, ValidationMessages.FieldRequired)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.FirstName, ValidationMessages.FieldLength,
+                        BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+
+                RuleFor(model => model.LastName)
+                    .NotEmpty()
+                    .WithMessage(model => model.LastName, ValidationMessages.FieldRequired)
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                    .WithMessage(model => model.LastName, ValidationMessages.FieldLength,
+                        BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+            }
         }
 
         private class EmailOrderModelValidator : AbstractValidator<EmailOrderManageModel>
