@@ -8,5 +8,7 @@ namespace VC.Admin.Models.Infrastructure
 		public IList<LookupItem<string>> Labels { get; set; }
 
 	    public IList<LookupItem<int>> CartShippingOptions { get; set; }
+
+        public string GoogleCaptchaPublicKey { get; set; }
     }
 }
