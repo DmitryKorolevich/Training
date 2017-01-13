@@ -110,7 +110,8 @@ namespace VC.Admin.Controllers
                 referenceDataModel = new RestrictedReferenceData()
                 {
                     Labels = referenceData.Labels,
-                    CartShippingOptions = referenceData.CartShippingOptions
+                    CartShippingOptions = referenceData.CartShippingOptions,
+                    GoogleCaptchaPublicKey = referenceData.GoogleCaptchaPublicKey,
                 };
             }
 
