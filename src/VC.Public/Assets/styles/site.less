@@ -2579,30 +2579,30 @@ footer {
 }
 
 .slider-wrapper.theme-default .nivo-directionNav a {
-	width:75px;
-	height:100%;
+    width: 75px;
+    height: 100%;
     top: 0;
-	opacity: 0.6;
+    opacity: 0.6;
 }
 
 .slider-wrapper.theme-default:hover .nivo-directionNav a {
-	opacity: 0.6;
+    opacity: 0.6;
 }
 
 .slider-wrapper.theme-default a.nivo-prevNav {
     left: 0;
-	background:url(/assets/images/nivoslider/vc-carousel-arrows-left.png) no-repeat;
+    background: url(/assets/images/nivoslider/vc-carousel-arrows-left.png) no-repeat;
     background-position: 14px;
 }
 
 .slider-wrapper.theme-default a.nivo-nextNav {
     right: 0;
-	background:url(/assets/images/nivoslider/vc-carousel-arrows-right.png) no-repeat;
+    background: url(/assets/images/nivoslider/vc-carousel-arrows-right.png) no-repeat;
     background-position: 14px;
 }
 
-.slider-wrapper.theme-default .nivo-directionNav a:hover{
-	opacity: 1;
+.slider-wrapper.theme-default .nivo-directionNav a:hover {
+    opacity: 1;
 }
 
 .content-bottom {
@@ -4423,6 +4423,22 @@ footer {
     margin-right: 20px !important;
 }
 
+.padding-top-small {
+    padding-top: 10px !important;
+}
+
+.padding-bottom-small {
+    padding-bottom: 10px !important;
+}
+
+.padding-top-medium {
+    padding-top: 30px !important;
+}
+
+.padding-bottom-medium {
+    padding-bottom: 30px !important;
+}
+
 .standard-table {
     width: 100%;
 }
@@ -5736,6 +5752,14 @@ body.view-cart-background {
             background-color: #518CA5;
         }
 
+        &.red {
+            background-color: #BD281E;
+        }
+
+        &.red:hover {
+            background-color: #BD281E;
+        }
+
         &.checkout-blue {
             background: #5c95af url("/assets/images/checkout.png") 10px 4px no-repeat;
             padding-left: 45px;
@@ -5806,6 +5830,17 @@ body.view-cart-background {
 
             button.ui-state-hover {
                 background-color: #E8E8E8;
+            }
+        }
+    }
+
+    .checkout-step-container {
+        .shipping-items {
+
+            .checkout-sections-divider.big {               
+                border-top: 2px solid #000;
+                height: 20px;
+                border-bottom: none;
             }
         }
     }
@@ -6778,7 +6813,7 @@ h6.cart-head {
     margin: -5px 0 -10px -30px;
     width: 984px;
 
-    .close-button{
+    .close-button {
         float: right;
         width: 24px;
         margin-right: 10px;

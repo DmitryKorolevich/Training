@@ -1,4 +1,20 @@
-﻿$(function () {
+﻿$(function ()
+{
+    $(".shipping-items").on("click", ".delete-shipping", function ()
+    {
+        $(this).closest('.item').remove();
+    });
+
+    $(".new-shipping").click(function ()
+    {
+        var item = $(".item.template").clone();
+        item.removeClass('hide');
+        item.removeClass('template');
+        var content = $(".main-shipping-item").contents().clone();
+        item.find(".item-content").append(content);
+        $(".shipping-items").append(item);
+    });
+
     controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther");
     controlSectionState("#GiftMessageBox", "#IsGiftOrder");
     controlUseBillingState(".form-two-column", "#UseBillingAddress");

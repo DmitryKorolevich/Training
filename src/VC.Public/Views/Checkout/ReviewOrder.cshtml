@@ -31,93 +31,359 @@
             <img name="trustseal" alt="Security Seal" style="border: 0;" src="https://secure.trust-guard.com/seals/5867/scanned/mini/gray" />
         </a>
     </div>
+    <div class="assign-buttons template hide">
+        <a class="circle-button button-green">
+            <i class="glyphicon glyphicon-move"></i>
+        </a>
+        <a class="circle-button button-red">
+            <i class="glyphicon glyphicon-copyright-mark"></i>
+        </a>
+    </div>
     <div class="cart-overlay-container">
         <div class="overlay" data-bind="visible:refreshing">
             <div class="loading">Loading…</div>
         </div>
-        <div class="review-order-cart">
-            @using (Html.BeginForm("ReviewOrder", "Checkout", null, FormMethod.Post, null, new { @class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart" }))
-            {
-                @await Html.PartialAsync("_ViewCart", Model, ViewData)
-            }
-        </div>
-        <div class="reivew-order-info">
-            <div class="reivew-info-box">
-                <div class="review-header-container">
-                    <span>Bill to Details</span>
-                    @Html.ActionLink("Edit", "AddUpdateBillingAddress", "Checkout", null, new { @class = "button" })
+        <div class="shipping-items">
+            <div class="item" data-id="1">
+                <div class="checkout-sections-divider big"></div>
+                <h4 class="checkout-step-heading">Order 1</h4>
+                <div class="review-order-cart">
+                    @using (Html.BeginForm("ReviewOrder", "Checkout", null, FormMethod.Post, null, new {@class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart"}))
+                    {
+                        @await Html.PartialAsync("_ViewCart", Model, ViewData)
+                    }
                 </div>
-                @foreach (var item in Model.CreditCardDetails)
-                {
-                    <div class="review-box-line">
-                        @if (!string.IsNullOrWhiteSpace(item.Key))
+                <div class="reivew-order-info">
+                    <div class="reivew-info-box">
+                        <div class="review-header-container">
+                            <span>Bill to Details</span>
+                            @Html.ActionLink("Edit", "AddUpdateBillingAddress", "Checkout", null, new {@class = "button"})
+                        </div>
+                        @foreach (var item in Model.CreditCardDetails)
                         {
-                            <span class="review-info-label">@item.Key:</span>
+                            <div class="review-box-line">
+                                @if (!string.IsNullOrWhiteSpace(item.Key))
+                                {
+                                    <span class="review-info-label">@item.Key:</span>
+                                }
+                                <span class="review-info-value">@item.Value</span>
+                            </div>
                         }
-                        <span class="review-info-value">@item.Value</span>
-                    </div>
-                }
-                <div class="review-box-line">
-                </div>
-                @foreach (var item in Model.BillToAddress)
-                {
-                    if (!string.IsNullOrEmpty(item.Value))
-                    {
                         <div class="review-box-line">
-                            @if (!string.IsNullOrWhiteSpace(item.Key))
+                        </div>
+                        @foreach (var item in Model.BillToAddress)
+                        {
+                            if (!string.IsNullOrEmpty(item.Value))
                             {
-                                <span class="review-info-label">@item.Key:</span>
+                                <div class="review-box-line">
+                                    @if (!string.IsNullOrWhiteSpace(item.Key))
+                                    {
+                                        <span class="review-info-label">@item.Key:</span>
+                                    }
+                                    <span class="review-info-value">@item.Value</span>
+                                </div>
                             }
-                            <span class="review-info-value">@item.Value</span>
+                        }
+                    </div>
+                    <div class="reivew-info-box">
+                        <div class="review-header-container">
+                            <span>Ship to Details</span>
+                            @Html.ActionLink("Edit", "AddUpdateShippingMethod", "Checkout", null, new {@class = "button"})
+                        </div>
+                        @foreach (var item in Model.ShipToAddress)
+                        {
+                            if (!string.IsNullOrEmpty(item.Value))
+                            {
+                                <div class="review-box-line">
+                                    @if (!string.IsNullOrWhiteSpace(item.Key))
+                                    {
+                                        <span class="review-info-label">@item.Key:</span>
+                                    }
+                                    <span class="review-info-value">@item.Value</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
+                    {
+                        <div class="reivew-info-box">
+                            <div class="review-header-container">
+                                <span>Delivery Instructions</span>
+                            </div>
+                            <div class="review-box-line">
+                                @Model.DeliveryInstructions
+                            </div>
                         </div>
                     }
-                }
-            </div>
-            <div class="reivew-info-box">
-                <div class="review-header-container">
-                    <span>Ship to Details</span>
-                    @Html.ActionLink("Edit", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button" })
-                </div>
-                @foreach (var item in Model.ShipToAddress)
-                {
-                    if (!string.IsNullOrEmpty(item.Value))
+                    @if (!string.IsNullOrEmpty(Model.GiftMessage))
                     {
-                        <div class="review-box-line">
-                            @if (!string.IsNullOrWhiteSpace(item.Key))
-                            {
-                                <span class="review-info-label">@item.Key:</span>
-                            }
-                            <span class="review-info-value">@item.Value</span>
+                        <div class="reivew-info-box">
+                            <div class="review-header-container">
+                                <span>Gift Message</span>
+                            </div>
+                            <div class="review-box-line">
+                                @Model.GiftMessage
+                            </div>
                         </div>
                     }
-                }
+                </div>
             </div>
-            @if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
-            {
-                <div class="reivew-info-box">
-                    <div class="review-header-container">
-                        <span>Delivery Instructions</span>
-                    </div>
-                    <div class="review-box-line">
-                        @Model.DeliveryInstructions
-                    </div>
+            <div class="item" data-id="2">
+                <div class="checkout-sections-divider big"></div>
+                <h4 class="checkout-step-heading">Order 2</h4>
+                <div class="review-order-cart">
+                    @using (Html.BeginForm("ReviewOrder", "Checkout", null, FormMethod.Post, null, new {@class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart"}))
+                    {
+                        @await Html.PartialAsync("_ViewCart", Model, ViewData)
+                    }
                 </div>
-            }
-            @if (!string.IsNullOrEmpty(Model.GiftMessage))
-            {
-                <div class="reivew-info-box">
-                    <div class="review-header-container">
-                        <span>Gift Message</span>
+                <div class="reivew-order-info">
+                    <div class="reivew-info-box">
+                        <div class="review-header-container">
+                            <span>Bill to Details</span>
+                            @Html.ActionLink("Edit", "AddUpdateBillingAddress", "Checkout", null, new {@class = "button"})
+                        </div>
+                        @foreach (var item in Model.CreditCardDetails)
+                        {
+                            <div class="review-box-line">
+                                @if (!string.IsNullOrWhiteSpace(item.Key))
+                                {
+                                    <span class="review-info-label">@item.Key:</span>
+                                }
+                                <span class="review-info-value">@item.Value</span>
+                            </div>
+                        }
+                        <div class="review-box-line">
+                        </div>
+                        @foreach (var item in Model.BillToAddress)
+                        {
+                            if (!string.IsNullOrEmpty(item.Value))
+                            {
+                                <div class="review-box-line">
+                                    @if (!string.IsNullOrWhiteSpace(item.Key))
+                                    {
+                                        <span class="review-info-label">@item.Key:</span>
+                                    }
+                                    <span class="review-info-value">@item.Value</span>
+                                </div>
+                            }
+                        }
                     </div>
-                    <div class="review-box-line">
-                        @Model.GiftMessage
+                    <div class="reivew-info-box">
+                        <div class="review-header-container">
+                            <span>Ship to Details</span>
+                            @Html.ActionLink("Edit", "AddUpdateShippingMethod", "Checkout", null, new {@class = "button"})
+                        </div>
+                        @foreach (var item in Model.ShipToAddress)
+                        {
+                            if (!string.IsNullOrEmpty(item.Value))
+                            {
+                                <div class="review-box-line">
+                                    @if (!string.IsNullOrWhiteSpace(item.Key))
+                                    {
+                                        <span class="review-info-label">@item.Key:</span>
+                                    }
+                                    <span class="review-info-value">@item.Value</span>
+                                </div>
+                            }
+                        }
                     </div>
+                    @if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
+                    {
+                        <div class="reivew-info-box">
+                            <div class="review-header-container">
+                                <span>Delivery Instructions</span>
+                            </div>
+                            <div class="review-box-line">
+                                @Model.DeliveryInstructions
+                            </div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.GiftMessage))
+                    {
+                        <div class="reivew-info-box">
+                            <div class="review-header-container">
+                                <span>Gift Message</span>
+                            </div>
+                            <div class="review-box-line">
+                                @Model.GiftMessage
+                            </div>
+                        </div>
+                    }
                 </div>
-            }
+            </div>
+            <div class="item" data-id="4">
+                <div class="checkout-sections-divider big"></div>
+                <h4 class="checkout-step-heading">Order 4</h4>
+                <div class="review-order-cart">
+                    @using (Html.BeginForm("ReviewOrder", "Checkout", null, FormMethod.Post, null, new { @class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart" }))
+                    {
+                        @await Html.PartialAsync("_ViewCart", Model, ViewData)
+                    }
+                </div>
+                <div class="reivew-order-info">
+                    <div class="reivew-info-box">
+                        <div class="review-header-container">
+                            <span>Bill to Details</span>
+                            @Html.ActionLink("Edit", "AddUpdateBillingAddress", "Checkout", null, new { @class = "button" })
+                        </div>
+                        @foreach (var item in Model.CreditCardDetails)
+                        {
+                            <div class="review-box-line">
+                                @if (!string.IsNullOrWhiteSpace(item.Key))
+                                {
+                                    <span class="review-info-label">@item.Key:</span>
+                                }
+                                <span class="review-info-value">@item.Value</span>
+                            </div>
+                        }
+                        <div class="review-box-line">
+                        </div>
+                        @foreach (var item in Model.BillToAddress)
+                        {
+                            if (!string.IsNullOrEmpty(item.Value))
+                            {
+                                <div class="review-box-line">
+                                    @if (!string.IsNullOrWhiteSpace(item.Key))
+                                    {
+                                        <span class="review-info-label">@item.Key:</span>
+                                    }
+                                    <span class="review-info-value">@item.Value</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                    <div class="reivew-info-box">
+                        <div class="review-header-container">
+                            <span>Ship to Details</span>
+                            @Html.ActionLink("Edit", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button" })
+                        </div>
+                        @foreach (var item in Model.ShipToAddress)
+                        {
+                            if (!string.IsNullOrEmpty(item.Value))
+                            {
+                                <div class="review-box-line">
+                                    @if (!string.IsNullOrWhiteSpace(item.Key))
+                                    {
+                                        <span class="review-info-label">@item.Key:</span>
+                                    }
+                                    <span class="review-info-value">@item.Value</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
+                    {
+                        <div class="reivew-info-box">
+                            <div class="review-header-container">
+                                <span>Delivery Instructions</span>
+                            </div>
+                            <div class="review-box-line">
+                                @Model.DeliveryInstructions
+                            </div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.GiftMessage))
+                    {
+                        <div class="reivew-info-box">
+                            <div class="review-header-container">
+                                <span>Gift Message</span>
+                            </div>
+                            <div class="review-box-line">
+                                @Model.GiftMessage
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="item" data-id="5">
+                <div class="checkout-sections-divider big"></div>
+                <h4 class="checkout-step-heading">Order 5</h4>
+                <div class="review-order-cart">
+                    @using (Html.BeginForm("ReviewOrder", "Checkout", null, FormMethod.Post, null, new { @class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart" }))
+                    {
+                        @await Html.PartialAsync("_ViewCart", Model, ViewData)
+                    }
+                </div>
+                <div class="reivew-order-info">
+                    <div class="reivew-info-box">
+                        <div class="review-header-container">
+                            <span>Bill to Details</span>
+                            @Html.ActionLink("Edit", "AddUpdateBillingAddress", "Checkout", null, new { @class = "button" })
+                        </div>
+                        @foreach (var item in Model.CreditCardDetails)
+                        {
+                            <div class="review-box-line">
+                                @if (!string.IsNullOrWhiteSpace(item.Key))
+                                {
+                                    <span class="review-info-label">@item.Key:</span>
+                                }
+                                <span class="review-info-value">@item.Value</span>
+                            </div>
+                        }
+                        <div class="review-box-line">
+                        </div>
+                        @foreach (var item in Model.BillToAddress)
+                        {
+                            if (!string.IsNullOrEmpty(item.Value))
+                            {
+                                <div class="review-box-line">
+                                    @if (!string.IsNullOrWhiteSpace(item.Key))
+                                    {
+                                        <span class="review-info-label">@item.Key:</span>
+                                    }
+                                    <span class="review-info-value">@item.Value</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                    <div class="reivew-info-box">
+                        <div class="review-header-container">
+                            <span>Ship to Details</span>
+                            @Html.ActionLink("Edit", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button" })
+                        </div>
+                        @foreach (var item in Model.ShipToAddress)
+                        {
+                            if (!string.IsNullOrEmpty(item.Value))
+                            {
+                                <div class="review-box-line">
+                                    @if (!string.IsNullOrWhiteSpace(item.Key))
+                                    {
+                                        <span class="review-info-label">@item.Key:</span>
+                                    }
+                                    <span class="review-info-value">@item.Value</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
+                    {
+                        <div class="reivew-info-box">
+                            <div class="review-header-container">
+                                <span>Delivery Instructions</span>
+                            </div>
+                            <div class="review-box-line">
+                                @Model.DeliveryInstructions
+                            </div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.GiftMessage))
+                    {
+                        <div class="reivew-info-box">
+                            <div class="review-header-container">
+                                <span>Gift Message</span>
+                            </div>
+                            <div class="review-box-line">
+                                @Model.GiftMessage
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
         <div class="form-buttons-group">
             @Html.ActionLink("Back", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button arrow-left-red" })
-            <input id="btnPlaceOrder" class="arrow-right-blue" type="button" value="Place Your Order"/>
+            <input id="btnPlaceOrder" class="arrow-right-blue" type="button" value="Place Your Order" />
         </div>
     </div>
 </div>
