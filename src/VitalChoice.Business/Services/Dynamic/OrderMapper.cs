@@ -9,6 +9,7 @@ using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
+using VitalChoice.Ecommerce.Domain.Entities.Checkout;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
@@ -205,6 +206,45 @@ namespace VitalChoice.Business.Services.Dynamic
                 {
                     dynamic.Data.IsHealthwise = true;
                 }
+
+                if (entity.CartAdditionalShipments != null)
+                {
+                    dynamic.CartAdditionalShipments=new List<CartAdditionalShipmentModelItem>();
+                    foreach (var entityAdditionalShipment in entity.CartAdditionalShipments)
+                    {
+                        CartAdditionalShipmentModelItem shipment =new CartAdditionalShipmentModelItem();
+                        shipment.Id = entityAdditionalShipment.Id;
+                        shipment.Name = entityAdditionalShipment.Name;
+                        shipment.ShippingAddress = await _orderAddressMapper.FromEntityAsync(entityAdditionalShipment.ShippingAddress, 
+                            withDefaults);
+
+                        if (entityAdditionalShipment.Skus != null)
+                        {
+                            await shipment.Skus.AddRangeAsync(entity.Skus.Select(async s => new SkuOrdered
+                            {
+                                Amount = s.Amount,
+                                Quantity = s.Quantity,
+                                Sku = await _skuMapper.FromEntityAsync(s.Sku, withDefaults),
+                                GcsGenerated = s.GeneratedGiftCertificates
+                            }));
+
+                            if (shipment.Skus != null && shipment.Skus.Count != 0 && dynamic.Skus.First().Sku?.Product != null)
+                            {
+                                var productContents =
+                                    await _productService.SelectProductContents(shipment.Skus.Select(p => p.Sku.IdProduct).Distinct().ToList());
+
+                                foreach (var productContent in productContents)
+                                {
+                                    var sku = shipment.Skus.FirstOrDefault(p => p.Sku.IdProduct == productContent.Id);
+                                    if (sku != null)
+                                    {
+                                        sku.Sku.Product.Url = productContent.Url;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             });
         }
 
@@ -299,6 +339,23 @@ namespace VitalChoice.Business.Services.Dynamic
                         IdOrder = orderToPromo.IdOrder,
                         IdInventorySku = p.IdInventorySku,
                         Quantity = p.Quantity,
+                    }).ToList();
+                }
+
+                if (dynamic.CartAdditionalShipments != null)
+                {
+                    entity.CartAdditionalShipments = dynamic.CartAdditionalShipments.Select(s=> new CartAdditionalShipment()
+                    {
+                        Name = s.Name,
+                        ShippingAddress = _orderAddressMapper.ToEntityAsync(s.ShippingAddress).Result,
+
+                        Skus = new List<CartAdditionalShipmentToSku>(s.Skus.Select(p => new CartAdditionalShipmentToSku()
+                        {
+                            Amount = p.Amount,
+                            Quantity = p.Quantity,
+                            IdCartAdditionalShipment = s.Id,
+                            IdSku = p.Sku.Id,
+                        }))
                     }).ToList();
                 }
             });
@@ -465,6 +522,42 @@ namespace VitalChoice.Business.Services.Dynamic
                                 Quantity = p.Quantity,
                             }, (p, rp) => p.Quantity = rp.Quantity);
                     });
+
+                if (dynamic.CartAdditionalShipments != null)
+                {
+                    entity.CartAdditionalShipments.MergeKeyed(dynamic.CartAdditionalShipments, p => p.Id,
+                        p => p.Id, s => new CartAdditionalShipment()
+                        {
+                            Name = s.Name,
+                            ShippingAddress = _orderAddressMapper.ToEntityAsync(s.ShippingAddress).Result,
+
+                            Skus = new List<CartAdditionalShipmentToSku>(s.Skus.Select(p => new CartAdditionalShipmentToSku()
+                            {
+                                Amount = p.Amount,
+                                Quantity = p.Quantity,
+                                IdCartAdditionalShipment = s.Id,
+                                IdSku = p.Sku.Id,
+                            })),
+                        }, (dbItem, modelItem) =>
+                        {
+                            dbItem.Name = modelItem.Name;
+                            _orderAddressMapper.UpdateEntityAsync(modelItem.ShippingAddress, dbItem.ShippingAddress).Wait();
+
+                            dbItem.Skus.MergeKeyed(modelItem.Skus.Where(s => (s.Sku?.Id ?? 0) != 0).ToArray(), 
+                                sku => sku.IdSku, ordered => ordered.Sku.Id,
+                                s => new CartAdditionalShipmentToSku
+                                {
+                                    Amount = s.Amount,
+                                    Quantity = s.Quantity,
+                                    IdCartAdditionalShipment = dynamic.Id,
+                                    IdSku = s.Sku.Id,
+                                }, (sku, ordered) =>
+                                {
+                                    sku.Amount = ordered.Amount;
+                                    sku.Quantity = ordered.Quantity;
+                                });
+                        });
+                }
             });
         }
 

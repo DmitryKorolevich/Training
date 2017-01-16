@@ -15,3 +15,4 @@
 :r .\Scripts\GCs.sql
 :r .\Scripts\SkuOOSHistoryItems.sql
 :r .\Scripts\LookupVariants.sql
+:r .\Scripts\CartAdditionalShipments.sql

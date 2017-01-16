@@ -2,6 +2,7 @@
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 using VitalChoice.Ecommerce.Domain.Entities.Base;
+using VitalChoice.Ecommerce.Domain.Entities.Checkout;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
@@ -67,5 +68,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Orders
         public ICollection<RefundOrderToGiftCertificate> RefundOrderToGiftCertificates { get; set; }
 
         public ICollection<OrderShippingPackage> OrderShippingPackages { get; set; }
+
+        public ICollection<CartAdditionalShipment> CartAdditionalShipments { get; set; }
     }
 }

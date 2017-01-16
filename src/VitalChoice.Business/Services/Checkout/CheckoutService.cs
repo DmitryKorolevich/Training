@@ -48,7 +48,7 @@ namespace VitalChoice.Business.Services.Checkout
         private readonly SkuMapper _skuMapper;
         private readonly ProductMapper _productMapper;
         private readonly OrderMapper _orderMapper;
-        private readonly IOrderService _orderService;
+        private readonly OrderService _orderService;
         private readonly EcommerceContext _context;
         private readonly ICustomerService _customerService;
         private readonly IDiscountService _discountService;
@@ -65,7 +65,7 @@ namespace VitalChoice.Business.Services.Checkout
 
         public CheckoutService(IEcommerceRepositoryAsync<CartExtended> cartRepository,
             SkuMapper skuMapper, ProductMapper productMapper, OrderMapper orderMapper,
-            IOrderService orderService, EcommerceContext context,
+            OrderService orderService, EcommerceContext context,
             ILoggerFactory loggerProvider, ICustomerService customerService,
             IEcommerceRepositoryAsync<CartToSku> cartToSkusRepository,
             IDynamicReadServiceAsync<AddressDynamic, OrderAddress> addressService, ICountryService countryService,

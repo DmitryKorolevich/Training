@@ -965,6 +965,11 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(v => v.IdOrder)
                     .HasPrincipalKey(o => o.Id)
                     .IsRequired();
+                entity.HasMany(o => o.CartAdditionalShipments)
+                    .WithOne()
+                    .HasForeignKey(v => v.IdOrder)
+                    .HasPrincipalKey(o => o.Id)
+                    .IsRequired();
                 entity.Ignore(o => o.OptionTypes);
             });
 
@@ -1350,8 +1355,11 @@ namespace VitalChoice.Ecommerce.Context
             CartToSkus(builder);
             CartToGiftCertificates(builder);
 
+            CartAdditionalShipmentsToSkus(builder);
+            CartAdditionalShipments(builder);
+
             #endregion
-            
+
             #region HealthWise
 
             builder.Entity<HealthwiseOrder>(entity =>
@@ -1520,6 +1528,35 @@ namespace VitalChoice.Ecommerce.Context
                 entity.CacheUniqueIndex(c => c.CartUid);
                 entity.HasMany(c => c.GiftCertificates).WithOne().HasForeignKey(g => g.IdCart).HasPrincipalKey(c => c.Id);
                 entity.HasMany(c => c.Skus).WithOne().HasForeignKey(s => s.IdCart).HasPrincipalKey(c => c.Id);
+            });
+        }
+
+        protected virtual void CartAdditionalShipmentsToSkus(ModelBuilder builder)
+        {
+            builder.Entity<CartAdditionalShipmentToSku>(entity =>
+            {
+                entity.ToTable("CartAdditionalShipmentsToSkus");
+                entity.Ignore(c => c.Id);
+                entity.HasKey(c => new { c.IdCartAdditionalShipment, c.IdSku });
+                entity.HasOne(c => c.Sku)
+                    .WithMany()
+                    .HasForeignKey(c => c.IdSku)
+                    .HasPrincipalKey(s => s.Id);
+            });
+        }
+
+        protected virtual void CartAdditionalShipments(ModelBuilder builder)
+        {
+            builder.Entity<CartAdditionalShipment>(entity =>
+            {
+                entity.ToTable("CartAdditionalShipments");
+                entity.HasKey(c => c.Id);
+                entity.HasMany(c => c.Skus).WithOne().HasForeignKey(s => s.IdCartAdditionalShipment).HasPrincipalKey(c => c.Id);
+                entity.HasOne(o => o.ShippingAddress)
+                    .WithOne()
+                    .HasForeignKey<CartAdditionalShipment>(o => o.IdShippingAddress)
+                    .HasPrincipalKey<OrderAddress>(a => a.Id)
+                    .IsRequired(true);
             });
         }
 

@@ -69,5 +69,8 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
         public int? SendSide { get; set; }
 
         public ICollection<OrderShippingPackageModelItem> OrderShippingPackages { get; set; }
+
+        //For storefront multiple shipments configuration
+        public ICollection<CartAdditionalShipmentModelItem> CartAdditionalShipments { get; set; }
     }
 }

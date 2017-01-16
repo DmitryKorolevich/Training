@@ -523,7 +523,19 @@ namespace VitalChoice.Business.Services.Orders
                     .Include(o => o.HealthwiseOrder)
                     .Include(o => o.ReshipProblemSkus)
                     .ThenInclude(g => g.Sku)
-                    .Include(o => o.OrderShippingPackages);
+                    .Include(o => o.OrderShippingPackages)
+                    .Include(p => p.CartAdditionalShipments)
+                    .ThenInclude(p => p.ShippingAddress)
+                    .ThenInclude(s => s.OptionValues)
+                    .Include(p => p.CartAdditionalShipments)
+                    .ThenInclude(o => o.Skus)
+                    .ThenInclude(s => s.Sku)
+                    .ThenInclude(s => s.OptionValues)
+                    .Include(p => p.CartAdditionalShipments)
+                    .ThenInclude(o => o.Skus)
+                    .ThenInclude(s => s.Sku)
+                    .ThenInclude(s => s.Product)
+                    .ThenInclude(s => s.OptionValues);
         }
 
         protected override Task AfterSelect(ICollection<Order> entities)

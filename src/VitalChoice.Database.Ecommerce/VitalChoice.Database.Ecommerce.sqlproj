@@ -259,4 +259,7 @@
   <ItemGroup>
     <None Include="PostDeployment\Scripts\LookupVariants.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreDeployment\Scripts\CartAdditionalShipments.sql" />
+  </ItemGroup>
 </Project>
