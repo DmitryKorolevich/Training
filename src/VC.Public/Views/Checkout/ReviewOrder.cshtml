@@ -32,14 +32,12 @@
         </a>
     </div>
     <div class="assign-buttons template hide">
+        <a class="circle-button button-blue margin-right-small">
+            <i class="glyphicon glyphicon-sort"></i><span class="description">Move Item</span>
+        </a>
         <a class="circle-button button-green">
-            <i class="glyphicon glyphicon-sort"></i>
+            <i class="glyphicon glyphicon-plus"></i><span class="description">Copy Item</span>
         </a>
-        <span class="margin-right-small">Move Item</span>
-        <a class="circle-button button-red">
-            <i class="glyphicon glyphicon-plus"></i>
-        </a>
-        <span>Copy Item</span>
     </div>
     <div class="cart-overlay-container margin-top-medium">
         <div class="overlay" data-bind="visible:refreshing">
@@ -51,7 +49,6 @@
                 <div class="reivew-info-box">
                     <div class="review-header-container">
                         <span>Bill to Details</span>
-                        <a class="button" href="/checkout/addupdatebillingaddress">Edit</a>
                     </div>
                     <div class="review-box-line">
                         <span class="review-info-value">MasterCard</span>
@@ -85,6 +82,7 @@
                 <div class="reivew-info-box">
                     <div class="review-header-container">
                         <span>&nbsp;</span>
+                        <a class="button" href="/checkout/addupdatebillingaddress">Edit</a>
                     </div>
                     <div class="cart-order-details">
                         <div class="cart-promo-container">
@@ -114,12 +112,12 @@
                 </div>
             </div>
         </div>
-        <div class="shipping-items">
+        <div class="review-items">
             <div class="clear"></div>
             <div class="item main-item" data-id="1">
                 <div class="checkout-sections-divider big"></div>
                 <h4 class="checkout-step-heading">
-                    Order #1 - Gary1 Gould 806 Front ST
+                    <span class="title">Order #1 - Gary1 Gould 806 Front ST</span>
                 </h4>
                 <div class="review-order-cart">
                     @using (Html.BeginForm("ReviewOrder", "Checkout", null, FormMethod.Post, null, new { @class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart" }))
@@ -206,7 +204,7 @@
             <div class="item" data-id="2">
                 <div class="checkout-sections-divider big"></div>
                 <h4 class="checkout-step-heading">
-                    Order #2 - Gary2 Gould 806 Front ST
+                    <span class="title">Order #2 - Gary2 Gould 806 Front ST</span>
                     <a class="button red pull-right delete-order">Delete Order</a>
                 </h4>
                 <div class="review-order-cart">
@@ -263,7 +261,7 @@
             <div class="item" data-id="4">
                 <div class="checkout-sections-divider big"></div>
                 <h4 class="checkout-step-heading">
-                    Order #4 - Gary4 Gould 806 Front ST
+                    <span class="title">Order #4 - Gary4 Gould 806 Front ST</span>
                     <a class="button red pull-right delete-order">Delete Order</a>
                 </h4>
                 <div class="review-order-cart">
@@ -320,7 +318,7 @@
             <div class="item" data-id="5">
                 <div class="checkout-sections-divider big"></div>
                 <h4 class="checkout-step-heading">
-                    Order #5 - Gary5 Gould 806 Front ST
+                    <span class="title">Order #5 - Gary5 Gould 806 Front ST</span>
                     <a class="button red pull-right delete-order">Delete Order</a>
                 </h4>
                 <div class="review-order-cart">

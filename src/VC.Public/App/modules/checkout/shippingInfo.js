@@ -41,7 +41,7 @@
         {
             if (!$(item).hasClass('template'))
             {
-                $(item).find('.checkout-step-heading span').text('Order #'+number);
+                $(item).find('.checkout-step-heading span span').text('Order #'+number);
                 number++;
             }
         });
@@ -49,6 +49,8 @@
 
     $(".shipping-items").on("click", ".item .plus", function ()
     {
+        $(".main-shipping-item-wrapper .minus").click();
+        $(".shipping-items .minus").click();
         $(this).closest('.item').find('.item-content').removeClass('hide-imp');
         $(this).addClass('hide-imp');
         $(this).closest('.item').find('.minus').removeClass('hide-imp');
@@ -63,6 +65,7 @@
 
     $(".main-shipping-item-wrapper").on("click", ".plus", function ()
     {
+        $(".shipping-items .minus").click();
         $(this).closest('.main-shipping-item-wrapper').find('.main-shipping-item').removeClass('hide-imp');
         $(this).addClass('hide-imp');
         $(this).closest('.main-shipping-item-wrapper').find('.minus').removeClass('hide-imp');
