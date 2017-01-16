@@ -5837,10 +5837,45 @@ body.view-cart-background {
     .checkout-step-container {
         .shipping-items {
 
-            .checkout-sections-divider.big {               
-                border-top: 2px solid #000;
+            .checkout-sections-divider.big {
+                border-top: 2px solid #ccc;
                 height: 20px;
                 border-bottom: none;
+            }
+
+            .checkout-step-heading a.circle-button, .assign-buttons a.circle-button{
+                margin-left: 0;
+                margin-top: 0;
+            }
+
+            .reivew-order-info{
+                margin-top: 0px;
+            }
+
+            .item.alternate-color{
+                background: #f9f9f9;
+
+                .reivew-order-info, .cart-order-details{
+                    background: #f9f9f9;
+                }
+            }
+        }
+
+        .main-shipping-item-wrapper{            
+            a.circle-button {
+                margin-left: 0;
+                margin-top: 0;
+            }
+        }
+
+        .top-billing-wrapper .reivew-order-info {
+            .reivew-info-box {
+                width: 50%;
+                clear: none;
+            }
+
+            .cart-promo-container{
+                margin-top: 0;
             }
         }
     }

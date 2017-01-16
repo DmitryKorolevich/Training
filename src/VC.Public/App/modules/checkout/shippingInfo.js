@@ -3,16 +3,76 @@
     $(".shipping-items").on("click", ".delete-shipping", function ()
     {
         $(this).closest('.item').remove();
+        updateItemsUI();
     });
 
     $(".new-shipping").click(function ()
     {
+        $(".main-shipping-item-wrapper .minus").click();
+        $(".shipping-items .minus").click();
+
         var item = $(".item.template").clone();
         item.removeClass('hide');
         item.removeClass('template');
         var content = $(".main-shipping-item").contents().clone();
         item.find(".item-content").append(content);
         $(".shipping-items").append(item);
+        item.find('.use-billing-section').remove();
+
+        updateItemsUI();
+    });
+
+    var updateItemsUI = function ()
+    {
+        if ($(".item").length > 1)
+        {
+            $(".new-shipping").text('Add Another Recipient');
+            $(".main-shipping-item-wrapper .order-header").removeClass('hide');
+        }
+        else
+        {
+            $(".new-shipping").text('Send Order To Multiple Receipents');
+            $(".main-shipping-item-wrapper .order-header").addClass('hide');
+            $('.main-shipping-item-wrapper .main-shipping-item').removeClass('hide-imp');
+        }
+
+        var number = 2;
+        $.each($(".item"), function (i, item)
+        {
+            if (!$(item).hasClass('template'))
+            {
+                $(item).find('.checkout-step-heading span').text('Order #'+number);
+                number++;
+            }
+        });
+    };
+
+    $(".shipping-items").on("click", ".item .plus", function ()
+    {
+        $(this).closest('.item').find('.item-content').removeClass('hide-imp');
+        $(this).addClass('hide-imp');
+        $(this).closest('.item').find('.minus').removeClass('hide-imp');
+    });
+
+    $(".shipping-items").on("click", ".item .minus", function ()
+    {
+        $(this).closest('.item').find('.item-content').addClass('hide-imp');
+        $(this).addClass('hide-imp');
+        $(this).closest('.item').find('.plus').removeClass('hide-imp');
+    });
+
+    $(".main-shipping-item-wrapper").on("click", ".plus", function ()
+    {
+        $(this).closest('.main-shipping-item-wrapper').find('.main-shipping-item').removeClass('hide-imp');
+        $(this).addClass('hide-imp');
+        $(this).closest('.main-shipping-item-wrapper').find('.minus').removeClass('hide-imp');
+    });
+
+    $(".main-shipping-item-wrapper").on("click", ".minus", function ()
+    {
+        $(this).closest('.main-shipping-item-wrapper').find('.main-shipping-item').addClass('hide-imp');
+        $(this).addClass('hide-imp');
+        $(this).closest('.main-shipping-item-wrapper').find('.plus').removeClass('hide-imp');
     });
 
     controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther");
