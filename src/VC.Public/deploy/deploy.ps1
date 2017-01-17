@@ -14,6 +14,6 @@ foreach ($target in $targetNames) {
 	CopyTarget -targetName $target
 	GruntTask -taskName "bower:install"
 	GruntTask -taskName "release"
-	cmd /c "%windir%\system32\inetsrv\appcmd" stop apppool /apppool.name:public
+	cmd /c "%windir%\system32\inetsrv\appcmd" stop apppool /apppool.name:public_dev
 	BuildAll -deployPath "${RootDeploy}\${target}"
 }

@@ -62,5 +62,5 @@ foreach{
 		}
 	}
 }
-cmd /c "%windir%\system32\inetsrv\appcmd" start apppool /apppool.name:admin
-cmd /c "%windir%\system32\inetsrv\appcmd" start apppool /apppool.name:public
+cmd /c "%windir%\system32\inetsrv\appcmd" start apppool /apppool.name:admin_dev
+cmd /c "%windir%\system32\inetsrv\appcmd" start apppool /apppool.name:public_dev
