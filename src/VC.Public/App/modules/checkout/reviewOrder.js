@@ -46,21 +46,21 @@
 	    $(item).append(buttons);
 	});
 
-	var popupCopyContent = '<div title="Select order"><form class="form-regular small"><div class="form-group"><label class="control-label">Orders</label><div class="input-group"><select class="form-control" id="ddOrder">' +
+	var popupCopyContent = '<div title="Select order"><form class="form-regular small"><div class="form-group"><label class="control-label">Orders</label><div class="input-group"><select class="form-control big" id="ddOrder">' +
         '<option value="1">Order #1 - Gary1 Gould 806 Front ST</option>' +
         '<option value="2">Order #2 - Gary2 Gould 806 Front ST</option>' +
         '<option value="4">Order #4 - Gary4 Gould 806 Front ST</option>' +
         '<option value="5">Order #5 - Gary5 Gould 806 Front ST</option></select></div></div></form></div>';
 
-	var popupMoveContent = '<div title="Select order"><form class="form-regular small"><div class="form-group"><label class="control-label">Orders</label><div class="input-group"><select class="form-control" id="ddOrder">' +
+	var popupMoveContent = '<div title="Select order"><form class="form-regular small"><div class="form-group"><label class="control-label">Orders</label><div class="input-group"><select class="form-control big" id="ddOrder">' +
         '<option value="1">Order #1 - Gary1 Gould 806 Front ST</option>' +
         '<option value="2">Order #2 - Gary2 Gould 806 Front ST</option>' +
         '<option value="4">Order #4 - Gary4 Gould 806 Front ST</option>' +
         '<option value="5">Order #5 - Gary5 Gould 806 Front ST</option></select></div></div>' +
-        '<div class="form-group"><label class="control-label">QTY</label><div class="input-group"><div class="input-group"><input class="form-control" type="text" id="qty" value="1"></div></div>' +
+        '<div class="form-group"><label class="control-label">QTY</label><div class="input-group"><div class="input-group"><input class="form-control small-form-control" type="text" id="qty" value="1"></div></div>' +
         '</form></div>';
 
-	$("body").on("click", ".assign-buttons .button-green", function ()
+	$("body").on("click", ".assign-buttons .button-blue", function ()
 	{
 	    var row = $(this).closest('tr');
 	    openAssignPopup(function (id)
@@ -71,7 +71,7 @@
 	    }, popupMoveContent);
 	});
 
-	$("body").on("click", ".assign-buttons .button-red", function ()
+	$("body").on("click", ".assign-buttons .button-green", function ()
 	{
 	    var row = $(this).closest('tr');
 	    openAssignPopup(function (id)
@@ -87,7 +87,7 @@
 	    $(content).dialog({
 	        resizable: false,
 	        modal: true,
-	        minWidth: 315,
+	        minWidth: 515,
 	        open: function ()
 	        {
 	        },

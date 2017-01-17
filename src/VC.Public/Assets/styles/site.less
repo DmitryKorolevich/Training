@@ -5706,6 +5706,15 @@ body.view-cart-background {
         text-decoration: none;
         margin-left: 10px;
         margin-top: 6px;
+        
+        .description{
+            font-size: 12px;
+            vertical-align: top;
+            padding-top: 3px;
+            display: inline-block;
+            color: #f34d20;
+            margin-left: 5px;
+        }
 
         &.button-red {
             color: #C3392F;
@@ -5721,6 +5730,14 @@ body.view-cart-background {
 
         &.button-green:hover {
             color: #59822c;
+        }
+
+        &.button-blue {
+            color: #5C95AF;
+        }
+
+        &.button-blue:hover {
+            color: #518CA5;
         }
     }
 
@@ -5835,15 +5852,50 @@ body.view-cart-background {
     }
 
     .checkout-step-container {
-        .shipping-items {
+        .checkout-sections-divider.big {
+            border-top: 1px solid #ccc;
+            height: 20px;
+            border-bottom: none;
+        }
 
-            .checkout-sections-divider.big {
-                border-top: 2px solid #ccc;
-                height: 20px;
-                border-bottom: none;
+        .shipping-items, .main-shipping-item-wrapper {
+
+            .checkout-step-heading{
+                a.title{
+                    margin-left: 0;
+                    margin-top: 0;
+
+                    max-width: 630px;
+                    display:inline-block;
+                    text-decoration: none;
+
+                    .name{
+                        color: #f15d22;
+                        font-size: 24px;
+                        font-weight: bold;
+                        line-height: 24px;
+                        margin-right: 5px;
+                    }
+
+                    .address{                        
+                        color: #333333;
+                        font-size: 12px;
+                        white-space: normal;
+                    }
+                }
+            }
+        }
+
+        .review-items {
+
+            .checkout-step-heading{
+                .title{
+                    max-width: 700px;
+                    display:inline-block;
+                }
             }
 
-            .checkout-step-heading a.circle-button, .assign-buttons a.circle-button{
+            .assign-buttons a.circle-button{
                 margin-left: 0;
                 margin-top: 0;
             }
@@ -5853,10 +5905,10 @@ body.view-cart-background {
             }
 
             .item.alternate-color{
-                background: #f9f9f9;
+                background: #f7f7f7;
 
                 .reivew-order-info, .cart-order-details{
-                    background: #f9f9f9;
+                    background: #f7f7f7;
                 }
             }
         }
