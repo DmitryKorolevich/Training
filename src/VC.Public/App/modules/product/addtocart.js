@@ -101,13 +101,7 @@ function processErrorResponse(result)
 {
     if (result)
     {
-        if (result.Command != null)
-        {
-            if (result.Command == 'redirect' && result.Data)
-            {
-                window.location = result.Data;
-            }
-        }
+        processJsonCommands(result);
     }
     else
     {

@@ -29,118 +29,115 @@
         <div class="overlay">
             <div class="loading">Loading…</div>
         </div>
-        @using (Html.BeginForm("AddUpdateShippingMethod", "Checkout", null, FormMethod.Post, null, new { @class = "form-regular medium-small", role = "form" }))
-        {
-            <div class="main-shipping-item-wrapper">
-                <div class="form-group order-header hide">
-                    <h4 class="checkout-step-heading">
-                        <a class="circle-button button-green title plus hide-imp">
-                            <span class="name">Order #1 Open / Review</span><i class="glyphicon glyphicon-plus"></i><br/>
-                            <span class="address">Gary1 Gould 806 Front ST</span>
-                        </a>
-                        <a class="circle-button button-green title minus">
-                            <span class="name">Order #1</span><i class="glyphicon glyphicon-minus"></i><br />
-                            <span class="address">Gary1 Gould 806 Front ST</span>
-                        </a>
-                    </h4>
-                </div>
-                <div class="main-shipping-item">
-                    @Html.AntiForgeryToken()
-                    <div style="display: none;">
-                        <input type="text" id="PreventChromeAutocomplete"
-                               name="PreventChromeAutocomplete" autocomplete="address-level4" />
-                    </div>
-                    <div class="use-billing-section">
-                        <span class="checkout-notification-simple">Enter your Shipping Address information below.</span>
-                        <span class="checkout-notification-important margin-top-small margin-bottom-small">OR</span>
-                        <div class="form-group">
-                            <div class="input-group">
-                                <label class="multiline-checkbox-container">
-                                    @Html.CheckBoxFor(m => m.UseBillingAddress, new { @class = "form-control", autocomplete = "off" })
-                                    Use my Billing address as my Shipping address.<br />
-                                    <span class="shopping-notice-note">NOTE:</span> Frozen goods cannot be sent to PO boxes.
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    @if (ViewBag.ShippingAddresses != null && ViewBag.ShippingAddresses.Count > 0)
-                {
-                        <div class="form-group" @*style="display: none;" *@>
-                            @Html.Label("SavedAddresses", "Saved Addresses", new { @class = "control-label" })
-                            <div class="input-group">
-                                @Html.DropDownListFor(x => x.Id, new SelectList(ViewBag.ShippingAddresses, "Key", "Value"), new { id = "ddShippingAddressesSelection", @class = "form-control auto", autocomplete = "off" })
-                            </div>
-                        </div>
-                        <div class="form-group" style="display:none;" id="updateSaved">
-                            <label class="control-label"></label>
-                            <div class="input-group">
-                                <label class="multiline-checkbox-container bold">
-                                    @Html.CheckBoxFor(m => m.SaveToProfile, new { @class = "form-control", autocomplete = "off" })
-                                    Update saved shipping address
-                                </label>
-                            </div>
-                        </div>
-                    }
-                    <span class="checkout-notification-simple">Then click Continue, below.</span>
-                    <span class="checkout-notification-important" id="spEnterAddress">Enter your Shipping Address.</span>
-                    @Html.ValidationSummary(true, "")
-                    <div class="columns-container checkout-columns-container">
-
-                        <div id="dynamicArea">
-                            @await Html.PartialAsync("_AddUpdateShippingMethod", Model, ViewData)
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label"></label>
-                            <div class="input-group">
-                                <label class="multiline-checkbox-container bold">
-                                    @Html.CheckBoxFor(m => m.IsGiftOrder, new { @class = "form-control", autocomplete = "off" })
-                                    Check here if this order is a gift
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group" id="GiftMessageBox" style="display: none;">
-                            @Html.LabelFor(m => m.GiftMessage, new { @class = "control-label" })
-                            <div class="input-group">
-                                <div class="form-control-note">
-                                    <span class="shopping-notice-note">NOTE:</span> If this is an e-Gift Certificate, enter the recipient’s email address where indicated AFTER you place your order,<br />
-                                    using the form on the Thank You page. (This is a security requirement.)
-                                </div>
-                                @Html.TextAreaFor(m => m.GiftMessage, new { @class = "form-control checkout-huge", rows = "5", maxlength = 250, charcount = "true", autocomplete = "off" })
-                                <span class="checkout-charcount"><b>250</b> characters remaining</span>
-                                @Html.ValidationMessageFor(m => m.GiftMessage)
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <form id="mainForm" data-bind="submit: save" class="form-regular medium-small" role="form" novalidate="novalidate">
+            <div style="display: none;">
+                <input type="text" id="PreventChromeAutocomplete"
+                       name="PreventChromeAutocomplete" autocomplete="address-level4" />
             </div>
+            @Html.ValidationSummary(true, "")
             <div class="shipping-items">
-            </div>
-            <div class="item hide template">
-                <div class="checkout-sections-divider big"></div>
-                <div class="form-group">
-                    <h4 class="checkout-step-heading">
-                        <a class="circle-button button-green title plus hide-imp">
-                            <span class="name"><span></span> Open / Review</span><i class="glyphicon glyphicon-plus"></i><br />
-                            <span class="address">Gary1 Gould 806 Front ST</span>
-                        </a>
-                        <a class="circle-button button-green title minus">
-                            <span class="name"><span></span></span><i class="glyphicon glyphicon-minus"></i><br />
-                            <span class="address">Gary1 Gould 806 Front ST</span>
-                        </a>
-                        <a class="button red pull-right delete-shipping">Delete Shipping Address</a>
-                    </h4>
+                <div class="item" data-bind="foreach: Shipments">
+                    <!-- ko ifnot: $index() == 0 -->
+                    <div class="checkout-sections-divider big"></div>
+                    <!-- /ko -->
+                    <!-- ko ifnot: $parent.Shipments() > 1 -->
+                    <div class="form-group">
+                        <h4 class="checkout-step-heading">
+                            <!-- ko if: Collapsed -->
+                            <a data-bind="click: $parent.expand" class="circle-button button-green title plus hide-imp">
+                                <span class="name"><span data-bind="text: 'Order #' + ($index+1)"></span> Open / Review</span><i class="glyphicon glyphicon-plus"></i><br/>
+                                <span data-bind="text: FirstName+' '+LastName+' '+Address1" class="address"></span>
+                            </a>
+                            <!-- /ko -->
+                            <!-- ko ifnot: Collapsed -->
+                            <a data-bind="click: $parent.collapse" class="circle-button button-green title minus">
+                                <span class="name"><span data-bind="text: 'Order #' + ($index+1)"></span></span><i class="glyphicon glyphicon-minus"></i><br/>
+                                <span data-bind="text: FirstName+' '+LastName+' '+Address1" class="address"></span>
+                            </a>
+                            <!-- /ko -->
+                            <!-- ko ifnot: FromOrder -->
+                            <a data-bind="click: $parent.remove" class="button red pull-right delete-shipping">Delete Shipping Address</a>
+                            <!-- /ko -->
+                        </h4>
+                    </div>
+                    <!-- /ko -->
+                    <div data-bind="css: { hide: Collapsed() }" class="item-content">
+                        <!-- ko if: FromOrder -->
+                        <div class="use-billing-section">
+                            <span class="checkout-notification-simple">Enter your Shipping Address information below.</span>
+                            <span class="checkout-notification-important margin-top-small margin-bottom-small">OR</span>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <label class="multiline-checkbox-container">
+                                        <input autocomplete="off" class="form-control" type="checkbox" data-bind="checked: UseBillingAddress">
+                                        Use my Billing address as my Shipping address.<br/>
+                                        <span class="shopping-notice-note">NOTE:</span> Frozen goods cannot be sent to PO boxes.
+                                    </label>
+                                </div>
+                            </div>
+                        </div>         
+                        <!-- /ko -->    
+                        <!-- ko if: AvalibleAddresses().length>0 -->
+                        <div class="form-group">
+                            <label class="control-label" for="SavedAddresses">Saved Addresses</label>
+                            <div class="input-group">
+                                <select autocomplete="off" class="form-control auto"
+                                        data-bind="value: SelectedAvalibleAddress, options: $parent.AvalibleAddresses(), optionsText: 'Name', optionsValue:  function(item) { return item.Address.Id }, optionsCaption: 'Select'">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="display: none;" id="updateSaved">
+                            <label class="control-label"></label>
+                            <div class="input-group">
+                                <label class="multiline-checkbox-container bold">
+                                    <input autocomplete="off" class="form-control" type="checkbox" data-bind="checked: SaveToProfile">
+                                </label>
+                            </div>
+                        </div>  
+                        <!-- /ko -->    
+                        <span class="checkout-notification-simple">Then click Continue, below.</span>
+                        <span class="checkout-notification-important" id="spEnterAddress">Enter your Shipping Address.</span>
+                        
+                        <div class="columns-container checkout-columns-container">
+
+                            <div id="dynamicArea">
+                                @await Html.PartialAsync("_AddUpdateShippingMethod", Model, ViewData)
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label"></label>
+                                <div class="input-group">
+                                    <label class="multiline-checkbox-container bold">
+                                        <input autocomplete="off" class="form-control" type="checkbox" data-bind="checked: IsGiftOrder">
+                                        Check here if this order is a gift
+                                    </label>
+                                </div>
+                            </div>     
+                            <!-- ko if: IsGiftOrder -->
+                            <div class="form-group" id="GiftMessageBox" style="display: none;">
+                                <label class="control-label" for="GiftMessage">Gift Message</label>
+                                <div class="input-group">
+                                    <div class="form-control-note">
+                                        <span class="shopping-notice-note">NOTE:</span> If this is an e-Gift Certificate, enter the recipient’s email address where indicated AFTER you place your order,<br />
+                                        using the form on the Thank You page. (This is a security requirement.)
+                                    </div>
+                                    @Html.TextAreaFor(m => m.GiftMessage, new { @class = "form-control checkout-huge", rows = "5", maxlength = 250, charcount = "true", autocomplete = "off" })
+                                    <span class="checkout-charcount"><b>250</b> characters remaining</span>
+                                    <span class="field-validation-valid" data-valmsg-for="GiftMessage" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>    
+                            <!-- /ko -->
+                        </div>
+                    </div>
                 </div>
-                <div class="item-content">
+                <div>
+                    <a data-bind="click: add, text: options.AddButtonText" class="button blue margin-top-small margin-bottom-medium new-shipping"></a>
                 </div>
-            </div>
-            <div>
-                <a class="button blue margin-top-small margin-bottom-medium new-shipping">Send Order To Multiple Receipents</a>
             </div>
             <div class="form-buttons-group">
-                @Html.ActionLink("Back", "AddUpdateBillingAddress", "Checkout", null, new { @class = "button arrow-left-red" })
-                <input class="arrow-right-blue" type="submit" value="Continue" />
+                @Html.ActionLink("Back", "AddUpdateBillingAddress", "Checkout", null, new {@class = "button arrow-left-red"})
+                <input class="arrow-right-blue" type="submit" value="Continue"/>
             </div>
-        }
+        </form>
     </div>
 </div>

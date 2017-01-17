@@ -908,3 +908,14 @@ function brontoSignupValidateEmail(e)
         return false;
     }
 }
+
+function processJsonCommands(result)
+{
+    if (result.Command != null)
+    {
+        if (result.Command == 'redirect' && result.RedirectUrl)
+        {
+            window.location = result.RedirectUrl;
+        }
+    }
+}

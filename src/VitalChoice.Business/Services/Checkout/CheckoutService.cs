@@ -49,6 +49,7 @@ namespace VitalChoice.Business.Services.Checkout
         private readonly ProductMapper _productMapper;
         private readonly OrderMapper _orderMapper;
         private readonly OrderService _orderService;
+        private readonly MultipleShipmentsOrderService _multipleShipmentsOrderService;
         private readonly EcommerceContext _context;
         private readonly ICustomerService _customerService;
         private readonly IDiscountService _discountService;
@@ -65,7 +66,9 @@ namespace VitalChoice.Business.Services.Checkout
 
         public CheckoutService(IEcommerceRepositoryAsync<CartExtended> cartRepository,
             SkuMapper skuMapper, ProductMapper productMapper, OrderMapper orderMapper,
-            OrderService orderService, EcommerceContext context,
+            OrderService orderService, 
+            MultipleShipmentsOrderService multipleShipmentsOrderService,
+            EcommerceContext context,
             ILoggerFactory loggerProvider, ICustomerService customerService,
             IEcommerceRepositoryAsync<CartToSku> cartToSkusRepository,
             IDynamicReadServiceAsync<AddressDynamic, OrderAddress> addressService, ICountryService countryService,
@@ -79,6 +82,7 @@ namespace VitalChoice.Business.Services.Checkout
             _productMapper = productMapper;
             _orderMapper = orderMapper;
             _orderService = orderService;
+            _multipleShipmentsOrderService = multipleShipmentsOrderService;
             _context = context;
             _customerService = customerService;
             _cartToSkusRepository = cartToSkusRepository;
@@ -112,7 +116,7 @@ namespace VitalChoice.Business.Services.Checkout
                 .ThenInclude(p => p.ProductsToCategories);
         }
 
-        public async Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, bool loggedIn)
+        public async Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, bool loggedIn, bool withMultipleShipmentsService = false)
         {
             CartExtended cart;
             if (uid.HasValue)
@@ -150,10 +154,10 @@ namespace VitalChoice.Business.Services.Checkout
             {
                 cart = await CreateNew();
             }
-            return await InitCartOrderModel(cart);
+            return await InitCartOrderModel(cart, withMultipleShipmentsService);
         }
 
-        public async Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, int idCustomer)
+        public async Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, int idCustomer, bool withMultipleShipmentsService = false)
         {
             CustomerCartOrder result;
             using (var transaction = _context.BeginTransaction())
@@ -172,14 +176,20 @@ namespace VitalChoice.Business.Services.Checkout
                         cart = await BuildIncludes(_cartRepository.Query(c => c.CartUid == uid.Value)).SelectFirstOrDefaultAsync(false) ??
                                await CreateNew(idCustomer);
 
+                        var orderService = _orderService;
+                        if (withMultipleShipmentsService)
+                        {
+                            orderService = _multipleShipmentsOrderService;
+                        }
+
                         if (cart.IdCustomer != null)
                         {
                             //if customer id different than was set in cart by uid then create new cart and assign new customer into it
                             if (cart.IdCustomer != idCustomer && cart.IdOrder != null)
                             {
-                                var currectOrder = await _orderService.SelectAsync(cart.IdOrder.Value, true);
+                                var currectOrder = await orderService.SelectAsync(cart.IdOrder.Value, true);
                                 var newCart = await CreateNew(idCustomer);
-                                var newCartOrder = await InitCartOrderModel(newCart);
+                                var newCartOrder = await InitCartOrderModel(newCart, withMultipleShipmentsService);
                                 newCartOrder.Order.Customer = await _customerService.SelectAsync(idCustomer, true);
                                 newCartOrder.Order.Skus = currectOrder.Skus;
                                 newCartOrder.Order.PromoSkus = currectOrder.PromoSkus;
@@ -187,9 +197,9 @@ namespace VitalChoice.Business.Services.Checkout
                                 newCartOrder.Order.GiftCertificates = currectOrder.GiftCertificates;
 
                                 newCartOrder.Order =
-                                    (await _orderService.CalculateStorefrontOrder(newCartOrder.Order, OrderStatus.Incomplete)).Order;
+                                    (await orderService.CalculateStorefrontOrder(newCartOrder.Order, OrderStatus.Incomplete)).Order;
 
-                                newCartOrder.Order = await _orderService.InsertAsync(newCartOrder.Order);
+                                newCartOrder.Order = await orderService.InsertAsync(newCartOrder.Order);
 
                                 var dbCart =
                                     await _cartRepository.Query(c => c.CartUid == newCart.CartUid).SelectFirstOrDefaultAsync(true);
@@ -217,11 +227,11 @@ namespace VitalChoice.Business.Services.Checkout
                                 var cartDataSource = new CustomerCartOrder
                                 {
                                     CartUid = cart.CartUid,
-                                    Order = await _orderService.SelectAsync(customerCart.IdOrder.Value, true)
+                                    Order = await orderService.SelectAsync(customerCart.IdOrder.Value, true)
                                 };
                                 cartDataSource.Order.Customer = await _customerService.SelectAsync(idCustomer, true);
 
-                                var currentCart = await InitCartOrderModel(cart);
+                                var currentCart = await InitCartOrderModel(cart, withMultipleShipmentsService);
 
                                 cartDataSource.CartUid = cart.CartUid;
                                 cartDataSource.Order.Skus = currentCart.Order.Skus;
@@ -238,12 +248,12 @@ namespace VitalChoice.Business.Services.Checkout
 
                                 await _context.SaveChangesAsync();
                                 cartDataSource.Order =
-                                    (await _orderService.CalculateStorefrontOrder(cartDataSource.Order, OrderStatus.Incomplete)).Order;
-                                await _orderService.UpdateAsync(cartDataSource.Order);
+                                    (await orderService.CalculateStorefrontOrder(cartDataSource.Order, OrderStatus.Incomplete)).Order;
+                                await orderService.UpdateAsync(cartDataSource.Order);
                             }
                         }
                     }
-                    result = await CreateCartResult(idCustomer, cart);
+                    result = await CreateCartResult(idCustomer, cart, withMultipleShipmentsService);
                     transaction.Commit();
                 }
                 catch (AppValidationException)
@@ -261,18 +271,24 @@ namespace VitalChoice.Business.Services.Checkout
             return result;
         }
 
-        private async Task<CustomerCartOrder> CreateCartResult(int idCustomer, CartExtended cart)
+        private async Task<CustomerCartOrder> CreateCartResult(int idCustomer, CartExtended cart, bool withMultipleShipmentsService = false)
         {
             var result = new CustomerCartOrder
             {
                 CartUid = cart.CartUid
             };
+            var orderService = _orderService;
+            if (withMultipleShipmentsService)
+            {
+                orderService = _multipleShipmentsOrderService;
+            }
+
             if (cart.IdOrder == null)
             {
-                var anonymCart = await InitCartOrderModel(cart);
+                var anonymCart = await InitCartOrderModel(cart, withMultipleShipmentsService);
                 var customer = await _customerService.SelectAsync(idCustomer, true);
                 anonymCart.Order.Customer = customer;
-                anonymCart.Order = await _orderService.InsertAsync(anonymCart.Order);
+                anonymCart.Order = await orderService.InsertAsync(anonymCart.Order);
 
                 var dbCart = await _cartRepository.Query(c => c.CartUid == cart.CartUid).SelectFirstOrDefaultAsync(true);
                 dbCart.IdOrder = anonymCart.Order.Id;
@@ -283,7 +299,7 @@ namespace VitalChoice.Business.Services.Checkout
             }
             else
             {
-                result.Order = await _orderService.SelectAsync(cart.IdOrder.Value, true);
+                result.Order = await orderService.SelectAsync(cart.IdOrder.Value, true);
                 //check if order was created before cart reading happen, clear cart then
                 if (result.Order.IsAnyNotIncomplete())
                 {
@@ -291,7 +307,7 @@ namespace VitalChoice.Business.Services.Checkout
                     dbCart.IdOrder = null;
                     await _context.SaveChangesAsync();
 
-                    return await InitCartOrderModel(dbCart);
+                    return await InitCartOrderModel(dbCart, withMultipleShipmentsService);
                 }
                 result.Order.Customer = await _customerService.SelectAsync(idCustomer, true);
                 await FillProductContentDetails(result);
@@ -299,7 +315,7 @@ namespace VitalChoice.Business.Services.Checkout
             return result;
         }
 
-        public async Task<bool> UpdateCart(CustomerCartOrder cartOrder)
+        public async Task<bool> UpdateCart(CustomerCartOrder cartOrder, bool withMultipleShipmentsService = false)
         {
             if (cartOrder?.Order == null)
                 return false;
@@ -318,17 +334,24 @@ namespace VitalChoice.Business.Services.Checkout
                     {
                         return false;
                     }
+
+                    var orderService = _orderService;
+                    if (withMultipleShipmentsService)
+                    {
+                        orderService = _multipleShipmentsOrderService;
+                    }
+
                     if (cartOrder.Order.Customer?.Id > 0)
                     {
                         var customerBackup = cartOrder.Order.Customer;
 
                         if (cartOrder.Order.Id == 0)
                         {
-                            cartOrder.Order = await _orderService.InsertAsync(cartOrder.Order);
+                            cartOrder.Order = await orderService.InsertAsync(cartOrder.Order);
                         }
                         else
                         {
-                            cartOrder.Order = await _orderService.UpdateAsync(cartOrder.Order);
+                            cartOrder.Order = await orderService.UpdateAsync(cartOrder.Order);
                         }
                         cartOrder.Order.Customer = customerBackup;
                         cart.IdCustomer = cartOrder.Order?.Customer?.Id;
@@ -372,7 +395,7 @@ namespace VitalChoice.Business.Services.Checkout
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AutoShipOrderShouldContainAutoShip]);
             }
 
-            cartOrder.Order = (await _orderService.CalculateStorefrontOrder(cartOrder.Order, OrderStatus.Processed)).Order;
+            cartOrder.Order = (await _multipleShipmentsOrderService.CalculateStorefrontOrder(cartOrder.Order, OrderStatus.Processed)).Order;
             //set needed key code for orders from storefront
             cartOrder.Order.Data.KeyCode = "WEB ORDER";
             using (var transaction = _context.BeginTransaction())
@@ -400,7 +423,7 @@ namespace VitalChoice.Business.Services.Checkout
                         sendOrderConfirm = true;
                         cartOrder.Order.Data.ConfirmationEmailSent = true;
                         cartOrder.Order.DateCreated = DateTime.Now;
-                        cartOrder.Order = await _orderService.UpdateAsync(cartOrder.Order);
+                        cartOrder.Order = await _multipleShipmentsOrderService.UpdateAsync(cartOrder.Order);
                         cart.IdCustomer = cartOrder.Order?.Customer?.Id;
                         cart.IdOrder = null;
                         cart.DiscountCode = null;
@@ -468,9 +491,15 @@ namespace VitalChoice.Business.Services.Checkout
             return 0;
         }
 
-        private async Task<CustomerCartOrder> InitCartOrderModel(CartExtended cart)
+        private async Task<CustomerCartOrder> InitCartOrderModel(CartExtended cart, bool withMultipleShipmentsService = false)
         {
-            var newOrder = _orderService.Mapper.CreatePrototype((int) OrderType.Normal);
+            var orderService = _orderService;
+            if (withMultipleShipmentsService)
+            {
+                orderService = _multipleShipmentsOrderService;
+            }
+
+            var newOrder = orderService.Mapper.CreatePrototype((int) OrderType.Normal);
             newOrder.Data.OrderType = (int) SourceOrderType.Web;
             if (newOrder.Customer != null)
             {

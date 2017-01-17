@@ -215,6 +215,8 @@ namespace VitalChoice.Business.Services.Dynamic
                         CartAdditionalShipmentModelItem shipment =new CartAdditionalShipmentModelItem();
                         shipment.Id = entityAdditionalShipment.Id;
                         shipment.Name = entityAdditionalShipment.Name;
+                        shipment.IsGiftOrder = entityAdditionalShipment.IsGiftOrder;
+                        shipment.GiftMessage = entityAdditionalShipment.GiftMessage;
                         shipment.ShippingAddress = await _orderAddressMapper.FromEntityAsync(entityAdditionalShipment.ShippingAddress, 
                             withDefaults);
 
@@ -347,6 +349,8 @@ namespace VitalChoice.Business.Services.Dynamic
                     entity.CartAdditionalShipments = dynamic.CartAdditionalShipments.Select(s=> new CartAdditionalShipment()
                     {
                         Name = s.Name,
+                        IsGiftOrder = s.IsGiftOrder,
+                        GiftMessage = s.GiftMessage,
                         ShippingAddress = _orderAddressMapper.ToEntityAsync(s.ShippingAddress).Result,
 
                         Skus = new List<CartAdditionalShipmentToSku>(s.Skus.Select(p => new CartAdditionalShipmentToSku()
@@ -529,6 +533,8 @@ namespace VitalChoice.Business.Services.Dynamic
                         p => p.Id, s => new CartAdditionalShipment()
                         {
                             Name = s.Name,
+                            IsGiftOrder = s.IsGiftOrder,
+                            GiftMessage = s.GiftMessage,
                             ShippingAddress = _orderAddressMapper.ToEntityAsync(s.ShippingAddress).Result,
 
                             Skus = new List<CartAdditionalShipmentToSku>(s.Skus.Select(p => new CartAdditionalShipmentToSku()
@@ -541,6 +547,8 @@ namespace VitalChoice.Business.Services.Dynamic
                         }, (dbItem, modelItem) =>
                         {
                             dbItem.Name = modelItem.Name;
+                            dbItem.IsGiftOrder = modelItem.IsGiftOrder;
+                            dbItem.GiftMessage = modelItem.GiftMessage;
                             _orderAddressMapper.UpdateEntityAsync(modelItem.ShippingAddress, dbItem.ShippingAddress).Wait();
 
                             dbItem.Skus.MergeKeyed(modelItem.Skus.Where(s => (s.Sku?.Id ?? 0) != 0).ToArray(), 

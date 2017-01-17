@@ -625,6 +625,7 @@ namespace VitalChoice.Core.DependencyInjection
             builder.RegisterType<OrderNoteService>().As<IOrderNoteService>().InstancePerLifetimeScope();
             builder.RegisterType<CustomerService>().As<ICustomerService>().InstancePerLifetimeScope();
             builder.RegisterType<OrderService>().As<IOrderService>().AsSelf().InstancePerLifetimeScope();
+            builder.RegisterType<MultipleShipmentsOrderService>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<OrderExport>().As<IOrderExport>().SingleInstance();
             builder.RegisterType<OrderRefundService>().As<IOrderRefundService>().AsSelf().InstancePerLifetimeScope();
             builder.RegisterType<AffiliateService>().As<IAffiliateService>().InstancePerLifetimeScope();

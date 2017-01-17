@@ -63,6 +63,12 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
+        public IActionResult EmptyCart()
+        {
+            return View("EmptyCart");
+        }
+
+        [HttpGet]
         public Task<IActionResult> GetCartLiteComponent()
         {
             return Task.FromResult<IActionResult>(ViewComponent("CartLite"));
@@ -210,6 +216,7 @@ namespace VC.Public.Controllers
                 bool updateResult = true;
                 if (canUpdate)
                 {
+                    //TODO: should be sent withMultipleShipmentsService=true for 4 step
                     updateResult = await _checkoutService.UpdateCart(cart);
                 }
                 if (!ModelState.IsValid)

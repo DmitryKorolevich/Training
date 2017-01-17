@@ -7,6 +7,7 @@ using VitalChoice.Infrastructure.Identity.UserManagers;
 
 namespace VitalChoice.Core.Base
 {
+    [ApiModelAutoValidationFilter]
     [MvcExceptionFilter]
     [SetAffiliateCookieFilter]
     [CustomerAutoReloginFilter]

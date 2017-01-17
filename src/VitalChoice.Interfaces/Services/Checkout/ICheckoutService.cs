@@ -6,9 +6,9 @@ namespace VitalChoice.Interfaces.Services.Checkout
 {
     public interface ICheckoutService
     {
-        Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, bool loggedIn);
-        Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, int idCustomer);
-        Task<bool> UpdateCart(CustomerCartOrder anonymCart);
+        Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, bool loggedIn, bool withMultipleShipmentsService = false);
+        Task<CustomerCartOrder> GetOrCreateCart(Guid? uid, int idCustomer, bool withMultipleShipmentsService = false);
+        Task<bool> UpdateCart(CustomerCartOrder anonymCart, bool withMultipleShipmentsService = false);
         Task<bool> SaveOrder(CustomerCartOrder anonymCart);
         Task<int> GetCartItemsCount(Guid uid);
     }

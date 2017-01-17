@@ -25,6 +25,7 @@ using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Infrastructure.Services;
+using VitalChoice.Validation.Models;
 
 namespace VC.Public.Controllers
 {
@@ -85,7 +86,7 @@ namespace VC.Public.Controllers
             return CartLocks.LockWhenAsync(() => uid.HasValue, () => uid.Value);
         }
 
-        protected async Task<CustomerCartOrder> GetCurrentCart(bool? loggedIn = null)
+        protected async Task<CustomerCartOrder> GetCurrentCart(bool? loggedIn = null, bool withMultipleShipmentsService=false)
         {
             if (loggedIn == null)
             {
@@ -94,14 +95,14 @@ namespace VC.Public.Controllers
             if (loggedIn.Value)
             {
                 var existingUid = HttpContext.GetCartUid();
-                var result = await CheckoutService.GetOrCreateCart(existingUid, GetInternalCustomerId());
+                var result = await CheckoutService.GetOrCreateCart(existingUid, GetInternalCustomerId(), withMultipleShipmentsService);
                 HttpContext.SetCartUid(result.CartUid);
                 return result;
             }
             else
             {
                 var existingUid = HttpContext.GetCartUid();
-                var result = await CheckoutService.GetOrCreateCart(existingUid, false);
+                var result = await CheckoutService.GetOrCreateCart(existingUid, false, withMultipleShipmentsService);
                 HttpContext.SetCartUid(result.CartUid);
                 return result;
             }
@@ -168,6 +169,12 @@ namespace VC.Public.Controllers
             var toReturn = $"{cardType}, ending in {cardNumberPart} {defaultPart}";
 
             return toReturn;
+        }
+
+        public Result<T> GetJsonRedirect<T>(string url)
+            where T: class
+        {
+            return new Result<T>(false, null, "redirect", url);
         }
     }
 }

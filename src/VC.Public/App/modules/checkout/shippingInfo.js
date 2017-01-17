@@ -1,122 +1,169 @@
-﻿$(function ()
+﻿var Shipments;
+
+$(function ()
 {
-    $(".shipping-items").on("click", ".delete-shipping", function ()
+    Shipments = function (data)
     {
-        $(this).closest('.item').remove();
-        updateItemsUI();
-    });
+        var self = this;
 
-    $(".new-shipping").click(function ()
-    {
-        $(".main-shipping-item-wrapper .minus").click();
-        $(".shipping-items .minus").click();
+        self.Model = ko.mapping.fromJS(data);
+        $.each(self.Model.Shipments(), function(i, item){
+            item.Collapsed = ko.observable(!item.FromOrder());
 
-        var item = $(".item.template").clone();
-        item.removeClass('hide');
-        item.removeClass('template');
-        var content = $(".main-shipping-item").contents().clone();
-        item.find(".item-content").append(content);
-        $(".shipping-items").append(item);
-        item.find('.use-billing-section').remove();
+            item.SelectedAvalibleAddress = ko.observable(null);
+            item.SelectedAvalibleAddress.subscribe(function(newValue) {
+                //TODO: handle changing
+            });
 
-        updateItemsUI();
-    });
+            if(item.FromOrder())
+            {
+            }
+        });
 
-    var updateItemsUI = function ()
-    {
-        if ($(".item").length > 1)
+        self.options = {};
+        self.options.AddButtonText = ko.observable('');
+        updateAddButtonText();
+
+        self.refreshing = ko.observable(true);
+
+        self.remove = function (item, event) {
         {
-            $(".new-shipping").text('Add Another Recipient');
-            $(".main-shipping-item-wrapper .order-header").removeClass('hide');
+            if (confirm('Are you sure you want to delete this order?'))
+            {
+                self.Model.Shipments.remove(item);
+            }
+        };
+
+        self.add = function ()
+        {
+            
+        };
+
+        self.collapse = function (item, event)
+        {
+            item.Collapsed(true);
+        };
+
+        self.expand = function (item, event)
+        {
+            $.each(self.Model.Shipments(), function(i, item){
+                item.Collapsed(true);
+            });
+            item.Collapsed(false);
+        };
+
+        self.save = function ()
+        {
+            
+        };
+
+        function updateAddButtonText = function(){
+            if(Model.Shipments().length>1)
+            {
+                self.options.AddButtonText('Add Another Recipient');
+            }
+            else
+            {
+                self.options.AddButtonText('Send Order To Multiple Receipents');
+            }
+        };     
+    }
+
+    initShipments();
+
+    //controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther");
+    //controlSectionState("#GiftMessageBox", "#IsGiftOrder");
+    //controlUseBillingState(".form-two-column", "#UseBillingAddress");
+
+    //$("body")
+    //    .on("click",
+    //        "#chkSelectOther",
+    //        function () { controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther"); });
+    //$("body")
+    //    .on("click",
+    //        "#IsGiftOrder",
+    //        function () {
+    //            controlSectionState("#GiftMessageBox", "#IsGiftOrder");
+    //            controlSectionContent("#GiftMessage", "#IsGiftOrder");
+    //        });
+    //$("body")
+    //    .on("click",
+    //        "#UseBillingAddress",
+    //        function () { controlUseBillingState(".form-two-column", "#UseBillingAddress"); });
+
+    //$("body")
+    //    .on("change",
+    //        "#ddShippingAddressesSelection",
+    //        function () {
+    //            changeSelection($("#ddShippingAddressesSelection").val());
+    //        });
+
+    //$(".columns-container form").data("validator").settings.submitHandler = function (form)
+    //{
+    //    $(".columns-container .overlay").show();
+    //    form.submit();
+    //};
+
+    //controlUpdateSavedState();
+});
+
+function initShipments()
+{
+    var viewModel;
+
+    $.ajax({
+        url: "/Checkout/GetShipments",
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        type: "GET"
+    }).success(function (result)
+    {
+        $("span[data-valmsg-for]").text('');
+        $("div.validation-summary-errors").html('');
+        if (result.Success)
+        {
+            viewModel = new Shipments(result.Data);
+            ko.applyBindings(viewModel);
+            reparseElementValidators("form#mainForm");
+            checkCanadaIssue();
+        } else
+        {
+            processErrorResponse(result);
+        }
+        viewModel.refreshing(false);
+    }).error(function (result)
+    {
+        $("span[data-valmsg-for]").text('');
+        processErrorResponse();
+        viewModel.refreshing(false);
+    });
+}
+
+function processErrorResponse(result)
+{
+    if (result)
+    {
+        if (result.Command != null)
+        {
+            processJsonCommands(result);
         }
         else
         {
-            $(".new-shipping").text('Send Order To Multiple Receipents');
-            $(".main-shipping-item-wrapper .order-header").addClass('hide');
-            $('.main-shipping-item-wrapper .main-shipping-item').removeClass('hide-imp');
+            trySetFormErrors(result);
         }
-
-        var number = 2;
-        $.each($(".item"), function (i, item)
-        {
-            if (!$(item).hasClass('template'))
-            {
-                $(item).find('.checkout-step-heading span span').text('Order #'+number);
-                number++;
-            }
-        });
-    };
-
-    $(".shipping-items").on("click", ".item .plus", function ()
+    }
+    else
     {
-        $(".main-shipping-item-wrapper .minus").click();
-        $(".shipping-items .minus").click();
-        $(this).closest('.item').find('.item-content').removeClass('hide-imp');
-        $(this).addClass('hide-imp');
-        $(this).closest('.item').find('.minus').removeClass('hide-imp');
-    });
+        notifyError();
+    }
+}
 
-    $(".shipping-items").on("click", ".item .minus", function ()
-    {
-        $(this).closest('.item').find('.item-content').addClass('hide-imp');
-        $(this).addClass('hide-imp');
-        $(this).closest('.item').find('.plus').removeClass('hide-imp');
-    });
-
-    $(".main-shipping-item-wrapper").on("click", ".plus", function ()
-    {
-        $(".shipping-items .minus").click();
-        $(this).closest('.main-shipping-item-wrapper').find('.main-shipping-item').removeClass('hide-imp');
-        $(this).addClass('hide-imp');
-        $(this).closest('.main-shipping-item-wrapper').find('.minus').removeClass('hide-imp');
-    });
-
-    $(".main-shipping-item-wrapper").on("click", ".minus", function ()
-    {
-        $(this).closest('.main-shipping-item-wrapper').find('.main-shipping-item').addClass('hide-imp');
-        $(this).addClass('hide-imp');
-        $(this).closest('.main-shipping-item-wrapper').find('.plus').removeClass('hide-imp');
-    });
-
-    controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther");
-    controlSectionState("#GiftMessageBox", "#IsGiftOrder");
-    controlUseBillingState(".form-two-column", "#UseBillingAddress");
-
-    $("body")
-        .on("click",
-            "#chkSelectOther",
-            function () { controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther"); });
-    $("body")
-        .on("click",
-            "#IsGiftOrder",
-            function () {
-                controlSectionState("#GiftMessageBox", "#IsGiftOrder");
-                controlSectionContent("#GiftMessage", "#IsGiftOrder");
-            });
-    $("body")
-        .on("click",
-            "#UseBillingAddress",
-            function () { controlUseBillingState(".form-two-column", "#UseBillingAddress"); });
-
-    $("body")
-        .on("change",
-            "#ddShippingAddressesSelection",
-            function () {
-                changeSelection($("#ddShippingAddressesSelection").val());
-            });
-
-    $(".columns-container form").data("validator").settings.submitHandler = function (form)
-    {
-        $(".columns-container .overlay").show();
-        form.submit();
-    };
-
-    controlUpdateSavedState();
-
+function checkCanadaIssue()
+{
     var param = getQueryParameterByName("canadaissue");
     if (param)
     {
-        $(".columns-container .overlay").show();
+        Shipments.refreshing(true);
         $.ajax({
             url: "/Checkout/CanadaShippingIssueView",
             dataType: "html",
@@ -128,7 +175,8 @@
                 modal: true,
                 minWidth: 450,
                 dialogClass: "canada-shipping-notice",
-                open: function(event,ui) {
+                open: function (event, ui)
+                {
                     $(this).parent().focus();
                 },
                 close: function ()
@@ -150,91 +198,89 @@
             notifyError();
         }).complete(function ()
         {
-            $(".columns-container .overlay").hide();
+            Shipments.refreshing(false);
         });
     }
-
-    $(".columns-container .overlay").hide();
-});
-
-function controlUpdateSavedState() {
-    if ($("#ShipAddressIdToOverride").val() == null || $("#ShipAddressIdToOverride").val() == "") {
-        $("#SaveToProfile").prop("checked", false);
-        $("#SaveToProfile").trigger("change");
-        $("#updateSaved").hide();
-    } else {
-        $("#updateSaved").show();
-    }
 }
 
-function changeSelection(selId) {
-    $.ajax({
-        url: "/Checkout/GetShippingAddress/" + selId,
-        dataType: "html"
-    }).success(function (result) {
-        $("#dynamicArea").html(result);
+//function controlUpdateSavedState() {
+//    if ($("#ShipAddressIdToOverride").val() == null || $("#ShipAddressIdToOverride").val() == "") {
+//        $("#SaveToProfile").prop("checked", false);
+//        $("#SaveToProfile").trigger("change");
+//        $("#updateSaved").hide();
+//    } else {
+//        $("#updateSaved").show();
+//    }
+//}
 
-        refreshCountries();
+//function changeSelection(selId) {
+//    $.ajax({
+//        url: "/Checkout/GetShippingAddress/" + selId,
+//        dataType: "html"
+//    }).success(function (result) {
+//        $("#dynamicArea").html(result);
 
-        controlUpdateSavedState();
+//        refreshCountries();
 
-        $(".phone-mask").mask("(999) 999-9999? x99999");
+//        controlUpdateSavedState();
 
-        reparseElementValidators("form");
-    }).error(function (result) {
-        notifyError();
-    });
-}
+//        $(".phone-mask").mask("(999) 999-9999? x99999");
 
-function controlSectionContent(selector, controlId) {
-    var jSel = $(selector);
+//        reparseElementValidators("form");
+//    }).error(function (result) {
+//        notifyError();
+//    });
+//}
 
-    if (!$(controlId).is(":checked")) {
-        jSel.val("");
-        jSel.trigger("change");
-        jSel.trigger("keyup");
-    }
-}
+//function controlSectionContent(selector, controlId) {
+//    var jSel = $(selector);
 
-function controlSectionState(selector, controlId) {
-    var jSel = $(selector).closest(".form-group");
+//    if (!$(controlId).is(":checked")) {
+//        jSel.val("");
+//        jSel.trigger("change");
+//        jSel.trigger("keyup");
+//    }
+//}
 
-    if ($(controlId).is(":checked")) {
-        jSel.show();
-    } else {
-        jSel.hide();
-    }
-}
+//function controlSectionState(selector, controlId) {
+//    var jSel = $(selector).closest(".form-group");
 
-var lastPrefShipMethodLabel = null;
+//    if ($(controlId).is(":checked")) {
+//        jSel.show();
+//    } else {
+//        jSel.hide();
+//    }
+//}
 
-function controlUseBillingState(selector, controlId) {
-    var jSel = $(selector);
-    var jDrop = $("#ddShippingAddressesSelection").closest(".form-group");
+//var lastPrefShipMethodLabel = null;
 
-    var jChk = $("#SaveToProfile");
-    var jChkContainer = $("#updateSaved");
+//function controlUseBillingState(selector, controlId) {
+//    var jSel = $(selector);
+//    var jDrop = $("#ddShippingAddressesSelection").closest(".form-group");
 
-    var jSpan = $("#spEnterAddress");
-    var jPrefShipMethod = $("#PreferredShipMethodLabel");
+//    var jChk = $("#SaveToProfile");
+//    var jChkContainer = $("#updateSaved");
 
-    if ($(controlId).is(":checked")) {
-        jSel.hide();
-        jDrop.hide();
-        jChk.prop("checked", false);
-        jChk.trigger("change");
-        jChkContainer.hide();
-        jSpan.hide();
-        lastPrefShipMethodLabel = jPrefShipMethod.text();
-        jPrefShipMethod.text("Best");
-    } else {
-        jSel.show();
-        jDrop.show();
-        jChkContainer.show();
-        jSpan.show();
-        if (lastPrefShipMethodLabel !== null) {
-            jPrefShipMethod.text(lastPrefShipMethodLabel);
-        }
-        //controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther");
-    }
-}
+//    var jSpan = $("#spEnterAddress");
+//    var jPrefShipMethod = $("#PreferredShipMethodLabel");
+
+//    if ($(controlId).is(":checked")) {
+//        jSel.hide();
+//        jDrop.hide();
+//        jChk.prop("checked", false);
+//        jChk.trigger("change");
+//        jChkContainer.hide();
+//        jSpan.hide();
+//        lastPrefShipMethodLabel = jPrefShipMethod.text();
+//        jPrefShipMethod.text("Best");
+//    } else {
+//        jSel.show();
+//        jDrop.show();
+//        jChkContainer.show();
+//        jSpan.show();
+//        if (lastPrefShipMethodLabel !== null) {
+//            jPrefShipMethod.text(lastPrefShipMethodLabel);
+//        }
+//        //controlSectionState("#ddShippingAddressesSelection", "#chkSelectOther");
+//    }
+//}

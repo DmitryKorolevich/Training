@@ -16,6 +16,10 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public string Name { get; set; }
 
+        public bool IsGiftOrder { get; set; }
+
+        public string GiftMessage { get; set; }
+
         public AddressDynamic ShippingAddress { get; set; }
 
         public ICollection<SkuOrdered> Skus { get; set; }

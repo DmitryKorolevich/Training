@@ -53,7 +53,7 @@ namespace VitalChoice.Core.Infrastructure
 
 	    public static IActionResult CreateJsonResponse()
 	    {
-	        return new JsonResult(new Result<string>(false, "/content/issues-with-account", "redirect"));
+	        return new JsonResult(new Result<object>(false, null, "/content/issues-with-account", "redirect"));
         }
 	}
 }

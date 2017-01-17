@@ -8,12 +8,13 @@ namespace VitalChoice.Validation.Models
     {
         private readonly List<MessageInfo> _messages;
 
-        public Result(bool status, T data = default(T),string command=null)
+        public Result(bool status, T data = default(T),string command=null, string redirectUrl=null)
         {
             _messages = new List<MessageInfo>();
             Data = data;
             Success = status;
             Command = command;
+            RedirectUrl = redirectUrl;
         }
 
         public T Data { get; }
@@ -21,6 +22,8 @@ namespace VitalChoice.Validation.Models
         public bool Success { get; }
 
         public string Command { get; }
+
+        public string RedirectUrl { get; }
 
         public void AddMessage(string field, string message)
         {
