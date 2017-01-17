@@ -471,14 +471,22 @@ namespace VitalChoice.Business.Services.Products
                                     if (DateTime.TryParse(sExpirationDate, CultureInfo.InvariantCulture, DateTimeStyles.None, out tempDate))
                                     {
                                         tempDate = TimeZoneInfo.ConvertTime(tempDate, TimeZoneHelper.PstTimeZoneInfo, TimeZoneInfo.Local);
-                                        if (tempDate < DateTime.Now)
+                                        if (notificationType == GCImportNotificationType.StandartAdminEGiftEmail)
                                         {
-                                            localMessages.Add(BusinessHelper.AddErrorMessage(expirationDateHeader, 
-                                                String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.MustBeFutureDateError], expirationDateHeader)));
+                                            localMessages.Add(BusinessHelper.AddErrorMessage(expirationDateHeader,
+                                                String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldShouldBeBlack], expirationDateHeader)));
                                         }
                                         else
-                                        {
-                                            item.ExpirationDate = tempDate;
+                                        { 
+                                            if (tempDate < DateTime.Now)
+                                            {
+                                                localMessages.Add(BusinessHelper.AddErrorMessage(expirationDateHeader, 
+                                                    String.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.MustBeFutureDateError], expirationDateHeader)));
+                                            }
+                                            else
+                                            {
+                                                item.ExpirationDate = tempDate;
+                                            }
                                         }
                                     }
                                     else
