@@ -8,8 +8,8 @@
     "DefaultCacheExpirationTermMinutes": 1440,
     "ActivationTokenExpirationTermDays": 3,
     "DefaultCultureId": "en-US",
-    "PublicHost": "staging.g2-dg.com",
-    "AdminHost": "admin.staging.g2-dg.com",
+    "PublicHost": "staging2.g2-dg.com",
+    "AdminHost": "admin2.staging.g2-dg.com",
     "CustomerServiceToEmail": "customercare@vitalchoice.com",
     "CustomerFeedbackToEmail": "feedback@vitalchoice.com",
     "MainSuperAdminEmail": "gary@g2designgroup.com",
@@ -96,7 +96,8 @@
     "CacheSyncOptions": {
       "ConnectionString": "Endpoint=sb://staging-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=l1XNjdRaaMjJ1glYnDwjnIiw+9yaX6E2vksJXa4zBSk=",
       "ServiceBusQueueName": "caching",
-      "Enabled": true
+      "Enabled": true,
+      "AppNameOverride": "VC.Admin2"
     },
     "Bronto": {
       "ApiKey": "BCCC606B-8D04-4BBA-80D2-8FF8832F7D2F",

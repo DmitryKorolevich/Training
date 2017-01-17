@@ -342,7 +342,8 @@ namespace VitalChoice.Core.DependencyInjection
             {
                 ConnectionString = section["ConnectionString"],
                 ServiceBusQueueName = section["ServiceBusQueueName"],
-                Enabled = Convert.ToBoolean(section["Enabled"])
+                Enabled = Convert.ToBoolean(section["Enabled"]),
+                AppNameOverride = section["AppNameOverride"]
             };
         }
 
