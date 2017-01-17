@@ -48,6 +48,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             public const string ZeroSkusForOrderInImport = "ZeroSkusForOrderInImport";
             public const string InvalidFieldValue = "InvalidFieldValue";
             public const string FieldIsRequired = "FieldIsRequired";
+            public const string FieldShouldBeBlack = "FieldShouldBeBlack";
             public const string FieldIsInvalidEmail = "FieldIsInvalidEmail";
             public const string FieldMaxLength = "FieldMaxLength";
             public const string SkuNotFoundOrderImport = "SkuNotFoundOrderImport";
@@ -115,6 +116,7 @@ namespace VitalChoice.Infrastructure.Domain.Constants
             {Keys.ZeroSkusForOrderInImport, "Order should have at least one sku with specified qty"},
             {Keys.InvalidFieldValue, "{0} have invalid value"},
             {Keys.FieldIsRequired, "{0} is required"},
+            {Keys.FieldShouldBeBlack, "{0} should be blank"},
             {Keys.FieldIsInvalidEmail, "{0} is not a valid e-mail address"},
             {Keys.FieldMaxLength, "{0} exceeds length of {1} literals"},
             {Keys.SkuNotFoundOrderImport, "Field \"{0}\": the given product SKU has not been found in the database({1})"},
