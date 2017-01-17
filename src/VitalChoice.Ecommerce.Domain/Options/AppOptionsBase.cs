@@ -1,6 +1,4 @@
-﻿using VitalChoice.Infrastructure.Domain.Options;
-
-namespace VitalChoice.Ecommerce.Domain.Options
+﻿namespace VitalChoice.Ecommerce.Domain.Options
 {
     public class AppOptionsBase
     {

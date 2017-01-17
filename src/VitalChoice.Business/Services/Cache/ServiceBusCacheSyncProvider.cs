@@ -55,10 +55,15 @@ namespace VitalChoice.Business.Services.Cache
 
                 _sendingPool = new BatchSendingPool<SyncOperation>(_sendingClient, Logger);
 
+                var appName = string.IsNullOrWhiteSpace(options.Value.CacheSyncOptions.AppNameOverride)
+                    ? applicationEnvironment.ApplicationName
+                    : options.Value.CacheSyncOptions.AppNameOverride;
+
                 _receiverHost = new ServiceBusReceiverHost(Logger,
                     new ServiceBusSubscriptionReceiver(
                         new SubcriptionFactory(options.Value.CacheSyncOptions?.ConnectionString, queName,
-                            applicationEnvironment.ApplicationName, ReceiveMode.ReceiveAndDelete).Create, Logger), true);
+                            appName,
+                            ReceiveMode.ReceiveAndDelete).Create, Logger), true);
 
                 _receiverHost.ReceiveBatchEvent += ReceiveMessages;
                 _receiverHost.Start();
