@@ -16,6 +16,7 @@
         item.removeClass('template');
         var content = $(".main-shipping-item").contents().clone();
         item.find(".item-content").append(content);
+        $(".shipping-items").append("<div class='clear'></div>");
         $(".shipping-items").append(item);
         item.find('.use-billing-section').remove();
 
@@ -36,6 +37,8 @@
             $('.main-shipping-item-wrapper .main-shipping-item').removeClass('hide-imp');
         }
 
+        $('.main-shipping-item-wrapper').removeClass('alternate-color');
+        $('.item').removeClass('alternate-color');
         var number = 2;
         $.each($(".item"), function (i, item)
         {
@@ -43,8 +46,16 @@
             {
                 $(item).find('.checkout-step-heading span span').text('Order #'+number);
                 number++;
+                if (i % 2 != 0)
+                {
+                    $(item).addClass('alternate-color');
+                }
             }
         });
+        if($(".item").length>1)
+        {
+            $('.main-shipping-item-wrapper').addClass('alternate-color');
+        }
     };
 
     $(".shipping-items").on("click", ".item .plus", function ()
