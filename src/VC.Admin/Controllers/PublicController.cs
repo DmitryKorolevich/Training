@@ -63,14 +63,14 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<EmailOrderManageModel>> GetEmailOrder()
+        public Result<EmailOrderManageModel> GetEmailOrder()
         {
             var defaultCountry = _referenceData.DefaultCountry;
             var toReturn = new EmailOrderManageModel()
             {
-                Shipping = new AddressModel() { Country = new CountryListItemModel(defaultCountry) },
-                SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) },
-                IdPaymentMethodType = (int)PaymentMethodType.Marketing,
+                Shipping = new AddressModel() {Country = new CountryListItemModel(defaultCountry)},
+                SkuOrdereds = new List<SkuOrderedManageModel>() {new SkuOrderedManageModel(null)},
+                IdPaymentMethodType = (int) PaymentMethodType.Marketing,
             };
 
             return toReturn;
