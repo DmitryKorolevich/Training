@@ -494,9 +494,9 @@ namespace VC.Admin.Controllers
                 {
                     StatusCode = RecordStatusCode.Active,
                     ApplyType = ApplyType.All,
-                    CompareNamesType = (int)CompareType.Equal,
-                    CompareAddressesType = (int)CompareType.Equal,
-                    ReshipsRefundsCheckType = (int)OrderType.Reship,
+                    CompareNamesType = CompareType.Equal,
+                    CompareAddressesType = CompareType.Equal,
+                    ReshipsRefundsCheckType = OrderType.Reship,
                     ReshipsRefundsMonthCount = 6,
                 };
             }

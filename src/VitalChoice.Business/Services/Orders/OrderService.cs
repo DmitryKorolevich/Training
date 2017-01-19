@@ -2522,6 +2522,18 @@ namespace VitalChoice.Business.Services.Orders
             }).ToList();
         }
 
+        public Task<int> GetReshipCount(int pastMonths, int idCustomer)
+        {
+            var endDate = DateTime.Now;
+            var startDate = endDate.AddMonths(-pastMonths);
+            return
+                SelectCountAsync(
+                    o =>
+                        o.IdCustomer == idCustomer && o.IdObjectType == (int) OrderType.Reship && o.OrderStatus != OrderStatus.Cancelled &&
+                        o.StatusCode != (int) RecordStatusCode.Deleted &&
+                        o.DateCreated > startDate && o.DateCreated <= endDate, q => q);
+        }
+
         #endregion
 
         private struct OrderPaymentReference

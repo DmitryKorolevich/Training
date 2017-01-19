@@ -147,5 +147,7 @@ namespace VitalChoice.Business.Services.Orders
 
             return toReturn;
         }
+
+        public Task<List<OrderReviewRuleDynamic>> GetAllRules() => SelectAsync(rule => true, withDefaults: true);
     }
 }

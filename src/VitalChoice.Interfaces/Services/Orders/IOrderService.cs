@@ -83,5 +83,7 @@ namespace VitalChoice.Interfaces.Services.Orders
 		Task SubmitAutoShipOrders();
 
 		Task<IList<int>> SelectAutoShipOrdersAsync(int idOrder);
+
+	    Task<int> GetReshipCount(int pastMonths, int idCustomer);
 	}
 }

@@ -6,6 +6,7 @@ using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Entities.Localization.Groups;
 using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models;
@@ -47,13 +48,13 @@ namespace VC.Admin.Models.Orders
         public bool CompareNames { get; set; }
 
         [Map]
-        public int? CompareNamesType { get; set; }
+        public CompareType? CompareNamesType { get; set; }
 
         [Map]
         public bool CompareAddresses { get; set; }
 
         [Map]
-        public int? CompareAddressesType { get; set; }
+        public CompareType? CompareAddressesType { get; set; }
 
         [Map]
         public bool ReshipsRefundsCheck { get; set; }
@@ -62,7 +63,7 @@ namespace VC.Admin.Models.Orders
         public int? ReshipsRefundsQTY { get; set; }
 
         [Map]
-        public int? ReshipsRefundsCheckType { get; set; }
+        public OrderType? ReshipsRefundsCheckType { get; set; }
 
         [Map]
         public int? ReshipsRefundsMonthCount { get; set; }

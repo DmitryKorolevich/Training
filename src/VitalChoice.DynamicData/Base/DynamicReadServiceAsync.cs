@@ -308,6 +308,30 @@ namespace VitalChoice.DynamicData.Base
             return res;
         }
 
+        public Task<int> SelectCountAsync(IQueryObject<TEntity> queryObject = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null)
+        {
+            var queryFluent = BuildQueryFluent(queryObject?.Query(), includesOverride, null);
+            return queryFluent.SelectCountAsync();
+        }
+
+        public Task<int> SelectCountAsync(Expression<Func<TEntity, bool>> query = null, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null)
+        {
+            var queryFluent = BuildQueryFluent(query, includesOverride, null);
+            return queryFluent.SelectCountAsync();
+        }
+
+        public int SelectCount(IQueryObject<TEntity> queryObject = null, Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null)
+        {
+            return SelectCountAsync(queryObject, includesOverride).GetAwaiter().GetResult();
+        }
+
+        public int SelectCount(Expression<Func<TEntity, bool>> query = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null)
+        {
+            return SelectCountAsync(query, includesOverride).GetAwaiter().GetResult();
+        }
+
         //protected async Task SetBigValuesAsync(IEnumerable<TEntity> entities, bool tracked = false)
         //{
         //    var bigValueIds = new Dictionary<long, List<TOptionValue>>();

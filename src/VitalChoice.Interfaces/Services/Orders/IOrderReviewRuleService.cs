@@ -17,5 +17,7 @@ namespace VitalChoice.Interfaces.Services.Orders
     public interface IOrderReviewRuleService : IDynamicServiceAsync<OrderReviewRuleDynamic, OrderReviewRule>
     {
         Task<PagedList<OrderReviewRuleDynamic>> GetShortOrderReviewRulesAsync(FilterBase filter);
+
+        Task<List<OrderReviewRuleDynamic>> GetAllRules();
     }
 }

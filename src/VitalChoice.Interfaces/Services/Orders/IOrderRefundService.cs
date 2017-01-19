@@ -25,5 +25,6 @@ namespace VitalChoice.Interfaces.Services.Orders
 
 	    Task<bool> CancelRefundOrderAsync(int id);
 
+	    Task<int> GetRefundCount(int pastMonths, int idCustomer);
 	}
 }
