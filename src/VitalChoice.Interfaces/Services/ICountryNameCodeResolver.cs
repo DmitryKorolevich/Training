@@ -20,8 +20,10 @@ namespace VitalChoice.Interfaces.Services
         string GetStateCode(int idCountry, int idState);
         string GetStateCode(AddressDynamic address);
         string GetStateName(AddressDynamic address);
+        string GetStateName(int idCountry, int idState);
         string GetCountryCode(AddressDynamic address);
         string GetCountryName(AddressDynamic address);
+        string GetCountryName(int idCountry);
         string GetRegionOrStateCode(AddressDynamic address);
         string GetRegionOrStateName(AddressDynamic address);
     }

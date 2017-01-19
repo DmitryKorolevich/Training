@@ -376,6 +376,7 @@ namespace VitalChoice.Core.DependencyInjection
             options.CustomerFeedbackToEmail = configuration.GetSection("App:CustomerFeedbackToEmail").Value;
             options.OrderShippingNotificationBcc = configuration.GetSection("App:OrderShippingNotificationBcc").Value;
             options.AffiliateEmailBcc = configuration.GetSection("App:AffiliateEmailBcc").Value;
+            options.EmailOrderNotificationEmail = configuration.GetSection("App:EmailOrderNotificationEmail").Value;
             options.FilesRelativePath = configuration.GetSection("App:FilesRelativePath").Value;
             options.FilesPath = configuration.GetSection("App:FilesPath").Value;
             options.EnableOrderTrackScripts = Convert.ToBoolean(configuration.GetSection("App:EnableOrderTrackScripts").Value);

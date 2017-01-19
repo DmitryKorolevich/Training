@@ -169,6 +169,15 @@ namespace VitalChoice.Business.Services
             return _stateCodes.GetState(address?.IdCountry ?? 0, address?.IdState ?? 0)?.StateName;
         }
 
+        public string GetStateName(int idCountry, int idState)
+        {
+            if (_stateCodes == null)
+            {
+                _stateCodes = _countrySource.Value.ToDictionary(c => c.Id, c => c.States.ToDictionary(s => s.Id));
+            }
+            return _stateCodes.GetState(idCountry, idState)?.StateName;
+        }
+
         public string GetCountryCode(AddressDynamic address)
         {
             if (_coutryCodes == null)
@@ -185,6 +194,15 @@ namespace VitalChoice.Business.Services
                 _coutryCodes = _countrySource.Value.ToDictionary(c => c.Id);
             }
             return _coutryCodes.GetCountry(address?.IdCountry ?? 0)?.CountryName;
+        }
+
+        public string GetCountryName(int idCountry)
+        {
+            if (_coutryCodes == null)
+            {
+                _coutryCodes = _countrySource.Value.ToDictionary(c => c.Id);
+            }
+            return _coutryCodes.GetCountry(idCountry)?.CountryName;
         }
 
         public string GetRegionOrStateCode(AddressDynamic address)

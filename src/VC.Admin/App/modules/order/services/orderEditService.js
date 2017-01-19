@@ -1119,6 +1119,18 @@ angular.module('app.modules.order.services.orderEditService', [])
                 uiScope.shippingUpgradeNPOptions = options;
             }
         }
+
+        if (uiScope.order && uiScope.order.Marketing && uiScope.order.Marketing.MarketingPromotionType && !uiScope.orderEditDisabled)
+        {
+            var options = $.grep($rootScope.ReferenceData.MarketingPromotionTypesNotHidden, function (item, index)
+            {
+                return item.Key == uiScope.order.Marketing.MarketingPromotionType;
+            });
+            if (options.length == 0)
+            {
+                uiScope.order.Marketing.MarketingPromotionType = null;
+            }
+        }
     };
 
     var baseReferencedDataInit = function(uiScope){

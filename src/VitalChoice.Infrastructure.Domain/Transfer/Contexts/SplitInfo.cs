@@ -32,7 +32,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 
         public decimal NonPerishableSubtotal
             =>
-                NonPerishableShippingOverriden + NonPerishableSurchargeOverriden + PerishableTax - PerishableDiscount + NonPerishableAmount +
+                NonPerishableShippingOverriden + NonPerishableSurchargeOverriden + NonPerishableTax - NonPerishableDiscount +
+                NonPerishableAmount +
                 OtherProductsAmount;
 
         public int PerishableCount { get; set; }

@@ -18,12 +18,17 @@
         public const string AFFILIATE_EMAIL_TEMPLATE_ID_HOLDER = "{AFFILIATE_ID}";
         public const string AFFILIATE_EMAIL_TEMPLATE_EMAIL_HOLDER = "{AFFILIATE_EMAIL}";
 
-        public const string SETTINGS_LOOKUP_NAMES = "ServiceCodes,InventorySkuChannels,InventorySkuProductSources,InventorySkuUnitOfMeasures,InventorySkuPurchaseUnitOfMeasures";
+        public const string SETTINGS_LOOKUP_NAMES = "ServiceCodes,InventorySkuChannels,InventorySkuProductSources," +
+                                                    "InventorySkuUnitOfMeasures,InventorySkuPurchaseUnitOfMeasures,EmailOrderRequestors,EmailOrderReasons";
         public const string INVENTORY_SKU_LOOKUP_CHANNEL_NAME = "InventorySkuChannels";
         public const string INVENTORY_SKU_LOOKUP_PRODUCT_SOURCE_NAME = "InventorySkuProductSources";
         public const string INVENTORY_SKU_LOOKUP_UNIT_OF_MEASURE_NAME = "InventorySkuUnitOfMeasures";
         public const string INVENTORY_SKU_LOOKUP_PURCHASE_UNIT_OF_MEASURE_NAME = "InventorySkuPurchaseUnitOfMeasures";
         public const string INVENTORY_SKU_LOOKUP_NAMES = "InventorySkuChannels,InventorySkuProductSources,InventorySkuUnitOfMeasures,InventorySkuPurchaseUnitOfMeasures";
         public const string SERVICE_CODE_LOOKUP_NAME = "ServiceCodes";
+        public const string EMAIL_ORDER_LOOKUP_NAMES = "EmailOrderRequestors,EmailOrderReasons,EmailOrderShippingTypes";
+        public const string EMAIL_ORDER_REQUESTOR_LOOKUP_NAME = "EmailOrderRequestors";
+        public const string EMAIL_ORDER_REASON_LOOKUP_NAME = "EmailOrderReasons";
+        public const string EMAIL_ORDER_SHIPPING_TYPE_LOOKUP_NAME = "EmailOrderShippingTypes";
     }
 }

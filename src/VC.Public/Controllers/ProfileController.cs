@@ -1,21 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using VC.Public.Models.Profile;
 using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Core.Infrastructure;
-using VitalChoice.Core.Services;
 using VitalChoice.DynamicData.Interfaces;
-using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
 using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
@@ -25,7 +19,6 @@ using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Ecommerce.Utils;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Domain.Dynamic;
-using VitalChoice.Infrastructure.Domain.Entities.Help;
 using VitalChoice.Infrastructure.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Help;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
@@ -50,7 +43,6 @@ using VitalChoice.Infrastructure.Domain.Entities.Users;
 using VitalChoice.Infrastructure.Identity;
 using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Interfaces.Services.Content;
-using VitalChoice.Interfaces.Services.Settings;
 using VitalChoice.SharedWeb.Helpers;
 using VitalChoice.SharedWeb.Models.Orders;
 
@@ -139,33 +131,48 @@ namespace VC.Public.Controllers
         private async Task<Tuple<BillingInfoModel, CustomerDynamic, OrderDynamic>> GetBillingDetailsInternal(int id, int orderId)
         {
             var currentCustomer = await GetCurrentCustomerDynamic();
+            if (currentCustomer?.Id > 0)
+            {
+                BillingInfoModel model;
+                OrderDynamic order = null;
+                if (id > 0)
+                {
+                    var paymentMethod = currentCustomer.CustomerPaymentMethods
+                        .Single(p => p.IdObjectType == (int) PaymentMethodType.CreditCard && p.Id == id);
+                    model = await _addressConverter.ToModelAsync<BillingInfoModel>(paymentMethod.Address);
+                    await _customerPaymentMethodConverter.UpdateModelAsync(model, paymentMethod);
+                }
+                else if (orderId > 0)
+                {
+                    order = await _orderService.SelectAsync(orderId, true);
+                    if (order.Customer?.Id != currentCustomer.Id)
+                    {
+                        throw new ApiException($"Invalid customer, order id {orderId} got {currentCustomer.Id}");
+                    }
+                    model = await _addressConverter.ToModelAsync<BillingInfoModel>(order.PaymentMethod.Address);
+                    await _orderPaymentMethodConverter.UpdateModelAsync(model, order.PaymentMethod);
+                }
+                else
+                {
+                    throw new ApiException("Wrong arguments");
+                }
 
-            BillingInfoModel model;
-            OrderDynamic order = null;
-            if (id > 0)
-            {
-                var paymentMethod = currentCustomer.CustomerPaymentMethods
-                .Single(p => p.IdObjectType == (int)PaymentMethodType.CreditCard && p.Id == id);
-                model = await _addressConverter.ToModelAsync<BillingInfoModel>(paymentMethod.Address);
-                await _customerPaymentMethodConverter.UpdateModelAsync(model, paymentMethod);
-            }
-            else if (orderId > 0)
-            {
-                order = await _orderService.SelectAsync(orderId, true);
-                model = await _addressConverter.ToModelAsync<BillingInfoModel>(order.PaymentMethod.Address);
-                await _orderPaymentMethodConverter.UpdateModelAsync(model, order.PaymentMethod);
+                return Tuple.Create(model, currentCustomer, order);
             }
             else
             {
-                throw new ApiException();
+                throw new ApiException("Customer is logged out and cannot perform this operation");
             }
-
-            return Tuple.Create(model, currentCustomer, order);
         }
 
         private async Task<PagedListEx<OrderHistoryItemModel>> PopulateOrderHistoryModel(VOrderFilter filter)
         {
             var internalId = GetInternalCustomerId();
+
+            if (!internalId.HasValue)
+            {
+                throw new ApiException("Customer is logged out and cannot perform this operation");
+            }
 
             filter.IdCustomer = internalId;
             filter.Sorting.SortOrder = FilterSortOrder.Desc;
@@ -266,9 +273,9 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
-        public Task<IActionResult> ChangePassword()
+        public IActionResult ChangePassword()
         {
-            return Task.FromResult<IActionResult>(View(new ChangePasswordModel()));
+            return View(new ChangePasswordModel());
         }
 
         [HttpPost]
@@ -334,7 +341,12 @@ namespace VC.Public.Controllers
 
             if (oldEmail != customer.Email)
             {
-                var user = await _storefrontUserService.GetAsync(GetInternalCustomerId());
+                var internalId = GetInternalCustomerId();
+                ApplicationUser user = null;
+                if (internalId.HasValue)
+                {
+                    user = await _storefrontUserService.GetAsync(internalId.Value);
+                }
                 if (user == null)
                 {
                     throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindLogin]);
@@ -655,9 +667,12 @@ namespace VC.Public.Controllers
         {
             var internalId = GetInternalCustomerId();
 
+            if (!internalId.HasValue)
+                throw new ApiException("Customer is logged out");
+
             var filter = new VCustomerFavoritesFilter()
             {
-                IdCustomer = internalId,
+                IdCustomer = internalId.Value,
                 Paging = new Paging()
                 {
                     PageIndex = 0,
@@ -749,8 +764,15 @@ namespace VC.Public.Controllers
                 return PartialView("_BillingDetailsInner", model);
             }
 
+            var internalId = GetInternalCustomerId();
+
+            if (!internalId.HasValue)
+            {
+                return GetItemNotAccessibleResult();
+            }
+
             var order = await _orderService.SelectWithCustomerAsync(orderId, true);
-            if (order.Customer.Id != GetInternalCustomerId())
+            if (order.Customer.Id != internalId.Value)
             {
                 throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AccessDenied], HttpStatusCode.Forbidden);
             }
@@ -771,6 +793,12 @@ namespace VC.Public.Controllers
         [HttpGet]
         public async Task<IActionResult> GetBillingAddress(int paymentId, int orderId)
         {
+            var internalId = GetInternalCustomerId();
+            if (!internalId.HasValue)
+            {
+                return GetItemNotAccessibleResult();
+            }
+
             var billingInfoModel = await GetBillingDetailsInternal(paymentId, orderId);
 
             return PartialView("_BillingDetailsInner", billingInfoModel.Item1);
@@ -781,7 +809,10 @@ namespace VC.Public.Controllers
         {
             var internalId = GetInternalCustomerId();
 
-            await _orderService.ActivatePauseAutoShipAsync(internalId, id, activate);
+            if (!internalId.HasValue)
+                return false;
+
+            await _orderService.ActivatePauseAutoShipAsync(internalId.Value, id, activate);
 
             return true;
         }
@@ -791,7 +822,10 @@ namespace VC.Public.Controllers
         {
             var internalId = GetInternalCustomerId();
 
-            await _orderService.DeleteAutoShipAsync(internalId, id);
+            if (!internalId.HasValue)
+                return false;
+
+            await _orderService.DeleteAutoShipAsync(internalId.Value, id);
 
             return true;
         }
@@ -800,6 +834,7 @@ namespace VC.Public.Controllers
         public async Task<IActionResult> OrderInvoice(int id)
         {
             var internalId = GetInternalCustomerId();
+
             var order = await _orderService.SelectAsync(id, true);
             if (order != null && order.Customer.Id == internalId)
             {
@@ -820,6 +855,7 @@ namespace VC.Public.Controllers
             ICollection<HelpTicketListItemModel> toReturn;
             ViewBag.IdOrder = (int?)null;
             var customerId = GetInternalCustomerId();
+
             var orderCustomerId = await _orderService.GetOrderIdCustomer(idorder);
             if (orderCustomerId == customerId)
             {
@@ -847,8 +883,9 @@ namespace VC.Public.Controllers
             HelpTicketManageModel toReturn = null;
             if (id.HasValue)
             {
-                var item = await _helpService.GetHelpTicketAsync(id.Value);
                 var customerId = GetInternalCustomerId();
+                
+                var item = await _helpService.GetHelpTicketAsync(id.Value);
                 if (item != null && item.Order.IdCustomer == customerId)
                 {
                     toReturn = new HelpTicketManageModel(item);

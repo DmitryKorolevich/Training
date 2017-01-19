@@ -65,6 +65,8 @@ namespace VitalChoice.Business.Mailings
 
         Task SendOrderProductReviewEmailsAsync(ICollection<OrderProductReviewEmail> models);
 
+        Task SendEmailOrderEmailAsync(EmailOrderEmail model);
+
         #endregion
 
         #region Newsletters

@@ -136,7 +136,10 @@ namespace VC.Public.Controllers
             if (await CustomerLoggedIn())
             {
                 var internalId = GetInternalCustomerId();
-                return await CustomerService.GetCustomerCardExist(internalId, id);
+                if (internalId.HasValue)
+                {
+                    return await CustomerService.GetCustomerCardExist(internalId.Value, id);
+                }
             }
             return new Result<bool>(false);
         }

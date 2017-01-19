@@ -17,6 +17,7 @@
     "OrderShippingNotificationBcc": "",
     //cdbdf92c@trustpilotservice.com
     "AffiliateEmailBcc": "affiliatesupport@vitalchoice.com",
+    "EmailOrderNotificationEmail": "gary@g2designgroup.com",
 
     "EnableOrderTrackScripts": false,
     "GenerateLowercaseUrls": true,
@@ -77,6 +78,11 @@
       "ProfileName": "Vital Choice",
       "CompanyCode": "VC001",
       "TurnOffCommit": false
+    },
+    "GoogleCaptcha": {
+      "PublicKey": "6LduhBETAAAAAIchdv6MpxnA401nNxCBxm4qLumh",
+      "SecretKey": "6LduhBETAAAAAKeX2NoU3T0IXqqQ2JgyhJ2PDtMK",
+      "VerifyUrl": "https://www.google.com/recaptcha/api/siteverify"
     },
     "PDFMyUrl": {
       "LicenseKey": "sZ0ZaPUmBkt8&",
