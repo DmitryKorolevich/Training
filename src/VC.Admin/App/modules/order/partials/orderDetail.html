@@ -545,7 +545,7 @@
                                             <div class="form-group">
                                                 <div class="col-md-3"></div>
                                                 <div class="col-md-9">
-                                                    <select class="form-control" id="customerType" data-ng-model="currentCustomer.CustomerType" data-ng-change="filterCountries();" data-ng-options="customerType.Key as customerType.Text for customerType in ReferenceData.CustomerTypes" data-ng-change="requestRecalculate()" data-ng-disabled="orderEditDisabled"></select>
+                                                    <select class="form-control" id="customerType" data-ng-model="currentCustomer.CustomerType" data-ng-change="filterCountries();requestRecalculate();" data-ng-options="customerType.Key as customerType.Text for customerType in ReferenceData.CustomerTypes" data-ng-disabled="orderEditDisabled"></select>
                                                 </div>
                                             </div>
                                             <div data-ng-if="currentCustomer.CustomerType == 2">
@@ -1300,6 +1300,19 @@
                     <uib-tab heading="Files" index="customerFilesTab.index">
                         <div class="container-fluid">
                             <div ng-controller="manageCustomerFilesController" onload="name = 'CustomerFiles'" data-ng-include="'app/modules/customer/partials/manageCustomerFiles.html'"></div>
+                        </div>
+                    </uib-tab>
+                    <uib-tab data-ng-if="order.Review == 1" heading="Fraud" index="fraudTab.index">
+                        <div class="container-fluid">
+                            <div class="well row">
+                                <table class="table table-striped table-hover">
+                                    <tbody>
+                                        <tr data-ng-repeat="error in order.ReviewReason.split(';')">
+                                            <td class="error">{{error}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </uib-tab>
                 </uib-tabset>

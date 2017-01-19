@@ -406,7 +406,7 @@ namespace VC.Admin.Controllers
                 return new Result<OrderCalculateModel>(false);
             }
             await _orderService.OrderTypeSetup(order);
-            var orderContext = await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus);
+            var orderContext = await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus, false);
 
             //bind gcs errors
             if (orderContext.GcMessageInfos != null && orderContext.Order.GiftCertificates != null)
@@ -499,7 +499,7 @@ namespace VC.Admin.Controllers
                 }
 
                 await _orderService.OrderTypeSetup(order);
-                await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus);
+                await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus, model.Id == 0);
 
                 if (!model.ConfirmationEmailSent &&
                     (model.CombinedEditOrderStatus == OrderStatus.Processed ||
@@ -912,7 +912,7 @@ namespace VC.Admin.Controllers
                 }
 
                 await _orderService.OrderTypeSetup(order);
-                await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus);
+                await _orderService.CalculateOrder(order, model.CombinedEditOrderStatus, model.Id == 0);
 
                 if (!model.ConfirmationEmailSent &&
                     (model.CombinedEditOrderStatus == OrderStatus.Processed ||

@@ -13,6 +13,18 @@ namespace VitalChoice.Business.Workflow.Orders.Fraud
 
         public Task<CheckResult> CheckCondition(OrderDataContext context, ITreeContext executionContext, object valueToCheck,
             OrderReviewRuleDynamic reviewRule)
-            => valueToCheck == null ? TaskCache<CheckResult>.DefaultCompletedTask : CheckCondition(context, executionContext, (T) valueToCheck, reviewRule);
+            =>
+                valueToCheck == null
+                    ? TaskCache<CheckResult>.DefaultCompletedTask
+                    : CheckCondition(context, executionContext, (T) valueToCheck, reviewRule);
+
+        public bool ShouldCheck(OrderDataContext context, ITreeContext executionContext, object valueToCheck,
+            OrderReviewRuleDynamic reviewRule)
+        {
+            return valueToCheck != null && ShouldCheck(context, executionContext, (T) valueToCheck, reviewRule);
+        }
+
+        public abstract bool ShouldCheck(OrderDataContext context, ITreeContext executionContext, T valueToCheck,
+            OrderReviewRuleDynamic reviewRule);
     }
 }

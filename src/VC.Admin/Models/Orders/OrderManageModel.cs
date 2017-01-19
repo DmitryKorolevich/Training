@@ -329,7 +329,10 @@ namespace VC.Admin.Models.Orders
         public bool Guest { get; set; }
 
         [Map]
-        public int? Review { get; set; }
+        public ReviewType? Review { get; set; }
+
+        [Map]
+        public string ReviewReason { get; set; }
 
         public bool AllowSetAsReviewed { get; set; }
 

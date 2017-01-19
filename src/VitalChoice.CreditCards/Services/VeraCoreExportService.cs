@@ -63,7 +63,7 @@ namespace VitalChoice.CreditCards.Services
             var npStatus = order.NPOrderStatus;
             var pStatus = order.POrderStatus;
 
-            var context = await _orderService.CalculateOrder(order, OrderStatus.Processed);
+            var context = await _orderService.CalculateOrderForExport(order, OrderStatus.Processed);
 
             //restore order statuses
             order.OrderStatus = status;

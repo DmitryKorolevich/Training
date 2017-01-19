@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VitalChoice.Business.Workflow.Orders.Fraud;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Workflow.Base;
@@ -19,6 +20,11 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
 
         public override async Task<decimal> ExecuteActionAsync(OrderDataContext context, ITreeContext executionContext)
         {
+            //bypass fraud checks
+            if (!context.CheckForFraud)
+            {
+                return 0;
+            }
             var ruleService = executionContext.Resolve<IOrderReviewRuleService>();
             var rules = (await ruleService.GetAllRules()).Where(r => r.StatusCode == (int) RecordStatusCode.Active);
             bool isFraud = false;
@@ -31,53 +37,43 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
                 {
                     case ApplyType.All:
                         ruleFraud = true;
-                        checkers = new List<RuleData>();
-                        foreach (var pair in rule.DictionaryData)
-                        {
-                            int priority;
-                            var checker = FraudFactory.GetChecker(pair.Key, out priority);
-                            if (checker != null)
-                            {
-                                checkers.Add(new RuleData(checker, priority, pair.Value));
-                            }
-                        }
+                        checkers = GetCheckers(rule);
+                        bool anyChecksPerformed = false;
                         foreach (var checker in checkers.OrderBy(c => c.Priority))
                         {
                             //check if we skipped at least one condition, then go to next global rule with success
-                            var checkResult = await checker.Checker.CheckCondition(context, executionContext, checker.Data, rule);
-                            if (!checkResult)
+                            if (checker.Checker.ShouldCheck(context, executionContext, checker.Data, rule))
                             {
-                                ruleFraud = false;
-                                break;
+                                anyChecksPerformed = true;
+                                var checkResult = await checker.Checker.CheckCondition(context, executionContext, checker.Data, rule);
+                                if (!checkResult)
+                                {
+                                    ruleFraud = false;
+                                    break;
+                                }
+                                reasonList.Add(checkResult.Reason);
                             }
-                            reasonList.Add(checkResult.Reason);
                         }
-                        if (ruleFraud)
+                        if (anyChecksPerformed && ruleFraud)
                         {
                             isFraud = true;
                         }
                         break;
                     case ApplyType.Any:
                         ruleFraud = false;
-                        checkers = new List<RuleData>();
-                        foreach (var pair in rule.DictionaryData)
-                        {
-                            int priority;
-                            var checker = FraudFactory.GetChecker(pair.Key, out priority);
-                            if (checker != null)
-                            {
-                                checkers.Add(new RuleData(checker, priority, pair.Value));
-                            }
-                        }
+                        checkers = GetCheckers(rule);
                         foreach (var checker in checkers.OrderBy(c => c.Priority))
                         {
                             //check if we spot at least one condition to succeed, then go to global exit
-                            var checkResult = await checker.Checker.CheckCondition(context, executionContext, checker.Data, rule);
-                            if (checkResult)
+                            if (checker.Checker.ShouldCheck(context, executionContext, checker.Data, rule))
                             {
-                                reasonList.Add(checkResult.Reason);
-                                ruleFraud = true;
-                                break;
+                                var checkResult = await checker.Checker.CheckCondition(context, executionContext, checker.Data, rule);
+                                if (checkResult)
+                                {
+                                    reasonList.Add(checkResult.Reason);
+                                    ruleFraud = true;
+                                    break;
+                                }
                             }
                         }
                         if (ruleFraud)
@@ -97,6 +93,24 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
                 }
             }
             return 0;
+        }
+
+        private static List<RuleData> GetCheckers(OrderReviewRuleDynamic rule)
+        {
+            var checkers = new List<RuleData>();
+            foreach (var pair in rule.DictionaryData)
+            {
+                if (pair.Value != null)
+                {
+                    int priority;
+                    var checker = FraudFactory.GetChecker(pair.Key, out priority);
+                    if (checker != null)
+                    {
+                        checkers.Add(new RuleData(checker, priority, pair.Value));
+                    }
+                }
+            }
+            return checkers;
         }
 
         private struct RuleData

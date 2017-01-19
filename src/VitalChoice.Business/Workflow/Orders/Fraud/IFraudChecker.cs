@@ -17,10 +17,16 @@ namespace VitalChoice.Business.Workflow.Orders.Fraud
     {
         Task<CheckResult> CheckCondition(OrderDataContext context, ITreeContext executionContext, object valueToCheck,
             OrderReviewRuleDynamic reviewRule);
+
+        bool ShouldCheck(OrderDataContext context, ITreeContext executionContext, object valueToCheck,
+            OrderReviewRuleDynamic reviewRule);
     }
 
     public interface IFraudChecker<in T> : IFraudChecker
     {
         Task<CheckResult> CheckCondition(OrderDataContext context, ITreeContext executionContext, T valueToCheck, OrderReviewRuleDynamic reviewRule);
+
+        bool ShouldCheck(OrderDataContext context, ITreeContext executionContext, T valueToCheck,
+            OrderReviewRuleDynamic reviewRule);
     }
 }

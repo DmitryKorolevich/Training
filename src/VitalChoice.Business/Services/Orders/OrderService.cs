@@ -618,7 +618,8 @@ namespace VitalChoice.Business.Services.Orders
             }
             var context = new OrderDataContext(combinedStatus)
             {
-                Order = order
+                Order = order,
+                CheckForFraud = combinedStatus != OrderStatus.Incomplete
             };
             var tree = await _treeFactory.CreateTreeAsync<OrderDataContext, decimal>("Order");
             await tree.ExecuteAsync(context);
@@ -653,11 +654,12 @@ namespace VitalChoice.Business.Services.Orders
             return context;
         }
 
-        public async Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus)
+        public async Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus, bool checkForFraud)
         {
             var context = new OrderDataContext(combinedStatus)
             {
-                Order = order
+                Order = order, 
+                CheckForFraud = checkForFraud
             };
             IWorkflowTreeExecutor<OrderDataContext, decimal> tree;
             switch ((OrderType) order.IdObjectType)
@@ -705,6 +707,11 @@ namespace VitalChoice.Business.Services.Orders
             order.ShippingTotal = dataContext.ShippingTotal;
             order.ProductsSubtotal = dataContext.ProductsSubtotal;
             order.PromoSkus = dataContext.PromoSkus;
+            if (dataContext.IsFraud)
+            {
+                order.Data.Review = ReviewType.ForReview;
+                order.Data.ReviewReason = string.Join("; ", dataContext.FraudReason);
+            }
             SetOrderSplitStatuses(dataContext, order);
         }
 
@@ -1921,7 +1928,7 @@ namespace VitalChoice.Business.Services.Orders
                 var orderCombinedStatus = item.Order.OrderStatus ?? OrderStatus.Processed;
                 item.Order.Data.ShipDelayType = item.Order.SafeData.ShipDelayDate != null ? ShipDelayType.EntireOrder : ShipDelayType.None;
 
-                var context = await CalculateOrder(item.Order, orderCombinedStatus);
+                var context = await CalculateOrder(item.Order, orderCombinedStatus, false);
                 if (orderType == OrderImportType.DropShipAAFES)
                 {
                     if (context.ShippingUpgradePOptions == null ||
@@ -1966,7 +1973,7 @@ namespace VitalChoice.Business.Services.Orders
                         ? ShipDelayType.EntireOrder
                         : ShipDelayType.None;
 
-                    var context = await CalculateOrder(item.Order, orderCombinedStatus);
+                    var context = await CalculateOrder(item.Order, orderCombinedStatus, false);
 
                     var rows = item.OrderImportItems.Select(p => p.RowNumber).ToList();
                     var tempMessages = new List<MessageInfo>(context.Messages.Where(p => p.MessageLevel == MessageLevel.Error));

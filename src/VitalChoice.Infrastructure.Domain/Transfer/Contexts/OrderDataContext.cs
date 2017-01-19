@@ -98,6 +98,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
 
         public decimal SurchargeShippingOverriden => CanadaSurcharge + AlaskaHawaiiSurcharge + Data.SurchargeOverride;
 
+        public bool CheckForFraud { get; set; }
+
         public bool IsFraud { get; set; }
 
         public List<string> FraudReason { get; set; }

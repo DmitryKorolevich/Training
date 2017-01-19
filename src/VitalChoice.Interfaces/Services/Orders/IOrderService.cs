@@ -19,7 +19,7 @@ namespace VitalChoice.Interfaces.Services.Orders
         Task<int?> GetOrderIdCustomer(int id);
 	    Task<PagedList<OrderInfoItem>> GetOrdersAsync(VOrderFilter filter);
         Task<OrderDynamic> SelectWithCustomerAsync(int id, bool withDefaults = false);
-	    Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus);
+	    Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus, bool checkForFraud);
 	    Task<OrderDataContext> CalculateStorefrontOrder(OrderDynamic order, OrderStatus combinedStatus);
 	    Task<OrderDataContext> CalculateOrderForExport(OrderDynamic order, OrderStatus combinedStatus);
 	    Task<OrderDynamic> SelectLastOrderAsync(int customerId);
