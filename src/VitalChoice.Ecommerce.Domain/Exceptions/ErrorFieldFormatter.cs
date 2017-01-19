@@ -4,7 +4,14 @@
     {
         public static string FormatCollectionError(this string propertyName, string collectionName, int index)
         {
-            return $"{collectionName}.i{index}.{propertyName}";
+            if (!string.IsNullOrEmpty(collectionName))
+            {
+                return $"{collectionName}.i{index}.{propertyName}";
+            }
+            else
+            {
+                return $"i{index}.{propertyName}";
+            }
         }
 
         public static string FormatErrorWithForm(this string fieldName, string formName)

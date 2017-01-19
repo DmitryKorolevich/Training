@@ -171,10 +171,10 @@ namespace VC.Public.Controllers
             return toReturn;
         }
 
-        public Result<T> GetJsonRedirect<T>(string url)
+        public Result<T> GetJsonRedirect<T>(string url, bool withSuccess=false)
             where T: class
         {
-            return new Result<T>(false, null, "redirect", url);
+            return new Result<T>(withSuccess, null, "redirect", url);
         }
     }
 }

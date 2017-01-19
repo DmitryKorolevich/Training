@@ -2,10 +2,12 @@
 using System.ComponentModel.DataAnnotations;
 using VC.Public.DataAnnotations;
 using VC.Public.Models.Profile;
+using VC.Public.Validators.Checkout;
 using VitalChoice.Ecommerce.Domain.Attributes;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
 using VitalChoice.Infrastructure.Domain.Constants;
+using VitalChoice.Validation.Attributes;
 using VitalChoice.Validation.Models;
 
 namespace VC.Public.Models.Checkout
@@ -17,6 +19,7 @@ namespace VC.Public.Models.Checkout
         public ShippingAddressModel Address { get; set; }
     }
 
+    [ApiValidator(typeof(UpdateShipmentsModelValidator))]
     public class UpdateShipmentsModel : BaseModel
     {
         public UpdateShipmentsModel()
@@ -27,6 +30,6 @@ namespace VC.Public.Models.Checkout
 
         public ICollection<AvalibleShippingAddressModel> AvalibleAddresses { get; set; }
 
-        public ICollection<ShippingAddressModel> Shipments { get; set; }
+        public IList<ShippingAddressModel> Shipments { get; set; }
     }
 }

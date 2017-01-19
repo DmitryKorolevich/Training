@@ -24,6 +24,8 @@ namespace VC.Public.Models.Checkout
         [Map]
         public PreferredShipMethod? PreferredShipMethod { get; set; }
 
+        public string PreferredShipMethodName { get; set; }
+
         [Map("ShippingAddressType")]
         public ShippingAddressType? AddressType { get; set; }
 

@@ -5858,7 +5858,11 @@ body.view-cart-background {
             border-bottom: none;
         }
 
-        .shipping-items, .main-shipping-item-wrapper {
+        .shipping-items > .form-group{
+            margin-bottom: 0px;
+        }
+
+        .shipping-items{
 
             .checkout-step-heading{
                 a.title{
@@ -5882,6 +5886,18 @@ body.view-cart-background {
                         font-size: 12px;
                         white-space: normal;
                     }
+                }
+            }
+
+            .item.alternate-color{
+                background: #f7f7f7;
+
+                .checkout-columns-container{
+                    background: #f7f7f7;
+                }
+                
+                .checkout-sections-divider.big {
+                    background: #f7f7f7;
                 }
             }
         }

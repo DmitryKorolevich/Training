@@ -138,7 +138,7 @@ namespace VitalChoice.Business.Services.Checkout
                     };
                     UpdateCartEntity(oldCart, newCart);
                     await _cartRepository.InsertGraphAsync(newCart);
-                    return await GetOrCreateCart(newUid, false);
+                    return await GetOrCreateCart(newUid, false, withMultipleShipmentsService);
                 }
                 if (cartForCheck == null)
                 {

@@ -72,7 +72,7 @@ namespace VitalChoice.Core.Infrastructure.Helpers
             }
             else
             {
-                var directNameAttribute = memberExpression.Member.GetCustomAttributes(typeof(LocalizedAttribute), false).FirstOrDefault() as DirectLocalizedAttribute;
+                var directNameAttribute = memberExpression.Member.GetCustomAttributes(typeof(DirectLocalizedAttribute), false).FirstOrDefault() as DirectLocalizedAttribute;
                 if (directNameAttribute != null)
                 {
                     parameters.Add(directNameAttribute.FieldName);

@@ -722,6 +722,12 @@ function confirmAction(successCallback, errorCallback, text) {
 function reparseElementValidators(selector) {
 	var $form = $(selector);
 	$form.removeData("validator").removeData("unobtrusiveValidation");
+	$form.off("focusin.validate focusout.validate keyup.validate",
+					":text, [type='password'], [type='file'], select, textarea, [type='number'], [type='search'], " +
+					"[type='tel'], [type='url'], [type='email'], [type='datetime'], [type='date'], [type='month'], " +
+					"[type='week'], [type='time'], [type='datetime-local'], [type='range'], [type='color'], " +
+					"[type='radio'], [type='checkbox'], [contenteditable]");    
+	$form.off("click.validate", "select, option, [type='radio'], [type='checkbox']");
 	$.validator.unobtrusive.parse($form);
 }
 
@@ -919,3 +925,28 @@ function processJsonCommands(result)
         }
     }
 }
+
+String.prototype.replaceAll = function (find, replace)
+{
+    var str = this;
+    return str.replace(new RegExp(find.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), replace);
+};
+
+ko.bindingHandlers.masked = {
+    init: function (element, valueAccessor, allBindingsAccessor)
+    {
+        ko.utils.registerEventHandler(element, "blur", function ()
+        {
+            var observable = valueAccessor();
+            var resultValues = $(element).val().replaceAll('(', '').replaceAll(')', '').replaceAll(' ', '').replaceAll('-', '').replaceAll('x', '').replaceAll('_', '');
+            observable(resultValues);
+        });
+    },
+    update: function (element, valueAccessor)
+    {
+        var mask = "(999) 999-9999? x99999";
+        var value = ko.utils.unwrapObservable(valueAccessor());
+        $(element).val(value);
+        $(element).mask(mask);
+    }
+};

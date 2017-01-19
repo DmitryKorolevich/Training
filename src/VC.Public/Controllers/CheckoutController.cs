@@ -526,7 +526,7 @@ namespace VC.Public.Controllers
                 return GetJsonRedirect<UpdateShipmentsModel>(Url.Action("EmptyCart", "Cart"));
             }
 
-            var cart = await GetCurrentCart(true);
+            var cart = await GetCurrentCart(withMultipleShipmentsService: true);
 
             if (cart.Order.PaymentMethod?.Address?.IdCountry == null)
             {
@@ -563,6 +563,9 @@ namespace VC.Public.Controllers
                 }
                 shippingMethodModel.IsGiftOrder = cart.Order.SafeData.GiftOrder;
                 shippingMethodModel.GiftMessage = cart.Order.SafeData.GiftMessage;
+                shippingMethodModel.PreferredShipMethodName = shippingMethodModel.PreferredShipMethod.HasValue ?
+                    ReferenceData.OrderPreferredShipMethod.FirstOrDefault(x => x.Key == (int)shippingMethodModel.PreferredShipMethod.Value)?.Text
+                    : null;
                 toReturn.Shipments.Add(shippingMethodModel);
 
                 var addresses = GetShippingAddresses(cart.Order, currentCustomer);
@@ -570,6 +573,7 @@ namespace VC.Public.Controllers
                 foreach (var addressData in addresses)
                 {
                     var item = new AvalibleShippingAddressModel();
+                    item.Address=new ShippingAddressModel();
                     item.Name = $"{addressData.Value.SafeData.FirstName} {addressData.Value.SafeData.LastName} " +
                                 $"{addressData.Value.SafeData.Address1} {addressData.Key}";
                     await _addressConverter.UpdateModelAsync(item.Address, addressData.Value);
@@ -589,6 +593,10 @@ namespace VC.Public.Controllers
                         await _addressConverter.UpdateModelAsync(shippingMethodModel, cartAdditionalShipmentModelItem.ShippingAddress);
                         shippingMethodModel.IsGiftOrder = cartAdditionalShipmentModelItem.IsGiftOrder;
                         shippingMethodModel.GiftMessage = cartAdditionalShipmentModelItem.GiftMessage;
+                        shippingMethodModel.PreferredShipMethodName = shippingMethodModel.PreferredShipMethod.HasValue ?
+                            ReferenceData.OrderPreferredShipMethod.FirstOrDefault(x => x.Key == (int)shippingMethodModel.PreferredShipMethod.Value)?.Text
+                            : null;
+                        toReturn.Shipments.Add(shippingMethodModel);
                     }
                 }
             }
@@ -601,7 +609,6 @@ namespace VC.Public.Controllers
         }
 
         [HttpPost]
-        [CustomValidateAntiForgeryToken]
         public async Task<Result<UpdateShipmentsModel>> UpdateShipments([FromBody]UpdateShipmentsModel model)
         {
             if (!Validate(model))
@@ -623,7 +630,7 @@ namespace VC.Public.Controllers
                     throw new AppValidationException("Main order shipping isn't specified");
                 }
 
-                var cart = await GetCurrentCart(true);
+                var cart = await GetCurrentCart(withMultipleShipmentsService: true);
                 using (await CartLocks.LockWhenAsync(() => cartUid.HasValue && cartUid.Value != cart.CartUid, () => cart.CartUid))
                 {
                     using (await OrderLocks.LockWhenAsync(() => cart.Order?.Id > 0, () => cart.Order.Id))
@@ -646,7 +653,7 @@ namespace VC.Public.Controllers
                                 else
                                 {
                                     cart.Order.ShippingAddress =
-                                        await _addressConverter.FromModelAsync(model, (int)AddressType.Shipping);
+                                        await _addressConverter.FromModelAsync(mainShipment, (int)AddressType.Shipping);
                                 }
                                 cart.Order.ShippingAddress.Id = 0;
                             }
@@ -654,21 +661,22 @@ namespace VC.Public.Controllers
                             {
                                 if (mainShipment.UseBillingAddress)
                                 {
+                                    var oldId = cart.Order.ShippingAddress.Id;
                                     await
-                                        _addressConverter.UpdateObjectAsync(model, cart.Order.ShippingAddress,
+                                        _addressConverter.UpdateObjectAsync(mainShipment, cart.Order.ShippingAddress,
                                             (int)AddressType.Shipping);
                                     var billingMapped =
                                         await
                                             _addressConverter.ToModelAsync<AddUpdateShippingMethodModel>(
                                                 cart.Order.PaymentMethod.Address);
                                     await _addressConverter.UpdateObjectAsync(billingMapped, cart.Order.ShippingAddress);
-                                    cart.Order.ShippingAddress.Id = mainShipment.Id;
+                                    cart.Order.ShippingAddress.Id = oldId;
                                 }
                                 else
                                 {
                                     var oldId = cart.Order.ShippingAddress.Id;
                                     await
-                                        _addressConverter.UpdateObjectAsync(model, cart.Order.ShippingAddress,
+                                        _addressConverter.UpdateObjectAsync(mainShipment, cart.Order.ShippingAddress,
                                             (int)AddressType.Shipping);
                                     cart.Order.ShippingAddress.Id = oldId;
                                 }
@@ -753,7 +761,7 @@ namespace VC.Public.Controllers
                                     return GetJsonRedirect<UpdateShipmentsModel>(Url.Action("AddUpdateShippingMethod", new { canadaissue = true }));
                                 }
 
-                                return GetJsonRedirect<UpdateShipmentsModel>(Url.Action("ReviewOrder"));
+                                return GetJsonRedirect<UpdateShipmentsModel>(Url.Action("ReviewOrder"), true);
                             }
 
                         }
@@ -774,7 +782,7 @@ namespace VC.Public.Controllers
         [CustomerStatusCheck]
         public async Task<IActionResult> GetShippingAddress(int id)
         {
-            var cart = await GetCurrentCart(true);
+            var cart = await GetCurrentCart(withMultipleShipmentsService: true);
             var addresses = GetShippingAddresses(cart.Order, cart.Order?.Customer);
             var shipping = addresses[id].Value;
 
@@ -796,7 +804,7 @@ namespace VC.Public.Controllers
         //        return View("EmptyCart");
         //    }
 
-        //    var cart = await GetCurrentCart(true);
+        //    var cart = await GetCurrentCart();
 
         //    if (cart.Order.PaymentMethod?.Address?.IdCountry == null)
         //    {
@@ -867,7 +875,7 @@ namespace VC.Public.Controllers
                     }
                 }
 
-                var cart = await GetCurrentCart(true);
+                var cart = await GetCurrentCart(withMultipleShipmentsService: true);
                 using (await CartLocks.LockWhenAsync(() => cartUid.HasValue && cartUid.Value != cart.CartUid, () => cart.CartUid))
                 {
                     using (await OrderLocks.LockWhenAsync(() => cart.Order?.Id > 0, () => cart.Order.Id))
@@ -1003,7 +1011,7 @@ namespace VC.Public.Controllers
             {
                 return View("EmptyCart");
             }
-            var cart = await GetCurrentCart(true);
+            var cart = await GetCurrentCart(withMultipleShipmentsService: true);
             if (cart.Order.PaymentMethod?.Address?.IdCountry == null)
             {
                 return RedirectToAction("AddUpdateBillingAddress");
@@ -1040,7 +1048,7 @@ namespace VC.Public.Controllers
                     return Url.Action("ViewCart", "Cart");
                 }
 
-                var cart = await GetCurrentCart(true);
+                var cart = await GetCurrentCart(withMultipleShipmentsService: true);
                 using (await CartLocks.LockWhenAsync(() => cartUid.HasValue && cartUid.Value != cart.CartUid, () => cart.CartUid))
                 {
                     using (await OrderLocks.LockWhenAsync(() => cart.Order?.Id > 0, () => cart.Order.Id))
