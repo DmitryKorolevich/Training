@@ -115,7 +115,7 @@ BEGIN
 			temp.OrderStatus, temp.POrderStatus, temp.NPOrderStatus, temp.DateCreated, temp.ProductsSubtotal, temp.Total,
 			cadfval.Value as CustomerFirstName,	cadlval.Value as CustomerLastName,	cadcval.Value as CustomerCompany,
 			d.Code as DiscountCode, aop.IdAffiliate, kcval.Value as KeyCode, CAST(sval.Value as int) as Source,
-			sdval.Value as SourceDetails, occ.Count as OrdersCount, ISNULL(foc.DateCreated, temp.CustomerDateCreated) as FirstOrderDate
+			sdval.Value as SourceDetails, ISNULL(occ.Count,0) as OrdersCount, ISNULL(foc.DateCreated, temp.CustomerDateCreated) as FirstOrderDate
 			FROM
 			orders_rep as temp	
 		LEFT JOIN OrderOptionValues AS kcval WITH(NOLOCK) ON kcval.IdOrder = temp.Id AND kcval.IdOptionType IN (SELECT Id FROM @KeyCodeIds)
