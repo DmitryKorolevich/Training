@@ -62,7 +62,7 @@
         <div class="advert-top-holder">
             @if (!User.Identity.IsAuthenticated || User.IsInRole(IdentityConstants.RetailCustomer))
             {
-                <a href="#">
+                <a href="/content/shipping-information">
                     <img src="/Assets/images/freeship-13-2.jpg">
                 </a>
             }
@@ -76,13 +76,13 @@
             <div class="advert-bottom-holder">
                 @if (!User.Identity.IsAuthenticated || User.IsInRole(IdentityConstants.RetailCustomer))
                 {
-                    <a href="#">
+                    <a href="/content/shipping-information">
                         <img src="/Assets/images/freeship-13-2.jpg">
                     </a>
                 }
             </div>
             <div class="footer-cart-middle">
-                <a href="#">
+                <a href="/content/the-vital-choice-guarantee">
                     <img src="/Assets/images/guarantee-13.png">
                 </a>
             </div>
@@ -97,13 +97,12 @@
         <nav class="footer-cart-nav">
             <ul>
                 <li><a href="/">Home</a></li>
-                <li><a href="#">Site Map</a></li>
-                <li><a href="#">Shipping</a></li>
-                <li><a href="#">About Us</a></li>
-                <li><a href="#">Contact Us</a></li>
-                <li><a href="#">Request Catalog</a></li>
-                <li><a href="#">Affiliate Program</a></li>
-                <li class="last-child"><a href="#">Privacy & Security</a></li>
+                <li><a href="/content/shipping-information">Shipping</a></li>
+                <li><a href="/content/About-Vital-Choice">About Us</a></li>
+                <li><a href="/content/contact-customer-service">Contact Us</a></li>
+                <li><a href="/content/request-catalog">Request Catalog</a></li>
+                <li><a href="/content/Web-Affiliate-Program">Affiliate Program</a></li>
+                <li class="last-child"><a href="/content/privacy-policy">Privacy & Security</a></li>
             </ul>
         </nav>
     </footer>
