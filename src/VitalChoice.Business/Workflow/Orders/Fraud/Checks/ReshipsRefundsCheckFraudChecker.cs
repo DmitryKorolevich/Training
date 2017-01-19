@@ -29,7 +29,8 @@ namespace VitalChoice.Business.Workflow.Orders.Fraud.Checks
                             return new CheckResult
                             {
                                 Result = true,
-                                Reason = $"Customer has {refundCount} Refund(s) for the last {monthCount} months, Review Rule has quantity of {qty} Refund(s)"
+                                Reason =
+                                    $"Customer has {refundCount} Refund{(refundCount > 1 ? "s" : string.Empty)} for the last {monthCount} month{(monthCount > 1 ? "s" : string.Empty)}, Review Rule has quantity of {qty} Refund{(qty > 1 ? "s" : string.Empty)}"
                             };
                         }
                         break;
@@ -41,7 +42,8 @@ namespace VitalChoice.Business.Workflow.Orders.Fraud.Checks
                             return new CheckResult
                             {
                                 Result = true,
-                                Reason = $"Customer has {reshipCount} Reship(s) for the last {monthCount} months, Review Rule has quantity of {qty} Reship(s)"
+                                Reason =
+                                    $"Customer has {reshipCount} Reship{(reshipCount > 1 ? "s" : string.Empty)} for the last {monthCount} month{(monthCount > 1 ? "s" : string.Empty)}, Review Rule has quantity of {qty} Reship{(qty > 1 ? "s" : string.Empty)}"
                             };
                         }
                         break;
