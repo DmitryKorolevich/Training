@@ -11,8 +11,8 @@ AS
 	INNER JOIN dbo.Customers AS c ON o.IdCustomer = c.Id
 	WHERE o.StatusCode!=3 AND o.IdObjectType NOT IN (2,5,6) AND 
 	((o.OrderStatus IS NOT NULL AND o.OrderStatus !=1 AND o.OrderStatus !=4 AND o.OrderStatus !=6 ) OR 
-	(o.OrderStatus IS NULL AND o.POrderStatus !=1 AND o.POrderStatus !=4 AND o.POrderStatus !=6 AND 
-	o.NPOrderStatus !=1 AND o.NPOrderStatus !=4 AND o.NPOrderStatus !=6))
+	(o.OrderStatus IS NULL AND ((o.POrderStatus !=1 AND o.POrderStatus !=4 AND o.POrderStatus !=6) OR 
+	(o.NPOrderStatus !=1 AND o.NPOrderStatus !=4 AND o.NPOrderStatus !=6))))
 	GROUP BY o.IdCustomer
 
 GO

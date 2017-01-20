@@ -71,11 +71,13 @@ namespace VC.Public.Controllers
             return ReferenceData.HasRole(context.User, role);
         }
 
-        protected int GetInternalCustomerId()
+        protected int? GetInternalCustomerId()
         {
-            var internalId = Convert.ToInt32(_userManager.GetUserId(User));
+            var internalId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(internalId))
+                return null;
 
-            return internalId;
+            return int.Parse(internalId);
         }
 
         protected Task<IDisposable> LockCurrentCart(out Guid? cartUid)
@@ -92,10 +94,11 @@ namespace VC.Public.Controllers
             {
                 loggedIn = await CustomerLoggedIn();
             }
-            if (loggedIn.Value)
+            var internalId = GetInternalCustomerId();
+            if (loggedIn.Value && internalId.HasValue)
             {
                 var existingUid = HttpContext.GetCartUid();
-                var result = await CheckoutService.GetOrCreateCart(existingUid, GetInternalCustomerId(), withMultipleShipmentsService);
+                var result = await CheckoutService.GetOrCreateCart(existingUid, internalId.Value, withMultipleShipmentsService);
                 HttpContext.SetCartUid(result.CartUid);
                 return result;
             }
@@ -111,7 +114,11 @@ namespace VC.Public.Controllers
         protected async Task<CustomerDynamic> GetCurrentCustomerDynamic()
         {
             var internalId = GetInternalCustomerId();
-            var customer = await CustomerService.SelectAsync(internalId);
+            if (!internalId.HasValue)
+            {
+                throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);
+            }
+            var customer = await CustomerService.SelectAsync(internalId.Value);
             if (customer == null)
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantFindUser]);

@@ -301,10 +301,10 @@ namespace VC.Public.Controllers
                     throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
                 CustomerCartOrder cart;
                 var loggedIn = await CustomerLoggedIn();
-                if (loggedIn)
+                var id = GetInternalCustomerId();
+                if (loggedIn && id.HasValue)
                 {
-                    var id = GetInternalCustomerId();
-                    cart = await _checkoutService.GetOrCreateCart(existingUid, id);
+                    cart = await _checkoutService.GetOrCreateCart(existingUid, id.Value);
                 }
                 else
                 {
@@ -382,10 +382,10 @@ namespace VC.Public.Controllers
                     throw new ApiException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.CantAddProductToCart]);
                 CustomerCartOrder cart;
                 var loggedIn = await CustomerLoggedIn();
-                if (loggedIn)
+                var id = GetInternalCustomerId();
+                if (loggedIn && id.HasValue)
                 {
-                    var id = GetInternalCustomerId();
-                    cart = await _checkoutService.GetOrCreateCart(existingUid, id);
+                    cart = await _checkoutService.GetOrCreateCart(existingUid, id.Value);
                 }
                 else
                 {
