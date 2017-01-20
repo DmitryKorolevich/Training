@@ -14,6 +14,8 @@ namespace VC.Public.Models.Checkout
         public bool FromOrder { get; set; }
 
         public int? IdCustomerShippingAddress { get; set; }
+        
+        public int IdShipment { get; set; }
 
         [Map]
         public int? Id { get; set; }

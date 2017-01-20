@@ -222,12 +222,11 @@ namespace VitalChoice.Business.Services.Dynamic
 
                         if (entityAdditionalShipment.Skus != null)
                         {
-                            await shipment.Skus.AddRangeAsync(entity.Skus.Select(async s => new SkuOrdered
+                            await shipment.Skus.AddRangeAsync(entityAdditionalShipment.Skus.Select(async s => new SkuOrdered
                             {
                                 Amount = s.Amount,
                                 Quantity = s.Quantity,
                                 Sku = await _skuMapper.FromEntityAsync(s.Sku, withDefaults),
-                                GcsGenerated = s.GeneratedGiftCertificates
                             }));
 
                             if (shipment.Skus != null && shipment.Skus.Count != 0 && dynamic.Skus.First().Sku?.Product != null)
@@ -245,6 +244,7 @@ namespace VitalChoice.Business.Services.Dynamic
                                 }
                             }
                         }
+                        dynamic.CartAdditionalShipments.Add(shipment);
                     }
                 }
             });

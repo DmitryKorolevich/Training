@@ -950,3 +950,21 @@ ko.bindingHandlers.masked = {
         $(element).mask(mask);
     }
 };
+
+ko.bindingHandlers.charcount = {
+    init: function (element, valueAccessor, allBindingsAccessor)
+    {
+        $(element).keyup(function (elem) { processCharcount(elem); });
+    },
+    update: function (element, valueAccessor)
+    {
+        var value = ko.utils.unwrapObservable(valueAccessor());
+        if (value)
+        {
+            setTimeout(function ()
+            {
+                processCharcount({ target: element });
+            }, 200)
+        }
+    }
+};

@@ -580,6 +580,10 @@ namespace VC.Public.Controllers
                     item.Address.FromOrder = item.Address.Id == cart.Order?.ShippingAddress?.Id;
                     item.Address.IdCustomerShippingAddress = item.Address.Id == cart.Order?.ShippingAddress?.Id ? (int?)null : item.Address.Id;
                     item.Address.Id = null;
+                    item.Address.PreferredShipMethodName = item.Address.PreferredShipMethod.HasValue
+                        ? ReferenceData.OrderPreferredShipMethod.FirstOrDefault(
+                            x => x.Key == (int) item.Address.PreferredShipMethod.Value)?.Text
+                            : null;
 
                     toReturn.AvalibleAddresses.Add(item);
                 }
@@ -591,6 +595,7 @@ namespace VC.Public.Controllers
                     {
                         shippingMethodModel = new ShippingAddressModel();
                         await _addressConverter.UpdateModelAsync(shippingMethodModel, cartAdditionalShipmentModelItem.ShippingAddress);
+                        shippingMethodModel.IdShipment = cartAdditionalShipmentModelItem.Id;
                         shippingMethodModel.IsGiftOrder = cartAdditionalShipmentModelItem.IsGiftOrder;
                         shippingMethodModel.GiftMessage = cartAdditionalShipmentModelItem.GiftMessage;
                         shippingMethodModel.PreferredShipMethodName = shippingMethodModel.PreferredShipMethod.HasValue ?
@@ -644,11 +649,12 @@ namespace VC.Public.Controllers
                                 if (mainShipment.UseBillingAddress)
                                 {
                                     cart.Order.ShippingAddress =
-                                        await _addressConverter.FromModelAsync(
-                                            await
-                                                _addressConverter.ToModelAsync<AddUpdateShippingMethodModel>(
-                                                    cart.Order.PaymentMethod.Address),
-                                            (int)AddressType.Shipping);
+                                        await _addressConverter.FromModelAsync(mainShipment, (int)AddressType.Shipping);
+                                    var billingMapped =
+                                        await
+                                            _addressConverter.ToModelAsync<AddUpdateBillingAddressModel>(
+                                                cart.Order.PaymentMethod.Address);
+                                    await _addressConverter.UpdateObjectAsync(billingMapped, cart.Order.ShippingAddress);
                                 }
                                 else
                                 {
@@ -667,7 +673,7 @@ namespace VC.Public.Controllers
                                             (int)AddressType.Shipping);
                                     var billingMapped =
                                         await
-                                            _addressConverter.ToModelAsync<AddUpdateShippingMethodModel>(
+                                            _addressConverter.ToModelAsync<AddUpdateBillingAddressModel>(
                                                 cart.Order.PaymentMethod.Address);
                                     await _addressConverter.UpdateObjectAsync(billingMapped, cart.Order.ShippingAddress);
                                     cart.Order.ShippingAddress.Id = oldId;
@@ -700,12 +706,14 @@ namespace VC.Public.Controllers
 
                             //update additional shipments
                             var i = 2;
+                            cart.Order.CartAdditionalShipments = new List<CartAdditionalShipmentModelItem>();
                             foreach (var modelShipment in model.Shipments.Where(p=>!p.FromOrder))
                             {
-                                var item = new CartAdditionalShipmentModelItem();
-                                item.ShippingAddress=new AddressDynamic();
+                                var item = new CartAdditionalShipmentModelItem {ShippingAddress = new AddressDynamic()};
+
                                 await _addressConverter.UpdateObjectAsync(modelShipment, item.ShippingAddress,
                                     (int)AddressType.Shipping);
+                                item.Id = modelShipment.IdShipment;
                                 item.Name = $"Order #{i}";
                                 item.IsGiftOrder = modelShipment.IsGiftOrder;
                                 item.GiftMessage = modelShipment.GiftMessage;
@@ -717,8 +725,9 @@ namespace VC.Public.Controllers
                                         customerShippingAddressForUpdate.Add(modelShipment.IdCustomerShippingAddress.Value, item.ShippingAddress);
                                     }
                                 }
-
                                 i++;
+
+                                cart.Order.CartAdditionalShipments.Add(item);
                             }
                             
                             await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
