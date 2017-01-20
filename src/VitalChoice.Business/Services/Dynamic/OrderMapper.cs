@@ -529,22 +529,8 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 if (dynamic.CartAdditionalShipments != null)
                 {
-                    entity.CartAdditionalShipments.MergeKeyed(dynamic.CartAdditionalShipments, p => p.Id,
-                        p => p.Id, s => new CartAdditionalShipment()
-                        {
-                            Name = s.Name,
-                            IsGiftOrder = s.IsGiftOrder,
-                            GiftMessage = s.GiftMessage,
-                            ShippingAddress = _orderAddressMapper.ToEntityAsync(s.ShippingAddress).Result,
-
-                            Skus = new List<CartAdditionalShipmentToSku>(s.Skus.Select(p => new CartAdditionalShipmentToSku()
-                            {
-                                Amount = p.Amount,
-                                Quantity = p.Quantity,
-                                IdCartAdditionalShipment = s.Id,
-                                IdSku = p.Sku.Id,
-                            })),
-                        }, (dbItem, modelItem) =>
+                    entity.CartAdditionalShipments.UpdateRemoveKeyed(dynamic.CartAdditionalShipments.Where(p=>p.Id!=0).ToList(),
+                        p => p.Id, p => p.Id, (dbItem, modelItem) =>
                         {
                             dbItem.Name = modelItem.Name;
                             dbItem.IsGiftOrder = modelItem.IsGiftOrder;
@@ -565,6 +551,23 @@ namespace VitalChoice.Business.Services.Dynamic
                                     sku.Quantity = ordered.Quantity;
                                 });
                         });
+                    entity.CartAdditionalShipments.AddRange(dynamic.CartAdditionalShipments.Where(p => p.Id == 0).Select(
+                        s => new CartAdditionalShipment()
+                        {
+                            Name = s.Name,
+                            IsGiftOrder = s.IsGiftOrder,
+                            GiftMessage = s.GiftMessage,
+                            ShippingAddress = _orderAddressMapper.ToEntityAsync(s.ShippingAddress).Result,
+
+                            Skus = new List<CartAdditionalShipmentToSku>(s.Skus.Select(p => new CartAdditionalShipmentToSku()
+                            {
+                                Amount = p.Amount,
+                                Quantity = p.Quantity,
+                                IdCartAdditionalShipment = s.Id,
+                                IdSku = p.Sku.Id,
+                            })),
+                        })
+                    );
                 }
             });
         }
