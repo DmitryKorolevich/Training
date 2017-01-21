@@ -72,7 +72,6 @@ namespace VC.Admin.Controllers
                 SkuOrdereds = new List<SkuOrderedManageModel>() {new SkuOrderedManageModel(null)},
                 IdPaymentMethodType = (int) PaymentMethodType.Marketing,
             };
-
             return toReturn;
         }
 

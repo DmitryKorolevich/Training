@@ -906,7 +906,7 @@ namespace VitalChoice.Business.Services.Orders
 
             OrderQuery conditions = new OrderQuery().NotDeleted().WithCreatedDate(filter.From, filter.To).WithActualStatusOnly().
                 WithOrderTypes(new[] {OrderType.AutoShipOrder, OrderType.DropShip, OrderType.GiftList, OrderType.Normal}).
-                WithOrderDynamicValues(filter.IdOrderSource, null, null);
+                WithOrderDynamicValues(filter.IdOrderSource, null, null, null);
 
             Func<IQueryable<Order>, IOrderedQueryable<Order>> sortable = x => x.OrderByDescending(y => y.Id);
             Func<IQueryLite<Order>, IQueryLite<Order>> includes = p => p.Include(c => c.OptionValues).

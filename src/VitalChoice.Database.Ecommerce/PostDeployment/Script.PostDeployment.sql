@@ -62,4 +62,5 @@ Post-Deployment Script Template
 :r .\Scripts\SPGetCustomersForReview.sql
 :r .\Scripts\CustomerOptionTypes.sql
 :r .\Scripts\SPsForCustomerAbuseReport.sql
+:r .\Scripts\OrderReviewRules.sql
 :r .\Scripts\LookupVariants.sql

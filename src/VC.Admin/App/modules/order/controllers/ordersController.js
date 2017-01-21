@@ -49,11 +49,11 @@
                     {                        
                         $.each(result.Data.Items, function (index, item)
                         {
-                            item.AllowExport = item.OrderStatus == 2;
+                            item.AllowExport = item.OrderStatus == 2 && item.Review!=1;
                             item.IsSelected = item.OrderStatus == 3 || item.OrderStatus == 5;//Shipped
-                            item.PAllowExport = item.POrderStatus == 2;
+                            item.PAllowExport = item.POrderStatus == 2 && item.Review != 1;
                             item.IsPSelected = item.POrderStatus == 3 || item.POrderStatus==5;//Shipped
-                            item.NPAllowExport = item.NPOrderStatus == 2;
+                            item.NPAllowExport = item.NPOrderStatus == 2 && item.Review != 1;
                             item.IsNPSelected = item.NPOrderStatus == 3 || item.NPOrderStatus == 5;//Shipped
                         });
 

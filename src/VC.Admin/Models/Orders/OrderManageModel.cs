@@ -328,6 +328,16 @@ namespace VC.Admin.Models.Orders
         [Map]
         public bool Guest { get; set; }
 
+        [Map]
+        public ReviewType? Review { get; set; }
+
+        [Map]
+        public string ReviewReason { get; set; }
+
+        public bool AllowSetAsReviewed { get; set; }
+
+        public bool Reviewed { get; set; }
+
         public bool? SignUpNewsletter { get; set; }
 
         public bool ShouldSplit { get; set; }

@@ -618,7 +618,8 @@ namespace VitalChoice.Business.Services.Orders
             }
             var context = new OrderDataContext(combinedStatus)
             {
-                Order = order
+                Order = order,
+                CheckForFraud = combinedStatus != OrderStatus.Incomplete
             };
             var tree = await _treeFactory.CreateTreeAsync<OrderDataContext, decimal>("Order");
             await tree.ExecuteAsync(context);
@@ -653,11 +654,12 @@ namespace VitalChoice.Business.Services.Orders
             return context;
         }
 
-        public async Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus)
+        public async Task<OrderDataContext> CalculateOrder(OrderDynamic order, OrderStatus combinedStatus, bool checkForFraud)
         {
             var context = new OrderDataContext(combinedStatus)
             {
-                Order = order
+                Order = order, 
+                CheckForFraud = checkForFraud
             };
             IWorkflowTreeExecutor<OrderDataContext, decimal> tree;
             switch ((OrderType) order.IdObjectType)
@@ -705,6 +707,11 @@ namespace VitalChoice.Business.Services.Orders
             order.ShippingTotal = dataContext.ShippingTotal;
             order.ProductsSubtotal = dataContext.ProductsSubtotal;
             order.PromoSkus = dataContext.PromoSkus;
+            if (dataContext.IsFraud)
+            {
+                order.Data.Review = ReviewType.ForReview;
+                order.Data.ReviewReason = string.Join("; ", dataContext.FraudReason);
+            }
             SetOrderSplitStatuses(dataContext, order);
         }
 
@@ -1553,7 +1560,8 @@ namespace VitalChoice.Business.Services.Orders
                 .WithIdSku(filter.IdSku)
                 .WithIdAddedBy(filter.IdAddedBy)
                 .WithShipState(filter.IdShipState)
-                .WithOrderDynamicValues(filter.IdOrderSource, filter.POrderType, filter.IdShippingMethod)
+                .WithOrderDynamicValues(filter.IdOrderSource, filter.POrderType, filter.IdShippingMethod,
+                filter.ForReview ? ReviewType.ForReview : (ReviewType?)null)
                 .WithCustomerDynamicValues(filter.CustomerFirstName, filter.CustomerLastName, filter.CustomerCompany)
                 .NotAutoShip();
 
@@ -1639,6 +1647,7 @@ namespace VitalChoice.Business.Services.Orders
                     ShipTo = item.ShippingAddress?.SafeData.FirstName + " " + item.ShippingAddress?.SafeData.LastName,
                     PreferredShipMethod = item.ShippingAddress?.SafeData.PreferredShipMethod,
                     Healthwise = (bool?) item.SafeData.IsHealthwise ?? false,
+                    Review = (int?)item.SafeData.Review ?? null,
                 };
                 await DynamicMapper.UpdateModelAsync(newItem, item);
 
@@ -1919,7 +1928,7 @@ namespace VitalChoice.Business.Services.Orders
                 var orderCombinedStatus = item.Order.OrderStatus ?? OrderStatus.Processed;
                 item.Order.Data.ShipDelayType = item.Order.SafeData.ShipDelayDate != null ? ShipDelayType.EntireOrder : ShipDelayType.None;
 
-                var context = await CalculateOrder(item.Order, orderCombinedStatus);
+                var context = await CalculateOrder(item.Order, orderCombinedStatus, false);
                 if (orderType == OrderImportType.DropShipAAFES)
                 {
                     if (context.ShippingUpgradePOptions == null ||
@@ -1964,7 +1973,7 @@ namespace VitalChoice.Business.Services.Orders
                         ? ShipDelayType.EntireOrder
                         : ShipDelayType.None;
 
-                    var context = await CalculateOrder(item.Order, orderCombinedStatus);
+                    var context = await CalculateOrder(item.Order, orderCombinedStatus, false);
 
                     var rows = item.OrderImportItems.Select(p => p.RowNumber).ToList();
                     var tempMessages = new List<MessageInfo>(context.Messages.Where(p => p.MessageLevel == MessageLevel.Error));
@@ -2518,6 +2527,18 @@ namespace VitalChoice.Business.Services.Orders
             {
                 Sku = _skuMapper.FromEntity(s.Sku, true), GcsGenerated = s.GeneratedGiftCertificates, Quantity = s.Quantity, Amount = s.Amount
             }).ToList();
+        }
+
+        public Task<int> GetReshipCount(int pastMonths, int idCustomer)
+        {
+            var endDate = DateTime.Now;
+            var startDate = endDate.AddMonths(-pastMonths);
+            return
+                SelectCountAsync(
+                    o =>
+                        o.IdCustomer == idCustomer && o.IdObjectType == (int) OrderType.Reship && o.OrderStatus != OrderStatus.Cancelled &&
+                        o.StatusCode != (int) RecordStatusCode.Deleted &&
+                        o.DateCreated > startDate && o.DateCreated <= endDate, q => q);
         }
 
         #endregion

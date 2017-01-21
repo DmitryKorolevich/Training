@@ -76,5 +76,7 @@ namespace VitalChoice.Infrastructure.Domain.Entities.Orders
 
         [Map]
         public bool Healthwise { get; set; }
+
+        public int? Review { get; set; }
     }
 }

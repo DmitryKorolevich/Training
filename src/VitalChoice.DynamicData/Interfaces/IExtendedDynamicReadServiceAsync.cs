@@ -29,6 +29,12 @@ namespace VitalChoice.DynamicData.Interfaces
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             bool withDefaults = false);
 
+        Task<int> SelectCountAsync(IQueryObject<TEntity> queryObject = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null);
+
+        Task<int> SelectCountAsync(Expression<Func<TEntity, bool>> query = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null);
+
         Task<T> SelectFirstAsync(IQueryObject<TEntity> queryObject = null,
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, bool withDefaults = false);
@@ -56,6 +62,12 @@ namespace VitalChoice.DynamicData.Interfaces
 
         List<T> Select(Expression<Func<TEntity, bool>> query = null,
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null, bool withDefaults = false);
+
+        int SelectCount(IQueryObject<TEntity> queryObject = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null);
+
+        int SelectCount(Expression<Func<TEntity, bool>> query = null,
+            Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null);
 
         T SelectFirst(IQueryObject<TEntity> queryObject = null,
             Func<IQueryLite<TEntity>, IQueryLite<TEntity>> includesOverride = null,

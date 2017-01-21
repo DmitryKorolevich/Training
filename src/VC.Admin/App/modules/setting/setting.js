@@ -17,6 +17,8 @@ angular.module('app.modules.setting', [
 	'app.modules.setting.controllers.lookupDetailController',
 	'app.modules.setting.controllers.profileScopesController',
 	'app.modules.setting.controllers.recaptchaConfirmPopupController',
+	'app.modules.setting.controllers.orderReviewRulesController',
+	'app.modules.setting.controllers.orderReviewRuleDetailController',    
 ])
 .config([
 		'$stateProvider', '$urlRouterProvider',
@@ -63,6 +65,22 @@ angular.module('app.modules.setting', [
 		            url: '/settings/lookups/{id:int}',
 		            templateUrl: 'app/modules/setting/partials/lookupDetail.html',
 		            controller: 'lookupDetailController',
+		        })
+		    	/*order review rules*/
+		        .state('index.oneCol.manageOrderReviewRules', {
+		            url: '/settings/order-review-rules',
+		            templateUrl: 'app/modules/setting/partials/orderReviewRulesList.html',
+		            controller: 'orderReviewRulesController',
+		        })
+		        .state('index.oneCol.addOrderReviewRule', {
+		            url: '/order-review-rules/add',
+		            templateUrl: 'app/modules/setting/partials/orderReviewRuleDetail.html',
+		            controller: 'orderReviewRuleDetailController'
+		        })
+		        .state('index.oneCol.orderReviewRuleDetail', {
+		            url: '/settings/order-review-rules/{id:int}',
+		            templateUrl: 'app/modules/setting/partials/orderReviewRuleDetail.html',
+		            controller: 'orderReviewRuleDetailController',
 		        });
 		}
 ]);
