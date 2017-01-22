@@ -444,6 +444,8 @@ namespace VitalChoice.Workflow.Configuration
 
             orderContextTreeSetup.Tree<ExportTree>("ExportOrder", exportOrder =>
             {
+                exportOrder.Action<FraudCheckAction>("Fraud", action => action.Dependency<TotalAction>());
+
                 exportOrder.Action<TotalAction>("Total", action =>
                 {
                     action.Dependency<GiftCertificatesBuyAction>();
