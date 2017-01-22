@@ -53,11 +53,6 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, settingService, pr
             { Key: 24, Text: '2 years' },
         ];
 
-        $scope.skusFilter = {
-            Code: '',
-            Paging: { PageIndex: 1, PageItemCount: 20 },
-        };
-
         settingService.getOrderReviewRule($stateParams.id ? $stateParams.id : 0, $scope.refreshTracker).success(function (result)
         {
             if (result.Success)
@@ -70,22 +65,6 @@ function ($scope, $rootScope, $state, $stateParams, $timeout, settingService, pr
         }).error(function (result) {
             errorHandler(result);
         });
-    };
-
-    $scope.getSKUsBySKU = function (val)
-    {
-        if (val)
-        {
-            $scope.skusFilter.Code = val;
-            return productService.getSkus($scope.skusFilter)
-                .then(function (result)
-                {
-                    return result.data.Data.map(function (item)
-                    {
-                        return item;
-                    });
-                });
-        }
     };
 
     $scope.save = function () {

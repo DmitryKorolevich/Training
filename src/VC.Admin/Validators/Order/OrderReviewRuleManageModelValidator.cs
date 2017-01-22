@@ -30,12 +30,12 @@ namespace VC.Admin.Validators.Order
                     .WithMessage(model => model.DeliveryInstructionForSearch, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
 
                 RuleFor(model => model.ZipForSearch)
-                    .Length(0, BaseAppConstants.ZIP_MAX_SIZE)
-                    .WithMessage(model => model.ZipForSearch, ValidationMessages.FieldLength, BaseAppConstants.ZIP_MAX_SIZE);
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_EXPANDED_MAX_SIZE)
+                    .WithMessage(model => model.ZipForSearch, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_EXPANDED_MAX_SIZE);
 
                 RuleFor(model => model.SkuForSearch)
-                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
-                    .WithMessage(model => model.SkuForSearch, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+                    .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_EXPANDED_MAX_SIZE)
+                    .WithMessage(model => model.SkuForSearch, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_EXPANDED_MAX_SIZE);
 
                 RuleFor(model => model.CompareNamesType)
                    .Must(p => p.HasValue)
