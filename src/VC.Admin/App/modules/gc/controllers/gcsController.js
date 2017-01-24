@@ -64,6 +64,27 @@ function ($scope, $rootScope, $state, gcService, toaster, modalUtil, confirmUtil
         refreshItems();
     };
 
+    $scope.exportItems = function ()
+    {
+        gcService.requestGiftCertificatesReportFile($scope.filter, $scope.refreshTracker)
+            .success(function (result)
+            {
+                if (result.Success)
+                {
+                    var id = result.Data;
+                    var url = gcService.getGiftCertificatesReportFile(id, $rootScope.buildNumber);
+                    $rootScope.downloadFileIframe(url);
+                } else
+                {
+                    errorHandler(result);
+                }
+            })
+            .error(function (result)
+            {
+                errorHandler(result);
+            });
+    };
+
     $scope.pageChanged = function ()
     {
         refreshItems();

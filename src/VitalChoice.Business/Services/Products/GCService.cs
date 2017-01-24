@@ -135,7 +135,18 @@ namespace VitalChoice.Business.Services.Products
                     break;
             }
 
-	        PagedList<GiftCertificate> toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            PagedList<GiftCertificate> toReturn = null;
+            if (filter.Paging != null)
+            {
+                toReturn =
+                    await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount);
+            }
+            else
+            {
+                var data = await query.OrderBy(sortable).SelectAsync(false);
+                toReturn=new PagedList<GiftCertificate>(data, data.Count);
+            }
+
             var userIds = toReturn.Items.Select(pp => pp.UserId).Where(u => u.HasValue).Select(u => u.Value).Distinct().ToList();
             var users =
                 await

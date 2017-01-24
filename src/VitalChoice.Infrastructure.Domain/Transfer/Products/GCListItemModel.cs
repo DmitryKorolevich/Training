@@ -1,12 +1,10 @@
 ﻿using System;
-using VitalChoice.Business.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
-using VitalChoice.Validation.Models;
 
-namespace VC.Admin.Models.Products
+namespace VitalChoice.Infrastructure.Domain.Transfer.Products
 {
-    public class GCListItemModel : BaseModel
+    public class GCListItemModel
     {
         public int Id { get; set; }
 
@@ -32,7 +30,7 @@ namespace VC.Admin.Models.Products
 
         public int? IdOrder { get; set; }
 
-        public RecordStatusCode StatusCode { get; set; }
+        public int StatusCode { get; set; }
 
         public GCType GCType { get; set; }
 
@@ -40,7 +38,7 @@ namespace VC.Admin.Models.Products
 
         public string Tag { get; set; }
 
-        public GCListItemModel(GiftCertificate item)
+        public GCListItemModel(GiftCertificate item, string productName)
         {
             if(item!=null)
             {
@@ -51,7 +49,7 @@ namespace VC.Admin.Models.Products
                 FirstName = item.FirstName;
                 LastName = item.LastName;
                 Email = item.Email;
-                StatusCode = item.StatusCode;
+                StatusCode = (int)item.StatusCode;
                 GCType = item.GCType;
                 IdOrder = item.IdOrder;
                 if (!string.IsNullOrEmpty(item.FirstName) || !String.IsNullOrEmpty(item.LastName))
@@ -62,7 +60,7 @@ namespace VC.Admin.Models.Products
                 {
                     RecipientEmail = $"({item.Email})";
                 }
-                ProductName = LookupHelper.GetGCTypeName(item.GCType);
+                ProductName = productName;
                 AgentId = item.AgentId;
                 ExpirationDate = item.ExpirationDate;
                 Tag = item.Tag;
