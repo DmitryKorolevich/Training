@@ -1,4 +1,4 @@
-﻿IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Product page' AND Updated<'2016-11-10 00:00:00.000')
+﻿IF EXISTS(SELECT [Id] FROM [dbo].[MasterContentItems] WHERE [Name]='Product page' AND Updated<'2017-01-24 00:00:00.000')
 BEGIN
 
 	UPDATE [dbo].[MasterContentItems]
@@ -276,6 +276,23 @@ BEGIN
     			</div>
     		</div>  
 		}}
+		@list(Skus) {{
+    	    <div class="hide" itemscope itemtype="http://schema.org/Product">
+                <span itemprop="name">@(@root.ProductPage.Name) @(@root.ProductPage.SubTitle)</span>
+                <meta itemprop="sku" content="@(Code)" />
+                <div itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                    <meta itemprop="priceCurrency" content="USD" />$
+                    <span itemprop="price">@(@model.Price.ToString("F"))</span>
+                    <meta itemprop="itemCondition" itemtype="http://schema.org/OfferItemCondition" content="http://schema.org/NewCondition"/>New
+                    @if(InStock) {{
+                    <meta itemprop="availability" content="http://schema.org/InStock"/>in stock
+                    }}
+                    @ifnot(InStock){{
+                    <meta itemprop="availability" content="http://schema.org/OutOfStock"/>out of stock
+                    }}
+                </div>
+            </div>
+    	}}
 	</div>
 }}
 
