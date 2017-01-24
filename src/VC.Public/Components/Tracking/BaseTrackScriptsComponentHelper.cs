@@ -38,14 +38,19 @@ namespace VC.Public.Components.Tracking
             OrderDynamic order;
             if (toReturn.PageName == PageName.Receipt)
             {
-                var idOrder = context.Session.GetInt32(CheckoutConstants.ReceiptSessionOrderId);
-                if (idOrder.HasValue)
+                var ids = context.Session.GetString(CheckoutConstants.ReceiptSessionOrderIds).Split(',');
+                int idOrder = 0;
+                if (ids.Length > 0)
+                {
+                    Int32.TryParse(ids[0], out idOrder);
+                }
+                if (idOrder!=0)
                 {
                     var tOrderService = orderService.Value;
-                    order = await orderService.Value.SelectAsync(idOrder.Value, true);
+                    order = await orderService.Value.SelectAsync(idOrder, true);
                     if (order.IdObjectType == (int) OrderType.AutoShip)
                     {
-                        var id = (await tOrderService.SelectAutoShipOrdersAsync(idOrder.Value)).FirstOrDefault();
+                        var id = (await tOrderService.SelectAutoShipOrdersAsync(idOrder)).FirstOrDefault();
 
                         if (id != 0)
                         {

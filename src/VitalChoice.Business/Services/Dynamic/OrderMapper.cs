@@ -210,7 +210,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 if (entity.CartAdditionalShipments != null)
                 {
                     dynamic.CartAdditionalShipments=new List<CartAdditionalShipmentModelItem>();
-                    foreach (var entityAdditionalShipment in entity.CartAdditionalShipments)
+                    foreach (var entityAdditionalShipment in entity.CartAdditionalShipments.OrderBy(p=>p.Name))
                     {
                         CartAdditionalShipmentModelItem shipment =new CartAdditionalShipmentModelItem();
                         shipment.Id = entityAdditionalShipment.Id;
@@ -533,9 +533,13 @@ namespace VitalChoice.Business.Services.Dynamic
                         p => p.Id, p => p.Id, (dbItem, modelItem) =>
                         {
                             dbItem.Name = modelItem.Name;
-                            dbItem.IsGiftOrder = modelItem.IsGiftOrder;
-                            dbItem.GiftMessage = modelItem.GiftMessage;
-                            _orderAddressMapper.UpdateEntityAsync(modelItem.ShippingAddress, dbItem.ShippingAddress).Wait();
+                            if (modelItem.ShippingAddress != null)
+                            {
+                                dbItem.IsGiftOrder = modelItem.IsGiftOrder;
+                                dbItem.GiftMessage = modelItem.GiftMessage;
+                                _orderAddressMapper.UpdateEntityAsync(modelItem.ShippingAddress, dbItem.ShippingAddress)
+                                    .Wait();
+                            }
 
                             dbItem.Skus.MergeKeyed(modelItem.Skus.Where(s => (s.Sku?.Id ?? 0) != 0).ToArray(), 
                                 sku => sku.IdSku, ordered => ordered.Sku.Id,

@@ -9,7 +9,7 @@
 
 @section PageScripts {
     <script src="@Url.Content("/app/modules/checkout/checkoutMain.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
-    <script src="@Url.Content("/app/modules/cart/viewcart.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+    <script src="@Url.Content("/app/common/dataAccess.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
     <script src="@Url.Content("/app/modules/checkout/reviewOrder.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
 }
 
@@ -31,350 +31,177 @@
             <img name="trustseal" alt="Security Seal" style="border: 0;" src="https://secure.trust-guard.com/seals/5867/scanned/mini/gray" />
         </a>
     </div>
-    <div class="assign-buttons template hide">
-        <a class="circle-button button-blue margin-right-small">
-            <i class="glyphicon glyphicon-sort"></i><span class="description">Move Item</span>
-        </a>
-        <a class="circle-button button-green">
-            <i class="glyphicon glyphicon-plus"></i><span class="description">Copy Item</span>
-        </a>
-    </div>
+    @*<div class="assign-buttons template hide">
+            <a class="circle-button button-blue margin-right-small">
+                <i class="glyphicon glyphicon-sort"></i><span class="description">Move Item</span>
+            </a>
+            <a class="circle-button button-green">
+                <i class="glyphicon glyphicon-plus"></i><span class="description">Copy Item</span>
+            </a>
+        </div>*@
     <div class="cart-overlay-container margin-top-medium">
         <div class="overlay" data-bind="visible:refreshing">
             <div class="loading">Loading…</div>
         </div>
-        <div class="top-billing-wrapper">
-            <div class="checkout-sections-divider big"></div>
-            <div class="reivew-order-info margin-bottom-medium">
-                <div class="reivew-info-box">
-                    <div class="review-header-container">
-                        <span>Bill to Details</span>
-                    </div>
-                    <div class="review-box-line">
-                        <span class="review-info-value">MasterCard</span>
-                    </div>
-                    <div class="review-box-line">
-                        <span class="review-info-value">XXXXXXXXXXXX1111</span>
-                    </div>
-                    <div class="review-box-line">
-                        <span class="review-info-value">11/21</span>
-                    </div>
-                    <div class="review-box-line">
-                    </div>
-                    <div class="review-box-line">
-                        <span class="review-info-value">111111111 ttttttttttttttt2222222222</span>
-                    </div>
-                    <div class="review-box-line">
-                        <span class="review-info-value">ttttt</span>
-                    </div>
-                    <div class="review-box-line">
-                        <span class="review-info-value">ttttttttttt, AL 11111</span>
-                    </div>
-                    <div class="review-box-line">
-                        <span class="review-info-label">Phone:</span>
-                        <span class="review-info-value">(111) 111-1111 x11111</span>
-                    </div>
-                    <div class="review-box-line">
-                        <span class="review-info-label">Email:</span>
-                        <span class="review-info-value">gary@g2designgroup.com</span>
-                    </div>
-                </div>
-                <div class="reivew-info-box">
-                    <div class="review-header-container">
-                        <span>&nbsp;</span>
-                        <a class="button" href="/checkout/addupdatebillingaddress">Edit</a>
-                    </div>
-                    <div class="cart-order-details">
-                        <div class="cart-promo-container">
-                            <i class="tooltip-l glyphicon glyphicon-question-sign tooltipstered" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total."></i>
-                            <label>Promo Code</label>
-                            <input class="cart-input-box input-control" data-bind="value: Model.DiscountCode, css: {'input-validation-error': !isDiscountValid(Model) }, disable: Model.AutoShip" id="DiscountCode" name="DiscountCode" type="text" value="">
-                        </div>
-                        <span class="success-message-box" data-bind="text: Model.DiscountMessage, visible: Model.DiscountMessage &amp;&amp; isDiscountValid(Model)"></span>
-                        <span class="field-validation-error" data-bind="if: !isDiscountValid(Model)" data-valmsg-for="DiscountCode" data-valmsg-replace="true"></span>
-                        <div id="divGcContainer" class="cart-gc-container">
-                            <i class="tooltip-l glyphicon glyphicon-question-sign tooltipstered" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total."></i>
-                            <div data-bind="foreach:Model.GiftCertificateCodes">
-                                <div>
-                                    <!-- ko if: $index() == 0 -->
-                                    <label>Gift Certificate Code</label>
-                                    <a id="btnAddGc" class="circle-button button-green" data-bind="click: $parent.addGc, visible: $index() == 0">
-                                        <i class="glyphicon glyphicon-plus-sign"></i>
-                                    </a>
-                                    <!-- /ko -->
-                                    <!-- ko if: $index() != 0 --><!-- /ko -->
-                                    <input class="cart-input-box input-control" data-bind="value: Value, attr: { name: 'GiftCertificateCodes' + $index(), id: 'GiftCertificateCodes' + $index()}, event: { blur: $parent.gcLostFocus }, css: {'input-validation-error': !isGcValid($parent.Model, $index()) }, disable: $parent.Model.AutoShip" id="GiftCertificateCodes0" name="GiftCertificateCodes0" type="text" value="">
-                                    <span class="field-validation-error" data-bind="if: !isGcValid($parent.Model, $index()), attr: { 'data-valmsg-for': 'GiftCertificateCodes' + $index()}" data-valmsg-replace="true" data-valmsg-for="GiftCertificateCodes0"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="review-items">
-            <div class="clear"></div>
-            <div class="item main-item" data-id="1">
+        <!-- ko if: loaded() -->
+        <from id="mainForm" data-bind="submit: save" class="form-cart hide" role="form" novalidate="novalidate">
+            <!-- ko if: Model.Shipments().length>1 && loaded() -->
+            <div class="top-billing-wrapper">
                 <div class="checkout-sections-divider big"></div>
-                <h4 class="checkout-step-heading">
-                    <span class="title">Order #1 - Gary1 Gould 806 Front ST</span>
-                </h4>
-                <div class="review-order-cart">
-                    @using (Html.BeginForm("ReviewOrder", "Checkout", null, FormMethod.Post, null, new { @class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart" }))
-                    {
-                        @await Html.PartialAsync("_ViewCart", Model, ViewData)
-                    }
-                </div>
-                <div class="reivew-order-info padding-bottom-medium">
-                    <div class="reivew-info-box billing">
+                <div class="reivew-order-info margin-bottom-medium">
+                    <div class="reivew-info-box">
                         <div class="review-header-container">
                             <span>Bill to Details</span>
-                            @Html.ActionLink("Edit", "AddUpdateBillingAddress", "Checkout", null, new { @class = "button" })
                         </div>
-                        @foreach (var item in Model.CreditCardDetails)
-                        {
+                        <div data-bind="foreach: Model.CreditCardDetails">
                             <div class="review-box-line">
-                                @if (!string.IsNullOrWhiteSpace(item.Key))
-                                {
-                                    <span class="review-info-label">@item.Key:</span>
-                                }
-                                <span class="review-info-value">@item.Value</span>
+                                <span data-bind="text: Value()" class="review-info-value"></span>
                             </div>
-                        }
+                        </div>
                         <div class="review-box-line">
                         </div>
-                        @foreach (var item in Model.BillToAddress)
-                        {
-                            if (!string.IsNullOrEmpty(item.Value))
-                            {
-                                <div class="review-box-line">
-                                    @if (!string.IsNullOrWhiteSpace(item.Key))
-                                    {
-                                        <span class="review-info-label">@item.Key:</span>
-                                    }
-                                    <span class="review-info-value">@item.Value</span>
-                                </div>
-                            }
-                        }
+                        <div data-bind="foreach: Model.BillToAddress">
+                            <!-- ko if: Value() -->
+                            <div class="review-box-line">
+                                <!-- ko if: Key() -->
+                                <span data-bind="text: Key()+':'" class="review-info-label"></span>
+                                <!-- /ko -->
+                                <span data-bind="text: Value()" class="review-info-value"></span>
+                            </div>
+                            <!-- /ko -->
+                        </div>
                     </div>
                     <div class="reivew-info-box">
                         <div class="review-header-container">
-                            <span>Ship to Details</span>
-                            @Html.ActionLink("Edit", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button" })
+                            <span>&nbsp;</span>
+                            <a class="button" href="/checkout/addupdatebillingaddress">Edit</a>
                         </div>
-                        @foreach (var item in Model.ShipToAddress)
-                        {
-                            if (!string.IsNullOrEmpty(item.Value))
-                            {
-                                <div class="review-box-line">
-                                    @if (!string.IsNullOrWhiteSpace(item.Key))
-                                    {
-                                        <span class="review-info-label">@item.Key:</span>
-                                    }
-                                    <span class="review-info-value">@item.Value</span>
+                        <div data-bind="ifnot: Model.AutoShip" class="cart-order-details">
+                            <div class="cart-promo-container">
+                                <i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total."></i>
+                                <label>Promo Code</label>
+                                <input class="cart-input-box input-control" data-bind="value: Model.DiscountCode, css: {'input-validation-error': !isDiscountValid(Model) }, disable: Model.AutoShip"
+                                       id="DiscountCode" name="DiscountCode" type="text">
+                            </div>
+                            <span class="success-message-box" data-bind="text: Model.DiscountMessage, visible: Model.DiscountMessage && isDiscountValid(Model)"></span>
+                            <span class="field-validation-error" data-bind="if: !isDiscountValid(Model)" data-valmsg-for="DiscountCode" data-valmsg-replace="true">
+                                <span id="DiscountCode-error" class="" data-bind="text: getDiscountRelatedErrors(Model)[0].Value"></span>
+                            </span>
+                            <div id="divGcContainer" class="cart-gc-container">
+                                <i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total."></i>
+                                <div data-bind="foreach:Model.GiftCertificateCodes">
+                                    <div>
+                                        <!-- ko if: $index() == 0 -->
+                                        <label>Gift Certificate Code</label>
+                                        <a id="btnAddGc" class="circle-button button-green" data-bind="click: $parent.addGc, visible: $index() == 0">
+                                            <i class="glyphicon glyphicon-plus-sign"></i>
+                                        </a>
+                                        <!-- /ko -->
+                                        <!-- ko if: $index() != 0 -->
+                                        <a class="btnRemoveGc circle-button button-red" data-bind="click: $parent.removeGc, visible: $index() != 0">
+                                            <i class="glyphicon glyphicon-minus-sign"></i>
+                                        </a>
+                                        <!-- /ko -->
+                                        <input class="cart-input-box input-control" data-bind="value: Value, attr: { name: 'GiftCertificateCodes' + $index(), id: 'GiftCertificateCodes' + $index()}, event: { blur: $parent.gcLostFocus }, css: {'input-validation-error': !isGcValid($parent.Model, $index()) }, disable: $parent.Model.AutoShip"
+                                               id="GiftCertificateCodes0" name="GiftCertificateCodes0" type="text">
+                                        <span class="field-validation-error" data-bind="if: !isGcValid($parent.Model, $index()), attr: { 'data-valmsg-for': 'GiftCertificateCodes' + $index()}" data-valmsg-replace="true">
+                                            <span class="" data-bind="text: ErrorMessage"></span>
+                                        </span>
+                                    </div>
                                 </div>
-                            }
-                        }
+                            </div>
+                        </div>
                     </div>
-                    @if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
-                    {
-                        <div class="reivew-info-box">
-                            <div class="review-header-container">
-                                <span>Delivery Instructions</span>
-                            </div>
-                            <div class="review-box-line">
-                                @Model.DeliveryInstructions
-                            </div>
-                        </div>
-                    }
-                    @if (!string.IsNullOrEmpty(Model.GiftMessage))
-                    {
-                        <div class="reivew-info-box">
-                            <div class="review-header-container">
-                                <span>Gift Message</span>
-                            </div>
-                            <div class="review-box-line">
-                                @Model.GiftMessage
-                            </div>
-                        </div>
-                    }
                 </div>
             </div>
+            <!-- /ko -->
             <div class="clear"></div>
-            <div class="item" data-id="2">
-                <div class="checkout-sections-divider big"></div>
-                <h4 class="checkout-step-heading">
-                    <span class="title">Order #2 - Gary2 Gould 806 Front ST</span>
-                    <a class="button red pull-right delete-order">Delete Order</a>
-                </h4>
-                <div class="review-order-cart">
-                    @using (Html.BeginForm("ReviewOrder", "Checkout", null, FormMethod.Post, null, new { @class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart" }))
-                    {
-                        @await Html.PartialAsync("_ViewCart", Model, ViewData)
-                    }
-                </div>
-                <div class="reivew-order-info padding-bottom-medium">
-                    <div class="reivew-info-box">
-                        <div class="review-header-container">
-                            <span>Ship to Details</span>
-                            @Html.ActionLink("Edit", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button" })
-                        </div>
-                        @foreach (var item in Model.ShipToAddress)
-                        {
-                            if (!string.IsNullOrEmpty(item.Value))
+            <div class="review-items">
+                <div class="item-wrapper" data-bind="foreach: Model.Shipments">
+                    <div class="item" data-bind="css: { 'alternate-color': $root.Model.Shipments().length>1 && $index()%2==0 }, attr: {'data-index': $index()}">
+                        <div class="checkout-sections-divider big"></div>
+                        <h4 class="checkout-step-heading">
+                            <span class="title"><span data-bind="text: Name()"></span> - <span data-bind="text: ShipToFirstName()+' '+ShipToLastName()+' '+ShipToAddress1()"></span></span>
+                            <!-- ko if: !Main() -->
+                            <a data-bind="click: $parent.remove" class="button red pull-right delete-order">Delete Order</a>
+                            <!-- /ko -->
+                        </h4>
+                        <div class="review-order-cart">
+                            @*@using (Html.BeginForm("ReviewOrder", "Checkout", null, FormMethod.Post, null, new { @class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart" }))
                             {
-                                <div class="review-box-line">
-                                    @if (!string.IsNullOrWhiteSpace(item.Key))
-                                    {
-                                        <span class="review-info-label">@item.Key:</span>
-                                    }
-                                    <span class="review-info-value">@item.Value</span>
+                                @await Html.PartialAsync("_ViewCart", Model, ViewData)
+                            }*@
+                        </div>
+                        <div class="reivew-order-info padding-bottom-medium">
+                            <!-- ko if: $root.Model.Shipments().length==1 -->
+                            <div class="reivew-info-box billing">
+                                <div class="review-header-container">
+                                    <span>Bill to Details</span>
+                                    @Html.ActionLink("Edit", "AddUpdateBillingAddress", "Checkout", null, new {@class = "button"})
                                 </div>
-                            }
-                        }
+                                <div data-bind="foreach: $root.Model.CreditCardDetails">
+                                    <div class="review-box-line">
+                                        <span data-bind="text: Value()" class="review-info-value"></span>
+                                    </div>
+                                </div>
+                                <div class="review-box-line">
+                                </div>
+                                <div data-bind="foreach: $root.Model.BillToAddress">
+                                    <!-- ko if: Value() -->
+                                    <div class="review-box-line">
+                                        <!-- ko if: Key() -->
+                                        <span data-bind="text: Key()+':'" class="review-info-label"></span>
+                                        <!-- /ko -->
+                                        <span data-bind="text: Value()" class="review-info-value"></span>
+                                    </div>
+                                    <!-- /ko -->
+                                </div>
+                            </div>
+                            <!-- /ko -->
+                            <div class="reivew-info-box">
+                                <div class="review-header-container">
+                                    <span>Ship to Details</span>
+                                    @Html.ActionLink("Edit", "AddUpdateShippingMethod", "Checkout", null, new {@class = "button"})
+                                </div>
+                                <div data-bind="foreach: ShipToAddress">
+                                    <!-- ko if: Value() -->
+                                    <div class="review-box-line">
+                                        <!-- ko if: Key() -->
+                                        <span data-bind="text: Key()+':'" class="review-info-label"></span>
+                                        <!-- /ko -->
+                                        <span data-bind="text: Value()" class="review-info-value"></span>
+                                    </div>
+                                    <!-- /ko -->
+                                </div>
+                            </div>
+                            <!-- ko if: DeliveryInstructions() -->
+                            <div class="reivew-info-box">
+                                <div class="review-header-container">
+                                    <span>Delivery Instructions</span>
+                                </div>
+                                <div data-bind="text: DeliveryInstructions()" class="review-box-line">
+                                </div>
+                            </div>
+                            <!-- /ko -->
+                            <!-- ko if: GiftMessage() -->
+                            <div class="reivew-info-box">
+                                <div class="review-header-container">
+                                    <span>Gift Message</span>
+                                </div>
+                                <div data-bind="text: GiftMessage()" class="review-box-line">
+                                </div>
+                            </div>
+                            <!-- /ko -->
+                        </div>
                     </div>
-                    @if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
-                    {
-                        <div class="reivew-info-box">
-                            <div class="review-header-container">
-                                <span>Delivery Instructions</span>
-                            </div>
-                            <div class="review-box-line">
-                                @Model.DeliveryInstructions
-                            </div>
-                        </div>
-                    }
-                    @if (!string.IsNullOrEmpty(Model.GiftMessage))
-                    {
-                        <div class="reivew-info-box">
-                            <div class="review-header-container">
-                                <span>Gift Message</span>
-                            </div>
-                            <div class="review-box-line">
-                                @Model.GiftMessage
-                            </div>
-                        </div>
-                    }
+                    <div class="clear"></div>
                 </div>
             </div>
-            <div class="clear"></div>
-            <div class="item" data-id="4">
-                <div class="checkout-sections-divider big"></div>
-                <h4 class="checkout-step-heading">
-                    <span class="title">Order #4 - Gary4 Gould 806 Front ST</span>
-                    <a class="button red pull-right delete-order">Delete Order</a>
-                </h4>
-                <div class="review-order-cart">
-                    @using (Html.BeginForm("ReviewOrder", "Checkout", null, FormMethod.Post, null, new { @class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart" }))
-                    {
-                        @await Html.PartialAsync("_ViewCart", Model, ViewData)
-                    }
-                </div>
-                <div class="reivew-order-info padding-bottom-medium">
-                    <div class="reivew-info-box">
-                        <div class="review-header-container">
-                            <span>Ship to Details</span>
-                            @Html.ActionLink("Edit", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button" })
-                        </div>
-                        @foreach (var item in Model.ShipToAddress)
-                        {
-                            if (!string.IsNullOrEmpty(item.Value))
-                            {
-                                <div class="review-box-line">
-                                    @if (!string.IsNullOrWhiteSpace(item.Key))
-                                    {
-                                        <span class="review-info-label">@item.Key:</span>
-                                    }
-                                    <span class="review-info-value">@item.Value</span>
-                                </div>
-                            }
-                        }
-                    </div>
-                    @if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
-                    {
-                        <div class="reivew-info-box">
-                            <div class="review-header-container">
-                                <span>Delivery Instructions</span>
-                            </div>
-                            <div class="review-box-line">
-                                @Model.DeliveryInstructions
-                            </div>
-                        </div>
-                    }
-                    @if (!string.IsNullOrEmpty(Model.GiftMessage))
-                    {
-                        <div class="reivew-info-box">
-                            <div class="review-header-container">
-                                <span>Gift Message</span>
-                            </div>
-                            <div class="review-box-line">
-                                @Model.GiftMessage
-                            </div>
-                        </div>
-                    }
-                </div>
+            <div class="form-buttons-group">
+                @Html.ActionLink("Back", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button arrow-left-red" })
+                <input class="arrow-right-blue" type="submit" value="Place Your Order" />
             </div>
-            <div class="clear"></div>
-            <div class="item" data-id="5">
-                <div class="checkout-sections-divider big"></div>
-                <h4 class="checkout-step-heading">
-                    <span class="title">Order #5 - Gary5 Gould 806 Front ST</span>
-                    <a class="button red pull-right delete-order">Delete Order</a>
-                </h4>
-                <div class="review-order-cart">
-                    @using (Html.BeginForm("ReviewOrder", "Checkout", null, FormMethod.Post, null, new { @class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart" }))
-                    {
-                        @await Html.PartialAsync("_ViewCart", Model, ViewData)
-                    }
-                </div>
-                <div class="reivew-order-info padding-bottom-medium">
-                    <div class="reivew-info-box">
-                        <div class="review-header-container">
-                            <span>Ship to Details</span>
-                            @Html.ActionLink("Edit", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button" })
-                        </div>
-                        @foreach (var item in Model.ShipToAddress)
-                        {
-                            if (!string.IsNullOrEmpty(item.Value))
-                            {
-                                <div class="review-box-line">
-                                    @if (!string.IsNullOrWhiteSpace(item.Key))
-                                    {
-                                        <span class="review-info-label">@item.Key:</span>
-                                    }
-                                    <span class="review-info-value">@item.Value</span>
-                                </div>
-                            }
-                        }
-                    </div>
-                    @if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
-                    {
-                        <div class="reivew-info-box">
-                            <div class="review-header-container">
-                                <span>Delivery Instructions</span>
-                            </div>
-                            <div class="review-box-line">
-                                @Model.DeliveryInstructions
-                            </div>
-                        </div>
-                    }
-                    @if (!string.IsNullOrEmpty(Model.GiftMessage))
-                    {
-                        <div class="reivew-info-box">
-                            <div class="review-header-container">
-                                <span>Gift Message</span>
-                            </div>
-                            <div class="review-box-line">
-                                @Model.GiftMessage
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-        <div class="form-buttons-group">
-            @Html.ActionLink("Back", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button arrow-left-red" })
-            <input id="btnPlaceOrder" class="arrow-right-blue" type="button" value="Place Your Order" />
-        </div>
+        </from>
+        <!-- /ko -->
     </div>
 </div>

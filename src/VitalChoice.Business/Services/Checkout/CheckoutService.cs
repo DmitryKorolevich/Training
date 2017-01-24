@@ -384,47 +384,49 @@ namespace VitalChoice.Business.Services.Checkout
             return true;
         }
 
-        public async Task<bool> SaveOrder(CustomerCartOrder cartOrder)
+        public async Task<int?> SaveOrder(OrderDynamic order,Guid idCart)
         {
-            if (cartOrder?.Order == null)
-                return false;
+            if (order == null)
+                return null;
 
-            if (cartOrder.Order.IdObjectType == (int) OrderType.AutoShip &&
-                !cartOrder.Order.Skus.Any(x => (bool?) x.Sku.SafeData.AutoShipProduct ?? false))
+            if (order.IdObjectType == (int) OrderType.AutoShip &&
+                !order.Skus.Any(x => (bool?) x.Sku.SafeData.AutoShipProduct ?? false))
             {
                 throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AutoShipOrderShouldContainAutoShip]);
             }
 
-            cartOrder.Order = (await _multipleShipmentsOrderService.CalculateStorefrontOrder(cartOrder.Order, OrderStatus.Processed)).Order;
+            order = (await _multipleShipmentsOrderService.CalculateStorefrontOrder(order, OrderStatus.Processed)).Order;
             //set needed key code for orders from storefront
-            cartOrder.Order.Data.KeyCode = "WEB ORDER";
+            order.Data.KeyCode = "WEB ORDER";
             using (var transaction = _context.BeginTransaction())
             {
                 try
                 {
                     var cart =
                         await
-                            _cartRepository.Query(c => c.CartUid == cartOrder.CartUid)
+                            _cartRepository.Query(c => c.CartUid == idCart)
                                 .Include(c => c.GiftCertificates)
                                 .Include(c => c.Skus)
                                 .SelectFirstOrDefaultAsync(true);
 
                     if (cart == null)
-                        return false;
+                        return null;
 
                     var sendOrderConfirm = false;
-                    if (cartOrder.Order.Customer?.Id != 0)
+                    if (order.Customer?.Id != 0)
                     {
-                        if (cartOrder.Order.Id == 0)
-                        {
-                            throw new ApiException("Order haven't been created during checkout session.");
-                        }
-
                         sendOrderConfirm = true;
-                        cartOrder.Order.Data.ConfirmationEmailSent = true;
-                        cartOrder.Order.DateCreated = DateTime.Now;
-                        cartOrder.Order = await _multipleShipmentsOrderService.UpdateAsync(cartOrder.Order);
-                        cart.IdCustomer = cartOrder.Order?.Customer?.Id;
+                        order.Data.ConfirmationEmailSent = true;
+                        order.DateCreated = DateTime.Now;
+                        if (order.Id == 0)
+                        {
+                            order = await _multipleShipmentsOrderService.InsertAsync(order);
+                        }
+                        else
+                        {
+                            order = await _multipleShipmentsOrderService.UpdateAsync(order);
+                        }
+                        cart.IdCustomer = order?.Customer?.Id;
                         cart.IdOrder = null;
                         cart.DiscountCode = null;
                         cart.GiftCertificates?.Clear();
@@ -435,22 +437,22 @@ namespace VitalChoice.Business.Services.Checkout
                     }
                     await _context.SaveChangesAsync();
 
-                    if (sendOrderConfirm && cartOrder.Order?.Customer != null)
+                    if (sendOrderConfirm && order?.Customer != null)
                     {
                         var customer =
-                            await _customerRepository.Query(p => p.Id == cartOrder.Order.Customer.Id).SelectFirstOrDefaultAsync(false);
+                            await _customerRepository.Query(p => p.Id == order.Customer.Id).SelectFirstOrDefaultAsync(false);
                         if (!string.IsNullOrEmpty(customer?.Email))
                         {
                             OrderDynamic mailOrder;
-                            if (cartOrder.Order.IdObjectType == (int) OrderType.AutoShip)
+                            if (order.IdObjectType == (int) OrderType.AutoShip)
                             {
-                                var ids = await _orderService.SelectAutoShipOrdersAsync(cartOrder.Order.Id);
+                                var ids = await _orderService.SelectAutoShipOrdersAsync(order.Id);
 
                                 mailOrder = await _orderService.SelectAsync(ids.First());
                             }
                             else
                             {
-                                mailOrder = cartOrder.Order;
+                                mailOrder = order;
                             }
 
                             var emailModel = await _orderMapper.ToModelAsync<OrderConfirmationEmail>(mailOrder);
@@ -469,7 +471,7 @@ namespace VitalChoice.Business.Services.Checkout
                     throw;
                 }
             }
-            return true;
+            return order.Id;
         }
 
         public async Task<int> GetCartItemsCount(Guid uid)

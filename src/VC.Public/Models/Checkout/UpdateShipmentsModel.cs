@@ -28,6 +28,8 @@ namespace VC.Public.Models.Checkout
             Shipments=new List<ShippingAddressModel>();
         }
 
+        public bool AllowAddMultipleShipments { get; set; }
+
         public ICollection<AvalibleShippingAddressModel> AvalibleAddresses { get; set; }
 
         public IList<ShippingAddressModel> Shipments { get; set; }

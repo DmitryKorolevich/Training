@@ -281,7 +281,7 @@
                     </div>
                 </div>
                 <div>
-                    <!-- ko if: options.AddButtonText() -->
+                    <!-- ko if: Model.AllowAddMultipleShipments() && options.AddButtonText() -->
                     <a data-bind="click: add, text: options.AddButtonText" class="button blue margin-top-small margin-bottom-medium new-shipping"></a>
                     <!-- /ko -->
                 </div>

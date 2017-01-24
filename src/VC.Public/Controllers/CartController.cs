@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using VC.Public.Models.Cart;
+using VC.Public.Models.Checkout;
 using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Core.Infrastructure;
 using VitalChoice.Core.Infrastructure.Helpers;
@@ -124,7 +125,7 @@ namespace VC.Public.Controllers
                 var addResult = await AddToCartInternal(skus.ToDictionary(s => s.Code));
                 await FillModel(result, addResult.Item2.Order, addResult.Item1);
                 HttpContext.SetCartUid(addResult.Item2.CartUid);
-                HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderId);
+                HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderIds);
                 result.CrossSells = await PopulateCartCrossSells(ContentCrossSellType.AddToCart);
                 return PartialView("_CartLite", result);
             }
@@ -148,7 +149,7 @@ namespace VC.Public.Controllers
 
             await FillModel(result, res.Item2.Order, res.Item1);
             HttpContext.SetCartUid(res.Item2.CartUid);
-            HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderId);
+            HttpContext.Session.Remove(CheckoutConstants.ReceiptSessionOrderIds);
             return result;
         }
 

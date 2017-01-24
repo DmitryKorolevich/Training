@@ -9,6 +9,6 @@ namespace VitalChoice.Infrastructure.Domain.Constants
     {
         public const string CartUidCookieName = "CartUid";
         public const string CustomerAuthToken = "AuthToken";
-        public const string ReceiptSessionOrderId = "ReceiptId";
+        public const string ReceiptSessionOrderIds = "ReceiptIds";
     }
 }
