@@ -16,6 +16,15 @@ angular.module('app.core.dataAccess.services.gcService', [])
         getGiftCertificates: function (filter, tracker) {
             return $http.post(baseUrl + 'GetGiftCertificates', filter, getConfig(tracker));
         },
+        requestGiftCertificatesReportFile: function (filter, tracker)
+        {
+            return $http.post(baseUrl + 'RequestGiftCertificatesReportFile', filter, getConfig(tracker));
+        },
+        getGiftCertificatesReportFile: function (id, buildNumber)
+        {
+            return baseUrl + ('GetGiftCertificatesReportFile/{0}?buildNumber={1}')
+                .format(id, buildNumber);
+        },
         getGiftCertificatesWithOrderInfo: function (filter, tracker) {
             return $http.post(baseUrl + 'GetGiftCertificatesWithOrderInfo', filter, getConfig(tracker));
         },

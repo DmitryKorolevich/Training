@@ -64,6 +64,7 @@ using VitalChoice.Business.Helpers;
 using VitalChoice.Business.Services.Products;
 using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services.Products;
 
 namespace VC.Admin.Controllers
@@ -357,7 +358,7 @@ namespace VC.Admin.Controllers
 
                 var model = await _mapper.ToModelAsync<OrderManageModel>(order);
                 model.UseShippingAndBillingFromCustomer = true;
-                model.GCs = new List<GCListItemModel>() { new GCListItemModel(null) };
+                model.GCs = new List<GCListItemModel>() { new GCListItemModel(null, null) };
                 model.SkuOrdereds = skus;
                 model.UpdateShippingAddressForCustomer = true;
                 model.UpdateCardForCustomer = true;

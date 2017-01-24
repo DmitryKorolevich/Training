@@ -22,6 +22,7 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services;
 
 namespace VC.Admin.ModelConverters
@@ -84,13 +85,13 @@ namespace VC.Admin.ModelConverters
                 }
                 foreach(var item in dynamic.GiftCertificates)
                 {
-                    model.GCs.Add(new GCListItemModel(item.GiftCertificate));
+                    model.GCs.Add(new GCListItemModel(item.GiftCertificate, LookupHelper.GetGCTypeName(item.GiftCertificate.GCType)));
                     model.GiftCertificatesSubtotal += item.Amount;
                 }
             }
             else
             {
-                model.GCs = new List<GCListItemModel>() { new GCListItemModel(null) };
+                model.GCs = new List<GCListItemModel>() { new GCListItemModel(null,null) };
             }
 
             if (dynamic.Skus != null)

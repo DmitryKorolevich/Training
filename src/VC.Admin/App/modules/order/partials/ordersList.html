@@ -1,6 +1,15 @@
 ﻿<div class="container-fluid orders">
     <div class="well">
-        <span class="legend">Manage Orders</span>
+        <div class="row form-group margin-bottom-0px">
+            <div class="col-md-10">
+                <span class="legend">Manage Orders</span>
+            </div>
+            <div class="col-md-2">
+                <div class="pull-right">
+                    <a ui-sref="index.oneCol.emailOrderDetail" target="_blank" class="btn btn-primary top-button">Internal Orders</a>
+                </div>
+            </div>
+        </div>
         <form class="form-horizontal" name="forms.form" data-ng-submit="save()" data-ng-class="{submitted: forms.form.submitted}" novalidate>
             <fieldset>
                 <div class="row form-group">
@@ -16,7 +25,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="pull-right padding-left-15px">
-                            <button class="btn btn-info" data-ng-click="filterGCs();" type="button" ladda="gcRefreshTracker.active()">Check GC Balance</button>
+                            <button class="btn btn-info top-button" data-ng-click="filterGCs();" type="button" ladda="gcRefreshTracker.active()">Check GC Balance</button>
                         </div>
                         <div class="col-md-4 pull-right">
                             <input type="text" name="ExactCode" class="form-control" placeholder="GC Code" data-ng-model="gcfilter.ExactCode" autocomplete="off">
