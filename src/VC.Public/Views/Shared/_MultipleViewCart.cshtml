@@ -1,0 +1,188 @@
+﻿<div data-bind="visible: OrderModel.AutoShip" style="display: none;" class="form-regular">
+    <div class="form-control-important-info">Your cart contains Auto-Ship product. Other products cannot be added to the cart until you submit your order. If you don't want to just remove it from cart and then you will be able add other products to cart again</div>
+</div>
+<div data-bind="visible: OrderModel.TopGlobalMessage" style="display: none;" class="form-regular">
+    <div class="form-control-important-info" data-bind="text: OrderModel.TopGlobalMessage"></div>
+</div>
+<table class="standard-table cart-items-list">
+    <thead>
+        <tr>
+            <th colspan="2">
+                Item
+            </th>
+            <th>
+                Price
+            </th>
+            <th>
+                Quantity
+            </th>
+            <th>
+                Subtotal
+            </th>
+            <th>
+            </th>
+        </tr>
+    </thead>
+    <tbody style="display: none;" data-bind="visible: OrderModel.Skus().length == 0">
+        <tr><td colspan="6">No Items Added</td></tr>
+    </tbody>
+    <tbody data-bind="foreach: OrderModel.Skus">
+        <tr>
+            <td class="cart-image-link">
+                <a data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }">
+                    <img data-bind="attr: { src: IconUrl, title: formatDisplayName($data) }" />
+                </a>
+            </td>
+            <td class="cart-line-info">
+                <a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }, text: formatDisplayName($data)"></a>
+                <span class="cart-sku-code" data-bind="text: '(' + Code() + ')', visible: Code"></span>
+                <span class="stock-presence-note" data-bind="visible: InStock()">In Stock Ready to Ship</span>
+                <span class="field-validation-error no-space" data-bind="text: !InStock() ? 'Out of stock' : '', attr: {'data-valmsg-for': 'i'+$parentContext.$index() + '.Skus.i' + $index() + '.Code'}" data-valmsg-replace="true"></span>
+                <span data-bind="foreach: Warnings">
+                    <span class="field-validation-warning no-space" data-bind="text: $data"></span>
+                </span>
+                <span data-bind="foreach: Infos">
+                    <span class="field-validation-info no-space" data-bind="text: $data"></span>
+                </span>
+                <!-- ko if: $root.Model.Shipments().length>1 -->
+                <div class="assign-buttons">
+                    <a data-bind="click: $root.move" class="circle-button button-blue margin-right-small">
+                        <i class="glyphicon glyphicon-sort"></i><span class="description">Move Item</span>
+                    </a>
+                    <a data-bind="click: $root.copy" class="circle-button button-green">
+                        <i class="glyphicon glyphicon-plus"></i><span class="description">Copy Item</span>
+                    </a>
+                </div>
+                <!-- /ko -->
+            </td>
+            <td data-bind="text: formatCurrency(Price())"></td>
+            <td class="width-cart-quantity">
+                <input class="input-control width-small" data-bind="value: Quantity, attr: { name: 'i'+$parentContext.$index() + '.SkusQuantity' + $index(), id: 'i'+$parentContext.$index() + '.SkusQuantity' + $index()}"
+                       data-val="true" data-val-range="Quantity must be greater than zero" data-val-range-max="2147483647" data-val-range-min="0"
+                       data-val-regex="Quantity must be whole number" data-val-regex-pattern="-?\d+" data-val-required="The Quantity field is required."
+                       type="text">
+                <span class="field-validation-valid" data-bind="attr: { 'data-valmsg-for': 'i'+$parentContext.$index() + '.SkusQuantity' + $index()}" data-valmsg-replace="true"></span>
+            </td>
+            <td data-bind="text: formatCurrency(SubTotal())"></td>
+            <td class="grid-controls-container width-cart-control">
+                <a class="circle-button button-red" data-bind="click: $parent.removeSku">
+                    <i class="glyphicon glyphicon-remove-sign"></i>
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<span class="shipping-instructions-title margin-top-small" data-bind="visible: OrderModel.PromoSkus() != null && OrderModel.PromoSkus().length > 0" style="display: none;">Promo Products</span>
+<table class="standard-table cart-items-list" data-bind="visible: OrderModel.PromoSkus() != null && OrderModel.PromoSkus().length > 0" style="display: none;">
+    <thead>
+        <tr>
+            <th colspan="2">
+                Item
+            </th>
+            <th>
+                Price
+            </th>
+            <th>
+                Quantity
+            </th>
+            <th>
+                Subtotal
+            </th>
+            <th>
+            </th>
+        </tr>
+    </thead>
+    <tbody data-bind="foreach: OrderModel.PromoSkus">
+        <tr>
+            <td class="cart-image-link">
+                <a data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }">
+                    <img data-bind="attr: { src: IconUrl, title: formatDisplayName($data) }" />
+                </a>
+            </td>
+            <td class="cart-line-info">
+                <a class="cart-text-link" data-bind="attr: { href: ProductPageUrl, title: formatDisplayName($data) }, text: formatDisplayName($data)"></a>
+                <span class="cart-sku-code" data-bind="text: '(' + Code() + ')', visible: Code"></span>
+                <span class="stock-presence-note" data-bind="visible: InStock()">In Stock Ready to Ship</span>
+                <span class="field-validation-error no-space" data-bind="text: !InStock() ? 'Out of stock' : '', attr: {'data-valmsg-for': 'i'+$parentContext.$index() + '.Promos.i' + $index() + '.Code'}" data-valmsg-replace="true"></span>
+                <span data-bind="foreach: Warnings">
+                    <span class="field-validation-warning no-space" data-bind="text: $data"></span>
+                </span>
+                <span data-bind="foreach: Infos">
+                    <span class="field-validation-info no-space" data-bind="text: $data"></span>
+                </span>
+            </td>
+            <td data-bind="text: formatCurrency(Price())"></td>
+            <td class="width-cart-quantity" data-bind="text: Quantity"></td>
+            <td data-bind="text: formatCurrency(SubTotal())"></td>
+            <td class="grid-controls-container width-cart-control"></td>
+        </tr>
+    </tbody>
+</table>
+<div class="cart-order-details">
+    <div class="cart-shipping-instructions" data-bind="ifnot: OrderModel.AutoShip">
+        <span class="shipping-instructions-title">
+            Shipping Instructions:
+        </span>
+        <label class="cart-shipping-option">
+            <input type="radio" data-bind="checked: OrderModel.ShipAsap, checkedValue: true, event: { change: shipAsapChanged }, attr: { name: $index() + 'rdUpgradeOption'}" />
+            Ship this order as soon as possible
+        </label>
+        <label class="cart-shipping-option">
+            <input type="radio" data-bind="checked: OrderModel.ShipAsap, checkedValue: false, event: { change: shipAsapChanged }, attr: { name: $index() + 'rdUpgradeOption'}" />
+            Ship this order the week of:
+        </label>
+        <input class="cart-input-box input-control date-picker-async" data-bind="value: OrderModel.ShippingDate, disable: OrderModel.ShipAsap, attr: { name: 'i'+$index() + '.ShippingDate', id: 'i'+$index() + '.ShippingDate'}" type="text">
+        <span class="field-validation-valid field-validation-error" data-bind="attr: {'data-valmsg-for': 'i'+$index() + '.ShippingDate'}" data-valmsg-replace="true"></span>
+        <a href="/content/shipping-information">View our shipping policies</a>
+    </div>
+    <div class="cart-order-totals">
+        <div class="cart-total-line">
+            <label>
+                Subtotal
+            </label>
+            <label class="cart-total-value" data-bind="text: OrderModel.SubTotal() ? formatCurrency(OrderModel.SubTotal()) : ''"></label>
+        </div>
+        <div class="cart-total-line" data-bind="visible: OrderModel.ShippingUpgradeNPOptions() != null && OrderModel.ShippingUpgradeNPOptions().length > 0">
+            <label>
+                Upgrade Non-Perishable Items
+            </label>
+            <select id="slNpUpgradeOption" name="NpUpgradeOption" class="input-control cart-total-value" data-bind='options: OrderModel.ShippingUpgradeNPOptions, optionsText: "Text", optionsValue: "Key",  value: OrderModel.ShippingUpgradeNP, optionsCaption: "Not Selected"'></select>
+        </div>
+        <div class="cart-total-line margin-top-small" data-bind="visible: OrderModel.ShippingUpgradePOptions() != null && OrderModel.ShippingUpgradePOptions().length > 0">
+            <label>
+                Upgrade Perishable Items
+            </label>
+            <select id="slUpgradeOption" name="UpgradeOption" class="input-control cart-total-value" data-bind='options: OrderModel.ShippingUpgradePOptions, optionsText: "Text", optionsValue: "Key",  value: OrderModel.ShippingUpgradeP, optionsCaption: "Not Selected"'></select>
+        </div>
+        <div class="cart-total-line" data-bind="visible: OrderModel.DiscountTotal() != null && OrderModel.DiscountTotal() != 0" style="display: none;">
+            <label>
+                Discount
+            </label>
+            <label class="cart-total-value" data-bind="text: OrderModel.DiscountTotal() ? formatCurrency(OrderModel.DiscountTotal()) : ''"></label>
+        </div>
+        <div class="cart-total-line">
+            <label>
+                Shipping
+            </label>
+            <label class="cart-total-value" data-bind="text: OrderModel.ShippingCost() ? formatCurrency(OrderModel.ShippingCost()) : 'FREE!'"></label>
+        </div>
+        <div class="cart-total-line" data-bind="visible: OrderModel.Tax() != null && OrderModel.Tax() != 0">
+            <label>
+                Tax
+            </label>
+            <label class="cart-total-value" data-bind="text: OrderModel.Tax() ? formatCurrency(OrderModel.Tax()) : ''"></label>
+        </div>
+        <div class="cart-total-line" data-bind="visible: OrderModel.GiftCertificatesTotal() != null && OrderModel.GiftCertificatesTotal() != 0" style="display: none;">
+            <label>
+                Gift Certificates
+            </label>
+            <label class="cart-total-value" data-bind="text: OrderModel.GiftCertificatesTotal() ? formatCurrency(OrderModel.GiftCertificatesTotal()) : ''"></label>
+        </div>
+        <div class="cart-total-line cart-order-summary">
+            <label>
+                Order Total
+            </label>
+            <label class="cart-total-value" data-bind="text: formatCurrency(OrderModel.OrderTotal())"></label>
+        </div>
+    </div>
+</div>

@@ -12,6 +12,7 @@ $(function ()
 
         self.refreshing = ko.observable(true);
         self.loaded = ko.observable(false);
+        self.blockCalculation = false;
 
         var load = function ()
         {
@@ -30,15 +31,16 @@ $(function ()
                     if (result.Success)
                     {
                         self.Model = ko.mapping.fromJS(result.Data);
-                        setRecalculateCartHandler();
+                        initCart();
 
                         self.loaded(true);
+                        self.refreshing(false);
                     } else
                     {
                         processErrorResponse(result, self);
                         self.loaded(false);
+                        self.refreshing(false);
                     }
-                    self.refreshing(false);
                 }).error(function (result)
                 {
                     $("span[data-valmsg-for]").text('');
@@ -53,13 +55,229 @@ $(function ()
             if (confirm('Are you sure you want to delete this order?'))
             {
                 self.Model.Shipments.remove(item);
+                setTimeout(function ()
+                {
+                    reparseElementValidators("#mainForm");
+                }, 200);
             }
+        };
+
+        self.removeGc = function (item)
+        {
+            if (self.Model.GiftCertificateCodes().length > 0)
+            {
+                self.Model.GiftCertificateCodes.remove(item);
+            }
+        };
+
+        self.addGc = function ()
+        {
+            var newGc = { Value: "" };
+            self.Model.GiftCertificateCodes.push(newGc);
+        };
+
+        self.gcLostFocus = function ()
+        {
+            recalculateCart(self);
+        };
+
+        self.move = function (item, e)
+        {
+            var context = ko.contextFor(e.target);
+            var fromIndex = context.$parentContext.$index();
+            var skus = context.$parent.OrderModel.Skus;
+            $.ajax({
+                url: "/Checkout/MoveSku",
+                dataType: "html"
+            }).success(function (content)
+            {
+                $(content).dialog({
+                    resizable: false,
+                    modal: true,
+                    minWidth: 515,
+                    open: function ()
+                    {
+                        var options = getOrderOptions(fromIndex);
+                        $('#dQTY').val(1);
+                        $('#dddOrder').append(options);
+                        reparseElementValidators("#popupForm");
+                    },
+                    close: function ()
+                    {
+                        $(this).dialog('destroy').remove();
+                    },
+                    buttons: [
+                        {
+                            text: "Select",
+                            'class': "main-dialog-button",
+                            click: function ()
+                            {
+                                var validator = $("#popupForm").validate();
+
+                                if ($("#popupForm").valid())
+                                {
+                                    var toIndex = parseInt($('#dddOrder').val());
+                                    var qty = parseInt($('#dQTY').val());
+                                    if (toIndex == fromIndex)
+                                    {
+                                        item.Quantity(qty);
+                                        $(this).dialog("close");
+                                        return;
+                                    }
+
+                                    self.blockCalculation = true;
+                                    if (item.Quantity() > qty)
+                                    {
+                                        item.Quantity(item.Quantity() - qty);
+                                    }
+                                    else
+                                    {
+                                        skus.remove(item);
+                                    }
+                                    var newItem = ko.mapping.fromJS(ko.toJS(item));
+                                    newItem.Quantity(qty);
+                                    var add=true;
+                                    $.each(self.Model.Shipments()[toIndex].OrderModel.Skus(), function (i, sku)
+                                    {
+                                        if (sku.Code() == newItem.Code())
+                                        {
+                                            add = false;
+                                            sku.Quantity(sku.Quantity() + newItem.Quantity());
+                                            return false;
+                                        }
+                                    });
+                                    if (add)
+                                    {
+                                        self.Model.Shipments()[toIndex].OrderModel.Skus.push(newItem);
+                                    }
+                                    self.blockCalculation = false;
+
+                                    $(this).dialog("close");
+                                    recalculateCart(self);
+                                }
+                            }
+                        },
+                        {
+                            text: "Cancel",
+                            click: function ()
+                            {
+                                $(this).dialog("close");
+                            }
+                        }
+                    ]
+                });
+            });
+        };
+
+        var getOrderOptions = function (fromIndex)
+        {
+            var options = "";
+            $.each(self.Model.Shipments(), function (i, item)
+            {
+                if (i != fromIndex)
+                {
+                    options += '<option value="{0}">{1} - {2} {3} {4}</option>'.format(i,
+                        item.Name(), item.ShipToFirstName(), item.ShipToLastName(), item.ShipToAddress1());
+                }
+            });
+            return options;
+        };
+
+        self.copy = function (item, e)
+        {
+            var context = ko.contextFor(e.target);
+            var fromIndex = context.$parentContext.$index();
+            var skus = context.$parent.OrderModel.Skus;
+            $.ajax({
+                url: "/Checkout/CopySku",
+                dataType: "html"
+            }).success(function (content)
+            {
+                $(content).dialog({
+                    resizable: false,
+                    modal: true,
+                    minWidth: 515,
+                    open: function ()
+                    {
+                        var options = getOrderOptions(fromIndex);
+                        $('#dddOrder').append(options);
+                        reparseElementValidators("#popupForm");
+                    },
+                    close: function ()
+                    {
+                        $(this).dialog('destroy').remove();
+                    },
+                    buttons: [
+                        {
+                            text: "Select",
+                            'class': "main-dialog-button",
+                            click: function ()
+                            {
+                                var validator = $("#popupForm").validate();
+
+                                if ($("#popupForm").valid())
+                                {
+                                    var toIndex = parseInt($('#dddOrder').val());
+                                    if (toIndex == fromIndex)
+                                    {
+                                        $(this).dialog("close");
+                                        return;
+                                    }
+
+                                    self.blockCalculation = true;
+                                    var newItem = ko.mapping.fromJS(ko.toJS(item));
+                                    var add=true;
+                                    $.each(self.Model.Shipments()[toIndex].OrderModel.Skus(), function (i, sku)
+                                    {
+                                        if (sku.Code() == newItem.Code())
+                                        {
+                                            add = false;
+                                            sku.Quantity(sku.Quantity() + newItem.Quantity());
+                                            return false;
+                                        }
+                                    });
+                                    if (add)
+                                    {
+                                        self.Model.Shipments()[toIndex].OrderModel.Skus.push(newItem);
+                                    }
+                                    self.blockCalculation = false;
+
+                                    $(this).dialog("close");
+                                    recalculateCart(self);
+                                }
+                            }
+                        },
+                        {
+                            text: "Cancel",
+                            click: function ()
+                            {
+                                $(this).dialog("close");
+                            }
+                        }
+                    ]
+                });
+            });
         };
 
         self.save = function ()
         {
             recalculateCart(self, function ()
             {
+                var atLeastOneProduct = false;
+                $.each(self.Model.Shipments(), function (i, shipment)
+                {
+                    if (shipment.OrderModel.Skus().length == 0)
+                    {
+                        atLeastOneProduct = true;
+                        return false;
+                    }
+                });
+                if (atLeastOneProduct)
+                {
+                    notifyError('Each order should contain at least one product');
+                    return;
+                }
+
                 self.refreshing(true);
 
                 $.ajax({
@@ -86,15 +304,51 @@ $(function ()
             });
         };
 
-        var setRecalculateCartHandler = function ()
+        var initCart = function ()
         {
+            $.each(self.Model.Shipments(), function (i, item)
+            {
+                item.upgradeOptions = ko.observableArray([]);
+                if (item.OrderModel.ShippingDate() !== null && item.OrderModel.ShippingDate() !== undefined)
+                {
+                    item.OrderModel.ShippingDate = ko.observable(moment(item.OrderModel.ShippingDate()).format('L'));
+                }
+                else
+                {
+                    item.OrderModel.ShippingDate = ko.observable("");
+                }
+
+                item.shipAsapChanged = function ()
+                {
+                    if (item.OrderModel.ShipAsap() && self.loaded())
+                    {
+                        var index = self.Model.Shipments().indexOf(item);
+                        $(".item[data-index='" + index + "'] .date-picker").datepicker('setDate', null);
+                        item.OrderModel.ShippingDate(null);
+                    }
+                };
+
+                item.removeSku = function (sku)
+                {
+                    item.OrderModel.Skus.remove(sku)
+                };
+            });
+
             ko.computed(function ()
             {
                 return ko.toJSON(self.Model);
             }).subscribe(function ()
             {
-                //recalculateCart(self);
+                recalculateCart(self);
             });
+
+            setTimeout(function ()
+            {
+                $(".date-picker-async").datepicker();
+                $(".date-picker-async").datepicker("option", "minDate", 1);
+                reparseElementValidators("#mainForm");
+                recalculateCart(self);
+            }, 200);
         };
 
         load();
@@ -103,136 +357,22 @@ $(function ()
     $('#mainForm').removeClass('hide');
     var viewModel = new ReviewModel();
     ko.applyBindings(viewModel);
-
-    $(".date-picker").datepicker("option", "minDate", 1);
-
-	//$("body").on("click", "#btnPlaceOrder", function() {
-	//	$("#viewCartForm").submit();
-	//})
-
-	//var updateUIVisibility = function ()
-	//{
-	//    if ($('.item').length >1)
-	//    {
-	//        $('.top-billing-wrapper').show();
-	//        $('.item .reivew-info-box.billing').hide();
-	//        $('.item .cart-promo-container').hide();
-	//        $('.item .cart-gc-container').hide();
-	//    }
-	//    else
-	//    {
-	//        $('.top-billing-wrapper').hide();
-	//        $('.item .reivew-info-box.billing').show();
-	//        $('.item .cart-promo-container').show();
-	//        $('.item .cart-gc-container').show();
-	//    }
-
-	//    $('.item').removeClass('alternate-color');
-	//    $.each($('.item'), function (i, item)
-	//    {
-	//        if (i % 2 == 0)
-	//        {
-	//            $(item).addClass('alternate-color');
-	//        }
-	//    });
-	//};
-	//updateUIVisibility();
-
-	//$("body").on("click", ".item .delete-order", function ()
-	//{
-	//    $(this).closest('.item').remove();
-	//    updateUIVisibility();
-	//});
-
-	//var items = $('td.cart-line-info');
-	//$.each(items, function (index, item)
-	//{
-	//    var buttons = $('.assign-buttons.template').clone();
-	//    buttons.removeClass('hide');
-	//    buttons.removeClass('template');
-	//    $(item).append(buttons);
-	//});
-
-	//var popupCopyContent = '<div title="Select order"><form class="form-regular small"><div class="form-group"><label class="control-label">Orders</label><div class="input-group"><select class="form-control big" id="ddOrder">' +
-    //    '<option value="1">Order #1 - Gary1 Gould 806 Front ST</option>' +
-    //    '<option value="2">Order #2 - Gary2 Gould 806 Front ST</option>' +
-    //    '<option value="4">Order #4 - Gary4 Gould 806 Front ST</option>' +
-    //    '<option value="5">Order #5 - Gary5 Gould 806 Front ST</option></select></div></div></form></div>';
-
-	//var popupMoveContent = '<div title="Select order"><form class="form-regular small"><div class="form-group"><label class="control-label">Orders</label><div class="input-group"><select class="form-control big" id="ddOrder">' +
-    //    '<option value="1">Order #1 - Gary1 Gould 806 Front ST</option>' +
-    //    '<option value="2">Order #2 - Gary2 Gould 806 Front ST</option>' +
-    //    '<option value="4">Order #4 - Gary4 Gould 806 Front ST</option>' +
-    //    '<option value="5">Order #5 - Gary5 Gould 806 Front ST</option></select></div></div>' +
-    //    '<div class="form-group"><label class="control-label">QTY</label><div class="input-group"><div class="input-group"><input class="form-control small-form-control" type="text" id="qty" value="1"></div></div>' +
-    //    '</form></div>';
-
-	//$("body").on("click", ".assign-buttons .button-blue", function ()
-	//{
-	//    var row = $(this).closest('tr');
-	//    openAssignPopup(function (id)
-	//    {
-	//        row.remove();
-	//        var targetItem = $('.item[data-id=' + id + ']');
-	//        targetItem.find('tbody').eq(1).append(row);
-	//    }, popupMoveContent);
-	//});
-
-	//$("body").on("click", ".assign-buttons .button-green", function ()
-	//{
-	//    var row = $(this).closest('tr');
-	//    openAssignPopup(function (id)
-	//    {
-	//        row = row.clone();
-	//        var targetItem = $('.item[data-id=' + id + ']');
-	//        targetItem.find('tbody').eq(1).append(row);
-	//    }, popupCopyContent);
-	//});
-
-	//var openAssignPopup = function (successCallback, content)
-	//{
-	//    $(content).dialog({
-	//        resizable: false,
-	//        modal: true,
-	//        minWidth: 515,
-	//        open: function ()
-	//        {
-	//        },
-	//        close: function ()
-	//        {
-	//            $(this).dialog('destroy').remove();
-	//        },
-	//        buttons: [
-    //            {
-    //                text: "Select",
-    //                'class': "main-dialog-button",
-    //                click: function ()
-    //                {
-    //                    successCallback($('#ddOrder').val());
-    //                    $(this).dialog("close");
-    //                }
-    //            },
-    //            {
-    //                text: "Cancel",
-    //                click: function ()
-    //                {
-    //                    $(this).dialog("close");
-    //                }
-    //            }
-	//        ]
-	//    });
-	//};
 });
 
 var ajax_request;
 function recalculateCart(viewModel, successCallback)
 {
+    if (viewModel.blockCalculation)
+    {
+        return;
+    }
+
     if (viewModel.refreshing())
     {
         return;
     }
 
-    $("#mainForm").validate();
+    var validator = $("#mainForm").validate();
 
     if ($("#mainForm").valid())
     {

@@ -3,14 +3,14 @@
 }
 
 @using VC.Public.Models.Cart
-@model VC.Public.Models.Checkout.ReceiptModel
+@model VC.Public.Models.Checkout.MultipleReceiptModel
 @using Microsoft.Extensions.Options
 @using VitalChoice.Infrastructure.Domain.Options
 @inject IOptions<AppOptions> appOptions
 
 @section PageScripts {
     <script src="@Url.Content("/app/modules/checkout/checkoutMain.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
-<script src="@Url.Content("/app/modules/checkout/receipt.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
+    <script src="@Url.Content("/app/modules/checkout/receipt.js")?v=@(appOptions.Value.Versioning.BuildNumber)"></script>
 }
 
 @section Meta {
@@ -39,270 +39,278 @@
             <a href="/" class="button arrow-left-red">Continue Shopping</a>
         </div>
     </div>
-    <div class="checkout-sections-divider margin-top-reasonable margin-bottom-small"></div>
-    <div class="receipt-info-line">
-        @Html.LabelFor(x => x.OrderNumber, null, new { @class = "bold" }):<span>@Model.OrderNumber</span>
-    </div>
-    <div class="receipt-info-line">
-        @Html.LabelFor(x => x.OrderDate, null, new { @class = "bold" }):<span>@Model.OrderDate.ToString("MM/dd/yyyy")</span>
-    </div>
-    @if (!Model.ShipAsap && Model.ShippingDate.HasValue)
+    @foreach (var receipt in Model.Receipts)
     {
-        <div class="receipt-info-line">
-            <label class="bold">Ship Delay Date</label>@(":")<span>@Model.ShippingDate?.ToString("MM/dd/yyyy")</span>
-        </div>
-    }
-    <div class="reivew-order-info receipt-step two-columns">
-        <div class="reivew-info-box">
-            <div class="review-header-container">
-                <span>Bill to Details</span>
+        <div class="margin-bottom-medium">
+            <div class="checkout-sections-divider margin-top-reasonable margin-bottom-small"></div>
+            <div class="receipt-info-line">
+                @Html.LabelFor(x => x.Receipts[0].OrderNumber, null, new { @class = "bold" }):<span>@receipt.OrderNumber</span>
             </div>
-            @foreach (var item in Model.CreditCardDetails)
+            <div class="receipt-info-line">
+                @Html.LabelFor(x => x.Receipts[0].OrderDate, null, new { @class = "bold" }):<span>@receipt.OrderDate.ToString("MM/dd/yyyy")</span>
+            </div>
+            @if (!receipt.ShipAsap && receipt.ShippingDate.HasValue)
             {
-                <div class="review-box-line">
-                    @if (!string.IsNullOrWhiteSpace(item.Key))
-                    {
-                        <span class="review-info-label">@item.Key:</span>
-                    }
-                    <span class="review-info-value">@item.Value</span>
+                <div class="receipt-info-line">
+                    <label class="bold">Ship Delay Date</label>@(":")<span>@receipt.ShippingDate?.ToString("MM/dd/yyyy")</span>
                 </div>
             }
-            <div class="review-box-line">
-            </div>
-            @foreach (var item in Model.BillToAddress)
-            {
-                if (!string.IsNullOrEmpty(item.Value))
-                {
-                    <div class="review-box-line">
-                        @if (!string.IsNullOrWhiteSpace(item.Key))
-                        {
-                            <span class="review-info-label">@item.Key:</span>
-                        }
-                        <span class="review-info-value">@item.Value</span>
+            <div class="reivew-order-info receipt-step two-columns">
+                <div class="reivew-info-box">
+                    <div class="review-header-container">
+                        <span>Bill to Details</span>
                     </div>
-                }
-            }
-        </div>
-        <div class="reivew-info-box">
-            <div class="review-header-container">
-                <span>Ship to Details</span>
-            </div>
-            @foreach (var item in Model.ShipToAddress)
-            {
-                if (!string.IsNullOrEmpty(item.Value))
+                    @foreach (var item in receipt.CreditCardDetails)
                 {
+                        <div class="review-box-line">
+                            @if (!string.IsNullOrWhiteSpace(item.Key))
+                            {
+                                <span class="review-info-label">@item.Key:</span>
+                            }
+                            <span class="review-info-value">@item.Value</span>
+                        </div>
+                    }
                     <div class="review-box-line">
-                        @if (!string.IsNullOrWhiteSpace(item.Key))
-                        {
-                            <span class="review-info-label">@item.Key:</span>
-                        }
-                        <span class="review-info-value">@item.Value</span>
                     </div>
-                }
-            }
-        </div>
-    </div>
-    <div class="margin-bottom-small"></div>
-    <div class="receipt-sku-details">
-        <table class="standard-table cart-items-list cart-items-list-readonly">
-            <thead>
-                <tr>
-                    <th>
-                        Qty
-                    </th>
-                    <th>
-                        SKU
-                    </th>
-                    <th>
-                        Description
-                    </th>
-                    <th>
-                        Unit Price
-                    </th>
-                    <th>
-                        Price
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.Skus.Count > 0)
+                    @foreach (var item in receipt.BillToAddress)
                 {
-                    foreach (var t in Model.Skus)
+                    if (!string.IsNullOrEmpty(item.Value))
                     {
-                        <tr>
-                            <td class="qty">@t.Quantity</td>
-                            <td class="sku">@t.Code</td>
-                            <td>
-                                <a class="cart-text-link" href="@t.ProductPageUrl">@t.DisplayName @(!string.IsNullOrWhiteSpace(t.SubTitle) ? $"{t.SubTitle} " : string.Empty)(@t.PortionsCount)</a>
-                                @foreach (var gcCode in t.GeneratedGCCodes)
+                            <div class="review-box-line">
+                                @if (!string.IsNullOrWhiteSpace(item.Key))
                                 {
-                                    <br /><span class="cart-sku-code"><em>GC Code: @gcCode</em></span>
+                                    <span class="review-info-label">@item.Key:</span>
                                 }
-                            </td>
-                            <td class="unit-price">@((t.Price ?? 0).ToString("C2"))</td>
-                            <td class="price">@((t.SubTotal ?? 0).ToString("C2"))</td>
-                        </tr>
+                                <span class="review-info-value">@item.Value</span>
+                            </div>
+                        }
                     }
-                }
-                else
+                </div>
+                <div class="reivew-info-box">
+                    <div class="review-header-container">
+                        <span>Ship to Details</span>
+                    </div>
+                    @foreach (var item in receipt.ShipToAddress)
                 {
-                    <tr><td colspan="6">No Items Added</td></tr>
-                }
-            </tbody>
-        </table>
-    </div>
-    @if (Model.PromoSkus.Count > 0)
-    {
-        <div class="receipt-sku-details">
-            <label class="receipt-promo-title">Promo Products</label>
-            <table class="standard-table cart-items-list cart-items-list-readonly">
-                <thead>
-                    <tr>
-                        <th>
-                            Qty
-                        </th>
-                        <th>
-                            SKU
-                        </th>
-                        <th>
-                            Description
-                        </th>
-                        <th>
-                            Unit Price
-                        </th>
-                        <th>
-                            Price
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var t in Model.PromoSkus)
+                    if (!string.IsNullOrEmpty(item.Value))
                     {
-                        <tr>
-                            <td class="qty">@t.Quantity</td>
-                            <td class="sku">@t.Code</td>
-                            <td>
-                                <a class="cart-text-link" href="@t.ProductPageUrl">@t.DisplayName @(!string.IsNullOrWhiteSpace(t.SubTitle) ? $"{t.SubTitle} " : string.Empty)(@t.PortionsCount)</a>
-                                @if (t.GeneratedGCCodes != null)
+                            <div class="review-box-line">
+                                @if (!string.IsNullOrWhiteSpace(item.Key))
                                 {
-                                    foreach (var gcCode in t.GeneratedGCCodes)
-                                    {
-                                        <br />
-                                        <span class="cart-sku-code"><em>GC Code: @gcCode</em></span>
-                                    }
+                                    <span class="review-info-label">@item.Key:</span>
                                 }
-                            </td>
-                            <td class="unit-price">@((t.Price ?? 0).ToString("C2"))</td>
-                            <td class="price">@((t.SubTotal ?? 0).ToString("C2"))</td>
-                        </tr>
+                                <span class="review-info-value">@item.Value</span>
+                            </div>
+                        }
                     }
-                </tbody>
-            </table>
-        </div>
-    }
-    <div class="receipt-shipping-method">
-        <label>Shipping:</label>
-        <div class="receipt-shipping-linecontainer">
-            <div class="receipt-shipping-line">
-                <label class="cart-total-value">
-                    Standard Shipping
-                </label>
+                </div>
             </div>
-            @if (Model.ShippingUpgradeNP.HasValue)
+            <div class="margin-bottom-small"></div>
+            <div class="receipt-sku-details">
+                <table class="standard-table cart-items-list cart-items-list-readonly">
+                    <thead>
+                        <tr>
+                            <th>
+                                Qty
+                            </th>
+                            <th>
+                                SKU
+                            </th>
+                            <th>
+                                Description
+                            </th>
+                            <th>
+                                Unit Price
+                            </th>
+                            <th>
+                                Price
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (receipt.Skus.Count > 0)
+                {
+                    foreach (var t in receipt.Skus)
+                    {
+                                <tr>
+                                    <td class="qty">@t.Quantity</td>
+                                    <td class="sku">@t.Code</td>
+                                    <td>
+                                        <a class="cart-text-link" href="@t.ProductPageUrl">@t.DisplayName @(!string.IsNullOrWhiteSpace(t.SubTitle) ? $"{t.SubTitle} " : string.Empty)(@t.PortionsCount)</a>
+                                        @foreach (var gcCode in t.GeneratedGCCodes)
+                                        {
+                                            <br />
+                                            <span class="cart-sku-code"><em>GC Code: @gcCode</em></span>
+                                        }
+                                    </td>
+                                    <td class="unit-price">@((t.Price ?? 0).ToString("C2"))</td>
+                                    <td class="price">@((t.SubTotal ?? 0).ToString("C2"))</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="6">No Items Added</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (receipt.PromoSkus.Count > 0)
             {
-                <div class="receipt-shipping-line">
+                <div class="receipt-sku-details">
+                    <label class="receipt-promo-title">Promo Products</label>
+                    <table class="standard-table cart-items-list cart-items-list-readonly">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Qty
+                                </th>
+                                <th>
+                                    SKU
+                                </th>
+                                <th>
+                                    Description
+                                </th>
+                                <th>
+                                    Unit Price
+                                </th>
+                                <th>
+                                    Price
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var t in receipt.PromoSkus)
+                            {
+                                <tr>
+                                    <td class="qty">@t.Quantity</td>
+                                    <td class="sku">@t.Code</td>
+                                    <td>
+                                        <a class="cart-text-link" href="@t.ProductPageUrl">@t.DisplayName @(!string.IsNullOrWhiteSpace(t.SubTitle) ? $"{t.SubTitle} " : string.Empty)(@t.PortionsCount)</a>
+                                        @if (t.GeneratedGCCodes != null)
+                                        {
+                                            foreach (var gcCode in t.GeneratedGCCodes)
+                                            {
+                                                <br />
+                                                <span class="cart-sku-code"><em>GC Code: @gcCode</em></span>
+                                            }
+                                        }
+                                    </td>
+                                    <td class="unit-price">@((t.Price ?? 0).ToString("C2"))</td>
+                                    <td class="price">@((t.SubTotal ?? 0).ToString("C2"))</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            <div class="receipt-shipping-method">
+                <label>Shipping:</label>
+                <div class="receipt-shipping-linecontainer">
+                    <div class="receipt-shipping-line">
+                        <label class="cart-total-value">
+                            Standard Shipping
+                        </label>
+                    </div>
+                    @if (receipt.ShippingUpgradeNP.HasValue)
+                {
+                        <div class="receipt-shipping-line">
+                            <label class="cart-total-value">
+                                Non-Perishable: @receipt.ShippingUpgradeNPOptions.Single(x => x.Key == receipt.ShippingUpgradeNP).Text
+                            </label>
+                        </div>
+                    }
+                    @if (receipt.ShippingUpgradeP.HasValue)
+                {
+                        <div class="receipt-shipping-line">
+                            <label class="cart-total-value">
+                                Perishable: @receipt.ShippingUpgradePOptions.Single(x => x.Key == receipt.ShippingUpgradeP).Text
+                            </label>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="cart-order-totals">
+                <div class="cart-total-line">
+                    @Html.LabelFor(x => x.Receipts[0].SubTotal)
                     <label class="cart-total-value">
-                        Non-Perishable: @Model.ShippingUpgradeNPOptions.Single(x => x.Key == Model.ShippingUpgradeNP).Text
+                        @receipt.SubTotal.ToString("C2")
                     </label>
                 </div>
-            }
-            @if (Model.ShippingUpgradeP.HasValue)
-            {
-                <div class="receipt-shipping-line">
+                @if (receipt.DiscountTotal.HasValue && receipt.DiscountTotal.Value != 0)
+                {
+                    <div class="cart-total-line">
+                        @Html.LabelFor(x => x.Receipts[0].DiscountTotal)
+                        <label class="cart-total-value">
+                            @receipt.DiscountTotal.Value.ToString("C2")
+                        </label>
+                    </div>
+                }
+                <div class="cart-total-line">
+                    @Html.LabelFor(x => x.Receipts[0].ShippingCost)
                     <label class="cart-total-value">
-                        Perishable: @Model.ShippingUpgradePOptions.Single(x => x.Key == Model.ShippingUpgradeP).Text
+                        @(receipt.ShippingCost.HasValue ? receipt.ShippingCost.Value.ToString("C2") : "FREE!")
                     </label>
                 </div>
+                @if (receipt.Tax != 0)
+                {
+                    <div class="cart-total-line">
+                        @Html.LabelFor(x => x.Receipts[0].Tax)
+                        <label class="cart-total-value">
+                            @receipt.Tax.ToString("C2")
+                        </label>
+                    </div>
+                }
+                @if (receipt.GiftCertificatesTotal.HasValue && receipt.GiftCertificatesTotal.Value != 0)
+                {
+                    <div class="cart-total-line">
+                        @Html.LabelFor(x => x.Receipts[0].GiftCertificatesTotal)
+                        <label class="cart-total-value">
+                            @receipt.GiftCertificatesTotal.Value.ToString("C2")
+                        </label>
+                    </div>
+                }
+                <div class="cart-total-line cart-order-summary">
+                    @Html.LabelFor(x => x.Receipts[0].OrderTotal)
+                    <label class="cart-total-value">
+                        @receipt.OrderTotal.ToString("C2")
+                    </label>
+                </div>
+            </div>
+            @if (!string.IsNullOrEmpty(receipt.DeliveryInstructions))
+            {
+
+                <div class="reivew-order-info receipt-step">
+                    <div class="reivew-info-box">
+                        <div class="review-header-container">
+                            <span>Delivery Instructions</span>
+                        </div>
+                        <div class="review-box-line">
+                            @receipt.DeliveryInstructions
+                        </div>
+                    </div>
+                </div>
             }
-        </div>
-    </div>
-    <div class="cart-order-totals">
-        <div class="cart-total-line">
-            @Html.LabelFor(x => x.SubTotal)
-            <label class="cart-total-value">
-                @Model.SubTotal.ToString("C2")
-            </label>
-        </div>
-        @if (Model.DiscountTotal.HasValue && Model.DiscountTotal.Value != 0)
-        {
-            <div class="cart-total-line">
-                @Html.LabelFor(x => x.DiscountTotal)
-                <label class="cart-total-value">
-                    @Model.DiscountTotal.Value.ToString("C2")
-                </label>
-            </div>
-        }
-        <div class="cart-total-line">
-            @Html.LabelFor(x => x.ShippingCost)
-            <label class="cart-total-value">
-                @(Model.ShippingCost.HasValue ? Model.ShippingCost.Value.ToString("C2") : "FREE!")
-            </label>
-        </div>
-        @if (Model.Tax != 0)
-        {
-            <div class="cart-total-line">
-                @Html.LabelFor(x => x.Tax)
-                <label class="cart-total-value">
-                    @Model.Tax.ToString("C2")
-                </label>
-            </div>
-        }
-        @if (Model.GiftCertificatesTotal.HasValue && Model.GiftCertificatesTotal.Value != 0)
-        {
-            <div class="cart-total-line">
-                @Html.LabelFor(x => x.GiftCertificatesTotal)
-                <label class="cart-total-value">
-                    @Model.GiftCertificatesTotal.Value.ToString("C2")
-                </label>
-            </div>
-        }
-        <div class="cart-total-line cart-order-summary">
-            @Html.LabelFor(x => x.OrderTotal)
-            <label class="cart-total-value">
-                @Model.OrderTotal.ToString("C2")
-            </label>
-        </div>
-    </div>
-    @if (!string.IsNullOrEmpty(Model.DeliveryInstructions))
-    {
+            @if (!string.IsNullOrEmpty(receipt.GiftMessage))
+            {
 
-        <div class="reivew-order-info receipt-step">
-            <div class="reivew-info-box">
-                <div class="review-header-container">
-                    <span>Delivery Instructions</span>
+                <div class="reivew-order-info receipt-step">
+                    <div class="reivew-info-box">
+                        <div class="review-header-container">
+                            <span>Gift Message</span>
+                        </div>
+                        <div class="review-box-line">
+                            @receipt.GiftMessage
+                        </div>
+                    </div>
                 </div>
-                <div class="review-box-line">
-                    @Model.DeliveryInstructions
-                </div>
-            </div>
-        </div>
-    }
-    @if (!string.IsNullOrEmpty(Model.GiftMessage))
-    {
-
-        <div class="reivew-order-info receipt-step">
-            <div class="reivew-info-box">
-                <div class="review-header-container">
-                    <span>Gift Message</span>
-                </div>
-                <div class="review-box-line">
-                    @Model.GiftMessage
-                </div>
-            </div>
+            }
+            <div class="clear"></div>
         </div>
     }
     @if (Model.ShowEGiftEmailForm)
     {
+        <div class="checkout-sections-divider margin-top-reasonable margin-bottom-small"></div>
         await Html.RenderPartialAsync("_SendEGiftEmail", Model.EGiftSendEmail);
     }
 </div>

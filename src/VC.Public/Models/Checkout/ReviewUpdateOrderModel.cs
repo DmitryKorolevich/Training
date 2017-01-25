@@ -13,13 +13,15 @@ namespace VC.Public.Models.Checkout
 			BillToAddress = new List<KeyValuePair<string, string>>();
             CreditCardDetails = new List<KeyValuePair<string, string>>();
             ShipToAddress = new List<KeyValuePair<string, string>>();
-		}
+        }
+
+        public int IdShipment { get; set; }
 
         public bool Main { get; set; }
 
         public string Name { get; set; }
 
-        public ViewCartModel OrderModel { get; set; }
+        public MultipleOrdersViewCartModel OrderModel { get; set; }
 
 	    public IList<KeyValuePair<string, string>> BillToAddress { get; set; }
 

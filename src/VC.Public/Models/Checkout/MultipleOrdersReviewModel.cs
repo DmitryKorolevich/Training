@@ -13,6 +13,7 @@ using VitalChoice.Validation.Models;
 
 namespace VC.Public.Models.Checkout
 {
+    [ApiValidator(typeof(MultipleOrdersReviewModelValidator))]
     public class MultipleOrdersReviewModel : BaseModel
     {
         public bool AutoShip { get; set; }
@@ -33,7 +34,7 @@ namespace VC.Public.Models.Checkout
 
         public IList<KeyValuePair<string, string>> CreditCardDetails { get; set; }
 
-        public ICollection<ReviewUpdateOrderModel> Shipments { get; set; }
+        public IList<ReviewUpdateOrderModel> Shipments { get; set; }
 
         public MultipleOrdersReviewModel()
         {

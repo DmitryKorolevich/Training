@@ -5,10 +5,11 @@ using System.Runtime.Serialization;
 using VC.Public.DataAnnotations;
 using VitalChoice.Ecommerce.Domain.Transfer;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
+using VitalChoice.Validation.Models;
 
 namespace VC.Public.Models.Cart
 {
-    public class ViewCartModel
+    public class ViewCartModel : BaseModel
     {
 	    public ViewCartModel()
 	    {
@@ -27,7 +28,8 @@ namespace VC.Public.Models.Cart
 
 		[FutureDate(ErrorMessage = "Shipping Date should be in the future")]
         [Display(Name = "Shipping Date")]
-        public DateTime? ShippingDate { get; set; }
+        [DirectLocalized("Shipping Date")]
+        public virtual DateTime? ShippingDate { get; set; }
 
         //public string ShippingDateError { get; set; }
 

@@ -63,6 +63,25 @@ namespace VitalChoice.Core.Infrastructure.Helpers
             return optionsChain.WithMessage(GetMessage(messageKey, parameters));
         }
 
+        public static IRuleBuilderOptions<TModel, TResult> WithCustomMessage<TModel, TResult>(
+            this IRuleBuilderOptions<TModel, TResult> optionsChain,
+            Expression<Func<TModel, TResult>> expression, string message)
+        {
+            if (expression.Body.NodeType != ExpressionType.MemberAccess)
+            {
+                throw new InvalidOperationException("Only member select expressions accepted.");
+            }
+            var memberExpression = (MemberExpression)expression.Body;
+            if (!(memberExpression.Member is PropertyInfo))
+            {
+                throw new InvalidOperationException("Only property members accepted.");
+            }
+            List<object> parameters = new List<object>();
+            parameters = AddFieldNameParam(memberExpression, parameters);
+
+            return optionsChain.WithMessage(message);
+        }
+
         private static List<object> AddFieldNameParam(MemberExpression memberExpression, List<object> parameters)
         {
             var attribute = memberExpression.Member.GetCustomAttributes(typeof(LocalizedAttribute), false).FirstOrDefault() as LocalizedAttribute;

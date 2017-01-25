@@ -10,13 +10,5 @@ namespace VC.Public.Models.Checkout
 
 		[Display(Name = "Order Date")]
 		public DateTime OrderDate { get; set; }
-
-        public bool ShowEGiftEmailForm { get; set; }
-
-        public EGiftSendEmailModel EGiftSendEmail { get; set; }
-
-        public string GATransactionInfo { get; set; }
-
-        public string GAItemsInfo { get; set; }
     }
 }

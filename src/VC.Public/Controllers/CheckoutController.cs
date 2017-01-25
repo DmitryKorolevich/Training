@@ -61,7 +61,10 @@ using VitalChoice.SharedWeb.Helpers;
 using VitalChoice.Validation.Models;
 using ApiException = VitalChoice.Ecommerce.Domain.Exceptions.ApiException;
 using Microsoft.AspNetCore.Mvc.Internal;
+using VitalChoice.Ecommerce.Domain;
+using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
+using VitalChoice.ObjectMapping.Extensions;
 
 namespace VC.Public.Controllers
 {
@@ -554,7 +557,7 @@ namespace VC.Public.Controllers
                     return GetJsonRedirect<UpdateShipmentsModel>(Url.Action("AddUpdateShippingMethod"));
                 }
 
-                toReturn.AllowAddMultipleShipments = cart.Order.IdObjectType != (int) OrderType.AutoShip;
+                toReturn.AllowAddMultipleShipments = cart.Order.IdObjectType != (int)OrderType.AutoShip;
 
                 //order part
                 var currentCustomer = cart.Order.Customer;
@@ -586,7 +589,7 @@ namespace VC.Public.Controllers
                 foreach (var addressData in addresses)
                 {
                     var item = new AvalibleShippingAddressModel();
-                    item.Address=new ShippingAddressModel();
+                    item.Address = new ShippingAddressModel();
                     item.Name = $"{addressData.Value.SafeData.FirstName} {addressData.Value.SafeData.LastName} " +
                                 $"{addressData.Value.SafeData.Address1} {addressData.Key}";
                     await _addressConverter.UpdateModelAsync(item.Address, addressData.Value);
@@ -595,7 +598,7 @@ namespace VC.Public.Controllers
                     item.Address.Id = null;
                     item.Address.PreferredShipMethodName = item.Address.PreferredShipMethod.HasValue
                         ? ReferenceData.OrderPreferredShipMethod.FirstOrDefault(
-                            x => x.Key == (int) item.Address.PreferredShipMethod.Value)?.Text
+                            x => x.Key == (int)item.Address.PreferredShipMethod.Value)?.Text
                             : null;
 
                     toReturn.AvalibleAddresses.Add(item);
@@ -721,9 +724,9 @@ namespace VC.Public.Controllers
                             //update additional shipments
                             var i = 2;
                             cart.Order.CartAdditionalShipments = new List<CartAdditionalShipmentModelItem>();
-                            foreach (var modelShipment in model.Shipments.Where(p=>!p.FromOrder))
+                            foreach (var modelShipment in model.Shipments.Where(p => !p.FromOrder))
                             {
-                                var item = new CartAdditionalShipmentModelItem {ShippingAddress = new AddressDynamic()};
+                                var item = new CartAdditionalShipmentModelItem { ShippingAddress = new AddressDynamic() };
 
                                 await _addressConverter.UpdateObjectAsync(modelShipment, item.ShippingAddress,
                                     (int)AddressType.Shipping);
@@ -731,6 +734,10 @@ namespace VC.Public.Controllers
                                 item.Name = $"Order #{i}";
                                 item.IsGiftOrder = modelShipment.IsGiftOrder;
                                 item.GiftMessage = modelShipment.GiftMessage;
+                                if (item.Id != 0)
+                                {
+                                    item.Skus = null;
+                                }
 
                                 if (modelShipment.SaveToProfile && modelShipment.IdCustomerShippingAddress.HasValue)
                                 {
@@ -743,7 +750,7 @@ namespace VC.Public.Controllers
 
                                 cart.Order.CartAdditionalShipments.Add(item);
                             }
-                            
+
                             await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
                             if (await CheckoutService.UpdateCart(cart, true))
                             {
@@ -756,7 +763,7 @@ namespace VC.Public.Controllers
                                     {
                                         var index = shippingAddresses.IndexOf(customerShippinhAddress);
                                         var originalId = shippingAddresses[index].Id;
-                                        var defaultAddr = (bool?) shippingAddresses[index].SafeData.Default ?? false;
+                                        var defaultAddr = (bool?)shippingAddresses[index].SafeData.Default ?? false;
                                         shippingAddresses[index] = itemForUpdate.Value;
                                         shippingAddresses[index].Id = originalId;
                                         shippingAddresses[index].Data.Default = defaultAddr;
@@ -810,6 +817,18 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> MoveSku()
+        {
+            return PartialView("_MoveSku");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CopySku()
+        {
+            return PartialView("_CopySku");
+        }
+
+        [HttpGet]
         [CustomerStatusCheck]
         public async Task<Result<MultipleOrdersReviewModel>> OrderReviewInitCartModel()
         {
@@ -860,7 +879,7 @@ namespace VC.Public.Controllers
             var reviewModel = new ReviewUpdateOrderModel();
             reviewModel.Name = "Order #1";
             reviewModel.Main = true;
-            reviewModel.OrderModel = new ViewCartModel();
+            reviewModel.OrderModel = new MultipleOrdersViewCartModel();
             PopulateReviewModel(reviewModel, cart.Order);
 
             var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
@@ -881,10 +900,12 @@ namespace VC.Public.Controllers
                 order.Data.GiftMessage = cartAdditionalShipmentModelItem.IsGiftOrder ?
                     cartAdditionalShipmentModelItem.GiftMessage :
                     string.Empty;
+                order.Data.ShipDelayType = ShipDelayType.None;
 
                 reviewModel = new ReviewUpdateOrderModel();
+                reviewModel.IdShipment = cartAdditionalShipmentModelItem.Id;
                 reviewModel.Name = cartAdditionalShipmentModelItem.Name;
-                reviewModel.OrderModel = new ViewCartModel();
+                reviewModel.OrderModel = new MultipleOrdersViewCartModel();
                 PopulateReviewModel(reviewModel, order);
 
                 context = await OrderService.CalculateStorefrontOrder(order, OrderStatus.Incomplete);
@@ -924,6 +945,9 @@ namespace VC.Public.Controllers
             {
                 return GetJsonRedirect<MultipleOrdersReviewModel>(Url.Action("EmptyCart", "Cart"));
             }
+
+            Validate(model);
+
             var cart = await GetCurrentCart(withMultipleShipmentsService: true);
 
             bool canUpdate = true;
@@ -940,7 +964,7 @@ namespace VC.Public.Controllers
                     reviewUpdateOrderModel.OrderModel.ShippingDate = null;
                 }
             }
-            
+
             using (await CartLocks.GetLockAsync(cart.CartUid))
             {
                 var mainShipment = model.Shipments.FirstOrDefault(p => p.Main);
@@ -953,7 +977,7 @@ namespace VC.Public.Controllers
                 var skuCodes = new List<string>();
                 foreach (var reviewUpdateOrderModel in model.Shipments)
                 {
-                    skuCodes.AddRange(reviewUpdateOrderModel.OrderModel.Skus.Select(p=>p.Code));
+                    skuCodes.AddRange(reviewUpdateOrderModel.OrderModel.Skus.Select(p => p.Code));
                 }
                 var skus = await _productService.GetSkusOrderedAsync(skuCodes.Distinct().ToList());
 
@@ -993,12 +1017,6 @@ namespace VC.Public.Controllers
                 if (!mainShipment.OrderModel.ShipAsap)
                 {
                     cart.Order.Data.ShipDelayType = ShipDelayType.EntireOrder;
-                    if (mainShipment.OrderModel.ShippingDate == null)
-                    {
-                        ModelState.AddModelError("i0.ShippingDate",
-                            string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsRequired], "Shipping Date"));
-                        return ResultHelper.CreateErrorResult(ModelState, model);
-                    }
                     cart.Order.Data.ShipDelayDate = mainShipment.OrderModel.ShippingDate;
                 }
                 else
@@ -1006,17 +1024,24 @@ namespace VC.Public.Controllers
                     cart.Order.Data.ShipDelayType = ShipDelayType.None;
                     cart.Order.Data.ShipDelayDate = null;
                 }
-                cart.Order.Data.ShippingUpgradeP = mainShipment.OrderModel.ShippingUpgradeP;
-                cart.Order.Data.ShippingUpgradeNP = mainShipment.OrderModel.ShippingUpgradeNP;
-                var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
-                await FillModel(mainShipment.OrderModel, cart.Order, context);
+
+                if (ModelState.IsValid)
+                {
+                    cart.Order.Data.ShippingUpgradeP = mainShipment.OrderModel.ShippingUpgradeP;
+                    cart.Order.Data.ShippingUpgradeNP = mainShipment.OrderModel.ShippingUpgradeNP;
+                    var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
+                    await FillModel(mainShipment.OrderModel, cart.Order, context);
+                }
 
                 var i = 1;
-                cart.Order.CartAdditionalShipments = new List<CartAdditionalShipmentModelItem>();
-                foreach (var shipment in model.Shipments.Where(p=>!p.Main))
+                foreach (var shipment in model.Shipments.Where(p => !p.Main))
                 {
-                    var item = new CartAdditionalShipmentModelItem { ShippingAddress = null };
-                    item.Name = $"Order #{(i+1)}";
+                    var item = cart.Order.CartAdditionalShipments.FirstOrDefault(p => p.Id == shipment.IdShipment);
+                    if (item == null)
+                    {
+                        return GetJsonRedirect<MultipleOrdersReviewModel>(Url.Action("ReviewOrder"));
+                    }
+                    item.Name = $"Order #{(i + 1)}";
                     item.Skus = shipment.OrderModel.Skus.Where(s => s.Quantity > 0).Select(skuModel =>
                     {
                         var ordered = skus.FirstOrDefault(p => p.Sku.Code == skuModel.Code);
@@ -1029,12 +1054,13 @@ namespace VC.Public.Controllers
                         }
                         return ordered;
                     }).ToList();
-                    item.Skus.RemoveAll(p=>p==null);
-                    cart.Order.CartAdditionalShipments.Add(item);
+                    item.Skus.RemoveAll(p => p == null);
 
                     var currentOrder = OrderService.CreateNewNormalOrder(OrderStatus.Incomplete);
+                    currentOrder.ShippingAddress = item.ShippingAddress;
                     currentOrder.Skus = item.Skus;
                     currentOrder.PaymentMethod = cart.Order.PaymentMethod;
+                    currentOrder.Customer = cart.Order.Customer;
 
                     currentOrder.Discount = await _discountService.GetByCode(model.DiscountCode);
 
@@ -1054,12 +1080,6 @@ namespace VC.Public.Controllers
                     if (!shipment.OrderModel.ShipAsap)
                     {
                         currentOrder.Data.ShipDelayType = ShipDelayType.EntireOrder;
-                        if (shipment.OrderModel.ShippingDate == null)
-                        {
-                            ModelState.AddModelError($"i{i}.ShippingDate",
-                                string.Format(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.FieldIsRequired], "Shipping Date"));
-                            return ResultHelper.CreateErrorResult(ModelState, model);
-                        }
                         currentOrder.Data.ShipDelayDate = shipment.OrderModel.ShippingDate;
                     }
                     else
@@ -1069,10 +1089,33 @@ namespace VC.Public.Controllers
                     }
                     currentOrder.Data.ShippingUpgradeP = shipment.OrderModel.ShippingUpgradeP;
                     currentOrder.Data.ShippingUpgradeNP = shipment.OrderModel.ShippingUpgradeNP;
-                    context = await OrderService.CalculateStorefrontOrder(currentOrder, OrderStatus.Incomplete);
+                    var context = await OrderService.CalculateStorefrontOrder(currentOrder, OrderStatus.Incomplete);
                     await FillModel(shipment.OrderModel, currentOrder, context);
 
                     i++;
+                }
+
+                //remove deletes shipments
+                var forRemove = new List<CartAdditionalShipmentModelItem>();
+                foreach (var item in cart.Order.CartAdditionalShipments)
+                {
+                    var remove = true;
+                    foreach (var shipment in model.Shipments.Where(p => !p.Main))
+                    {
+                        if (item.Id == shipment.IdShipment)
+                        {
+                            remove = false;
+                            break;
+                        }
+                    }
+                    if (remove)
+                    {
+                        forRemove.Add(item);
+                    }
+                }
+                foreach (var cartAdditionalShipmentModelItem in forRemove)
+                {
+                    cart.Order.CartAdditionalShipments.Remove(cartAdditionalShipmentModelItem);
                 }
 
                 bool updateResult = true;
@@ -1088,44 +1131,6 @@ namespace VC.Public.Controllers
                 return model;
             }
         }
-
-        #endregion
-
-        private bool IsCanadaShippingIssue(CustomerDynamic customer, OrderDynamic order)
-            => customer.IdObjectType == (int)CustomerType.Retail && order.ShippingAddress.IdCountry != ReferenceData.DefaultCountry.Id;
-
-        //[HttpGet]
-        //[CustomerStatusCheck]
-        ////[CustomerAuthorize]
-        //public async Task<IActionResult> ReviewOrder()
-        //{
-        //    if (await IsCartEmpty())
-        //    {
-        //        return View("EmptyCart");
-        //    }
-        //    var cart = await GetCurrentCart(withMultipleShipmentsService: true);
-        //    if (cart.Order.PaymentMethod?.Address?.IdCountry == null)
-        //    {
-        //        return RedirectToAction("AddUpdateBillingAddress");
-        //    }
-        //    if (cart.Order.ShippingAddress?.IdCountry == null)
-        //    {
-        //        return RedirectToAction("AddUpdateShippingMethod");
-        //    }
-        //    var loggedIn = await EnsureLoggedIn(cart);
-        //    if (loggedIn.HasValue)
-        //    {
-        //        if (!loggedIn.Value)
-        //        {
-        //            return RedirectToAction("ReviewOrder");
-        //        }
-        //    }
-        //    var reviewOrderModel = new ReviewOrderModel();
-
-        //    await PopulateReviewModel(reviewOrderModel, cart);
-
-        //    return View(reviewOrderModel);
-        //}
 
         [HttpPost]
         [CustomerStatusCheck]
@@ -1167,8 +1172,26 @@ namespace VC.Public.Controllers
                             }
                             foreach (var shipment in model.Shipments.Where(p => !p.Main))
                             {
+                                var item = cart.Order.CartAdditionalShipments.FirstOrDefault(p => p.Id == shipment.IdShipment);
+                                if (item == null)
+                                {
+                                    return GetJsonRedirect<MultipleOrdersReviewModel>(Url.Action("ReviewOrder"));
+                                }
+
                                 var currentOrder = OrderService.CreateNewNormalOrder(OrderStatus.Incomplete);
-                                currentOrder.PaymentMethod = cart.Order.PaymentMethod;
+                                currentOrder.ShippingAddress = item.ShippingAddress.Clone<AddressDynamic, MappedObject>()
+                                            .Clone<AddressDynamic, Entity>();
+                                currentOrder.ShippingAddress.Id = 0;
+                                currentOrder.Skus = item.Skus;
+                                currentOrder.PaymentMethod = cart.Order.PaymentMethod.Clone<OrderPaymentMethodDynamic, MappedObject>()
+                                        .Clone<OrderPaymentMethodDynamic, Entity>();
+                                currentOrder.PaymentMethod.Id = 0;
+                                currentOrder.PaymentMethod.IdOrderSource = cart.Order.Id;
+                                if (currentOrder.PaymentMethod.Address != null)
+                                {
+                                    currentOrder.PaymentMethod.Address.Id = 0;
+                                }
+                                currentOrder.Customer = cart.Order.Customer;
 
                                 currentOrder.Discount = await _discountService.GetByCode(model.DiscountCode);
 
@@ -1228,35 +1251,57 @@ namespace VC.Public.Controllers
             }
         }
 
+        #endregion
+
+        private bool IsCanadaShippingIssue(CustomerDynamic customer, OrderDynamic order)
+            => customer.IdObjectType == (int)CustomerType.Retail && order.ShippingAddress.IdCountry != ReferenceData.DefaultCountry.Id;
+        
         [HttpGet]
         [CustomerStatusCheck]
         public async Task<IActionResult> Receipt()
         {
-            var ids = HttpContext.Session.GetString(CheckoutConstants.ReceiptSessionOrderIds).Split(',');
-            int idOrder = 0;
-            if (ids.Length > 0)
+            var ids = (HttpContext.Session.GetString(CheckoutConstants.ReceiptSessionOrderIds) ?? String.Empty).Split(',');
+            var orderIds = new List<int>();
+            foreach (var id in ids)
             {
-                Int32.TryParse(ids[0], out idOrder);
+                int result;
+                if (Int32.TryParse(id, out result))
+                {
+                    orderIds.Add(result);
+                }
             }
 
-            if (idOrder != 0)
+            if (orderIds.Count == 0)
             {
                 return View("EmptyCart");
             }
-            var receiptModel = new ReceiptModel();
+            var toReturn = new MultipleReceiptModel();
+            var orders = (await OrderService.SelectAsync(orderIds, true)).OrderBy(p=>p.Id).ToList();
+            for (int i = 0; i < orders.Count; i++)
+            {
+                if (orders[i].IdObjectType == (int)OrderType.AutoShip)
+                {
+                    var id = (await OrderService.SelectAutoShipOrdersAsync(orders[i].Id)).First();
 
-            var order = await PopulateReviewModel(receiptModel, idOrder);
+                    orders[i] = await OrderService.SelectAsync(id, true);
+                }
 
-            receiptModel.OrderNumber = order.Id.ToString();
-            receiptModel.OrderDate = order.DateCreated;
+                ReceiptModel model =new ReceiptModel();
+                await PopulateReviewModel(model, orders[i]);
+                model.OrderNumber = orders[i].Id.ToString();
+                model.OrderDate = orders[i].DateCreated;
 
-            if (order.Skus.Where(p => p.Sku.Product.IdObjectType == (int)ProductType.EGс).
+                toReturn.Receipts.Add(model);
+            }
+
+
+            if (orders.SelectMany(x=>x.Skus).Where(p => p.Sku.Product.IdObjectType == (int)ProductType.EGс).
                 SelectMany(p => p.GcsGenerated).Any())
             {
-                receiptModel.ShowEGiftEmailForm = true;
-                receiptModel.EGiftSendEmail = new EGiftSendEmailModel();
-                receiptModel.EGiftSendEmail.All = true;
-                receiptModel.EGiftSendEmail.Codes = order.Skus.Where(p => p.Sku.Product.IdObjectType == (int)ProductType.EGс).
+                toReturn.ShowEGiftEmailForm = true;
+                toReturn.EGiftSendEmail = new EGiftSendEmailModel();
+                toReturn.EGiftSendEmail.All = true;
+                toReturn.EGiftSendEmail.Codes = orders.SelectMany(x => x.Skus).Where(p => p.Sku.Product.IdObjectType == (int)ProductType.EGс).
                     SelectMany(p => p.GcsGenerated).Select(p => new EGiftSendEmailCodeModel()
                     {
                         Code = p.Code,
@@ -1264,26 +1309,40 @@ namespace VC.Public.Controllers
                     }).ToList();
             }
 
-            return View(receiptModel);
+            return View(toReturn);
         }
 
         [HttpPost]
         [CustomerStatusCheck]
         public async Task<IActionResult> SendEGiftEmail(EGiftSendEmailModel model)
         {
-            var ids = HttpContext.Session.GetString(CheckoutConstants.ReceiptSessionOrderIds).Split(',');
-            int idOrder = 0;
-            if (ids.Length > 0)
+            var ids = (HttpContext.Session.GetString(CheckoutConstants.ReceiptSessionOrderIds) ?? String.Empty).Split(',');
+            var orderIds = new List<int>();
+            foreach (var id in ids)
             {
-                Int32.TryParse(ids[0], out idOrder);
+                int result;
+                if (Int32.TryParse(id, out result))
+                {
+                    orderIds.Add(result);
+                }
             }
 
-            if (idOrder==0)
+            if (orderIds.Count == 0)
             {
                 model.Codes = new List<EGiftSendEmailCodeModel>();
                 return PartialView("_SendEGiftEmail", model);
             }
-            var order = await OrderService.SelectAsync(idOrder);
+
+            var orders = (await OrderService.SelectAsync(orderIds, true)).OrderBy(p => p.Id).ToList();
+            for (int i = 0; i < orders.Count; i++)
+            {
+                if (orders[i].IdObjectType == (int)OrderType.AutoShip)
+                {
+                    var id = (await OrderService.SelectAutoShipOrdersAsync(orders[i].Id)).First();
+
+                    orders[i] = await OrderService.SelectAsync(id, true);
+                }
+            }
 
             if (!model.All && (model.SelectedCodes == null || model.SelectedCodes.Count == 0))
             {
@@ -1291,7 +1350,7 @@ namespace VC.Public.Controllers
             }
             if (!ModelState.IsValid)
             {
-                model.Codes = order.Skus.Where(p => p.Sku.Product.IdObjectType == (int)ProductType.EGс).
+                model.Codes = orders.SelectMany(x => x.Skus).Where(p => p.Sku.Product.IdObjectType == (int)ProductType.EGс).
                    SelectMany(p => p.GcsGenerated).Select(p => new EGiftSendEmailCodeModel()
                    {
                        Code = p.Code,
@@ -1300,13 +1359,13 @@ namespace VC.Public.Controllers
                 return PartialView("_SendEGiftEmail", model);
             }
 
-            var customer = await CustomerService.SelectAsync(order.Customer.Id);
+            var customer = await CustomerService.SelectAsync(orders.First().Customer.Id);
             var emailModel = new EGiftNotificationEmail();
             emailModel.Sender = $"{customer.ProfileAddress.SafeData.FirstName} {customer.ProfileAddress.SafeData.LastName}";
             emailModel.Recipient = model.Recipient;
             emailModel.Email = model.Email;
             emailModel.Message = model.Message;
-            emailModel.EGifts = order.Skus.Where(p => p.Sku.Product.IdObjectType == (int)ProductType.EGс).
+            emailModel.EGifts = orders.SelectMany(x => x.Skus).Where(p => p.Sku.Product.IdObjectType == (int)ProductType.EGс).
                 SelectMany(p => p.GcsGenerated)
                 .Where(p => model.All || model.SelectedCodes.Contains(p.Code))
                 .Select(p => new GiftEmailModel()
@@ -1320,7 +1379,7 @@ namespace VC.Public.Controllers
             ModelState.Clear();
             var newModel = new EGiftSendEmailModel();
             newModel.All = true;
-            newModel.Codes = order.Skus.Where(p => p.Sku.Product.IdObjectType == (int)ProductType.EGс).
+            newModel.Codes = orders.SelectMany(x => x.Skus).Where(p => p.Sku.Product.IdObjectType == (int)ProductType.EGс).
                 SelectMany(p => p.GcsGenerated).Select(p => new EGiftSendEmailCodeModel()
                 {
                     Code = p.Code,
@@ -1376,16 +1435,8 @@ namespace VC.Public.Controllers
             return cart;
         }
 
-        private async Task<OrderDynamic> PopulateReviewModel(ReviewOrderModel reviewOrderModel, int idOrder)
+        private async Task PopulateReviewModel(ReviewOrderModel reviewOrderModel, OrderDynamic order)
         {
-            var order = await OrderService.SelectAsync(idOrder, true);
-            if (order.IdObjectType == (int)OrderType.AutoShip)
-            {
-                var id = (await OrderService.SelectAutoShipOrdersAsync(idOrder)).First();
-
-                order = await OrderService.SelectAsync(id, true);
-            }
-
             order.Customer = await CustomerService.SelectAsync(order.Customer.Id, true);
             var context = await OrderService.CalculateStorefrontOrder(order, OrderStatus.Processed);
             await FillModel(reviewOrderModel, order, context);
@@ -1400,8 +1451,6 @@ namespace VC.Public.Controllers
 
             reviewOrderModel.DeliveryInstructions = shippingAddress.SafeData.DeliveryInstructions;
             reviewOrderModel.GiftMessage = order.SafeData.GiftMessage;
-
-            return order;
         }
 
         private struct CreateResult

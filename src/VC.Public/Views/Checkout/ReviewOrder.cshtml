@@ -31,20 +31,12 @@
             <img name="trustseal" alt="Security Seal" style="border: 0;" src="https://secure.trust-guard.com/seals/5867/scanned/mini/gray" />
         </a>
     </div>
-    @*<div class="assign-buttons template hide">
-            <a class="circle-button button-blue margin-right-small">
-                <i class="glyphicon glyphicon-sort"></i><span class="description">Move Item</span>
-            </a>
-            <a class="circle-button button-green">
-                <i class="glyphicon glyphicon-plus"></i><span class="description">Copy Item</span>
-            </a>
-        </div>*@
     <div class="cart-overlay-container margin-top-medium">
         <div class="overlay" data-bind="visible:refreshing">
             <div class="loading">Loading…</div>
         </div>
         <!-- ko if: loaded() -->
-        <from id="mainForm" data-bind="submit: save" class="form-cart hide" role="form" novalidate="novalidate">
+        <form id="mainForm" data-bind="submit: save" class="form-cart hide" role="form" novalidate="novalidate">
             <!-- ko if: Model.Shipments().length>1 && loaded() -->
             <div class="top-billing-wrapper">
                 <div class="checkout-sections-divider big"></div>
@@ -127,10 +119,7 @@
                             <!-- /ko -->
                         </h4>
                         <div class="review-order-cart">
-                            @*@using (Html.BeginForm("ReviewOrder", "Checkout", null, FormMethod.Post, null, new { @class = "form-cart", role = "form", @id = "viewCartForm", data_bind = "submit: submitCart" }))
-                            {
-                                @await Html.PartialAsync("_ViewCart", Model, ViewData)
-                            }*@
+                            @await Html.PartialAsync("_MultipleViewCart")
                         </div>
                         <div class="reivew-order-info padding-bottom-medium">
                             <!-- ko if: $root.Model.Shipments().length==1 -->
@@ -201,7 +190,7 @@
                 @Html.ActionLink("Back", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button arrow-left-red" })
                 <input class="arrow-right-blue" type="submit" value="Place Your Order" />
             </div>
-        </from>
+        </form>
         <!-- /ko -->
     </div>
 </div>

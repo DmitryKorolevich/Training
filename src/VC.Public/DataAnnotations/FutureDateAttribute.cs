@@ -52,15 +52,20 @@ namespace VC.Public.DataAnnotations
     [AttributeUsage(AttributeTargets.Property)]
     public class FutureDateAttribute : ValidationAttribute
     {
+        public bool Disabled { get; set; }
+
         public override bool IsValid(object value)
         {
-            if (value == null)
-                return true;
-
-            DateTime dt;
-            if (DateTime.TryParse(value.ToString(), out dt))
+            if (!Disabled)
             {
-                return dt.Date > DateTime.Today;
+                if (value == null)
+                    return true;
+
+                DateTime dt;
+                if (DateTime.TryParse(value.ToString(), out dt))
+                {
+                    return dt.Date > DateTime.Today;
+                }
             }
 
             return true;

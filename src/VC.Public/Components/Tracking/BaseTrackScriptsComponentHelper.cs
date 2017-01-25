@@ -38,7 +38,7 @@ namespace VC.Public.Components.Tracking
             OrderDynamic order;
             if (toReturn.PageName == PageName.Receipt)
             {
-                var ids = context.Session.GetString(CheckoutConstants.ReceiptSessionOrderIds).Split(',');
+                var ids = (context.Session.GetString(CheckoutConstants.ReceiptSessionOrderIds) ?? String.Empty).Split(',');
                 int idOrder = 0;
                 if (ids.Length > 0)
                 {

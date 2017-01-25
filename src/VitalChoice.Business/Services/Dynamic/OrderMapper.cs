@@ -541,19 +541,22 @@ namespace VitalChoice.Business.Services.Dynamic
                                     .Wait();
                             }
 
-                            dbItem.Skus.MergeKeyed(modelItem.Skus.Where(s => (s.Sku?.Id ?? 0) != 0).ToArray(), 
-                                sku => sku.IdSku, ordered => ordered.Sku.Id,
-                                s => new CartAdditionalShipmentToSku
-                                {
-                                    Amount = s.Amount,
-                                    Quantity = s.Quantity,
-                                    IdCartAdditionalShipment = dynamic.Id,
-                                    IdSku = s.Sku.Id,
-                                }, (sku, ordered) =>
-                                {
-                                    sku.Amount = ordered.Amount;
-                                    sku.Quantity = ordered.Quantity;
-                                });
+                            if (modelItem.Skus != null)
+                            {
+                                dbItem.Skus.MergeKeyed(modelItem.Skus.Where(s => (s.Sku?.Id ?? 0) != 0).ToArray(),
+                                    sku => sku.IdSku, ordered => ordered.Sku.Id,
+                                    s => new CartAdditionalShipmentToSku
+                                    {
+                                        Amount = s.Amount,
+                                        Quantity = s.Quantity,
+                                        IdCartAdditionalShipment = dynamic.Id,
+                                        IdSku = s.Sku.Id,
+                                    }, (sku, ordered) =>
+                                    {
+                                        sku.Amount = ordered.Amount;
+                                        sku.Quantity = ordered.Quantity;
+                                    });
+                            }
                         });
                     entity.CartAdditionalShipments.AddRange(dynamic.CartAdditionalShipments.Where(p => p.Id == 0).Select(
                         s => new CartAdditionalShipment()
