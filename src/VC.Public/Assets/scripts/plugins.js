@@ -329,12 +329,6 @@ $(function () {
 		notifySuccess(successMessage);
 	}
 
-    //old live support code
-	if (document.getElementById('lhnContainer'))
-	{
-	    initLiveHelp();
-	}
-
 	$.each($("textarea[charcount=true]"), function (index, elem)
 	{
 		processCharcount({ target: elem });
@@ -651,35 +645,6 @@ function processCharcount(ev) {
 		var char = max - len;
 		$(elem).next().html('<b>' + char + '</b> characters remaining');
 	}
-}
-
-//<!-- old live support code -->
-function initLiveHelp()
-{
-    if (window.addEventListener)
-    {
-        window.addEventListener('load',
-	        function ()
-	        {
-	            setTimeout(function ()
-	            {
-	                document.getElementById('lhnContainer').appendChild(lhnScript);
-	            }, 1);
-	        },
-	        false);
-    }
-    else if (window.attachEvent)
-    {
-        window.attachEvent('onload',
-	        function ()
-	        {
-	            setTimeout(function ()
-	            {
-	                document.getElementById('lhnContainer').appendChild(lhnScript);
-	            },
-	                1);
-	        });
-    }
 }
 
 function confirmAction(successCallback, errorCallback, text) {
