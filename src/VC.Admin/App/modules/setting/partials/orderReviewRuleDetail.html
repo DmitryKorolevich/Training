@@ -69,7 +69,7 @@
                                     <div class="form-group">
                                         <label class="col-md-3 control-label">Delivery Instruction</label>
                                         <div class="col-md-9">
-                                            <input type="text" name="DeliveryInstructionForSearch" class="form-control" placeholder="Delivery Instruction"
+                                            <input type="text" name="DeliveryInstructionForSearch" class="form-control" placeholder="Separate phrases by comma. Ex: front door, back door"
                                                     data-ng-model="rule.DeliveryInstructionForSearch">
                                             <div class="error-container" ng-show="forms.submitted && forms.form.DeliveryInstructionForSearch.$invalid">
                                                 <small class="error" ng-show="forms.form.DeliveryInstructionForSearch.$error.server">{{serverMessages.GetMessage('DeliveryInstructionForSearch')}}</small>
@@ -79,7 +79,7 @@
                                     <div class="form-group">
                                         <label class="col-md-3 control-label">Zip</label>
                                         <div class="col-md-9">
-                                            <input type="text" name="ZipForSearch" class="form-control" placeholder="Zips divided by comma"
+                                            <input type="text" name="ZipForSearch" class="form-control" placeholder="Separate zip codes by comma. Ex: 98274, 98225"
                                                    data-ng-model="rule.ZipForSearch">
                                             <div class="error-container" ng-show="forms.submitted && forms.form.ZipForSearch.$invalid">
                                                 <small class="error" ng-show="forms.form.ZipForSearch.$error.server">{{serverMessages.GetMessage('ZipForSearch')}}</small>
@@ -89,7 +89,7 @@
                                     <div class="form-group">
                                         <label class="col-md-3 control-label">Product SKU</label>
                                         <div class="col-md-9">
-                                            <input type="text" name="SkuForSearch" class="form-control" placeholder="Product SKUs divided by comma"
+                                            <input type="text" name="SkuForSearch" class="form-control" placeholder="Separate SKU by comma, partials allowed. Ex: FRP, NDC, NSC103"
                                                    data-ng-model="rule.SkuForSearch">
                                             <div class="error-container" ng-show="forms.submitted && forms.form.SkuForSearch.$invalid">
                                                 <small class="error" ng-show="forms.form.SkuForSearch.$error.server">{{serverMessages.GetMessage('SkuForSearch')}}</small>

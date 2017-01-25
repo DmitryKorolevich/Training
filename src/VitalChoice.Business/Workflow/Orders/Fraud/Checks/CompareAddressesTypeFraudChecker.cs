@@ -15,13 +15,14 @@ namespace VitalChoice.Business.Workflow.Orders.Fraud.Checks
         public override Task<CheckResult> CheckCondition(OrderDataContext context, ITreeContext executionContext, CompareType valueToCheck,
             OrderReviewRuleDynamic reviewRule)
         {
+            var billingAddress2 = (string) context.Order.PaymentMethod.Address.SafeData.Address2 ?? string.Empty;
+            var shippingAddress2 = (string) context.Order.ShippingAddress.SafeData.Address2 ?? string.Empty;
             switch (valueToCheck)
             {
                 case CompareType.Equal:
                     if (string.Equals((string) context.Order.PaymentMethod.Address.Data.Address1,
                             (string) context.Order.ShippingAddress.Data.Address1, StringComparison.OrdinalIgnoreCase) &&
-                        string.Equals((string) context.Order.PaymentMethod.Address.Data.Address2,
-                            (string) context.Order.ShippingAddress.Data.Address2, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(billingAddress2, shippingAddress2, StringComparison.OrdinalIgnoreCase) &&
                         string.Equals((string) context.Order.PaymentMethod.Address.Data.City,
                             (string) context.Order.ShippingAddress.Data.City, StringComparison.OrdinalIgnoreCase))
                     {
@@ -35,8 +36,7 @@ namespace VitalChoice.Business.Workflow.Orders.Fraud.Checks
                 case CompareType.NotEqual:
                     if (!string.Equals((string) context.Order.PaymentMethod.Address.Data.Address1,
                             (string) context.Order.ShippingAddress.Data.Address1, StringComparison.OrdinalIgnoreCase) ||
-                        !string.Equals((string) context.Order.PaymentMethod.Address.Data.Address2,
-                            (string) context.Order.ShippingAddress.Data.Address2, StringComparison.OrdinalIgnoreCase) ||
+                        !string.Equals(billingAddress2, shippingAddress2, StringComparison.OrdinalIgnoreCase) ||
                         !string.Equals((string) context.Order.PaymentMethod.Address.Data.City,
                             (string) context.Order.ShippingAddress.Data.City, StringComparison.OrdinalIgnoreCase))
                     {
