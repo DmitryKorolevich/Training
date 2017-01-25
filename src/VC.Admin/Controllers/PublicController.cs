@@ -63,7 +63,7 @@ namespace VC.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<Result<EmailOrderManageModel>> GetEmailOrder()
+        public Result<EmailOrderManageModel> GetEmailOrder()
         {
             var defaultCountry = _referenceData.DefaultCountry;
             var toReturn = new EmailOrderManageModel()
