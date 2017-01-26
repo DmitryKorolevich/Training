@@ -9,103 +9,103 @@
 
 <!DOCTYPE html>
 <!--[if lt IE 9]>
-	<html class="no-js lt-ie9" lang="en">
+    <html class="no-js lt-ie9" lang="en">
 <![endif]-->
 <!--[if gte IE 9]>
-	<html class="no-js" lang="en">
+    <html class="no-js" lang="en">
 <![endif]-->
 <!--[if !IE]><!-->
 <html class="no-js" lang="en">
 <!--<![endif]-->
 
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="x-ua-compatible" content="ie=edge">
-	@if (IsSectionDefined("Meta"))
-	{
-		@RenderSection("Meta", false)
-	}
-	else
-	{
-		<title>Wild Seafood & Organics - Vital Choice</title>
-	}
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    @if (IsSectionDefined("Meta"))
+    {
+        @RenderSection("Meta", false)
+    }
+    else
+    {
+        <title>Wild Seafood & Organics - Vital Choice</title>
+    }
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!--start optimizely -->
     <script src="//cdn.optimizely.com/js/1571690011.js"></script>
     <!--end optimizely -->
-	<link rel="apple-touch-icon" href="/assets/miscellaneous/apple-touch-icon.png">
-	<link rel="icon" type="img/ico" href="/assets/miscellaneous/favicon.ico">
-	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Francois One">
-	@await Component.InvokeAsync("Assets", new { assetType = "styles" })
-	<style>
+    <link rel="apple-touch-icon" href="/assets/miscellaneous/apple-touch-icon.png">
+    <link rel="icon" type="img/ico" href="/assets/miscellaneous/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Francois One">
+    @await Component.InvokeAsync("Assets", new { assetType = "styles" })
+    <style>
 		@await Component.InvokeAsync("CustomStyles")
-		</style>
+    </style>
     <script>
 		@{
 		    var appInfrastructure = appInfrastructureService;
 		}
 
-		var appSettings = { DefaultCountryId: @(appInfrastructure.DefaultCountry?.Id) }
-	</script>
+        var appSettings = { DefaultCountryId: @(appInfrastructure.DefaultCountry?.Id) }
+    </script>
     @await Component.InvokeAsync("HeadTrackScripts")
 </head>
 <body class="view-cart-layout view-cart-background order-info-section-fonts">
     @await Component.InvokeAsync("BodyBeginTrackScripts")
     @RenderSection("ViewCartTopAlert", false)
-<div class="view-cart-main">
-    <header>
-        <div class="logo-holder">
-            <a href="/">
-                <img alt="Vital Choice" src="/Assets/images/VCwso.png"/>
-            </a>
-        </div>
-        <div class="advert-top-holder">
-            @if (!User.Identity.IsAuthenticated || User.IsInRole(IdentityConstants.RetailCustomer))
-            {
-                <a href="/content/shipping-information">
-                    <img src="/Assets/images/freeship-13-2.jpg">
+    <div class="view-cart-main">
+        <header>
+            <div class="logo-holder">
+                <a href="/">
+                    <img alt="Vital Choice" src="/Assets/images/VCwso.png" />
                 </a>
-            }
-        </div>
-    </header>
-    <div class="view-cart-content">
-        @RenderBody()
-    </div>
-    <footer>
-        <div class="footer-cart-main">
-            <div class="advert-bottom-holder">
+            </div>
+            <div class="advert-top-holder">
                 @if (!User.Identity.IsAuthenticated || User.IsInRole(IdentityConstants.RetailCustomer))
-                {
+            {
                     <a href="/content/shipping-information">
                         <img src="/Assets/images/freeship-13-2.jpg">
                     </a>
                 }
             </div>
-            <div class="footer-cart-middle">
-                <a href="/content/the-vital-choice-guarantee">
-                    <img src="/Assets/images/guarantee-13.png">
-                </a>
-            </div>
-            <div class="footer-cart-right">
-                <a name="trustlink" href="http://secure.trust-guard.com/certificates/5867" target="_blank"
-                   onclick="var nonwin = navigator.appName != 'Microsoft Internet Explorer' ? 'yes' : 'no'; window.open(this.href.replace('http', 'https'), 'welcome', 'location=' + nonwin + ',scrollbars=yes,width=517,height=' + screen.availHeight + ',menubar=no,toolbar=no'); return false;"
-                   oncontextmenu="var d = new Date(); alert('Copying Prohibited by Law - This image and all included logos are copyrighted by trust-guard \251 '+d.getFullYear()+'.'); return false;">
-                    <img name="trustseal" alt="Security Seal" style="border: 0;" src="https://secure.trust-guard.com/seals/5867/scanned/mini/gray"/>
-                </a>
-            </div>
+        </header>
+        <div class="view-cart-content">
+            @RenderBody()
         </div>
-        <nav class="footer-cart-nav">
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/content/shipping-information">Shipping</a></li>
-                <li><a href="/content/About-Vital-Choice">About Us</a></li>
-                <li><a href="/content/contact-customer-service">Contact Us</a></li>
-                <li><a href="/content/request-catalog">Request Catalog</a></li>
-                <li><a href="/content/Web-Affiliate-Program">Affiliate Program</a></li>
-                <li class="last-child"><a href="/content/privacy-policy">Privacy & Security</a></li>
-            </ul>
-        </nav>
-    </footer>
+        <footer>
+            <div class="footer-cart-main">
+                <div class="advert-bottom-holder">
+                    @if (!User.Identity.IsAuthenticated || User.IsInRole(IdentityConstants.RetailCustomer))
+                    {
+                        <a href="/content/shipping-information">
+                            <img src="/Assets/images/freeship-13-2.jpg">
+                        </a>
+                    }
+                </div>
+                <div class="footer-cart-middle">
+                    <a href="/content/the-vital-choice-guarantee">
+                        <img src="/Assets/images/guarantee-13.png">
+                    </a>
+                </div>
+                <div class="footer-cart-right">
+                    <a name="trustlink" href="http://secure.trust-guard.com/certificates/5867" target="_blank"
+                       onclick="var nonwin = navigator.appName != 'Microsoft Internet Explorer' ? 'yes' : 'no'; window.open(this.href.replace('http', 'https'), 'welcome', 'location=' + nonwin + ',scrollbars=yes,width=517,height=' + screen.availHeight + ',menubar=no,toolbar=no'); return false;"
+                       oncontextmenu="var d = new Date(); alert('Copying Prohibited by Law - This image and all included logos are copyrighted by trust-guard \251 '+d.getFullYear()+'.'); return false;">
+                        <img name="trustseal" alt="Security Seal" style="border: 0;" src="https://secure.trust-guard.com/seals/5867/scanned/mini/gray" />
+                    </a>
+                </div>
+            </div>
+            <nav class="footer-cart-nav">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/content/shipping-information">Shipping</a></li>
+                    <li><a href="/content/About-Vital-Choice">About Us</a></li>
+                    <li><a href="/content/contact-customer-service">Contact Us</a></li>
+                    <li><a href="/content/request-catalog">Request Catalog</a></li>
+                    <li><a href="/content/Web-Affiliate-Program">Affiliate Program</a></li>
+                    <li class="last-child"><a href="/content/privacy-policy">Privacy & Security</a></li>
+                </ul>
+            </nav>
+        </footer>
 </div>
 @*<script src="https://www.google.com/jsapi" type="text/javascript"></script>*@
 @await Component.InvokeAsync("Assets", new {assetType = "scripts"})
@@ -139,5 +139,7 @@
     </noscript>
     <!-- end olark code -->
 }
+    <script src="https://use.typekit.net/bdl6fja.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
 </body>
 </html>
