@@ -261,6 +261,20 @@ namespace VC.Public.Controllers
         }
 
         [HttpGet]
+        public async Task<FileResult> PepperJamFeed()
+        {
+            var data = await _productService.GetPepperJamItemsReportFile();
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = FileConstants.PEPPER_JAM_PRODUCTS_FEED
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(data, "text/csv");
+        }
+
+        [HttpGet]
         public async Task<Result<bool>> SubscribeBronto(string id)
         {
             var toReturn = await _brontoService.Subscribe(id);

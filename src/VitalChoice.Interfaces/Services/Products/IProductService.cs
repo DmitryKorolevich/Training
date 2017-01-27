@@ -90,6 +90,8 @@ namespace VitalChoice.Interfaces.Services.Products
 
 	    Task<byte[]> GetCJItemsReportFile();
 
+	    Task<byte[]> GetPepperJamItemsReportFile();
+
         #endregion
 
         #region ProductOutOfStockRequests

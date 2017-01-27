@@ -21,6 +21,7 @@
         public const string GOOGLE_PRODUCTS_FEED = "datafeed.csv";
         public const string CRITEO_PRODUCTS_FEED = "criteo-datafeed.csv";
         public const string CJ_PRODUCTS_FEED = "CJFEED.csv";
+        public const string PEPPER_JAM_PRODUCTS_FEED = "pepper-jam.csv";
         public const string CJ_PRODUCTS_FEED_WITH_DATE_FORMAT = "CJFEED_{0:MM_dd_yy}.csv";
 
         public const string ORDERS_AGENT_REPORT = "Agents_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";

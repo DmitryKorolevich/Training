@@ -968,7 +968,65 @@ namespace VitalChoice.Business.Services.Products
 
             return toReturn;
         }
-        
+
+        public byte[] GeneratePepperJamItemsReportFile(ICollection<ProductContentTransferEntity> products, ProductCategory productCategories)
+        {
+            byte[] toReturn = null;
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine("description_long\timage_thumb_url\tsku\tbuy_url\tmanufacturer\tprice\timage_url\tkeywords\tname");
+
+            ProductCategory category;
+            string url;
+            string thumb;
+            string mainImage;
+            string productRootCategory;
+            foreach (var productContentTransferEntity in products.OrderBy(p => p.ProductContent?.Url))
+            {
+                if (productContentTransferEntity.ProductDynamic.StatusCode == (int)RecordStatusCode.Active
+                    && productContentTransferEntity.ProductDynamic.IdVisibility.HasValue
+                    && (productContentTransferEntity.ProductDynamic.IdVisibility.Value == CustomerTypeCode.All ||
+                    productContentTransferEntity.ProductDynamic.IdVisibility.Value == CustomerTypeCode.Retail)
+                    && productContentTransferEntity.ProductDynamic.Skus != null)
+                {
+                    var activeSkus =
+                        productContentTransferEntity.ProductDynamic.Skus.Where(p => p.StatusCode == (int)RecordStatusCode.Active &&
+                                                                                    !p.Hidden && p.SafeData.HideFromDataFeed != true).
+                                                                                    OrderBy(p=>p.Price).Take(1).ToArray();
+
+                    if (activeSkus.Length == 0)
+                        continue;
+
+                    foreach (var skuDynamic in activeSkus)
+                    {
+                        var subTitle = productContentTransferEntity.ProductDynamic.SafeData.SubTitle;
+                        var name = !string.IsNullOrEmpty(subTitle) ? productContentTransferEntity.ProductDynamic.Name + " "+ subTitle
+                                    : productContentTransferEntity.ProductDynamic.Name;
+
+
+                        url = !string.IsNullOrEmpty(productContentTransferEntity.ProductContent?.Url) ?
+                            $"https://{_options.Value.PublicHost}/product/{productContentTransferEntity.ProductContent?.Url}"
+                            : string.Empty;
+                        thumb = !string.IsNullOrEmpty(productContentTransferEntity.ProductDynamic.SafeData.Thumbnail) ?
+                            $"https://{_options.Value.PublicHost}{productContentTransferEntity.ProductDynamic.SafeData.Thumbnail}"
+                            : string.Empty;
+                        mainImage = !string.IsNullOrEmpty(productContentTransferEntity.ProductDynamic.SafeData.MainProductImage) ?
+                            $"https://{_options.Value.PublicHost}{productContentTransferEntity.ProductDynamic.SafeData.MainProductImage}"
+                            : string.Empty;
+                        category = GetProductCategory(productContentTransferEntity.ProductDynamic.CategoryIds.FirstOrDefault(), productCategories);
+                        productRootCategory = GetRootProductCategory(productCategories, category)?.Name;
+
+                        builder.AppendLine($"\"{name}\"\t{thumb}\t{skuDynamic.Code}\t{url}\tVitalChoice\t" +
+                                           $"{skuDynamic.Price:N2}\t{mainImage}\t\"{productRootCategory}\"\t\"{name}\"");
+                    }
+                }
+            }
+
+            toReturn = Encoding.UTF8.GetBytes(builder.ToString());
+
+            return toReturn;
+        }
+
+
         public async Task UpdateSkuFeedItemsReportFiles()
         {
             try
@@ -986,6 +1044,10 @@ namespace VitalChoice.Business.Services.Products
 
                 file = GenerateCJItemsReportFile(products, productCategories);
                 await _storageClient.UploadBlobAsync(_options.Value.AzureStorage.AppFilesContainerName, FileConstants.CJ_PRODUCTS_FEED,
+                    file, "text/csv");
+
+                file = GeneratePepperJamItemsReportFile(products, productCategories);
+                await _storageClient.UploadBlobAsync(_options.Value.AzureStorage.AppFilesContainerName, FileConstants.PEPPER_JAM_PRODUCTS_FEED,
                     file, "text/csv");
             }
             catch (Exception e)
@@ -1009,6 +1071,12 @@ namespace VitalChoice.Business.Services.Products
         public async Task<byte[]> GetCJItemsReportFile()
         {
             var blob = await _storageClient.DownloadBlobBlockAsync(_options.Value.AzureStorage.AppFilesContainerName, FileConstants.CJ_PRODUCTS_FEED);
+            return blob?.File;
+        }
+
+        public async Task<byte[]> GetPepperJamItemsReportFile()
+        {
+            var blob = await _storageClient.DownloadBlobBlockAsync(_options.Value.AzureStorage.AppFilesContainerName, FileConstants.PEPPER_JAM_PRODUCTS_FEED);
             return blob?.File;
         }
 

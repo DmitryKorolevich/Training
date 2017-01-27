@@ -58,6 +58,12 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    stateLabel: 'Download CJ Data Feed',
 				    access: 4
 				},
+				{
+				    name: 'downloadPepperJamFeed',
+				    href: $rootScope.PublicHost != null ? 'https://{0}/feed/pepper-jam.csv'.format($rootScope.PublicHost) : '',
+				    stateLabel: 'Download PepperJam Data Feed',
+				    access: 4
+				},
 				{ name: 'manageSkuPrices', stateName: 'index.oneCol.manageSkuPrices', stateLabel: 'Bulk Product Price Update', access: 4 },
 			]
 		},
