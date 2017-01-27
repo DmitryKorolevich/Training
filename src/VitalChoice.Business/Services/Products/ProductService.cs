@@ -976,10 +976,13 @@ namespace VitalChoice.Business.Services.Products
             builder.AppendLine("description_long\timage_thumb_url\tsku\tbuy_url\tmanufacturer\tprice\timage_url\tkeywords\tname");
 
             ProductCategory category;
+            string subTitle;
+            string name;
             string url;
             string thumb;
             string mainImage;
             string productRootCategory;
+            string description;
             foreach (var productContentTransferEntity in products.OrderBy(p => p.ProductContent?.Url))
             {
                 if (productContentTransferEntity.ProductDynamic.StatusCode == (int)RecordStatusCode.Active
@@ -998,9 +1001,10 @@ namespace VitalChoice.Business.Services.Products
 
                     foreach (var skuDynamic in activeSkus)
                     {
-                        var subTitle = productContentTransferEntity.ProductDynamic.SafeData.SubTitle;
-                        var name = !string.IsNullOrEmpty(subTitle) ? productContentTransferEntity.ProductDynamic.Name + " "+ subTitle
+                        subTitle = productContentTransferEntity.ProductDynamic.SafeData.SubTitle;
+                        name = !string.IsNullOrEmpty(subTitle) ? productContentTransferEntity.ProductDynamic.Name + " "+ subTitle
                                     : productContentTransferEntity.ProductDynamic.Name;
+                        description = productContentTransferEntity.ProductDynamic.SafeData.GoogleFeedDescription;
 
 
                         url = !string.IsNullOrEmpty(productContentTransferEntity.ProductContent?.Url) ?
@@ -1015,7 +1019,7 @@ namespace VitalChoice.Business.Services.Products
                         category = GetProductCategory(productContentTransferEntity.ProductDynamic.CategoryIds.FirstOrDefault(), productCategories);
                         productRootCategory = GetRootProductCategory(productCategories, category)?.Name;
 
-                        builder.AppendLine($"\"{name}\"\t{thumb}\t{skuDynamic.Code}\t{url}\tVitalChoice\t" +
+                        builder.AppendLine($"\"{description}\"\t{thumb}\t{skuDynamic.Code}\t{url}\tVitalChoice\t" +
                                            $"{skuDynamic.Price:N2}\t{mainImage}\t\"{productRootCategory}\"\t\"{name}\"");
                     }
                 }
