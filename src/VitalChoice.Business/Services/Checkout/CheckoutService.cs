@@ -474,6 +474,104 @@ namespace VitalChoice.Business.Services.Checkout
             return order.Id;
         }
 
+        public async Task<ICollection<int>> SaveOrdersForTheSameCustomer(IList<OrderDynamic> orders, CustomerDynamic customer, Guid idCart)
+        {
+            var toReturn =new List<int>();
+
+            if (orders == null || orders.Count==0 || customer==null)
+                return null;
+
+            foreach (var order in orders)
+            {
+                if (order.IdObjectType == (int)OrderType.AutoShip &&
+                    !order.Skus.Any(x => (bool?)x.Sku.SafeData.AutoShipProduct ?? false))
+                {
+                    throw new AppValidationException(ErrorMessagesLibrary.Data[ErrorMessagesLibrary.Keys.AutoShipOrderShouldContainAutoShip]);
+                }
+            }
+
+            for (int i = 0; i < orders.Count; i++)
+            {
+                orders[i] = (await _multipleShipmentsOrderService.CalculateStorefrontOrder(orders[i], OrderStatus.Processed)).Order;
+                //set needed key code for orders from storefront
+                orders[i].Data.KeyCode = "WEB ORDER";
+            }
+            
+            using (var transaction = _context.BeginTransaction())
+            {
+                try
+                {
+                    var cart =
+                        await
+                            _cartRepository.Query(c => c.CartUid == idCart)
+                                .Include(c => c.GiftCertificates)
+                                .Include(c => c.Skus)
+                                .SelectFirstOrDefaultAsync(true);
+
+                    if (cart == null)
+                        return toReturn;
+
+                    for (int i = 0; i < orders.Count; i++)
+                    {
+                        orders[i].Data.ConfirmationEmailSent = true;
+                        orders[i].DateCreated = DateTime.Now;
+                        if (orders[i].Id == 0)
+                        {
+                            orders[i] = await _multipleShipmentsOrderService.InsertAsync(orders[i]);
+                        }
+                        else
+                        {
+                            orders[i] = await _multipleShipmentsOrderService.UpdateAsync(orders[i]);
+                        }
+                    }
+                    cart.IdCustomer = customer.Id;
+                    cart.IdOrder = null;
+                    cart.DiscountCode = null;
+                    cart.GiftCertificates?.Clear();
+                    cart.Skus?.Clear();
+                    cart.ShipDelayDate = null;
+                    cart.ShippingUpgradeNP = null;
+                    cart.ShippingUpgradeP = null;
+
+                    await _context.SaveChangesAsync();
+
+                    for (int i = 0; i < orders.Count; i++)
+                    {
+                        if (!string.IsNullOrEmpty(customer?.Email))
+                        {
+                            OrderDynamic mailOrder;
+                            if (orders[i].IdObjectType == (int) OrderType.AutoShip)
+                            {
+                                var ids = await _orderService.SelectAutoShipOrdersAsync(orders[i].Id);
+
+                                mailOrder = await _orderService.SelectAsync(ids.First());
+                            }
+                            else
+                            {
+                                mailOrder = orders[i];
+                            }
+
+                            var emailModel = await _orderMapper.ToModelAsync<OrderConfirmationEmail>(mailOrder);
+                            if (emailModel != null)
+                            {
+                                await _notificationService.SendOrderConfirmationEmailAsync(customer.Email, emailModel);
+                            }
+                        }
+                    }
+
+                    transaction.Commit();
+
+                    toReturn = orders.Select(p => p.Id).ToList();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+            return toReturn;
+        }
+
         public async Task<int> GetCartItemsCount(Guid uid)
         {
             var cart =

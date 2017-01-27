@@ -1223,21 +1223,10 @@ namespace VC.Public.Controllers
                                 ordersForSaving.Add(currentOrder);
                             }
 
-                            string ids = string.Empty;
-                            for (int i = 0; i < ordersForSaving.Count; i++)
-                            {
-                                var id = await CheckoutService.SaveOrder(ordersForSaving[i], cart.CartUid);
-                                if (id.HasValue)
-                                {
-                                    ids += id;
-                                }
-                                if (i != ordersForSaving.Count - 1)
-                                {
-                                    ids += ",";
-                                }
-                            }
+                            var ids = await CheckoutService.SaveOrdersForTheSameCustomer(ordersForSaving, cart.Order.Customer, cart.CartUid);
+                            string sIds = string.Join(",", ids);
 
-                            HttpContext.Session.SetString(CheckoutConstants.ReceiptSessionOrderIds, ids);
+                            HttpContext.Session.SetString(CheckoutConstants.ReceiptSessionOrderIds, sIds);
 
                             return GetJsonRedirect<object>(Url.Action("Receipt"));
                         }
