@@ -24,7 +24,7 @@ namespace VitalChoice.Business.Workflow.Orders.Fraud.Checks
                     case OrderType.Refund:
                         var refundService = executionContext.Resolve<IOrderRefundService>();
                         var refundCount = await refundService.GetRefundCount(monthCount, context.Order.Customer.Id);
-                        if (qty >= refundCount)
+                        if (refundCount >= qty)
                         {
                             return new CheckResult
                             {
@@ -37,7 +37,7 @@ namespace VitalChoice.Business.Workflow.Orders.Fraud.Checks
                     case OrderType.Reship:
                         var orderService = executionContext.Resolve<IOrderService>();
                         var reshipCount = await orderService.GetReshipCount(monthCount, context.Order.Customer.Id);
-                        if (qty >= reshipCount)
+                        if (reshipCount >= qty)
                         {
                             return new CheckResult
                             {
