@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -38,6 +39,13 @@ namespace VC.Public.Controllers
                 }
             }
             return toReturn;
+        }
+
+        [HttpPost]
+        public async Task<Result<ICollection<GCInfoModel>>> GetGCsInfo([FromBody]ICollection<string> codes)
+        {
+            var gcs = await _gcService.TryGetGiftCertificatesAsync(codes);
+            return gcs.Select(p=> new GCInfoModel(p)).ToList();
         }
     }
 }

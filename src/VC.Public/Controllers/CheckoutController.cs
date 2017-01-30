@@ -63,7 +63,9 @@ using ApiException = VitalChoice.Ecommerce.Domain.Exceptions.ApiException;
 using Microsoft.AspNetCore.Mvc.Internal;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Dynamic;
+using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Infrastructure.Domain.Entities.Roles;
+using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 using VitalChoice.ObjectMapping.Extensions;
 
 namespace VC.Public.Controllers
@@ -723,10 +725,15 @@ namespace VC.Public.Controllers
 
                             //update additional shipments
                             var i = 2;
+                            var dbShipments = cart.Order.CartAdditionalShipments;
                             cart.Order.CartAdditionalShipments = new List<CartAdditionalShipmentModelItem>();
                             foreach (var modelShipment in model.Shipments.Where(p => !p.FromOrder))
                             {
-                                var item = new CartAdditionalShipmentModelItem { ShippingAddress = new AddressDynamic() };
+                                CartAdditionalShipmentModelItem item= dbShipments.FirstOrDefault(p=>p.Id== modelShipment.IdShipment);
+                                if (item == null)
+                                {
+                                    item = new CartAdditionalShipmentModelItem {ShippingAddress = new AddressDynamic()};
+                                }
 
                                 await _addressConverter.UpdateObjectAsync(modelShipment, item.ShippingAddress,
                                     (int)AddressType.Shipping);
@@ -734,10 +741,6 @@ namespace VC.Public.Controllers
                                 item.Name = $"Order #{i}";
                                 item.IsGiftOrder = modelShipment.IsGiftOrder;
                                 item.GiftMessage = modelShipment.GiftMessage;
-                                if (item.Id != 0)
-                                {
-                                    item.Skus = null;
-                                }
 
                                 if (modelShipment.SaveToProfile && modelShipment.IdCustomerShippingAddress.HasValue)
                                 {
@@ -883,13 +886,14 @@ namespace VC.Public.Controllers
             PopulateReviewModel(reviewModel, cart.Order);
 
             var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
-            await FillModel(reviewModel.OrderModel, cart.Order, context);
+            await FillModel(reviewModel.OrderModel, cart.Order, context, "i0.");
             if (reviewModel.OrderModel.GiftCertificateCodes.Count == 0)
             {
                 reviewModel.OrderModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty });
             }
             toReturn.Shipments.Add(reviewModel);
 
+            var index = 1;
             foreach (var cartAdditionalShipmentModelItem in cart.Order.CartAdditionalShipments)
             {
                 var order = OrderService.CreateNewNormalOrder(OrderStatus.Incomplete);
@@ -900,7 +904,22 @@ namespace VC.Public.Controllers
                 order.Data.GiftMessage = cartAdditionalShipmentModelItem.IsGiftOrder ?
                     cartAdditionalShipmentModelItem.GiftMessage :
                     string.Empty;
-                order.Data.ShipDelayType = ShipDelayType.None;
+                order.Data.ShipDelayType = cartAdditionalShipmentModelItem.ShipDelayDate.HasValue ? ShipDelayType.EntireOrder : ShipDelayType.None;
+                order.Data.ShipDelayDate = cartAdditionalShipmentModelItem.ShipDelayDate;
+                order.Data.ShippingUpgradeP = (ShippingUpgradeOption?)cartAdditionalShipmentModelItem.ShippingUpgradeP;
+                order.Data.ShippingUpgradeNP = (ShippingUpgradeOption?)cartAdditionalShipmentModelItem.ShippingUpgradeNP;
+                if (!string.IsNullOrEmpty(cartAdditionalShipmentModelItem.DiscountCode))
+                {
+                    order.Discount = await _discountService.GetByCode(cartAdditionalShipmentModelItem.DiscountCode);
+                }
+                if (cartAdditionalShipmentModelItem.GiftCertificateIds != null)
+                {
+                    var gcs = await _gcService.GetGiftCertificatesAsync(cartAdditionalShipmentModelItem.GiftCertificateIds);
+                    order.GiftCertificates = gcs.Select(p => new GiftCertificateInOrder()
+                    {
+                        GiftCertificate = p,
+                    }).ToList();
+                }
 
                 reviewModel = new ReviewUpdateOrderModel();
                 reviewModel.IdShipment = cartAdditionalShipmentModelItem.Id;
@@ -909,13 +928,14 @@ namespace VC.Public.Controllers
                 PopulateReviewModel(reviewModel, order);
 
                 context = await OrderService.CalculateStorefrontOrder(order, OrderStatus.Incomplete);
-                await FillModel(reviewModel.OrderModel, order, context);
+                await FillModel(reviewModel.OrderModel, order, context, $"i{index}.");
 
                 if (reviewModel.OrderModel.GiftCertificateCodes.Count == 0)
                 {
                     reviewModel.OrderModel.GiftCertificateCodes.Add(new CartGcModel() { Value = string.Empty });
                 }
                 toReturn.Shipments.Add(reviewModel);
+                index++;
             }
             HttpContext.SetCartUid(cart.CartUid);
         }
@@ -973,13 +993,28 @@ namespace VC.Public.Controllers
                     throw new AppValidationException("Main order shipping isn't specified");
                 }
 
-                //get skus data for all needed skus in all shipments
+                //get skus data and gc codes in all shipments
                 var skuCodes = new List<string>();
+                var gcCodes = new List<string>();
                 foreach (var reviewUpdateOrderModel in model.Shipments)
                 {
                     skuCodes.AddRange(reviewUpdateOrderModel.OrderModel.Skus.Select(p => p.Code));
+                    gcCodes.AddRange(reviewUpdateOrderModel.OrderModel.GiftCertificateCodes
+                        .Select(x => x.Value?.Trim().ToUpper())
+                        .Where(v => !string.IsNullOrWhiteSpace(v)));
                 }
                 var skus = await _productService.GetSkusOrderedAsync(skuCodes.Distinct().ToList());
+                //user current cart.Order gcs for correct calculation
+                if (cart.Order.GiftCertificates != null)
+                {
+                    gcCodes.RemoveAll(p => cart.Order.GiftCertificates.Select(pp => pp.GiftCertificate.Code.ToUpper()).Contains(p));
+                }
+                var gcs = await _gcService.TryGetGiftCertificatesAsync(gcCodes.Distinct().ToList());
+                //user current cart.Order gcs for correct calculation
+                if (cart.Order.GiftCertificates != null)
+                {
+                    gcs.AddRange(cart.Order.GiftCertificates.Select(p=>p.GiftCertificate));
+                }
 
                 //main shipment
                 if (cart.Order.Skus != null)
@@ -1002,18 +1037,31 @@ namespace VC.Public.Controllers
                             });
                     cart.Order.Skus.RemoveAll(p => p == null);
                 }
-                cart.Order.Discount = await _discountService.GetByCode(model.DiscountCode);
-                var gcCodes =
-                    model.GiftCertificateCodes.Select(x => x.Value?.Trim().ToUpper())
-                        .Where(v => !string.IsNullOrWhiteSpace(v))
-                        .Distinct()
-                        .ToList();
-                cart.Order.GiftCertificates?.MergeKeyed(await _gcService.TryGetGiftCertificatesAsync(gcCodes),
+                cart.Order.Discount = await _discountService.GetByCode(mainShipment.OrderModel.DiscountCode);
+
+                var inOrderGcs = gcs.Where(p=> mainShipment.OrderModel.GiftCertificateCodes.Select(pp=>pp.Value).Contains(p.Code)).ToList();
+                cart.Order.GiftCertificates?.MergeKeyed(inOrderGcs,
                     gc => gc.GiftCertificate?.Code?.Trim().ToUpper(), code => code.Code?.Trim().ToUpper(),
                     code => new GiftCertificateInOrder
                     {
                         GiftCertificate = code
                     });
+                //reorder based on UI ordering
+                if (cart.Order.GiftCertificates != null)
+                {
+                    var data = cart.Order.GiftCertificates;
+                    cart.Order.GiftCertificates= new List<GiftCertificateInOrder>();
+                    foreach (var orderModelGiftCertificateCode in mainShipment.OrderModel.GiftCertificateCodes)
+                    {
+                        var gc = data.FirstOrDefault(p=>p.GiftCertificate.Code.Trim().ToUpper() ==
+                            orderModelGiftCertificateCode.Value.Trim().ToUpper());
+                        if (gc != null)
+                        {
+                            cart.Order.GiftCertificates.Add(gc);
+                        }
+                    }
+                }
+
                 if (!mainShipment.OrderModel.ShipAsap)
                 {
                     cart.Order.Data.ShipDelayType = ShipDelayType.EntireOrder;
@@ -1030,7 +1078,7 @@ namespace VC.Public.Controllers
                     cart.Order.Data.ShippingUpgradeP = mainShipment.OrderModel.ShippingUpgradeP;
                     cart.Order.Data.ShippingUpgradeNP = mainShipment.OrderModel.ShippingUpgradeNP;
                     var context = await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
-                    await FillModel(mainShipment.OrderModel, cart.Order, context);
+                    await FillModel(mainShipment.OrderModel, cart.Order, context, "i0.");
                 }
 
                 var i = 1;
@@ -1062,35 +1110,54 @@ namespace VC.Public.Controllers
                     currentOrder.PaymentMethod = cart.Order.PaymentMethod;
                     currentOrder.Customer = cart.Order.Customer;
 
-                    currentOrder.Discount = await _discountService.GetByCode(model.DiscountCode);
+                    currentOrder.Discount = await _discountService.GetByCode(shipment.OrderModel.DiscountCode);
+                    item.DiscountCode = shipment.OrderModel.DiscountCode;
 
-                    //Not clear how to be with gcs
-                    //gcCodes =
-                    //    model.GiftCertificateCodes.Select(x => x.Value?.Trim().ToUpper())
-                    //        .Where(v => !string.IsNullOrWhiteSpace(v))
-                    //        .Distinct()
-                    //        .ToList();
-                    //currentOrder.GiftCertificates?.MergeKeyed(await _gcService.TryGetGiftCertificatesAsync(gcCodes),
-                    //    gc => gc.GiftCertificate?.Code?.Trim().ToUpper(), code => code.Code?.Trim().ToUpper(),
-                    //    code => new GiftCertificateInOrder
-                    //    {
-                    //        GiftCertificate = code
-                    //    });
+                    inOrderGcs = gcs.Where(p => shipment.OrderModel.GiftCertificateCodes.Select(pp => pp.Value).Contains(p.Code)).ToList();
+                    currentOrder.GiftCertificates?.MergeKeyed(inOrderGcs,
+                        gc => gc.GiftCertificate?.Code?.Trim().ToUpper(), code => code.Code?.Trim().ToUpper(),
+                        code => new GiftCertificateInOrder
+                        {
+                            GiftCertificate = code
+                        });
+                    //reorder based on UI ordering
+                    if (currentOrder.GiftCertificates != null)
+                    {
+                        var data = currentOrder.GiftCertificates;
+                        currentOrder.GiftCertificates = new List<GiftCertificateInOrder>();
+                        foreach (var orderModelGiftCertificateCode in shipment.OrderModel.GiftCertificateCodes)
+                        {
+                            var gc = data.FirstOrDefault(p => p.GiftCertificate.Code.Trim().ToUpper() ==
+                                orderModelGiftCertificateCode.Value.Trim().ToUpper());
+                            if (gc != null)
+                            {
+                                currentOrder.GiftCertificates.Add(gc);
+                            }
+                        }
+                    }
+
+                    item.GiftCertificateIds = currentOrder.GiftCertificates?.Select(p => p.GiftCertificate.Id).ToList() ??
+                        new List<int>();
 
                     if (!shipment.OrderModel.ShipAsap)
                     {
                         currentOrder.Data.ShipDelayType = ShipDelayType.EntireOrder;
                         currentOrder.Data.ShipDelayDate = shipment.OrderModel.ShippingDate;
+                        item.ShipDelayDate = shipment.OrderModel.ShippingDate;
                     }
                     else
                     {
                         currentOrder.Data.ShipDelayType = ShipDelayType.None;
                         currentOrder.Data.ShipDelayDate = null;
+                        item.ShipDelayDate = null;
                     }
                     currentOrder.Data.ShippingUpgradeP = shipment.OrderModel.ShippingUpgradeP;
                     currentOrder.Data.ShippingUpgradeNP = shipment.OrderModel.ShippingUpgradeNP;
+                    item.ShippingUpgradeP= (int?)shipment.OrderModel.ShippingUpgradeP;
+                    item.ShippingUpgradeNP = (int?)shipment.OrderModel.ShippingUpgradeNP;
+
                     var context = await OrderService.CalculateStorefrontOrder(currentOrder, OrderStatus.Incomplete);
-                    await FillModel(shipment.OrderModel, currentOrder, context);
+                    await FillModel(shipment.OrderModel, currentOrder, context, $"i{i}.");
 
                     i++;
                 }
@@ -1132,6 +1199,8 @@ namespace VC.Public.Controllers
             }
         }
 
+        //private void ParseFieldsCalculationErrors
+
         [HttpPost]
         [CustomerStatusCheck]
         //[CustomerAuthorize]
@@ -1156,6 +1225,55 @@ namespace VC.Public.Controllers
                             if (IsCanadaShippingIssue(cart.Order.Customer, cart.Order))
                             {
                                 return GetJsonRedirect<object>(Url.Action("AddUpdateShippingMethod", new { canadaissue = true }));
+                            }
+
+                            var mainShipment = model.Shipments.FirstOrDefault(p => p.Main);
+                            if (mainShipment == null)
+                            {
+                                throw new AppValidationException("Main order shipping isn't specified");
+                            }
+
+                            //get gc codes in all shipments
+                            var gcCodes = new List<string>();
+                            foreach (var reviewUpdateOrderModel in model.Shipments)
+                            {
+                                gcCodes.AddRange(reviewUpdateOrderModel.OrderModel.GiftCertificateCodes
+                                    .Select(x => x.Value?.Trim().ToUpper())
+                                    .Where(v => !string.IsNullOrWhiteSpace(v)));
+                            }
+                            //user current cart.Order gcs for correct calculation
+                            if (cart.Order.GiftCertificates != null)
+                            {
+                                gcCodes.RemoveAll(p => cart.Order.GiftCertificates.Select(pp => pp.GiftCertificate.Code.ToUpper()).Contains(p));
+                            }
+                            var gcs = await _gcService.TryGetGiftCertificatesAsync(gcCodes.Distinct().ToList());
+                            //user current cart.Order gcs for correct calculation
+                            if (cart.Order.GiftCertificates != null)
+                            {
+                                gcs.AddRange(cart.Order.GiftCertificates.Select(p => p.GiftCertificate));
+                            }
+                            
+                            var inOrderGcs = gcs.Where(p => mainShipment.OrderModel.GiftCertificateCodes.Select(pp => pp.Value).Contains(p.Code)).ToList();
+                            cart.Order.GiftCertificates?.MergeKeyed(inOrderGcs,
+                                gc => gc.GiftCertificate?.Code?.Trim().ToUpper(), code => code.Code?.Trim().ToUpper(),
+                                code => new GiftCertificateInOrder
+                                {
+                                    GiftCertificate = code
+                                });
+                            //reorder based on UI ordering
+                            if (cart.Order.GiftCertificates != null)
+                            {
+                                var data = cart.Order.GiftCertificates;
+                                cart.Order.GiftCertificates = new List<GiftCertificateInOrder>();
+                                foreach (var orderModelGiftCertificateCode in mainShipment.OrderModel.GiftCertificateCodes)
+                                {
+                                    var gc = data.FirstOrDefault(p => p.GiftCertificate.Code.Trim().ToUpper() ==
+                                        orderModelGiftCertificateCode.Value.Trim().ToUpper());
+                                    if (gc != null)
+                                    {
+                                        cart.Order.GiftCertificates.Add(gc);
+                                    }
+                                }
                             }
 
                             var ordersForSaving = new List<OrderDynamic>()
@@ -1183,6 +1301,8 @@ namespace VC.Public.Controllers
                                             .Clone<AddressDynamic, Entity>();
                                 currentOrder.ShippingAddress.Id = 0;
                                 currentOrder.Skus = item.Skus;
+                                currentOrder.Data.GiftMessage = item.IsGiftOrder ? item.GiftMessage : string.Empty;
+                                currentOrder.Data.GiftOrder = item.IsGiftOrder;
                                 currentOrder.PaymentMethod = cart.Order.PaymentMethod.Clone<OrderPaymentMethodDynamic, MappedObject>()
                                         .Clone<OrderPaymentMethodDynamic, Entity>();
                                 currentOrder.PaymentMethod.Id = 0;
@@ -1193,33 +1313,52 @@ namespace VC.Public.Controllers
                                 }
                                 currentOrder.Customer = cart.Order.Customer;
 
-                                currentOrder.Discount = await _discountService.GetByCode(model.DiscountCode);
+                                currentOrder.Discount = await _discountService.GetByCode(shipment.OrderModel.DiscountCode);
+                                item.DiscountCode = shipment.OrderModel.DiscountCode;
 
-                                //Not clear how to be with gcs
-                                //gcCodes =
-                                //    model.GiftCertificateCodes.Select(x => x.Value?.Trim().ToUpper())
-                                //        .Where(v => !string.IsNullOrWhiteSpace(v))
-                                //        .Distinct()
-                                //        .ToList();
-                                //currentOrder.GiftCertificates?.MergeKeyed(await _gcService.TryGetGiftCertificatesAsync(gcCodes),
-                                //    gc => gc.GiftCertificate?.Code?.Trim().ToUpper(), code => code.Code?.Trim().ToUpper(),
-                                //    code => new GiftCertificateInOrder
-                                //    {
-                                //        GiftCertificate = code
-                                //    });
+                                inOrderGcs = gcs.Where(p => shipment.OrderModel.GiftCertificateCodes.Select(pp => pp.Value).Contains(p.Code)).ToList();
+                                currentOrder.GiftCertificates?.MergeKeyed(inOrderGcs,
+                                    gc => gc.GiftCertificate?.Code?.Trim().ToUpper(), code => code.Code?.Trim().ToUpper(),
+                                    code => new GiftCertificateInOrder
+                                    {
+                                        GiftCertificate = code
+                                    });
+                                //reorder based on UI ordering
+                                if (currentOrder.GiftCertificates != null)
+                                {
+                                    var data = currentOrder.GiftCertificates;
+                                    currentOrder.GiftCertificates = new List<GiftCertificateInOrder>();
+                                    foreach (var orderModelGiftCertificateCode in shipment.OrderModel.GiftCertificateCodes)
+                                    {
+                                        var gc = data.FirstOrDefault(p => p.GiftCertificate.Code.Trim().ToUpper() ==
+                                            orderModelGiftCertificateCode.Value.Trim().ToUpper());
+                                        if (gc != null)
+                                        {
+                                            currentOrder.GiftCertificates.Add(gc);
+                                        }
+                                    }
+                                }
+
+                                item.GiftCertificateIds = currentOrder.GiftCertificates?.Select(p => p.GiftCertificate.Id).ToList() ??
+                                    new List<int>();
 
                                 if (!shipment.OrderModel.ShipAsap)
                                 {
                                     currentOrder.Data.ShipDelayType = ShipDelayType.EntireOrder;
                                     currentOrder.Data.ShipDelayDate = shipment.OrderModel.ShippingDate;
+                                    item.ShipDelayDate = shipment.OrderModel.ShippingDate;
                                 }
                                 else
                                 {
                                     currentOrder.Data.ShipDelayType = ShipDelayType.None;
                                     currentOrder.Data.ShipDelayDate = null;
+                                    item.ShipDelayDate = null;
                                 }
                                 currentOrder.Data.ShippingUpgradeP = shipment.OrderModel.ShippingUpgradeP;
                                 currentOrder.Data.ShippingUpgradeNP = shipment.OrderModel.ShippingUpgradeNP;
+                                item.ShippingUpgradeP = (int?)shipment.OrderModel.ShippingUpgradeP;
+                                item.ShippingUpgradeNP = (int?)shipment.OrderModel.ShippingUpgradeNP;
+
                                 ordersForSaving.Add(currentOrder);
                             }
 

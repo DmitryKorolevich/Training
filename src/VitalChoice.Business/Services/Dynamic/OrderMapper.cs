@@ -63,7 +63,7 @@ namespace VitalChoice.Business.Services.Dynamic
             var order = base.CreatePrototype(idObjectType);
             if (order.Customer == null)
             {
-                order.Customer = _customerMapper.CreatePrototype((int) CustomerType.Retail);
+                order.Customer = _customerMapper.CreatePrototype((int)CustomerType.Retail);
             }
             return order;
         }
@@ -209,15 +209,19 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 if (entity.CartAdditionalShipments != null)
                 {
-                    dynamic.CartAdditionalShipments=new List<CartAdditionalShipmentModelItem>();
-                    foreach (var entityAdditionalShipment in entity.CartAdditionalShipments.OrderBy(p=>p.Name))
+                    dynamic.CartAdditionalShipments = new List<CartAdditionalShipmentModelItem>();
+                    foreach (var entityAdditionalShipment in entity.CartAdditionalShipments.OrderBy(p => p.Name))
                     {
-                        CartAdditionalShipmentModelItem shipment =new CartAdditionalShipmentModelItem();
+                        CartAdditionalShipmentModelItem shipment = new CartAdditionalShipmentModelItem();
                         shipment.Id = entityAdditionalShipment.Id;
                         shipment.Name = entityAdditionalShipment.Name;
                         shipment.IsGiftOrder = entityAdditionalShipment.IsGiftOrder;
                         shipment.GiftMessage = entityAdditionalShipment.GiftMessage;
-                        shipment.ShippingAddress = await _orderAddressMapper.FromEntityAsync(entityAdditionalShipment.ShippingAddress, 
+                        shipment.DiscountCode = entityAdditionalShipment.DiscountCode;
+                        shipment.ShipDelayDate = entityAdditionalShipment.ShipDelayDate;
+                        shipment.ShippingUpgradeP = entityAdditionalShipment.ShippingUpgradeP;
+                        shipment.ShippingUpgradeNP = entityAdditionalShipment.ShippingUpgradeNP;
+                        shipment.ShippingAddress = await _orderAddressMapper.FromEntityAsync(entityAdditionalShipment.ShippingAddress,
                             withDefaults);
 
                         if (entityAdditionalShipment.Skus != null)
@@ -243,6 +247,10 @@ namespace VitalChoice.Business.Services.Dynamic
                                     }
                                 }
                             }
+                        }
+                        if (entityAdditionalShipment.GiftCertificates != null)
+                        {
+                            shipment.GiftCertificateIds = entityAdditionalShipment.GiftCertificates.Select(p => p.IdGiftCertificate).ToList();
                         }
                         dynamic.CartAdditionalShipments.Add(shipment);
                     }
@@ -303,7 +311,7 @@ namespace VitalChoice.Business.Services.Dynamic
                     IdSku = s.Sku.Id,
                     GeneratedGiftCertificates = s.GcsGenerated
                 }));
-                foreach (var gc in entity?.Skus?.Where(p=>p.GeneratedGiftCertificates!=null).SelectMany(p=>p.GeneratedGiftCertificates))
+                foreach (var gc in entity?.Skus?.Where(p => p.GeneratedGiftCertificates != null).SelectMany(p => p.GeneratedGiftCertificates))
                 {
                     gc.UserId = entity.IdEditedBy;
                     gc.IdEditedBy = entity.IdEditedBy;
@@ -346,11 +354,15 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 if (dynamic.CartAdditionalShipments != null)
                 {
-                    entity.CartAdditionalShipments = dynamic.CartAdditionalShipments.Select(s=> new CartAdditionalShipment()
+                    entity.CartAdditionalShipments = dynamic.CartAdditionalShipments.Select(s => new CartAdditionalShipment()
                     {
                         Name = s.Name,
                         IsGiftOrder = s.IsGiftOrder,
                         GiftMessage = s.GiftMessage,
+                        DiscountCode = s.DiscountCode,
+                        ShipDelayDate = s.ShipDelayDate,
+                        ShippingUpgradeP = s.ShippingUpgradeP,
+                        ShippingUpgradeNP = s.ShippingUpgradeNP,
                         ShippingAddress = _orderAddressMapper.ToEntityAsync(s.ShippingAddress).Result,
 
                         Skus = new List<CartAdditionalShipmentToSku>(s.Skus.Select(p => new CartAdditionalShipmentToSku()
@@ -359,7 +371,12 @@ namespace VitalChoice.Business.Services.Dynamic
                             Quantity = p.Quantity,
                             IdCartAdditionalShipment = s.Id,
                             IdSku = p.Sku.Id,
-                        }))
+                        })),
+                        GiftCertificates = new List<CartAdditionalShipmentToGiftCertificate>(s.GiftCertificateIds.Select(p => new CartAdditionalShipmentToGiftCertificate()
+                        {
+                            IdCartAdditionalShipment = s.Id,
+                            IdGiftCertificate = p,
+                        })),
                     }).ToList();
                 }
             });
@@ -435,7 +452,7 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.IdDiscount = dynamic.Discount?.Id;
                 if (dynamic.PaymentMethod.Address != null && entity.PaymentMethod.BillingAddress == null)
                 {
-                    entity.PaymentMethod.BillingAddress = new OrderAddress {OptionValues = new List<OrderAddressOptionValue>()};
+                    entity.PaymentMethod.BillingAddress = new OrderAddress { OptionValues = new List<OrderAddressOptionValue>() };
                 }
                 if (dynamic.PaymentMethod.Address == null)
                 {
@@ -529,7 +546,7 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 if (dynamic.CartAdditionalShipments != null)
                 {
-                    entity.CartAdditionalShipments.UpdateRemoveKeyed(dynamic.CartAdditionalShipments.Where(p=>p.Id!=0).ToList(),
+                    entity.CartAdditionalShipments.UpdateRemoveKeyed(dynamic.CartAdditionalShipments.Where(p => p.Id != 0).ToList(),
                         p => p.Id, p => p.Id, (dbItem, modelItem) =>
                         {
                             dbItem.Name = modelItem.Name;
@@ -537,6 +554,10 @@ namespace VitalChoice.Business.Services.Dynamic
                             {
                                 dbItem.IsGiftOrder = modelItem.IsGiftOrder;
                                 dbItem.GiftMessage = modelItem.GiftMessage;
+                                dbItem.DiscountCode = modelItem.DiscountCode;
+                                dbItem.ShipDelayDate = modelItem.ShipDelayDate;
+                                dbItem.ShippingUpgradeP = modelItem.ShippingUpgradeP;
+                                dbItem.ShippingUpgradeNP = modelItem.ShippingUpgradeNP;
                                 _orderAddressMapper.UpdateEntityAsync(modelItem.ShippingAddress, dbItem.ShippingAddress)
                                     .Wait();
                             }
@@ -557,6 +578,16 @@ namespace VitalChoice.Business.Services.Dynamic
                                         sku.Quantity = ordered.Quantity;
                                     });
                             }
+
+                            if (modelItem.GiftCertificateIds != null)
+                            {
+                                dbItem.GiftCertificates.MergeKeyed(modelItem.GiftCertificateIds, p=>p.IdGiftCertificate, pp=>pp,
+                                    p => new CartAdditionalShipmentToGiftCertificate()
+                                    {
+                                        IdCartAdditionalShipment = dynamic.Id,
+                                        IdGiftCertificate = p,
+                                    });
+                            }
                         });
                     entity.CartAdditionalShipments.AddRange(dynamic.CartAdditionalShipments.Where(p => p.Id == 0).Select(
                         s => new CartAdditionalShipment()
@@ -564,6 +595,10 @@ namespace VitalChoice.Business.Services.Dynamic
                             Name = s.Name,
                             IsGiftOrder = s.IsGiftOrder,
                             GiftMessage = s.GiftMessage,
+                            DiscountCode = s.DiscountCode,
+                            ShipDelayDate = s.ShipDelayDate,
+                            ShippingUpgradeP = s.ShippingUpgradeP,
+                            ShippingUpgradeNP = s.ShippingUpgradeNP,
                             ShippingAddress = _orderAddressMapper.ToEntityAsync(s.ShippingAddress).Result,
 
                             Skus = new List<CartAdditionalShipmentToSku>(s.Skus.Select(p => new CartAdditionalShipmentToSku()
@@ -573,6 +608,13 @@ namespace VitalChoice.Business.Services.Dynamic
                                 IdCartAdditionalShipment = s.Id,
                                 IdSku = p.Sku.Id,
                             })),
+
+                            GiftCertificates = new List<CartAdditionalShipmentToGiftCertificate>(
+                                        s.GiftCertificateIds.Select(p => new CartAdditionalShipmentToGiftCertificate()
+                                        {
+                                            IdCartAdditionalShipment = dynamic.Id,
+                                            IdGiftCertificate = p,
+                                        })),
                         })
                     );
                 }

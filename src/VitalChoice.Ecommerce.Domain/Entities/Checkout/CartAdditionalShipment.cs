@@ -19,6 +19,16 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Checkout
 
         public OrderAddress ShippingAddress { get; set; }
 
+        public string DiscountCode { get; set; }
+
+        public DateTime? ShipDelayDate { get; set; }
+
+        public int? ShippingUpgradeP { get; set; }
+
+        public int? ShippingUpgradeNP { get; set; }
+
         public ICollection<CartAdditionalShipmentToSku> Skus { get; set; }
+
+        public ICollection<CartAdditionalShipmentToGiftCertificate> GiftCertificates { get; set; }
     }
 }

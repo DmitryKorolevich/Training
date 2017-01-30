@@ -192,7 +192,9 @@ namespace VitalChoice.Business.Services.Orders
                     .ThenInclude(o => o.Skus)
                     .ThenInclude(s => s.Sku)
                     .ThenInclude(s => s.Product)
-                    .ThenInclude(s => s.OptionValues);
+                    .ThenInclude(s => s.OptionValues)
+                    .Include(p => p.CartAdditionalShipments)
+                    .ThenInclude(c => c.GiftCertificates);
         }
     }
 }

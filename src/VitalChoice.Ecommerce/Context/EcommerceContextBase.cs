@@ -1409,6 +1409,7 @@ namespace VitalChoice.Ecommerce.Context
             CartToGiftCertificates(builder);
 
             CartAdditionalShipmentsToSkus(builder);
+            CartAdditionalShipmentsToGiftCertificates(builder);
             CartAdditionalShipments(builder);
 
             #endregion
@@ -1598,13 +1599,34 @@ namespace VitalChoice.Ecommerce.Context
             });
         }
 
+        protected virtual void CartAdditionalShipmentsToGiftCertificates(ModelBuilder builder)
+        {
+            builder.Entity<CartAdditionalShipmentToGiftCertificate>(entity =>
+            {
+                entity.ToTable("CartAdditionalShipmentsToGiftCertificates");
+                entity.Ignore(c => c.Id);
+                entity.HasKey(c => new { c.IdCartAdditionalShipment, c.IdGiftCertificate });
+                entity.HasOne(c => c.GiftCertificate)
+                    .WithMany()
+                    .HasForeignKey(c => c.IdGiftCertificate)
+                    .HasPrincipalKey(s => s.Id);
+            });
+        }
+
         protected virtual void CartAdditionalShipments(ModelBuilder builder)
         {
             builder.Entity<CartAdditionalShipment>(entity =>
             {
                 entity.ToTable("CartAdditionalShipments");
                 entity.HasKey(c => c.Id);
-                entity.HasMany(c => c.Skus).WithOne().HasForeignKey(s => s.IdCartAdditionalShipment).HasPrincipalKey(c => c.Id);
+                entity.HasMany(c => c.Skus)
+                    .WithOne()
+                    .HasForeignKey(s => s.IdCartAdditionalShipment)
+                    .HasPrincipalKey(c => c.Id);
+                entity.HasMany(c => c.GiftCertificates)
+                    .WithOne()
+                    .HasForeignKey(s => s.IdCartAdditionalShipment)
+                    .HasPrincipalKey(c => c.Id);
                 entity.HasOne(o => o.ShippingAddress)
                     .WithOne()
                     .HasForeignKey<CartAdditionalShipment>(o => o.IdShippingAddress)

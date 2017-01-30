@@ -282,6 +282,14 @@ namespace VitalChoice.Business.Services.Products
             return query.SelectFirstOrDefaultAsync(false);
         }
 
+        public async Task<ICollection<GiftCertificate>> GetGiftCertificatesAsync(ICollection<int> ids)
+        {
+            var conditions = new GcQuery().WithIds(ids).NotDeleted();
+            var query = giftCertificateRepository.Query(conditions);
+
+            return await query.SelectAsync(false);
+        }
+
         public Task<GiftCertificate> GetGiftCertificateAsync(string code)
         {
             if (string.IsNullOrWhiteSpace(code))

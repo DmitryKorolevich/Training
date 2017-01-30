@@ -73,7 +73,7 @@ namespace VC.Public.Controllers
             HttpContext.SetCartUid(cart.CartUid);
         }
 
-        protected async Task FillModel(ViewCartModel cartModel, OrderDynamic order, OrderDataContext context)
+        protected async Task FillModel(ViewCartModel cartModel, OrderDynamic order, OrderDataContext context, string prefix="")
         {
             if (!context.ProductsPerishableThresholdIssue)
             {
@@ -218,7 +218,14 @@ namespace VC.Public.Controllers
                 var message in
                 context.Messages.Where(m => m.MessageLevel == MessageLevel.Error))
             {
-                ModelState.AddModelError(message.Field, message.Message);
+                if (!string.IsNullOrEmpty(message.Field))
+                {
+                    ModelState.AddModelError(prefix + message.Field, message.Message);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, message.Message);
+                }
             }
 
             int index = 0;
@@ -228,7 +235,7 @@ namespace VC.Public.Controllers
                 {
                     if (error.MessageLevel == MessageLevel.Error)
                     {
-                        ModelState.AddModelError("Code".FormatCollectionError("Skus", index), error.Message);
+                        ModelState.AddModelError(prefix + "Code".FormatCollectionError("Skus", index), error.Message);
                         ModelState.AddModelError(string.Empty, $"{sku.Sku.Code}: {error.Message}");
                     }
                 }
@@ -241,7 +248,7 @@ namespace VC.Public.Controllers
                 {
                     if (error.MessageLevel == MessageLevel.Error)
                     {
-                        ModelState.AddModelError("Code".FormatCollectionError("Promos", index), error.Message);
+                        ModelState.AddModelError(prefix + "Code".FormatCollectionError("Promos", index), error.Message);
                         ModelState.AddModelError(string.Empty, $"{promo.Sku.Code}: {error.Message}");
                     }
                 }

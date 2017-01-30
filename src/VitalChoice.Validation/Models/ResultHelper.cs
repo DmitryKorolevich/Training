@@ -75,6 +75,7 @@ namespace VitalChoice.Validation.Models
                     }
                 }
             }
+            modelState.Clear();
             return result;
         }
 

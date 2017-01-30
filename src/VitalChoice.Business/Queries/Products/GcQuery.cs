@@ -18,6 +18,15 @@ namespace VitalChoice.Business.Queries.Product
             return this;
         }
 
+        public GcQuery WithIds(ICollection<int> ids)
+        {
+            if (ids != null)
+            {
+                Add(x => ids.Contains(x.Id));
+            }
+            return this;
+        }
+
         public GcQuery WithCode(string code)
         {
             if (!String.IsNullOrEmpty(code))

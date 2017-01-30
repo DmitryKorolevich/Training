@@ -184,5 +184,40 @@
             </label>
             <label class="cart-total-value" data-bind="text: formatCurrency(OrderModel.OrderTotal())"></label>
         </div>
+        <div data-bind="ifnot: OrderModel.AutoShip" class="cart-order-details">
+            <div class="cart-promo-container">
+                <i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Promo Code" data-tooltip-body="If you have a discount code, enter it in the box to see the change in your order's total."></i>
+                <label>Promo Code</label>
+                <input class="cart-input-box input-control" data-bind="value: OrderModel.DiscountCode, css: {'input-validation-error': !isDiscountValid(OrderModel) }, disable: OrderModel.AutoShip, attr: { name: 'i'+$index() + '.DiscountCode', id: 'i'+$index() + '.DiscountCode'}"
+                       type="text">
+            </div>
+            <span class="success-message-box" data-bind="text: OrderModel.DiscountMessage, visible: OrderModel.DiscountMessage && isDiscountValid(OrderModel)"></span>
+            <span class="field-validation-error" data-bind="if: !isDiscountValid(OrderModel), attr: {'data-valmsg-for': 'i'+$index() + '.DiscountCode'}" data-valmsg-replace="true">
+                @*<span data-bind="text: getDiscountRelatedErrors(OrderModel)[0].Value,attr: { id: 'i'+$index() + '.DiscountCode-error'}"></span>*@
+            </span>
+            <div data-bind="attr: {id: 'i'+$index() + '.divGcContainer'}" class="cart-gc-container">
+                <i class="tooltip-l glyphicon glyphicon-question-sign" data-tooltip-title="Gift Certificate Code" data-tooltip-body="If you have a gift certificate code, enter it in the box to see the change in your order's total."></i>
+                <div data-bind="foreach: OrderModel.GiftCertificateCodes">
+                    <div>
+                        <!-- ko if: $index() == 0 -->
+                        <label>Gift Certificate Code</label>
+                        <a id="btnAddGc" class="circle-button button-green" data-bind="click: $parent.orderAddGc, visible: $index() == 0">
+                            <i class="glyphicon glyphicon-plus-sign"></i>
+                        </a>
+                        <!-- /ko -->
+                        <!-- ko if: $index() != 0 -->
+                        <a class="btnRemoveGc circle-button button-red" data-bind="click: $parent.orderRemoveGc, visible: $index() != 0">
+                            <i class="glyphicon glyphicon-minus-sign"></i>
+                        </a>
+                        <!-- /ko -->
+                        <input class="cart-input-box input-control" data-bind="value: Value, attr: { name: 'i'+$parentContext.$index() + '.GiftCertificateCodes' + $index(), id: 'i'+$parentContext.$index() + '.GiftCertificateCodes' + $index()}, event: { blur: $parent.orderGcLostFocus }, css: {'input-validation-error': !isGcValid($parent.OrderModel, $index()) }, disable: $parent.OrderModel.AutoShip"
+                               type="text">
+                        <span class="field-validation-error" data-bind="if: !isGcValid($parent.OrderModel, $index()), attr: { 'data-valmsg-for': 'i'+$parentContext.$index() + '.GiftCertificateCodes' + $index()}" data-valmsg-replace="true">
+                            <span class="" data-bind="text: ErrorMessage"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

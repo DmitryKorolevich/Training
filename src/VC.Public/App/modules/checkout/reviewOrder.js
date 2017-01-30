@@ -38,7 +38,10 @@ $(function ()
                     } else
                     {
                         processErrorResponse(result, self);
-                        self.loaded(false);
+                        self.Model = ko.mapping.fromJS(result.Data);
+                        initCart();
+
+                        self.loaded(true);
                         self.refreshing(false);
                     }
                 }).error(function (result)
@@ -72,13 +75,107 @@ $(function ()
 
         self.addGc = function ()
         {
-            var newGc = { Value: "" };
+            var newGc = { Value: ko.observable('') };
             self.Model.GiftCertificateCodes.push(newGc);
         };
 
-        self.gcLostFocus = function ()
+        self.applyToAll = function ()
         {
-            recalculateCart(self);
+            self.blockCalculation = true;
+            $.each(self.Model.Shipments(), function (i, item)
+            {
+                item.OrderModel.DiscountCode(self.Model.DiscountCode());
+            });
+            applyGCs(function ()
+            {
+                self.blockCalculation = false;
+                recalculateCart(self);
+            });
+        };
+
+        var applyGCs = function (success)
+        {
+            var codes = [];
+            $.each(self.Model.GiftCertificateCodes(), function (i, item)
+            {
+                if (item.Value())
+                {
+                    codes.push(item.Value());
+                }
+            });
+
+            self.refreshing(true);
+            $.ajax({
+                url: "/GC/GetGCsInfo",
+                dataType: "json",
+                data: ko.toJSON(codes),
+                contentType: "application/json; charset=utf-8",
+                type: "POST"
+            }).success(function (result)
+            {
+                if (result.Success)
+                {
+                    var gcs = result.Data;
+                    var orderTotals = [];
+
+                    $.each(self.Model.Shipments(), function (i, item)
+                    {
+                        var orderTotal = 
+                            { 
+                                OrderModel: item.OrderModel,
+                                TotalWithoutGC: item.OrderModel.OrderTotal() - item.OrderModel.GiftCertificatesTotal()
+                            };
+                        orderTotals.push(orderTotal);
+                        item.OrderModel.GiftCertificateCodes.removeAll();
+                    });
+
+                    $.each(gcs, function (i, gc)
+                    {
+                        if (gc.Amount > 0)
+                        {
+                            var added = false;
+                            $.each(orderTotals, function (j, orderTotal)
+                            {
+                                if (orderTotal.TotalWithoutGC > 0 && gc.Amount > 0)
+                                {
+                                    var usedAmount = orderTotal.TotalWithoutGC > gc.Amount ? gc.Amount : orderTotal.TotalWithoutGC;
+                                    orderTotal.TotalWithoutGC = orderTotal.TotalWithoutGC - usedAmount;
+                                    gc.Amount = gc.Amount - usedAmount;
+                                    var newGc = { Value: ko.observable(gc.Code) };
+                                    orderTotal.OrderModel.GiftCertificateCodes.push(newGc);
+                                    added = true;
+                                }
+                            });
+
+                            if (!added)
+                            {
+                                $.each(orderTotals, function (j, orderTotal)
+                                {
+                                    var newGc = { Value: ko.observable(gc.Code) };
+                                    orderTotal.OrderModel.GiftCertificateCodes.push(newGc);
+                                });
+                            }
+                        }
+                    });
+
+                    $.each(orderTotals, function (j, orderTotal)
+                    {
+                        if (orderTotal.OrderModel.GiftCertificateCodes().length == 0)
+                        {
+                            var newGc = { Value: ko.observable('') };
+                            orderTotal.OrderModel.GiftCertificateCodes.push(newGc);
+                        }
+                    });
+
+                    self.refreshing(false);
+                    success();
+                }
+                self.refreshing(false);
+            }).error(function (result)
+            {
+                processErrorResponse();
+                self.refreshing(false);
+            });
         };
 
         self.move = function (item, e)
@@ -306,49 +403,72 @@ $(function ()
 
         var initCart = function ()
         {
-            $.each(self.Model.Shipments(), function (i, item)
+            if (self.Model)
             {
-                item.upgradeOptions = ko.observableArray([]);
-                if (item.OrderModel.ShippingDate() !== null && item.OrderModel.ShippingDate() !== undefined)
+                $.each(self.Model.Shipments(), function (i, item)
                 {
-                    item.OrderModel.ShippingDate = ko.observable(moment(item.OrderModel.ShippingDate()).format('L'));
-                }
-                else
-                {
-                    item.OrderModel.ShippingDate = ko.observable("");
-                }
-
-                item.shipAsapChanged = function ()
-                {
-                    if (item.OrderModel.ShipAsap() && self.loaded())
+                    item.upgradeOptions = ko.observableArray([]);
+                    if (item.OrderModel.ShippingDate() !== null && item.OrderModel.ShippingDate() !== undefined)
                     {
-                        var index = self.Model.Shipments().indexOf(item);
-                        $(".item[data-index='" + index + "'] .date-picker").datepicker('setDate', null);
-                        item.OrderModel.ShippingDate(null);
+                        item.OrderModel.ShippingDate = ko.observable(moment(item.OrderModel.ShippingDate()).format('L'));
                     }
-                };
+                    else
+                    {
+                        item.OrderModel.ShippingDate = ko.observable("");
+                    }
 
-                item.removeSku = function (sku)
+                    item.shipAsapChanged = function ()
+                    {
+                        if (item.OrderModel.ShipAsap() && self.loaded())
+                        {
+                            var index = self.Model.Shipments().indexOf(item);
+                            $(".item[data-index='" + index + "'] .date-picker").datepicker('setDate', null);
+                            item.OrderModel.ShippingDate(null);
+                        }
+                    };
+
+                    item.removeSku = function (sku)
+                    {
+                        item.OrderModel.Skus.remove(sku)
+                    };
+
+                    item.orderRemoveGc = function (gc)
+                    {
+                        if (item.OrderModel.GiftCertificateCodes().length > 0)
+                        {
+                            item.OrderModel.GiftCertificateCodes.remove(gc);
+                        }
+                    };
+
+                    item.orderAddGc = function ()
+                    {
+                        var newGc = { Value: ko.observable('') };
+                        item.OrderModel.GiftCertificateCodes.push(newGc);
+                    };
+
+                    item.orderGcLostFocus = function ()
+                    {
+                        recalculateCart(self);
+                    };
+                });
+
+
+                ko.computed(function ()
                 {
-                    item.OrderModel.Skus.remove(sku)
-                };
-            });
+                    return ko.toJSON(self.Model.Shipments);
+                }).subscribe(function ()
+                {
+                    recalculateCart(self);
+                });
 
-            ko.computed(function ()
-            {
-                return ko.toJSON(self.Model);
-            }).subscribe(function ()
-            {
-                recalculateCart(self);
-            });
-
-            setTimeout(function ()
-            {
-                $(".date-picker-async").datepicker();
-                $(".date-picker-async").datepicker("option", "minDate", 1);
-                reparseElementValidators("#mainForm");
-                recalculateCart(self);
-            }, 200);
+                setTimeout(function ()
+                {
+                    $(".date-picker-async").datepicker();
+                    $(".date-picker-async").datepicker("option", "minDate", 1);
+                    reparseElementValidators("#mainForm");
+                    recalculateCart(self);
+                }, 200);
+            }
         };
 
         load();
@@ -400,30 +520,34 @@ function recalculateCart(viewModel, successCallback)
                     successCallback();
                 } else
                 {
+                    viewModel.blockCalculation = true;
                     $.each(result.Data.Shipments, function (i, item)
                     {
                         if (viewModel.Model.Shipments().length > i)
                         {
                             var uiShipment = viewModel.Model.Shipments()[i];
                             ko.mapping.fromJS(item.OrderModel, { 'ignore': ["ShipAsap", "DiscountCode", "ShippingDate"] }, uiShipment.OrderModel);
-                            processServerMessages(viewModel.Model);
+                            processServerMessages(viewModel.Model.Shipments()[i].OrderModel);
                         }
                     });
+                    viewModel.blockCalculation = false;
                     viewModel.refreshing(false);
                 }
             } else
             {
                 if (result.Data)
                 {
+                    viewModel.blockCalculation = true;
                     $.each(result.Data.Shipments, function (i, item)
                     {
                         if (viewModel.Model.Shipments().length > i)
                         {
                             var uiShipment = viewModel.Model.Shipments()[i];
                             ko.mapping.fromJS(item.OrderModel, { 'ignore': ["ShipAsap", "DiscountCode", "ShippingDate"] }, uiShipment.OrderModel);
-                            processServerMessages(viewModel.Model);
+                            processServerMessages(viewModel.Model.Shipments()[i].OrderModel);
                         }
                     });
+                    viewModel.blockCalculation = false;
                 }
                 processErrorResponse(result);
                 viewModel.refreshing(false);
@@ -468,30 +592,35 @@ function formatDisplayName(sku)
     return displayName;
 }
 
-var originalDiscountDescription;
-
-var originalGiftCertificates = [];
-
 function processServerMessages(model)
 {
-    if (model.DiscountDescription() && isDiscountValid(model) && originalDiscountDescription != model.DiscountDescription())
+    if (!model.originalGiftCertificates)
+    {
+        model.originalGiftCertificates = [];
+    }
+    if (typeof model.originalDiscountDescription === 'undefined')
+    {
+        model.originalDiscountDescription = null;
+    }
+
+    if (model.DiscountDescription() && isDiscountValid(model) && model.originalDiscountDescription != model.DiscountDescription())
     {
         notifySuccess(model.DiscountDescription() + "<br/>was applied to your order");
     }
-    originalDiscountDescription = model.DiscountDescription();
+    model.originalDiscountDescription = model.DiscountDescription();
 
     var actualSuccessMessages = $.grep(model.GiftCertificateCodes(), function (elem, index)
     {
-        if (elem.SuccessMessage() && (originalGiftCertificates.length != originalGiftCertificates.length || elem.SuccessMessage() != originalGiftCertificates[index]))
+        if (elem.SuccessMessage() && (model.originalGiftCertificates.length != model.originalGiftCertificates.length || elem.SuccessMessage() != model.originalGiftCertificates[index]))
         {
             notifySuccess(elem.SuccessMessage());
         }
     });
 
-    originalGiftCertificates = [];
+    model.originalGiftCertificates = [];
     $.each(model.GiftCertificateCodes(), function (ind, element)
     {
-        originalGiftCertificates.push(element.SuccessMessage());
+        model.originalGiftCertificates.push(element.SuccessMessage());
     });
 }
 
