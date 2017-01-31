@@ -120,8 +120,8 @@ $(function ()
 
                     $.each(self.Model.Shipments(), function (i, item)
                     {
-                        var orderTotal = 
-                            { 
+                        var orderTotal =
+                            {
                                 OrderModel: item.OrderModel,
                                 TotalWithoutGC: item.OrderModel.OrderTotal() - item.OrderModel.GiftCertificatesTotal()
                             };
@@ -170,7 +170,10 @@ $(function ()
                     self.refreshing(false);
                     success();
                 }
-                self.refreshing(false);
+                else
+                {
+                    self.refreshing(false);
+                }
             }).error(function (result)
             {
                 processErrorResponse();
