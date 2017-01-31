@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -11,6 +12,7 @@ using VitalChoice.Interfaces.Services.Customers;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Core.Infrastructure.Helpers;
 using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Infrastructure.Identity;
@@ -39,35 +41,72 @@ namespace VC.Public.Components.Tracking
             if (toReturn.PageName == PageName.Receipt)
             {
                 var ids = (context.Session.GetString(CheckoutConstants.ReceiptSessionOrderIds) ?? String.Empty).Split(',');
-                int idOrder = 0;
-                if (ids.Length > 0)
+                var orderIds = new List<int>();
+                foreach (var id in ids)
                 {
-                    Int32.TryParse(ids[0], out idOrder);
-                }
-                if (idOrder!=0)
-                {
-                    var tOrderService = orderService.Value;
-                    order = await orderService.Value.SelectAsync(idOrder, true);
-                    if (order.IdObjectType == (int) OrderType.AutoShip)
+                    int result;
+                    if (Int32.TryParse(id, out result))
                     {
-                        var id = (await tOrderService.SelectAutoShipOrdersAsync(idOrder)).FirstOrDefault();
+                        orderIds.Add(result);
+                    }
+                }
 
+                if (orderIds.Count == 0)
+                {
+                    return;
+                }
+                var tOrderService = orderService.Value;
+                var orders = (await tOrderService.SelectAsync(orderIds, true)).OrderBy(p => p.Id).ToList();
+                for (int i = 0; i < orders.Count; i++)
+                {
+                    if (orders[i].IdObjectType == (int)OrderType.AutoShip)
+                    {
+                        var id = (await tOrderService.SelectAutoShipOrdersAsync(orders[i].Id)).First();
                         if (id != 0)
                         {
-                            order = await tOrderService.SelectAsync(id, true);
+                            orders[i] = await tOrderService.SelectAsync(id, true);
                         }
                         else
                         {
-                            order = null;
+                            orders[i] = null;
                         }
                     }
+                }
 
-                    if (order != null)
+                if (orders.Count>0 && orders[0]!=null)
+                {
+                    var mainOrder = orders[0];
+                    mainOrder.Customer = await customerService.Value.SelectAsync(mainOrder.Customer.Id, true);
+
+                    //merge other shipments to the main order
+                    orders.Remove(mainOrder);
+                    orders.RemoveAll(p => p == null);
+                    foreach (var additionalOrder in orders)
                     {
-                        order.Customer = await customerService.Value.SelectAsync(order.Customer.Id, true);
+                        if (additionalOrder.Skus != null)
+                        {
+                            mainOrder.Skus.AddUpdateKeyed(additionalOrder.Skus, p=>p.Sku.Id, (d, s) =>
+                            {
+                                d.Quantity += s.Quantity;
+                            });
+                        }
+                        if (additionalOrder.PromoSkus != null)
+                        {
+                            mainOrder.PromoSkus.AddUpdateKeyed(additionalOrder.PromoSkus, p => p.Sku.Id, (d, s) =>
+                            {
+                                d.Quantity += s.Quantity;
+                            });
+                        }
+
+                        mainOrder.Total += additionalOrder.Total;
+                        mainOrder.ProductsSubtotal += additionalOrder.ProductsSubtotal;
+                        mainOrder.DiscountTotal += additionalOrder.DiscountTotal;
+                        mainOrder.TaxTotal += additionalOrder.TaxTotal;
+                        mainOrder.ShippingTotal += additionalOrder.ShippingTotal;
                     }
+
                     toReturn.OrderCompleteStep = true;
-                    toReturn.Order = order;
+                    toReturn.Order = mainOrder;
                 }
             }
             else
