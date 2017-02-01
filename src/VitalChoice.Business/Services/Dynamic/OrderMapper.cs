@@ -440,6 +440,25 @@ namespace VitalChoice.Business.Services.Dynamic
                             },
                             (p, rp) => p.Quantity = rp.Quantity);
                     });
+                if (entity.ReviewReasons == null)
+                {
+                    entity.ReviewReasons = new List<OrderReviewReason>();
+                }
+                if (dynamic.ReviewReasons == null || dynamic.ReviewReasons.Count == 0 ||
+                    (ReviewType?) dynamic.SafeData.Review == ReviewType.Reviewed)
+                {
+                    entity.ReviewReasons.Clear();
+                }
+                else if ((ReviewType?)dynamic.SafeData.Review == ReviewType.ForReview)
+                {
+                    entity.ReviewReasons.AddKeyed(dynamic.ReviewReasons, r => r.IdReviewRule, r => r.Rule.Id,
+                        reason => new OrderReviewReason
+                        {
+                            IdReviewRule = reason.Rule.Id,
+                            ReviewReason = CreateCombinedReason(reason.Reasons),
+                            IdOrder = dynamic.Id
+                        });
+                }
 
                 foreach (var gc in entity?.Skus?.Where(p => p.GeneratedGiftCertificates != null).SelectMany(p => p.GeneratedGiftCertificates))
                 {

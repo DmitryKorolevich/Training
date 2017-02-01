@@ -339,7 +339,6 @@ namespace VC.Admin.Models.Orders
         [Map]
         public ReviewType? Review { get; set; }
 
-        [Map]
         public ICollection<ReviewReasonViewModel> ReviewReasons { get; set; }
 
         public bool AllowSetAsReviewed { get; set; }
