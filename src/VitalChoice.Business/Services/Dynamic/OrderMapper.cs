@@ -444,12 +444,11 @@ namespace VitalChoice.Business.Services.Dynamic
                 {
                     entity.ReviewReasons = new List<OrderReviewReason>();
                 }
-                if (dynamic.ReviewReasons == null || dynamic.ReviewReasons.Count == 0 ||
-                    (ReviewType?) dynamic.SafeData.Review == ReviewType.Reviewed)
+                if ((ReviewType?)dynamic.SafeData.Review == ReviewType.Reviewed)
                 {
                     entity.ReviewReasons.Clear();
                 }
-                else if ((ReviewType?)dynamic.SafeData.Review == ReviewType.ForReview)
+                else if ((ReviewType?)dynamic.SafeData.Review == ReviewType.ForReview && dynamic.ReviewReasons != null)
                 {
                     entity.ReviewReasons.AddKeyed(dynamic.ReviewReasons, r => r.IdReviewRule, r => r.Rule.Id,
                         reason => new OrderReviewReason
