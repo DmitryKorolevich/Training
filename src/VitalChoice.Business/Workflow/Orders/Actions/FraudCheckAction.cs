@@ -6,6 +6,7 @@ using VitalChoice.Business.Workflow.Orders.Fraud;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
 using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Workflow.Base;
 using VitalChoice.Workflow.Core;
@@ -27,7 +28,6 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
             }
             var ruleService = executionContext.Resolve<IOrderReviewRuleService>();
             var rules = (await ruleService.GetAllRules()).Where(r => r.StatusCode == (int) RecordStatusCode.Active);
-            bool isFraud = false;
             foreach (var rule in rules)
             {
                 List<string> reasonList = new List<string>();
@@ -56,7 +56,12 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
                         }
                         if (anyChecksPerformed && ruleFraud)
                         {
-                            isFraud = true;
+                            context.IsFraud = true;
+                            context.FraudReason.Add(new ReviewReason
+                            {
+                                Reasons = reasonList,
+                                Rule = rule
+                            });
                         }
                         break;
                     case ApplyType.Any:
@@ -72,24 +77,21 @@ namespace VitalChoice.Business.Workflow.Orders.Actions
                                 {
                                     reasonList.Add(checkResult.Reason);
                                     ruleFraud = true;
-                                    break;
                                 }
                             }
                         }
                         if (ruleFraud)
                         {
-                            isFraud = true;
+                            context.IsFraud = true;
+                            context.FraudReason.Add(new ReviewReason
+                            {
+                                Reasons = reasonList,
+                                Rule = rule
+                            });
                         }
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
-                }
-
-                if (isFraud)
-                {
-                    context.IsFraud = true;
-                    context.FraudReason = reasonList;
-                    return 0;
                 }
             }
             return 0;

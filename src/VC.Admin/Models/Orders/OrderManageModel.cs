@@ -139,6 +139,13 @@ namespace VC.Admin.Models.Orders
         }
     }
 
+    public class ReviewReasonViewModel
+    {
+        public string Name { get; set; }
+
+        public ICollection<string> Reasons { get; set; }
+    }
+
     [ApiValidator(typeof(OrderManageModelValidator))]
     public class OrderManageModel : BaseModel
     {
@@ -333,7 +340,7 @@ namespace VC.Admin.Models.Orders
         public ReviewType? Review { get; set; }
 
         [Map]
-        public string ReviewReason { get; set; }
+        public ICollection<ReviewReasonViewModel> ReviewReasons { get; set; }
 
         public bool AllowSetAsReviewed { get; set; }
 

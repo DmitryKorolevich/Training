@@ -72,4 +72,19 @@ BEGIN
 
 END
 
+IF OBJECT_ID(N'dbo.OrderReviewReasons') IS NULL
+BEGIN
+	CREATE TABLE OrderReviewReasons
+	(
+		IdOrder INT NOT NULL,
+		IdReviewRule INT NOT NULL,
+		ReviewReason NVARCHAR(MAX) NULL,
+		CONSTRAINT PK_OrderReviewReasonValues PRIMARY KEY (IdOrder DESC, IdReviewRule),
+		CONSTRAINT FK_ReviewReasonToReviewRule FOREIGN KEY (IdReviewRule) REFERENCES OrderReviewRules (Id),
+		CONSTRAINT FK_ReviewReasonToOrder FOREIGN KEY (IdOrder) REFERENCES Orders (Id)
+	)
+
+	CREATE NONCLUSTERED INDEX IX_IdOrderReviewReason ON OrderReviewReasons (IdOrder DESC)
+END
+
 GO

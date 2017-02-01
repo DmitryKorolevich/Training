@@ -76,12 +76,10 @@ BEGIN
 END
 GO
 
-IF NOT EXISTS(SELECT * FROM OrderOptionTypes WHERE Name='ReviewReason')
+IF EXISTS(SELECT * FROM OrderOptionTypes WHERE Name='ReviewReason')
 BEGIN
 
-	INSERT INTO [dbo].[OrderOptionTypes]
-	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
-	VALUES
-	(N'ReviewReason', 8, NULL, NULL, NULL)
+	DELETE FROM [dbo].[OrderOptionTypes]
+	WHERE Name = 'ReviewReason' AND IdObjectType IS NULL
 
 END

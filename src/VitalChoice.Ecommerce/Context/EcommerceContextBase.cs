@@ -965,6 +965,11 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(v => v.IdOrder)
                     .HasPrincipalKey(o => o.Id)
                     .IsRequired();
+                entity.HasMany(o => o.ReviewReasons)
+                    .WithOne()
+                    .HasForeignKey(r => r.IdOrder)
+                    .HasPrincipalKey(o => o.Id)
+                    .IsRequired();
                 entity.Ignore(o => o.OptionTypes);
             });
 
@@ -1267,6 +1272,17 @@ namespace VitalChoice.Ecommerce.Context
                     .IsRequired(false);
                 entity.Ignore(d => d.IdObjectType);
                 entity.NotCollectiable();
+            });
+
+            builder.Entity<OrderReviewReason>(entity =>
+            {
+                entity.Ignore(p => p.Id);
+                entity.HasKey(p => new {p.IdOrder, p.IdReviewRule});
+                entity.ToTable("OrderReviewReasons");
+                entity.HasOne(r => r.Rule)
+                    .WithOne()
+                    .HasForeignKey<OrderReviewReason>(r => r.IdReviewRule)
+                    .HasPrincipalKey<OrderReviewRule>(r => r.Id);
             });
 
             #endregion

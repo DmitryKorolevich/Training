@@ -24,7 +24,7 @@ namespace VitalChoice.Business.Workflow.Orders.Fraud.Checks
                     Task.FromResult(new CheckResult
                     {
                         Result = true,
-                        Reason = $"Delivery Instructions has one of specified words: ({valueToCheck})"
+                        Reason = $"Delivery Instructions has one of specified phrases: ({valueToCheck})"
                     });
             }
             return TaskCache<CheckResult>.DefaultCompletedTask;
