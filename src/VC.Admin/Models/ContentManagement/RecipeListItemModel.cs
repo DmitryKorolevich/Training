@@ -8,6 +8,13 @@ using VitalChoice.Infrastructure.Domain.Content.Recipes;
 
 namespace VC.Admin.Models.ContentManagement
 {
+    public class ContentCategoryListItemModel
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+    }
+
     public class RecipeListItemModel : BaseModel
 	{
 	    public int Id { get; set; }
@@ -16,7 +23,7 @@ namespace VC.Admin.Models.ContentManagement
 
         public string Url { get; set; }
 
-        public ICollection<string> Categories { get; set; }
+        public ICollection<ContentCategoryListItemModel> Categories { get; set; }
 
         public DateTime Created { get; set; }
 
@@ -36,7 +43,12 @@ namespace VC.Admin.Models.ContentManagement
                 StatusCode = item.StatusCode;
                 if (item.RecipesToContentCategories != null)
                 {
-                    Categories = item.RecipesToContentCategories.OrderBy(p => p.ContentCategory.Name).Select(p => p.ContentCategory.Name).ToArray();
+                    Categories =
+                        item.RecipesToContentCategories.OrderBy(p => p.ContentCategory.Name).Select(p => new ContentCategoryListItemModel
+                        {
+                            Id = p.ContentCategory.Id,
+                            Name = p.ContentCategory.Name
+                        }).ToArray();
                 }
                 if (item.ContentItem!=null)
                 {
