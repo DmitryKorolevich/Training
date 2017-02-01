@@ -9,6 +9,7 @@ SELECT
 	a.Id,
 	a.StatusCode,
 	a.Name,
+	a.Email,
 	cval.Value as Company,
 	wval.Value as WebSite,
 	a.CommissionFirst,

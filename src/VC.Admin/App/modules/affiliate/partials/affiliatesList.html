@@ -33,7 +33,10 @@
         <hr />
         <div class="form-group">
             <button data-ng-click="open();" class="btn btn-primary">Add New Affiliate</button>
-            <span class="pull-right">* commissions are up until last day of previous month</span>
+            <div class="pull-right padding-left-15px">
+                <a class="btn btn-primary" data-ng-click="exportItems();">Export</a>
+            </div>
+            <span class="pull-right margin-top-10px">* commissions are up until last day of previous month</span>
         </div>
         <spinner-overlay data-loading="refreshTracker.active()">
             <table id="data-grid" class="table table-striped table-hover">
@@ -123,7 +126,7 @@
                         </td>
                         <td>{{::item.Company}}</td>
                         <td>{{::item.WebSite}}</td>
-                        <td>{{::item.CommissionFirst | number:2}}% / {{::item.CommissionAll | number:2}}%</td>   
+                        <td>{{::item.CommissionDescription}}</td>   
                         <td>
                             <span data-ng-if="item.StatusCode == 1" class="label label-warning font-default">{{getReferenceItem(ReferenceData.AffiliateStatuses, item.StatusCode).Text}}</span>
                             <span data-ng-if="item.StatusCode == 2" class="label label-info font-default">{{getReferenceItem(ReferenceData.AffiliateStatuses, item.StatusCode).Text}}</span>

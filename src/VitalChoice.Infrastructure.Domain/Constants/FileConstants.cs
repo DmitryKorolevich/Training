@@ -54,5 +54,6 @@
         public const string CUSTOMERS_REFUND_RESHIP_ABUSE_REPORT = "Customers_Refund_Reship_Abuse_Report_{0:MM_dd_yyyy_hh_mm_ss}.csv";
 
         public const string GCS_REPORT = "GCs_{0:MM_dd_yyyy_hh_mm_ss}.csv";
+        public const string AFFILIATES_REPORT = "Affiliates_{0:MM_dd_yyyy_hh_mm_ss}.csv";
     }
 }

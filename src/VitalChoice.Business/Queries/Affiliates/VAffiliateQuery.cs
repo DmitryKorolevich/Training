@@ -48,7 +48,7 @@ namespace VitalChoice.Business.Queries.Affiliate
 
         public VAffiliateQuery NotDeleted()
         {
-            And(x => x.StatusCode != RecordStatusCode.Deleted);
+            And(x => x.StatusCode != AffiliateStatus.Deleted);
             return this;
         }
 
