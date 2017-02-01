@@ -1,14 +1,17 @@
 ﻿using System;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Entities;
+using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
 
 namespace VitalChoice.Infrastructure.Domain.Transfer.Affiliates
 {
     public class VAffiliate : Entity
 	{
-        public RecordStatusCode StatusCode { get; set; }
+        public AffiliateStatus StatusCode { get; set; }
 
 	    public string Name{ get; set; }
+
+        public string Email { get; set; }
 
         public int CustomersCount { get; set; }
 

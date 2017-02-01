@@ -192,7 +192,18 @@ namespace VitalChoice.Business.Services.Affiliates
                     break;
             }
 
-            var toReturn = await query.OrderBy(sortable).SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, false);
+            PagedList<VAffiliate> toReturn = null;
+            if (filter.Paging != null)
+            {
+                toReturn = await query.OrderBy(sortable)
+                            .SelectPageAsync(filter.Paging.PageIndex, filter.Paging.PageItemCount, false);
+            }
+            else
+            {
+                var data = await query.OrderBy(sortable).SelectAsync(false);
+                toReturn=new PagedList<VAffiliate>(data,data.Count);
+            }
+
             if (toReturn.Items.Count > 0)
             {
                 var ids = toReturn.Items.Where(p => p.IdEditedBy.HasValue).Select(p => p.IdEditedBy).ToList();

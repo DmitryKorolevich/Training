@@ -1,18 +1,18 @@
 ﻿using System;
-using VitalChoice.Validation.Models;
 using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
-using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 
-namespace VC.Admin.Models.Affiliate
+namespace VitalChoice.Infrastructure.Domain.Transfer.Affiliates
 {
-    public class AffiliateListItemModel : BaseModel
+    public class AffiliateListItemModel
     {
         public int Id { get; set; }
 
-        public RecordStatusCode StatusCode { get; set; }
+        public AffiliateStatus StatusCode { get; set; }
 
         public string Name { get; set; }
+
+        public string Email { get; set; }
 
         public string Company { get; set; }
 
@@ -21,6 +21,8 @@ namespace VC.Admin.Models.Affiliate
         public decimal CommissionFirst { get; set; }
 
         public decimal CommissionAll { get; set; }
+
+        public string CommissionDescription { get; set; }
 
         public string Tier { get; set; }
 
@@ -43,10 +45,12 @@ namespace VC.Admin.Models.Affiliate
                 Id = item.Id;
                 StatusCode = item.StatusCode;
                 Name = item.Name;
+                Email = item.Email;
                 Company = item.Company;
                 WebSite = item.WebSite;
                 CommissionFirst = item.CommissionFirst;
                 CommissionAll = item.CommissionAll;
+                CommissionDescription = $"{item.CommissionFirst:N2}% / {item.CommissionAll:N2}%";
                 Tier = item.Tier;
                 CustomersCount = item.CustomersCount;
                 DateEdited = item.DateEdited;

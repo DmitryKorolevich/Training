@@ -59,6 +59,21 @@ namespace VitalChoice.Business.Helpers
             return toReturn;
         }
 
+        public static string GetAffiliatePaymentTypeName(int? type)
+        {
+            string toReturn = null;
+            switch (type)
+            {
+                case 1:
+                    toReturn = "Cash";
+                    break;
+                case 2:
+                    toReturn = "Credit";
+                    break;
+            }
+            return toReturn;
+        }
+
         public static string GetGCTypeName(GCType type)
         {
             string toReturn = null;
@@ -191,6 +206,30 @@ namespace VitalChoice.Business.Helpers
                 {(int) AffiliateStatus.Deleted, "Deleted"},
                 {(int) AffiliateStatus.Suspended, "Suspended"},
             };
+            return toReturn;
+        }
+
+        public static string GetAffiliateStatusName(AffiliateStatus status)
+        {
+            string toReturn = null;
+            switch (status)
+            {
+                case AffiliateStatus.Active:
+                    toReturn = "Active";
+                    break;
+                case AffiliateStatus.Pending:
+                    toReturn = "Pending";
+                    break;
+                case AffiliateStatus.NotActive:
+                    toReturn = "Not Active";
+                    break;
+                case AffiliateStatus.Deleted:
+                    toReturn = "Deleted";
+                    break;
+                case AffiliateStatus.Suspended:
+                    toReturn = "Suspended";
+                    break;
+            }
             return toReturn;
         }
 
