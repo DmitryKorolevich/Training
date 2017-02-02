@@ -2543,6 +2543,21 @@ namespace VitalChoice.Business.Services.Orders
                         o.DateCreated > startDate && o.DateCreated <= endDate, q => q);
         }
 
+        public Task<int> GetOrderCount(int idCustomer)
+        {
+            return
+                SelectCountAsync(
+                    o =>
+                        o.IdCustomer == idCustomer &&
+                        o.StatusCode != (int) RecordStatusCode.Deleted &&
+                        (o.IdObjectType == (int) OrderType.Normal || o.IdObjectType == (int) OrderType.AutoShipOrder ||
+                         o.IdObjectType == (int) OrderType.DropShip || o.IdObjectType == (int) OrderType.GiftList) &&
+                        !(o.OrderStatus == OrderStatus.Incomplete || o.POrderStatus == OrderStatus.Incomplete ||
+                          o.NPOrderStatus == OrderStatus.Incomplete)
+                        && (o.OrderStatus != OrderStatus.Cancelled || o.POrderStatus != OrderStatus.Cancelled ||
+                            o.NPOrderStatus != OrderStatus.Cancelled), q => q);
+        }
+
         #endregion
 
         private struct OrderPaymentReference

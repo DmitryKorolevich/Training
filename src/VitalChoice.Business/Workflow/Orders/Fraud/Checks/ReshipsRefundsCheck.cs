@@ -9,7 +9,7 @@ namespace VitalChoice.Business.Workflow.Orders.Fraud.Checks
 {
     [FraudPriority(Priority = 1)]
     [FraudFieldName(Name = "ReshipsRefundsCheckType")]
-    public class ReshipsRefundsCheckFraudChecker : BaseFraudChecker<OrderType>
+    public class ReshipsRefundsCheck : BaseFraudChecker<OrderType>
     {
         public override async Task<CheckResult> CheckCondition(OrderDataContext context, ITreeContext executionContext,
             OrderType valueToCheck,
