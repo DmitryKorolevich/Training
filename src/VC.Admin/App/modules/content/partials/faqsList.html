@@ -58,7 +58,7 @@
                         <td>{{faq.Url}}</td>
                         <td>
                             <div data-ng-if="faq.Categories && faq.Categories.length>0">
-                                <div data-ng-repeat="category in faq.Categories">
+                                <div data-ng-repeat="category in faq.Categories track by $index">
                                     {{category}}
                                 </div>
                             </div>
