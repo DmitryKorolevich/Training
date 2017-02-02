@@ -79,6 +79,12 @@ GO
 IF EXISTS(SELECT * FROM OrderOptionTypes WHERE Name='ReviewReason')
 BEGIN
 
+	DELETE FROM [dbo].[OrderOptionValues]
+	WHERE IdOptionType IN (
+		SELECT Id FROM [dbo].[OrderOptionTypes]
+		WHERE Name = 'ReviewReason' AND IdObjectType IS NULL
+	)
+
 	DELETE FROM [dbo].[OrderOptionTypes]
 	WHERE Name = 'ReviewReason' AND IdObjectType IS NULL
 
