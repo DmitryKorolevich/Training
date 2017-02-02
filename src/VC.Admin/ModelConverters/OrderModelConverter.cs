@@ -58,7 +58,7 @@ namespace VC.Admin.ModelConverters
 
         public override async Task DynamicToModelAsync(OrderManageModel model, OrderDynamic dynamic)
         {
-            if (dynamic.SafeData.Review == (int) ReviewType.ForReview)
+            if ((ReviewType?) dynamic.SafeData.Review == ReviewType.ForReview)
             {
                 model.AllowSetAsReviewed = true;
             }
