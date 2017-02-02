@@ -40,6 +40,7 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
             SkuOrdereds = new List<SkuOrdered>();
             GcMessageInfos = new List<MessageInfo>();
             SplitInfo = new SplitInfo<SkuOrdered>(() => SkuOrdereds.Concat(PromoSkus));
+            FraudReason = new List<ReviewReason>();
         }
 
         public decimal AlaskaHawaiiSurcharge { get; set; }
@@ -97,5 +98,11 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Contexts
         public decimal StandardShippingOverriden => StandardShippingCharges + Data.ShippingUpgrade + Data.ShippingOverride;
 
         public decimal SurchargeShippingOverriden => CanadaSurcharge + AlaskaHawaiiSurcharge + Data.SurchargeOverride;
+
+        public bool CheckForFraud { get; set; }
+
+        public bool IsFraud { get; set; }
+
+        public List<ReviewReason> FraudReason { get; set; }
     }
 }

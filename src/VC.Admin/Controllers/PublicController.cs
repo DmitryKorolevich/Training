@@ -68,11 +68,10 @@ namespace VC.Admin.Controllers
             var defaultCountry = _referenceData.DefaultCountry;
             var toReturn = new EmailOrderManageModel()
             {
-                Shipping = new AddressModel() { Country = new CountryListItemModel(defaultCountry) },
-                SkuOrdereds = new List<SkuOrderedManageModel>() { new SkuOrderedManageModel(null) },
-                IdPaymentMethodType = (int)PaymentMethodType.Marketing,
+                Shipping = new AddressModel() {Country = new CountryListItemModel(defaultCountry)},
+                SkuOrdereds = new List<SkuOrderedManageModel>() {new SkuOrderedManageModel(null)},
+                IdPaymentMethodType = (int) PaymentMethodType.Marketing,
             };
-
             return toReturn;
         }
 

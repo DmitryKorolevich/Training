@@ -38,14 +38,23 @@ using VitalChoice.Infrastructure.Domain.Content.Products;
 using VitalChoice.Infrastructure.Domain.Content.Recipes;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Data.Extensions;
+using VitalChoice.DynamicData.Interfaces;
+using VitalChoice.Ecommerce.Domain.Entities.Customers;
+using VitalChoice.Ecommerce.Domain.Entities.Discounts;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
+using VitalChoice.Ecommerce.Domain.Entities.Orders;
+using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Azure;
 using VitalChoice.Infrastructure.Domain.Content;
 using VitalChoice.Infrastructure.Domain.Content.Emails;
+using VitalChoice.Infrastructure.Domain.Entities.Roles;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Transfer;
+using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Infrastructure.Identity.UserManagers;
 using VitalChoice.Infrastructure.Services;
 using VitalChoice.Interfaces.Services.Content;
+using VitalChoice.Interfaces.Services.Orders;
 using VitalChoice.Profiling.Base;
 
 namespace VC.Admin.Controllers
@@ -67,6 +76,9 @@ namespace VC.Admin.Controllers
         private readonly ITableLogsClient _logsClient;
         private readonly AppSettings _appSettings;
         private readonly IContentAreaService _contentAreaService;
+        private readonly IOrderReviewRuleService _orderReviewRuleService;
+        private readonly IDynamicMapper<OrderReviewRuleDynamic, OrderReviewRule> _orderReviewRuleMapper;
+        private readonly ExtendedUserManager _userManager;
 
         public SettingController(
             ILogViewService logViewService,
@@ -79,7 +91,10 @@ namespace VC.Admin.Controllers
             ILoggerFactory loggerProvider, 
             ITableLogsClient logsClient,
             AppSettings appSettings,
-            IContentAreaService contentAreaService)
+            IContentAreaService contentAreaService,
+            IOrderReviewRuleService orderReviewRuleService,
+            IDynamicMapper<OrderReviewRuleDynamic, OrderReviewRule> orderReviewRuleMapper,
+            ExtendedUserManager userManager)
         {
             this.logViewService = logViewService;
             this.countryService = countryService;
@@ -92,6 +107,9 @@ namespace VC.Admin.Controllers
             _appSettings = appSettings;
             this.logger = loggerProvider.CreateLogger<SettingController>();
             _contentAreaService = contentAreaService;
+            _orderReviewRuleService = orderReviewRuleService;
+            _orderReviewRuleMapper = orderReviewRuleMapper;
+            _userManager = userManager;
         }
 
         #region Lookups
@@ -443,6 +461,84 @@ namespace VC.Admin.Controllers
             var toReturn = await _catalogRequestAddressService.DeleteCatalogRequestsAsync();
 
             return toReturn;
+        }
+
+        #endregion
+
+        #region OrderReviewRules
+
+        [HttpPost]
+        public async Task<Result<PagedList<OrderReviewRuleListItemModel>>> GetOrderReviewRules([FromBody]FilterBase filter)
+        {
+            var result = await _orderReviewRuleService.GetShortOrderReviewRulesAsync(filter);
+
+            var toReturn = new PagedList<OrderReviewRuleListItemModel>
+            {
+                Items = result.Items.Select(p => new OrderReviewRuleListItemModel(p)).ToList(),
+                Count = result.Count,
+            };
+
+            return toReturn;
+        }
+        
+        [HttpGet]
+        public async Task<Result<OrderReviewRuleManageModel>> GetOrderReviewRule(string id)
+        {
+            int idOrderReviewRule = 0;
+            if (id != null && !Int32.TryParse(id, out idOrderReviewRule))
+                throw new NotFoundException();
+
+            if (idOrderReviewRule == 0)
+            {
+                return new OrderReviewRuleManageModel()
+                {
+                    StatusCode = RecordStatusCode.Active,
+                    ApplyType = ApplyType.All,
+                    CompareNamesType = CompareType.Equal,
+                    CompareAddressesType = CompareType.Equal,
+                    ReshipsRefundsCheckType = OrderType.Reship,
+                    ReshipsRefundsMonthCount = 6,
+                };
+            }
+
+            var item = await _orderReviewRuleService.SelectAsync(idOrderReviewRule);
+            if (item == null)
+                throw new NotFoundException();
+
+            OrderReviewRuleManageModel toReturn = await _orderReviewRuleMapper.ToModelAsync<OrderReviewRuleManageModel>(item);
+            return toReturn;
+        }
+
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Marketing)]
+        public async Task<Result<OrderReviewRuleManageModel>> UpdateOrderReviewRule([FromBody]OrderReviewRuleManageModel model)
+        {
+            if (!Validate(model))
+                return null;
+            var rule = await _orderReviewRuleMapper.FromModelAsync(model);
+            var sUserId = _userManager.GetUserId(User);
+            int userId;
+            if (Int32.TryParse(sUserId, out userId))
+            {
+                rule.IdEditedBy = userId;
+            }
+            if (rule.Id > 0)
+            {
+                rule = await _orderReviewRuleService.UpdateAsync(rule);
+            }
+            else
+            {
+                rule = await _orderReviewRuleService.InsertAsync(rule);
+            }
+
+            return await _orderReviewRuleMapper.ToModelAsync<OrderReviewRuleManageModel>(rule);
+        }
+
+        [HttpPost]
+        [AdminAuthorize(PermissionType.Marketing)]
+        public async Task<Result<bool>> DeleteOrderReviewRule(int id)
+        {
+            return await _orderReviewRuleService.DeleteAsync(id);
         }
 
         #endregion

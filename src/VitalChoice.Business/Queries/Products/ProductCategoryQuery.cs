@@ -24,7 +24,7 @@ namespace VitalChoice.Business.Queries.Product
 
         public ProductCategoryQuery NotDeleted()
         {
-            Add(x => x.StatusCode == RecordStatusCode.Active || x.StatusCode == RecordStatusCode.NotActive);
+            Add(x => x.StatusCode != RecordStatusCode.Deleted);
 
             return this;
         }

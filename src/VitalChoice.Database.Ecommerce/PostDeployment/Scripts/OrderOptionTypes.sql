@@ -64,3 +64,28 @@ BEGIN
 
 END
 GO
+
+IF NOT EXISTS(SELECT * FROM OrderOptionTypes WHERE Name='Review')
+BEGIN
+
+	INSERT INTO [dbo].[OrderOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'Review', 3, NULL, NULL, NULL)
+
+END
+GO
+
+IF EXISTS(SELECT * FROM OrderOptionTypes WHERE Name='ReviewReason')
+BEGIN
+
+	DELETE FROM [dbo].[OrderOptionValues]
+	WHERE IdOptionType IN (
+		SELECT Id FROM [dbo].[OrderOptionTypes]
+		WHERE Name = 'ReviewReason' AND IdObjectType IS NULL
+	)
+
+	DELETE FROM [dbo].[OrderOptionTypes]
+	WHERE Name = 'ReviewReason' AND IdObjectType IS NULL
+
+END

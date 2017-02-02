@@ -12,12 +12,10 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 {
     public sealed class OrderDynamic : MappedObject
     {
-        public OrderDynamic()
-        {
-            Skus = new List<SkuOrdered>();
-            PromoSkus = new List<PromoOrdered>();
-            GiftCertificates = new List<GiftCertificateInOrder>();
-        }
+        private ICollection<ReviewReason> _reviewReasons;
+        private ICollection<GiftCertificateInOrder> _giftCertificates;
+        private ICollection<PromoOrdered> _promoSkus;
+        private ICollection<SkuOrdered> _skus;
 
         public int? IdAddedBy { get; set; }
 
@@ -29,11 +27,19 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
         public CustomerDynamic Customer { get; set; }
 
-        public ICollection<SkuOrdered> Skus { get; set; }
+        public ICollection<SkuOrdered> Skus
+        {
+            get { return _skus ?? (_skus = new List<SkuOrdered>()); }
+            set { _skus = value; }
+        }
 
         public DiscountDynamic Discount { get; set; }
 
-        public ICollection<GiftCertificateInOrder> GiftCertificates { get; set; }
+        public ICollection<GiftCertificateInOrder> GiftCertificates
+        {
+            get { return _giftCertificates ?? (_giftCertificates = new List<GiftCertificateInOrder>()); }
+            set { _giftCertificates = value; }
+        }
 
         public OrderPaymentMethodDynamic PaymentMethod { get; set; }
 
@@ -55,7 +61,11 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
 
         public bool IsFirstHealthwise { get; set; }
 
-        public ICollection<PromoOrdered> PromoSkus { get; set; }
+        public ICollection<PromoOrdered> PromoSkus
+        {
+            get { return _promoSkus ?? (_promoSkus = new List<PromoOrdered>()); }
+            set { _promoSkus = value; }
+        }
 
         //Don't storing in DB, should be set be calculating logic
         public decimal? AffiliatePaymentAmount { get; set; }
@@ -69,5 +79,11 @@ namespace VitalChoice.Infrastructure.Domain.Dynamic
         public int? SendSide { get; set; }
 
         public ICollection<OrderShippingPackageModelItem> OrderShippingPackages { get; set; }
+
+        public ICollection<ReviewReason> ReviewReasons
+        {
+            get { return _reviewReasons ?? (_reviewReasons = new List<ReviewReason>()); }
+            set { _reviewReasons = value; }
+        }
     }
 }

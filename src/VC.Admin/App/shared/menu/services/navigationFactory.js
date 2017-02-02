@@ -58,6 +58,12 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				    stateLabel: 'Download CJ Data Feed',
 				    access: 4
 				},
+				{
+				    name: 'downloadPepperJamFeed',
+				    href: $rootScope.PublicHost != null ? 'https://{0}/feed/pepper-jam.csv'.format($rootScope.PublicHost) : '',
+				    stateLabel: 'Download PepperJam Data Feed',
+				    access: 4
+				},
 				{ name: 'manageSkuPrices', stateName: 'index.oneCol.manageSkuPrices', stateLabel: 'Bulk Product Price Update', access: 4 },
 			]
 		},
@@ -183,6 +189,7 @@ angular.module('app.shared.menu.services.navigationFactory', [])
 				{ name: 'moveOrder', stateName: 'index.oneCol.moveOrder', stateLabel: 'Reassign Transaction', access: 10 },
 				{ name: 'changeOrderStatus', stateName: 'index.oneCol.changeOrderStatus', stateLabel: 'Change Order Status', access: 10 },
 				{ name: 'mergeCustomers', stateName: 'index.oneCol.mergeCustomers', stateLabel: 'Merge Customers', access: 10 },
+				{ name: 'manageOrderReviewRules', stateName: 'index.oneCol.manageOrderReviewRules', stateLabel: 'Manage Order Review Rules', access: 10 },
 			]
 		},
 		{

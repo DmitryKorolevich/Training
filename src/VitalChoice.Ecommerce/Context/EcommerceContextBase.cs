@@ -965,6 +965,11 @@ namespace VitalChoice.Ecommerce.Context
                     .HasForeignKey(v => v.IdOrder)
                     .HasPrincipalKey(o => o.Id)
                     .IsRequired();
+                entity.HasMany(o => o.ReviewReasons)
+                    .WithOne()
+                    .HasForeignKey(r => r.IdOrder)
+                    .HasPrincipalKey(o => o.Id)
+                    .IsRequired();
                 entity.Ignore(o => o.OptionTypes);
             });
 
@@ -1214,6 +1219,70 @@ namespace VitalChoice.Ecommerce.Context
                     .HasPrincipalKey(s => s.Id)
                     .IsRequired();
                 entity.Ignore(v => v.Id);
+            });
+
+            #endregion
+
+            #region OrderReviewRules
+
+            builder.Entity<OrderReviewRuleOptionType>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("OrderReviewRuleOptionTypes");
+                entity
+                    .HasOne(p => p.Lookup)
+                    .WithMany()
+                    .HasForeignKey(p => p.IdLookup)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
+                entity.CacheUniqueIndex(e => new { e.Name, e.IdObjectType });
+                entity.NotCollectiable();
+            });
+
+            builder.Entity<OrderReviewRuleOptionValue>(entity =>
+            {
+                entity.Ignore(o => o.Id);
+                entity.HasKey(d => new { d.IdOrderReviewRule, d.IdOptionType });
+                entity.ToTable("OrderReviewRuleOptionValues");
+                entity
+                    .HasOne(v => v.OptionType)
+                    .WithMany()
+                    .HasForeignKey(t => t.IdOptionType)
+                    .HasPrincipalKey(v => v.Id);
+
+                entity.Ignore(d => d.BigValue);
+                entity.Ignore(d => d.IdBigString);
+            });
+
+            builder.Entity<OrderReviewRule>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.ToTable("OrderReviewRules");
+                entity
+                    .HasMany(p => p.OptionValues)
+                    .WithOne()
+                    .HasForeignKey(o => o.IdOrderReviewRule)
+                    .HasPrincipalKey(p => p.Id);
+                entity.Ignore(p => p.OptionTypes);
+                entity
+                    .HasOne(p => p.EditedBy)
+                    .WithMany()
+                    .HasForeignKey(o => o.IdEditedBy)
+                    .HasPrincipalKey(p => p.Id)
+                    .IsRequired(false);
+                entity.Ignore(d => d.IdObjectType);
+                entity.NotCollectiable();
+            });
+
+            builder.Entity<OrderReviewReason>(entity =>
+            {
+                entity.Ignore(p => p.Id);
+                entity.HasKey(p => new {p.IdOrder, p.IdReviewRule});
+                entity.ToTable("OrderReviewReasons");
+                entity.HasOne(r => r.Rule)
+                    .WithOne()
+                    .HasForeignKey<OrderReviewReason>(r => r.IdReviewRule)
+                    .HasPrincipalKey<OrderReviewRule>(r => r.Id);
             });
 
             #endregion

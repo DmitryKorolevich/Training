@@ -65,7 +65,7 @@
                         <td>{{contentPage.Url}}</td>
                         <td>
                             <div data-ng-if="contentPage.Categories && contentPage.Categories.length>0">
-                                <div data-ng-repeat="category in contentPage.Categories">
+                                <div data-ng-repeat="category in contentPage.Categories track by $index">
                                     {{category}}
                                 </div>
                             </div>

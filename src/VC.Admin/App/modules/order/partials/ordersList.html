@@ -144,6 +144,14 @@
                     <div class="col-md-2">
                         <select class="form-control" placeholder="Agent ID" data-ng-model="filter.IdAddedBy" data-ng-options="item.Id as item.AgentId for item in admins"></select>
                     </div>
+                    <div class="col-md-2">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="ForReview" data-ng-model="filter.ForReview" />
+                                Orders For Review Only
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </fieldset>
         </form>
@@ -179,6 +187,7 @@
                 <thead>
                     <tr>
                         <th class="status">Status</th>
+                        <th>Review</th>
                         <th class="sortable-column" data-ng-click="filter.Sorting.applySort('IdObjectType')">
                             <span>O Type</span>
                             <span data-ng-if="filter.Sorting.Path == 'IdObjectType'">
@@ -262,6 +271,9 @@
                     <tr data-ng-class="::{'order-notes': item.OrderNotes}" data-ng-repeat="item in items">
                         <td>
                             <div data-ng-include="'app/modules/order/partials/orderStatusSection.html'"></div>
+                        </td>
+                        <td>
+                            <span data-ng-if="::item.Review==1" class="label label-wholesale font-default">R</span>
                         </td>
                         <td>
                             <span class="label font-default" data-ng-class="::{'label-retail': (item.IdObjectType==1 || item.IdObjectType==7 ||item.IdObjectType==3 || item.IdObjectType==4), 'label-primary':  item.IdObjectType==5, 'label-success':  item.IdObjectType==6}">{{::getReferenceItem(ReferenceData.ShortOrderTypes, item.IdObjectType).Text}}</span>

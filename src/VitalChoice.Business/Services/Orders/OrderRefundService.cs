@@ -51,28 +51,28 @@ namespace VitalChoice.Business.Services.Orders
             : base(
                 mapper, orderRepository, orderValueRepositoryAsync,
                 bigStringValueRepository, objectLogItemExternalService, loggerProvider, queryVisitor, transactionAccessor, orderingExtension
-                )
+            )
         {
             _treeFactory = treeFactory;
             _gcService = gcService;
         }
 
-        protected override Expression<Func<Order, bool>> AdditionalDefaultConditions => 
+        protected override Expression<Func<Order, bool>> AdditionalDefaultConditions =>
             p => p.IdObjectType == (int) OrderType.Refund;
 
         protected override IQueryLite<Order> BuildIncludes(IQueryLite<Order> query)
-		{
-		    return
-		        query.Include(o => o.RefundSkus)
-		            .ThenInclude(s => s.Sku)
+        {
+            return
+                query.Include(o => o.RefundSkus)
+                    .ThenInclude(s => s.Sku)
                     .ThenInclude(s => s.OptionValues)
                     .Include(o => o.RefundSkus)
                     .ThenInclude(p => p.Sku)
                     .ThenInclude(s => s.Product)
                     .ThenInclude(p => p.OptionValues)
                     .Include(g => g.RefundOrderToGiftCertificates)
-		            .ThenInclude(og => og.OrderToGiftCertificate)
-                    .ThenInclude(g=>g.GiftCertificate)
+                    .ThenInclude(og => og.OrderToGiftCertificate)
+                    .ThenInclude(g => g.GiftCertificate)
                     .Include(o => o.PaymentMethod)
                     .ThenInclude(p => p.BillingAddress)
                     .ThenInclude(a => a.OptionValues)
@@ -84,7 +84,7 @@ namespace VitalChoice.Business.Services.Orders
                     .ThenInclude(p => p.PaymentMethod)
                     .Include(o => o.ShippingAddress)
                     .ThenInclude(s => s.OptionValues);
-		}
+        }
 
         protected override bool LogObjectFullData => true;
 
@@ -102,8 +102,11 @@ namespace VitalChoice.Business.Services.Orders
 
         public async Task<ICollection<int>> GetRefundIdsForOrder(int idOrder)
         {
-            return await ObjectRepository.Query(p => p.IdOrderSource == idOrder && p.StatusCode != (int)RecordStatusCode.Deleted && p.IdObjectType==(int)OrderType.Refund)
-                    .SelectAsync(p => p.Id, false);
+            return await ObjectRepository.Query(
+                    p =>
+                        p.IdOrderSource == idOrder && p.StatusCode != (int) RecordStatusCode.Deleted &&
+                        p.IdObjectType == (int) OrderType.Refund)
+                .SelectAsync(p => p.Id, false);
         }
 
         private void UpdateOrderFromCalculationContext(OrderRefundDynamic order, OrderRefundDataContext dataContext)
@@ -125,7 +128,7 @@ namespace VitalChoice.Business.Services.Orders
             var order = await SelectAsync(id, false);
             if (order != null)
             {
-                order.OrderStatus=OrderStatus.Cancelled;
+                order.OrderStatus = OrderStatus.Cancelled;
                 foreach (var refundOrderToGiftCertificateUsed in order.RefundOrderToGiftCertificates)
                 {
                     refundOrderToGiftCertificateUsed.Amount = 0;
@@ -246,6 +249,18 @@ namespace VitalChoice.Business.Services.Orders
             }
 
             return entities;
+        }
+
+        public Task<int> GetRefundCount(int pastMonths, int idCustomer)
+        {
+            var endDate = DateTime.Now;
+            var startDate = endDate.AddMonths(-pastMonths);
+            return
+                SelectCountAsync(
+                    o =>
+                        o.IdCustomer == idCustomer && o.OrderStatus != OrderStatus.Cancelled &&
+                        o.StatusCode != (int) RecordStatusCode.Deleted &&
+                        o.DateCreated > startDate && o.DateCreated <= endDate, q => q);
         }
     }
 }

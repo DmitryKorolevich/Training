@@ -123,6 +123,10 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
             index: 6,
             formName: 'customerFile'
         };
+        $scope.fraudTab = {
+            index: 7,
+            formName: 'fraud'
+        };
         $scope.options.activeTabIndex = $scope.mainTab.index;
         var tabs = [];
         tabs.push($scope.mainTab);
@@ -131,6 +135,7 @@ function ($q, $scope, $rootScope, $filter, $injector, $state, $stateParams, $tim
         tabs.push($scope.paymentInfoTab);
         tabs.push($scope.customerNotesTab);
         tabs.push($scope.customerFilesTab);
+        tabs.push($scope.fraudTab);
         $scope.tabs = tabs;
 
         $scope.giftOrderChanged = function() {

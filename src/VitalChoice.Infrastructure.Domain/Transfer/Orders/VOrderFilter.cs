@@ -34,6 +34,8 @@ namespace VitalChoice.Infrastructure.Domain.Transfer.Orders
 
         public int? IdShippingMethod { get; set; }
 
+        public bool ForReview { get; set; }
+
         public int? IdShipState { get; set; }
 
         public int? IdAddedBy { get; set; }

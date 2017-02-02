@@ -65,8 +65,8 @@
                         <td>{{recipe.Url}}</td>
                         <td>
                             <div data-ng-if="recipe.Categories && recipe.Categories.length>0">
-                                <div data-ng-repeat="category in recipe.Categories">
-                                    {{category}}
+                                <div data-ng-repeat="category in recipe.Categories track by category.Id">
+                                    {{category.Name}}
                                 </div>
                             </div>
                             <div data-ng-if="!recipe.Categories || recipe.Categories.length==0">No Categories</div>

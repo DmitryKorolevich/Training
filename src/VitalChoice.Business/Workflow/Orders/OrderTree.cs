@@ -23,7 +23,7 @@ namespace VitalChoice.Business.Workflow.Orders
 
             var result = await ExecuteAsync<TotalAction>(dataContext, treeContext);
             dataContext.Total = result;
-
+            await ExecuteAsync("Fraud", dataContext, treeContext);
             return result;
         }
 

@@ -293,7 +293,7 @@
 	@await RenderSectionAsync("PageScripts", false)
     @await RenderSectionAsync("EndPageStyles", false)
     @await Component.InvokeAsync("BodyEndTrackScripts")
-    @if (!Context.Request.Path.HasValue || Context.Request.Path.Value != "/profile/changebillinginfo")
+    @if (!Context.Request.Path.HasValue || Context.Request.Path.Value != "/profile/changebillinginfo" && Context.Request.Path.Value != "/checkout/addupdatebillingaddress")
     {
         <script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.sync.bootstrap.min.js" defer="defer" async="async"></script>
         <script src="//www.google.com/jsapi?callback=googleLoadCallback" type="text/javascript" defer="defer" async="async"></script>
@@ -324,5 +324,7 @@
         </noscript>
         <!-- end olark code -->
     }
+    <script src="https://use.typekit.net/bdl6fja.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
 </body>
 </html>

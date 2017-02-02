@@ -67,5 +67,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Orders
         public ICollection<RefundOrderToGiftCertificate> RefundOrderToGiftCertificates { get; set; }
 
         public ICollection<OrderShippingPackage> OrderShippingPackages { get; set; }
+
+        public ICollection<OrderReviewReason> ReviewReasons { get; set; }
     }
 }

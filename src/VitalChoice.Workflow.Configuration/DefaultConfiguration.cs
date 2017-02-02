@@ -34,6 +34,8 @@ namespace VitalChoice.Workflow.Configuration
 
             orderContextTreeSetup.Tree<OrderTree>("Order", order =>
             {
+                order.Action<FraudCheckAction>("Fraud", action => action.Dependency<TotalAction>());
+
                 order.Action<TotalAction>("Total", action =>
                 {
                     action.Dependency<GiftCertificatesBuyAction>();
@@ -329,6 +331,8 @@ namespace VitalChoice.Workflow.Configuration
                     action.Aggregate<PayableTotalAction>();
                 });
 
+                reship.Action<DummyFraudAction>("Fraud");
+
                 reship.Action<DummyPromoProductsResultAction>("PromoProducts", action =>
                 {
                     action.Aggregate<ProductAction>();
@@ -440,6 +444,8 @@ namespace VitalChoice.Workflow.Configuration
 
             orderContextTreeSetup.Tree<ExportTree>("ExportOrder", exportOrder =>
             {
+                exportOrder.Action<FraudCheckAction>("Fraud", action => action.Dependency<TotalAction>());
+
                 exportOrder.Action<TotalAction>("Total", action =>
                 {
                     action.Dependency<GiftCertificatesBuyAction>();
