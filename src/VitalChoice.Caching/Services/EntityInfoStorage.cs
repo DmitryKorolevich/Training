@@ -64,8 +64,8 @@ namespace VitalChoice.Caching.Services
                 {
                     EntityPrimaryKeyInfo primaryKey;
 
-                    if (!TryGetPrimaryKey(entityType, out primaryKey) ||
-                        entityType.GetAnnotations().Any(a => a.Name == EntityBuilderExtensions.NonCachedAnnotationName))
+                    if (entityType.GetAnnotations().Any(a => a.Name == EntityBuilderExtensions.NonCachedAnnotationName) ||
+                        !TryGetPrimaryKey(entityType, out primaryKey))
                     {
                         continue;
                     }
