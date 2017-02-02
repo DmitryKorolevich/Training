@@ -22,7 +22,7 @@
     "jquery.maskedinput": "~1.4.1",
     "json-formatter": "~0.6.0",
     "jsondiffpatch": "~0.1.43",
-    "angular-ui-tinymce": "~0.0.17"
+    "angular-ui-tinymce": "~0.0.18"
   },
   "exportsOverride": {
     "bootstrap": {
@@ -56,6 +56,7 @@
   },
   "resolutions": {
     "angular": "~1.5.5",
-    "d3": "~3.4.13"
+    "d3": "~3.4.13",
+    "tinymce": "~4.5.1"
   }
 }
