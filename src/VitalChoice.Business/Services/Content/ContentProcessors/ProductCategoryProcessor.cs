@@ -71,48 +71,6 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             _appOptions = appOptions;
         }
 
-        private IList<CustomerTypeCode> GetCustomerVisibility(ProcessorViewContext viewContext)
-        {
-            return viewContext.User.Identity.IsAuthenticated
-                ? (viewContext.User.IsInRole(IdentityConstants.WholesaleCustomer)
-                    ? new List<CustomerTypeCode>() { CustomerTypeCode.Wholesale, CustomerTypeCode.All }
-                    : new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All })
-                : new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All };
-        }
-
-        private void DenyAccessIfRetailRuleApplied(ProductCategory category, ProcessorViewContext viewContext, bool wholesaleCustomer)
-        {
-            if (category.Assigned == CustomerTypeCode.Retail || viewContext.Entity.NavIdVisible == CustomerTypeCode.Retail)
-            {
-                if (!wholesaleCustomer)
-                {
-                    return;
-                }
-
-                throw new ApiException("Access denied", HttpStatusCode.Forbidden);
-            }
-        }
-
-        private async Task DenyAccessIfWholesaleRuleApplied(ProductCategory category, ProcessorViewContext viewContext, bool wholesaleCustomer)
-        {
-            if (category.Assigned == CustomerTypeCode.Wholesale ||
-                viewContext.Entity.NavIdVisible == CustomerTypeCode.Wholesale)
-            {
-                if (wholesaleCustomer)
-                {
-			        var customer = await _customerService.SelectAsync(Convert.ToInt32(_userManager.GetUserId(viewContext.User)));
-
-                    var wholesaleActiveCustomer = customer.StatusCode == (int)CustomerStatus.Active;
-                    if (wholesaleActiveCustomer)
-                    {
-                        return;
-                    }
-                }
-
-                throw new ApiException("Access denied", HttpStatusCode.Forbidden);
-            }
-        }
-
         protected override async Task<TtlCategoryModel> ExecuteAsync(ProcessorViewContext viewContext)
         {
             if (viewContext.Entity == null)
@@ -218,6 +176,48 @@ namespace VitalChoice.Business.Services.Content.ContentProcessors
             }
 
             return toReturn;
+        }
+
+        private IList<CustomerTypeCode> GetCustomerVisibility(ProcessorViewContext viewContext)
+        {
+            return viewContext.User.Identity.IsAuthenticated
+                ? (viewContext.User.IsInRole(IdentityConstants.WholesaleCustomer)
+                    ? new List<CustomerTypeCode>() { CustomerTypeCode.Wholesale, CustomerTypeCode.All }
+                    : new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All })
+                : new List<CustomerTypeCode>() { CustomerTypeCode.Retail, CustomerTypeCode.All };
+        }
+
+        private void DenyAccessIfRetailRuleApplied(ProductCategory category, ProcessorViewContext viewContext, bool wholesaleCustomer)
+        {
+            if (category.Assigned == CustomerTypeCode.Retail || viewContext.Entity.NavIdVisible == CustomerTypeCode.Retail)
+            {
+                if (!wholesaleCustomer)
+                {
+                    return;
+                }
+
+                throw new ApiException("Access denied", HttpStatusCode.Forbidden);
+            }
+        }
+
+        private async Task DenyAccessIfWholesaleRuleApplied(ProductCategory category, ProcessorViewContext viewContext, bool wholesaleCustomer)
+        {
+            if (category.Assigned == CustomerTypeCode.Wholesale ||
+                viewContext.Entity.NavIdVisible == CustomerTypeCode.Wholesale)
+            {
+                if (wholesaleCustomer)
+                {
+                    var customer = await _customerService.SelectAsync(Convert.ToInt32(_userManager.GetUserId(viewContext.User)));
+
+                    var wholesaleActiveCustomer = customer.StatusCode == (int)CustomerStatus.Active;
+                    if (wholesaleActiveCustomer)
+                    {
+                        return;
+                    }
+                }
+
+                throw new ApiException("Access denied", HttpStatusCode.Forbidden);
+            }
         }
 
         private ProductNavCategoryLite GetFilteredByVisibilityCategories(ProductNavCategoryLite navCategory, IList<CustomerTypeCode> visibility)
