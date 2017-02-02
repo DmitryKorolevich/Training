@@ -754,6 +754,18 @@ namespace VC.Public.Controllers
                                 cart.Order.CartAdditionalShipments.Add(item);
                             }
 
+                            //Move all skus on the removed shipments to the main order
+                            foreach (var shipmentForRemove in dbShipments.Where(p => !cart.Order.CartAdditionalShipments.Contains(p)))
+                            {
+                                if (shipmentForRemove.Skus?.Count > 0)
+                                {
+                                    cart.Order.Skus.AddUpdateKeyed(shipmentForRemove.Skus, p => p.Sku.Id, (d, s) =>
+                                    {
+                                        d.Quantity += s.Quantity;
+                                    });
+                                }
+                            }
+
                             await OrderService.CalculateStorefrontOrder(cart.Order, OrderStatus.Incomplete);
                             if (await CheckoutService.UpdateCart(cart, true))
                             {

@@ -52,7 +52,7 @@
             @if (!receipt.ShipAsap && receipt.ShippingDate.HasValue)
             {
                 <div class="receipt-info-line">
-                    <label class="bold">Ship Delay Date</label>@(":")<span>@receipt.ShippingDate?.ToString("MM/dd/yyyy")</span>
+                    <label class="bold">Ship Delay Date</label>@(":")<span class="ship-delay-date">@receipt.ShippingDate?.ToString("MM/dd/yyyy")</span>
                 </div>
             }
             <div class="reivew-order-info receipt-step two-columns">
