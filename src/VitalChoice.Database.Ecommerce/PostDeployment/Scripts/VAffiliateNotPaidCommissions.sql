@@ -12,7 +12,7 @@ AS
 	INNER JOIN [dbo].Orders o ON o.Id=op.Id
 	INNER JOIN [dbo].AppOptions ao ON ao.OptionName='AffiliateOrderPaymentsCountToDate'
 	WHERE 
-		op.Status=1 AND o.DateCreated<CONVERT(datetime2,ao.OptionValue, 21) AND
+		op.Status=1 AND o.DateCreated<CONVERT(datetime2,ao.OptionValue, 21) AND o.DateCreated>=DATEADD(mm,-6,CONVERT(datetime2,OptionValue, 21)) AND
 		o.StatusCode!=3 AND 
 		(
 			(o.OrderStatus IS NOT NULL AND o.OrderStatus IN (2,3,5)) OR

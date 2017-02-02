@@ -1419,6 +1419,11 @@ namespace VC.Public.Controllers
                 model.OrderNumber = orders[i].Id.ToString();
                 model.OrderDate = orders[i].DateCreated;
 
+                if (orders.Count > 1 && i%2 == 0)
+                {
+                    model.AlternateColor = true;
+                }
+
                 toReturn.Receipts.Add(model);
             }
 

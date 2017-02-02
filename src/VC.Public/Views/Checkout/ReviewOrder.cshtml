@@ -112,6 +112,7 @@
             <div class="review-items">
                 <div class="item-wrapper" data-bind="foreach: Model.Shipments">
                     <div class="item" data-bind="css: { 'alternate-color': $root.Model.Shipments().length>1 && $index()%2==0 }, attr: {'data-index': $index()}">
+                        <!-- ko if: $root.Model.Shipments().length>1 -->
                         <div class="checkout-sections-divider big"></div>
                         <h4 class="checkout-step-heading">
                             <span class="title"><span data-bind="text: Name()"></span> - <span data-bind="text: ShipToFirstName()+' '+ShipToLastName()+' '+ShipToAddress1()"></span></span>
@@ -119,6 +120,7 @@
                             <a data-bind="click: $parent.remove" class="button red pull-right delete-order">Delete Order</a>
                             <!-- /ko -->
                         </h4>
+                        <!-- /ko -->
                         <div class="review-order-cart">
                             @await Html.PartialAsync("_MultipleViewCart")
                         </div>
@@ -151,7 +153,12 @@
                             <div class="reivew-info-box">
                                 <div class="review-header-container">
                                     <span>Ship to Details</span>
-                                    @Html.ActionLink("Edit", "AddUpdateShippingMethod", "Checkout", null, new {@class = "button"})
+                                    <!-- ko if: Main() -->  
+                                    <a href="/checkout/addupdateshippingmethod?shipment=main" class="button">Edit</a> 
+                                    <!-- /ko -->
+                                    <!-- ko ifnot: Main() -->
+                                    <a data-bind="attr: {href: '/checkout/addupdateshippingmethod?shipment=' + IdShipment() }" class="button">Edit</a>
+                                    <!-- /ko -->
                                 </div>
                                 <div data-bind="foreach: ShipToAddress">
                                     <!-- ko if: Value() -->
@@ -187,6 +194,10 @@
                     <div class="clear"></div>
                 </div>
             </div>
+            <!-- ko ifnot: Model.AutoShip -->
+            <a href="/checkout/addupdateshippingmethod?shipment=new" class="button blue margin-top-small margin-bottom-medium">Add Another Order</a>
+            <div class="clear"></div>
+            <!-- /ko -->
             <div class="form-buttons-group">
                 @Html.ActionLink("Back", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button arrow-left-red" })
                 <input class="arrow-right-blue" type="submit" value="Place Your Order" />

@@ -35,14 +35,14 @@
             <span class="shopping-notice-note">NOTE:</span> If you ordered an e-Gift, please scroll down to the “Notify Recipient” section,<br />
             enter recipient’s name, email address, and your message where indicated, then click “Send Email”.
         </span>
-        <div class="margin-top-reasonable">
+        <div class="margin-top-reasonable margin-bottom-reasonable">
             <a href="/" class="button arrow-left-red">Continue Shopping</a>
         </div>
     </div>
     @foreach (var receipt in Model.Receipts)
     {
-        <div class="margin-bottom-medium">
-            <div class="checkout-sections-divider margin-top-reasonable margin-bottom-small"></div>
+        <div class="padding-bottom-medium receipt-item @(receipt.AlternateColor ? "alternate-color" : "")">
+            <div class="checkout-sections-divider margin-bottom-small"></div>
             <div class="receipt-info-line">
                 @Html.LabelFor(x => x.Receipts[0].OrderNumber, null, new { @class = "bold" }):<span>@receipt.OrderNumber</span>
             </div>

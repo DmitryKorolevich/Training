@@ -30,15 +30,49 @@ $(function ()
                     if (result.Success)
                     {
                         self.Model = ko.mapping.fromJS(result.Data);
+                        var mainOrder = null;
                         $.each(self.Model.Shipments(), function (i, item)
                         {
-                            item.Collapsed = ko.observable(!item.FromOrder());
                             if (item.FromOrder())
                             {
+                                mainOrder = item;
                             }
+                            item.Collapsed = ko.observable(true);
 
                             setShipmentHandlers(item);
                         });
+
+                        var shipment = getQueryParameterByName("shipment");
+                        if (shipment == 'new')
+                        {
+                            setTimeout(function ()
+                            {
+                                self.add();
+                            }, 200);
+                        }
+                        else if (shipment == 'main')
+                        {
+                            mainOrder.Collapsed(false);
+                        } else
+                        {
+                            var id = parseInt(shipment);
+                            if (id)
+                            {
+                                $.each(self.Model.Shipments(), function (i, item)
+                                {
+                                    if (item.IdShipment() == id)
+                                    {
+                                        item.Collapsed(false);
+                                        return;
+                                    }
+                                });
+                            }
+                            else if (mainOrder)
+                            {
+                                mainOrder.Collapsed(false);
+                            }
+                        }
+
                         updateAddButtonText();
 
                         checkCanadaIssue();
@@ -60,14 +94,24 @@ $(function ()
 
         var openCollapsibleForClientErrors = function (validator)
         {
+            var firstIssueElement = null;
+            var firstIssueShipment = null;
+
             $.each(validator.errorList, function (i, item)
             {
                 var index = parseInt($(item.element).closest('.item').data('index'));
-                self.Model.Shipments()[index].Collapsed(false);
+
+                if (firstIssueElement == null)
+                {
+                    firstIssueElement = $(item.element);
+                    firstIssueShipment = self.Model.Shipments()[index];
+                }
             });
-            if(validator.errorList.length>0)
+
+            if (firstIssueElement)
             {
-                $(validator.errorList[validator.errorList.length-1].element).focus();
+                self.expand(firstIssueShipment);
+                firstIssueElement.focus();
             }
         };
 
@@ -199,7 +243,8 @@ $(function ()
 
         self.expand = function (item, event)
         {
-            $.each(self.Model.Shipments(), function(i, innerItem){
+            $.each(self.Model.Shipments(), function (i, innerItem)
+            {
                 innerItem.Collapsed(true);
             });
             item.Collapsed(false);
@@ -224,16 +269,20 @@ $(function ()
                 data: ko.toJSON(self.Model),
                 contentType: "application/json; charset=utf-8",
                 type: "POST"
-            }).success(function (result) {
+            }).success(function (result)
+            {
                 $("span[data-valmsg-for]").text('');
                 $("div.validation-summary-errors").html('');
-                if (result.Success) {
+                if (result.Success)
+                {
                     processJsonCommands(result);
-                } else {
+                } else
+                {
                     processErrorResponse(result, self);
                     self.refreshing(false);
                 }
-            }).error(function (result) {
+            }).error(function (result)
+            {
                 $("div.validation-summary-errors").html('');
                 $("span[data-valmsg-for]").text('');
                 processErrorResponse();
@@ -241,7 +290,8 @@ $(function ()
             });
         };
 
-        var updateAddButtonText = function(){
+        var updateAddButtonText = function ()
+        {
             if (self.Model.Shipments().length > 1)
             {
                 self.options.AddButtonText('Add Another Recipient');
@@ -318,19 +368,27 @@ function processErrorResponse(result, root)
             trySetFormErrors(result);
             if (root)
             {
+                var firstIssueElement = null;
+                var firstIssueShipment = null;
                 $.each(result.Messages, function (i, item)
                 {
                     var element = $('#' + item.Field.replace('.', "\\."));
                     if (element.length == 1)
                     {
                         var index = parseInt(element.closest('.item').data('index'));
-                        root.Model.Shipments()[index].Collapsed(false);
-                        if (i == (result.Messages.length - 1))
+                        if (firstIssueElement == null)
                         {
-                            element.focus();
+                            firstIssueElement = element;
+                            firstIssueShipment = root.Model.Shipments()[index];
                         }
                     }
                 });
+
+                if (firstIssueElement)
+                {
+                    self.expand(firstIssueShipment);
+                    firstIssueElement.focus();
+                }
             }
         }
     }
