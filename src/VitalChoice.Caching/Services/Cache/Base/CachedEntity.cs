@@ -20,6 +20,52 @@ namespace VitalChoice.Caching.Services.Cache.Base
         T Entity { get; set; }
     }
 
+    public abstract class CachedEntityContainer
+    {
+        private readonly ThreadLocal<CachedEntity> _localItems;
+        private volatile CachedEntity _master;
+
+        protected CachedEntityContainer()
+        {
+            _localItems = new ThreadLocal<CachedEntity>(() => _master);
+        }
+
+        protected CachedEntity GetCachedUntyped()
+        {
+            var candidate = _localItems.Value;
+            if (candidate != _master)
+            {
+                using (_master.Lock())
+                {
+                    _localItems.Value = _master;
+                    return _master;
+                }
+            }
+            return candidate;
+        }
+
+        protected void UpdateMasterUntyped(CachedEntity master)
+        {
+            using (_master.Lock())
+            {
+                _master = master;
+            }
+        }
+    }
+
+    public class CachedEntityContainer<T> : CachedEntityContainer
+    {
+        public CachedEntity<T> GetCached()
+        {
+            return (CachedEntity<T>) GetCachedUntyped();
+        }
+
+        public void UpdateMaster(CachedEntity<T> master)
+        {
+            UpdateMasterUntyped(master);
+        }
+    }
+
     public abstract class CachedEntity : ICachedEntity
     {
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
@@ -40,10 +86,12 @@ namespace VitalChoice.Caching.Services.Cache.Base
         }
 
         private volatile bool _needUpdate;
+        private HashSet<string> _needUpdateRelated;
 
         public DateTime CreatedDate { get; protected set; } = DateTime.Now;
 
-        public HashSet<string> NeedUpdateRelated { get; } = new HashSet<string>();
+        public HashSet<string> NeedUpdateRelated
+            => _needUpdateRelated ?? Interlocked.CompareExchange(ref _needUpdateRelated, new HashSet<string>(), null);
 
         public virtual bool NeedUpdate => _needUpdate;
 
