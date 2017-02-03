@@ -40,7 +40,8 @@ namespace VitalChoice.Caching.Services.Cache
                 _primaryKeyInfo = info.PrimaryKey;
                 _primaryKeyAnalyzer = new PrimaryKeyAnalyzer<T>(info.PrimaryKey);
                 _indexAnalyzer = new IndexAnalyzer<T>(info.CacheableIndex);
-                _conditionalIndexAnalyzers = info.ConditionalIndexes.Select(i => new ConditionalIndexAnalyzer<T>(i)).ToArray();
+                _conditionalIndexAnalyzers = info.ConditionalIndexes?.Select(i => new ConditionalIndexAnalyzer<T>(i)).ToArray() ??
+                                             new ConditionalIndexAnalyzer<T>[0];
                 _cacheCondition = info.CacheCondition;
             }
         }
@@ -50,6 +51,11 @@ namespace VitalChoice.Caching.Services.Cache
             if (_entityType == null)
             {
                 Interlocked.CompareExchange(ref _entityType, model.FindEntityType(typeof(T)), null);
+            }
+            if (_primaryKeyInfo == null)
+            {
+                newExpression = query;
+                return null;
             }
             QueryParseVisitor<T> parseVisitor = new QueryParseVisitor<T>(model, _entityInfo, _primaryKeyInfo, _entityType);
             query = parseVisitor.Visit(query);
