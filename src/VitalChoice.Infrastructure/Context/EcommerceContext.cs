@@ -412,7 +412,6 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(t => t.Id);
                 entity.ToTable("VHealthwisePeriods");
                 entity.NonCached();
-                entity.NonCached();
             });
 
             builder.Entity<CatalogRequestAddress>(entity =>
@@ -476,7 +475,6 @@ namespace VitalChoice.Infrastructure.Context
                 entity.ToTable("OneTimeDiscountToCustomerUsages");
 
                 entity.HasKey(e => new {e.IdCustomer, e.IdDiscount});
-                entity.NonCached();
             });
 
             builder.Entity<Newsletter>(entity =>

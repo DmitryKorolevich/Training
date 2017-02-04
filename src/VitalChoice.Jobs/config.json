@@ -58,7 +58,7 @@
         "OrderProductReviewEmailsJob": "0 0 2 * * ?",
         "VeraCoreNotificationsJob": "0 0/5 * * * ?",
         "HostStatusJob": "0 0/5 * * * ?",
-        "AppOptionsSetupJob": "0 0 2 * * ?",
+        "AppOptionsSetupJob": "0 32 2 * * ?",
         "KPIReportJob": "0 0 3 * * ?",
         "RedirectJob": "0 1 0 * * ?"
       }
