@@ -1,5 +1,11 @@
 {
   "buildOptions": { "emitEntryPoint": true },
+  "publishOptions": {
+    "include": [
+      "nlog.config",
+      "config.json"
+    ]
+  },
   "version": "1.0.0-*",
   "description": "VitalChoice.Workflow.Configuration Console Application",
   "authors": [ "multi_000" ],
@@ -20,6 +26,6 @@
   },
 
   "frameworks": {
-    "net462": { }
+    "net462": {}
   }
 }

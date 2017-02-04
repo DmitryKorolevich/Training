@@ -202,33 +202,36 @@ namespace VitalChoice.Caching.Services
             foreach (var group in entriesToSave.Where(e => e.EntityType != null).GroupBy(e => e.EntityType))
             {
                 var cache = CacheFactory.GetCache(group.Key);
-                foreach (var entry in group)
+                if (cache != null)
                 {
-                    EntityKey primaryKey;
-                    switch (entry.State)
+                    foreach (var entry in group)
                     {
-                        case EntityState.Modified:
-                            primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
-                            if (primaryKey.IsValid)
-                            {
-                                cache.MarkForUpdateByPrimaryKey(primaryKey, DataContext);
-                            }
-                            break;
-                        case EntityState.Deleted:
-                            primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
-                            if (primaryKey.IsValid)
-                            {
-                                var entity = entry.Entity;
-                                cache.MarkForAdd(entity, DataContext);
-                            }
-                            break;
-                        case EntityState.Added:
-                            primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
-                            if (primaryKey.IsValid)
-                            {
-                                cache.MarkForUpdateByPrimaryKey(primaryKey, DataContext);
-                            }
-                            break;
+                        EntityKey primaryKey;
+                        switch (entry.State)
+                        {
+                            case EntityState.Modified:
+                                primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
+                                if (primaryKey.IsValid)
+                                {
+                                    cache.MarkForUpdateByPrimaryKey(primaryKey, DataContext);
+                                }
+                                break;
+                            case EntityState.Deleted:
+                                primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
+                                if (primaryKey.IsValid)
+                                {
+                                    var entity = entry.Entity;
+                                    cache.MarkForAdd(entity, DataContext);
+                                }
+                                break;
+                            case EntityState.Added:
+                                primaryKey = cache.EntityInfo.PrimaryKey.GetPrimaryKeyValue(entry.Entity);
+                                if (primaryKey.IsValid)
+                                {
+                                    cache.MarkForUpdateByPrimaryKey(primaryKey, DataContext);
+                                }
+                                break;
+                        }
                     }
                 }
             }
@@ -244,84 +247,87 @@ namespace VitalChoice.Caching.Services
             foreach (var group in entryGroups)
             {
                 var cache = CacheFactory.GetCache(group.Key);
-                foreach (var ops in group.GroupBy(op => op.State))
+                if (cache != null)
                 {
-                    switch (ops.Key)
+                    foreach (var ops in group.GroupBy(op => op.State))
                     {
-                        case EntityState.Modified:
-                            foreach (
-                                var opPair in ops.SimpleJoin(cache.MarkForUpdateList(ops.Select(op => op.Entity), null))
-                            )
-                            {
-                                var op = opPair.Key;
-                                var pk = opPair.Value;
-                                if (pk.IsValid)
+                        switch (ops.Key)
+                        {
+                            case EntityState.Modified:
+                                foreach (
+                                    var opPair in ops.SimpleJoin(cache.MarkForUpdateList(ops.Select(op => op.Entity), null))
+                                )
                                 {
-                                    updateList.Add(new UpdateOp
+                                    var op = opPair.Key;
+                                    var pk = opPair.Value;
+                                    if (pk.IsValid)
                                     {
-                                        Entity = op.Entity,
-                                        Cache = cache
-                                    });
-                                    yield return new SyncOperation
-                                    {
-                                        Data = new UpdateDeleteSyncData
+                                        updateList.Add(new UpdateOp
                                         {
-                                            Key = pk.ToExportable(group.Key)
-                                        },
-                                        SyncType = SyncType.Update
-                                    };
+                                            Entity = op.Entity,
+                                            Cache = cache
+                                        });
+                                        yield return new SyncOperation
+                                        {
+                                            Data = new UpdateDeleteSyncData
+                                            {
+                                                Key = pk.ToExportable(group.Key)
+                                            },
+                                            SyncType = SyncType.Update
+                                        };
+                                    }
                                 }
-                            }
-                            break;
-                        case EntityState.Deleted:
-                            foreach (
-                                var opPair in ops.SimpleJoin(cache.MarkForUpdateList(ops.Select(op => op.Entity), null))
-                            )
-                            {
-                                var pk = opPair.Value;
-                                if (pk.IsValid)
+                                break;
+                            case EntityState.Deleted:
+                                foreach (
+                                    var opPair in ops.SimpleJoin(cache.MarkForUpdateList(ops.Select(op => op.Entity), null))
+                                )
                                 {
-                                    cache.TryRemove(pk);
-                                    yield return new SyncOperation
+                                    var pk = opPair.Value;
+                                    if (pk.IsValid)
                                     {
-                                        Data = new UpdateDeleteSyncData
+                                        cache.TryRemove(pk);
+                                        yield return new SyncOperation
                                         {
-                                            Key = pk.ToExportable(group.Key)
-                                        },
-                                        SyncType = SyncType.Delete
-                                    };
+                                            Data = new UpdateDeleteSyncData
+                                            {
+                                                Key = pk.ToExportable(group.Key)
+                                            },
+                                            SyncType = SyncType.Delete
+                                        };
+                                    }
                                 }
-                            }
-                            break;
-                        case EntityState.Added:
-                            foreach (
-                                var opPair in
-                                ops.SimpleJoin(cache.MarkForAddList(ops.Select(op => op.Entity).ToArray(), null)))
-                            {
-                                var op = opPair.Key;
-                                var pk = opPair.Value;
-                                if (pk.IsValid)
+                                break;
+                            case EntityState.Added:
+                                foreach (
+                                    var opPair in
+                                    ops.SimpleJoin(cache.MarkForAddList(ops.Select(op => op.Entity).ToArray(), null)))
                                 {
-                                    updateList.Add(new UpdateOp
+                                    var op = opPair.Key;
+                                    var pk = opPair.Value;
+                                    if (pk.IsValid)
                                     {
-                                        Entity = op.Entity,
-                                        Cache = cache
-                                    });
-                                    yield return new SyncOperation
-                                    {
-                                        Data = new AddSyncData
+                                        updateList.Add(new UpdateOp
                                         {
-                                            Key = pk.ToExportable(group.Key),
-                                            ForeignKeys =
-                                                cache.EntityInfo.ForeignKeys.GetForeignKeys(op.Entity)?
-                                                    .AsExportable()
-                                                    .ToArray()
-                                        },
-                                        SyncType = SyncType.Add
-                                    };
+                                            Entity = op.Entity,
+                                            Cache = cache
+                                        });
+                                        yield return new SyncOperation
+                                        {
+                                            Data = new AddSyncData
+                                            {
+                                                Key = pk.ToExportable(group.Key),
+                                                ForeignKeys =
+                                                    cache.EntityInfo.ForeignKeys.GetForeignKeys(op.Entity)?
+                                                        .AsExportable()
+                                                        .ToArray()
+                                            },
+                                            SyncType = SyncType.Add
+                                        };
+                                    }
                                 }
-                            }
-                            break;
+                                break;
+                        }
                     }
                 }
             }
@@ -342,50 +348,53 @@ namespace VitalChoice.Caching.Services
             foreach (var group in entryGroups)
             {
                 var cache = CacheFactory.GetCache(group.Key);
-                foreach (var ops in group.GroupBy(op => op.State))
+                if (cache != null)
                 {
-                    switch (ops.Key)
+                    foreach (var ops in group.GroupBy(op => op.State))
                     {
-                        case EntityState.Modified:
-                            foreach (var opPair in ops.SimpleJoin(cache.MarkForUpdateList(ops.Select(op => op.Entity), null)))
-                            {
-                                var op = opPair.Key;
-                                var pk = opPair.Value;
-                                if (pk.IsValid)
+                        switch (ops.Key)
+                        {
+                            case EntityState.Modified:
+                                foreach (var opPair in ops.SimpleJoin(cache.MarkForUpdateList(ops.Select(op => op.Entity), null)))
                                 {
-                                    updateList.Add(new UpdateOp
+                                    var op = opPair.Key;
+                                    var pk = opPair.Value;
+                                    if (pk.IsValid)
                                     {
-                                        Entity = op.Entity,
-                                        Cache = cache
-                                    });
+                                        updateList.Add(new UpdateOp
+                                        {
+                                            Entity = op.Entity,
+                                            Cache = cache
+                                        });
+                                    }
                                 }
-                            }
-                            break;
-                        case EntityState.Deleted:
-                            foreach (var opPair in ops.SimpleJoin(cache.MarkForUpdateList(ops.Select(op => op.Entity), null)))
-                            {
-                                var pk = opPair.Value;
-                                if (pk.IsValid)
+                                break;
+                            case EntityState.Deleted:
+                                foreach (var opPair in ops.SimpleJoin(cache.MarkForUpdateList(ops.Select(op => op.Entity), null)))
                                 {
-                                    cache.TryRemove(pk);
-                                }
-                            }
-                            break;
-                        case EntityState.Added:
-                            foreach (var opPair in ops.SimpleJoin(cache.MarkForAddList(ops.Select(op => op.Entity).ToArray(), null)))
-                            {
-                                var op = opPair.Key;
-                                var pk = opPair.Value;
-                                if (pk.IsValid)
-                                {
-                                    updateList.Add(new UpdateOp
+                                    var pk = opPair.Value;
+                                    if (pk.IsValid)
                                     {
-                                        Entity = op.Entity,
-                                        Cache = cache
-                                    });
+                                        cache.TryRemove(pk);
+                                    }
                                 }
-                            }
-                            break;
+                                break;
+                            case EntityState.Added:
+                                foreach (var opPair in ops.SimpleJoin(cache.MarkForAddList(ops.Select(op => op.Entity).ToArray(), null)))
+                                {
+                                    var op = opPair.Key;
+                                    var pk = opPair.Value;
+                                    if (pk.IsValid)
+                                    {
+                                        updateList.Add(new UpdateOp
+                                        {
+                                            Entity = op.Entity,
+                                            Cache = cache
+                                        });
+                                    }
+                                }
+                                break;
+                        }
                     }
                 }
             }
