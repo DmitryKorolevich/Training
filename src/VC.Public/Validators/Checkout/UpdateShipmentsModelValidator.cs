@@ -14,12 +14,46 @@ namespace VC.Public.Validators.Checkout
         public override void Validate(UpdateShipmentsModel value)
         {
             ValidationErrors.Clear();
+            ParseResults(ValidatorsFactory.GetValidator<UpdateShipmentsModelInnerValidator>().Validate(value));
             if (value.Shipments != null)
             {
                 for (int i = 0; i < value.Shipments.Count; i++)
                 {
                     ParseResults(ValidatorsFactory.GetValidator<ShippingAddressModelInnerValidator>().Validate(value.Shipments[i]), null, i);
                 }
+            }
+        }
+
+        private class UpdateShipmentsModelInnerValidator : AbstractValidator<UpdateShipmentsModel>
+        {
+            public UpdateShipmentsModelInnerValidator()
+            {
+                RuleFor(model => model.Email)
+                  .NotEmpty()
+                  .When(p => p.CreateAccount)
+                  .WithMessage(model => model.Email, ValidationMessages.FieldRequired)
+                  .EmailAddress()
+                  .When(p => p.CreateAccount)
+                  .WithMessage(model => model.Email, ValidationMessages.EmailFormat)
+                  .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                  .WithMessage(model => model.Email, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+
+                RuleFor(model => model.Password)
+                  .NotEmpty()
+                  .When(p => p.CreateAccount && !p.GuestCheckout)
+                  .WithMessage(model => model.Password, ValidationMessages.FieldRequired)
+                  .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                  .WithMessage(model => model.Password, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
+
+                RuleFor(model => model.ConfirmPassword)
+                  .NotEmpty()
+                  .When(p => p.CreateAccount && !p.GuestCheckout)
+                  .WithMessage(model => model.ConfirmPassword, ValidationMessages.FieldRequired)
+                  .Must((p, a) => a == p.ConfirmPassword)
+                  .When(p => !string.IsNullOrEmpty(p.ConfirmPassword) && p.CreateAccount && !p.GuestCheckout)
+                  .WithCustomMessage(model => model.ConfirmPassword, "'Password Confirm' and 'Password' do not match.")
+                  .Length(0, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE)
+                  .WithMessage(model => model.ConfirmPassword, ValidationMessages.FieldLength, BaseAppConstants.DEFAULT_TEXT_FIELD_MAX_SIZE);
             }
         }
 

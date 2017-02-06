@@ -5,7 +5,10 @@
 @model VC.Public.Models.Checkout.AddUpdateShippingMethodModel
 @using Microsoft.Extensions.Options
 @using VitalChoice.Infrastructure.Domain.Options
+@using VitalChoice.Infrastructure.Domain.Transfer
+@using VitalChoice.Core.Infrastructure.Helpers
 @inject IOptions<AppOptions> appOptions
+@inject ReferenceData InfrastructureService
 
 @section Meta {
     <title>Wild Seafood & Organics - Vital Choice</title>
@@ -22,8 +25,8 @@
 }
 
 <div class="checkout-step-container working-area-holder">
-    <img class="checkout-step-banner" src="/assets/images/checkout/step3.jpg" />
-    <h4 class="checkout-step-heading">3. Shipping Method</h4>
+    <img class="checkout-step-banner" src="/assets/images/checkout/step2.jpg" />
+    <h4 class="checkout-step-heading">2. Shipping</h4>
     <div class="columns-container">
         <!-- ko if: refreshing() -->
         <div class="overlay">
@@ -67,17 +70,19 @@
                         <div data-bind="css: { 'hide-imp': Collapsed() }" class="item-content">
                             <!-- ko if: FromOrder -->
                             <div class="use-billing-section">
-                                <span class="checkout-notification-simple">Enter your Shipping Address information below.</span>
-                                <span class="checkout-notification-important margin-top-small margin-bottom-small">OR</span>
                                 <div class="form-group">
-                                    <div class="input-group">
-                                        <label class="multiline-checkbox-container">
-                                            <input autocomplete="off" class="form-control" type="checkbox" data-bind="checked: UseBillingAddress, attr: { name: 'i'+$index()+'.UseBillingAddress', id: 'i'+$index()+'.UseBillingAddress'}">
-                                            Use my Billing address as my Shipping address.<br />
-                                            <span class="shopping-notice-note">NOTE:</span> Frozen goods cannot be sent to PO boxes.
-                                        </label>
-                                    </div>
+                                    <span class="checkout-notification-simple">Enter your Shipping Address information below.</span>
                                 </div>
+                                @*<span class="checkout-notification-important margin-top-small margin-bottom-small">OR</span>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <label class="multiline-checkbox-container">
+                                                <input autocomplete="off" class="form-control" type="checkbox" data-bind="checked: UseBillingAddress, attr: { name: 'i'+$index()+'.UseBillingAddress', id: 'i'+$index()+'.UseBillingAddress'}">
+                                                Use my Billing address as my Shipping address.<br />
+                                                <span class="shopping-notice-note">NOTE:</span> Frozen goods cannot be sent to PO boxes.
+                                            </label>
+                                        </div>
+                                    </div>*@
                             </div>
                             <!-- /ko -->
                             <!-- ko if: $root.Model.AvalibleAddresses().length>0 -->
@@ -86,7 +91,7 @@
                                 <label class="control-label" for="SavedAddresses">Saved Addresses</label>
                                 <div class="input-group">
                                     <select autocomplete="off" class="form-control auto" data-val="false"
-                                            data-bind="attr: { name: 'i'+$index()+'.SelectedAvalibleAddress', id: 'i'+$index()+'.SelectedAvalibleAddress'}, 
+                                            data-bind="attr: { name: 'i'+$index()+'.SelectedAvalibleAddress', id: 'i'+$index()+'.SelectedAvalibleAddress'},
                                             value: SelectedAvalibleAddress, options: $root.Model.AvalibleAddresses(), optionsText: 'Name', optionsValue:  function(item) { return item.Address }, optionsCaption: 'Select'"></select>
                                 </div>
                             </div>
@@ -286,10 +291,85 @@
                     <!-- /ko -->
                 </div>
             </div>
-            <div class="form-buttons-group">
-                @Html.ActionLink("Back", "AddUpdateBillingAddress", "Checkout", null, new { @class = "button arrow-left-red" })
-                <input class="arrow-right-blue" type="submit" value="Continue" />
+
+            @if (!User.Identity.IsAuthenticated || !InfrastructureService.IsValidCustomer(User))
+            {
+                <div>
+                    <h4 class="checkout-step-heading">Create Account</h4>
+                    <div class="form-group">
+                        <div class="checkout-sections-divider"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="Email">Email</label>
+                        <div class="input-group">
+                            <input data-bind="value: Model.Email" autocomplete="off" class="form-control"
+                                   data-val="true" data-val-email="The Email field is not a valid e-mail address." data-val-maxlength="Email exceeds length of 100 literals." data-val-maxlength-max="100" data-val-required="The Email field is required." id="Email" name="Email" type="text" value=""><span class="field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <span class="checkout-notification-important">For faster checkout and to receive customer rewards and incentives please register your account by providing a password.</span>
+                    </div>
+                    <!-- ko ifnot: Model.GuestCheckout() -->
+                    <span class="form-control-important-info">Must be at least 8 characters long, contain at least 1 numerical digit, 1 capital character, 1 lowercase character and 1 special character.<br />Example: Dontuse!#1</span>
+                    <div class="form-group">
+                        <label class="control-label" for="Password">Password</label>
+                        <div class="input-group">
+                            <input data-bind="value: Model.Password" autocomplete="off" autocomplete="off" class="form-control"
+                                   data-val="true" data-val-required="The Password field is required." id="Password" name="Password" type="password">
+                            <span class="field-validation-valid" data-valmsg-for="Password" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="ConfirmPassword">Password Confirm</label>
+                        <div class="input-group">
+                            <input data-bind="value: Model.ConfirmPassword" autocomplete="off" class="form-control"
+                                   data-val="true" data-val-equalto="'Password Confirm' and 'Password' do not match." data-val-equalto-other="*.Password" data-val-required="The Password Confirm field is required." id="ConfirmPassword" name="ConfirmPassword" type="password">
+                            <span class="field-validation-valid" data-valmsg-for="ConfirmPassword" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- ko if: Model.GuestCheckout() -->
+                    <span class="form-control-important-info">By checking out as a guest you will not be able to retrieve your order history or receive all the benefits of a registered user.</span>
+                    <!-- /ko -->
+                    <div class="form-group">
+                        <label class="control-label"></label>
+                        <div class="input-group">
+                            <label class="bold">
+                                <input data-bind="checked: Model.GuestCheckout" autocomplete="off" class="form-control" id="GuestCheckout" name="GuestCheckout" type="checkbox" value="true">
+                                No thank you. I would like to checkout as a guest
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            }
+            <img class="billing-advert-image" src="/Assets/images/checkout/subscribe-promo-bar-5-16-13-A.png" />
+            <div class="form-group">
+                <label class="control-label"></label>
+                <div class="input-group">
+                    <label class="multiline-checkbox-container">
+                        <input data-bind="checked: Model.SendNews" autocomplete="off" checked="checked" class="form-control" id="SendNews" name="SendNews" type="checkbox">
+                        Send weekly Offers, Recipes, and Food/Health News via the <i>Vital Choices</i> e-letter.<br /><br />
+                        <span class="shopping-notice-note">NOTE:</span>If you already get <i>Vital Choices</i>, DO NOT UN-CHECK THIS BOX unless you want to cancel it … we won’t <br /> duplicate your subscription!
+                    </label>
+                </div>
             </div>
+            <!-- ko if: Model.ShowSendCatalog() -->
+            <div class="form-group">
+                <label class="control-label"></label>
+                <div class="input-group">
+                    <label class="multiline-checkbox-container">
+                        <input data-bind="checked: Model.SendCatalog" autocomplete="off" checked="checked" class="form-control" id="SendNews" name="SendNews" type="checkbox">
+                        Send me the award-winning Vital Choice catalog on a seasonal basis.<br /><br />
+                        <a href="#">Our privacy policy</a>
+                    </label>
+                </div>
+            </div>
+            <!-- /ko -->
+
+        <div class="form-buttons-group">
+            @(User.Identity.IsAuthenticated ? Html.ActionLink("Back", "ViewCart", "Cart", null, new {@class = "button arrow-left-red"}) : Html.ActionLink("Back", "Welcome", "Checkout", htmlAttributes: new {@class = "button arrow-left-red"}))
+            <input class="arrow-right-blue" type="submit" value="Continue"/>
+        </div>
         </form>
         <!-- /ko -->
     </div>

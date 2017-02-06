@@ -154,10 +154,10 @@
                                 <div class="review-header-container">
                                     <span>Ship to Details</span>
                                     <!-- ko if: Main() -->  
-                                    <a href="/checkout/addupdateshippingmethod?shipment=main" class="button">Edit</a> 
+                                    <a href="/checkout/addupdateshippingmethod?mode=review&shipment=main" class="button">Edit</a> 
                                     <!-- /ko -->
                                     <!-- ko ifnot: Main() -->
-                                    <a data-bind="attr: {href: '/checkout/addupdateshippingmethod?shipment=' + IdShipment() }" class="button">Edit</a>
+                                    <a data-bind="attr: {href: '/checkout/addupdateshippingmethod?mode=review&shipment=' + IdShipment() }" class="button">Edit</a>
                                     <!-- /ko -->
                                 </div>
                                 <div data-bind="foreach: ShipToAddress">
@@ -195,11 +195,11 @@
                 </div>
             </div>
             <!-- ko ifnot: Model.AutoShip -->
-            <a href="/checkout/addupdateshippingmethod?shipment=new" class="button blue margin-top-small margin-bottom-medium">Add Another Order</a>
+            <a href="/checkout/addupdateshippingmethod?mode=review&shipment=new" class="button blue margin-top-small margin-bottom-medium">Add Another Order</a>
             <div class="clear"></div>
             <!-- /ko -->
             <div class="form-buttons-group">
-                @Html.ActionLink("Back", "AddUpdateShippingMethod", "Checkout", null, new { @class = "button arrow-left-red" })
+                @Html.ActionLink("Back", "AddUpdateBillingAddress", "Checkout", null, new { @class = "button arrow-left-red" })
                 <input class="arrow-right-blue" type="submit" value="Place Your Order" />
             </div>
         </form>

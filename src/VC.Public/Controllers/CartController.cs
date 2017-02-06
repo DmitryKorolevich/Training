@@ -287,7 +287,7 @@ namespace VC.Public.Controllers
                 Quantity = 1
             }, model.IdSchedule);
 
-            return RedirectToAction("AddUpdateBillingAddress", "Checkout");
+            return RedirectToAction("AddUpdateShippingMethod", "Checkout");
         }
 
         private async Task<Tuple<OrderDataContext, CustomerCartOrder>> AddToCartInternal(CartSkuModel skuModelToAdd,

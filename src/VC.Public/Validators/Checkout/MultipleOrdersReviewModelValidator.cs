@@ -37,7 +37,6 @@ namespace VC.Public.Validators.Checkout
                     .Must(p => p.Value > DateTime.Today)
                     .When(p => p.ShippingDate.HasValue)
                     .WithCustomMessage(model => model.ShippingDate, "Shipping Date should be in the future");
-
             }
         }
     }

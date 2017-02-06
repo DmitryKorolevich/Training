@@ -28,6 +28,6 @@
 
         public const string HEALTHWISE_DISCOUNT_CODE = "healthwise";
 
-        public const string WELCOME_LETTER_SKU = "LTR02";
+        public const string WELCOME_LETTER_SKU = "ltr02";
     }
 }

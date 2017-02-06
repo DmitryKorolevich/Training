@@ -2,12 +2,6 @@
 {
     var ignoreCanadaNotice = false;
 
-	controlGuestCheckout();
-
-	$("body").on("click", "#GuestCheckout", function() {
-		controlGuestCheckout();
-	});
-
 	$("body").on("change", "#CardNumber", function () {
 	    controlCardChange();
 	});
@@ -29,47 +23,49 @@
 
 	$(".columns-container form").data("validator").settings.submitHandler = function (form)
 	{
-	    var idCustomerType = $(".columns-container form #hdIdCustomerType").val();
-	    var countryName = $(".columns-container form #ddCountry option:selected").text();
-	    if (idCustomerType == 1 && countryName != "United States" && !ignoreCanadaNotice)
-	    {
-	        $(".columns-container .overlay").show();
-	        $.ajax({
-	            url: "/Checkout/CanadaShippingNoticeView",
-	            dataType: "html",
-	            type: "GET"
-	        }).success(function (result, textStatus, xhr)
-	        {
-	            $(result).dialog({
-	                resizable: false,
-	                modal: true,
-	                minWidth: 450,
-	                dialogClass: "canada-shipping-notice",
-	                close: function ()
-	                {
-	                    $(this).dialog('destroy').remove();
-	                }
-	            });
-	        }).error(function (result)
-	        {
-	            notifyError();
-	        }).complete(function ()
-	        {
-	            $(".columns-container .overlay").hide();
-	        });
-	    }
-	    else
-	    {
-	        $(".columns-container .overlay").show();
-	        form.submit();
-	    }
+	    $(".columns-container .overlay").show();
+	    form.submit();
+
+	    //var idCustomerType = $(".columns-container form #hdIdCustomerType").val();
+	    //var countryName = $(".columns-container form #ddCountry option:selected").text();
+	    //if (idCustomerType == 1 && countryName != "United States" && !ignoreCanadaNotice)
+	    //{
+	    //    $(".columns-container .overlay").show();
+	    //    $.ajax({
+	    //        url: "/Checkout/CanadaShippingNoticeView",
+	    //        dataType: "html",
+	    //        type: "GET"
+	    //    }).success(function (result, textStatus, xhr)
+	    //    {
+	    //        $(result).dialog({
+	    //            resizable: false,
+	    //            modal: true,
+	    //            minWidth: 450,
+	    //            dialogClass: "canada-shipping-notice",
+	    //            close: function ()
+	    //            {
+	    //                $(this).dialog('destroy').remove();
+	    //            }
+	    //        });
+	    //    }).error(function (result)
+	    //    {
+	    //        notifyError();
+	    //    }).complete(function ()
+	    //    {
+	    //        $(".columns-container .overlay").hide();
+	    //    });
+	    //}
+	    //else
+	    //{
+	    //    $(".columns-container .overlay").show();
+	    //    form.submit();
+	    //}
 	};
 
 	populateCardTypes();
 
 	var cardId = $("#ddCreditCardsSelection").val() === undefined ? $("#hdCreditCard").val() : $("#ddCreditCardsSelection").val();
 	checkCreditCard(cardId);
-	getBrontoIsUnsubscribed();
 
 	$(".columns-container .overlay").hide();
 });
@@ -126,22 +122,6 @@ function checkCreditCard(cardId) {
     }
 }
 
-function getBrontoIsUnsubscribed() {
-    $.ajax({
-        url: "/Checkout/GetIsUnsubscribed",
-        dataType: "json"
-    }).success(function (result) {
-        if (result && result.Data) {
-            $("#SendNews").prop("checked", false);
-        }
-        else {
-            $("#SendNews").prop("checked", true);
-        }
-    }).error(function (result) {
-        notifyError();
-    });
-}
-
 function controlCardChange() {
     if ($("#CardNumber").val().indexOf("X") == -1 && $("#CardNumber").val().indexOf("x") == -1) {
         $(".validation-summary-errors>ul li:contains(Please enter all credit card)").remove();
@@ -154,22 +134,4 @@ function controlCardChange() {
         var cardId = $("#ddCreditCardsSelection").val() === undefined ? $("#hdCreditCard").val() : $("#ddCreditCardsSelection").val();
         checkCreditCard(cardId);
     }
-}
-
-function controlGuestCheckout() {
-	if ($("#GuestCheckout").is(":checked")) {
-		$("#Password").val("password");
-		$("#Password").closest(".form-group").hide();
-		$("#ConfirmPassword").val("password");
-		$("#ConfirmPassword").closest(".form-group").hide();
-		$("#spGuestNotify").show();
-		$("#spPasswordHint").hide();
-	} else {
-		$("#Password").val("");
-		$("#Password").closest(".form-group").show();
-		$("#ConfirmPassword").val("");
-		$("#ConfirmPassword").closest(".form-group").show();
-		$("#spGuestNotify").hide();
-		$("#spPasswordHint").show();
-	}
 }

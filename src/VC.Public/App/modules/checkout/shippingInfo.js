@@ -76,6 +76,7 @@ $(function ()
                         updateAddButtonText();
 
                         checkCanadaIssue();
+                        getBrontoIsUnsubscribed();
                         self.loaded(true);
                     } else
                     {
@@ -109,8 +110,11 @@ $(function ()
             });
 
             if (firstIssueElement)
-            {
-                self.expand(firstIssueShipment);
+            {                
+                if (firstIssueShipment)
+                {
+                    self.expand(firstIssueShipment);
+                }
                 firstIssueElement.focus();
             }
         };
@@ -262,9 +266,16 @@ $(function ()
                 return;
             }
 
+            var url = "/Checkout/UpdateShipments";
+            var mode = getQueryParameterByName("mode");
+            if (mode)
+            {
+                url += "?mode=" + mode;
+            }
+
             self.refreshing(true);
             ajaxRequest = $.ajax({
-                url: "/Checkout/UpdateShipments",
+                url: url,
                 dataType: "json",
                 data: ko.toJSON(self.Model),
                 contentType: "application/json; charset=utf-8",
@@ -347,6 +358,23 @@ $(function ()
             }
         };
 
+        function getBrontoIsUnsubscribed()
+        {
+            $.ajax({
+                url: "/Checkout/GetIsUnsubscribed",
+                dataType: "json"
+            }).success(function (result)
+            {
+                if (result && result.Data)
+                {
+                    self.Model.SendNews(!SendNews);
+                }
+            }).error(function (result)
+            {
+                notifyError();
+            });
+        };
+
         load();
     }
 
@@ -386,7 +414,10 @@ function processErrorResponse(result, root)
 
                 if (firstIssueElement)
                 {
-                    self.expand(firstIssueShipment);
+                    if (firstIssueShipment)
+                    {
+                        self.expand(firstIssueShipment);
+                    }
                     firstIssueElement.focus();
                 }
             }
