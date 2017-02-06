@@ -83,5 +83,14 @@ angular.module('app.core.dataAccess.services.affiliateService', [])
 	    {
 	        return baseUrl + 'LoginAsAffiliate/{0}?&buildNumber={1}'.format(id, buildNumber);
 	    },
+	    requestAffiliatesReportFile: function (filter, tracker)
+	    {
+	        return $http.post(baseUrl + 'RequestAffiliatesReportFile', filter, getConfig(tracker));
+	    },
+	    getAffiliatesReportFile: function (id, buildNumber)
+	    {
+	        return baseUrl + ('GetAffiliatesReportFile/{0}?buildNumber={1}')
+                .format(id, buildNumber);
+	    },
 	};
 }]);

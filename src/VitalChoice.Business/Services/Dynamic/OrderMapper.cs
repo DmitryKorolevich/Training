@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using VitalChoice.Data.Extensions;
 using VitalChoice.Data.Repositories.Specifics;
@@ -34,6 +35,7 @@ namespace VitalChoice.Business.Services.Dynamic
         private readonly PromotionMapper _promotionMapper;
         private readonly IProductService _productService;
         private readonly IInventorySkuService _inventorySkuService;
+        private readonly OrderReviewRuleMapper _reviewRuleMapper;
 
         public OrderMapper(ITypeConverter converter,
             IModelConverterService converterService,
@@ -42,7 +44,7 @@ namespace VitalChoice.Business.Services.Dynamic
             OrderPaymentMethodMapper orderPaymentMethodMapper, SkuMapper skuMapper,
             IProductService productService,
             IInventorySkuService inventorySkuService,
-            PromotionMapper promotionMapper, IGcService gcService)
+            PromotionMapper promotionMapper, IGcService gcService, OrderReviewRuleMapper reviewRuleMapper)
             : base(converter, converterService, orderRepositoryAsync)
         {
             _orderAddressMapper = orderAddressMapper;
@@ -54,6 +56,7 @@ namespace VitalChoice.Business.Services.Dynamic
             _inventorySkuService = inventorySkuService;
             _promotionMapper = promotionMapper;
             _gcService = gcService;
+            _reviewRuleMapper = reviewRuleMapper;
         }
 
         public override Expression<Func<OrderOptionValue, int>> ObjectIdSelector => o => o.IdOrder;
@@ -105,6 +108,14 @@ namespace VitalChoice.Business.Services.Dynamic
 
                 dynamic.ShippingAddress =
                     await _orderAddressMapper.FromEntityAsync(entity.ShippingAddress, withDefaults);
+                if (entity.ReviewReasons != null)
+                {
+                    await dynamic.ReviewReasons.AddRangeAsync(entity.ReviewReasons.Select(async r => new ReviewReason
+                    {
+                        Rule = await _reviewRuleMapper.FromEntityAsync(r.Rule),
+                        Reasons = ParseReasons(r.ReviewReason)
+                    }));
+                }
                 dynamic.Customer = await _customerMapper.FromEntityAsync(entity.Customer, withDefaults);
                 if (dynamic.Customer == null || dynamic.Customer.Id == 0)
                 {
@@ -277,9 +288,16 @@ namespace VitalChoice.Business.Services.Dynamic
                 entity.TaxTotal = dynamic.TaxTotal;
                 entity.Total = dynamic.Total;
                 entity.IdOrderSource = dynamic.IdOrderSource;
-                entity.ReshipProblemSkus = dynamic.ReshipProblemSkus?.Select(p => new ReshipProblemSku()
+                entity.ReshipProblemSkus = dynamic.ReshipProblemSkus?.Select(p => new ReshipProblemSku
                 {
                     IdSku = p.IdSku,
+                }).ToList();
+
+                entity.ReviewReasons = dynamic.ReviewReasons?.Select(r => new OrderReviewReason
+                {
+                    IdOrder = dynamic.Id,
+                    IdReviewRule = r.Rule.Id,
+                    ReviewReason = CreateCombinedReason(r.Reasons)
                 }).ToList();
 
                 entity.ShippingAddress =
@@ -500,6 +518,24 @@ namespace VitalChoice.Business.Services.Dynamic
                             },
                             (p, rp) => p.Quantity = rp.Quantity);
                     });
+                if (entity.ReviewReasons == null)
+                {
+                    entity.ReviewReasons = new List<OrderReviewReason>();
+                }
+                if ((ReviewType?)dynamic.SafeData.Review == ReviewType.Reviewed)
+                {
+                    entity.ReviewReasons.Clear();
+                }
+                else if ((ReviewType?)dynamic.SafeData.Review == ReviewType.ForReview && dynamic.ReviewReasons != null)
+                {
+                    entity.ReviewReasons.AddKeyed(dynamic.ReviewReasons, r => r.IdReviewRule, r => r.Rule.Id,
+                        reason => new OrderReviewReason
+                        {
+                            IdReviewRule = reason.Rule.Id,
+                            ReviewReason = CreateCombinedReason(reason.Reasons),
+                            IdOrder = dynamic.Id
+                        });
+                }
 
                 foreach (var gc in entity?.Skus?.Where(p => p.GeneratedGiftCertificates != null).SelectMany(p => p.GeneratedGiftCertificates))
                 {
@@ -628,6 +664,31 @@ namespace VitalChoice.Business.Services.Dynamic
             skuIds = skuIds.Union(items.Select(p => p.Dynamic).SelectMany(p => p.PromoSkus).Select(p => p.Sku.Id));
             var inventoryMap = await _inventorySkuService.GetAssignedInventorySkusAsync(skuIds);
             return inventoryMap;
+        }
+
+        private static readonly Regex SplitParser = new Regex("((?<result>([^;]|;;)+);|(?<result>([^;]|;;)+))",
+            RegexOptions.Compiled | RegexOptions.Singleline);
+
+        private List<string> ParseReasons(string reason)
+        {
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                return new List<string>();
+            }
+            var matches = SplitParser.Matches(reason);
+            var result = new List<string>(matches.Count);
+            foreach (Match match in matches)
+            {
+                result.Add(match.Groups["result"].Value);
+            }
+            return result;
+        }
+
+        private string CreateCombinedReason(ICollection<string> reasons)
+        {
+            if (reasons == null || reasons.Count == 0)
+                return string.Empty;
+            return string.Join(";", reasons.Select(r => r.Replace(";", ";;")));
         }
     }
 }

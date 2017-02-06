@@ -55,6 +55,17 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <label class="col-md-3 control-label"></label>
+                                        <div class="col-md-9">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" data-ng-model="rule.FirstTimeOrder">
+                                                    First Time Order
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                         <label for="type" class="col-md-3 control-label">Min Sales Order Value</label>
                                         <div class="col-md-9">
                                             <input type="text" name="MinOrderTotal" class="form-control" placeholder="Order Value" money max="100000" min="0.01" data-ng-model="rule.MinOrderTotal">
@@ -69,7 +80,7 @@
                                     <div class="form-group">
                                         <label class="col-md-3 control-label">Delivery Instruction</label>
                                         <div class="col-md-9">
-                                            <input type="text" name="DeliveryInstructionForSearch" class="form-control" placeholder="Delivery Instruction"
+                                            <input type="text" name="DeliveryInstructionForSearch" class="form-control" placeholder="Separate phrases by comma. Ex: front door, back door"
                                                     data-ng-model="rule.DeliveryInstructionForSearch">
                                             <div class="error-container" ng-show="forms.submitted && forms.form.DeliveryInstructionForSearch.$invalid">
                                                 <small class="error" ng-show="forms.form.DeliveryInstructionForSearch.$error.server">{{serverMessages.GetMessage('DeliveryInstructionForSearch')}}</small>
@@ -79,7 +90,7 @@
                                     <div class="form-group">
                                         <label class="col-md-3 control-label">Zip</label>
                                         <div class="col-md-9">
-                                            <input type="text" name="ZipForSearch" class="form-control" placeholder="Zip"
+                                            <input type="text" name="ZipForSearch" class="form-control" placeholder="Separate zip codes by comma. Ex: 98274, 98225"
                                                    data-ng-model="rule.ZipForSearch">
                                             <div class="error-container" ng-show="forms.submitted && forms.form.ZipForSearch.$invalid">
                                                 <small class="error" ng-show="forms.form.ZipForSearch.$error.server">{{serverMessages.GetMessage('ZipForSearch')}}</small>
@@ -89,11 +100,8 @@
                                     <div class="form-group">
                                         <label class="col-md-3 control-label">Product SKU</label>
                                         <div class="col-md-9">
-                                            <div class="input-group autocomplete col-md-12">
-                                                <input type="text" name="SkuForSearch" class="form-control" placeholder="Product SKU" data-ng-model="rule.SkuForSearch" autocomplete="off"
-                                                       typeahead-min-length="1" typeahead-wait-ms="200"
-                                                       uib-typeahead="sku.Code as sku.Code for sku in getSKUsBySKU($viewValue)" typeahead-loading="loadingSKUsBySKU">
-                                            </div>
+                                            <input type="text" name="SkuForSearch" class="form-control" placeholder="Separate SKU by comma, partials allowed. Ex: FRP, NDC, NSC103"
+                                                   data-ng-model="rule.SkuForSearch">
                                             <div class="error-container" ng-show="forms.submitted && forms.form.SkuForSearch.$invalid">
                                                 <small class="error" ng-show="forms.form.SkuForSearch.$error.server">{{serverMessages.GetMessage('SkuForSearch')}}</small>
                                             </div>
@@ -152,7 +160,7 @@
                                             <div class="checkbox">
                                                 <label>
                                                     <input type="checkbox" data-ng-model="rule.ReshipsRefundsCheck">
-                                                    Refunds/Reships Per Customer Check
+                                                    Enable Refunds/Reships Per Customer Check
                                                 </label>
                                             </div>
                                         </div>

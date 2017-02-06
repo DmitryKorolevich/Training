@@ -21,6 +21,7 @@ using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Business.CsvExportMaps;
 using Microsoft.Net.Http.Headers;
 using VC.Admin.Models.Products;
+using VitalChoice.Business.CsvExportMaps.Products;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Constants;
 using VitalChoice.Infrastructure.Identity.UserManagers;
@@ -30,7 +31,9 @@ using VitalChoice.Business.Mailings;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Infrastructure.Domain;
 using VitalChoice.Core.Infrastructure.Helpers;
+using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Ecommerce.Domain.Mail;
+using VitalChoice.Infrastructure.Domain.Transfer.Reports;
 
 namespace VC.Admin.Controllers
 {
@@ -39,22 +42,28 @@ namespace VC.Admin.Controllers
         private readonly IGcService GCService;
         private readonly IOrderSchedulerService OrderSchedulerService;
         private readonly ICsvExportService<GCWithOrderListItemModel, GcWithOrderListItemModelCsvMap> _gCWithOrderListItemModelCsvMapCSVExportService;
+        private readonly ICsvExportService<GCListItemModel, GCListItemModelExportICsvMap> _gCListItemModelExportCSVExportService;
         private readonly ExtendedUserManager _userManager;
         private readonly INotificationService _notificationService;
+        private readonly ICacheProvider _cache;
         private readonly ILogger logger;
 
         public GCController(IGcService GCService,
             IOrderSchedulerService OrderSchedulerService,
             ICsvExportService<GCWithOrderListItemModel, GcWithOrderListItemModelCsvMap> gCWithOrderListItemModelCsvMapCSVExportService,
+            ICsvExportService<GCListItemModel, GCListItemModelExportICsvMap> gCListItemModelExportCSVExportService,
             INotificationService notificationService,
-            ILoggerFactory loggerProvider, 
+            ILoggerFactory loggerProvider,
+            ICacheProvider cache,
             ExtendedUserManager userManager)
         {
             this.GCService = GCService;
             this.OrderSchedulerService = OrderSchedulerService;
             _gCWithOrderListItemModelCsvMapCSVExportService = gCWithOrderListItemModelCsvMapCSVExportService;
+            _gCListItemModelExportCSVExportService = gCListItemModelExportCSVExportService;
             _userManager = userManager;
             _notificationService = notificationService;
+            _cache = cache;
             this.logger = loggerProvider.CreateLogger<GCController>();
         }
 
@@ -65,11 +74,47 @@ namespace VC.Admin.Controllers
 
             var toReturn = new PagedList<GCListItemModel>
             {
-                Items = result.Items.Select(p => new GCListItemModel(p)).ToList(),
+                Items = result.Items.Select(p => new GCListItemModel(p, LookupHelper.GetGCTypeName(p.GCType))).ToList(),
                 Count = result.Count,
             };
 
             return toReturn;
+        }
+        
+        [AdminAuthorize(PermissionType.Marketing, PermissionType.GC)]
+        [HttpPost]
+        public async Task<Result<string>> RequestGiftCertificatesReportFile([FromBody]GCFilter filter)
+        {
+            filter.Paging = null;
+
+            var data = (await GCService.GetGiftCertificatesAsync(filter)).Items.
+                Select(p=>new GCListItemModel(p, LookupHelper.GetGCTypeName(p.GCType))).ToList();
+
+            var result = _gCListItemModelExportCSVExportService.ExportToCsv(data);
+
+            var guid = Guid.NewGuid().ToString().ToLower();
+            _cache.SetItem(String.Format(CacheKeys.ReportFormat, guid), result);
+
+            return guid;
+        }
+
+        [AdminAuthorize(PermissionType.Marketing, PermissionType.GC)]
+        [HttpGet]
+        public FileResult GetGiftCertificatesReportFile(string id)
+        {
+            var result = _cache.GetItem<byte[]>(String.Format(CacheKeys.ReportFormat, id));
+            if (result == null)
+            {
+                throw new AppValidationException("Please reload a file.");
+            }
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.GCS_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
         }
 
         [AdminAuthorize(PermissionType.Reports)]
@@ -162,7 +207,7 @@ namespace VC.Admin.Controllers
                 item.IdEditedBy = userId;
             }
 
-            return (await GCService.AddManualGiftCertificatesAsync(quantity, item)).Select(p => new GCListItemModel(p)).ToList();
+            return (await GCService.AddManualGiftCertificatesAsync(quantity, item)).Select(p => new GCListItemModel(p, LookupHelper.GetGCTypeName(p.GCType))).ToList();
         }
 
         [AdminAuthorize(PermissionType.Marketing, PermissionType.GC)]

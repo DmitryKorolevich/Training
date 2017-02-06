@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Internal;
+using VitalChoice.Ecommerce.Domain.Entities;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Contexts;
 using VitalChoice.Workflow.Core;
@@ -24,7 +25,7 @@ namespace VitalChoice.Business.Workflow.Orders.Fraud.Checks
                     Task.FromResult(new CheckResult
                     {
                         Result = true,
-                        Reason = $"Delivery Instructions has one of specified words: ({valueToCheck})"
+                        Reason = $"Delivery Instructions has one of specified phrases: ({valueToCheck})"
                     });
             }
             return TaskCache<CheckResult>.DefaultCompletedTask;
@@ -33,8 +34,7 @@ namespace VitalChoice.Business.Workflow.Orders.Fraud.Checks
         public override bool ShouldCheck(OrderDataContext context, ITreeContext executionContext, string valueToCheck,
             OrderReviewRuleDynamic reviewRule)
         {
-            var deliveryInstructions = (string) context.Order.ShippingAddress?.SafeData.DeliveryInstructions;
-            return !string.IsNullOrEmpty(deliveryInstructions);
+            return !string.IsNullOrWhiteSpace(valueToCheck);
         }
     }
 }

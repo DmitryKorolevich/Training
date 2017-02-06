@@ -462,6 +462,17 @@ namespace VitalChoice.ExportService.Services
                     continue;
                 }
 
+                if ((ReviewType?) order.SafeData.Review == ReviewType.ForReview)
+                {
+                    exportCallBack(new OrderExportItemResult
+                    {
+                        Id = item.Id,
+                        Error = "Order is marked as Fraud, please review",
+                        Success = false
+                    });
+                    continue;
+                }
+
                 order.Customer = await _customerService.SelectAsync(order.Customer.Id, true);
                 if (order.PaymentMethod.IdObjectType == (int) PaymentMethodType.CreditCard)
                 {

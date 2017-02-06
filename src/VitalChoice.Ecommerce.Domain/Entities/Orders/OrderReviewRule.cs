@@ -1,12 +1,4 @@
-﻿using System.Collections.Generic;
-using VitalChoice.Ecommerce.Domain.Entities.Addresses;
-using VitalChoice.Ecommerce.Domain.Entities.Affiliates;
-using VitalChoice.Ecommerce.Domain.Entities.Base;
-using VitalChoice.Ecommerce.Domain.Entities.Customers;
-using VitalChoice.Ecommerce.Domain.Entities.Discounts;
-using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
-using VitalChoice.Ecommerce.Domain.Entities.Healthwise;
-using VitalChoice.Ecommerce.Domain.Entities.Payment;
+﻿using VitalChoice.Ecommerce.Domain.Entities.Base;
 
 namespace VitalChoice.Ecommerce.Domain.Entities.Orders
 {

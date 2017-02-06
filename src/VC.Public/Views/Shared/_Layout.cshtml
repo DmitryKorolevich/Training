@@ -82,10 +82,6 @@
             </div>
             <div class="header-top-middle">
                 <div class="trustpilot-widget" data-locale="en-US" data-template-id="5418052cfbfb950d88702476" data-businessunit-id="51975a73000064000533c457" data-style-height="30px" data-style-width="100%" data-theme="light" data-stars="4,5,3"></div>
-                <!-- old live support code -->
-                @*<div class="customer-service-chart" id="lhnContainer">
-                    <div id="lhnChatButton"></div>
-                </div>*@
             </div>
             <div class="header-top-right">
                 <div class="actions-top-nav">
@@ -288,7 +284,7 @@
 				</div>
 			</div>
 			<div class="footer-copyright">
-				<span>For orders, questions, or assistance call 800-608-4825 any day or time. © @DateTime.Now.Year Vital Choice Wild Seafood & Organics, Inc. All Rights Reserved</span>
+				<span>For orders, questions, or assistance call 800-608-4825 any day or time. © @DateTime.Now.Year Vital Choice Wild Seafood & Organics, SPC. All Rights Reserved</span>
 			</div>
 		</footer>
 	</div>
@@ -297,13 +293,13 @@
 	@await RenderSectionAsync("PageScripts", false)
     @await RenderSectionAsync("EndPageStyles", false)
     @await Component.InvokeAsync("BodyEndTrackScripts")
-    @if (!Context.Request.Path.HasValue || Context.Request.Path.Value != "/profile/changebillinginfo")
+    @if (!Context.Request.Path.HasValue || Context.Request.Path.Value != "/profile/changebillinginfo" && Context.Request.Path.Value != "/checkout/addupdatebillingaddress")
     {
         <script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.sync.bootstrap.min.js" defer="defer" async="async"></script>
         <script src="//www.google.com/jsapi?callback=googleLoadCallback" type="text/javascript" defer="defer" async="async"></script>
         <!-- new live support code -->
         <!-- begin olark code -->
-        <script data-cfasync="false" type='text/javascript'>
+        <script data-cfasync="true" type='text/javascript'>
             /*<![CDATA[*/window.olark||(function(c){var f=window,d=document,l=f.location.protocol=="https:"?"https:":"http:",z=c.name,r="load";var nt=function(){
             f[z]=function(){
             (a.s=a.s||[]).push(arguments)};var a=f[z]._={
@@ -327,29 +323,8 @@
             <a href="https://www.olark.com/site/4550-485-10-6061/contact" title="Contact us" target="_blank">Questions? Feedback?</a> powered by <a href="http://www.olark.com?welcome" title="Olark live chat software">Olark live chat software</a>
         </noscript>
         <!-- end olark code -->
-
-        <!-- old live support code -->
-        @*<script>
-            var lhnAccountN = 7307;
-            var lhnButtonN = 5138;
-            var lhnVersion = 5.3;
-            var lhnJsHost = (("https:" == document.location.protocol) ? "https://" : "http://");
-            var lhnInviteEnabled = 1;
-            var lhnInviteChime = 0;
-            var lhnWindowN = 0;
-            var lhnDepartmentN = 0;
-            var lhnCustomInvitation = '';
-            var lhnCustom1 = '';
-            var lhnCustom2 = '';
-            var lhnCustom3 = '';
-            var lhnTrackingEnabled = 't';
-            var lhnScriptSrc = lhnJsHost + 'www.livehelpnow.net/lhn/scripts/livehelpnow.aspx?lhnid=' + lhnAccountN + '&iv=' + lhnInviteEnabled + '&d=' + lhnDepartmentN + '&ver=' + lhnVersion + '&rnd=' + Math.random();
-            var lhnScript = document.createElement("script");
-            lhnScript.setAttribute("defer", "defer");
-            lhnScript.setAttribute("async", "async");
-            lhnScript.type = "text/javascript";
-            lhnScript.src = lhnScriptSrc;
-        </script>*@
     }
+    <script src="https://use.typekit.net/bdl6fja.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
 </body>
 </html>

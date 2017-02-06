@@ -55,22 +55,26 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<CountModel>(entity =>
             {
                 entity.HasKey(f => f.Id);
+                entity.NonCached();
             });
 
             builder.Entity<IdModel>(entity =>
             {
                 entity.HasKey(f => f.Id);
+                entity.NonCached();
             });
 
             builder.Entity<WholesaleDropShipReportSkuRawItem>(entity =>
             {
                 entity.HasKey(f => f.Id);
+                entity.NonCached();
             });
 
             builder.Entity<TransactionAndRefundRawItem>(entity =>
             {
                 entity.HasKey(f => f.RowNumber);
                 entity.Ignore(f => f.Id);
+                entity.NonCached();
             });
 
             builder.Entity<OrdersSummarySalesOrderTypeStatisticItem>(entity =>
@@ -78,40 +82,47 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(f => f.Id);
                 entity.Ignore(f => f.Name);
                 entity.Ignore(f => f.Average);
+                entity.NonCached();
             });
 
             builder.Entity<OrdersSummarySalesOrderItem>(entity =>
             {
                 entity.HasKey(f => f.Id);
                 entity.Ignore(f => f.SourceName);
+                entity.NonCached();
             });
 
             builder.Entity<CustomerOrdersTotal>(entity =>
             {
                 entity.HasKey(f => f.Id);
+                entity.NonCached();
             });
 
             builder.Entity<CustomerLastOrder>(entity =>
             {
                 entity.HasKey(f => f.Id);
+                entity.NonCached();
             });
 
             builder.Entity<SkuBreakDownReportRawItem>(entity =>
             {
                 entity.HasKey(f => new {f.IdSku, f.CustomerIdObjectType});
                 entity.Ignore(f => f.Id);
+                entity.NonCached();
             });
 
             builder.Entity<SkuPOrderTypeBreakDownReportRawItem>(entity =>
             {
                 entity.HasKey(f => f.RowNumber);
                 entity.Ignore(f => f.Id);
+                entity.NonCached();
             });
 
             builder.Entity<SkuPOrderTypeFutureBreakDownReportRawItem>(entity =>
             {
                 entity.HasKey(f => f.RowNumber);
                 entity.Ignore(f => f.Id);
+                entity.NonCached();
             });
 
             builder.Entity<MailingReportItem>(entity =>
@@ -120,12 +131,14 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(f => f.CustomerOrderSource);
                 entity.Ignore(f => f.CountryCode);
                 entity.Ignore(f => f.StateCode);
+                entity.NonCached();
             });
 
             builder.Entity<ShippedViaSummaryReportRawItem>(entity =>
             {
                 entity.HasKey(f => new {f.IdWarehouse,f.IdShipMethodFreightService, f.ShipMethodFreightCarrier });
                 entity.Ignore(f => f.Id);
+                entity.NonCached();
             });
 
             builder.Entity<ShippedViaReportRawOrderItem>(entity =>
@@ -135,17 +148,20 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(f => f.WarehouseName);
                 entity.Ignore(f => f.ShipMethodFreightServiceName);
                 entity.Ignore(f => f.StateCode);
+                entity.NonCached();
             });
 
             builder.Entity<ProductQualitySalesReportItem>(entity =>
             {
                 entity.HasKey(f => f.Id);
                 entity.Ignore(f => f.SalesPerIssue);
+                entity.NonCached();
             });
 
             builder.Entity<ProductQualitySkusReportItem>(entity =>
             {
                 entity.HasKey(f => f.Id);
+                entity.NonCached();
             });
 
             builder.Entity<KPIReportDBSaleRawItem>(entity =>
@@ -157,6 +173,7 @@ namespace VitalChoice.Infrastructure.Context
             builder.Entity<ShortOrderItemModel>(entity =>
             {
                 entity.HasKey(f => f.Id);
+                entity.NonCached();
             });
 
             builder.Entity<AAFESReportItem>(entity =>
@@ -164,6 +181,7 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(f => f.Id);
                 entity.Ignore(f => f.ServiceUrl);
                 entity.HasKey(f => f.RowNumber);
+                entity.NonCached();
             });
 
             builder.Entity<CustomerSkuUsageReportRawItem>(entity =>
@@ -174,6 +192,7 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(f => f.ShippingCountryCode);
                 entity.Ignore(f => f.ShippingStateCode);
                 entity.HasKey(f => new { f.IdCustomer, f.IdSku});
+                entity.NonCached();
             });
 
             builder.Entity<OrderDiscountReportItem>(entity =>
@@ -182,11 +201,13 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(f => f.DiscountMessage);
                 entity.Ignore(f => f.DiscountInfo);
                 entity.HasKey(f => f.Id);
+                entity.NonCached();
             });
 
             builder.Entity<SkuAverageDailySalesReportRawItem>(entity =>
             {
                 entity.HasKey(f => f.Id);
+                entity.NonCached();
             });
 
             builder.Entity<OrderAbuseReportRawItem>(entity =>
@@ -199,11 +220,13 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(f => f.IdReship);
                 entity.Ignore(f => f.ReshipDateCreated);
                 entity.Ignore(f => f.OrderSourceAddedBy);
+                entity.NonCached();
             });
 
             builder.Entity<CustomerOrderAbuseReportRawItem>(entity =>
             {
                 entity.HasKey(f => f.Id);
+                entity.NonCached();
             });
 
             #endregion
@@ -212,6 +235,7 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(x => x.Id);
                 entity.ToTable("VCustomerFavorites");
+                entity.NonCached();
             });
 
             builder.Entity<VProductSku>(entity =>
@@ -219,6 +243,7 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(p => p.Id);
                 entity.Ignore(x => x.EditedByAgentId);
                 entity.ToTable("VProductSkus");
+                entity.NonCached();
             });
 
             builder.Entity<VSku>(entity =>
@@ -226,6 +251,7 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(p => new { p.IdProduct, p.SkuId });
                 entity.Ignore(x => x.Id);
                 entity.ToTable("VSkus");
+                entity.NonCached();
             });
 
             builder.Entity<VProductsWithReview>(entity =>
@@ -233,23 +259,27 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(p => p.IdProduct);
                 entity.Ignore(x => x.Id);
                 entity.ToTable("VProductsWithReviews");
+                entity.NonCached();
             });
 
             builder.Entity<ProductCategoryStatisticItem>(entity =>
             {
                 entity.HasKey(p => p.Id);
+                entity.NonCached();
             });
 
             builder.Entity<SkusInProductCategoryStatisticItem>(entity =>
             {
                 entity.HasKey(p => p.Code);
                 entity.Ignore(p => p.Id);
+                entity.NonCached();
             });
 
             builder.Entity<VCustomer>(entity =>
             {
                 entity.HasKey(x => x.Id);
                 entity.ToTable("VCustomers");
+                entity.NonCached();
             });
 
             builder.Entity<VOrder>(entity =>
@@ -257,19 +287,22 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(t => t.Id);
                 entity.ToTable("VOrders");
                 entity.Ignore(t => t.EditedByAgentId);
+                entity.NonCached();
             });
 
 			builder.Entity<VAutoShip>(entity =>
 			{
 				entity.HasKey(t => t.Id);
 				entity.ToTable("VAutoShips");
-			});
+                entity.NonCached();
+            });
 
 			builder.Entity<VAutoShipOrder>(entity =>
 			{
 				entity.HasKey(t => t.Id);
 				entity.ToTable("VAutoShipOrders");
-			});
+                entity.NonCached();
+            });
 
 			builder.Entity<VOrderWithRegionInfoItem>(entity =>
             {
@@ -278,29 +311,34 @@ namespace VitalChoice.Infrastructure.Context
                 entity.Ignore(p => p.CustomerFirstName);
                 entity.Ignore(p => p.CustomerLastName);
                 entity.Ignore(p => p.CustomerOrdersCount);
+                entity.NonCached();
             });
 
             builder.Entity<OrdersRegionStatisticItem>(entity =>
             {
                 entity.HasKey(p => p.Region);
                 entity.Ignore(p => p.Id);
+                entity.NonCached();
             });
 
             builder.Entity<InventorySkuUsageRawReportItem>(entity =>
             {
                 entity.HasKey(p => p.Id);
+                entity.NonCached();
             });
 
             builder.Entity<InventoriesSummaryUsageRawReportItem>(entity =>
             {
                 entity.HasKey(p => new {p.IdInventorySku, p.Date });
                 entity.Ignore(p => p.Id);
+                entity.NonCached();
             });
 
             builder.Entity<OrdersZipStatisticItem>(entity =>
             {
                 entity.HasKey(p => p.Zip);
                 entity.Ignore(p => p.Id);
+                entity.NonCached();
             });
 
             builder.Entity<VAffiliate>(entity =>
@@ -313,6 +351,7 @@ namespace VitalChoice.Infrastructure.Context
                     .HasForeignKey<VAffiliate>(p => p.Id)
                     .HasPrincipalKey<VAffiliateNotPaidCommission>(p => p.Id)
                     .IsRequired();
+                entity.NonCached();
             });
 
             builder.Entity<VAffiliateNotPaidCommission>(entity =>
@@ -326,11 +365,13 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(t => t.Id);
                 entity.ToTable("VCustomersInAffiliates");
+                entity.NonCached();
             });
 
             builder.Entity<AffiliateSummaryReportModel>(entity =>
             {
                 entity.HasKey(p => new { p.From, p.IdType });
+                entity.NonCached();
             });
 
             builder.Entity<HelpTicket>(entity =>
@@ -363,6 +404,7 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(t => t.Id);
                 entity.ToTable("VHelpTickets");
+                entity.NonCached();
             });
 
             builder.Entity<VHealthwisePeriod>(entity =>
@@ -416,12 +458,14 @@ namespace VitalChoice.Infrastructure.Context
 
                 entity.HasKey(e => new {e.IdSku, e.IdCustomer});
                 entity.HasOne(e => e.Sku).WithMany().HasForeignKey(e => e.IdSku).HasPrincipalKey(s => s.Id);
+                entity.NonCached();
             });
 
             builder.Entity<VShortProduct>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.ToTable("VShortProducts");
+                entity.NonCached();
             });
 
             builder.Entity<OneTimeDiscountToCustomerUsage>(entity =>
@@ -454,6 +498,7 @@ namespace VitalChoice.Infrastructure.Context
             {
                 entity.HasKey(p => p.Id);
                 entity.ToTable("VWholesaleSummaryInfo");
+                entity.NonCached();
             });
 
             builder.Entity<KPICacheItem>(entity =>
@@ -467,6 +512,7 @@ namespace VitalChoice.Infrastructure.Context
                 entity.HasKey(f => f.IdCustomer);
                 entity.Ignore(f => f.Id);
                 entity.ToTable("VOrderCountOnCustomers");
+                entity.NonCached();
             });
 
             builder.Entity<VCustomerWithDublicateEmail>(entity =>

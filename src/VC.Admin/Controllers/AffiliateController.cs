@@ -31,7 +31,9 @@ using VitalChoice.Infrastructure.Domain.Transfer.Affiliates;
 using VitalChoice.Infrastructure.Domain.Transfer.Country;
 using VitalChoice.Infrastructure.Domain.Transfer.Settings;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using VC.Admin.Models.Affiliates;
+using VitalChoice.Ecommerce.Cache;
 using VitalChoice.Ecommerce.Domain.Helpers;
 using VitalChoice.Infrastructure.Domain.Entities.Settings;
 using VitalChoice.Infrastructure.Domain.Options;
@@ -50,10 +52,12 @@ namespace VC.Admin.Controllers
         private readonly ReferenceData _referenceData;
         private readonly AppSettings _appSettings;
         private readonly ICsvExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> _csvExportAffiliateOrderListItemService;
+        private readonly ICsvExportService<AffiliateListItemModel, AffiliateListItemModelCsvMap> _affiliateListItemModelСSVExportService;
         private readonly IOrderService _orderService;
         private readonly ICountryService _countryService;
         private readonly ISettingService _settingService;
         private readonly IOptions<AppOptions> _appOptions;
+        private readonly ICacheProvider _cache;
         private readonly ILogger logger;
 
         public AffiliateController(
@@ -62,11 +66,16 @@ namespace VC.Admin.Controllers
             ILoggerFactory loggerProvider,
             IDynamicMapper<AffiliateDynamic, Affiliate> mapper,
             ICsvExportService<AffiliateOrderListItemModel, AffiliateOrderListItemModelCsvMap> csvExportAffiliateOrderListItemService,
+            ICsvExportService<AffiliateListItemModel, AffiliateListItemModelCsvMap> affiliateListItemModelСSVExportService,
             IOrderService orderService,
             ICountryService countryService,
             ISettingService settingService,
             IOptions<AppOptions> appOptions,
-            IObjectHistoryLogService objectHistoryLogService, ExtendedUserManager userManager, ReferenceData referenceData, AppSettings appSettings)
+            IObjectHistoryLogService objectHistoryLogService,
+            ExtendedUserManager userManager,
+            ReferenceData referenceData, 
+            AppSettings appSettings,
+            ICacheProvider cache)
         {
             _affiliateService = affiliateService;
             _affiliateUserService = affiliateUserService;
@@ -76,10 +85,12 @@ namespace VC.Admin.Controllers
             _referenceData = referenceData;
             _appSettings = appSettings;
             _csvExportAffiliateOrderListItemService = csvExportAffiliateOrderListItemService;
+            _affiliateListItemModelСSVExportService = affiliateListItemModelСSVExportService;
             _orderService = orderService;
             _countryService = countryService;
             _settingService = settingService;
             _appOptions = appOptions;
+            _cache = cache;
             logger = loggerProvider.CreateLogger<AffiliateController>();
         }
 
@@ -110,6 +121,39 @@ namespace VC.Admin.Controllers
             };
 
             return toReturn;
+        }
+        
+        [HttpPost]
+        public async Task<Result<string>> RequestAffiliatesReportFile([FromBody]VAffiliateFilter filter)
+        {
+            filter.Paging = null;
+
+            var data = await _affiliateService.GetAffiliatesAsync(filter);
+
+            var result = _affiliateListItemModelСSVExportService.ExportToCsv(data.Items.Select(p => new AffiliateListItemModel(p)).ToList());
+
+            var guid = Guid.NewGuid().ToString().ToLower();
+            _cache.SetItem(String.Format(CacheKeys.ReportFormat, guid), result);
+
+            return guid;
+        }
+        
+        [HttpGet]
+        public FileResult GetAffiliatesReportFile(string id)
+        {
+            var result = _cache.GetItem<byte[]>(String.Format(CacheKeys.ReportFormat, id));
+            if (result == null)
+            {
+                throw new AppValidationException("Please reload a file.");
+            }
+
+            var contentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = String.Format(FileConstants.AFFILIATES_REPORT, DateTime.Now)
+            };
+
+            Response.Headers.Add("Content-Disposition", contentDisposition.ToString());
+            return File(result, "text/csv");
         }
 
         [HttpGet]

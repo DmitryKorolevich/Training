@@ -20,3 +20,14 @@ BEGIN
 
 END
 GO
+
+IF NOT EXISTS(SELECT * FROM OrderReviewRuleOptionTypes WHERE Name ='FirstTimeOrder')
+BEGIN
+
+	INSERT INTO [dbo].[OrderReviewRuleOptionTypes]
+	([Name], [IdFieldType], [IdLookup], [IdObjectType], [DefaultValue])
+	VALUES
+	(N'FirstTimeOrder', 5, NULL, NULL, 'False')
+
+END
+GO

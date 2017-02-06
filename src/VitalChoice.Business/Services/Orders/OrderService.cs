@@ -523,7 +523,9 @@ namespace VitalChoice.Business.Services.Orders
                     .Include(o => o.HealthwiseOrder)
                     .Include(o => o.ReshipProblemSkus)
                     .ThenInclude(g => g.Sku)
-                    .Include(o => o.OrderShippingPackages);
+                    .Include(o => o.OrderShippingPackages)
+                    .Include(o => o.ReviewReasons)
+                    .ThenInclude(r => r.Rule);
         }
 
         protected override Task AfterSelect(ICollection<Order> entities)
@@ -699,20 +701,20 @@ namespace VitalChoice.Business.Services.Orders
             //return await SelectFirstAsync(queryObject: orderQuery, orderBy: o => o.OrderByDescending(x => x.DateCreated));
         }
 
-        private void UpdateOrderFromCalculationContext(OrderDynamic order, OrderDataContext dataContext)
+        private void UpdateOrderFromCalculationContext(OrderDynamic order, OrderDataContext context)
         {
-            order.TaxTotal = dataContext.TaxTotal;
-            order.Total = dataContext.Total;
-            order.DiscountTotal = dataContext.DiscountTotal;
-            order.ShippingTotal = dataContext.ShippingTotal;
-            order.ProductsSubtotal = dataContext.ProductsSubtotal;
-            order.PromoSkus = dataContext.PromoSkus;
-            if (dataContext.IsFraud)
+            order.TaxTotal = context.TaxTotal;
+            order.Total = context.Total;
+            order.DiscountTotal = context.DiscountTotal;
+            order.ShippingTotal = context.ShippingTotal;
+            order.ProductsSubtotal = context.ProductsSubtotal;
+            order.PromoSkus = context.PromoSkus;
+            if (context.IsFraud)
             {
                 order.Data.Review = ReviewType.ForReview;
-                order.Data.ReviewReason = string.Join("; ", dataContext.FraudReason);
+                order.ReviewReasons = context.FraudReason;
             }
-            SetOrderSplitStatuses(dataContext, order);
+            SetOrderSplitStatuses(context, order);
         }
 
         public async Task OrderTypeSetup(OrderDynamic order)
@@ -2539,6 +2541,21 @@ namespace VitalChoice.Business.Services.Orders
                         o.IdCustomer == idCustomer && o.IdObjectType == (int) OrderType.Reship && o.OrderStatus != OrderStatus.Cancelled &&
                         o.StatusCode != (int) RecordStatusCode.Deleted &&
                         o.DateCreated > startDate && o.DateCreated <= endDate, q => q);
+        }
+
+        public Task<int> GetOrderCount(int idCustomer)
+        {
+            return
+                SelectCountAsync(
+                    o =>
+                        o.IdCustomer == idCustomer &&
+                        o.StatusCode != (int) RecordStatusCode.Deleted &&
+                        (o.IdObjectType == (int) OrderType.Normal || o.IdObjectType == (int) OrderType.AutoShipOrder ||
+                         o.IdObjectType == (int) OrderType.DropShip || o.IdObjectType == (int) OrderType.GiftList) &&
+                        !(o.OrderStatus == OrderStatus.Incomplete || o.POrderStatus == OrderStatus.Incomplete ||
+                          o.NPOrderStatus == OrderStatus.Incomplete)
+                        && (o.OrderStatus != OrderStatus.Cancelled || o.POrderStatus != OrderStatus.Cancelled ||
+                            o.NPOrderStatus != OrderStatus.Cancelled), q => q);
         }
 
         #endregion

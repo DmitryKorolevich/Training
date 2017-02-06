@@ -164,6 +164,11 @@ namespace VC.Public
                 defaults: new { controller = "Help", action = "CJProductsFeed" });
 
             routeBuilder.MapRoute(
+                name: "PepperJamFeed",
+                template: "feed/pepper-jam.csv",
+                defaults: new { controller = "Help", action = "PepperJamFeed" });
+
+            routeBuilder.MapRoute(
                 name: "CustomCSS",
                 template: "custom-styles.css",
                 defaults: new { controller = "Help", action = "CustomCSS" });

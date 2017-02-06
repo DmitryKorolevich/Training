@@ -36,6 +36,9 @@ namespace VC.Admin.Models.Orders
         public bool Guest { get; set; }
 
         [Map]
+        public bool FirstTimeOrder { get; set; }
+
+        [Map]
         public string DeliveryInstructionForSearch { get; set; }
 
         [Map]

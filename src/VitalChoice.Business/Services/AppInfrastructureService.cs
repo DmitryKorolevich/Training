@@ -444,7 +444,7 @@ namespace VitalChoice.Business.Services
                 DateTime.TryParse(affiliateReportDateOption.OptionValue, out dbDate);
                 if (date > dbDate)
                 {
-                    affiliateReportDateOption.OptionValue = date.ToString("yyyy-MM-dd hh:mm:ss.fff");
+                    affiliateReportDateOption.OptionValue = date.ToString("yyyy-MM-dd HH:mm:ss.fff");
                     _appOptionRepository.Update(affiliateReportDateOption);
                 }
             }

@@ -14,6 +14,7 @@ using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Mail;
 using VitalChoice.Infrastructure.Domain.Dynamic;
 using VitalChoice.Infrastructure.Domain.Transfer.Orders;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Infrastructure.Domain.Transfer.Shipping;
 
 namespace VC.Admin.Models.Orders
@@ -136,6 +137,13 @@ namespace VC.Admin.Models.Orders
             toReturn.Messages = this.Messages;
             return toReturn;
         }
+    }
+
+    public class ReviewReasonViewModel
+    {
+        public string Name { get; set; }
+
+        public ICollection<string> Reasons { get; set; }
     }
 
     [ApiValidator(typeof(OrderManageModelValidator))]
@@ -331,8 +339,7 @@ namespace VC.Admin.Models.Orders
         [Map]
         public ReviewType? Review { get; set; }
 
-        [Map]
-        public string ReviewReason { get; set; }
+        public ICollection<ReviewReasonViewModel> ReviewReasons { get; set; }
 
         public bool AllowSetAsReviewed { get; set; }
 

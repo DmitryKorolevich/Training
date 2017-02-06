@@ -22,6 +22,7 @@ using VitalChoice.Data.Repositories.Specifics;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
+using VitalChoice.Infrastructure.Domain.Transfer.Products;
 using VitalChoice.Interfaces.Services;
 
 namespace VC.Admin.ModelConverters
@@ -57,21 +58,21 @@ namespace VC.Admin.ModelConverters
 
         public override async Task DynamicToModelAsync(OrderManageModel model, OrderDynamic dynamic)
         {
-            if (dynamic.SafeData.Review == (int)ReviewType.ForReview)
+            if ((ReviewType?) dynamic.SafeData.Review == ReviewType.ForReview)
             {
                 model.AllowSetAsReviewed = true;
             }
 
-            if(dynamic.Customer!=null)
+            if (dynamic.Customer != null)
             {
                 model.IdCustomer = dynamic.Customer.Id;
             }
 
-            if(dynamic.Discount!=null)
+            if (dynamic.Discount != null)
             {
                 model.DiscountCode = dynamic.Discount.Code;
-                model.DiscountMessage =BusinessHelper.GetDiscountMessage(dynamic.Discount, (int?)dynamic.SafeData.IdDiscountTier,
-                    (decimal?)dynamic.SafeData.AutoShipDiscountPercent);
+                model.DiscountMessage = BusinessHelper.GetDiscountMessage(dynamic.Discount, (int?) dynamic.SafeData.IdDiscountTier,
+                    (decimal?) dynamic.SafeData.AutoShipDiscountPercent);
             }
 
             model.DiscountedSubtotal = model.ProductsSubtotal - model.DiscountTotal;
@@ -81,32 +82,32 @@ namespace VC.Admin.ModelConverters
                 model.TotalShipping += model.ShippingOverride.Value;
             }
 
-            if (dynamic.GiftCertificates!=null && dynamic.GiftCertificates.Count>0)
+            if (dynamic.GiftCertificates != null && dynamic.GiftCertificates.Count > 0)
             {
-                if(model.GCs==null)
+                if (model.GCs == null)
                 {
                     model.GCs = new List<GCListItemModel>();
                 }
-                foreach(var item in dynamic.GiftCertificates)
+                foreach (var item in dynamic.GiftCertificates)
                 {
-                    model.GCs.Add(new GCListItemModel(item.GiftCertificate));
+                    model.GCs.Add(new GCListItemModel(item.GiftCertificate, LookupHelper.GetGCTypeName(item.GiftCertificate.GCType)));
                     model.GiftCertificatesSubtotal += item.Amount;
                 }
             }
             else
             {
-                model.GCs = new List<GCListItemModel>() { new GCListItemModel(null) };
+                model.GCs = new List<GCListItemModel>() {new GCListItemModel(null, null)};
             }
 
             if (dynamic.Skus != null)
             {
-                model.SkuOrdereds= new List<SkuOrderedManageModel>();
+                model.SkuOrdereds = new List<SkuOrderedManageModel>();
                 foreach (var item in dynamic.Skus)
                 {
                     model.SkuOrdereds.Add(new SkuOrderedManageModel(item));
                 }
             }
-            
+
             if (dynamic.PromoSkus != null)
             {
                 model.PromoSkus = new List<PromoSkuOrderedManageModel>();
@@ -116,22 +117,23 @@ namespace VC.Admin.ModelConverters
                 }
             }
 
-            if (!model.ShipDelayType.HasValue || model.IdObjectType == (int)OrderType.AutoShip)
+            if (!model.ShipDelayType.HasValue || model.IdObjectType == (int) OrderType.AutoShip)
             {
                 model.ShipDelayType = ShipDelayType.None;
             }
 
-            if(model.OrderStatus.HasValue)
+            if (model.OrderStatus.HasValue)
             {
                 model.CombinedEditOrderStatus = model.OrderStatus.Value;
             }
             else
             {
                 model.ShouldSplit = true;
-                if(model.POrderStatus==OrderStatus.Cancelled || model.NPOrderStatus==OrderStatus.Cancelled)
+                if (model.POrderStatus == OrderStatus.Cancelled || model.NPOrderStatus == OrderStatus.Cancelled)
                 {
                     model.CombinedEditOrderStatus = OrderStatus.Cancelled;
-                } else if(model.POrderStatus == OrderStatus.Shipped || model.NPOrderStatus == OrderStatus.Shipped)
+                }
+                else if (model.POrderStatus == OrderStatus.Shipped || model.NPOrderStatus == OrderStatus.Shipped)
                 {
                     model.CombinedEditOrderStatus = OrderStatus.Shipped;
                 }
@@ -144,10 +146,11 @@ namespace VC.Admin.ModelConverters
                     model.CombinedEditOrderStatus = OrderStatus.OnHold;
                 }
                 else if (model.POrderStatus == OrderStatus.Processed || model.NPOrderStatus == OrderStatus.Processed ||
-                    model.POrderStatus == OrderStatus.ShipDelayed || model.NPOrderStatus == OrderStatus.ShipDelayed)
+                         model.POrderStatus == OrderStatus.ShipDelayed || model.NPOrderStatus == OrderStatus.ShipDelayed)
                 {
                     model.CombinedEditOrderStatus = OrderStatus.Processed;
-                } else if (model.POrderStatus == OrderStatus.Incomplete || model.NPOrderStatus == OrderStatus.Incomplete)
+                }
+                else if (model.POrderStatus == OrderStatus.Incomplete || model.NPOrderStatus == OrderStatus.Incomplete)
                 {
                     model.CombinedEditOrderStatus = OrderStatus.Incomplete;
                 }
@@ -175,13 +178,14 @@ namespace VC.Admin.ModelConverters
                         model.Marketing = await _paymentMethodMapper.ToModelAsync<MarketingPaymentModel>(dynamic.PaymentMethod);
                         break;
                     case (int) PaymentMethodType.VCWellnessEmployeeProgram:
-                        model.VCWellness = await _paymentMethodMapper.ToModelAsync<VCWellnessEmployeeProgramPaymentModel>(dynamic.PaymentMethod);
+                        model.VCWellness =
+                            await _paymentMethodMapper.ToModelAsync<VCWellnessEmployeeProgramPaymentModel>(dynamic.PaymentMethod);
                         break;
-                    case (int)PaymentMethodType.NoCharge:
+                    case (int) PaymentMethodType.NoCharge:
                         model.NC = await _paymentMethodMapper.ToModelAsync<NCPaymentModel>(dynamic.PaymentMethod);
                         if (model.NC.Address == null)
                         {
-                            model.NC.Address=new AddressModel();
+                            model.NC.Address = new AddressModel();
                         }
                         break;
                 }
@@ -195,37 +199,49 @@ namespace VC.Admin.ModelConverters
                     model.DateShipped = package.ShippedDate;
                     model.ShipVia = $"{package.ShipMethodFreightCarrier} - {package.ShipMethodFreightService}";
                 }
-                model.TrackingEntities = dynamic.OrderShippingPackages.Where(p => !p.POrderType.HasValue).Select(p => new TrackingInvoiceItemModel()
-                {
-                    Sku = p.UPSServiceCode,
-                    ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber),
-                    TrackingNumber = p.TrackingNumber,
-                }).ToList();
+                model.TrackingEntities =
+                    dynamic.OrderShippingPackages.Where(p => !p.POrderType.HasValue).Select(p => new TrackingInvoiceItemModel()
+                    {
+                        Sku = p.UPSServiceCode,
+                        ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber),
+                        TrackingNumber = p.TrackingNumber,
+                    }).ToList();
 
-                package = dynamic.OrderShippingPackages.FirstOrDefault(p => p.POrderType == (int)POrderType.P);
+                package = dynamic.OrderShippingPackages.FirstOrDefault(p => p.POrderType == (int) POrderType.P);
                 if (package != null)
                 {
                     model.PDateShipped = package.ShippedDate;
                     model.PShipVia = $"{package.ShipMethodFreightCarrier} - {package.ShipMethodFreightService}";
                 }
-                model.PTrackingEntities = dynamic.OrderShippingPackages.Where(p => p.POrderType == (int)POrderType.P).Select(p => new TrackingInvoiceItemModel()
-                {
-                    Sku = p.UPSServiceCode,
-                    ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber),
-                    TrackingNumber = p.TrackingNumber,
-                }).ToList();
+                model.PTrackingEntities =
+                    dynamic.OrderShippingPackages.Where(p => p.POrderType == (int) POrderType.P).Select(p => new TrackingInvoiceItemModel()
+                    {
+                        Sku = p.UPSServiceCode,
+                        ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber),
+                        TrackingNumber = p.TrackingNumber,
+                    }).ToList();
 
-                package = dynamic.OrderShippingPackages.FirstOrDefault(p => p.POrderType == (int)POrderType.NP);
+                package = dynamic.OrderShippingPackages.FirstOrDefault(p => p.POrderType == (int) POrderType.NP);
                 if (package != null)
                 {
                     model.NPDateShipped = package.ShippedDate;
                     model.NPShipVia = $"{package.ShipMethodFreightCarrier} - {package.ShipMethodFreightService}";
                 }
-                model.NPTrackingEntities = dynamic.OrderShippingPackages.Where(p => p.POrderType == (int)POrderType.NP).Select(p => new TrackingInvoiceItemModel()
+                model.NPTrackingEntities =
+                    dynamic.OrderShippingPackages.Where(p => p.POrderType == (int) POrderType.NP).Select(p => new TrackingInvoiceItemModel()
+                    {
+                        Sku = p.UPSServiceCode,
+                        ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber),
+                        TrackingNumber = p.TrackingNumber,
+                    }).ToList();
+            }
+
+            if (dynamic.ReviewReasons != null)
+            {
+                model.ReviewReasons = dynamic.ReviewReasons.Select(r => new ReviewReasonViewModel
                 {
-                    Sku = p.UPSServiceCode,
-                    ServiceUrl = _trackingService.GetServiceUrl(p.ShipMethodFreightCarrier, p.TrackingNumber),
-                    TrackingNumber = p.TrackingNumber,
+                    Reasons = r.Reasons,
+                    Name = r.Rule?.Name
                 }).ToList();
             }
         }

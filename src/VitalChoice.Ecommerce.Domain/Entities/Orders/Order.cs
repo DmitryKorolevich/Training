@@ -70,5 +70,7 @@ namespace VitalChoice.Ecommerce.Domain.Entities.Orders
         public ICollection<OrderShippingPackage> OrderShippingPackages { get; set; }
 
         public ICollection<CartAdditionalShipment> CartAdditionalShipments { get; set; }
+
+        public ICollection<OrderReviewReason> ReviewReasons { get; set; }
     }
 }

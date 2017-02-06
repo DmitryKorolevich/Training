@@ -94,5 +94,26 @@
             }, { size: 'sm' });
         };
 
+        $scope.exportItems = function ()
+        {
+            affiliateService.requestAffiliatesReportFile($scope.filter, $scope.refreshTracker)
+                .success(function (result)
+                {
+                    if (result.Success)
+                    {
+                        var id = result.Data;
+                        var url = affiliateService.getAffiliatesReportFile(id, $rootScope.buildNumber);
+                        $rootScope.downloadFileIframe(url);
+                    } else
+                    {
+                        errorHandler(result);
+                    }
+                })
+                .error(function (result)
+                {
+                    errorHandler(result);
+                });
+        };
+
         initialize();
     }]);
