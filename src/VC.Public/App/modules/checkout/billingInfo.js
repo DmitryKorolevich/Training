@@ -61,9 +61,7 @@
 	    //    form.submit();
 	    //}
 	};
-
-	populateCardTypes();
-
+    
 	var cardId = $("#ddCreditCardsSelection").val() === undefined ? $("#hdCreditCard").val() : $("#ddCreditCardsSelection").val();
 	checkCreditCard(cardId);
 
@@ -78,7 +76,6 @@ function changeSelection(selId) {
 		$("#dynamicArea").html(result);
 
 		refreshCountries();
-		populateCardTypes();
 
 		$('.tooltip-v').each(function () {
 			var title = $(this).data("tooltip-title");

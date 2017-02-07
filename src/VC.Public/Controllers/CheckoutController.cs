@@ -61,6 +61,7 @@ using VitalChoice.SharedWeb.Helpers;
 using VitalChoice.Validation.Models;
 using ApiException = VitalChoice.Ecommerce.Domain.Exceptions.ApiException;
 using Microsoft.AspNetCore.Mvc.Internal;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.Ecommerce.Domain;
 using VitalChoice.Ecommerce.Domain.Dynamic;
 using VitalChoice.Ecommerce.Domain.Entities.GiftCertificates;
@@ -380,6 +381,12 @@ namespace VC.Public.Controllers
                                             (int)AddressType.Billing);
                                     cart.Order.PaymentMethod.Address.Id = idAddress;
                                 }
+
+                                if (!DynamicMapper.IsValuesMasked(cart.Order.PaymentMethod))
+                                {
+                                    cart.Order.PaymentMethod.Data.CardType = (int) BusinessHelper.GetCreditCardType(model.CardNumber);
+                                }
+
                                 if (ObjectMapper.IsValuesMasked(typeof(OrderPaymentMethodDynamic),
                                     (string)cart.Order.PaymentMethod.Data.CardNumber,
                                     "CardNumber"))

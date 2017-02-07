@@ -39,7 +39,6 @@ namespace VC.Public.Models.Profile
         [Map]
         public int? ExpirationDateYear { get; set; }
 
-		[Required]
 		[Display(Name = "Card Type")]
 		[Map]
 		public int CardType { get; set; }

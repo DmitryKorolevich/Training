@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using FluentValidation.Validators;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Discounts;
+using VitalChoice.Ecommerce.Domain.Entities.Payment;
 using VitalChoice.Ecommerce.Domain.Entities.Products;
 using VitalChoice.Ecommerce.Domain.Exceptions;
 using VitalChoice.Ecommerce.Domain.Helpers;
@@ -259,6 +260,31 @@ namespace VitalChoice.Business.Helpers
         {
             return idProductType == (int)ProductType.EGс || idProductType == (int)ProductType.Gc ||
                             (disregardStock ?? false) || (stock ?? 0) > 0;
+        }
+
+        public static CreditCardType GetCreditCardType(string cardNumber)
+        {
+            if(string.IsNullOrEmpty(cardNumber))
+                return CreditCardType.MasterCard;
+
+            var firstNumber = cardNumber[0];
+            switch (firstNumber)
+            {
+                case '3':
+                    return CreditCardType.AmericanExpress;
+                    break;
+                case '4':
+                    return CreditCardType.Visa;
+                    break;
+                case '5':
+                    return CreditCardType.MasterCard;
+                    break;
+                case '6':
+                    return CreditCardType.Discover;
+                    break;
+                default:
+                    return CreditCardType.MasterCard;
+            }
         }
     }
 }

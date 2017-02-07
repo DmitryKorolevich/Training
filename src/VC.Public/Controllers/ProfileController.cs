@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using VC.Public.Models.Profile;
+using VitalChoice.Business.Helpers;
 using VitalChoice.Core.GlobalFilters;
 using VitalChoice.Core.Infrastructure;
+using VitalChoice.DynamicData.Base;
 using VitalChoice.DynamicData.Interfaces;
 using VitalChoice.Ecommerce.Domain.Entities.Addresses;
 using VitalChoice.Ecommerce.Domain.Entities.Customers;
@@ -403,9 +405,23 @@ namespace VC.Public.Controllers
                 {
                     model.Default = true;
                 }
+                
+                int? dbCreditCardType = creditCardToUpdate.SafeData.CardType;
 
                 await _customerPaymentMethodConverter.UpdateObjectAsync(model, creditCardToUpdate, (int) PaymentMethodType.CreditCard);
                 await _addressConverter.UpdateObjectAsync(model, creditCardToUpdate.Address, (int) AddressType.Billing);
+
+                if (!DynamicMapper.IsValuesMasked(creditCardToUpdate))
+                {
+                    creditCardToUpdate.Data.CardType = (int)BusinessHelper.GetCreditCardType(model.CardNumber);
+                }
+                else
+                {
+                    if (dbCreditCardType.HasValue)
+                    {
+                        creditCardToUpdate.Data.CardType = dbCreditCardType;
+                    }
+                }
             }
             else
             {
@@ -429,6 +445,8 @@ namespace VC.Public.Controllers
 
                 var newMethod = await _customerPaymentMethodConverter.FromModelAsync(model, (int) PaymentMethodType.CreditCard);
                 newMethod.Address = await _addressConverter.FromModelAsync(model, (int) AddressType.Billing);
+
+                newMethod.Data.CardType = (int)BusinessHelper.GetCreditCardType(model.CardNumber);
 
                 currentCustomer.CustomerPaymentMethods.Add(newMethod);
             }
@@ -783,6 +801,11 @@ namespace VC.Public.Controllers
             await _addressConverter.UpdateObjectAsync(model, order.PaymentMethod.Address, (int)AddressType.Billing);
 
             order.PaymentMethod.Address.Id = addressId;
+
+            if (!DynamicMapper.IsValuesMasked(order.PaymentMethod))
+            {
+                order.PaymentMethod.Data.CardType = (int) BusinessHelper.GetCreditCardType(model.CardNumber);
+            }
 
             await _orderService.UpdateAsync(order);
 

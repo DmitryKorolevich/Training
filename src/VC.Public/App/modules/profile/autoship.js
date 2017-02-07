@@ -126,7 +126,6 @@ function billingDetailsDialog(jSelf, s) {
 			},
 			open: function () {
 				refreshCountries();
-				populateCardTypes();
 				$("#ddCreditCardsSelection").val('0');
 			},
 			buttons: [
