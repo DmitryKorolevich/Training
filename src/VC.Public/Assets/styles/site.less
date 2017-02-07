@@ -1088,7 +1088,7 @@ html {
 }
 
 body {
-    font-family: Arial;//@default-font-family;
+    font-family: @default-font-family;
     font-size: 13px;
     color: #000000;
     background-image: url(/assets/images/bodybg2-low.jpg);
@@ -1185,7 +1185,7 @@ body {
 .header-top-middle {
     float: left;
     position: relative;
-    font-family: Helvetica Neue,Arial,Helvetica,sans-serif;//@default-font-family;
+    font-family: @default-font-family;//Helvetica Neue,Arial,Helvetica,sans-serif;
     font-size: 14px;
     text-align: center;
 
@@ -1599,7 +1599,7 @@ a.see-reviews-link:active {
 .header-top-right {
     float: right;
     margin-top: 12px;
-    font-family: Helvetica Neue,Arial,Helvetica,sans-serif;//@default-font-family;
+    font-family: @default-font-family;//Helvetica Neue,Arial,Helvetica,sans-serif;
 
     a {
         color: #4C4C4C;
@@ -1614,7 +1614,7 @@ a.see-reviews-link:active {
 
     .actions-top-nav {
         font-size: 12px;
-        font-family: Helvetica Neue,Arial,Helvetica,sans-serif;//@default-font-family;
+        font-family: @default-font-family;//Helvetica Neue,Arial,Helvetica,sans-serif;
 
         a {
             margin-right: 17px;
@@ -1714,7 +1714,7 @@ a.block-link:hover {
 
         .actions-top-nav {
             font-size: 11px;
-            font-family: Verdana, Geneva, sans-serif;//@default-font-family;
+            font-family: @default-font-family;//Verdana, Geneva, sans-serif;
 
             a {
                 margin-right: 7px;
@@ -1789,7 +1789,7 @@ a.block-link:hover {
     font-size: 11px;
     padding-left: 14px;
     padding-top: 13px;
-    font-family: Arial, Helvetica, sans-serif;//@default-font-family;
+    font-family: @default-font-family;//Arial, Helvetica, sans-serif;
     height: 12px;
 
     ul {
@@ -1907,7 +1907,7 @@ header .search-area {
                 > span {
                     display: table-cell;
                     vertical-align: middle;
-                    font-family: 'Francois One', Arial, Helvetica, sans-serif;//@default-font-family;
+                    font-family: @default-font-family;//'Francois One', Arial, Helvetica, sans-serif;
                     font-size: 13px;
                     font-weight: normal;
                     line-height: 1.1;
@@ -1998,7 +1998,7 @@ footer {
             width: 136px;
 
             > span {
-                font-family: Verdana, Geneva, sans-serif;//@default-font-family;
+                font-family: @default-font-family;//Verdana, Geneva, sans-serif;
                 font-size: 12px;
                 font-weight: bold;
                 color: #585857;
@@ -2065,7 +2065,7 @@ footer {
     color: #666;
     font-size: 10px;
     font-weight: bold;
-    font-family: Tahoma;//@default-font-family;
+    font-family: @default-font-family;//Tahoma;
     margin-bottom: 20px;
     text-align: center;
 }
@@ -2371,13 +2371,13 @@ footer {
 .col_1 {
     width: 190px;
     font-size: 12px;
-    font-family: Arial, Helvetica, sans-serif;//@default-font-family;
+    font-family: @default-font-family;//Arial, Helvetica, sans-serif;
 }
 
 .col_1right {
     width: 180px;
     font-size: 12px;
-    font-family: Arial, Helvetica, sans-serif;//@default-font-family;
+    font-family: @default-font-family;//Arial, Helvetica, sans-serif;
     display: inline;
     float: left;
     position: relative;
@@ -2420,7 +2420,7 @@ footer {
 }
 
 .top-nav ul p, .top-nav ul h2, .top-nav ul h3, .top-nav ul ul li {
-    font-family: Arial, Helvetica, sans-serif;//@default-font-family;
+    font-family: @default-font-family;//Arial, Helvetica, sans-serif;
     line-height: 21px;
     font-size: 12px;
     text-align: left;
@@ -2552,7 +2552,7 @@ footer {
 
 .ddtitle {
     color: #F34D20;
-    font-family: Arial, Helvetica, sans-serif;//@default-font-family;
+    font-family: @default-font-family;//Arial, Helvetica, sans-serif;
     font-size: 12px;
 }
 
@@ -2776,7 +2776,7 @@ footer {
         color: rgb(51, 51, 51);
         line-height: 14px;
         text-align: left;
-        font-family: Arial;//@default-font-family;
+        font-family: @default-font-family;//Arial;
 
         .bordered-container {
             border: 1px solid #e3e3e3;
@@ -3042,7 +3042,7 @@ footer {
     }
 
     .sub-title {
-        font-family: Trebuchet MS,Verdana,Arial,sans-serif;//@default-font-family;
+        font-family: @default-font-family;//Trebuchet MS,Verdana,Arial,sans-serif;
         color: #e54702;
         font-size: 14px;
         font-weight: bold;
@@ -3050,7 +3050,7 @@ footer {
     }
 
     .captions-block {
-        font-family: Trebuchet MS,Verdana,Arial,sans-serif;//@default-font-family;
+        font-family: @default-font-family;//Trebuchet MS,Verdana,Arial,sans-serif;
         color: #333333;
         font-size: 11px;
         font-weight: bold;
@@ -3615,7 +3615,7 @@ footer {
         }
 
         .description {
-            font-family: 'Trebuchet MS';//@default-font-family;
+            font-family: @default-font-family;//'Trebuchet MS';
             line-height: 120%;
             font-size: 14px;
         }
@@ -4030,7 +4030,7 @@ footer {
 }
 
 .form-regular {
-    font-family: Arial;//@default-font-family;
+    font-family: @default-font-family;//Arial;
     font-size: 13px;
 
     *, :after, :before {
@@ -4422,6 +4422,14 @@ footer {
 
 .margin-right-reasonable {
     margin-right: 20px !important;
+}
+
+.padding-left-zero {
+    padding-left: 0 !important;
+}
+
+.padding-right-zero {
+    padding-right: 0 !important;
 }
 
 .standard-table {
@@ -5011,7 +5019,7 @@ footer {
 .product-reviews-overall {
     color: #4C4C4C;
     margin: 12px 0;
-    font-family: Arial;//@default-font-family;
+    font-family: @default-font-family;//Arial;
     font-size: 13px;
     text-align: left;
 
@@ -5130,7 +5138,7 @@ footer {
 }
 
 .addreview-product-title {
-    font-family: 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;//@default-font-family;
+    font-family: @default-font-family;//'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 15px;
     font-weight: bold;
     display: block;
@@ -5160,7 +5168,7 @@ footer {
 }
 
 .ui-dialog .title {
-    font-family: 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;//@default-font-family;
+    font-family: @default-font-family;//'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 15px;
     font-weight: bold;
     display: block;
@@ -5265,7 +5273,7 @@ a.product-recipe-link {
 }
 
 .ingredients-product-title {
-    font-family: Tahoma;//@default-font-family;
+    font-family: @default-font-family;//Tahoma;
     font-size: 13px;
     line-height: 14px;
     text-align: left;
@@ -5276,7 +5284,7 @@ a.product-recipe-link {
 
 .product-main .tabs-control .ingredients-nutrition-facts {
     line-height: 15.6px;
-    font-family: Arial;//@default-font-family;
+    font-family: @default-font-family;//Arial;
     font-size: 13px;
     color: rgb(76, 76, 76);
     width: 280px;
@@ -5300,41 +5308,41 @@ a.product-recipe-link {
         .facts-static-title {
             font-size: 24px;
             font-weight: bold;
-            font-family: Geneva, Arial, Helvetica, san-serif;//@default-font-family;
+            font-family: @default-font-family;//Geneva, Arial, Helvetica, san-serif;
             display: block;
             margin-bottom: 5px;
         }
 
         .facts-nutrition-title {
             font-weight: bold;
-            font-family: Geneva, Arial, Helvetica, san-serif;//@default-font-family;
+            font-family: @default-font-family;//Geneva, Arial, Helvetica, san-serif;
             display: block;
             margin-bottom: 4px;
             margin-top: 3px;
         }
 
         .facts-nutrition-line {
-            font-family: Geneva, Arial, Helvetica, san-serif;//@default-font-family;
+            font-family: @default-font-family;//Geneva, Arial, Helvetica, san-serif;
             display: block;
             margin-bottom: 4px;
         }
 
         .facts-hint-line {
-            font-family: Verdana, Arial, Helvetica, sans-serif;//@default-font-family;
+            font-family: @default-font-family;//Verdana, Arial, Helvetica, sans-serif;
             font-size: 10px;
         }
 
         .facts-info-subtitle {
-            font-family: Verdana, Arial, Helvetica, sans-serif;//@default-font-family;
+            font-family: @default-font-family;//Verdana, Arial, Helvetica, sans-serif;
             font-weight: bold;
         }
 
         .facts-info-line {
-            font-family: Verdana, Arial, Helvetica, sans-serif;//@default-font-family;
+            font-family: @default-font-family;//Verdana, Arial, Helvetica, sans-serif;
         }
 
         .facts-info-value {
-            font-family: Verdana, Arial, Helvetica, sans-serif;//@default-font-family;
+            font-family: @default-font-family;//Verdana, Arial, Helvetica, sans-serif;
             float: right;
         }
 
@@ -5345,12 +5353,12 @@ a.product-recipe-link {
         .facts-hint-value {
             float: right;
             margin-right: 20px;
-            font-family: Verdana, Arial, Helvetica, sans-serif;//@default-font-family;
+            font-family: @default-font-family;//Verdana, Arial, Helvetica, sans-serif;
             font-size: 10px;
         }
 
         .facts-bottom-hint {
-            font-family: Verdana, Arial, Helvetica, sans-serif;//@default-font-family;
+            font-family: @default-font-family;//Verdana, Arial, Helvetica, sans-serif;
             font-size: 10px;
         }
     }
@@ -5482,7 +5490,7 @@ a.product-recipe-link {
 
 .working-area-holder.full-reviews-page {
     color: #333333;
-    font-family: Arial;//@default-font-family;
+    font-family: @default-font-family;//Arial;
     line-height: 14px;
     padding-bottom: 40px;
 
@@ -5588,7 +5596,7 @@ body.view-cart-background {
 }
 
 .order-info-section-fonts {
-    font-family: Tahoma;//@default-font-family;
+    font-family: @default-font-family;//Tahoma;
     font-size: 12px;
 }
 
@@ -5617,7 +5625,7 @@ body.view-cart-background {
         color: #000000;
 
         .tooltipster-content {
-            font-family: Tahoma;//@default-font-family;
+            font-family: @default-font-family;//Tahoma;
             font-size: 12px;
             padding: 8px 10px;
 
@@ -5675,7 +5683,7 @@ body.view-cart-background {
     }
 
     .form-regular {
-        font-family: Tahoma;//@default-font-family;
+        font-family: @default-font-family;//Tahoma;
         font-size: 12px;
     }
 
@@ -6460,7 +6468,7 @@ h6.cart-head {
 }
 
 .cartlite-proposals-container {
-    font-family: 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;//@default-font-family;
+    font-family: @default-font-family;//'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     padding: 10px 0;
     display: inline-block;
     border-top: 1px solid #CCC;
@@ -6508,7 +6516,7 @@ h6.cart-head {
     text-align: center;
     padding: 10px 0;
     font-size: 16px;
-    font-family: "Trebuchet MS", Verdana, Arial, sans-serif;//@default-font-family;
+    font-family: @default-font-family;//"Trebuchet MS", Verdana, Arial, sans-serif;
 }
 
 .cart-lite-controls {
@@ -6698,7 +6706,7 @@ h6.cart-head {
 .top-menu li a {
     color: #4c4437;
     display: block;
-    font-family: Tahoma;//@default-font-family;
+    font-family: @default-font-family;//tahoma;
     font-size: 20px;
     outline: 0 none;
     text-decoration: none;
@@ -6852,7 +6860,7 @@ h6.cart-head {
 }
 
 .top-menu p, .top-menu h2, .top-menu h3, .top-menu ul li {
-    font-family: Arial,Helvetica,sans-serif;//@default-font-family;
+    font-family: @default-font-family;//Arial,Helvetica,sans-serif;
     font-size: 12px;
     text-align: left;
     text-shadow: 1px 1px 1px #ffffff;
@@ -6947,7 +6955,7 @@ h6.cart-head {
 
 .top-menu .ddtitle {
     color: #4c4437;
-    font-family: Arial,Helvetica,sans-serif;//@default-font-family;
+    font-family: @default-font-family;//Arial,Helvetica,sans-serif;
     font-size: 12px;
     font-weight: bold;
     line-height: 40px;
