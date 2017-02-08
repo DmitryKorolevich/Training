@@ -1,1 +1,0 @@
-powershell -File update-all-runtimes.ps1

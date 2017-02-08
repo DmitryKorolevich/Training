@@ -1,2 +1,0 @@
-& "c:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" "..\VitalChoice.Database.Ecommerce.sqlproj"
-& "c:\Program Files (x86)\MSBuild\12.0\Bin\MSBuild.exe" /t:Publish /p:SqlPublishProfilePath="Azure.publish.xml" "..\VitalChoice.Database.Ecommerce.sqlproj"

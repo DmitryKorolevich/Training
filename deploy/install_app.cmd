@@ -1,1 +1,0 @@
-powershell -ExecutionPolicy unrestricted -File live_deploy.ps1 >> install.log

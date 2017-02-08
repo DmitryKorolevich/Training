@@ -1,1 +1,0 @@
-powershell -File ".\run-all-published.ps1"
