@@ -245,7 +245,7 @@ namespace VC.Public.Controllers
                     return RedirectToAction("AddUpdateBillingAddress");
                 }
 
-                if (cart.Order.ShippingAddress?.IdCountry == null)
+                if (cart.Order.ShippingAddress?.SafeData?.FirstName == null)
                 {
                     return RedirectToAction("AddUpdateShippingMethod");
                 }
@@ -318,7 +318,7 @@ namespace VC.Public.Controllers
                 }
 
                 var cart = await GetCurrentCart(withMultipleShipmentsService: true);
-                if (cart.Order?.ShippingAddress?.IdCountry == null)
+                if (cart.Order?.ShippingAddress?.SafeData?.FirstName == null)
                 {
                     return RedirectToAction("AddUpdateShippingMethod");
                 }
@@ -954,7 +954,7 @@ namespace VC.Public.Controllers
                 return GetJsonRedirect<MultipleOrdersReviewModel>(Url.Action("EmptyCart", "Cart"));
             }
             var cart = await GetCurrentCart(withMultipleShipmentsService: true);
-            if (cart.Order.ShippingAddress?.IdCountry == null)
+            if (cart.Order.ShippingAddress?.SafeData?.FirstName == null)
             {
                 return GetJsonRedirect<MultipleOrdersReviewModel>(Url.Action("AddUpdateShippingMethod", "Checkout"));
             }

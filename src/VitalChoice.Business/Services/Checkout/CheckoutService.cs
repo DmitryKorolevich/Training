@@ -634,9 +634,9 @@ namespace VitalChoice.Business.Services.Checkout
                             }).ToList() ?? new List<SkuOrdered>();
             newOrder.ShippingAddress = _addressService.Mapper.CreatePrototype((int) AddressType.Shipping);
             newOrder.ShippingAddress.IdCountry = (await _countryService.GetCountriesAsync(new CountryFilter
-                                                 {
-                                                     CountryCode = "US"
-                                                 })).FirstOrDefault()?.Id ?? 0;
+            {
+                CountryCode = "US"
+            })).FirstOrDefault()?.Id ?? 0;
             if (cart.ShipDelayDate != null)
             {
                 newOrder.Data.ShipDelayType = ShipDelayType.EntireOrder;
